@@ -54,7 +54,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args, PyObject *ke
     const char *pszImageExt = "kea";
     int dataType = 9; // Default to 32 bit float
     PyObject *pImageFilterCmds;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO|ssi:applyfilters", kwlist, &pszInputImage, &pszOutputImageBase, &pImageFilterCmds, &pszImageFormat, &pszImageExt, &dataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO|ssi:apply_filters", kwlist, &pszInputImage, &pszOutputImageBase, &pImageFilterCmds, &pszImageFormat, &pszImageExt, &dataType))
     {
         return nullptr;
     }
@@ -219,7 +219,7 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
     const char *pszImageFormat = "KEA";
     const char *pszImageExt = "kea";
     int dataType = 9; // Default to 32 bit float
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ss|ssi:LeungMalikFilterBank", kwlist, &pszInputImage, &pszOutputImageBase, &pszImageFormat, &pszImageExt, &dataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ss|ssi:leung_malik_filter_bank", kwlist, &pszInputImage, &pszOutputImageBase, &pszImageFormat, &pszImageExt, &dataType))
     {
         return nullptr;
     }
@@ -256,8 +256,8 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
 
 // Our list of functions in this module
 static PyMethodDef ImageFilterMethods[] = {
-{"applyfilters", (PyCFunction)ImageFilter_Filter, METH_VARARGS | METH_KEYWORDS,
-"imagefilter.applyfilters(input_img, out_img_base, image_filters, gdalformat, out_img_ext, datatype)\n"
+{"apply_filters", (PyCFunction)ImageFilter_Filter, METH_VARARGS | METH_KEYWORDS,
+"imagefilter.apply_filters(input_img, out_img_base, image_filters, gdalformat, out_img_ext, datatype)\n"
 "Filters images\n"
 "\n"
 "Where:\n"
@@ -309,10 +309,10 @@ static PyMethodDef ImageFilterMethods[] = {
 "   filters.append(imagefilter.FilterParameters(filterType = 'NormVarLn', fileEnding = 'normvarln', size=3) )\n"
 "   filters.append(imagefilter.FilterParameters(filterType = 'TextureVar', fileEnding = 'texturevar', size=3) )\n"
 "   # Apply filters\n"
-"   imagefilter.applyfilters(inputImage, outputImageBase, filters, gdalformat, outExt, datatype)\n"
+"   imagefilter.apply_filters(inputImage, outputImageBase, filters, gdalformat, outExt, datatype)\n"
 "\n"},
 
-{"LeungMalikFilterBank", (PyCFunction)ImageFilter_LeungMalikFilterBank, METH_VARARGS | METH_KEYWORDS,
+{"leung_malik_filter_bank", (PyCFunction)ImageFilter_LeungMalikFilterBank, METH_VARARGS | METH_KEYWORDS,
 "imagefilter.(input_img, out_img_base, gdalformat, out_img_ext, datatype)\n"
 "Implements the Leung-Malik filter bank described in:\n"
 "Leung, T., Malik, J., 2001. Representing and recognizing the visual appearance of materials using three-dimensional textons.\n"
@@ -334,7 +334,7 @@ static PyMethodDef ImageFilterMethods[] = {
 "   gdalformat = 'KEA'\n"
 "   outExt = 'kea'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
-"   imagefilter.LeungMalikFilterBank(inputImage, outputImageBase, gdalformat, outExt, datatype)\n"
+"   imagefilter.leung_malik_filter_bank(inputImage, outputImageBase, gdalformat, outExt, datatype)\n"
 "\n"},
 
     {nullptr}        /* Sentinel */

@@ -45,7 +45,7 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
     static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO:landsat2Radiance", kwlist, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO:landsat_to_radiance", kwlist, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
         return nullptr;
     }
@@ -187,7 +187,7 @@ static PyObject *ImageCalibration_landsat2RadianceMultiAdd(PyObject *self, PyObj
     static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO:landsat2RadianceMultiAdd", kwlist, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO:landsat_to_radiance_multi_add", kwlist, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
         return nullptr;
     }
@@ -303,7 +303,7 @@ static PyObject *ImageCalibration_Radiance2TOARefl(PyObject *self, PyObject *arg
     int nDataType, year, month, day;
     float scaleFactor, solarZenith;
     PyObject *pSolarIrrObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiifO:radiance2TOARefl", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &year, &month, &day, &solarZenith, &pSolarIrrObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiifO:radiance_to_toa_refl", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &year, &month, &day, &solarZenith, &pSolarIrrObj))
     {
         return nullptr;
     }
@@ -362,7 +362,7 @@ static PyObject *ImageCalibration_TOARefl2Radiance(PyObject *self, PyObject *arg
     float scaleFactor, solarZenith, solarDistance;
     PyObject *pSolarIrrObj;
     PyObject *pInputImgsObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OssifffO:toaRefl2Radiance", kwlist, &pInputImgsObj, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &solarDistance, &solarZenith, &pSolarIrrObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OssifffO:toa_refl_to_radiance", kwlist, &pInputImgsObj, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &solarDistance, &solarZenith, &pSolarIrrObj))
     {
         return nullptr;
     }
@@ -452,7 +452,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, 
     int nDataType, useNoDataVal;
     float scaleFactor, noDataVal;
     PyObject *pBandValuesObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiffiO:apply6SCoeffSingleParam", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pBandValuesObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiffiO:apply_6s_coeff_single_param", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pBandValuesObj))
     {
         return nullptr;
     }
@@ -559,7 +559,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
     int nDataType, useNoDataVal;
     float scaleFactor, noDataVal;
     PyObject *pLUTObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssiffiO:apply6SCoeffElevLUTParam", kwlist, &pszInputRadFile, &pszInputDEMFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pLUTObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssiffiO:apply_6s_coeff_elev_lut_param", kwlist, &pszInputRadFile, &pszInputDEMFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pLUTObj))
     {
         return nullptr;
     }
@@ -702,7 +702,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
     int nDataType, useNoDataVal;
     float scaleFactor, noDataVal;
     PyObject *pLUTObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssiffiO:apply6SCoeffElevAOTLUTParam", kwlist, &pszInputRadFile, &pszInputDEMFile, &pszInputAOTFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pLUTObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssiffiO:apply_6s_coeff_elev_aot_lut_param", kwlist, &pszInputRadFile, &pszInputDEMFile, &pszInputAOTFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pLUTObj))
     {
         return nullptr;
     }
@@ -891,7 +891,7 @@ static PyObject *ImageCalibration_ApplySubtractOffsets(PyObject *self, PyObject 
     int nDataType, useNoDataValInt, nonNegativeInt;
     float noDataVal, darkObjReflVal;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssiiiff:applySubtractOffsets", kwlist, &pszInputFile, &pszInputOffsetsFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal, &darkObjReflVal))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssiiiff:apply_subtract_offsets", kwlist, &pszInputFile, &pszInputOffsetsFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal, &darkObjReflVal))
     {
         return nullptr;
     }
@@ -921,7 +921,7 @@ static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyO
     float noDataVal, darkObjReflVal;
     PyObject *pImageOffsetsObj;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiiiffO:applySubtractSingleOffsets", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal, &darkObjReflVal, &pImageOffsetsObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiiiffO:apply_subtract_single_offsets", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal, &darkObjReflVal, &pImageOffsetsObj))
     {
         return nullptr;
     }
@@ -976,7 +976,7 @@ static PyObject *ImageCalibration_SaturatedPixelsMask(PyObject *self, PyObject *
     static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO:saturatedPixelsMask", kwlist, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO:saturated_pixels_mask", kwlist, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
         return nullptr;
     }
@@ -1074,7 +1074,7 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
     int nDataType;
     float scaleFactor;
     PyObject *pBandDefnObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifO:landsatThermalRad2Brightness", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &pBandDefnObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifO:landsat_thermal_rad_to_brightness", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &pBandDefnObj))
     {
         return nullptr;
     }
@@ -1170,7 +1170,7 @@ static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject 
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:worldview2ToRadiance", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:worldview2_to_radiance", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
         return nullptr;
     }
@@ -1266,7 +1266,7 @@ static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:spot5ToRadiance", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:spot5_to_radiance", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
         return nullptr;
     }
@@ -1368,7 +1368,7 @@ static PyObject *ImageCalibration_calcNadirImgViewAngle(PyObject *self, PyObject
     float sateAltitude = 0.0;
     const char *pszMinXXCol, *pszMinXYCol, *pszMaxXXCol, *pszMaxXYCol, *pszMinYXCol, *pszMinYYCol, *pszMaxYXCol, *pszMaxYYCol;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssfssssssss:calcNadirImgViewAngle", kwlist, &pszImgFootprint, &pszOutViewAngleImg, &pszGDALFormat, &sateAltitude, &pszMinXXCol, &pszMinXYCol, &pszMaxXXCol, &pszMaxXYCol, &pszMinYXCol, &pszMinYYCol, &pszMaxYXCol, &pszMaxYYCol))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssfssssssss:calc_nadir_img_view_angle", kwlist, &pszImgFootprint, &pszOutViewAngleImg, &pszGDALFormat, &sateAltitude, &pszMinXXCol, &pszMinXYCol, &pszMaxXXCol, &pszMaxXYCol, &pszMinYXCol, &pszMinYYCol, &pszMaxYXCol, &pszMaxYYCol))
     {
         return nullptr;
     }
@@ -1397,7 +1397,7 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
     const char *pszInputDataMaskImg, *pszInputDEMFile, *pszInputIncidenceAngleImg, *pszInputSlopeImg, *pszSrefInputImage, *pszShadowMaskImg, *pszOutputFile, *pszGDALFormat;
     float solarZenith, reflScaleFactor = 0.0;
     PyObject *pLUTObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssssssffO:calcIrradianceImageElevLUT", kwlist, &pszInputDataMaskImg, &pszInputDEMFile,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssssssffO:calc_irradiance_img_elev_lut", kwlist, &pszInputDataMaskImg, &pszInputDEMFile,
                                      &pszInputIncidenceAngleImg, &pszInputSlopeImg, &pszSrefInputImage, &pszShadowMaskImg, &pszOutputFile,
                                      &pszGDALFormat, &solarZenith, &reflScaleFactor, &pLUTObj))
     {
@@ -1554,7 +1554,7 @@ static PyObject *ImageCalibration_CalcStandardisedReflectanceSD2010(PyObject *se
     float outIncidenceAngle = 45;
     float outExitanceAngle = 45;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssssffff:calcStandardisedReflectanceSD2010", kwlist, &pszInputDataMaskImg, &pszSrefInputImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssssffff:calc_standardised_reflectance_sd2010", kwlist, &pszInputDataMaskImg, &pszSrefInputImage,
                                      &pszInputSolarIrradiance, &pszInputIncidenceAngleImg, &pszInputExitanceAngleImg, &pszOutputFile,
                                      &pszGDALFormat, &reflScaleFactor, &brdfBeta, &outIncidenceAngle, &outExitanceAngle))
     {
@@ -1579,7 +1579,7 @@ static PyObject *ImageCalibration_GetJulianDay(PyObject *self, PyObject *args, P
     static char *kwlist[] = {RSGIS_PY_C_TEXT("year"), RSGIS_PY_C_TEXT("month"),
                              RSGIS_PY_C_TEXT("day"),  nullptr};
     unsigned int year, month, day;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "III:getJulianDay", kwlist, &year, &month, &day))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "III:get_julian_day", kwlist, &year, &month, &day))
     {
         return nullptr;
     }
@@ -1602,7 +1602,7 @@ static PyObject *ImageCalibration_CalcSolarDistance(PyObject *self, PyObject *ar
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("julian_day"),  nullptr};
     unsigned int julianDay;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "I:calcSolarDistance", kwlist, &julianDay))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "I:calc_solar_distance", kwlist, &julianDay))
     {
         return nullptr;
     }
@@ -1639,7 +1639,7 @@ static PyObject *ImageCalibration_calcCloudShadowMask(PyObject *self, PyObject *
     int rmTmpImages = true;
     
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssisfssffff|i:calcCloudShadowMask", kwlist, &pszInputCloudMaskFile, &pszInputReflFile,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssisfssffff|i:calc_cloud_shadow_mask", kwlist, &pszInputCloudMaskFile, &pszInputReflFile,
                                      &pszValidAreaImg, &pszOutputFile, &darkImgBand, &pszGDALFormat, &scaleFactor, &pszTmpImgsBase,
                                      &pszTmpImgsFileExt, &sunAz, &sunZen, &senAz, &senZen, &rmTmpImages))
     {
@@ -1662,8 +1662,8 @@ static PyObject *ImageCalibration_calcCloudShadowMask(PyObject *self, PyObject *
 
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
-{"landsat2Radiance", (PyCFunction)ImageCalibration_landsat2Radiance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.landsat2Radiance(output_img, gdalformat, bandDefnSeq)\n"
+{"landsat_to_radiance", (PyCFunction)ImageCalibration_landsat2Radiance, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.landsat_to_radiance(output_img, gdalformat, bandDefnSeq)\n"
 "Converts Landsat DN values to at sensor radiance.\n"
 "\n"
 "Where:\n"
@@ -1680,8 +1680,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "        * qCalMax - qCalMax value from Landsat header.\n"
 "\n"},
 
-{"landsat2RadianceMultiAdd", (PyCFunction)ImageCalibration_landsat2RadianceMultiAdd, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.landsat2RadianceMultiAdd(output_img, gdalformat, bandDefnSeq)\n"
+{"landsat_to_radiance_multi_add", (PyCFunction)ImageCalibration_landsat2RadianceMultiAdd, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.landsat_to_radiance_multi_add(output_img, gdalformat, bandDefnSeq)\n"
 "Converts Landsat DN values to at sensor radiance.\n"
 "\n"
 "Where:\n"
@@ -1696,8 +1696,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "        * multiVal - RADIANCE_MULT value from Landsat header.\n"
 "\n"},
 
-{"radiance2TOARefl", (PyCFunction)ImageCalibration_Radiance2TOARefl, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.radiance2TOARefl(input_img, output_img, gdalformat, datatype, scale_factor, year, month, day, solar_zenith, solar_irradiance)\n"
+{"radiance_to_toa_refl", (PyCFunction)ImageCalibration_Radiance2TOARefl, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.radiance_to_toa_refl(input_img, output_img, gdalformat, datatype, scale_factor, year, month, day, solar_zenith, solar_irradiance)\n"
 "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
 "\n"
 "Where:\n"
@@ -1714,10 +1714,10 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param solar_irradiance: is a sequence of floats each with the name \'irradiance\' which is in order of the bands in the input image.\n"
 "\n"},
 
-{"toaRefl2Radiance", (PyCFunction)ImageCalibration_TOARefl2Radiance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.toaRefl2Radiance(input_imgs, output_img, gdalformat, datatype, scale_factor, solar_dist, solar_zenith, solar_irradiance)\n"
+{"toa_refl_to_radiance", (PyCFunction)ImageCalibration_TOARefl2Radiance, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.toa_refl_to_radiance(input_imgs, output_img, gdalformat, datatype, scale_factor, solar_dist, solar_zenith, solar_irradiance)\n"
 "Converts at sensor (Top of Atmosphere; TOA) reflectance values to at sensor radiance.\n"
-"This is the inverse of imagecalibration.radiance2TOARefl().\n"
+"This is the inverse of imagecalibration.radiance_to_toa_refl().\n"
 "\n"
 "Where:\n"
 "\n"
@@ -1726,13 +1726,13 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 ":param scale_factor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
-":param solar_dist: is a float specifying the solar-earth distance (see imagecalibration.calcSolarDistance).\n"
+":param solar_dist: is a float specifying the solar-earth distance (see imagecalibration.calc_solar_distance).\n"
 ":param solar_zenith: is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
 ":param solar_irradiance: is a sequence of floats each with the name \'irradiance\' (ESUN) which is in order of the bands in the input image.\n"
 "\n"},
 
-{"apply6SCoeffSingleParam", (PyCFunction)ImageCalibration_Apply6SCoefficentsSingleParam, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.apply6SCoeffSingleParam(input_img, output_img, gdalformat, datatype, scale_factor, no_data_val, use_no_data, band_coeffs)\n"
+{"apply_6s_coeff_single_param", (PyCFunction)ImageCalibration_Apply6SCoefficentsSingleParam, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.apply_6s_coeff_single_param(input_img, output_img, gdalformat, datatype, scale_factor, no_data_val, use_no_data, band_coeffs)\n"
 "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX).\n"
 "\n"
 "Where:\n"
@@ -1751,8 +1751,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "                    * cX - A float for the cX coefficient.\n"
 "\n"},
 
-{"apply6SCoeffElevLUTParam", (PyCFunction)ImageCalibration_Apply6SCoefficentsElevLUTParam, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.apply6SCoeffElevLUTParam(in_rad_img, in_dem_img, output_img, gdalformat, datatype, scale_factor, no_data_val, use_no_data, band_lut_coeffs)\n"
+{"apply_6s_coeff_elev_lut_param", (PyCFunction)ImageCalibration_Apply6SCoefficentsElevLUTParam, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.apply_6s_coeff_elev_lut_param(in_rad_img, in_dem_img, output_img, gdalformat, datatype, scale_factor, no_data_val, use_no_data, band_lut_coeffs)\n"
 "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
 "\n"
 "Where:\n"
@@ -1774,8 +1774,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "                        * \'cX\' - A float for the cX coefficient.\n"
 "\n"},
 
-{"apply6SCoeffElevAOTLUTParam", (PyCFunction)ImageCalibration_Apply6SCoefficentsElevAOTLUTParam, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.apply6SCoeffElevLUTParam(in_rad_img, in_dem_img, in_aot_img, output_img, gdalformat, datatype, scale_factor, no_data_val, use_no_data, band_lut_coeffs)\n"
+{"apply_6s_coeff_elev_aot_lut_param", (PyCFunction)ImageCalibration_Apply6SCoefficentsElevAOTLUTParam, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.apply_6s_coeff_elev_aot_lut_param(in_rad_img, in_dem_img, in_aot_img, output_img, gdalformat, datatype, scale_factor, no_data_val, use_no_data, band_lut_coeffs)\n"
 "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
 "\n"
 "Where:\n"
@@ -1799,8 +1799,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "                            * \'cX\' - A float for the cX coefficient.\n"
 "\n"},
 
-{"applySubtractSingleOffsets", (PyCFunction)ImageCalibration_ApplySubtractSingleOffsets, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.applySubtractSingleOffsets(input_img, output_img, gdalformat, datatype, non_neg_int, use_no_data, no_data_val, dark_refl_val, band_offsets)\n"
+{"apply_subtract_single_offsets", (PyCFunction)ImageCalibration_ApplySubtractSingleOffsets, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.apply_subtract_single_offsets(input_img, output_img, gdalformat, datatype, non_neg_int, use_no_data, no_data_val, dark_refl_val, band_offsets)\n"
 "This function performs a dark object subtraction (DOS) using a set of defined offsets for retriving surface reflectance.\n"
 "\n"
 "Where:\n"
@@ -1816,8 +1816,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param band_offsets: is a list of offset values to be applied to the input image bands (specified with keyword 'offset')."
 "\n"},
 
-{"applySubtractOffsets", (PyCFunction)ImageCalibration_ApplySubtractOffsets, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.applySubtractOffsets(input_img, in_offs_img, output_img, gdalformat, datatype, non_neg_int, use_no_data, no_data_val, dark_refl_val)\n"
+{"apply_subtract_offsets", (PyCFunction)ImageCalibration_ApplySubtractOffsets, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.apply_subtract_offsets(input_img, in_offs_img, output_img, gdalformat, datatype, non_neg_int, use_no_data, no_data_val, dark_refl_val)\n"
 "This function performs a dark obejct subtraction (DOS) using a set of defined offsets for retriving surface reflectance.\n"
 "\n"
 "Where:\n"
@@ -1833,8 +1833,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param dark_refl_val: is a float specifying the minimum value within the reflectance value used for the dark targets used for the subtraction"
 "\n"},
 
-{"saturatedPixelsMask", (PyCFunction)ImageCalibration_SaturatedPixelsMask, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.saturatedPixelsMask(output_img, gdalformat, band_defs)\n"
+{"saturated_pixels_mask", (PyCFunction)ImageCalibration_SaturatedPixelsMask, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.saturated_pixels_mask(output_img, gdalformat, band_defs)\n"
 "Creates a mask of the saturated image pixels on a per band basis.\n"
 "\n"
 "Where:\n"
@@ -1848,8 +1848,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "        *  satVal - Saturation value for the image band.\n"
 "\n"},
 
-{"landsatThermalRad2Brightness", (PyCFunction)ImageCalibration_landsatThermalRad2Brightness, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.landsatThermalRad2Brightness(input_img, output_img, gdalformat, datatype, scale_factor, band_defs)\n"
+{"landsat_thermal_rad_to_brightness", (PyCFunction)ImageCalibration_landsatThermalRad2Brightness, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.landsat_thermal_rad_to_brightness(input_img, output_img, gdalformat, datatype, scale_factor, band_defs)\n"
 "Converts Landsat TM thermal radiation to degrees celsius for at sensor temperature.\n"
 "\n"
 "Where:\n"
@@ -1866,8 +1866,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "        *  k2 - k2 coefficient from Landsat header.\n"
 "\n"},
     
-{"worldview2ToRadiance", (PyCFunction)ImageCalibration_worldview2ToRadiance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.worldview2ToRadiance(input_img, output_img, gdalformat, band_defs)\n"
+{"worldview2_to_radiance", (PyCFunction)ImageCalibration_worldview2ToRadiance, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.worldview2_to_radiance(input_img, output_img, gdalformat, band_defs)\n"
 "Converts WorldView2 DN values to at sensor radiance.\n"
 "\n"
 "Where:\n"
@@ -1882,8 +1882,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "                        * effBandWidth - EFFECTIVEBANDWIDTH value from WorldView2 XML header.\n"
 "\n"},
 
-{"spot5ToRadiance", (PyCFunction)ImageCalibration_spot5ToRadiance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.spot5ToRadiance(input_img, output_img, gdalformat, band_defs)\n"
+{"spot5_to_radiance", (PyCFunction)ImageCalibration_spot5ToRadiance, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.spot5_to_radiance(input_img, output_img, gdalformat, band_defs)\n"
 "Converts WorldView2 DN values to at sensor radiance.\n"
 "\n"
 "Where:\n"
@@ -1898,8 +1898,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "                        * bias - PHYSICAL_BIAS value from SPOT5 XML header.\n"
 "\n"},
 
-{"calcNadirImgViewAngle", (PyCFunction)ImageCalibration_calcNadirImgViewAngle, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcNadirImgViewAngle(input_img, output_img, gdalformat, altitude, min_xx_col, min_xy_col, max_xx_col, max_xy_col, min_yx_col, min_yy_col, max_yx_col, max_yy_col)\n"
+{"calc_nadir_img_view_angle", (PyCFunction)ImageCalibration_calcNadirImgViewAngle, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.calc_nadir_img_view_angle(input_img, output_img, gdalformat, altitude, min_xx_col, min_xy_col, max_xx_col, max_xy_col, min_yx_col, min_yy_col, max_yx_col, max_yy_col)\n"
 "Calculate the sensor view angle for each pixel for a nadir sensor. Need to provide the satellite altitude in metres, for Landsat this is 705000.0. \n"
 "\n"
 "Where:\n"
@@ -1918,8 +1918,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param max_yy_col: is a string for the maxYY column in the RAT.\n"
 "\n"},
 
-{"calcIrradianceImageElevLUT", (PyCFunction)ImageCalibration_CalcIrradianceElevLUT, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcIrradianceImageElevLUT(in_data_msk_img, in_dem_img, in_inc_angle_img, in_slope_img, in_sref_img, in_shadow_img, output_img, gdalformat, solar_zenith, scale_factor, coeff_lut)\n"
+{"calc_irradiance_img_elev_lut", (PyCFunction)ImageCalibration_CalcIrradianceElevLUT, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.calc_irradiance_img_elev_lut(in_data_msk_img, in_dem_img, in_inc_angle_img, in_slope_img, in_sref_img, in_shadow_img, output_img, gdalformat, solar_zenith, scale_factor, coeff_lut)\n"
 "Calculate the incoming irradiance (Direct, Diffuse, Environment and Total) for sloped surfaces (Eq 1. Shepherd and Dymond 2010).\n"
 "\n"
 "Where:\n"
@@ -1943,15 +1943,15 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "                        * \'EnvIrr\' - A float for the environment irradiance for this band and elevation (i.e., as provided by 6S).\n"
 "\n"},
 
-{"calcStandardisedReflectanceSD2010", (PyCFunction)ImageCalibration_CalcStandardisedReflectanceSD2010, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcStandardisedReflectanceSD2010(in_data_msk_img, in_sref_img, in_solar_irr_img, in_inc_angle_img, in_exit_angle_img, output_img, gdalformat, scale_factor, brdf_beta, out_inc_angle, out_exit_angle)\n"
+{"calc_standardised_reflectance_sd2010", (PyCFunction)ImageCalibration_CalcStandardisedReflectanceSD2010, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.calc_standardised_reflectance_sd2010(in_data_msk_img, in_sref_img, in_solar_irr_img, in_inc_angle_img, in_exit_angle_img, output_img, gdalformat, scale_factor, brdf_beta, out_inc_angle, out_exit_angle)\n"
 "Calculate standardised reflectance, with respect to solar and view angles, as defined by Shepherd and Dymond (2010)\n"
 "\n"
 "Where:\n"
 "\n"
 ":param in_data_msk_img: is a string containing the name and path to a binary mask specifying the region to be calculated (1 = True)\n"
 ":param in_sref_img: is a surface reflectance image\n"
-":param in_solar_irr_img: is the solar irradiance for each band of the SREF image. The image will have four times the number of bands as the SREF with Direct, Diffuse, Environment and Total irradiance for each (generated by imagecalibration.calcIrradianceImageElevLUT).\n"
+":param in_solar_irr_img: is the solar irradiance for each band of the SREF image. The image will have four times the number of bands as the SREF with Direct, Diffuse, Environment and Total irradiance for each (generated by imagecalibration.calc_irradiance_img_elev_lut).\n"
 ":param in_inc_angle_img: is a string containing the name and path to a file with the incidence angle for each pixel.\n"
 ":param in_exit_angle_img: is a string containing the name and path to a file with the existance angle for each pixel.\n"
 ":param output_img: is a string containing the name of the output image file\n"
@@ -1962,8 +1962,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param out_exit_angle: is the exitance angle to which the output image is standardised to (Recommend: 0).\n"
 "\n"},
     
-{"getJulianDay", (PyCFunction)ImageCalibration_GetJulianDay, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.getJulianDay(year, month, day)\n"
+{"get_julian_day", (PyCFunction)ImageCalibration_GetJulianDay, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.get_julian_day(year, month, day)\n"
 "Calculates the julian day for the input date.\n"
 "\n"
 "Where:\n"
@@ -1975,8 +1975,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":return: julianDay - float\n"
 "\n"},
     
-{"calcSolarDistance", (PyCFunction)ImageCalibration_CalcSolarDistance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcSolarDistance(julian_day)\n"
+{"calc_solar_distance", (PyCFunction)ImageCalibration_CalcSolarDistance, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.calc_solar_distance(julian_day)\n"
 "Calculates the earth-solar distance from the given julian day.\n"
 "\n"
 "Where:\n"
@@ -1987,8 +1987,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
     
-{"calcCloudShadowMask", (PyCFunction)ImageCalibration_calcCloudShadowMask, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcCloudShadowMask(in_cld_msk_img, in_refl_img, in_vld_img, output_img, dark_band, gdalformat, scale_factor, tmp_img_base, tmp_img_ext, solar_azimuth, solar_zenith, sensor_azimuth, sensor_zenith, rm_tmp_imgs)\n"
+{"calc_cloud_shadow_mask", (PyCFunction)ImageCalibration_calcCloudShadowMask, METH_VARARGS | METH_KEYWORDS,
+"imagecalibration.calc_cloud_shadow_mask(in_cld_msk_img, in_refl_img, in_vld_img, output_img, dark_band, gdalformat, scale_factor, tmp_img_base, tmp_img_ext, solar_azimuth, solar_zenith, sensor_azimuth, sensor_zenith, rm_tmp_imgs)\n"
 "Calculate a cloud shadow mask from an inputted cloud mask.\n"
 "Where:\n"
 "\n"

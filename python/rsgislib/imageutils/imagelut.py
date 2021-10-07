@@ -127,7 +127,7 @@ def getRasterLyr(scn_bbox, lutdbfile, lyrname, tmp_path):
 
     fileListLUT = rsgislib.vectorutils.getAttLstSelectBBoxFeats(lutdbfile, lyrname, ['path', 'filename'], scn_bbox)
 
-    imgbase = "imglyr_{}".format(rsgislib.tools.utils.uidGenerator())
+    imgbase = "imglyr_{}".format(rsgislib.tools.utils.uid_generator())
     # if number of scenes available is > 0 then create VRT
     if len(fileListLUT) > 1:
         imgs = []

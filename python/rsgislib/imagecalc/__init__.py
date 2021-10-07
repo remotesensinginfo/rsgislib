@@ -19,7 +19,7 @@ gdal.UseExceptions()
 # define our own classes
 class BandDefn(object):
     """
-    Create a list of these objects to pass to the bandMath function
+    Create a list of these objects to pass to the band_math function
     as the 'bands' parameter.
     """
 
@@ -68,7 +68,7 @@ class StatsSummary:
 
 class ImageBandRescale:
     """
-    Data structure for rescaling information for rescaleImgPxlVals function.
+    Data structure for rescaling information for rescale_img_pxl_vals function.
     :param band: specified image band (band numbering starts at 1).
     :param in_min: the input image band minimum value for rescaling.
     :param in_max: the input image band maximum value for rescaling.
@@ -131,7 +131,7 @@ class ImageBandRescale:
         return str_val
 
 
-def calcDist2ImgVals(
+def calc_dist_to_img_vals(
     input_img,
     output_img,
     pxl_vals,
@@ -170,7 +170,7 @@ def calcDist2ImgVals(
         dist2Clouds = 'LS5TM_20110701_lat52lon421_r24p204_distclouds.kea'
         # Pixel value 1 == Clouds
         # Pixel value 2 == Cloud Shadows
-        rsgislib.imagecalc.calcDist2ImgVals(cloudsImg, dist2Clouds, pxl_vals=[1,2])
+        rsgislib.imagecalc.calc_dist_to_img_vals(cloudsImg, dist2Clouds, pxl_vals=[1,2])
     """
     # Check gdal is available
     import rsgislib.imageutils
@@ -213,7 +213,7 @@ def calcDist2ImgVals(
 
     valsImgDS = gdal.Open(input_img, gdal.GA_ReadOnly)
     valsImgBand = valsImgDS.GetRasterBand(img_band)
-    rsgislib.imageutils.createCopyImage(
+    rsgislib.imageutils.create_copy_img(
         input_img, output_img, 1, no_data_val, gdalformat, rsgislib.TYPE_32FLOAT
     )
     distImgDS = gdal.Open(output_img, gdal.GA_Update)
@@ -246,7 +246,7 @@ def _computeProximityArrArgsFunc(argVals):
         callback = gdal.TermProgress
     classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
     classImgBand = classImgDS.GetRasterBand(argVals[5])
-    rsgislib.imageutils.createCopyImage(
+    rsgislib.imageutils.create_copy_img(
         argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT
     )
     distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
@@ -257,7 +257,7 @@ def _computeProximityArrArgsFunc(argVals):
     classImgBand = None
     classImgDS = None
 
-def calcDist2ImgValsTiled(
+def calc_dist_to_img_vals_tiled(
     input_img,
     output_img,
     pxl_vals,
@@ -305,7 +305,7 @@ def calcDist2ImgValsTiled(
         dist2Clouds = 'LS5TM_20110701_lat52lon421_r24p204_distclouds.kea'
         # Pixel value 1 == Clouds
         # Pixel value 2 == Cloud Shadows
-        rsgislib.imagecalc.calcDist2ImgValsTiled(cloudsImg, dist2Clouds, pxl_vals=[1,2])
+        rsgislib.imagecalc.calc_dist_to_img_vals_tiled(cloudsImg, dist2Clouds, pxl_vals=[1,2])
 
     """
 
@@ -332,9 +332,9 @@ def calcDist2ImgValsTiled(
     if n_cores <= 0:
         n_cores = rsgislib.tools.utils.numProcessCores()
 
-    uid = rsgislib.tools.utils.uidGenerator()
+    uid = rsgislib.tools.utils.uid_generator()
 
-    xRes, yRes = rsgislib.imageutils.getImageRes(input_img)
+    xRes, yRes = rsgislib.imageutils.get_image_res(input_img)
     if unit_geo:
         xMaxDistPxl = math.ceil(max_dist / xRes) + 10
         yMaxDistPxl = math.ceil(max_dist / yRes) + 10
@@ -353,7 +353,7 @@ def calcDist2ImgValsTiled(
         imgTilesDIRPresent = False
 
     imgTileBase = os.path.join(imgTilesDIR, "ImgTile")
-    rsgislib.imageutils.createTiles(
+    rsgislib.imageutils.create_tiles(
         input_img,
         imgTileBase,
         tile_size,
@@ -361,7 +361,7 @@ def calcDist2ImgValsTiled(
         tileOverlap,
         0,
         "KEA",
-        rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_img),
+        rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
         "kea",
     )
     imgTileFiles = glob.glob(imgTileBase + "*.kea")
@@ -411,21 +411,21 @@ def calcDist2ImgValsTiled(
         p.map(_computeProximityArrArgsFunc, distTileArgs)
 
     # Mosaic Tiles
-    rsgislib.imageutils.createImageMosaic(
+    rsgislib.imageutils.create_img_mosaic(
         distTiles, output_img, 0, 0, 1, 1, gdalformat, rsgislib.TYPE_32FLOAT
     )
-    rsgislib.imageutils.popImageStats(
+    rsgislib.imageutils.pop_img_stats(
         output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
     )
 
     for imgFile in distTiles:
-        rsgislib.tools.filetools.deleteFileWithBasename(imgFile)
+        rsgislib.tools.filetools.delete_file_with_basename(imgFile)
 
     if not imgTilesDIRPresent:
         shutil.rmtree(imgTilesDIR, ignore_errors=True)
     else:
         for tileFile in imgTileFiles:
-            rsgislib.tools.filetools.deleteFileWithBasename(tileFile)
+            rsgislib.tools.filetools.delete_file_with_basename(tileFile)
 
     if not distTilesDIRPresent:
         shutil.rmtree(distTilesDIR, ignore_errors=True)
@@ -434,7 +434,7 @@ def calcDist2ImgValsTiled(
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
-def countPxlsOfVal(input_img, vals, img_band=None):
+def count_pxls_of_val(input_img, vals, img_band=None):
     """
     Function which counts the number of pixels of a set of values returning a
     list in the same order as the list of values provided.
@@ -455,7 +455,7 @@ def countPxlsOfVal(input_img, vals, img_band=None):
         raise Exception(
             "At least 1 value should be provided within the vals input variable."
         )
-    n_bands = rsgislib.imageutils.getImageBandCount(input_img)
+    n_bands = rsgislib.imageutils.get_image_band_count(input_img)
     if (img_band is not None) and ((img_band < 1) or (img_band > n_bands)):
         raise Exception("The specified input image band is not within the input image.")
     if img_band is not None:
@@ -483,7 +483,7 @@ def countPxlsOfVal(input_img, vals, img_band=None):
     return outVals
 
 
-def getUniqueValues(input_img, img_band=1):
+def get_unique_values(input_img, img_band=1):
     """
     Find the unique image values within an image band.
     Note, the whole image band gets read into memory.
@@ -506,7 +506,7 @@ def getUniqueValues(input_img, img_band=1):
     return uniq_vals
 
 
-def getPCAEigenVector(input_img, pxl_n_sample, no_data_val=None, out_matrix_file=None):
+def get_pca_eigen_vector(input_img, pxl_n_sample, no_data_val=None, out_matrix_file=None):
     """
     A function which takes a sample from an input image and uses it to
     generate eigenvector for a PCA. Note. this can be used as input
@@ -558,7 +558,7 @@ def getPCAEigenVector(input_img, pxl_n_sample, no_data_val=None, out_matrix_file
     return pca.components_, pca.explained_variance_ratio_
 
 
-def performImagePCA(
+def perform_image_pca(
     input_img,
     output_img,
     out_eigen_vec_file,
@@ -590,7 +590,7 @@ def performImagePCA(
     :returns: an array with the ratio of the explained variance per band."""
     import rsgislib.imageutils
 
-    eigenVec, varExplain = rsgislib.imagecalc.getPCAEigenVector(
+    eigenVec, varExplain = rsgislib.imagecalc.get_pca_eigen_vector(
         input_img, pxl_n_sample, no_data_val, out_eigen_vec_file
     )
     outNComp = varExplain.shape[0]
@@ -611,12 +611,12 @@ def performImagePCA(
         if no_data_val is not None:
             use_no_data = True
             lcl_no_data_val = no_data_val
-        rsgislib.imageutils.popImageStats(output_img, use_no_data, lcl_no_data_val, True)
+        rsgislib.imageutils.pop_img_stats(output_img, use_no_data, lcl_no_data_val, True)
 
     return varExplain
 
 
-def performImageMNF(
+def perform_image_mnf(
     input_img,
     output_img,
     n_comps=None,
@@ -715,7 +715,7 @@ def performImageMNF(
         whiten_img, eigenVecFile, output_img, outNComp, gdalformat, datatype
     )
     if calc_stats:
-        rsgislib.imageutils.popImageStats(output_img, True, in_img_no_data, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, in_img_no_data, True)
 
     if created_tmp_dir:
         shutil.rmtree(tmp_dir)
@@ -727,7 +727,7 @@ def performImageMNF(
     return varExplain
 
 
-def rescaleImgPxlVals(
+def rescale_img_pxl_vals(
     input_img, output_img, gdalformat, datatype, band_rescale_objs, trim_to_limits=True
 ):
     """
@@ -746,7 +746,7 @@ def rescaleImgPxlVals(
     for rescaleObj in band_rescale_objs:
         bandRescaleDict[rescaleObj.band - 1] = rescaleObj
 
-    numpyDT = rsgislib.getNumpyDataType(datatype)
+    numpyDT = rsgislib.get_numpy_datatype(datatype)
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -815,7 +815,7 @@ def rescaleImgPxlVals(
     applier.apply(_applyRescale, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calcHistograms4MskVals(
+def calc_histograms_for_msk_vals(
     input_img, imgBand, imgMsk, mskBand, minVal, maxVal, binWidth, mskvals=None
 ):
     """
@@ -872,7 +872,7 @@ def calcHistograms4MskVals(
     return hist_dict
 
 
-def calcWGS84PixelArea(input_img, out_img, scale=10000, gdalformat="KEA"):
+def calc_wgs84_pixel_area(input_img, out_img, scale=10000, gdalformat="KEA"):
     """
     A function which calculates the area (in metres) of the pixel projected in WGS84.
 
@@ -893,7 +893,7 @@ def calcWGS84PixelArea(input_img, out_img, scale=10000, gdalformat="KEA"):
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    x_res, y_res = rsgislib.imageutils.getImageRes(input_img)
+    x_res, y_res = rsgislib.imageutils.get_image_res(input_img)
 
     infiles = applier.FilenameAssociations()
     infiles.input_img = input_img
@@ -926,139 +926,9 @@ def calcWGS84PixelArea(input_img, out_img, scale=10000, gdalformat="KEA"):
     applier.apply(_calcPixelArea, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calcPPI(
-    input_img,
-    output_img,
-    gdalformat,
-    niters=1000,
-    lthres=0,
-    uthres=0,
-    img_gain=1,
-    seed=None,
-    calc_stats=True,
-):
-    """
-    A function which calculate the pixel purity index (PPI). Using an appropriate
-    number of iterations this can take a little while to run. Note, the whole input
-    image is read into memory.
-
-    It is recommended that you use the an MNF/PCA output and rescale that so all
-    bands have the same range to improve the PPI result.
-
-    Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
-        Partial Unmixing of AVIRIS Data," Pasadena, California, USA, 23 Jan 1995,
-        URI: http://hdl.handle.net/2014/33635
-
-    :param input_img: image values image file path.
-    :param output_img: output image
-    :param gdalformat: GDAL file format (e.g., KEA) of the output image.
-    :param niters: number of iterations
-    :param thres: a threshold in the image space (after again as been applied) to
-                  select more pixels around the extreme (e.g., 1% reflectance)
-    :param img_gain: the gain by which the image was multipled, reflectance images
-                     are typically multiplied by 1000 or 10000. The result should be
-                     an image with a range 0-1.
-    :param seed: seed for the random squence of numbers being generated. Using the
-                 same seed will result in the same seqence and therefore the
-                 same output.
-    :param calc_stats: whether to calculate image statistics and pyramids on
-                       the output image.
-    """
-    # Check gdal is available
-    import rsgislib.imageutils
-    import tqdm
-
-    imgDS = gdal.Open(input_img)
-    if imgDS is None:
-        raise Exception("Could not open input image")
-    n_bands = imgDS.RasterCount
-    x_size = imgDS.RasterXSize
-    y_size = imgDS.RasterYSize
-    img_data = numpy.zeros((n_bands, (x_size * y_size)), dtype=numpy.float32)
-    img_data_msk = numpy.ones((x_size * y_size), dtype=bool)
-    img_data_mean = numpy.zeros(n_bands, dtype=numpy.float32)
-
-    print("Importing Bands:")
-    for n in tqdm.tqdm(range(n_bands)):
-        imgBand = imgDS.GetRasterBand(n + 1)
-        if imgBand is None:
-            raise Exception("Could not open image band ({})".format(n + 1))
-        no_data_val = imgBand.GetNoDataValue()
-        band_arr = imgBand.ReadAsArray().flatten()
-        band_arr = band_arr.astype(numpy.float32)
-        img_data[n] = band_arr
-        img_data_msk[band_arr == no_data_val] = False
-        band_arr[band_arr == no_data_val] = numpy.nan
-        if img_gain > 1:
-            band_arr = band_arr / img_gain
-            img_data[n] = img_data[n] / img_gain
-        img_data_mean[n] = numpy.nanmean(band_arr)
-        img_data[n] = img_data[n] - img_data_mean[n]
-    imgDS = None
-    band_arr = None
-
-    print("Create empty output image file")
-    rsgislib.imageutils.createCopyImage(
-        input_img, output_img, 1, 0, gdalformat, rsgislib.TYPE_16UINT
-    )
-
-    # Open output image
-    outImgDS = gdal.Open(output_img, gdal.GA_Update)
-    if outImgDS is None:
-        raise Exception("Could not open output image")
-    outImgBand = outImgDS.GetRasterBand(1)
-    if outImgBand is None:
-        raise Exception("Could not open output image band (1)")
-    out_img_data = outImgBand.ReadAsArray()
-
-    # Mask the datasets to obtain just the valid pixel values
-    # (i.e., using the no data value)
-    img_data = img_data.T
-    out_img_data = out_img_data.flatten()
-    pxl_idxs = numpy.arange(out_img_data.shape[0])
-    pxl_idxs = pxl_idxs[img_data_msk]
-    out_img_count = out_img_data[img_data_msk]
-    img_data = img_data[img_data_msk]
-
-    if seed is not None:
-        numpy.random.seed(seed)
-
-    print("Perform PPI iterations.")
-    for i in tqdm.tqdm(range(niters)):
-        r = numpy.random.rand(n_bands) - 0.5
-        s = numpy.dot(img_data, r)
-
-        imin = numpy.argmin(s)
-        imax = numpy.argmax(s)
-        if lthres == 0:
-            # Only the two extreme pixels are incremented
-            out_img_count[imin] += 1
-        else:
-            # All pixels within threshold distance from the two extremes
-            out_img_count[s <= (s[imin] + lthres)] += 1
-
-        if uthres == 0:
-            # Only the two extreme pixels are incremented
-            out_img_count[imax] += 1
-        else:
-            # All pixels within threshold distance from the two extremes
-            out_img_count[s >= (s[imax] - uthres)] += 1
-    s = None
-
-    out_img_data[pxl_idxs] = out_img_count
-    out_img_data = out_img_data.reshape((y_size, x_size))
-
-    outImgBand.WriteArray(out_img_data)
-    outImgDS = None
-
-    if calc_stats:
-        print("Calculate Image stats and pyramids.")
-        rsgislib.imageutils.popImageStats(
-            output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
-        )
 
 
-def calcImgsPxlMode(input_imgs, output_img, gdalformat, no_data_val=0):
+def calc_imgs_pxl_mode(input_imgs, output_img, gdalformat, no_data_val=0):
     """
     Function which calculates the mode of a group of images.
 
@@ -1075,8 +945,8 @@ def calcImgsPxlMode(input_imgs, output_img, gdalformat, no_data_val=0):
     import scipy.stats
     from rios import applier
 
-    datatype = rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_imgs[0])
-    numpyDT = rsgislib.getNumpyDataType(datatype)
+    datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_imgs[0])
+    numpyDT = rsgislib.get_numpy_datatype(datatype)
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -1110,7 +980,7 @@ def calcImgsPxlMode(input_imgs, output_img, gdalformat, no_data_val=0):
     applier.apply(_applyCalcMode, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calcImgBasicStats4RefRegion(
+def calc_img_basic_stats_for_ref_region(
     in_ref_img, in_stats_imgs, output_img, gdalformat="KEA"
 ):
     """
@@ -1144,11 +1014,11 @@ def calcImgBasicStats4RefRegion(
     for img in in_stats_imgs:
         print(img)
         if first:
-            n_bands = rsgislib.imageutils.getImageBandCount(img)
+            n_bands = rsgislib.imageutils.get_image_band_count(img)
             no_data_val = rsgislib.imageutils.getImageNoDataValue(img)
             first = False
         else:
-            if n_bands != rsgislib.imageutils.getImageBandCount(img):
+            if n_bands != rsgislib.imageutils.get_image_band_count(img):
                 raise Exception(
                     "The number of bands must be the same in all input images."
                 )
@@ -1221,12 +1091,12 @@ def calcImgBasicStats4RefRegion(
     applier.apply(_calcBasicStats, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
 
-    rsgislib.imageutils.popImageStats(
+    rsgislib.imageutils.pop_img_stats(
         output_img, use_no_data=True, no_data_val=no_data_val, calc_pyramids=True
     )
 
 
-def normaliseImageBand(input_img, band, output_img, gdal_format="KEA"):
+def normalise_image_band(input_img, band, output_img, gdal_format="KEA"):
     """
     Perform a simple normalisation a single image band (val - min)/range.
 
@@ -1252,15 +1122,15 @@ def normaliseImageBand(input_img, band, output_img, gdal_format="KEA"):
     band_defns = [rsgislib.imagecalc.BandDefn("b1", input_img, band)]
     band_range = band_max - band_min
     exp = "(b1=={0})?0.0:(b1-{1})/{2}".format(no_data_val, band_min, band_range)
-    rsgislib.imagecalc.bandMath(
+    rsgislib.imagecalc.band_math(
         output_img, exp, gdal_format, rsgislib.TYPE_32FLOAT, band_defns
     )
-    rsgislib.imageutils.popImageStats(
+    rsgislib.imageutils.pop_img_stats(
         output_img, use_no_data=True, no_data_val=0.0, calc_pyramids=True
     )
 
 
-def recodeIntRaster(
+def recode_int_raster(
     input_img,
     output_img,
     recode_dict,
@@ -1300,7 +1170,7 @@ def recodeIntRaster(
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = output_img
     otherargs = applier.OtherInputs()
-    otherargs.np_dtype = rsgislib.getNumpyDataType(datatype)
+    otherargs.np_dtype = rsgislib.get_numpy_datatype(datatype)
     otherargs.keep_vals_not_in_dict = keep_vals_not_in_dict
     otherargs.recode_dict = recode_dict
     aControls = applier.ApplierControls()
@@ -1321,7 +1191,7 @@ def recodeIntRaster(
     applier.apply(_recode, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calcFillRegionsKNN(
+def calc_fill_regions_knn(
     in_ref_img,
     ref_no_data,
     in_fill_regions_img,
@@ -1378,7 +1248,7 @@ def calcFillRegionsKNN(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    x_res, y_res = rsgislib.imageutils.getImageRes(in_ref_img)
+    x_res, y_res = rsgislib.imageutils.get_image_res(in_ref_img)
     if x_res < 0:
         x_res *= -1
     if y_res < 0:
@@ -1427,7 +1297,7 @@ def calcFillRegionsKNN(
     applier.apply(_retrieve_idx_info, infiles, outfiles, otherargs, controls=aControls)
 
     print("\nFilling Image Regions using KNN (k={})".format(k))
-    x_res, y_res = rsgislib.imageutils.getImageRes(in_fill_regions_img)
+    x_res, y_res = rsgislib.imageutils.get_image_res(in_fill_regions_img)
     if x_res < 0:
         x_res *= -1
     if y_res < 0:
@@ -1442,7 +1312,7 @@ def calcFillRegionsKNN(
     otherargs.kd_idx = kd_idx
     otherargs.k = k
     otherargs.fill_region_val = fill_region_val
-    otherargs.np_dtype = rsgislib.getNumpyDataType(datatype)
+    otherargs.np_dtype = rsgislib.get_numpy_datatype(datatype)
     otherargs.w_box = x_res / 2
     otherargs.h_box = y_res / 2
     aControls = applier.ApplierControls()
@@ -1494,7 +1364,7 @@ def calcFillRegionsKNN(
     print("Finished fill")
 
 
-def areImgsEqual(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
+def are_imgs_equal(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
     """
     A function to check whether two images have equal pixel values within the spatial
     overlap. Note, if the two input images only have a partial overlap (i.e., one is
@@ -1515,9 +1385,9 @@ def areImgsEqual(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
     import rsgislib.imageutils
     from rios import applier
 
-    if rsgislib.imageutils.getImageBandCount(
+    if rsgislib.imageutils.get_image_band_count(
         in_ref_img
-    ) != rsgislib.imageutils.getImageBandCount(in_cmp_img):
+    ) != rsgislib.imageutils.get_image_band_count(in_cmp_img):
         raise Exception(
             "The number of image bands is not the same between the two images."
         )
@@ -1563,7 +1433,7 @@ def areImgsEqual(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
     return (prop_pxls_eq >= prop_eql), prop_pxls_eq
 
 
-def areImgBandsEqual(
+def are_img_bands_equal(
     in_ref_img, img_ref_band, in_cmp_img, img_cmp_band, prop_eql=1.0, flt_dif=0.0001
 ):
     """
@@ -1588,8 +1458,8 @@ def areImgBandsEqual(
     import rsgislib.imageutils
     from rios import applier
 
-    n_ref_bands = rsgislib.imageutils.getImageBandCount(in_ref_img)
-    n_cmp_bands = rsgislib.imageutils.getImageBandCount(in_cmp_img)
+    n_ref_bands = rsgislib.imageutils.get_image_band_count(in_ref_img)
+    n_cmp_bands = rsgislib.imageutils.get_image_band_count(in_cmp_img)
 
     if (img_ref_band < 1) or (img_ref_band > n_ref_bands):
         raise Exception("The specified band is not within the reference image.")

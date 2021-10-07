@@ -45,7 +45,7 @@ static PyObject *Segmentation_labelPixelsFromClusterCentres(PyObject *self, PyOb
                              RSGIS_PY_C_TEXT("gdalformat"),  nullptr};
     const char *pszInputImage, *pszOutputImage, *pszClusterCentres, *pszgdalformat;
     int ignoreZeros;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssis:labelPixelsFromClusterCentres", kwlist, &pszInputImage, &pszOutputImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssis:label_pixels_from_cluster_centres", kwlist, &pszInputImage, &pszOutputImage,
                                 &pszClusterCentres, &ignoreZeros, &pszgdalformat ))
     {
         return nullptr;
@@ -76,7 +76,7 @@ static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *ar
     const char *pszInputImage, *pszOutputImage, *pszClumpsImage, *pszgdalformat, *pszTempImage;
     int processInMemory, ignoreZeros;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssii:eliminateSinglePixels", kwlist, &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszTempImage, &pszgdalformat, &processInMemory, &ignoreZeros ))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssii:eliminate_single_pixels", kwlist, &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszTempImage, &pszgdalformat, &processInMemory, &ignoreZeros ))
     {
         return nullptr;
     }
@@ -159,7 +159,7 @@ static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *ar
     int storeMean,processInMemory,stretchStatsAvail;
     unsigned int minClumpSize;
     float specThreshold;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssisiiIf:rmSmallClumpsStepwise", kwlist, &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszgdalformat,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssisiiIf:rm_small_clumps_stepwise", kwlist, &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszgdalformat,
                     &stretchStatsAvail, &pszStretchStatsFile, &storeMean, &processInMemory, &minClumpSize, &specThreshold))
     {
         return nullptr;
@@ -188,7 +188,7 @@ static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args, PyOb
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("in_memory"), nullptr};
     const char *pszInputImage, *pszOutputImage, *pszgdalformat;
     int processInMemory;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssi:relabelClumps", kwlist, &pszInputImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssi:relabel_clumps", kwlist, &pszInputImage,
                         &pszOutputImage, &pszgdalformat, &processInMemory ))
     {
         return nullptr;
@@ -221,7 +221,7 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args, PyOb
     PyObject *pNoData; //could be none or a number
     PyObject *pInputListObj;
     int addRatPxlVals = false;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OssOi:unionOfClumps", kwlist, &pInputListObj, &pszOutputImage, &pszgdalformat, &pNoData, &addRatPxlVals))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OssOi:union_of_clumps", kwlist, &pInputListObj, &pszOutputImage, &pszgdalformat, &pNoData, &addRatPxlVals))
     {
         return nullptr;
     }
@@ -296,7 +296,7 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
     std::string inputImage;
     unsigned int tileBoundary, tileOverlap, tileBody;
     PyObject *pInputListObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OssIIIs:mergeSegmentationTiles", kwlist, &pInputListObj, &pszOutputImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OssIIIs:merge_segmentation_tiles", kwlist, &pInputListObj, &pszOutputImage,
                                      &pszBorderMaskImage, &tileBoundary, &tileOverlap, &tileBody, &pszColsName))
     {
         return nullptr;
@@ -350,7 +350,7 @@ static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args, P
     PyObject *pInputListObj;
     std::string inputImage;
     int mergeRATs = false;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Os|i:mergeClumpImages", kwlist, &pInputListObj, &pszOutputImage, &mergeRATs))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Os|i:merge_clump_images", kwlist, &pInputListObj, &pszOutputImage, &mergeRATs))
     {
         return nullptr;
     }
@@ -401,7 +401,7 @@ static PyObject *Segmentation_findTileBordersMask(PyObject *self, PyObject *args
     std::string inputImage;
     unsigned int tileBoundary, tileOverlap, tileBody;
     PyObject *pInputListObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OsIIIs:findTileBordersMask", kwlist, &pInputListObj, &pszBorderMaskImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OsIIIs:find_tile_borders_mask", kwlist, &pInputListObj, &pszBorderMaskImage,
                                 &tileBoundary, &tileOverlap, &tileBody, &pszColsName))
     {
         return nullptr;
@@ -455,7 +455,7 @@ static PyObject *Segmentation_rmSmallClumps(PyObject *self, PyObject *args, PyOb
                              RSGIS_PY_C_TEXT("area_threshold"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputClumps, *pszOutputClumps, *pszgdalformat;
     float areaThreshold;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssfs:rmSmallClumps", kwlist, &pszInputClumps, &pszOutputClumps, &areaThreshold, &pszgdalformat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssfs:rm_small_clumps", kwlist, &pszInputClumps, &pszOutputClumps, &areaThreshold, &pszgdalformat))
     {
         return nullptr;
     }
@@ -481,7 +481,7 @@ static PyObject *Segmentation_meanImage(PyObject *self, PyObject *args, PyObject
                              RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pszInputImage, *pszInputClumps, *pszOutputImage, *pszgdalformat;
     int nDataType;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:mergeImage", kwlist, &pszInputImage, &pszInputClumps, &pszOutputImage, &pszgdalformat, &nDataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:mean_image", kwlist, &pszInputImage, &pszInputClumps, &pszOutputImage, &pszgdalformat, &nDataType))
     {
         return nullptr;
     }
@@ -510,7 +510,7 @@ static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args
     const char *pszInputImage, *pszOutputImage, *pszgdalformat;
     unsigned int numXPxls, numYPxls;
     int offset = 0;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssII|i:generateRegularGrid", kwlist, &pszInputImage, &pszOutputImage, &pszgdalformat, &numXPxls, &numYPxls, &offset))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssII|i:generate_regular_grid", kwlist, &pszInputImage, &pszOutputImage, &pszgdalformat, &numXPxls, &numYPxls, &offset))
     {
         return nullptr;
     }
@@ -536,7 +536,7 @@ static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *a
                              RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszClumpsImage, *pszRegionsImage, *pszOutputImage, *pszgdalformat;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:includeRegionsInClumps", kwlist, &pszClumpsImage, &pszRegionsImage, &pszOutputImage, &pszgdalformat ))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:include_regions_in_clumps", kwlist, &pszClumpsImage, &pszRegionsImage, &pszOutputImage, &pszgdalformat ))
     {
         return nullptr;
     }
@@ -561,12 +561,12 @@ static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject 
                              RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("sel_clumps_col"), RSGIS_PY_C_TEXT("no_data_clumps_col"), nullptr};
     const char *pszInputClumpsImage, *pszInputSpecImage, *pszOutputImage, *pszgdalformat, *selectClumpsCol, *noDataClumpsCol;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssss:mergeSegments2Neighbours", kwlist, &pszInputClumpsImage, &pszInputSpecImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssss:merge_segments_to_neighbours", kwlist, &pszInputClumpsImage, &pszInputSpecImage,
                                      &pszOutputImage, &pszgdalformat, &selectClumpsCol, &noDataClumpsCol))
     {
         return nullptr;
     }
-    
+
     try
     {
         rsgis::cmds::executeMergeSelectClumps2Neighbour(std::string(pszInputSpecImage), std::string(pszInputClumpsImage),
@@ -578,7 +578,7 @@ static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject 
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return nullptr;
     }
-    
+
     Py_RETURN_NONE;
 }
 
@@ -587,12 +587,12 @@ static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *arg
     static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("sel_clumps_col"), nullptr};
     const char *pszInputClumpsImage, *pszOutputImage, *pszgdalformat, *selectClumpsCol;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:dropSelectedClumps", kwlist, &pszInputClumpsImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:drop_selected_clumps", kwlist, &pszInputClumpsImage,
                                      &pszOutputImage, &pszgdalformat, &selectClumpsCol ))
     {
         return nullptr;
     }
-    
+
     try
     {
         rsgis::cmds::executeDropSelectedClumps(std::string(pszInputClumpsImage), std::string(pszOutputImage),
@@ -603,7 +603,7 @@ static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *arg
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return nullptr;
     }
-    
+
     Py_RETURN_NONE;
 }
 
@@ -613,18 +613,18 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("val_columns"), nullptr};
     const char *pszInputClumpsImage, *pszOutputImage, *pszgdalformat;
     PyObject *valClumpsCols;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:mergeEquivClumps", kwlist, &pszInputClumpsImage, &pszOutputImage, &pszgdalformat, &valClumpsCols))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:merge_equiv_clumps", kwlist, &pszInputClumpsImage, &pszOutputImage, &pszgdalformat, &valClumpsCols))
     {
         return nullptr;
     }
-    
+
     Py_ssize_t nValCols = PyList_Size(valClumpsCols);
     if( nValCols < 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
         return nullptr;
     }
-    
+
     std::vector<std::string> cols;
     for(Py_ssize_t n = 0; n < nValCols; n++)
     {
@@ -638,7 +638,7 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
         std::string colName = RSGISPY_STRING_EXTRACT(strObj);
         cols.push_back(colName);
     }
-    
+
     try
     {
         rsgis::cmds::executeMergeClumpsEquivalentVal(std::string(pszInputClumpsImage), std::string(pszOutputImage),
@@ -649,7 +649,7 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return nullptr;
     }
-    
+
     Py_RETURN_NONE;
 }
 
@@ -658,8 +658,8 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
 
 // Our list of functions in this module
 static PyMethodDef SegmentationMethods[] = {
-    {"labelPixelsFromClusterCentres", (PyCFunction)Segmentation_labelPixelsFromClusterCentres, METH_VARARGS | METH_KEYWORDS,
-"segmentation.labelPixelsFromClusterCentres(input_img, output_img, cluster_centres_file, ignore_zeros, gdalformat)\n"
+    {"label_pixels_from_cluster_centres", (PyCFunction)Segmentation_labelPixelsFromClusterCentres, METH_VARARGS | METH_KEYWORDS,
+"segmentation.label_pixels_from_cluster_centres(input_img, output_img, cluster_centres_file, ignore_zeros, gdalformat)\n"
 "Labels image pixels with the ID of the nearest cluster centre.\n"
 "\n"
 "Where:\n"
@@ -671,8 +671,8 @@ static PyMethodDef SegmentationMethods[] = {
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "\n"},
 
-    {"eliminateSinglePixels", (PyCFunction)Segmentation_eliminateSinglePixels, METH_VARARGS | METH_KEYWORDS,
-"segmentation.eliminateSinglePixels(input_img, clumps_img, output_img, tmp_img, gdalformat, in_memory, ignorezeros)\n"
+    {"eliminate_single_pixels", (PyCFunction)Segmentation_eliminateSinglePixels, METH_VARARGS | METH_KEYWORDS,
+"segmentation.eliminate_single_pixels(input_img, clumps_img, output_img, tmp_img, gdalformat, in_memory, ignorezeros)\n"
 "Eliminates single pixels\n"
 "\n"
 "Where:\n"
@@ -700,8 +700,8 @@ static PyMethodDef SegmentationMethods[] = {
 ":param add_to_rat: is a boolean specifying whether the pixel value (from inputimage) should be added as a RAT.\n"
 "\n"},
 
-    {"rmSmallClumpsStepwise", (PyCFunction)Segmentation_RMSmallClumpsStepwise, METH_VARARGS | METH_KEYWORDS,
-"segmentation.rmSmallClumpsStepwise(input_img, clumps_img, output_img, gdalformat, use_stch_stats, stch_stats_file, store_mean, in_memory, min_clump_size, pxl_val_thres)\n"
+    {"rm_small_clumps_stepwise", (PyCFunction)Segmentation_RMSmallClumpsStepwise, METH_VARARGS | METH_KEYWORDS,
+"segmentation.rm_small_clumps_stepwise(input_img, clumps_img, output_img, gdalformat, use_stch_stats, stch_stats_file, store_mean, in_memory, min_clump_size, pxl_val_thres)\n"
 "eliminate clumps smaller than a given size from the scene, small clumps will be combined with their spectrally closest neighbouring  clump in a stepwise fashion unless over spectral distance threshold\n"
 "\n"
 "Where:\n"
@@ -718,8 +718,8 @@ static PyMethodDef SegmentationMethods[] = {
 ":param pxl_val_thres: is a float providing the maximum (Euclidian distance) spectral separation for which to merge clumps. Set to a large value to ignore spectral separation and always merge.\n"
 "\n"},
 
-    {"relabelClumps", (PyCFunction)Segmentation_relabelClumps, METH_VARARGS | METH_KEYWORDS,
-"segmentation.relabelClumps(input_img, output_img, gdalformat, in_memory)\n"
+    {"relabel_clumps", (PyCFunction)Segmentation_relabelClumps, METH_VARARGS | METH_KEYWORDS,
+"segmentation.relabel_clumps(input_img, output_img, gdalformat, in_memory)\n"
 "Relabel clumps\n"
 "\n"
 "Where:\n"
@@ -729,9 +729,9 @@ static PyMethodDef SegmentationMethods[] = {
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param in_memory: is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
 "\n"},
-                                
-    {"unionOfClumps", (PyCFunction)Segmentation_unionOfClumps, METH_VARARGS | METH_KEYWORDS,
-"segmentation.unionOfClumps(input_imgs, output_img, gdalformat, no_data_val, add_to_rat)\n"
+
+    {"union_of_clumps", (PyCFunction)Segmentation_unionOfClumps, METH_VARARGS | METH_KEYWORDS,
+"segmentation.union_of_clumps(input_imgs, output_img, gdalformat, no_data_val, add_to_rat)\n"
 "The function takes the union of clumps images - combining them so all lines from all clumps are preserved in the new outputted clumps image.\n"
 "\n"
 "Where:\n"
@@ -745,8 +745,8 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 },
 
-    {"mergeSegmentationTiles", (PyCFunction)Segmentation_mergeSegmentationTiles, METH_VARARGS | METH_KEYWORDS,
-"segmentation.mergeSegmentationTiles(input_imgs, output_img, border_msk_img, tile_boundary, tile_overlap, tile_body, col_name)\n"
+    {"merge_segmentation_tiles", (PyCFunction)Segmentation_mergeSegmentationTiles, METH_VARARGS | METH_KEYWORDS,
+"segmentation.merge_segmentation_tiles(input_imgs, output_img, border_msk_img, tile_boundary, tile_overlap, tile_body, col_name)\n"
 "Merge body clumps from tile segmentations into outputfile\n"
 "\n"
 "Where:\n"
@@ -760,8 +760,8 @@ static PyMethodDef SegmentationMethods[] = {
 ":param col_name: is a string containing the name of the object id column\n"
 "\n"},
 
-    {"mergeClumpImages", (PyCFunction)Segmentation_mergeClumpImages, METH_VARARGS | METH_KEYWORDS,
-"segmentation.mergeClumpImages(input_imgs, output_img, merge_rats)\n"
+    {"merge_clump_images", (PyCFunction)Segmentation_mergeClumpImages, METH_VARARGS | METH_KEYWORDS,
+"segmentation.merge_clump_images(input_imgs, output_img, merge_rats)\n"
 "Merge all clumps from tile segmentations into outputfile\n"
 "\n"
 "Where:\n"
@@ -771,8 +771,8 @@ static PyMethodDef SegmentationMethods[] = {
 ":param merge_rats: is a boolean specifying with the image RATs are to merged (Default: false; Optional)\n"
 "\n"},
 
-    {"findTileBordersMask", (PyCFunction)Segmentation_findTileBordersMask, METH_VARARGS | METH_KEYWORDS,
-"segmentation.findTileBordersMask(input_imgs, border_msk_img, tile_boundary, tile_overlap, tile_body, col_name)\n"
+    {"find_tile_borders_mask", (PyCFunction)Segmentation_findTileBordersMask, METH_VARARGS | METH_KEYWORDS,
+"segmentation.find_tile_borders_mask(input_imgs, border_msk_img, tile_boundary, tile_overlap, tile_body, col_name)\n"
 "Mask tile borders\n"
 "\n"
 "Where:\n"
@@ -786,8 +786,8 @@ static PyMethodDef SegmentationMethods[] = {
 
 "\n"},
 
-    {"rmSmallClumps", (PyCFunction)Segmentation_rmSmallClumps, METH_VARARGS | METH_KEYWORDS,
-"segmentation.rmSmallClumps(clumps_img, output_img, area_threshold, gdalformat)\n"
+    {"rm_small_clumps", (PyCFunction)Segmentation_rmSmallClumps, METH_VARARGS | METH_KEYWORDS,
+"segmentation.rm_small_clumps(clumps_img, output_img, area_threshold, gdalformat)\n"
 "A function to remove small clumps and set them with a value of 0 (i.e., no data) \n"
 "\n"
 "Where:\n"
@@ -797,9 +797,9 @@ static PyMethodDef SegmentationMethods[] = {
 ":param area_threshold: is a float containing the area threshold (in pixels)\n"
 ":param gdalformat: is a string defining the format of the output image.\n"
 "\n"},
-    
-    {"meanImage", (PyCFunction)Segmentation_meanImage, METH_VARARGS | METH_KEYWORDS,
-"segmentation.meanImage(input_img, clumps_img, output_img, gdalformat, datatype)\n"
+
+    {"mean_image", (PyCFunction)Segmentation_meanImage, METH_VARARGS | METH_KEYWORDS,
+"segmentation.mean_image(input_img, clumps_img, output_img, gdalformat, datatype)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
 "\n"
 "Where:\n"
@@ -811,8 +811,8 @@ static PyMethodDef SegmentationMethods[] = {
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
-{"generateRegularGrid", (PyCFunction)Segmentation_GenerateRegularGrid, METH_VARARGS | METH_KEYWORDS,
-"segmentation.generateRegularGrid(input_img, output_img, gdalformat, num_x_pxls, num_y_pxls, offset)\n"
+{"generate_regular_grid", (PyCFunction)Segmentation_GenerateRegularGrid, METH_VARARGS | METH_KEYWORDS,
+"segmentation.generate_regular_grid(input_img, output_img, gdalformat, num_x_pxls, num_y_pxls, offset)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
 "\n"
 "Where:\n"
@@ -824,11 +824,11 @@ static PyMethodDef SegmentationMethods[] = {
 ":param num_y_pxls: is the size of the grid cells in the Y axis in pixel units.\n"
 ":param offset: is a boolean specifying whether the grid should be offset, i.e., starts half way point of numXPxls and numYPxls (Default is false; optional)"
 "\n"},
-    
-{"includeRegionsInClumps", (PyCFunction)Segmentation_IncludeRegionsInClumps, METH_VARARGS | METH_KEYWORDS,
-"segmentation.includeRegionsInClumps(clumps_img, regions_img, output_img, gdalformat)\n"
+
+{"include_regions_in_clumps", (PyCFunction)Segmentation_IncludeRegionsInClumps, METH_VARARGS | METH_KEYWORDS,
+"segmentation.include_regions_in_clumps(clumps_img, regions_img, output_img, gdalformat)\n"
 "A function to include a set of clumped regions within an existing clumps (i.e., segmentation) image.\n"
-"NOTE. You should run the relabelClumps function on the output of this command before using further.\n"
+"NOTE. You should run the relabel_clumps function on the output of this command before using further.\n"
 "\n"
 "Where:\n"
 "\n"
@@ -837,9 +837,9 @@ static PyMethodDef SegmentationMethods[] = {
 ":param output_img: is a string containing the name and path of the output clumps image\n"
 ":param gdalformat: is a string defining the format of the output image.\n"
 "\n"},
-    
-{"mergeSegments2Neighbours", (PyCFunction)Segmentation_mergeSegments2Neighbours, METH_VARARGS | METH_KEYWORDS,
-"segmentation.mergeSegments2Neighbours(clumps_img, input_vals_img, output_img, gdalformat, sel_clumps_col, no_data_clumps_col)\n"
+
+{"merge_segments_to_neighbours", (PyCFunction)Segmentation_mergeSegments2Neighbours, METH_VARARGS | METH_KEYWORDS,
+"segmentation.merge_segments_to_neighbours(clumps_img, input_vals_img, output_img, gdalformat, sel_clumps_col, no_data_clumps_col)\n"
 "A function to merge some selected clumps with the neighbours based on colour (spectral) distance where clumps identified as no data are ignored.\n"
 "\n"
 "Where:\n"
@@ -852,8 +852,8 @@ static PyMethodDef SegmentationMethods[] = {
 ":param no_data_clumps_col: is a string defining the binary column for defining the segments to be ignored as no data (1 == no-data clumps).\n"
 "\n"},
     
-{"dropSelectedClumps", (PyCFunction)Segmentation_dropSelectedSegments, METH_VARARGS | METH_KEYWORDS,
-"segmentation.dropSelectedClumps(clumps_img, output_img, gdalformat, sel_clumps_col)\n"
+{"drop_selected_clumps", (PyCFunction)Segmentation_dropSelectedSegments, METH_VARARGS | METH_KEYWORDS,
+"segmentation.drop_selected_clumps(clumps_img, output_img, gdalformat, sel_clumps_col)\n"
 "A function to drop the selected clumps from the segmentation.\n"
 "\n"
 "Where:\n"
@@ -864,8 +864,8 @@ static PyMethodDef SegmentationMethods[] = {
 ":param sel_clumps_col: is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
 "\n"},
     
-{"mergeEquivClumps", (PyCFunction)Segmentation_mergeEquivalentClumps, METH_VARARGS | METH_KEYWORDS,
-"segmentation.mergeEquivClumps(clumps_img, output_img, gdalformat, val_columns)\n"
+{"merge_equiv_clumps", (PyCFunction)Segmentation_mergeEquivalentClumps, METH_VARARGS | METH_KEYWORDS,
+"segmentation.merge_equiv_clumps(clumps_img, output_img, gdalformat, val_columns)\n"
 "A function to merge neighbouring clumps which have the same value - for example when merging across tile boundaries.\n"
 "\n"
 "Where:\n"

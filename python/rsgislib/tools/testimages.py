@@ -76,11 +76,11 @@ def create_random_int_img(
         """
         in_img_shp = inputs.image.shape
         outputs.out_image = numpy.random.choice(otherargs.out_vals, in_img_shp).astype(
-            rsgislib.getNumpyDataType(datatype)
+            rsgislib.get_numpy_datatype(datatype)
         )
 
     applier.apply(_applyPopVals, infiles, outfiles, otherargs, controls=aControls)
     if calc_stats:
         import rsgislib.rastergis
 
-        rsgislib.rastergis.populateStats(output_img, True, True, True)
+        rsgislib.rastergis.pop_rat_img_stats(output_img, True, True, True)

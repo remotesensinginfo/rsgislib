@@ -14,7 +14,7 @@ import time
 import rsgislib
 
 
-def getFileExtension(gdalformat):
+def get_file_img_extension(gdalformat):
     """
     A function to get the extension for a given file format
     (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
@@ -40,7 +40,7 @@ def getFileExtension(gdalformat):
     return ext
 
 
-def getGDALFormatFromExt(input_file):
+def get_gdal_format_from_ext(input_file):
     """
     Get GDAL format, based on input_file
 
@@ -64,7 +64,7 @@ def getGDALFormatFromExt(input_file):
     return gdalStr
 
 
-def getFileBasename(input_file, check_valid=False, n_comps=0):
+def get_file_basename(input_file, check_valid=False, n_comps=0):
     """
     Uses os.path module to return file basename (i.e., path and extension removed)
 
@@ -104,7 +104,7 @@ def getFileBasename(input_file, check_valid=False, n_comps=0):
     return basename
 
 
-def getDIRName(input_file):
+def get_dir_name(input_file):
     """
     A function which returns just the name of the directory of the input file
     without the rest of the path.
@@ -118,7 +118,7 @@ def getDIRName(input_file):
     return dir_name
 
 
-def deleteFileWithBasename(input_file):
+def delete_file_with_basename(input_file):
     """
     Function to delete all the files which have a path
     and base name defined in the input_file attribute.
@@ -131,7 +131,7 @@ def deleteFileWithBasename(input_file):
         os.remove(file)
 
 
-def deleteDIR(dir_path):
+def delete_dir(dir_path):
     """
     A function which will delete a directory, if files and other directories
     are within the path specified they will be recursively deleted as well.
@@ -147,7 +147,7 @@ def deleteDIR(dir_path):
     print("Deleted " + dir_path)
 
 
-def findFile(dir_path, file_search):
+def find_file(dir_path, file_search):
     """
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
@@ -168,7 +168,7 @@ def findFile(dir_path, file_search):
     return files[0]
 
 
-def findFileNone(dir_path, file_search):
+def find_file_none(dir_path, file_search):
     """
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
@@ -183,7 +183,7 @@ def findFileNone(dir_path, file_search):
     return files[0]
 
 
-def findFilesExt(dir_path, ending):
+def find_files_ext(dir_path, ending):
     """
     Find all the files within a directory structure with a specific file ending.
     The files are return as dictionary using the file name as the dictionary key.
@@ -204,7 +204,7 @@ def findFilesExt(dir_path, ending):
     return out_file_dict
 
 
-def findFilesMPathsExt(dir_paths, ending):
+def find_files_mpaths_ext(dir_paths, ending):
     """
     Find all the files within a list of input directories and the structure beneath
     with a specific file ending. The files are return as dictionary using the file
@@ -227,7 +227,7 @@ def findFilesMPathsExt(dir_paths, ending):
     return out_file_dict
 
 
-def findFirstFile(dir_path, file_search, rtn_except=True):
+def find_first_file(dir_path, file_search, rtn_except=True):
     """
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
@@ -259,7 +259,7 @@ def findFirstFile(dir_path, file_search, rtn_except=True):
     return out_file
 
 
-def getFilesMTime(file_lst, dt_before=None, dt_after=None):
+def get_files_mod_time(file_lst, dt_before=None, dt_after=None):
     """
     A function which subsets a list of files based on datetime of
     last modification. The function also does a check as to whether
@@ -286,7 +286,7 @@ def getFilesMTime(file_lst, dt_before=None, dt_after=None):
     return out_file_lst
 
 
-def fileIsHidden(dir_path):
+def file_is_hidden(dir_path):
     """
     A function to test whether a file or folder is 'hidden' or not on the
     file system. Should be cross platform between Linux/UNIX and windows.
@@ -309,7 +309,7 @@ def fileIsHidden(dir_path):
         return file_name.startswith(".")
 
 
-def getDIRList(dir_path, inc_hidden=False):
+def get_dir_list(dir_path, inc_hidden=False):
     """
     Function which get the list of directories within the specified path.
 
@@ -325,14 +325,14 @@ def getDIRList(dir_path, inc_hidden=False):
         c_path = os.path.join(dir_path, item)
         if os.path.isdir(c_path):
             if not inc_hidden:
-                if not fileIsHidden(c_path):
+                if not file_is_hidden(c_path):
                     out_dir_lst.append(c_path)
             else:
                 out_dir_lst.append(c_path)
     return out_dir_lst
 
 
-def getFileLock(input_file, sleep_period=1, wait_iters=120, use_except=False):
+def get_file_lock(input_file, sleep_period=1, wait_iters=120, use_except=False):
     """
     A function which gets a lock on a file.
 
@@ -378,7 +378,7 @@ def getFileLock(input_file, sleep_period=1, wait_iters=120, use_except=False):
     return got_lock
 
 
-def releaseFileLock(input_file):
+def release_file_lock(input_file):
     """
     A function which releases a lock file for the input file.
 
@@ -392,7 +392,7 @@ def releaseFileLock(input_file):
         os.remove(lock_file_path)
 
 
-def cleanFileLocks(dir_path, timeout=3600):
+def clean_file_locks(dir_path, timeout=3600):
     """
     A function which cleans up any remaining lock file (i.e., if an application
     has crashed). The timeout time will be compared with the time written within
@@ -407,14 +407,14 @@ def cleanFileLocks(dir_path, timeout=3600):
     c_dateime = datetime.datetime.now()
     lock_files = glob.glob(os.path.join(dir_path, ".*.lok"))
     for lock_file_path in lock_files:
-        create_date_str = rsgislib.tools.utils.readTextFileNoNewLines(lock_file_path)
+        create_date_str = rsgislib.tools.utils.read_text_file_no_new_lines(lock_file_path)
         create_date = datetime.datetime.fromisoformat(create_date_str)
         time_since_create = (c_dateime - create_date).total_seconds()
         if time_since_create > timeout:
             os.remove(lock_file_path)
 
 
-def sortImgsUTM2DIRs(input_imgs_dir, file_search_str, out_base_dir):
+def sort_imgs_to_dirs_utm(input_imgs_dir, file_search_str, out_base_dir):
     """
     A function which will sort a series of input image files which
     a projected using the UTM system into individual directories per
@@ -444,7 +444,7 @@ def sortImgsUTM2DIRs(input_imgs_dir, file_search_str, out_base_dir):
                 shutil.move(tmpFile, outFile)
 
 
-def createDirectoryArchive(in_dir, out_arch, arch_format):
+def create_directory_archive(in_dir, out_arch, arch_format):
     """
     A function which creates an archive from an input directory. This function uses
     subprocess to call the appropriate command line function.
@@ -497,7 +497,7 @@ def createDirectoryArchive(in_dir, out_arch, arch_format):
     return out_arch_file
 
 
-def createSHA1Hash(input_file, block_size=4096):
+def create_sha1_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA1 hash string of the input file.
     :param input_file: the input file for which the SHA1 hash string with be found.
@@ -516,7 +516,7 @@ def createSHA1Hash(input_file, block_size=4096):
     return sha1_hash.hexdigest()
 
 
-def createSHA224Hash(input_file, block_size=4096):
+def create_sha224_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA224 hash string of the input file.
     :param input_file: the input file for which the SHA224 hash string with be found.
@@ -535,7 +535,7 @@ def createSHA224Hash(input_file, block_size=4096):
     return sha224_hash.hexdigest()
 
 
-def createSHA256Hash(input_file, block_size=4096):
+def create_sha256_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA256 hash string of the input file.
     :param input_file: the input file for which the SHA256 hash string with be found.
@@ -554,7 +554,7 @@ def createSHA256Hash(input_file, block_size=4096):
     return sha256_hash.hexdigest()
 
 
-def createSHA384Hash(input_file, block_size=4096):
+def create_sha384_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA384 hash string of the input file.
     :param input_file: the input file for which the SHA384 hash string with be found.
@@ -573,7 +573,7 @@ def createSHA384Hash(input_file, block_size=4096):
     return sha384_hash.hexdigest()
 
 
-def createSHA512Hash(input_file, block_size=4096):
+def create_sha512_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA512 hash string of the input file.
     :param input_file: the input file for which the SHA512 hash string with be found.
@@ -592,7 +592,7 @@ def createSHA512Hash(input_file, block_size=4096):
     return sha512_hash.hexdigest()
 
 
-def createMD5Hash(input_file, block_size=4096):
+def create_md5_hash(input_file, block_size=4096):
     """
     A function which calculates finds the MD5 hash string of the input file.
     :param input_file: the input file for which the MD5 hash string with be found.
@@ -611,7 +611,7 @@ def createMD5Hash(input_file, block_size=4096):
     return md5_hash.hexdigest()
 
 
-def createBlake2BHash(input_file, block_size=4096):
+def create_blake2b_hash(input_file, block_size=4096):
     """
     A function which calculates finds the Blake2B hash string of the input file.
     :param input_file: the input file for which the Blake2B hash string with be found.
@@ -630,7 +630,7 @@ def createBlake2BHash(input_file, block_size=4096):
     return blake2b_hash.hexdigest()
 
 
-def createBlake2SHash(input_file, block_size=4096):
+def create_blake2s_hash(input_file, block_size=4096):
     """
     A function which calculates finds the Blake2S hash string of the input file.
     :param input_file: the input file for which the Blake2S hash string with be found.
@@ -649,7 +649,7 @@ def createBlake2SHash(input_file, block_size=4096):
     return blake2s_hash.hexdigest()
 
 
-def createSHA3_224Hash(input_file, block_size=4096):
+def create_sha3_224_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA3_224 hash string of the input file.
     :param input_file: the input file for which the SHA3_224 hash string with be found.
@@ -668,7 +668,7 @@ def createSHA3_224Hash(input_file, block_size=4096):
     return sha224_hash.hexdigest()
 
 
-def createSHA3_256Hash(input_file, block_size=4096):
+def create_sha3_256_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA3_256 hash string of the input file.
     :param input_file: the input file for which the SHA3_256 hash string with be found.
@@ -687,7 +687,7 @@ def createSHA3_256Hash(input_file, block_size=4096):
     return sha256_hash.hexdigest()
 
 
-def createSHA3_384Hash(input_file, block_size=4096):
+def create_sha3_384_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA3_384 hash string of the input file.
     :param input_file: the input file for which the SHA3_384 hash string with be found.
@@ -706,7 +706,7 @@ def createSHA3_384Hash(input_file, block_size=4096):
     return sha384_hash.hexdigest()
 
 
-def createSHA3_512Hash(input_file, block_size=4096):
+def create_sha3_512_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA3_512 hash string of the input file.
     :param input_file: the input file for which the SHA3_512 hash string with be found.

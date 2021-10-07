@@ -6,109 +6,109 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools", "utils")
 
 
-def test_uidGenerator_len4():
+def test_uid_generator_len4():
     import rsgislib.tools.utils
 
-    uid_str = rsgislib.tools.utils.uidGenerator(4)
+    uid_str = rsgislib.tools.utils.uid_generator(4)
     assert len(uid_str) == 4
 
 
-def test_uidGenerator_len6():
+def test_uid_generator_len6():
     import rsgislib.tools.utils
 
-    uid_str = rsgislib.tools.utils.uidGenerator(6)
+    uid_str = rsgislib.tools.utils.uid_generator(6)
     assert len(uid_str) == 6
 
 
-def test_uidGenerator_len8():
+def test_uid_generator_len8():
     import rsgislib.tools.utils
 
-    uid_str = rsgislib.tools.utils.uidGenerator(8)
+    uid_str = rsgislib.tools.utils.uid_generator(8)
     assert len(uid_str) == 8
 
 
-def test_isNumber_int_1():
+def test_is_number_int_1():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.isNumber(1)
+    assert rsgislib.tools.utils.is_number(1)
 
 
-def test_isNumber_int_100():
+def test_is_number_int_100():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.isNumber(100)
+    assert rsgislib.tools.utils.is_number(100)
 
 
-def test_isNumber_int_1str():
+def test_is_number_int_1str():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.isNumber("1")
+    assert rsgislib.tools.utils.is_number("1")
 
 
-def test_isNumber_int_100str():
+def test_is_number_int_100str():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.isNumber("100")
+    assert rsgislib.tools.utils.is_number("100")
 
 
-def test_isNumber_float_125():
+def test_is_number_float_125():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.isNumber(1.25)
+    assert rsgislib.tools.utils.is_number(1.25)
 
 
-def test_isNumber_float_10025():
+def test_is_number_float_10025():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.isNumber(100.25)
+    assert rsgislib.tools.utils.is_number(100.25)
 
 
-def test_isNumber_float_str125():
+def test_is_number_float_str125():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.isNumber("1.25")
+    assert rsgislib.tools.utils.is_number("1.25")
 
 
-def test_isNumber_float_str10025():
+def test_is_number_float_str10025():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.isNumber("100.25")
+    assert rsgislib.tools.utils.is_number("100.25")
 
 
-def test_isNumber_str_Hello():
+def test_is_number_str_Hello():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.isNumber("Hello")
+    assert not rsgislib.tools.utils.is_number("Hello")
 
 
-def test_isNumber_str_World():
+def test_is_number_str_World():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.isNumber("World")
+    assert not rsgislib.tools.utils.is_number("World")
 
 
-def test_isNumber_str_1a():
+def test_is_number_str_1a():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.isNumber("1a")
+    assert not rsgislib.tools.utils.is_number("1a")
 
 
-def test_isNumber_str_100q():
+def test_is_number_str_100q():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.isNumber("100?")
+    assert not rsgislib.tools.utils.is_number("100?")
 
 
-def test_isNumber_str_1e():
+def test_is_number_str_1e():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.isNumber("1!")
+    assert not rsgislib.tools.utils.is_number("1!")
 
 
-def test_isNumber_str_10at():
+def test_is_number_str_10at():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.isNumber("10@")
+    assert not rsgislib.tools.utils.is_number("10@")
 
 
 def test_zero_pad_num_str_1():
@@ -176,35 +176,35 @@ def test_powerset_lst_min2():
     assert correct_answer
 
 
-def test_readTextFileNoNewLines_str():
+def test_read_text_file_no_new_lines_str():
     import rsgislib.tools.utils
 
     input_file = os.path.join(TOOLS_DATA_DIR, "basic_str.txt")
-    in_data = rsgislib.tools.utils.readTextFileNoNewLines(input_file)
+    in_data = rsgislib.tools.utils.read_text_file_no_new_lines(input_file)
     assert in_data == "Hello"
 
 
-def test_readTextFileNoNewLines_str_mline():
+def test_read_text_file_no_new_lines_str_mline():
     import rsgislib.tools.utils
 
     input_file = os.path.join(TOOLS_DATA_DIR, "basic_str_mline.txt")
-    in_data = rsgislib.tools.utils.readTextFileNoNewLines(input_file)
+    in_data = rsgislib.tools.utils.read_text_file_no_new_lines(input_file)
     assert in_data == "HelloWorld"
 
 
-def test_readTextFileNoNewLines_int():
+def test_read_text_file_no_new_lines_int():
     import rsgislib.tools.utils
 
     input_file = os.path.join(TOOLS_DATA_DIR, "basic_int.txt")
-    in_data = rsgislib.tools.utils.readTextFileNoNewLines(input_file)
+    in_data = rsgislib.tools.utils.read_text_file_no_new_lines(input_file)
     assert int(in_data) == 100
 
 
-def test_readTextFile2List_strs():
+def test_read_text_file_to_list_strs():
     import rsgislib.tools.utils
 
     input_file = os.path.join(TOOLS_DATA_DIR, "basic_str_mline.txt")
-    in_data = rsgislib.tools.utils.readTextFile2List(input_file)
+    in_data = rsgislib.tools.utils.read_text_file_to_list(input_file)
     ref_data = ["Hello", "World"]
     if len(in_data) != len(ref_data):
         assert False
@@ -214,140 +214,140 @@ def test_readTextFile2List_strs():
     assert True
 
 
-def test_writeData2File_fileExists(tmp_path):
+def test_write_data_to_file_fileExists(tmp_path):
     import rsgislib.tools.utils
 
     out_data = "CONTENT"
     out_file = os.path.join(tmp_path, "out_file.txt")
-    rsgislib.tools.utils.writeData2File(out_data, out_file)
+    rsgislib.tools.utils.write_data_to_file(out_data, out_file)
     assert os.path.exists(out_file)
 
 
-def test_writeData2File_str_chkcontent(tmp_path):
+def test_write_data_to_file_str_chkcontent(tmp_path):
     import rsgislib.tools.utils
 
     out_data = "CONTENT"
     out_file = os.path.join(tmp_path, "out_file.txt")
-    rsgislib.tools.utils.writeData2File(out_data, out_file)
-    in_data = rsgislib.tools.utils.readTextFileNoNewLines(out_file)
+    rsgislib.tools.utils.write_data_to_file(out_data, out_file)
+    in_data = rsgislib.tools.utils.read_text_file_no_new_lines(out_file)
     assert in_data == out_data
 
 
-def test_writeData2File_int_chkcontent(tmp_path):
+def test_write_data_to_file_int_chkcontent(tmp_path):
     import rsgislib.tools.utils
 
     out_data = 100
     out_file = os.path.join(tmp_path, "out_file.txt")
-    rsgislib.tools.utils.writeData2File(out_data, out_file)
-    in_data = rsgislib.tools.utils.readTextFileNoNewLines(out_file)
+    rsgislib.tools.utils.write_data_to_file(out_data, out_file)
+    in_data = rsgislib.tools.utils.read_text_file_no_new_lines(out_file)
     assert int(in_data) == out_data
 
 
-def test_readJSON2Dict_basic():
+def test_read_json_to_dict_basic():
     import rsgislib.tools.utils
 
     input_file = os.path.join(TOOLS_DATA_DIR, "basic_dict.json")
     out_data = dict()
     out_data["Hello"] = "World"
     out_data["ten"] = 10
-    in_data = rsgislib.tools.utils.readJSON2Dict(input_file)
+    in_data = rsgislib.tools.utils.read_json_to_dict(input_file)
     assert in_data == out_data
 
 
-def test_writeDict2JSON_basic(tmp_path):
+def test_write_dict_to_json_basic(tmp_path):
     import rsgislib.tools.utils
 
     out_data = dict()
     out_data["Hello"] = "World"
     out_data["ten"] = 10
     out_file = os.path.join(tmp_path, "out_file.json")
-    rsgislib.tools.utils.writeDict2JSON(out_data, out_file)
-    in_data = rsgislib.tools.utils.readJSON2Dict(out_file)
+    rsgislib.tools.utils.write_dict_to_json(out_data, out_file)
+    in_data = rsgislib.tools.utils.read_json_to_dict(out_file)
     assert in_data == out_data
 
 
-def test_inBounds_sgl_num():
+def test_in_bounds_sgl_num():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.inBounds(5, 1, 10, upper_strict=False)
+    assert rsgislib.tools.utils.in_bounds(5, 1, 10, upper_strict=False)
 
 
-def test_inBounds_sgl_num_fail():
+def test_in_bounds_sgl_num_fail():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.inBounds(15, 1, 10, upper_strict=False)
+    assert not rsgislib.tools.utils.in_bounds(15, 1, 10, upper_strict=False)
 
 
-def test_inBounds_sgl_num_strict_false():
+def test_in_bounds_sgl_num_strict_false():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.inBounds(10, 1, 10, upper_strict=False)
+    assert rsgislib.tools.utils.in_bounds(10, 1, 10, upper_strict=False)
 
 
-def test_inBounds_sgl_num_strict_true():
+def test_in_bounds_sgl_num_strict_true():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.inBounds(10, 1, 10, upper_strict=True)
+    assert not rsgislib.tools.utils.in_bounds(10, 1, 10, upper_strict=True)
 
 
-def test_inBounds_arr():
+def test_in_bounds_arr():
     import rsgislib.tools.utils
     import numpy
 
     arr = numpy.array([2, 3, 4, 7, 8])
-    assert rsgislib.tools.utils.inBounds(arr, 1, 10, upper_strict=False)
+    assert rsgislib.tools.utils.in_bounds(arr, 1, 10, upper_strict=False)
 
 
-def test_inBounds_arr_fail():
+def test_in_bounds_arr_fail():
     import rsgislib.tools.utils
     import numpy
 
     arr = numpy.array([12, 23, 34, 47, 68])
-    assert not rsgislib.tools.utils.inBounds(arr, 1, 10, upper_strict=False)
+    assert not rsgislib.tools.utils.in_bounds(arr, 1, 10, upper_strict=False)
 
 
-def test_inBounds_arr_strict_false():
+def test_in_bounds_arr_strict_false():
     import rsgislib.tools.utils
     import numpy
 
     arr = numpy.array([2, 3, 4, 7, 8, 10])
-    assert rsgislib.tools.utils.inBounds(arr, 1, 10, upper_strict=False)
+    assert rsgislib.tools.utils.in_bounds(arr, 1, 10, upper_strict=False)
 
 
-def test_inBounds_arr_strict_true():
+def test_in_bounds_arr_strict_true():
     import rsgislib.tools.utils
     import numpy
 
     arr = numpy.array([2, 3, 4, 7, 8, 10])
-    assert not rsgislib.tools.utils.inBounds(arr, 1, 10, upper_strict=True)
+    assert not rsgislib.tools.utils.in_bounds(arr, 1, 10, upper_strict=True)
 
 
-def test_mixedSigns_sgl_num_pos():
+def test_mixed_signs_sgl_num_pos():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.mixedSigns(5)
+    assert not rsgislib.tools.utils.mixed_signs(5)
 
 
-def test_mixedSigns_sgl_num_neg():
+def test_mixed_signs_sgl_num_neg():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.mixedSigns(-5)
+    assert not rsgislib.tools.utils.mixed_signs(-5)
 
 
-def test_mixedSigns_arr():
+def test_mixed_signs_arr():
     import rsgislib.tools.utils
     import numpy
 
     arr = numpy.array([-1, 1, -2, 2])
-    assert rsgislib.tools.utils.mixedSigns(arr)
+    assert rsgislib.tools.utils.mixed_signs(arr)
 
 
-def test_mixedSigns_arr_fail():
+def test_mixed_signs_arr_fail():
     import rsgislib.tools.utils
     import numpy
 
     arr = numpy.array([1, 1, 2, 2])
-    assert not rsgislib.tools.utils.mixedSigns(arr)
+    assert not rsgislib.tools.utils.mixed_signs(arr)
 
 
 def test_negative_sgl_num_pos():
@@ -386,119 +386,119 @@ def test_negative_arr_neg():
     assert rsgislib.tools.utils.negative(arr)
 
 
-def test_isOdd_num_even():
+def test_is_odd_num_even():
     import rsgislib.tools.utils
 
-    assert not rsgislib.tools.utils.isOdd(2)
+    assert not rsgislib.tools.utils.is_odd(2)
 
 
-def test_isOdd_num_odd():
+def test_is_odd_num_odd():
     import rsgislib.tools.utils
 
-    assert rsgislib.tools.utils.isOdd(5)
+    assert rsgislib.tools.utils.is_odd(5)
 
 
-def test_isOdd_str():
+def test_is_odd_str():
     import rsgislib.tools.utils
 
     with pytest.raises(TypeError):
-        assert rsgislib.tools.utils.isOdd("5")
+        assert rsgislib.tools.utils.is_odd("5")
 
 
-def test_removeRepeatedChars_two():
+def test_remove_repeated_chars_two():
     import rsgislib.tools.utils
 
     in_str = "Hello__World"
     ref_str = "Hello_World"
-    out_str = rsgislib.tools.utils.removeRepeatedChars(in_str, repeat_char="_")
+    out_str = rsgislib.tools.utils.remove_repeated_chars(in_str, repeat_char="_")
     assert ref_str == out_str
 
 
-def test_removeRepeatedChars_three():
+def test_remove_repeated_chars_three():
     import rsgislib.tools.utils
 
     in_str = "Hello___World"
     ref_str = "Hello_World"
-    out_str = rsgislib.tools.utils.removeRepeatedChars(in_str, repeat_char="_")
+    out_str = rsgislib.tools.utils.remove_repeated_chars(in_str, repeat_char="_")
     assert ref_str == out_str
 
 
-def test_removeRepeatedChars_four():
+def test_remove_repeated_chars_four():
     import rsgislib.tools.utils
 
     in_str = "Hello____World"
     ref_str = "Hello_World"
-    out_str = rsgislib.tools.utils.removeRepeatedChars(in_str, repeat_char="_")
+    out_str = rsgislib.tools.utils.remove_repeated_chars(in_str, repeat_char="_")
     assert ref_str == out_str
 
 
-def test_checkStr_nochng():
+def test_check_str_nochng():
     import rsgislib.tools.utils
 
     in_str = "Hello_World"
     ref_str = "Hello_World"
-    out_str = rsgislib.tools.utils.checkStr(
+    out_str = rsgislib.tools.utils.check_str(
         in_str, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_punc=False
     )
     assert ref_str == out_str
 
 
-def test_checkStr_rmDashs():
+def test_check_str_rmDashs():
     import rsgislib.tools.utils
 
     in_str = "Hello-World"
     ref_str = "Hello_World"
-    out_str = rsgislib.tools.utils.checkStr(
+    out_str = rsgislib.tools.utils.check_str(
         in_str, rm_non_ascii=False, rm_dashs=True, rm_spaces=False, rm_punc=False
     )
     assert ref_str == out_str
 
 
-def test_checkStr_rmSpaces():
+def test_check_str_rmSpaces():
     import rsgislib.tools.utils
 
     in_str = "Hello World"
     ref_str = "Hello_World"
-    out_str = rsgislib.tools.utils.checkStr(
+    out_str = rsgislib.tools.utils.check_str(
         in_str, rm_non_ascii=False, rm_dashs=False, rm_spaces=True, rm_punc=False
     )
     assert ref_str == out_str
 
 
-def test_checkStr_rmPunc():
+def test_check_str_rmPunc():
     import rsgislib.tools.utils
 
     in_str = "Hello_World!"
     ref_str = "Hello_World"
-    out_str = rsgislib.tools.utils.checkStr(
+    out_str = rsgislib.tools.utils.check_str(
         in_str, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_punc=True
     )
     assert ref_str == out_str
 
 
-def test_checkStr_rmNonASCII():
+def test_check_str_rmNonASCII():
     import rsgislib.tools.utils
 
     in_str = "Hello_World£"
     ref_str = "Hello_World"
-    out_str = rsgislib.tools.utils.checkStr(
+    out_str = rsgislib.tools.utils.check_str(
         in_str, rm_non_ascii=True, rm_dashs=False, rm_spaces=False, rm_punc=False
     )
     assert ref_str == out_str
 
 
-def test_getDaysSince():
+def test_get_days_since():
     import datetime
     import rsgislib.tools.utils
 
     base_date = datetime.date(2000, 1, 1)
     year = 2000
     day_of_year = 195
-    n_days = rsgislib.tools.utils.getDaysSince(year, day_of_year, base_date)
+    n_days = rsgislib.tools.utils.get_days_since(year, day_of_year, base_date)
     assert n_days == 194
 
 
-def test_getDaysSinceDate():
+def test_get_days_since_date():
     import datetime
     import rsgislib.tools.utils
 
@@ -506,5 +506,5 @@ def test_getDaysSinceDate():
     year = 2000
     month = 4
     day = 15
-    n_days = rsgislib.tools.utils.getDaysSinceDate(year, month, day, base_date)
+    n_days = rsgislib.tools.utils.get_days_since_date(year, month, day, base_date)
     assert n_days == 105

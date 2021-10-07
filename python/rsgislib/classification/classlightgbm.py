@@ -732,12 +732,12 @@ image and threshold can be applied to this image. Note. the softmax score is not
     print("Applying the Classifier")
     applier.apply(_applyLGBMClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.imageutils.popImageStats(outScoreImg, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imageutils.pop_img_stats(outScoreImg, usenodataval=True, nodataval=0, calcpyramids=True)
 
     if outClassImg is not None:
-        rsgislib.imagecalc.imageMath(outScoreImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,
+        rsgislib.imagecalc.image_math(outScoreImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,
                                      rsgislib.TYPE_8UINT)
-        rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+        rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
 def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file=None, unbalanced=False,
@@ -1078,7 +1078,7 @@ the maximum softmax score.
     print("Completed Classification")
 
     if classClrNames:
-        rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+        rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
         ratDataset = gdal.Open(outClassImg, gdal.GA_Update)
         red = rat.readColumn(ratDataset, 'Red')
         green = rat.readColumn(ratDataset, 'Green')

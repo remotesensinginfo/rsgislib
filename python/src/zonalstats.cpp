@@ -54,7 +54,7 @@ static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args, PyObj
     const char *pszInputImage, *pszInputVector, *pszInputVecLyr, *pszOutputHDF;
     int pixelInPolyMethod = 1;
     int noProjWarning = false;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|ii:imageZoneToHDF", kwlist, &pszInputImage, &pszInputVector, &pszInputVecLyr, &pszOutputHDF, &noProjWarning, &pixelInPolyMethod))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|ii:image_zone_to_hdf", kwlist, &pszInputImage, &pszInputVector, &pszInputVecLyr, &pszOutputHDF, &noProjWarning, &pixelInPolyMethod))
         return nullptr;
     try
     {
@@ -74,8 +74,8 @@ static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args, PyObj
 // Our list of functions in this module
 static PyMethodDef ZonalStatsMethods[] = {
 
-{"imageZoneToHDF", (PyCFunction)ZonalStats_ImageZoneToHDF, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.zonalstats.imageZoneToHDF(input_img, vec_file, vec_lyr, out_h5_file, no_prj_warn=False, pxl_in_poly_method=METHOD_POLYCONTAINSPIXELCENTER)\n"
+{"image_zone_to_hdf", (PyCFunction)ZonalStats_ImageZoneToHDF, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.zonalstats.image_zone_to_hdf(input_img, vec_file, vec_lyr, out_h5_file, no_prj_warn=False, pxl_in_poly_method=METHOD_POLYCONTAINSPIXELCENTER)\n"
 "Extract the all the pixel values for regions to a HDF5 file (1 column for each image band).\n\n"
 "Where:\n"
 "\n"
@@ -92,7 +92,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "    inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
 "    inputvector = './Vectors/injune_p142_crowns_utm.shp'\n"
 "    outputHDF = './TestOutputs/InjuneP142.hdf'\n"
-"    zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
+"    zonalstats.image_zone_to_hdf(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
 "\n"},
 
     {nullptr}        /* Sentinel */

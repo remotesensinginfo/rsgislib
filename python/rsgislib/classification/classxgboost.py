@@ -564,13 +564,13 @@ image and threshold can be applied to this image.
     print("Applying the Classifier")
     applier.apply(_applyXGBClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.imageutils.popImageStats(outProbImg, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imageutils.pop_img_stats(outProbImg, usenodataval=True, nodataval=0, calcpyramids=True)
 
     if outClassImg is not None:
-        rsgislib.imagecalc.imageMath(outProbImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,
+        rsgislib.imagecalc.image_math(outProbImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,
                                      rsgislib.TYPE_8UINT)
         if gdalformat == 'KEA':
-            rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+            rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
 def optimise_xgboost_multiclass_classifer(out_params_file, clsinfodict, nthread=1,
@@ -1083,7 +1083,7 @@ output image and threshold can be applied to this image.
     print("Completed Classification")
 
     if classClrNames:
-        rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+        rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
         ratDataset = gdal.Open(outClassImg, gdal.GA_Update)
         red = rat.readColumn(ratDataset, 'Red')
         green = rat.readColumn(ratDataset, 'Green')

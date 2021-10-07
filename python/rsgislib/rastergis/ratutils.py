@@ -1210,7 +1210,7 @@ Where:
         os.makedirs(tmpPath)
         createdDIR = True
     
-    uid = rsgislib.tools.utils.uidGenerator(10)
+    uid = rsgislib.tools.utils.uid_generator(10)
     
     classLayerSeq = list()
     tmpClassImgLayers = list()
@@ -1222,7 +1222,7 @@ Where:
         classShpFileLyr = os.path.splitext(os.path.basename(classShpFile))[0]
         classImgFile = os.path.join(tmpPath, className+"_{}.kea".format(uid))
         classIntVal = classesDict[key][0]
-        vectorutils.rasteriseVecLyr(classShpFile, classShpFileLyr, clumpsImg, classImgFile, gdalformat="KEA",
+        vectorutils.convertvector.rasterise_vec_lyr(classShpFile, classShpFileLyr, clumpsImg, classImgFile, gdalformat="KEA",
                                     burnVal=classIntVal, datatype=rsgislib.TYPE_16UINT)
         tmpClassImgLayers.append(classImgFile)
         classNamesDict[classIntVal] = className
@@ -1235,8 +1235,8 @@ Where:
     defineClassNames(clumpsImg, classesIntCol, classesNameCol, classNamesDict)
     
     for file in tmpClassImgLayers:
-        rsgislib.tools.filetools.deleteFileWithBasename(file)
-    rsgislib.tools.filetools.deleteFileWithBasename(combinedClassesImage)
+        rsgislib.tools.filetools.delete_file_with_basename(file)
+    rsgislib.tools.filetools.delete_file_with_basename(combinedClassesImage)
     
     if createdDIR:
         shutil.rmtree(tmpPath)
@@ -1401,7 +1401,7 @@ Example::
             tiledclump.performClumpingSingleThread(classMaskImg, classMaskClumps, tmpDIR=os.path.join(tmpPath, baseName+'_ClumpTmp', width=tileWidth, height=tileHeight))
     else:
         segmentation.clump(classMaskImg, classMaskClumps, "KEA", False, 0)
-    rastergis.populateStats(classMaskClumps, False, False)
+    rastergis.pop_rat_img_stats(classMaskClumps, False, False)
         
     for i in range(numThresholds):
         print("Processing thresold " + str(smallClumpsThres[i]) + " - " + outColName[i])
@@ -1419,9 +1419,9 @@ Example::
         rastergis.populateRATWithStats(smallClumpsMask, clumpsImg, bs)
     
 
-    rsgislib.tools.filetools.deleteFileWithBasename(classMaskImg)
-    rsgislib.tools.filetools.deleteFileWithBasename(classMaskClumps)
-    rsgislib.tools.filetools.deleteFileWithBasename(smallClumpsMask)
+    rsgislib.tools.filetools.delete_file_with_basename(classMaskImg)
+    rsgislib.tools.filetools.delete_file_with_basename(classMaskClumps)
+    rsgislib.tools.filetools.delete_file_with_basename(smallClumpsMask)
     if createdDIR:
         shutil.rmtree(tmpPath)
 
@@ -1434,7 +1434,7 @@ def _computeProximityArrArgsFunc(argVals):
     """
     classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
     classImgBand = classImgDS.GetRasterBand(1)
-    imageutils.createCopyImage(argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT)
+    imageutils.create_copy_img(argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT)
     distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
     distImgBand = distImgDS.GetRasterBand(1)
     try:
@@ -1475,7 +1475,7 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
     if nCores <= 0:
         nCores = multiprocessing.cpu_count()
     
-    uid = rsgislib.tools.utils.uidGenerator()
+    uid = rsgislib.tools.utils.uid_generator()
         
     classesImg = os.path.join(tmpDIR, 'ClassImg_'+uid+'.kea')
     rastergis.exportCol2GDALImage(clumpsImg, classesImg, 'KEA', rsgislib.TYPE_32UINT, classCol)
@@ -1536,16 +1536,16 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
                 
         distImage = outImgBase + '_' + str(classID) + '.kea'
         # Mosaic Tiles
-        imageutils.createImageMosaic(distTiles, distImage, nodata, nodata, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
-        imageutils.popImageStats(distImage, usenodataval=True, nodataval=nodata, calcpyramids=True)
+        imageutils.create_img_mosaic(distTiles, distImage, nodata, nodata, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
+        imageutils.pop_img_stats(distImage, usenodataval=True, nodataval=nodata, calcpyramids=True)
         for imgFile in distTiles:
-            rsgislib.tools.filetools.deleteFileWithBasename(imgFile)
+            rsgislib.tools.filetools.delete_file_with_basename(imgFile)
     
     if not classTilesDIRPresent:
         shutil.rmtree(classTilesDIR, ignore_errors=True)
     else:
         for classTileFile in imgTileFiles:
-            rsgislib.tools.filetools.deleteFileWithBasename(classTileFile)
+            rsgislib.tools.filetools.delete_file_with_basename(classTileFile)
     
     if not distTilesDIRPresent:
         shutil.rmtree(distTilesDIR, ignore_errors=True)
@@ -1574,7 +1574,7 @@ Calculate the distance between all clumps
         os.makedirs(tmpDIR)
         tmpPresent = False 
 
-    baseName = '{}_{}'.format(rsgislib.tools.filetools.get_file_basename(clumpsImg), rsgislib.tools.utils.uidGenerator())
+    baseName = '{}_{}'.format(rsgislib.tools.filetools.get_file_basename(clumpsImg), rsgislib.tools.utils.uid_generator())
     
     polysShp = os.path.join(tmpDIR, baseName+'_shp.shp')
     vectorutils.polygoniseRaster(clumpsImg, polysShp, imgBandNo=1, maskImg=clumpsImg, imgMaskBandNo=1)
@@ -1610,7 +1610,7 @@ Calculate the distance from each small clump to a large clump. Split defined by 
         os.makedirs(tmpDIR)
         tmpPresent = False 
     
-    uidStr = rsgislib.tools.utils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uid_generator()
     baseName = '{}_{}'.format(rsgislib.tools.filetools.get_file_basename(clumpsImg), uidStr)
     
     ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
@@ -1643,11 +1643,11 @@ Calculate the distance from each small clump to a large clump. Split defined by 
     
     smClumpsImg = os.path.join(tmpDIR, baseName+'_smclumps.kea')
     rastergis.exportCol2GDALImage(clumpsImg, smClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'SmUnits')
-    rastergis.populateStats(clumps=smClumpsImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+    rastergis.pop_rat_img_stats(clumps=smClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     
     lrgClumpsImg = os.path.join(tmpDIR, baseName+'_lrgclumps.kea')
     rastergis.exportCol2GDALImage(clumpsImg, lrgClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'LrgUnits')
-    rastergis.populateStats(clumps=lrgClumpsImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+    rastergis.pop_rat_img_stats(clumps=lrgClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     
     smPolysShp = os.path.join(tmpDIR, baseName+'_smClumps_shp.shp')
     rsgislib.vectorutils.polygoniseRaster(smClumpsImg, smPolysShp, imgBandNo=1, maskImg=smClumpsImg, imgMaskBandNo=1)

@@ -10,7 +10,7 @@ import osgeo.gdal as gdal
 import osgeo.ogr as ogr
 
 
-def writeVecColumn(vec_file, vec_lyr, att_column, att_col_datatype, att_col_data):
+def write_vec_column(vec_file, vec_lyr, att_column, att_col_datatype, att_col_data):
     """
     A function which will write a column to a vector file
 
@@ -96,7 +96,7 @@ def writeVecColumn(vec_file, vec_lyr, att_column, att_col_datatype, att_col_data
         raise e
 
 
-def writeVecColumn2Layer(lyr, att_column, att_col_datatype, att_col_data):
+def write_vec_column_to_layer(lyr, att_column, att_col_datatype, att_col_data):
     """
     A function which will write a column to a vector layer.
 
@@ -165,7 +165,7 @@ def writeVecColumn2Layer(lyr, att_column, att_col_datatype, att_col_data):
         openTransaction = False
 
 
-def readVecColumn(vec_file, vec_lyr, att_column):
+def read_vec_column(vec_file, vec_lyr, att_column):
     """
     A function which will reads a column from a vector file
 
@@ -208,7 +208,7 @@ def readVecColumn(vec_file, vec_lyr, att_column):
     return outVal
 
 
-def readVecColumns(vec_file, vec_lyr, att_columns):
+def read_vec_columns(vec_file, vec_lyr, att_columns):
     """
     A function which will reads a column from a vector file
 
@@ -270,8 +270,8 @@ def readVecColumns(vec_file, vec_lyr, att_columns):
     return outvals
 
 
-def popBBOXCols(vec_file, vec_lyr, xminCol='xmin', xmaxCol='xmax', yminCol='ymin',
-                ymaxCol='ymax'):
+def pop_bbox_cols(vec_file, vec_lyr, xminCol='xmin', xmaxCol='xmax', yminCol='ymin',
+                  ymaxCol='ymax'):
     """
     A function which adds a polygons boundary bbox as attributes to each feature.
 
@@ -379,9 +379,9 @@ def popBBOXCols(vec_file, vec_lyr, xminCol='xmin', xmaxCol='xmax', yminCol='ymin
     print(" Completed")
 
 
-def createNameCol(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG', out_col='names', x_col='MinX',
-                  y_col='MaxY', prefix='', postfix='', latlong=True, int_coords=True, zero_x_pad=0, zero_y_pad=0,
-                  round_n_digts=0, non_neg=False):
+def create_name_col(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG', out_col='names', x_col='MinX',
+                    y_col='MaxY', prefix='', postfix='', latlong=True, int_coords=True, zero_x_pad=0, zero_y_pad=0,
+                    round_n_digts=0, non_neg=False):
     """
     A function which creates a column in the vector layer which can define a name using coordinates associated
     with the feature. Often this is useful if a tiling has been created and from this a set of images are to

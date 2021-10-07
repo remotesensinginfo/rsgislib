@@ -1,15 +1,28 @@
 import os
+import pytest
+
+PYSPTOOLS_NOT_AVAIL = False
+try:
+    import pysptools
+except ImportError:
+    PYSPTOOLS_NOT_AVAIL = True
+
+PYMCR_NOT_AVAIL = False
+try:
+    import pymcr
+except ImportError:
+    PYMCR_NOT_AVAIL = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SPECUNMIX_DATA_DIR = os.path.join(DATA_DIR, "imagecalc", "specunmixing")
 
 
-def test_readEndmembersMTXT():
+def test_read_endmembers_mtxt():
     from rsgislib.imagecalc import specunmixing
 
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
-    n_endmembers, n_bands, endmembers = specunmixing.readEndmembersMTXT(
+    n_endmembers, n_bands, endmembers = specunmixing.read_endmembers_mtxt(
         endmembers_file, gain=1, weight=None
     )
 
@@ -54,12 +67,12 @@ def test_readEndmembersMTXT():
             assert False
 
 
-def test_readEndmembersMTXT_weight():
+def test_read_endmembers_mtxt_weight():
     from rsgislib.imagecalc import specunmixing
 
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
-    n_endmembers, n_bands, endmembers = specunmixing.readEndmembersMTXT(
+    n_endmembers, n_bands, endmembers = specunmixing.read_endmembers_mtxt(
         endmembers_file, gain=1, weight=42
     )
 
@@ -118,12 +131,12 @@ def test_readEndmembersMTXT_weight():
             assert False
 
 
-def test_readEndmembersMTXT_gain():
+def test_read_endmembers_mtxt_gain():
     from rsgislib.imagecalc import specunmixing
 
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
-    n_endmembers, n_bands, endmembers = specunmixing.readEndmembersMTXT(
+    n_endmembers, n_bands, endmembers = specunmixing.read_endmembers_mtxt(
         endmembers_file, gain=10, weight=None
     )
 
@@ -168,49 +181,49 @@ def test_readEndmembersMTXT_gain():
             assert False
 
 
-def test_plotEndmembers_basic(tmp_path):
+def test_plot_endmembers_basic(tmp_path):
     from rsgislib.imagecalc import specunmixing
 
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
     endmember_names = ["PhotoVeg", "NonPhotoVeg", "Water"]
     out_plot_file = os.path.join(tmp_path, "plot.png")
-    specunmixing.plotEndmembers(endmembers_file, endmember_names, out_plot_file)
+    specunmixing.plot_endmembers(endmembers_file, endmember_names, out_plot_file)
     assert os.path.exists(out_plot_file)
 
 
-def test_plotEndmembers_gain(tmp_path):
+def test_plot_endmembers_gain(tmp_path):
     from rsgislib.imagecalc import specunmixing
 
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
     endmember_names = ["PhotoVeg", "NonPhotoVeg", "Water"]
     out_plot_file = os.path.join(tmp_path, "plot.png")
-    specunmixing.plotEndmembers(
+    specunmixing.plot_endmembers(
         endmembers_file, endmember_names, out_plot_file, gain=10
     )
     assert os.path.exists(out_plot_file)
 
 
-def test_plotEndmembers_title(tmp_path):
+def test_plot_endmembers_title(tmp_path):
     from rsgislib.imagecalc import specunmixing
 
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
     endmember_names = ["PhotoVeg", "NonPhotoVeg", "Water"]
     title = "Endmembers Plot"
     out_plot_file = os.path.join(tmp_path, "plot.png")
-    specunmixing.plotEndmembers(
+    specunmixing.plot_endmembers(
         endmembers_file, endmember_names, out_plot_file, plot_title=title, gain=10
     )
     assert os.path.exists(out_plot_file)
 
 
-def test_plotEndmembers_wavelengths(tmp_path):
+def test_plot_endmembers_wavelengths(tmp_path):
     from rsgislib.imagecalc import specunmixing
 
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
     endmember_names = ["PhotoVeg", "NonPhotoVeg", "Water"]
     wavelengths = [490, 560, 665, 705, 740, 783, 842, 865, 1610, 2190]
     out_plot_file = os.path.join(tmp_path, "plot.png")
-    specunmixing.plotEndmembers(
+    specunmixing.plot_endmembers(
         endmembers_file,
         endmember_names,
         out_plot_file,
@@ -220,34 +233,36 @@ def test_plotEndmembers_wavelengths(tmp_path):
     assert os.path.exists(out_plot_file)
 
 
-def test_areEndmembersEqual_True():
+def test_are_endmembers_equal_True():
     from rsgislib.imagecalc import specunmixing
 
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
-    assert specunmixing.areEndmembersEqual(endmembers_file, endmembers_file)
+    assert specunmixing.are_endmembers_equal(endmembers_file, endmembers_file)
 
 
-def test_areEndmembersEqual_True_FltPtEdit():
+def test_are_endmembers_equal_True_FltPtEdit():
     from rsgislib.imagecalc import specunmixing
 
     endmembers_ref_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
     endmembers_cmp_file = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_endmembers_eq_fltpt_edit.mtxt"
     )
-    assert specunmixing.areEndmembersEqual(endmembers_ref_file, endmembers_cmp_file)
+    assert specunmixing.are_endmembers_equal(endmembers_ref_file, endmembers_cmp_file)
 
 
-def test_areEndmembersEqual_False():
+def test_are_endmembers_equal_False():
     from rsgislib.imagecalc import specunmixing
 
     endmembers_ref_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
     endmembers_cmp_file = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_endmembers_not_eq.mtxt"
     )
-    assert not specunmixing.areEndmembersEqual(endmembers_ref_file, endmembers_cmp_file)
+    assert not specunmixing.are_endmembers_equal(
+        endmembers_ref_file, endmembers_cmp_file
+    )
 
 
-def test_extractAvgEndMembers(tmp_path):
+def test_extract_avg_endmembers(tmp_path):
     from rsgislib.imagecalc import specunmixing
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
@@ -255,14 +270,16 @@ def test_extractAvgEndMembers(tmp_path):
     vec_lyr = "endmember_rois"
     out_endmembers_file = os.path.join(tmp_path, "sen2_endmembers_test")
 
-    specunmixing.extractAvgEndMembers(input_img, vec_file, vec_lyr, out_endmembers_file)
+    specunmixing.extract_avg_endmembers(
+        input_img, vec_file, vec_lyr, out_endmembers_file
+    )
 
     endmembers_ref_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
     test_endmembers_file = os.path.join(tmp_path, "sen2_endmembers_test.mtxt")
-    assert specunmixing.areEndmembersEqual(endmembers_ref_file, test_endmembers_file)
+    assert specunmixing.are_endmembers_equal(endmembers_ref_file, test_endmembers_file)
 
 
-def test_exhconLinearSpecUnmix(tmp_path):
+def test_exhcon_linear_spec_unmix(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -271,18 +288,19 @@ def test_exhconLinearSpecUnmix(tmp_path):
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
     output_img = os.path.join(tmp_path, "sen2_unmixed_img.kea")
-    specunmixing.exhconLinearSpecUnmix(
+    specunmixing.exhcon_linear_spec_unmix(
         input_img, output_img, "KEA", rsgislib.TYPE_32FLOAT, endmembers_file, 0.1, 1, 0
     )
 
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_exhcon.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_specUnmixSpTsUCLS_noWeight(tmp_path):
+@pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
+def test_spec_unmix_spts_ucls_noWeight(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -292,7 +310,7 @@ def test_specUnmixSpTsUCLS_noWeight(tmp_path):
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
     output_img = os.path.join(tmp_path, "sen2_unmixed_img.kea")
-    specunmixing.specUnmixSpTsUCLS(
+    specunmixing.spec_unmix_spts_ucls(
         input_img,
         valid_msk_img,
         1,
@@ -307,11 +325,12 @@ def test_specUnmixSpTsUCLS_noWeight(tmp_path):
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_SpTsUCLS_noweight.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_specUnmixSpTsUCLS_weight100(tmp_path):
+@pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
+def test_spec_unmix_spts_ucls_weight100(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -321,7 +340,7 @@ def test_specUnmixSpTsUCLS_weight100(tmp_path):
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
     output_img = os.path.join(tmp_path, "sen2_unmixed_img.kea")
-    specunmixing.specUnmixSpTsUCLS(
+    specunmixing.spec_unmix_spts_ucls(
         input_img,
         valid_msk_img,
         1,
@@ -336,11 +355,12 @@ def test_specUnmixSpTsUCLS_weight100(tmp_path):
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_SpTsUCLS_weight100.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_specUnmixSpTsNNLS_noWeight(tmp_path):
+@pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
+def test_spec_unmix_spts_nnls_noWeight(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -350,7 +370,7 @@ def test_specUnmixSpTsNNLS_noWeight(tmp_path):
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
     output_img = os.path.join(tmp_path, "sen2_unmixed_img.kea")
-    specunmixing.specUnmixSpTsNNLS(
+    specunmixing.spec_unmix_spts_nnls(
         input_img,
         valid_msk_img,
         1,
@@ -365,11 +385,12 @@ def test_specUnmixSpTsNNLS_noWeight(tmp_path):
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_SpTsNNLS_noWeight.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_specUnmixSpTsNNLS_weight100(tmp_path):
+@pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
+def test_spec_unmix_spts_nnls_weight100(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -379,7 +400,7 @@ def test_specUnmixSpTsNNLS_weight100(tmp_path):
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
     output_img = os.path.join(tmp_path, "sen2_unmixed_img.kea")
-    specunmixing.specUnmixSpTsNNLS(
+    specunmixing.spec_unmix_spts_nnls(
         input_img,
         valid_msk_img,
         1,
@@ -394,11 +415,12 @@ def test_specUnmixSpTsNNLS_weight100(tmp_path):
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_SpTsNNLS_weight100.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_specUnmixSpTsFCLS(tmp_path):
+@pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
+def test_spec_unmix_spts_fcls(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -408,7 +430,7 @@ def test_specUnmixSpTsFCLS(tmp_path):
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
     output_img = os.path.join(tmp_path, "sen2_unmixed_img.kea")
-    specunmixing.specUnmixSpTsFCLS(
+    specunmixing.spec_unmix_spts_fcls(
         input_img,
         valid_msk_img,
         1,
@@ -422,11 +444,12 @@ def test_specUnmixSpTsFCLS(tmp_path):
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_SpTsFCLS.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_specUnmixPyMcrNNLS_noWeight(tmp_path):
+@pytest.mark.skipif(PYMCR_NOT_AVAIL, reason="pymcr dependency not available")
+def test_spec_unmix_pymcr_nnls_noWeight(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -436,7 +459,7 @@ def test_specUnmixPyMcrNNLS_noWeight(tmp_path):
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
     output_img = os.path.join(tmp_path, "sen2_unmixed_img.kea")
-    specunmixing.specUnmixPyMcrNNLS(
+    specunmixing.spec_unmix_pymcr_nnls(
         input_img,
         valid_msk_img,
         1,
@@ -451,11 +474,12 @@ def test_specUnmixPyMcrNNLS_noWeight(tmp_path):
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_PyMcrNNLS_noWeight.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_specUnmixPyMcrNNLS_weight100(tmp_path):
+@pytest.mark.skipif(PYMCR_NOT_AVAIL, reason="pymcr dependency not available")
+def test_spec_unmix_pymcr_nnls_weight100(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -465,7 +489,7 @@ def test_specUnmixPyMcrNNLS_weight100(tmp_path):
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
     output_img = os.path.join(tmp_path, "sen2_unmixed_img.kea")
-    specunmixing.specUnmixPyMcrNNLS(
+    specunmixing.spec_unmix_pymcr_nnls(
         input_img,
         valid_msk_img,
         1,
@@ -480,11 +504,12 @@ def test_specUnmixPyMcrNNLS_weight100(tmp_path):
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_PyMcrNNLS_weight100.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_specUnmixPyMcrFCLS(tmp_path):
+@pytest.mark.skipif(PYMCR_NOT_AVAIL, reason="pymcr dependency not available")
+def test_spec_unmix_pymcr_fcls(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -494,7 +519,7 @@ def test_specUnmixPyMcrFCLS(tmp_path):
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
 
     output_img = os.path.join(tmp_path, "sen2_unmixed_img.kea")
-    specunmixing.specUnmixPyMcrFCLS(
+    specunmixing.spec_unmix_pymcr_fcls(
         input_img,
         valid_msk_img,
         1,
@@ -508,11 +533,11 @@ def test_specUnmixPyMcrFCLS(tmp_path):
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_PyMcrFCLS.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_rescaleUnmixingResults(tmp_path):
+def test_rescale_unmixing_results(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -521,7 +546,7 @@ def test_rescaleUnmixingResults(tmp_path):
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_SpTsUCLS_noweight.kea"
     )
     output_img = os.path.join(tmp_path, "sen2_unmixed_rescaled_img.kea")
-    specunmixing.rescaleUnmixingResults(
+    specunmixing.rescale_unmixing_results(
         input_img, output_img, gdalformat="KEA", calc_stats=True
     )
 
@@ -529,11 +554,11 @@ def test_rescaleUnmixingResults(tmp_path):
         SPECUNMIX_DATA_DIR,
         "sen2_20210527_aber_subset_unmixed_SpTsUCLS_noweight_rescaled.kea",
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_predictReflLinearUnmixing(tmp_path):
+def test_predict_refl_linear_unmixing(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -543,18 +568,18 @@ def test_predictReflLinearUnmixing(tmp_path):
     )
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
     output_img = os.path.join(tmp_path, "sen2_unmixed_pred_refl_img.kea")
-    specunmixing.predictReflLinearUnmixing(
+    specunmixing.predict_refl_linear_unmixing(
         input_img, endmembers_file, output_img, gdalformat="KEA", calc_stats=True
     )
 
     ref_unmix_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_unmixed_SpTsFCLS_predrefl.kea"
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_calcUnmixingRMSEResidualErr(tmp_path):
+def test_calc_unmixing_rmse_residual_err(tmp_path):
     import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
@@ -565,7 +590,7 @@ def test_calcUnmixingRMSEResidualErr(tmp_path):
     )
     endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
     output_img = os.path.join(tmp_path, "sen2_unmixed_rmse_residuals_img.kea")
-    specunmixing.calcUnmixingRMSEResidualErr(
+    specunmixing.calc_unmixing_rmse_residual_err(
         input_img,
         input_unmix_img,
         endmembers_file,
@@ -578,11 +603,11 @@ def test_calcUnmixingRMSEResidualErr(tmp_path):
         SPECUNMIX_DATA_DIR,
         "sen2_20210527_aber_subset_unmixed_SpTsFCLS_rmse_residuals.kea",
     )
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_unmix_img, output_img)
     assert img_eq
 
 
-def test_summariseMultiEndmemberLinearUnmixing(tmp_path):
+def test_summarise_multi_endmember_linear_unmixing(tmp_path):
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -622,21 +647,21 @@ def test_summariseMultiEndmemberLinearUnmixing(tmp_path):
     out_unmix_img = os.path.join(tmp_path, "multi_endmember_unmix_img.kea")
     out_ref_img = os.path.join(tmp_path, "multi_endmember_unmix_ref.kea")
     tmp_dir = os.path.join(tmp_path, "tmp")
-    specunmixing.summariseMultiEndmemberLinearUnmixing(
+    specunmixing.summarise_multi_endmember_linear_unmixing(
         input_img, in_unmixed_datasets, out_unmix_img, out_ref_img, tmp_dir
     )
 
     unmix_multi_ref_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_multi_endmember_unmix_img.kea"
     )
-    unmix_img_eq, prop_match_unmix = rsgislib.imagecalc.areImgsEqual(
+    unmix_img_eq, prop_match_unmix = rsgislib.imagecalc.are_imgs_equal(
         unmix_multi_ref_img, out_unmix_img
     )
 
     unmix_multi_ref_ref_img = os.path.join(
         SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_multi_endmember_unmix_ref.kea"
     )
-    ref_img_eq, prop_match_ref = rsgislib.imagecalc.areImgsEqual(
+    ref_img_eq, prop_match_ref = rsgislib.imagecalc.are_imgs_equal(
         unmix_multi_ref_ref_img, out_ref_img
     )
 

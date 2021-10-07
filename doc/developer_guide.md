@@ -23,12 +23,12 @@ are accepted into the library:
 
 1. Classes and module names should start with the `RSGIS` prefix (upper case for Classes 
    and lower case for modules)
-2. Function names within the python interface should be in CamelCase (first letter should be 
-   lower case) while variables should be in snake_case (all lower case) - see below for common 
-   name examples).
-3. Although not always (most often not) present in the historical code unit and overall 
+2. Function names within the python interface should be in snake_case (lower case) as should variables 
+   names - see below for common variable names which should be used for consistency).
+3. Although not always (most often not) present in the historical code, unit and overall 
    function tests should be provided where ever possible. See info below on creation of 
-   tests within the existing system in Python and C++ below.
+   tests within the existing system in Python and C++ below. We are trying to add these for
+   older functions as much as we can.
 4. Documentation should be provided for the Python functions and added to the sphinx configuration files.
 5. Documentation should provide a brief example of the function being called and a more complete tutorial 
    style example provided within the tutorials section so someone can see the function(s) being used in a
@@ -40,10 +40,11 @@ are accepted into the library:
 The main coding style things to be aware of when providing a function for RSGISLib are:
 
 1. Variables should be in snake_case and all characters should be in lower case
-2. Class and function names should be in CamelCase
-3. Module names should be lower case with no underscores between words.
-4. Functions should have keyword specified through the C++ interface
-5. Pure python functions should provide type hints.
+2. Functions should be in snake_case and all characters should be in lower case
+3. Class names should be in CamelCase
+4. Module names should be lower case with no underscores between words.
+5. Functions should have keyword specified through the C++ interface
+6. Pure python functions should provide type hints.
 
 ### Python Code Style Tools
 Before code is committed to the RSGISLib git repo the [black](https://black.readthedocs.io) 
@@ -62,7 +63,7 @@ flake8 path/to/python/script.py
 ```
 
 ```shell
-pylint --function-naming-style=camelCase --max-line-length=88 path/to/python/script.py
+pylint --max-line-length=88 path/to/python/script.py
 ```
 
 Note. for flake8 you will want to create a config file `~/.config/flake8` specifying the

@@ -241,7 +241,7 @@ can be used to train such as model. The output image will contain the hard membe
     print("Completed Classification")
 
     if classClrNames:
-        rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+        rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
         ratDataset = gdal.Open(outClassImg, gdal.GA_Update)
         red = rat.readColumn(ratDataset, 'Red')
         green = rat.readColumn(ratDataset, 'Green')

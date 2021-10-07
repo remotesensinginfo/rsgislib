@@ -96,7 +96,7 @@ Example::
     # Remove temp files
     print('Removing temp files')
     for tempFile in tempFileList:
-        rsgislib.tools.filetools.deleteFileWithBasename(tempFile)
+        rsgislib.tools.filetools.delete_file_with_basename(tempFile)
 
 
 def getRATLength(clumps_img, rat_band=1):

@@ -115,7 +115,7 @@ Where:
     tileClumpsImage = os.path.join(tmpdir, inImgBaseName+'_tilesimg.kea')
         
     segmentation.generateRegularGrid(inputImage, tileClumpsImage, 'KEA', width, height, offset)
-    rastergis.populateStats(tileClumpsImage, True, True)
+    rastergis.pop_rat_img_stats(tileClumpsImage, True, True)
 
     if not maskIntersect == None:
         bs = []
@@ -207,7 +207,7 @@ Where:
     for shpFile in shpFiles:
         imgTileFile = os.path.join(tilesMaskDIR, tilesNameBase + str(idx) + '.kea')
         shpFileLyr = os.path.splitext(os.path.basename(shpFile))[0]
-        vectorutils.rasteriseVecLyr(shpFile, shpFileLyr, inputImage, imgTileFile, gdalformat=imgFormat, burnVal=1,
+        vectorutils.convertvector.rasterise_vec_lyr(shpFile, shpFileLyr, inputImage, imgTileFile, gdalformat=imgFormat, burnVal=1,
                         datatype=rsgislib.TYPE_8UINT, vecAtt=None, vecExt=False, thematic=True, nodata=0)
         drv.DeleteDataSource(shpFile)
         idx = idx + 1
@@ -250,5 +250,5 @@ Where:
     idx = 1
     for maskFile in maskFiles:
         tileImage = os.path.join(tilesImgDIR, os.path.basename(maskFile))
-        imageutils.maskImage(inputImage, maskFile, tileImage, gdalformat, datatype, 0, 0)
-        imageutils.popImageStats(tileImage,True,0.,True)
+        imageutils.mask_img(inputImage, maskFile, tileImage, gdalformat, datatype, 0, 0)
+        imageutils.pop_img_stats(tileImage,True,0.,True)

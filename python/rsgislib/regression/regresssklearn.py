@@ -305,12 +305,12 @@ def apply_regress_sklearn_mdl(regrs_mdl, n_out_vars, predictor_img, predictor_im
     
     if out_band_names is not None:
         if n_out_vars == len(out_band_names):
-            rsgislib.imageutils.setBandNames(out_img, out_band_names)
+            rsgislib.imageutils.set_band_names(out_img, out_band_names)
         else:
             print("The number of output variables and the number of bands names provided do not match so ignoring.")
     
     if calc_stats:
-        rsgislib.imageutils.popImageStats(out_img, usenodataval=True, nodataval=out_no_date_val, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(out_img, usenodataval=True, nodataval=out_no_date_val, calcpyramids=True)
     
     
     

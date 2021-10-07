@@ -236,7 +236,7 @@ class RSGISGDALErrorHandler(object):
         self.err_msg = err_msg
 
 
-def getRSGISLibDataType(gdaltype):
+def get_rsgislib_datatype(gdaltype):
     """
     Convert from GDAL data type string to RSGISLib data type int.
 
@@ -267,7 +267,7 @@ def getRSGISLibDataType(gdaltype):
     else:
         raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
 
-def getGDALDataType(rsgislib_datatype):
+def get_gdal_datatype(rsgislib_datatype):
     """
     Convert from RSGIS data type to GDAL data type int.
 
@@ -291,7 +291,7 @@ def getGDALDataType(rsgislib_datatype):
     else:
         raise RSGISPyException("The data type '" + str(rsgislib_datatype) + "' is unknown / not supported.")
 
-def getNumpyDataType(rsgislib_datatype):
+def get_numpy_datatype(rsgislib_datatype):
     """
     Convert from RSGISLib data type to numpy datatype
 
@@ -324,7 +324,7 @@ def getNumpyDataType(rsgislib_datatype):
         raise Exception('Datatype was not recognised.')
     return numpyDT
 
-def getNumpyCharCodesDataType(rsgislib_datatype):
+def get_numpy_char_codes_datatype(rsgislib_datatype):
     """
     Convert from RSGISLib data type to numpy datatype
 
@@ -404,9 +404,9 @@ class RSGISTime (object):
         """
         self.endTime = time.time()
         if report_diff:
-            self.calcDiff(precede_str, post_str)
+            self.calc_diff(precede_str, post_str)
 
-    def calcDiff(self, precede_str="", post_str=""):
+    def calc_diff(self, precede_str="", post_str=""):
         """
         Calculate time difference, format and print.
 

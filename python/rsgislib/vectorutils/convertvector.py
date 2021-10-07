@@ -16,9 +16,9 @@ import rsgislib
 
 gdal.UseExceptions()
 
-def rasteriseVecLyr(vec_file, vec_lyr, inputImage, outImage, gdalformat="KEA",
-                    burnVal=1, datatype=rsgislib.TYPE_8UINT, vecAtt=None, vecExt=False,
-                    thematic=True, nodata=0):
+def rasterise_vec_lyr(vec_file, vec_lyr, inputImage, outImage, gdalformat="KEA",
+                      burnVal=1, datatype=rsgislib.TYPE_8UINT, vecAtt=None, vecExt=False,
+                      thematic=True, nodata=0):
     """
     A utillity to rasterise a vector layer to an image covering the same region and at the same resolution as the input image.
 
@@ -44,7 +44,7 @@ def rasteriseVecLyr(vec_file, vec_lyr, inputImage, outImage, gdalformat="KEA",
         inputVectorLyr = 'crowns'
         inputImage = 'injune_p142_casi_sub_utm.kea'
         outputImage = 'psu142_crowns.kea'
-        vectorutils.rasteriseVecLyr(inputVector, inputVectorLyr, inputImage, outputImage, 'KEA', vecAtt='FID')
+        vectorutils.rasterise_vec_lyr(inputVector, inputVectorLyr, inputImage, outputImage, 'KEA', vecAtt='FID')
 
     """
     import rsgislib.imageutils
@@ -57,14 +57,14 @@ def rasteriseVecLyr(vec_file, vec_lyr, inputImage, outImage, gdalformat="KEA",
             if xRes > yRes:
                 outRes = yRes
 
-            rsgislib.imageutils.createCopyImageVecExtentSnap2Grid(vec_file, vec_lyr,
+            rsgislib.imageutils.create_copy_imageVecExtentSnap2Grid(vec_file, vec_lyr,
                                                                   outImage, outRes, 1,
                                                                   gdalformat, datatype)
         elif inputImage is None:
             print("Assuming output image is already created so just using.")
         else:
             print("Creating output image using input image")
-            rsgislib.imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalformat, datatype)
+            rsgislib.imageutils.create_copy_img(inputImage, outImage, 1, 0, gdalformat, datatype)
 
         print("Running Rasterise now...")
         out_img_ds = gdal.Open(outImage, gdal.GA_Update)
@@ -93,14 +93,14 @@ def rasteriseVecLyr(vec_file, vec_lyr, inputImage, outImage, gdalformat="KEA",
 
         if thematic:
             import rsgislib.rastergis
-            rsgislib.rastergis.populateStats(clumps=outImage, addclrtab=True, calcpyramids=True, ignorezero=True)
+            rsgislib.rastergis.pop_rat_img_stats(clumps=outImage, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
         else:
-            rsgislib.imageutils.popImageStats(outImage, True, nodata, True)
+            rsgislib.imageutils.pop_img_stats(outImage, True, nodata, True)
     except Exception as e:
         raise e
 
 
-def rasteriseVecLyrObj(vec_lyr_obj, outImage, burnVal=1, vecAtt=None, calcstats=True, thematic=True, nodata=0):
+def rasterise_vec_lyr_obj(vec_lyr_obj, outImage, burnVal=1, vecAtt=None, calcstats=True, thematic=True, nodata=0):
     """
     A utility to rasterise a vector layer to an image covering the same region.
 
@@ -138,19 +138,19 @@ def rasteriseVecLyrObj(vec_lyr_obj, outImage, burnVal=1, vecAtt=None, calcstats=
         if calcstats:
             if thematic:
                 import rsgislib.rastergis
-                rsgislib.rastergis.populateStats(clumps=outImage, addclrtab=True, calcpyramids=True, ignorezero=True)
+                rsgislib.rastergis.pop_rat_img_stats(clumps=outImage, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
             else:
                 import rsgislib.imageutils
-                rsgislib.imageutils.popImageStats(outImage, True, nodata, True)
+                rsgislib.imageutils.pop_img_stats(outImage, True, nodata, True)
     except Exception as e:
         print('Failed rasterising: {}'.format(outImage))
         raise e
 
 
 
-def polygoniseRaster2VecLyr(out_vec_file: str, out_vec_lyr: str, out_format: str, input_img: str, img_band: int =1,
-                            mask_img: str =None, mask_band: int =1, replace_file: bool =True, replace_lyr: bool =True,
-                            pxl_val_fieldname: str ='PXLVAL', use_8_conn: bool =True):
+def polygonise_raster_to_vec_lyr(out_vec_file: str, out_vec_lyr: str, out_format: str, input_img: str, img_band: int =1,
+                                 mask_img: str =None, mask_band: int =1, replace_file: bool =True, replace_lyr: bool =True,
+                                 pxl_val_fieldname: str ='PXLVAL', use_8_conn: bool =True):
     """
 A utility to polygonise a raster to a OGR vector layer. Recommended that you output with 8 connectedness
 otherwise the resulting vector can be invalid and cause problems for further processing in GIS applications.
@@ -228,7 +228,7 @@ Where:
 
 
 
-def copyVec2RAT(vec_file, vec_lyr, inputImage, outputImage):
+def copy_vec_to_rat(vec_file, vec_lyr, inputImage, outputImage):
     """
     A utility to create raster copy of a shapefile. The output image is a KEA file and the attribute table has the attributes from the shapefile.
 
@@ -247,13 +247,13 @@ def copyVec2RAT(vec_file, vec_lyr, inputImage, outputImage):
         inputImage = 'injune_p142_casi_sub_utm.kea'
         outputImage = 'psu142_crowns.kea'
 
-        vectorutils.copyVec2RAT(inputVector, 'crowns', inputImage, outputImage)
+        vectorutils.copy_vec_to_rat(inputVector, 'crowns', inputImage, outputImage)
 
     """
     import rsgislib.rastergis
-    rasteriseVecLyr(vec_file, vec_lyr, inputImage, outputImage, gdalformat="KEA",
-                    datatype=rsgislib.TYPE_32UINT, vecAtt="FID", vecExt=False,
-                    thematic=True, nodata=0)
+    rasterise_vec_lyr(vec_file, vec_lyr, inputImage, outputImage, gdalformat="KEA",
+                      datatype=rsgislib.TYPE_32UINT, vecAtt="FID", vecExt=False,
+                      thematic=True, nodata=0)
     rsgislib.rastergis.importVecAtts(outputImage, vec_file, vec_lyr, 'pxlval', None)
 
 
@@ -344,7 +344,7 @@ def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_ou
             gdf.to_file(vec_out_file, driver=out_format)
 
 
-def extractImageFootprint(inputImg, outVec, tmpDIR='./tmp', rePrjTo=None):
+def extract_image_footprint(inputImg, outVec, tmpDIR='./tmp', rePrjTo=None):
     """
 A function to extract an image footprint as a vector.
 
@@ -359,7 +359,7 @@ A function to extract an image footprint as a vector.
     import rsgislib.imageutils
     import rsgislib.vectorutils
 
-    uidStr = rsgislib.tools.utils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uid_generator()
 
     createdTmp = False
     if not os.path.exists(tmpDIR):
@@ -395,7 +395,7 @@ A function to extract an image footprint as a vector.
     fileName = []
     for i in range(numFeats):
         fileName.append(os.path.basename(inputImg))
-    rsgislib.vectorutils.writeVecColumn(outVecTmpFile, vecLayerName, 'FileName',
+    rsgislib.vectorutils.write_vec_column(outVecTmpFile, vecLayerName, 'FileName',
                                         ogr.OFTString, fileName)
 
     if not (rePrjTo is None):

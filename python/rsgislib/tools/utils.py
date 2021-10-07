@@ -10,7 +10,7 @@ import string
 import numpy
 
 
-def uidGenerator(size=6):
+def uid_generator(size=6):
     """
     A function which will generate a 'random' string of the specified length
     based on the UUID
@@ -26,7 +26,7 @@ def uidGenerator(size=6):
     return randomStr[0:size]
 
 
-def isNumber(str_val):
+def is_number(str_val):
     """
     A function which tests whether the input string contains a number of not.
 
@@ -106,7 +106,7 @@ def powerset_lst(in_set, min_items=0):
     return out_pset
 
 
-def getEnvironmentVariable(var):
+def get_environment_variable(var):
     """
     A function to get an environmental variable, if variable is not present
     returns None.
@@ -123,7 +123,7 @@ def getEnvironmentVariable(var):
     return outVar
 
 
-def numProcessCores():
+def num_process_cores():
     """
     A functions which returns the number of processing cores available on the machine
 
@@ -135,7 +135,7 @@ def numProcessCores():
     return multiprocessing.cpu_count()
 
 
-def readTextFileNoNewLines(input_file):
+def read_text_file_no_new_lines(input_file):
     """
     Read a text file into a single string removing new lines.
 
@@ -154,7 +154,7 @@ def readTextFileNoNewLines(input_file):
     return txtStr
 
 
-def readTextFile2List(input_file):
+def read_text_file_to_list(input_file):
     """
     Read a text file into a list where each line is an element in the list.
 
@@ -175,7 +175,7 @@ def readTextFile2List(input_file):
     return outList
 
 
-def writeList2File(data_lst, out_file):
+def write_list_to_file(data_lst, out_file):
     """
     Write a list a text file, one line per item.
 
@@ -193,7 +193,7 @@ def writeList2File(data_lst, out_file):
         raise e
 
 
-def writeData2File(data_val, out_file):
+def write_data_to_file(data_val, out_file):
     """
     Write some data (a string or can be converted to a string using str(data_val) to
     an output text file.
@@ -211,7 +211,7 @@ def writeData2File(data_val, out_file):
         raise e
 
 
-def writeDict2JSON(data_dict, out_file):
+def write_dict_to_json(data_dict, out_file):
     """
     Write some data to a JSON file. The data would commonly be structured as a dict
     but could also be a list.
@@ -233,7 +233,7 @@ def writeDict2JSON(data_dict, out_file):
         )
 
 
-def readJSON2Dict(input_file):
+def read_json_to_dict(input_file):
     """
     Read a JSON file. Will return a list or dict.
 
@@ -247,7 +247,7 @@ def readJSON2Dict(input_file):
     return data
 
 
-def createVarList(in_vals_lsts, val_dict=None):
+def create_var_list(in_vals_lsts, val_dict=None):
     """
     A function which will produce a list of dictionaries with all the combinations
     of the input variables listed (i.e., the powerset).
@@ -268,7 +268,7 @@ def createVarList(in_vals_lsts, val_dict=None):
         seg_vars_ranges['k'] = [5, 10, 20, 30, 40, 50, 60, 80, 100, 120]
         seg_vars_ranges['d'] = [10, 20, 50, 100, 200, 1000, 10000]
         seg_vars_ranges['minsize'] = [5, 10, 20, 50, 100, 200]
-        seg_vars = rsgis_utils.createVarList(seg_vars_ranges)
+        seg_vars = rsgis_utils.create_var_list(seg_vars_ranges)
 
     """
     out_vars = []
@@ -297,12 +297,12 @@ def createVarList(in_vals_lsts, val_dict=None):
                 for ckey in val_dict.keys():
                     c_val_dict[ckey] = val_dict[ckey]
                 c_val_dict[key] = val
-                c_out_vars = createVarList(next_vals_lsts, c_val_dict)
+                c_out_vars = create_var_list(next_vals_lsts, c_val_dict)
                 out_vars = out_vars + c_out_vars
     return out_vars
 
 
-def inBounds(x, lower, upper, upper_strict=False):
+def in_bounds(x, lower, upper, upper_strict=False):
     """
     Checks whether a value or array of values is within specified bounds.
 
@@ -319,7 +319,7 @@ def inBounds(x, lower, upper, upper_strict=False):
         return lower <= numpy.min(x) and numpy.max(x) <= upper
 
 
-def mixedSigns(x):
+def mixed_signs(x):
     """
     Check whether an array of numbers has a mix of positive and negative values.
 
@@ -341,7 +341,7 @@ def negative(x):
     return numpy.max(x) < 0
 
 
-def isOdd(number):
+def is_odd(number):
     """
     A function which tests whether a number is odd
 
@@ -354,7 +354,7 @@ def isOdd(number):
     return False
 
 
-def removeRepeatedChars(str_val, repeat_char):
+def remove_repeated_chars(str_val, repeat_char):
     """
     A function which removes repeated characters within a string for the
     specified character
@@ -378,7 +378,7 @@ def removeRepeatedChars(str_val, repeat_char):
     return out_str
 
 
-def checkStr(
+def check_str(
     str_val, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_punc=False
 ):
     """
@@ -412,22 +412,22 @@ def checkStr(
 
     if rm_dashs:
         str_val_tmp = str_val_tmp.replace("-", "_")
-        str_val_tmp = removeRepeatedChars(str_val_tmp, "_")
+        str_val_tmp = remove_repeated_chars(str_val_tmp, "_")
 
     if rm_spaces:
         str_val_tmp = str_val_tmp.replace(" ", "_")
-        str_val_tmp = removeRepeatedChars(str_val_tmp, "_")
+        str_val_tmp = remove_repeated_chars(str_val_tmp, "_")
 
     if rm_punc:
         for punct in string.punctuation:
             if (punct != "_") and (punct != "-"):
                 str_val_tmp = str_val_tmp.replace(punct, "")
-        str_val_tmp = removeRepeatedChars(str_val_tmp, "_")
+        str_val_tmp = remove_repeated_chars(str_val_tmp, "_")
 
     return str_val_tmp
 
 
-def getDaysSince(year, day_of_year, base_date):
+def get_days_since(year, day_of_year, base_date):
     """
     Calculate the number of days from a base data to a defined year/day.
 
@@ -444,7 +444,7 @@ def getDaysSince(year, day_of_year, base_date):
     return (date_val - base_date).days
 
 
-def getDaysSinceDate(year, month, day, base_date):
+def get_days_since_date(year, month, day, base_date):
     """
     Calculate the number of days from a base data to a defined year/day.
 

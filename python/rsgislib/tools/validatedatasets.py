@@ -8,7 +8,7 @@ import osgeo.gdal as gdal
 import osgeo.osr as osr
 import rsgislib
 
-def checkGDALImageFile(gdal_img, check_bands=True, nbands=0, chk_proj=False, epsg_code=0, read_img=False, n_smp_pxls=10):
+def check_gdal_image_file(gdal_img, check_bands=True, nbands=0, chk_proj=False, epsg_code=0, read_img=False, n_smp_pxls=10):
     """
     A function which checks a GDAL compatible image file and returns an error message if appropriate.
 
@@ -34,7 +34,7 @@ def checkGDALImageFile(gdal_img, check_bands=True, nbands=0, chk_proj=False, eps
         gdal.UseExceptions()
         try:
             if os.path.splitext(gdal_img)[1].lower() == '.kea':
-                file_ok = checkHDF5File(gdal_img)
+                file_ok = check_hdf5_file(gdal_img)
                 if not file_ok:
                     err_str = "Error with KEA/HDF5 file."
             if file_ok:
@@ -118,7 +118,7 @@ def checkGDALImageFile(gdal_img, check_bands=True, nbands=0, chk_proj=False, eps
     return file_ok, err_str
 
 
-def checkGDALVectorFile(gdal_vec):
+def check_gdal_vector_file(gdal_vec):
     """
     A function which checks a GDAL compatible vector file and returns an error message if appropriate.
 
@@ -162,7 +162,7 @@ def checkGDALVectorFile(gdal_vec):
     return file_ok, err_str
 
 
-def checkHDF5File(input_file):
+def check_hdf5_file(input_file):
     """
     A function which checks whether a HDF5 file is valid.
     :param input_file: the file path to the input file.

@@ -205,7 +205,7 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=
     import shutil
 
     # Get valid mask, rasterised to this
-    uid_str = rsgislib.tools.utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uid_generator()
     tmp_lcl_dir = os.path.join(tmpdir, "get_class_training_data_{}".format(uid_str))
     if not os.path.exists(tmp_lcl_dir):
         os.makedirs(tmp_lcl_dir)
@@ -219,7 +219,7 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=
     for class_sample_info in classVecSampleInfo:
         cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.fileH5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
-        rsgislib.vectorutils.rasteriseVecLyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
+        rsgislib.vectorutils.convertvector.rasterise_vec_lyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
                                              out_vec_img, gdalformat="KEA", burnVal=class_sample_info.id,
                                              datatype=rsgislib.TYPE_16UINT, vecAtt=None, vecExt=False, thematic=True,
                                              nodata=0)
@@ -270,7 +270,7 @@ def get_class_training_chips_data(imgBandInfo, classVecSampleInfo, chip_h_size, 
     import shutil
 
     # Get valid mask, rasterised to this
-    uid_str = rsgislib.tools.utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uid_generator()
     tmp_lcl_dir = os.path.join(tmpdir, "get_class_training_chips_data_{}".format(uid_str))
     if not os.path.exists(tmp_lcl_dir):
         os.makedirs(tmp_lcl_dir)
@@ -284,7 +284,7 @@ def get_class_training_chips_data(imgBandInfo, classVecSampleInfo, chip_h_size, 
     for class_sample_info in classVecSampleInfo:
         cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.fileH5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
-        rsgislib.vectorutils.rasteriseVecLyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
+        rsgislib.vectorutils.convertvector.rasterise_vec_lyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
                                              out_vec_img, gdalformat="KEA", burnVal=class_sample_info.id,
                                              datatype=rsgislib.TYPE_16UINT, vecAtt=None, vecExt=False, thematic=True,
                                              nodata=0)
@@ -337,7 +337,7 @@ def split_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test
     import rsgislib.imageutils
     import os
 
-    uid_str = rsgislib.tools.utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uid_generator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -362,7 +362,7 @@ def split_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test
 def split_chip_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file,
                                        test_sample, valid_sample, train_sample=None, rand_seed=42, datatype=None):
     """
-    A function to split a chip HDF5 samples file (from rsgislib.imageutils.extractChipZoneImageBandValues2HDF)
+    A function to split a chip HDF5 samples file (from rsgislib.imageutils.extract_chip_zone_image_band_values_to_hdf)
     into three (i.e., Training, Validation and Testing).
 
     :param in_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
@@ -382,7 +382,7 @@ def split_chip_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file,
     import rsgislib.imageutils
     import os
 
-    uid_str = rsgislib.tools.utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uid_generator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -408,7 +408,7 @@ def split_chip_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file,
 def split_chip_sample_ref_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file,
                                            test_sample, valid_sample, train_sample=None, rand_seed=42, datatype=None):
     """
-    A function to split a chip HDF5 samples file (from rsgislib.imageutils.extractChipZoneImageBandValues2HDF)
+    A function to split a chip HDF5 samples file (from rsgislib.imageutils.extract_chip_zone_image_band_values_to_hdf)
     into three (i.e., Training, Validation and Testing).
 
     :param in_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
@@ -429,7 +429,7 @@ def split_chip_sample_ref_train_valid_test(in_h5_file, train_h5_file, valid_h5_f
     from rsgislib.imageutils import splitSampleRefChipHDF5File
     import os
 
-    uid_str = rsgislib.tools.utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uid_generator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -497,7 +497,7 @@ def flipChipHDF5File(input_h5_file, output_h5_file, datatype=None):
         chunk_features = n_in_feats
     else:
         chunk_features = 250
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
     fH5Out = h5py.File(output_h5_file, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
@@ -557,7 +557,7 @@ def flipRefChipHDF5File(input_h5_file, output_h5_file, datatype=None):
         chunk_features = n_in_feats
     else:
         chunk_features = 250
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
     fH5Out = h5py.File(output_h5_file, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
@@ -676,7 +676,7 @@ def label_pxl_sample_chips(sample_pxls_img, cls_msk_img, output_image, gdalforma
         else:
             writer.write(out_samp_arr)
     writer.close(calcStats=False)
-    rsgislib.rastergis.populateStats(output_image, True, True, True)
+    rsgislib.rastergis.pop_rat_img_stats(output_image, True, True, True)
 
 
 def plot_train_data(cls1_h5_file, cls2_h5_file, out_plots_dir, cls1_name="Class 1", cls2_name="Class 2",

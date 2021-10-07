@@ -62,7 +62,7 @@ def applyMedianFilter(input_img, output_img, filter_size, gdalformat, datatype):
     filters.append(
         FilterParameters(filter_type="Median", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyMeanFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -93,7 +93,7 @@ def applyMeanFilter(input_img, output_img, filter_size, gdalformat, datatype):
     filters.append(
         FilterParameters(filter_type="Mean", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyMinFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -124,7 +124,7 @@ def applyMinFilter(input_img, output_img, filter_size, gdalformat, datatype):
     filters.append(
         FilterParameters(filter_type="Min", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyMaxFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -155,7 +155,7 @@ def applyMaxFilter(input_img, output_img, filter_size, gdalformat, datatype):
     filters.append(
         FilterParameters(filter_type="Max", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyModeFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -186,7 +186,7 @@ def applyModeFilter(input_img, output_img, filter_size, gdalformat, datatype):
     filters.append(
         FilterParameters(filter_type="Mode", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyStdDevFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -217,7 +217,7 @@ def applyStdDevFilter(input_img, output_img, filter_size, gdalformat, datatype):
     filters.append(
         FilterParameters(filter_type="StdDev", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyRangeFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -248,7 +248,7 @@ def applyRangeFilter(input_img, output_img, filter_size, gdalformat, datatype):
     filters.append(
         FilterParameters(filter_type="Range", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyMeanDiffFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -279,7 +279,7 @@ def applyMeanDiffFilter(input_img, output_img, filter_size, gdalformat, datatype
     filters.append(
         FilterParameters(filter_type="MeanDiff", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyMeanDiffAbsFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -310,7 +310,7 @@ def applyMeanDiffAbsFilter(input_img, output_img, filter_size, gdalformat, datat
     filters.append(
         FilterParameters(filter_type="MeanDiffAbs", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyTotalDiffFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -341,7 +341,7 @@ def applyTotalDiffFilter(input_img, output_img, filter_size, gdalformat, datatyp
     filters.append(
         FilterParameters(filter_type="TotalDiff", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyTotalDiffAbsFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -372,7 +372,7 @@ def applyTotalDiffAbsFilter(input_img, output_img, filter_size, gdalformat, data
     filters.append(
         FilterParameters(filter_type="TotalDiffAbs", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyCoeffOfVarFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -403,7 +403,7 @@ def applyCoeffOfVarFilter(input_img, output_img, filter_size, gdalformat, dataty
     filters.append(
         FilterParameters(filter_type="CoeffOfVar", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyTotalFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -434,7 +434,7 @@ def applyTotalFilter(input_img, output_img, filter_size, gdalformat, datatype):
     filters.append(
         FilterParameters(filter_type="Total", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyNormVarFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -465,7 +465,7 @@ def applyNormVarFilter(input_img, output_img, filter_size, gdalformat, datatype)
     filters.append(
         FilterParameters(filter_type="NormVar", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyNormVarSqrtFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -496,7 +496,7 @@ def applyNormVarSqrtFilter(input_img, output_img, filter_size, gdalformat, datat
     filters.append(
         FilterParameters(filter_type="NormVarSqrt", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyNormVarLnFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -527,7 +527,7 @@ def applyNormVarLnFilter(input_img, output_img, filter_size, gdalformat, datatyp
     filters.append(
         FilterParameters(filter_type="NormVarLn", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyTextureVarFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -558,7 +558,7 @@ def applyTextureVarFilter(input_img, output_img, filter_size, gdalformat, dataty
     filters.append(
         FilterParameters(filter_type="TextureVar", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyKuwaharaFilter(input_img, output_img, filter_size, gdalformat, datatype):
@@ -589,7 +589,7 @@ def applyKuwaharaFilter(input_img, output_img, filter_size, gdalformat, datatype
     filters.append(
         FilterParameters(filter_type="Kuwahara", file_ending="", size=filter_size)
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applySobelFilter(input_img, output_img, gdalformat, datatype):
@@ -616,7 +616,7 @@ def applySobelFilter(input_img, output_img, gdalformat, datatype):
     outExt = outExt.replace(".", "").strip()
     filters = []
     filters.append(FilterParameters(filter_type="Sobel", file_ending="", option="xy"))
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applySobelXFilter(input_img, output_img, gdalformat, datatype):
@@ -643,7 +643,7 @@ def applySobelXFilter(input_img, output_img, gdalformat, datatype):
     outExt = outExt.replace(".", "").strip()
     filters = []
     filters.append(FilterParameters(filter_type="Sobel", file_ending="", option="x"))
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applySobelYFilter(input_img, output_img, gdalformat, datatype):
@@ -670,7 +670,7 @@ def applySobelYFilter(input_img, output_img, gdalformat, datatype):
     outExt = outExt.replace(".", "").strip()
     filters = []
     filters.append(FilterParameters(filter_type="Sobel", file_ending="", option="y"))
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyPrewittFilter(input_img, output_img, gdalformat, datatype):
@@ -697,7 +697,7 @@ def applyPrewittFilter(input_img, output_img, gdalformat, datatype):
     outExt = outExt.replace(".", "").strip()
     filters = []
     filters.append(FilterParameters(filter_type="Prewitt", file_ending="", option="xy"))
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyPrewittXFilter(input_img, output_img, gdalformat, datatype):
@@ -724,7 +724,7 @@ def applyPrewittXFilter(input_img, output_img, gdalformat, datatype):
     outExt = outExt.replace(".", "").strip()
     filters = []
     filters.append(FilterParameters(filter_type="Prewitt", file_ending="", option="x"))
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyPrewittYFilter(input_img, output_img, gdalformat, datatype):
@@ -751,7 +751,7 @@ def applyPrewittYFilter(input_img, output_img, gdalformat, datatype):
     outExt = outExt.replace(".", "").strip()
     filters = []
     filters.append(FilterParameters(filter_type="Prewitt", file_ending="", option="y"))
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyGaussianSmoothFilter(
@@ -801,7 +801,7 @@ def applyGaussianSmoothFilter(
             angle=filter_angle,
         )
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyGaussian1stDerivFilter(
@@ -851,7 +851,7 @@ def applyGaussian1stDerivFilter(
             angle=filter_angle,
         )
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyGaussian2ndDerivFilter(
@@ -901,7 +901,7 @@ def applyGaussian2ndDerivFilter(
             angle=filter_angle,
         )
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyLaplacianFilter(
@@ -937,7 +937,7 @@ def applyLaplacianFilter(
             filter_type="Laplacian", file_ending="", size=filter_size, stddev=stddev
         )
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
 def applyLeeFilter(input_img, output_img, filter_size, n_looks, gdalformat, datatype):
@@ -970,4 +970,4 @@ def applyLeeFilter(input_img, output_img, filter_size, n_looks, gdalformat, data
             filter_type="Lee", file_ending="", size=filter_size, n_looks=n_looks
         )
     )
-    applyfilters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
+    apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)

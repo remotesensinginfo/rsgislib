@@ -33,27 +33,11 @@
 #
 ############################################################################
 
-from osgeo import ogr
 from osgeo import osr
 import numpy
 
-havePysolar = True
-try:
-    import Pysolar
-except ImportError:
-    havePysolar = False
 
-haveRIOS = True
-try:
-    from rios import applier
-    from rios import cuiprogress
-except ImportError:
-    haveRIOS = False
-
-import datetime
-
-
-def getSolarIrrConventionSolarAzimuthFromUSGS(solarAz):
+def get_solar_irr_convention_solar_azimuth_from_usgs(solarAz):
     """
 IN: USGS Convertion::
 
@@ -78,7 +62,7 @@ OUT: Solar Irradiance Convertion::
     return solarAzOut
     
     
-def getSolarIrrConventionSolarAzimuthFromTrad(solarAz):
+def get_solar_irr_convention_solar_azimuth_from_trad(solarAz):
     """
 IN: Traditional Convertion::
 
@@ -105,7 +89,7 @@ OUT: Solar Irradiance Convertion::
     return solarAzOut
     
 
-def calcSolarAzimuthZenith(inputImg, inImgDateTime, outputImg, gdalformat):
+def calc_solar_azimuth_zenith(inputImg, inImgDateTime, outputImg, gdalformat):
     """
 Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
 
@@ -115,11 +99,10 @@ Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
 :param gdalformat: output file format (e.g., KEA)
 
 """
-    if not havePysolar:
-        raise Exception("The PySolar module required for this function could not be imported.")
-
-    if not haveRIOS:
-        raise Exception("The RIOS module required for this function could not be imported.")
+    import Pysolar
+    from rios import applier
+    from rios import cuiprogress
+    import rsgislib
 
     try:
         import tqdm
@@ -144,7 +127,7 @@ Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
     
     def _calcSolarAzimuthZenith(info, inputs, outputs, otherargs):
         """
-        Internal functions used within calcSolarAzimuthZenith() - don't call independently.
+        Internal functions used within calc_solar_azimuth_zenith() - don't call independently.
         
         """
         xBlock, yBlock = info.getBlockCoordArrays()

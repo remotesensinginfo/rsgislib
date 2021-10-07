@@ -50,7 +50,7 @@ static PyObject *ImageRegistration_FindImageOffset(PyObject *self, PyObject *arg
     PyObject *pRefImageBandsObj;
     PyObject *pFltImageBandsObj;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssOOiii|i:findImageOffset", kwlist, &pszInputRefImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssOOiii|i:find_image_offset", kwlist, &pszInputRefImage,
                                      &pszInputFloatImage, &pRefImageBandsObj, &pFltImageBandsObj, &metricType,
                                      &xImgSearch, &yImgSearch, &subPixelResolution))
     {
@@ -124,7 +124,7 @@ static PyObject *ImageRegistration_BasicRegistration(PyObject *self, PyObject *a
     int pixelGap, windowSize, searchArea, subPixelResolution, metricType, outputType;
     float threshold, stdDevRefThreshold, stdDevFloatThreshold;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiffiii:basicregistration", kwlist, &pszInputReferenceImage, &pszInputFloatingmage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiffiii:basic_registration", kwlist, &pszInputReferenceImage, &pszInputFloatingmage,
                                      &pszOutputGCPFile, &pixelGap, &threshold, &windowSize, &searchArea, &stdDevRefThreshold,
                                      &stdDevFloatThreshold, &subPixelResolution, &metricType, &outputType))
     {
@@ -163,7 +163,7 @@ static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObj
     float threshold, stdDevRefThreshold, stdDevFloatThreshold, moveChangeThreshold,
         pSmoothness;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiffiiiffii:singlelayerregistration", kwlist, &pszInputReferenceImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiffiiiffii:single_layer_registration", kwlist, &pszInputReferenceImage,
                                      &pszInputFloatingmage, &pszOutputGCPFile, &pixelGap, &threshold, &windowSize, &searchArea,
                                      &stdDevRefThreshold, &stdDevFloatThreshold, &subPixelResolution, &distanceThreshold,
                                      &maxNumIterations, &moveChangeThreshold, &pSmoothness, &metricType, &outputType))
@@ -196,7 +196,7 @@ static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args, PyOb
 	const char *pszInputImage, *pszInputGCPFile, *pszOutputFile, *pszGDALFormat;
 	int nOutDataType;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:gcp2gdal", kwlist, &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszGDALFormat, &nOutDataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:gcp_to_gdal", kwlist, &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszGDALFormat, &nOutDataType))
     {
         return nullptr;
     }
@@ -222,7 +222,7 @@ static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *a
 	int nOutDataType;
     double xOff, yOff;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssidd:applyOffset2Image", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &nOutDataType, &xOff, &yOff))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssidd:apply_offset_to_image", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &nOutDataType, &xOff, &yOff))
     {
         return nullptr;
     }
@@ -242,8 +242,8 @@ static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *a
 
 // Our list of functions in this module
 static PyMethodDef ImageRegistrationMethods[] = {
-{"findImageOffset", (PyCFunction)ImageRegistration_FindImageOffset, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.findImageOffset(in_ref_img, in_float_img, ref_img_bands, flt_img_bands, metric_type, x_search,  y_search, sub_pxl_res)\n"
+{"find_image_offset", (PyCFunction)ImageRegistration_FindImageOffset, METH_VARARGS | METH_KEYWORDS,
+"imageregistration.find_image_offset(in_ref_img, in_float_img, ref_img_bands, flt_img_bands, metric_type, x_search,  y_search, sub_pxl_res)\n"
 "Calculate and X/Y offset between the input reference and float images.\n"
 "This function will calculate the similarity intersecting regions of the\n"
 "two images and identified an X/Y where the similarity is greatest.\n"
@@ -262,8 +262,8 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "\n"
 },
 
-{"basicregistration", (PyCFunction)ImageRegistration_BasicRegistration, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.basicregistration(in_ref_img, in_float_img, out_gcp_file, pixel_gap, threshold, win_size, search_area, sd_ref_thres, sd_flt_thres, sub_pxl_res, metric_type, output_type)\n"
+{"basic_registration", (PyCFunction)ImageRegistration_BasicRegistration, METH_VARARGS | METH_KEYWORDS,
+"imageregistration.basic_registration(in_ref_img, in_float_img, out_gcp_file, pixel_gap, threshold, win_size, search_area, sd_ref_thres, sd_flt_thres, sub_pxl_res, metric_type, output_type)\n"
 "Generate tie points between floating and reference image using basic algorithm.\n"
 "\n"
 "Where:\n"
@@ -295,12 +295,12 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "   metric = imageregistration.METRIC_CORELATION\n"
 "   outputType = imageregistration.TYPE_RSGIS_IMG2MAP\n"
 "   output = './TestOutputs/injune_p142_casi_sub_utm_tie_points.txt'\n"
-"   imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
+"   imageregistration.basic_registration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
 "\n"
 },
 
-    {"singlelayerregistration", (PyCFunction)ImageRegistration_SingleLayerRegistration, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.singlelayerregistration(in_ref_img, in_float_img, out_gcp_file, pixel_gap, threshold, win_size, search_area, sd_ref_thres, sd_flt_thres, sub_pxl_res, dist_threshold, max_n_iters, move_chng_thres, p_smooth, metric_type, output_type)\n"
+    {"single_layer_registration", (PyCFunction)ImageRegistration_SingleLayerRegistration, METH_VARARGS | METH_KEYWORDS,
+"imageregistration.single_layer_registration(in_ref_img, in_float_img, out_gcp_file, pixel_gap, threshold, win_size, search_area, sd_ref_thres, sd_flt_thres, sub_pxl_res, dist_threshold, max_n_iters, move_chng_thres, p_smooth, metric_type, output_type)\n"
 "Generate tie points between floating and reference image using a single connected layer of tie points.\n"
 "\n"
 "Where:\n"
@@ -337,13 +337,13 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "   metric = imageregistration.METRIC_CORELATION\n"
 "   outputType = imageregistration.TYPE_RSGIS_IMG2MAP\n"
 "   output = './TestOutputs/injune_p142_casi_sub_utm_tie_points.txt'\n"
-"   imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
+"   imageregistration.single_layer_registration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
 "\n"
 },
 
 
-    {"gcp2gdal", (PyCFunction)ImageRegistration_GCP2GDAL, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.gcp2gdal(input_img, in_gcp_file, output_img, gdalformat, datatype)\n"
+    {"gcp_to_gdal", (PyCFunction)ImageRegistration_GCP2GDAL, METH_VARARGS | METH_KEYWORDS,
+"imageregistration.gcp_to_gdal(input_img, in_gcp_file, output_img, gdalformat, datatype)\n"
 "Adds tie points to GDAL file, suitable for warping using the gdalwarp command.\n"
 "\n"
 "Where:\n"
@@ -362,12 +362,12 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_gcps.kea'\n"
 "    gdalformat = 'KEA'\n"
 "    datatype = rsgislib.TYPE_32INT\n"
-"    imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, gdalformat, gdaltype)\n"
+"    imageregistration.gcp_to_gdal(inputImage,inputGCPs, outputImage, gdalformat, gdaltype)\n"
 "\n"
 },
     
-{"applyOffset2Image", (PyCFunction)ImageRegistration_ApplyOffset2Image, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.applyOffset2Image(input_img, output_img, gdalformat, datatype, x_offset, y_offset)\n"
+{"apply_offset_to_image", (PyCFunction)ImageRegistration_ApplyOffset2Image, METH_VARARGS | METH_KEYWORDS,
+"imageregistration.apply_offset_to_image(input_img, output_img, gdalformat, datatype, x_offset, y_offset)\n"
 "Apply a linear X,Y offset to the image header - does not change the pixel values.\n"
 "\n"
 "Where:\n"
@@ -386,7 +386,7 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_fixed.kea'\n"
 "    gdalformat = 'KEA'\n"
 "    datatype = rsgislib.TYPE_32INT\n"
-"    imageregistration.applyOffset2Image(inputImage, outputImage, gdalformat, datatype, -3.0, -3.0)\n"
+"    imageregistration.apply_offset_to_image(inputImage, outputImage, gdalformat, datatype, -3.0, -3.0)\n"
 "\n"
 },
     

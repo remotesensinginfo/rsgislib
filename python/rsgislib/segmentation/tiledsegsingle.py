@@ -107,7 +107,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     def performStage1Tiling(self, inputImage, tileShp, tilesRat, tilesBase, tilesMetaDIR, tilesImgDIR, tmpDIR, width, height, validDataThreshold):
         tilingutils.createMinDataTiles(inputImage, tileShp, tilesRat, width, height, validDataThreshold, None, False, True, tmpDIR)
         tilingutils.createTileMaskImagesFromClumps(tilesRat, tilesBase, tilesMetaDIR, "KEA")
-        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
+        dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImage)
         tilingutils.createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, dataType, 'KEA')
     
     def performStage1TilesSegmentation(self, tilesImgDIR, stage1TilesSegsDIR, tmpDIR, tilesBase, tileSegInfoJSON, strchStatsBase, kCentresBase, numClustersVal, minPxlsVal, distThresVal, bandsVal, samplingVal, kmMaxIterVal):
@@ -143,19 +143,19 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     
     def mergeStage1TilesToOutput(self, inputImage, tilesSegsDIR, tilesSegsBordersDIR, tilesBase, clumpsImage, bordersImage):
         segTiles = glob.glob(os.path.join(tilesSegsDIR, tilesBase+"*_segs.kea"))
-        imageutils.createCopyImage(inputImage, clumpsImage, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+        imageutils.create_copy_img(inputImage, clumpsImage, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
         segmentation.mergeClumpImages(segTiles, clumpsImage)
-        rastergis.populateStats(clumpsImage, True, True)
+        rastergis.pop_rat_img_stats(clumpsImage, True, True)
         
         tileBorders = glob.glob(os.path.join(tilesSegsBordersDIR, tilesBase+"*_segsborder.kea"))
-        imageutils.createCopyImage(inputImage, bordersImage, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
+        imageutils.create_copy_img(inputImage, bordersImage, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
         imageutils.includeImages(bordersImage, tileBorders)
-        rastergis.populateStats(bordersImage, True, True)
+        rastergis.pop_rat_img_stats(bordersImage, True, True)
     
     def performStage2Tiling(self, inputImage, tileShp, tilesRat, tilesBase, tilesMetaDIR, tilesImgDIR, tmpDIR, width, height, validDataThreshold, bordersImage):
         tilingutils.createMinDataTiles(inputImage, tileShp, tilesRat, width, height, validDataThreshold, bordersImage, True, True, tmpDIR)
         tilingutils.createTileMaskImagesFromClumps(tilesRat, tilesBase, tilesMetaDIR, "KEA")
-        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
+        dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImage)
         tilingutils.createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, dataType, 'KEA')
     
     
@@ -164,8 +164,8 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
         for imgTile in imgTiles:
             baseName = os.path.splitext(os.path.basename(imgTile))[0]        
             maskedFile = os.path.join(tilesMaskedDIR, baseName + '_masked.kea')
-            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(imgTile)
-            imageutils.maskImage(imgTile, s1BordersImage, maskedFile, 'KEA', dataType, 0, 0)
+            dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(imgTile)
+            imageutils.mask_img(imgTile, s1BordersImage, maskedFile, 'KEA', dataType, 0, 0)
             
         imgTiles = glob.glob(os.path.join(tilesMaskedDIR, tilesBase+"*_masked.kea"))
         for imgTile in imgTiles:
@@ -185,19 +185,19 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     def mergeStage2TilesToOutput(self, clumpsImage, tilesSegsDIR, tilesSegBordersDIR, tilesBase, s2BordersImage):
         segTiles = glob.glob(os.path.join(tilesSegsDIR, tilesBase+"*_segs.kea"))
         segmentation.mergeClumpImages(segTiles, clumpsImage)
-        rastergis.populateStats(clumpsImage, True, True)
+        rastergis.pop_rat_img_stats(clumpsImage, True, True)
         
         tileBorders = glob.glob(os.path.join(tilesSegBordersDIR, tilesBase+"*_segsborder.kea"))
-        imageutils.createCopyImage(clumpsImage, s2BordersImage, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
+        imageutils.create_copy_img(clumpsImage, s2BordersImage, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
         imageutils.includeImages(s2BordersImage, tileBorders)
     
     def createStage3ImageSubsets(self, inputImage, s2BordersImage, s3BordersClumps, subsetImgsDIR, subsetImgsMaskedDIR, subImgBaseName, minSize):
         segmentation.clump(s2BordersImage, s3BordersClumps, 'KEA', True, 0)
-        rastergis.populateStats(s3BordersClumps, True, True)
+        rastergis.pop_rat_img_stats(s3BordersClumps, True, True)
             
         rastergis.spatialExtent(s3BordersClumps, 'minXX', 'minXY', 'maxXX', 'maxXY', 'minYX', 'minYY', 'maxYX', 'maxYY')
         
-        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
+        dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImage)
         
         ratDS = gdal.Open(s3BordersClumps, gdal.GA_Update)
         minX = rat.readColumn(ratDS, "minXX")
@@ -214,8 +214,8 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
                     maskedFile = os.path.join(subsetImgsMaskedDIR, subImgBaseName + str(i) + '_masked.kea')
                 else:
                     maskedFile = os.path.join(subsetImgsMaskedDIR, subImgBaseName + str(i) + '_burn.kea')
-                imageutils.maskImage(subImage, s2BordersImage, maskedFile, 'KEA', dataType, 0, 0)
-                rastergis.populateStats(maskedFile, True, False)
+                imageutils.mask_img(subImage, s2BordersImage, maskedFile, 'KEA', dataType, 0, 0)
+                rastergis.pop_rat_img_stats(maskedFile, True, False)
         ratDS = None
     
     def performStage3SubsetsSegmentation(self, subsetImgsMaskedDIR, subsetSegsDIR, tmpDIR, subImgBaseName, segStatsInfo, minPxlsVal, distThresVal, bandsVal):
@@ -234,7 +234,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
         
         segTiles = glob.glob(os.path.join(subsetSegsDIR, subImgBaseName+"*_segs.kea"))
         segmentation.mergeClumpImages(segTiles, clumpsImage)
-        rastergis.populateStats(clumpsImage, True, True)
+        rastergis.pop_rat_img_stats(clumpsImage, True, True)
 
 
 def performTiledSegmentation(inputImage, clumpsImage, tmpDIR='segtmp', tileWidth=2000, tileHeight=2000, validDataThreshold = 0.3, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200):
@@ -270,7 +270,7 @@ Example::
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         createdTmp = True
-    uidStr = rsgislib.tools.utils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uid_generator()
     
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
         
@@ -394,13 +394,13 @@ Example::
     ########################################################
     
     shutil.rmtree(segStatsDIR)
-    rsgislib.tools.filetools.deleteFileWithBasename(stage1BordersImage)
-    rsgislib.tools.filetools.deleteFileWithBasename(stage2BordersImage)
-    rsgislib.tools.filetools.deleteFileWithBasename(stage3BordersClumps)
-    rsgislib.tools.filetools.deleteFileWithBasename(stage1TileShp)
-    rsgislib.tools.filetools.deleteFileWithBasename(stage1TileRAT)
-    rsgislib.tools.filetools.deleteFileWithBasename(stage2TileShp)
-    rsgislib.tools.filetools.deleteFileWithBasename(stage2TileRAT)
+    rsgislib.tools.filetools.delete_file_with_basename(stage1BordersImage)
+    rsgislib.tools.filetools.delete_file_with_basename(stage2BordersImage)
+    rsgislib.tools.filetools.delete_file_with_basename(stage3BordersClumps)
+    rsgislib.tools.filetools.delete_file_with_basename(stage1TileShp)
+    rsgislib.tools.filetools.delete_file_with_basename(stage1TileRAT)
+    rsgislib.tools.filetools.delete_file_with_basename(stage2TileShp)
+    rsgislib.tools.filetools.delete_file_with_basename(stage2TileRAT)
     os.remove(tileSegInfo)
     if createdTmp:
         shutil.rmtree(tmpDIR)

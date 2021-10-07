@@ -65,7 +65,7 @@ the maximum NDVI.
 
     """
     import rsgislib.tools.utils
-    uidStr = rsgislib.tools.utils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uid_generator()
     
     # Get List of input images:
     inImages = glob.glob(inImgsPattern)
@@ -84,7 +84,7 @@ the maximum NDVI.
             refImgTmpPresent = False
         
         if dataType is None:
-            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages[0])
+            dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages[0])
         
         numInLyrs = len(inImages)
         
@@ -115,10 +115,10 @@ the maximum NDVI.
         imgLyrs[0] = ""
     
         # Create REF Image
-        rsgislib.imagecalc.getImgIdxForStat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
+        rsgislib.imagecalc.get_img_idx_for_stat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
         if calcStats:
             # Pop Ref Image with stats
-            rsgislib.rastergis.populateStats(outRefImg, True, True, True)
+            rsgislib.rastergis.pop_rat_img_stats(outRefImg, True, True, True)
             
             # Open the clumps dataset as a gdal dataset
             ratDataset = osgeo.gdal.Open(outRefImg, osgeo.gdal.GA_Update)
@@ -133,11 +133,11 @@ the maximum NDVI.
             ratDataset = None
         
         # Create Composite Image
-        rsgislib.imageutils.createRefImgCompositeImg(inImages, outCompImg, outRefImg, gdalformat, dataType, 0.0)
+        rsgislib.imageutils.create_ref_img_composite_img(inImages, outCompImg, outRefImg, gdalformat, dataType, 0.0)
         
         if calcStats:
             # Calc Stats
-            rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+            rsgislib.imageutils.pop_img_stats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
     
         if not refImgTmpPresent:
             shutil.rmtree(refLayersPath, ignore_errors=True)
@@ -170,7 +170,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
 
     """
     import rsgislib.tools.utils
-    uidStr = rsgislib.tools.utils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uid_generator()
     
     # Get List of input images:
     inImages = glob.glob(inImgsPattern)
@@ -189,7 +189,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
             refImgTmpPresent = False
         
         if dataType is None:
-            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages[0])
+            dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages[0])
         
         numInLyrs = len(inImages)
         
@@ -236,7 +236,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
             bandDefns = []
             bandDefns.append(rsgislib.imagecalc.BandDefn('ndvi', refLyrNDVIImg, 1))
             bandDefns.append(rsgislib.imagecalc.BandDefn('ndwi', refLyrNDWIImg, 1))
-            rsgislib.imagecalc.bandMath(refLyrMskImg, 'ndvi<-1?0:ndvi>0.3?1:ndwi>0.01?2:1', 'KEA', rsgislib.TYPE_8UINT, bandDefns)
+            rsgislib.imagecalc.band_math(refLyrMskImg, 'ndvi<-1?0:ndvi>0.3?1:ndwi>0.01?2:1', 'KEA', rsgislib.TYPE_8UINT, bandDefns)
             mskImgs.append(refLyrMskImg)
             idx = idx + 1
         imgLyrs[0] = ""        
@@ -251,7 +251,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
             rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
                                                        rsgislib.imagecalc.StatsSummary(calcMedian=True), 'KEA',
                                                        rsgislib.TYPE_8UINT, 0, True)
-        rsgislib.rastergis.populateStats(outMskImg, True, True, True)
+        rsgislib.rastergis.pop_rat_img_stats(outMskImg, True, True, True)
         
         idx = 1
         refLyrsLst = []
@@ -268,7 +268,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
             bandDefns.append(rsgislib.imagecalc.BandDefn('omsk', outMskImg, 1))
             bandDefns.append(rsgislib.imagecalc.BandDefn('ndvi', refLyrNDVIImg, 1))
             bandDefns.append(rsgislib.imagecalc.BandDefn('ndwi', refLyrNDWIImg, 1))
-            rsgislib.imagecalc.bandMath(refLyrImg, 'lmsk==0?-999:omsk==1?ndvi:omsk==2?ndwi:-999', 'KEA', rsgislib.TYPE_32FLOAT, bandDefns)
+            rsgislib.imagecalc.band_math(refLyrImg, 'lmsk==0?-999:omsk==1?ndvi:omsk==2?ndwi:-999', 'KEA', rsgislib.TYPE_32FLOAT, bandDefns)
             refLyrsLst.append(refLyrImg)
             idx = idx + 1
         
@@ -285,10 +285,10 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
             inImages = inImagesTmp
         
         # Create REF Image
-        rsgislib.imagecalc.getImgIdxForStat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
+        rsgislib.imagecalc.get_img_idx_for_stat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
         if calcStats:
             # Pop Ref Image with stats
-            rsgislib.rastergis.populateStats(outRefImg, True, True, True)
+            rsgislib.rastergis.pop_rat_img_stats(outRefImg, True, True, True)
             
             # Open the clumps dataset as a gdal dataset
             ratDataset = osgeo.gdal.Open(outRefImg, osgeo.gdal.GA_Update)
@@ -301,11 +301,11 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
             ratDataset = None
         
         # Create Composite Image
-        rsgislib.imageutils.createRefImgCompositeImg(inImages, outCompImg, outRefImg, gdalformat, dataType, 0.0)
+        rsgislib.imageutils.create_ref_img_composite_img(inImages, outCompImg, outRefImg, gdalformat, dataType, 0.0)
         
         if calcStats:
             # Calc Stats
-            rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+            rsgislib.imageutils.pop_img_stats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
         
         if not refImgTmpPresent:
             shutil.rmtree(refLayersPath, ignore_errors=True)
@@ -369,7 +369,7 @@ used to define the spatial extent of the output images and spatial projection.
 
     """
     import rsgislib.tools.utils
-    uidStr = rsgislib.tools.utils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uid_generator()
     
     if len(inImages) > 1:
         init_in_images = inImages
@@ -380,10 +380,10 @@ used to define the spatial extent of the output images and spatial projection.
         first = True
         for img in init_in_images:
             if first:
-                nBands = rsgislib.imageutils.getImageBandCount(img)
+                nBands = rsgislib.imageutils.get_image_band_count(img)
                 first = False
             else:
-                cBands = rsgislib.imageutils.getImageBandCount(img)
+                cBands = rsgislib.imageutils.get_image_band_count(img)
                 if cBands != nBands:
                     raise rsgislib.RSGISPyException("The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
 
@@ -402,9 +402,9 @@ used to define the spatial extent of the output images and spatial projection.
         if nImgs > 1:
             if dataType is None:
                 if len(inImagesOverlap) > 0:
-                    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImagesOverlap[0])
+                    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImagesOverlap[0])
                 else:
-                    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages2ReProj[0])
+                    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages2ReProj[0])
         
             tmpPresent = True
             if not os.path.exists(tmpPath):
@@ -422,7 +422,7 @@ used to define the spatial extent of the output images and spatial projection.
                 for img in inImagesOverlap:
                     basename = os.path.splitext(os.path.basename(img))[0]
                     outImg = os.path.join(subsetLayersPath, basename+"_subset.kea")
-                    rsgislib.imageutils.createCopyImage(refImg, outImg, nBands, 0, 'KEA', dataType)
+                    rsgislib.imageutils.create_copy_img(refImg, outImg, nBands, 0, 'KEA', dataType)
                     rsgislib.imageutils.includeImagesIndImgIntersect(outImg, [img])
                     inImagesSub2Ref.append(outImg)
             
@@ -478,7 +478,7 @@ used to define the spatial extent of the output images and spatial projection.
                 bandDefns = []
                 bandDefns.append(rsgislib.imagecalc.BandDefn('ndvi', refLyrNDVIImg, 1))
                 bandDefns.append(rsgislib.imagecalc.BandDefn('ndwi', refLyrNDWIImg, 1))
-                rsgislib.imagecalc.bandMath(refLyrMskImg, 'ndvi<-1?0:ndvi>0.3?1:ndwi>0.01?2:1', 'KEA', rsgislib.TYPE_8UINT, bandDefns)
+                rsgislib.imagecalc.band_math(refLyrMskImg, 'ndvi<-1?0:ndvi>0.3?1:ndwi>0.01?2:1', 'KEA', rsgislib.TYPE_8UINT, bandDefns)
                 mskImgs.append(refLyrMskImg)
                 idx = idx + 1
             imgLyrs[0] = ""        
@@ -493,7 +493,7 @@ used to define the spatial extent of the output images and spatial projection.
                 rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
                                                            rsgislib.imagecalc.StatsSummary(calcMedian=True), 'KEA',
                                                            rsgislib.TYPE_8UINT, 0, True)
-            rsgislib.rastergis.populateStats(outMskImg, True, True, True)
+            rsgislib.rastergis.pop_rat_img_stats(outMskImg, True, True, True)
             
             idx = 1
             refLyrsLst = []
@@ -510,15 +510,15 @@ used to define the spatial extent of the output images and spatial projection.
                 bandDefns.append(rsgislib.imagecalc.BandDefn('omsk', outMskImg, 1))
                 bandDefns.append(rsgislib.imagecalc.BandDefn('ndvi', refLyrNDVIImg, 1))
                 bandDefns.append(rsgislib.imagecalc.BandDefn('ndwi', refLyrNDWIImg, 1))
-                rsgislib.imagecalc.bandMath(refLyrImg, 'lmsk==0?-999:omsk==1?ndvi:omsk==2?ndwi:-999', 'KEA', rsgislib.TYPE_32FLOAT, bandDefns)
+                rsgislib.imagecalc.band_math(refLyrImg, 'lmsk==0?-999:omsk==1?ndvi:omsk==2?ndwi:-999', 'KEA', rsgislib.TYPE_32FLOAT, bandDefns)
                 refLyrsLst.append(refLyrImg)
                 idx = idx + 1
             
             # Create REF Image
-            rsgislib.imagecalc.getImgIdxForStat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
+            rsgislib.imagecalc.get_img_idx_for_stat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
             if calcStats:
                 # Pop Ref Image with stats
-                rsgislib.rastergis.populateStats(outRefImg, True, True, True)
+                rsgislib.rastergis.pop_rat_img_stats(outRefImg, True, True, True)
                 
                 # Open the clumps dataset as a gdal dataset
                 ratDataset = osgeo.gdal.Open(outRefImg, osgeo.gdal.GA_Update)
@@ -531,11 +531,11 @@ used to define the spatial extent of the output images and spatial projection.
                 ratDataset = None
             
             # Create Composite Image
-            rsgislib.imageutils.createRefImgCompositeImg(inImagesSub2Ref, outCompImg, outRefImg, gdalformat, dataType, 0.0)
+            rsgislib.imageutils.create_ref_img_composite_img(inImagesSub2Ref, outCompImg, outRefImg, gdalformat, dataType, 0.0)
             
             if calcStats:
                 # Calc Stats
-                rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+                rsgislib.imageutils.pop_img_stats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
             
             if not refImgTmpPresent:
                 shutil.rmtree(refLayersPath, ignore_errors=True)
@@ -553,10 +553,10 @@ used to define the spatial extent of the output images and spatial projection.
 
     elif len(inImages) == 1:
         print("Only 1 Input Image, Just Copying File to output")
-        nBands = rsgislib.imageutils.getImageBandCount(inImages[0])
+        nBands = rsgislib.imageutils.get_image_band_count(inImages[0])
         if dataType is None:
-            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages[0])
-        rsgislib.imageutils.createCopyImage(refImg, outCompImg, nBands, 0, gdalformat, dataType)
+            dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages[0])
+        rsgislib.imageutils.create_copy_img(refImg, outCompImg, nBands, 0, gdalformat, dataType)
         rsgislib.imageutils.includeImagesIndImgIntersect(outCompImg, [inImages[0]])
     else:
         raise rsgislib.RSGISPyException("List of input images was empty ")
@@ -588,7 +588,7 @@ used to define the spatial extent of the output images and spatial projection.
 
     """
     import rsgislib.tools.utils
-    uidStr = rsgislib.tools.utils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uid_generator()
 
     if len(inImages) > 1:
         init_in_images = inImages
@@ -599,10 +599,10 @@ used to define the spatial extent of the output images and spatial projection.
         first = True
         for img in init_in_images:
             if first:
-                nBands = rsgislib.imageutils.getImageBandCount(img)
+                nBands = rsgislib.imageutils.get_image_band_count(img)
                 first = False
             else:
-                cBands = rsgislib.imageutils.getImageBandCount(img)
+                cBands = rsgislib.imageutils.get_image_band_count(img)
                 if cBands != nBands:
                     raise rsgislib.RSGISPyException(
                         "The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
@@ -622,9 +622,9 @@ used to define the spatial extent of the output images and spatial projection.
         if nImgs > 1:
             if dataType is None:
                 if len(inImagesOverlap) > 0:
-                    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImagesOverlap[0])
+                    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImagesOverlap[0])
                 else:
-                    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages2ReProj[0])
+                    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages2ReProj[0])
 
             tmpPresent = True
             if not os.path.exists(tmpPath):
@@ -642,7 +642,7 @@ used to define the spatial extent of the output images and spatial projection.
                 for img in inImagesOverlap:
                     basename = os.path.splitext(os.path.basename(img))[0]
                     outImg = os.path.join(subsetLayersPath, basename + "_subset.kea")
-                    rsgislib.imageutils.createCopyImage(refImg, outImg, nBands, 0, 'KEA', dataType)
+                    rsgislib.imageutils.create_copy_img(refImg, outImg, nBands, 0, 'KEA', dataType)
                     rsgislib.imageutils.includeImagesIndImgIntersect(outImg, [img])
                     inImagesSub2Ref.append(outImg)
 
@@ -704,8 +704,8 @@ used to define the spatial extent of the output images and spatial projection.
                 bandDefns.append(rsgislib.imagecalc.BandDefn('ndwi', refLyrNDWIImg, 1))
                 ###bandDefns.append(rsgislib.imagecalc.BandDefn('gndwi', refLyrGNDWIImg, 1))
                 ###bandDefns.append(rsgislib.imagecalc.BandDefn('gmndwi', refLyrGMNDWIImg, 1))
-                ###rsgislib.imagecalc.bandMath(refLyrMskImg, '(ndvi<-999)?0:(ndvi>0.3)?1:(ndwi>0.01)?2:(gndwi>0.01)?2:(gmndwi>0.01)?2:1', 'KEA', rsgislib.TYPE_8UINT, bandDefns)
-                rsgislib.imagecalc.bandMath(refLyrMskImg, '(ndvi==-999)?0:(ndvi>0.3)?1:(ndwi>0.01)?2:1', 'KEA',
+                ###rsgislib.imagecalc.band_math(refLyrMskImg, '(ndvi<-999)?0:(ndvi>0.3)?1:(ndwi>0.01)?2:(gndwi>0.01)?2:(gmndwi>0.01)?2:1', 'KEA', rsgislib.TYPE_8UINT, bandDefns)
+                rsgislib.imagecalc.band_math(refLyrMskImg, '(ndvi==-999)?0:(ndvi>0.3)?1:(ndwi>0.01)?2:1', 'KEA',
                                             rsgislib.TYPE_8UINT, bandDefns)
                 mskImgs.append(refLyrMskImg)
                 idx = idx + 1
@@ -722,7 +722,7 @@ used to define the spatial extent of the output images and spatial projection.
                 rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
                                                            rsgislib.imagecalc.StatsSummary(calcMedian=True), 'KEA',
                                                            rsgislib.TYPE_8UINT, 0, True)
-            rsgislib.rastergis.populateStats(outMskImg, True, True, True)
+            rsgislib.rastergis.pop_rat_img_stats(outMskImg, True, True, True)
             print("Created mask")
 
             idx = 1
@@ -741,13 +741,13 @@ used to define the spatial extent of the output images and spatial projection.
                 band_defns = [rsgislib.imagecalc.BandDefn('nir', img, nBand)]
                 nir_range = nir_max - nir_min
                 exp = '(nir==0)?0.0:(nir-{0})/{1}'.format(nir_min, nir_range)
-                rsgislib.imagecalc.bandMath(nir_bright_img, exp, 'KEA', rsgislib.TYPE_32FLOAT, band_defns)
+                rsgislib.imagecalc.band_math(nir_bright_img, exp, 'KEA', rsgislib.TYPE_32FLOAT, band_defns)
 
                 reflyr_ndvi_scaled_img = os.path.join(refLayersPath, '{}_ndvi_scaled.kea'.format(baseImgName))
                 band_defns = [rsgislib.imagecalc.BandDefn('ndvi', refLyrNDVIImg, 1),
                               rsgislib.imagecalc.BandDefn('bright', nir_bright_img, 1)]
                 exp = "(ndvi==-999)?-999:ndvi*bright"
-                rsgislib.imagecalc.bandMath(reflyr_ndvi_scaled_img, exp, 'KEA', rsgislib.TYPE_32FLOAT, band_defns)
+                rsgislib.imagecalc.band_math(reflyr_ndvi_scaled_img, exp, 'KEA', rsgislib.TYPE_32FLOAT, band_defns)
 
                 refLyrImg = os.path.join(refLayersPath, '{}_refHybrid.kea'.format(baseImgName))
                 bandDefns = []
@@ -755,17 +755,17 @@ used to define the spatial extent of the output images and spatial projection.
                 bandDefns.append(rsgislib.imagecalc.BandDefn('omsk', outMskImg, 1))
                 bandDefns.append(rsgislib.imagecalc.BandDefn('ndvi', reflyr_ndvi_scaled_img, 1))
                 bandDefns.append(rsgislib.imagecalc.BandDefn('ndwi', refLyrNDWIImg, 1))
-                rsgislib.imagecalc.bandMath(refLyrImg, 'lmsk==0?-999:omsk==1?ndvi:omsk==2?ndwi:-999', 'KEA',
+                rsgislib.imagecalc.band_math(refLyrImg, 'lmsk==0?-999:omsk==1?ndvi:omsk==2?ndwi:-999', 'KEA',
                                             rsgislib.TYPE_32FLOAT, bandDefns)
                 refLyrsLst.append(refLyrImg)
                 idx = idx + 1
 
             print("Create reference image..")
             # Create REF Image
-            rsgislib.imagecalc.getImgIdxForStat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
+            rsgislib.imagecalc.get_img_idx_for_stat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
             if calcStats:
                 # Pop Ref Image with stats
-                rsgislib.rastergis.populateStats(outRefImg, True, True, True)
+                rsgislib.rastergis.pop_rat_img_stats(outRefImg, True, True, True)
 
                 # Open the clumps dataset as a gdal dataset
                 ratDataset = osgeo.gdal.Open(outRefImg, osgeo.gdal.GA_Update)
@@ -778,12 +778,12 @@ used to define the spatial extent of the output images and spatial projection.
                 ratDataset = None
 
             # Create Composite Image
-            rsgislib.imageutils.createRefImgCompositeImg(inImagesSub2Ref, outCompImg, outRefImg, gdalformat, dataType,
+            rsgislib.imageutils.create_ref_img_composite_img(inImagesSub2Ref, outCompImg, outRefImg, gdalformat, dataType,
                                                          0.0)
 
             if calcStats:
                 # Calc Stats
-                rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+                rsgislib.imageutils.pop_img_stats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
 
             if not refImgTmpPresent:
                 shutil.rmtree(refLayersPath, ignore_errors=True)
@@ -802,10 +802,10 @@ used to define the spatial extent of the output images and spatial projection.
 
     elif len(inImages) == 1:
         print("Only 1 Input Image, Just Copying File to output")
-        nBands = rsgislib.imageutils.getImageBandCount(inImages[0])
+        nBands = rsgislib.imageutils.get_image_band_count(inImages[0])
         if dataType is None:
-            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages[0])
-        rsgislib.imageutils.createCopyImage(refImg, outCompImg, nBands, 0, gdalformat, dataType)
+            dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages[0])
+        rsgislib.imageutils.create_copy_img(refImg, outCompImg, nBands, 0, gdalformat, dataType)
         rsgislib.imageutils.includeImagesIndImgIntersect(outCompImg, [inImages[0]])
     else:
         raise rsgislib.RSGISPyException("List of input images was empty ")

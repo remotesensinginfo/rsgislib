@@ -72,7 +72,7 @@ static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args, PyObjec
     const char *pszInputVectorFile, *pszInputVectorLyr, *pszOutputVectorFile, *pszOutputVectorLyr, *pszOutFormat, *pszOutColName, *pszExpression;
     int delExistVec = false;
     PyObject *pVarsObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssssO|i:vectorMaths", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssssO|i:vector_maths", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
                                      &pszOutputVectorFile, &pszOutputVectorLyr, &pszOutFormat, &pszOutColName,
                                      &pszExpression, &pVarsObj, &delExistVec))
     {
@@ -152,7 +152,7 @@ static PyObject *VectorUtils_CreateLinesOfPoints(PyObject *self, PyObject *args,
     double step;
     int delExistVec = false;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssd|i:createLinesOfPoints", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssd|i:create_lines_of_points", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
                                      &pszOutputVectorFile, &pszOutputVectorLyr, &pszOutFormat, &step, &delExistVec))
     {
         return nullptr;
@@ -183,7 +183,7 @@ static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *a
     int printGeomErrsInt = false;
     int delExistVec = false;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssss|ii:checkValidateGeometries", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssss|ii:check_validate_geometries", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
                                      &pszOutputVectorFile, &pszOutputVectorLyr, &pszOutFormat, &printGeomErrsInt, &delExistVec))
     {
         return nullptr;
@@ -209,8 +209,8 @@ static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *a
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
 
-{"vectorMaths", (PyCFunction)VectorUtils_VectorMaths, METH_VARARGS | METH_KEYWORDS,
-"vectorutils.vectorMaths(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_col, exp, vars, del_exist_vec)\n"
+{"vector_maths", (PyCFunction)VectorUtils_VectorMaths, METH_VARARGS | METH_KEYWORDS,
+"vectorutils.vector_maths(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_col, exp, vars, del_exist_vec)\n"
 "A command to calculate a number column from data in existing columns.\n\n"
 "Where:\n"
 "\n"
@@ -225,8 +225,8 @@ static PyMethodDef VectorUtilsMethods[] = {
 ":param del_exist_vec: is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
 
-{"createLinesOfPoints", (PyCFunction)VectorUtils_CreateLinesOfPoints, METH_VARARGS | METH_KEYWORDS,
-"vectorutils.createLinesOfPoints(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, step, del_exist_vec)\n"
+{"create_lines_of_points", (PyCFunction)VectorUtils_CreateLinesOfPoints, METH_VARARGS | METH_KEYWORDS,
+"vectorutils.create_lines_of_points(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, step, del_exist_vec)\n"
 "A function to create a regularly spaced set of points following a set of lines.\n\n"
 "Where:\n"
 "\n"
@@ -239,8 +239,8 @@ static PyMethodDef VectorUtilsMethods[] = {
 ":param del_exist_vec: is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
 
-{"checkValidateGeometries", (PyCFunction)VectorUtils_CheckValidateGeometries, METH_VARARGS | METH_KEYWORDS,
-"vectorutils.checkValidateGeometries(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, print_err_geoms, del_exist_vec)\n"
+{"check_validate_geometries", (PyCFunction)VectorUtils_CheckValidateGeometries, METH_VARARGS | METH_KEYWORDS,
+"vectorutils.check_validate_geometries(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, print_err_geoms, del_exist_vec)\n"
 "A command fit a polygon to the points inputted.\n\n"
 "Where:\n"
 "\n"

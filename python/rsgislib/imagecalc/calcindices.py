@@ -68,11 +68,11 @@ calcNDVI(input_image, red_band, nir_band, out_image, stats, gdalformat)
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(outImage,False,-999.,True)
 
 
 def calcWBI(image, bBand, nBand, outImage, stats=True, gdalformat='KEA'):
@@ -91,11 +91,11 @@ Helper function to calculate WBI (Blue/NIR), note the output no data value is -9
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(outImage,False,-999.,True)
 
 
 def calcNDWI(image, nBand, sBand, outImage, stats=True, gdalformat='KEA'):
@@ -120,11 +120,11 @@ Where:
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(outImage,False,-999.,True)
 
 
 def calcGNDWI(image, gBand, nBand, outImage, stats=True, gdalformat='KEA'):
@@ -149,11 +149,11 @@ Where:
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(outImage,False,-999.,True)
 
 
 def calcGMNDWI(image, gBand, sBand, outImage, stats=True, gdalformat='KEA'):
@@ -178,11 +178,11 @@ Where:
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(outImage,False,-999.,True)
 
        
 def calcWhiteness(image, bBand, gBand, rBand, outImage, stats=True, gdalformat='KEA'):
@@ -205,11 +205,11 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(outImage,False,-999.,True)
 
 
 def calcBrightness(image, bBand, gBand, rBand, outImage, stats=True, gdalformat='KEA', scalefac=1000):
@@ -233,11 +233,11 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(outImage,False,-999.,True)
         
 
 def calcBrightnessScaled(image, bBand, gBand, rBand, outImage, stats=True, gdalformat='KEA', scalefac=1000):
@@ -258,20 +258,20 @@ Where:
 """
     import rsgislib.tools.utils
     import rsgislib.tools.filetools
-    uidStr = rsgislib.tools.utils.uidGenerator()
-    tmpImg = os.path.splitext(outImage)[0]+'_tmp'+uidStr+'.'+rsgisUtils.getFileExtension(gdalformat)
+    uidStr = rsgislib.tools.utils.uid_generator()
+    tmpImg = os.path.splitext(outImage)[0]+'_tmp'+uidStr+'.'+rsgisUtils.get_file_img_extension(gdalformat)
     expression = '(blue+green+red)!=0?((blue/{})+(green/{})+(red/{}))/3:-999'.format(scalefac, scalefac, scalefac)
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
-    rsgislib.imagecalc.bandMath(tmpImg, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(tmpImg, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     rsgislib.imageutils.normaliseImagePxlVals(inputimage=tmpImg, outputimage=outImage, gdalformat=gdalformat, datatype=rsgislib.TYPE_32FLOAT, innodataval=-999, outnodataval=-999, outmin=0, outmax=1, stretchtype=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretchparam=2)
-    rsgislib.tools.filetools.deleteFileWithBasename(tmpImg)
+    rsgislib.tools.filetools.delete_file_with_basename(tmpImg)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(outImage,False,-999.,True)
 
 
 
@@ -293,11 +293,11 @@ Where:
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(outImage,False,-999.,True)
 
 
 def calcNDSI(image, gBand, sBand, outImage, stats=True, gdalformat='KEA'):
@@ -320,11 +320,11 @@ Where:
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage, False, -999., True)
+        rsgislib.imageutils.pop_img_stats(outImage, False, -999., True)
 
 
 def calcNBR(image, nBand, s2Band, outImage, stats=True, gdalformat='KEA'):
@@ -347,11 +347,11 @@ Where:
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, s2Band))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage, False, -999., True)
+        rsgislib.imageutils.pop_img_stats(outImage, False, -999., True)
 
 
 def calcBAI(image, nBand, rBand, outImage, stats=True, gdalformat='KEA', scalefac=1000):
@@ -378,11 +378,11 @@ Where:
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage, False, -999., True)
+        rsgislib.imageutils.pop_img_stats(outImage, False, -999., True)
 
 
 def calcMVI(image, gBand, nBand, sBand, outImage, stats=True, gdalformat='KEA'):
@@ -409,11 +409,11 @@ and Remote Sensing. 166. pp95-177. https://doi.org/10.1016/j.isprsjprs.2020.06.0
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.band_math(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.imageutils.setImageNoDataValue(outImage, -999)
     if stats:
-        rsgislib.imageutils.popImageStats(outImage, False, -999., True)
+        rsgislib.imageutils.pop_img_stats(outImage, False, -999., True)
 
 
 """

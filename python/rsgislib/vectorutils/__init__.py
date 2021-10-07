@@ -286,7 +286,7 @@ Where:
             out_lyr = lyr
             if lyr in out_lyr_names:
                 if rename_dup_lyrs:
-                    out_lyr = '{}_{}'.format(lyr, rsgislib.tools.utils.uidGenerator())
+                    out_lyr = '{}_{}'.format(lyr, rsgislib.tools.utils.uid_generator())
                 else:
                     raise Exception("Input files have layers with the same name, these will be over written.")
             print("Processing Layer: {0} has {1} features to copy - output layer name: {2}".format(lyr, nFeat, out_lyr))
@@ -2312,7 +2312,7 @@ def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, 
 
     img_intersect = False
     if rsgislib.tools.geometrytools.do_bboxes_intersect(img_bbox, vec_bbox):
-        uid_str = rsgislib.tools.utils.uidGenerator()
+        uid_str = rsgislib.tools.utils.uid_generator()
         base_vmsk_img = rsgislib.tools.filetools.get_file_basename(input_vmsk_img)
 
         tmp_file_dir = os.path.join(tmp_dir, "{}_{}".format(base_vmsk_img, uid_str))
@@ -2332,7 +2332,7 @@ def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, 
             mem_result_lyr = mem_lyr
 
         roi_img = os.path.join(tmp_file_dir, "{}_roiimg.kea".format(base_vmsk_img))
-        rsgislib.imageutils.createCopyImage(input_vmsk_img, roi_img, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
+        rsgislib.imageutils.create_copy_img(input_vmsk_img, roi_img, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
         rasteriseVecLyrObj(mem_result_lyr, roi_img, burnVal=1, vecAtt=None, calcstats=True, thematic=True, nodata=0)
         mem_result_ds = None
 
@@ -2340,8 +2340,8 @@ def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, 
         bandDefns.append(rsgislib.imagecalc.BandDefn('vmsk', input_vmsk_img, 1))
         bandDefns.append(rsgislib.imagecalc.BandDefn('roi', roi_img, 1))
         intersect_img = os.path.join(tmp_file_dir, "{}_intersectimg.kea".format(base_vmsk_img))
-        rsgislib.imagecalc.bandMath(intersect_img, "(vmsk==1) && (roi==1)?1:0", 'KEA', rsgislib.TYPE_8UINT, bandDefns)
-        rsgislib.rastergis.populateStats(intersect_img, addclrtab=True, calcpyramids=True, ignorezero=True)
+        rsgislib.imagecalc.band_math(intersect_img, "(vmsk==1) && (roi==1)?1:0", 'KEA', rsgislib.TYPE_8UINT, bandDefns)
+        rsgislib.rastergis.pop_rat_img_stats(intersect_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
         n_vals = rsgislib.imagecalc.countPxlsOfVal(intersect_img, vals=[1])
         if n_vals[0] > 0:
             img_intersect = True

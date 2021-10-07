@@ -5,17 +5,17 @@ DATA_DIR = os.path.join(
 )
 
 
-def test_createCircularOp(tmp_path):
+def test_create_circular_op(tmp_path):
     import rsgislib.imagemorphology
 
     out_file = os.path.join(tmp_path, "CircularOp.gmtxt")
     op_size = 5
-    rsgislib.imagemorphology.createCircularOp(out_file, op_size)
+    rsgislib.imagemorphology.create_circular_op(out_file, op_size)
 
     assert os.path.exists(out_file)
 
 
-def test_imageDilate(tmp_path):
+def test_image_dilate(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -26,16 +26,16 @@ def test_imageDilate(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
-    rsgislib.imagemorphology.imageDilate(
+    rsgislib.imagemorphology.image_dilate(
         input_img, output_img, morph_op_file, use_op_file, op_size, gdalformat, datatype
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgDilate_OpFile.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     assert img_eq
 
 
-def test_imageDilateCombinedOut(tmp_path):
+def test_image_dilate_combined_out(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -46,16 +46,16 @@ def test_imageDilateCombinedOut(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
-    rsgislib.imagemorphology.imageDilateCombinedOut(
+    rsgislib.imagemorphology.image_dilate_combined_out(
         input_img, output_img, morph_op_file, use_op_file, op_size, gdalformat, datatype
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgDilate_combined.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     assert img_eq
 
 
-def test_imageErode(tmp_path):
+def test_image_erode(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -66,16 +66,16 @@ def test_imageErode(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
-    rsgislib.imagemorphology.imageErode(
+    rsgislib.imagemorphology.image_erode(
         input_img, output_img, morph_op_file, use_op_file, op_size, gdalformat, datatype
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgErode.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     assert img_eq
 
 
-def test_imageErodeCombinedOut(tmp_path):
+def test_image_erode_combined_out(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -86,16 +86,16 @@ def test_imageErodeCombinedOut(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
-    rsgislib.imagemorphology.imageErodeCombinedOut(
+    rsgislib.imagemorphology.image_erode_combined_out(
         input_img, output_img, morph_op_file, use_op_file, op_size, gdalformat, datatype
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgErode_combined.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     assert img_eq
 
 
-def test_imageGradiant(tmp_path):
+def test_image_gradiant(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -106,16 +106,16 @@ def test_imageGradiant(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_32FLOAT
-    rsgislib.imagemorphology.imageGradiant(
+    rsgislib.imagemorphology.image_gradiant(
         input_img, output_img, morph_op_file, use_op_file, op_size, gdalformat, datatype
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgGradiant.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     assert img_eq
 
 
-def test_imageGradiantCombinedOut(tmp_path):
+def test_image_gradiant_combined_out(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -126,16 +126,16 @@ def test_imageGradiantCombinedOut(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_32FLOAT
-    rsgislib.imagemorphology.imageGradiantCombinedOut(
+    rsgislib.imagemorphology.image_gradiant_combined_out(
         input_img, output_img, morph_op_file, use_op_file, op_size, gdalformat, datatype
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgGradiant_combined.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     assert img_eq
 
 
-def test_imageLocalMinima(tmp_path):
+def test_image_local_minima(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -148,7 +148,7 @@ def test_imageLocalMinima(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
-    rsgislib.imagemorphology.imageLocalMinima(
+    rsgislib.imagemorphology.image_local_minima(
         input_img,
         output_img,
         sequencial_out,
@@ -161,11 +161,11 @@ def test_imageLocalMinima(tmp_path):
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgLocalMinima.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     assert img_eq
 
 
-def test_imageLocalMinimaCombinedOut(tmp_path):
+def test_image_local_minima_combined_out(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -178,7 +178,7 @@ def test_imageLocalMinimaCombinedOut(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
-    rsgislib.imagemorphology.imageLocalMinimaCombinedOut(
+    rsgislib.imagemorphology.image_local_minima_combined_out(
         input_img,
         output_img,
         sequencial_out,
@@ -191,11 +191,11 @@ def test_imageLocalMinimaCombinedOut(tmp_path):
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgLocalMinimaCombined.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     assert img_eq
 
 
-def test_imageOpening(tmp_path):
+def test_image_opening(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -208,7 +208,7 @@ def test_imageOpening(tmp_path):
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
     niters = 1
-    rsgislib.imagemorphology.imageOpening(
+    rsgislib.imagemorphology.image_opening(
         input_img,
         output_img,
         tmp_img,
@@ -221,12 +221,12 @@ def test_imageOpening(tmp_path):
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgOpening.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     print(prop_match)
     assert img_eq
 
 
-def test_imageClosing(tmp_path):
+def test_image_closing(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -239,7 +239,7 @@ def test_imageClosing(tmp_path):
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
     niters = 1
-    rsgislib.imagemorphology.imageClosing(
+    rsgislib.imagemorphology.image_closing(
         input_img,
         output_img,
         tmp_img,
@@ -252,12 +252,12 @@ def test_imageClosing(tmp_path):
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgClosing.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     print(prop_match)
     assert img_eq
 
 
-def test_imageBlackTopHat(tmp_path):
+def test_image_black_top_hat(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -269,7 +269,7 @@ def test_imageBlackTopHat(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
-    rsgislib.imagemorphology.imageBlackTopHat(
+    rsgislib.imagemorphology.image_black_top_hat(
         input_img,
         output_img,
         tmp_img,
@@ -281,12 +281,12 @@ def test_imageBlackTopHat(tmp_path):
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgBlackTopHat.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     print(prop_match)
     assert img_eq
 
 
-def test_imageWhiteTopHat(tmp_path):
+def test_image_white_top_hat(tmp_path):
     import rsgislib.imagemorphology
     import rsgislib.imagecalc
 
@@ -298,7 +298,7 @@ def test_imageWhiteTopHat(tmp_path):
     op_size = 5
     gdalformat = "KEA"
     datatype = rsgislib.TYPE_8UINT
-    rsgislib.imagemorphology.imageWhiteTopHat(
+    rsgislib.imagemorphology.image_white_top_hat(
         input_img,
         output_img,
         tmp_img,
@@ -310,6 +310,6 @@ def test_imageWhiteTopHat(tmp_path):
     )
 
     ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_imgWhiteTopHat.kea")
-    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_img, output_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(ref_img, output_img)
     print(prop_match)
     assert img_eq

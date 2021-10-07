@@ -300,9 +300,9 @@ This function uses a trained classifier and applies it to the provided input ima
     print("Applying the Classifier")
     applier.apply(_applySKClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.rastergis.populateStats(clumps=outputImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+    rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     if out_score_img:
-        rsgislib.imageutils.popImageStats(outScoreImg, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(outScoreImg, usenodataval=True, nodataval=0, calcpyramids=True)
 
     if classClrNames:
         ratDataset = gdal.Open(outputImg, gdal.GA_Update)
@@ -465,7 +465,7 @@ Example::
     # Combine results using MODE.
     rsgislib.imagecalc.calcMultiImgBandStats(outClassImgs, outClassImg, rsgislib.SUMTYPE_MODE, gdalformat,
                                              rsgislib.TYPE_8UINT, 0, True)
-    rsgislib.rastergis.populateStats(clumps=outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+    rsgislib.rastergis.pop_rat_img_stats(clumps=outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
     # Colour output classification image.
     ratDataset = gdal.Open(outClassImg, gdal.GA_Update)

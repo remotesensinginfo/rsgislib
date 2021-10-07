@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 ############################################################################
-#  pxl_outlier_chng.py
+#  pxloutlierchng.py
 #
 #  Copyright 2019 RSGISLib.
 #
@@ -68,7 +68,7 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
         if not ((type(img_bands) is list) or (type(img_bands) is tuple)):
             raise rsgislib.RSGISPyException("If provided then img_bands should be a list (or None)")
     else:
-        n_bands = rsgislib.imageutils.getImageBandCount(input_img)
+        n_bands = rsgislib.imageutils.get_image_band_count(input_img)
         img_bands = numpy.arange(1, n_bands + 1)
     num_vars = len(img_bands)
     img_val_no_data = rsgislib.imageutils.getImageNoDataValue(input_img)
@@ -164,6 +164,6 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
     applier.apply(_applyPyOB, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
 
-    rsgislib.rastergis.populateStats(clumps=out_lbls_img, addclrtab=True, calcpyramids=True, ignorezero=True)
+    rsgislib.rastergis.pop_rat_img_stats(clumps=out_lbls_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     if out_scores_img is not None:
-        rsgislib.imageutils.popImageStats(out_scores_img, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(out_scores_img, usenodataval=True, nodataval=0, calcpyramids=True)

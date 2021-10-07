@@ -106,7 +106,7 @@ class RSGISMedianFilter(RSGISAbstractFilter):
                 filter_type="Median", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -134,7 +134,7 @@ class RSGISMeanFilter(RSGISAbstractFilter):
                 filter_type="Mean", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -162,7 +162,7 @@ class RSGISMinFilter(RSGISAbstractFilter):
                 filter_type="Min", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -190,7 +190,7 @@ class RSGISMaxFilter(RSGISAbstractFilter):
                 filter_type="Max", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -218,7 +218,7 @@ class RSGISModeFilter(RSGISAbstractFilter):
                 filter_type="Mode", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -246,7 +246,7 @@ class RSGISStdDevFilter(RSGISAbstractFilter):
                 filter_type="StdDev", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -274,7 +274,7 @@ class RSGISRangeFilter(RSGISAbstractFilter):
                 filter_type="Range", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -302,7 +302,7 @@ class RSGISMeanDiffFilter(RSGISAbstractFilter):
                 filter_type="MeanDiff", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -330,7 +330,7 @@ class RSGISMeanDiffAbsFilter(RSGISAbstractFilter):
                 filter_type="MeanDiffAbs", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -358,7 +358,7 @@ class RSGISTotalDiffFilter(RSGISAbstractFilter):
                 filter_type="TotalDiff", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -386,7 +386,7 @@ class RSGISTotalDiffAbsFilter(RSGISAbstractFilter):
                 filter_type="TotalDiffAbs", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -414,7 +414,7 @@ class RSGISCoeffOfVarFilter(RSGISAbstractFilter):
                 filter_type="CoeffOfVar", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -442,7 +442,7 @@ class RSGISTotalFilter(RSGISAbstractFilter):
                 filter_type="Total", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -470,7 +470,7 @@ class RSGISNormVarFilter(RSGISAbstractFilter):
                 filter_type="NormVar", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -500,7 +500,7 @@ class RSGISNormVarSqrtFilter(RSGISAbstractFilter):
                 filter_type="NormVarSqrt", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -530,7 +530,7 @@ class RSGISNormVarLnFilter(RSGISAbstractFilter):
                 filter_type="NormVarLn", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -558,7 +558,7 @@ class RSGISTextureVarFilter(RSGISAbstractFilter):
                 filter_type="TextureVar", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -586,7 +586,7 @@ class RSGISKuwaharaFilter(RSGISAbstractFilter):
                 filter_type="Kuwahara", file_ending="", size=self.filter_size
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -614,7 +614,7 @@ class RSGISSobelFilter(RSGISAbstractFilter):
                 filter_type="Sobel", file_ending="", option="xy"
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -642,7 +642,7 @@ class RSGISSobelXFilter(RSGISAbstractFilter):
                 filter_type="Sobel", file_ending="", option="x"
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -670,7 +670,7 @@ class RSGISSobelYFilter(RSGISAbstractFilter):
                 filter_type="Sobel", file_ending="", option="y"
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -698,7 +698,7 @@ class RSGISPrewittFilter(RSGISAbstractFilter):
                 filter_type="Prewitt", file_ending="", option="xy"
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -726,7 +726,7 @@ class RSGISPrewittXFilter(RSGISAbstractFilter):
                 filter_type="Prewitt", file_ending="", option="x"
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -754,7 +754,7 @@ class RSGISPrewittYFilter(RSGISAbstractFilter):
                 filter_type="Prewitt", file_ending="", option="y"
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -792,7 +792,7 @@ class RSGISGaussianSmoothFilter(RSGISAbstractFilter):
                 angle=self.filter_angle,
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -830,7 +830,7 @@ class RSGISGaussian1stDerivFilter(RSGISAbstractFilter):
                 angle=self.filter_angle,
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -868,7 +868,7 @@ class RSGISGaussian2ndDerivFilter(RSGISAbstractFilter):
                 angle=self.filter_angle,
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -900,7 +900,7 @@ class RSGISLaplacianFilter(RSGISAbstractFilter):
                 stddev=self.stddev,
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -932,7 +932,7 @@ class RSGISLeeFilter(RSGISAbstractFilter):
                 n_looks=self.n_looks,
             )
         )
-        imagefilter.applyfilters(
+        imagefilter.apply_filters(
             input_img,
             out_image_base,
             filters,
@@ -996,7 +996,7 @@ def performTiledImgFilter(
         medianFilter = tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT)
         tiledfilter.performTiledImgFilter(input_img, output_img, medianFilter,
                                           width=2000, height=2000)
-        imageutils.popImageStats(output_img, False, 0, True)
+        imageutils.pop_img_stats(output_img, False, 0, True)
 
     """
     import rsgislib.tools.utils
@@ -1009,9 +1009,9 @@ def performTiledImgFilter(
     if n_cores <= 0:
         n_cores = rsgislib.tools.utils.numProcessCores()
 
-    uidStr = rsgislib.tools.utils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uid_generator()
     if datatype is None:
-        datatype = rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_img)
+        datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
 
     baseName = os.path.splitext(os.path.basename(input_img))[0] + "_" + uidStr
 
@@ -1051,9 +1051,9 @@ def performTiledImgFilter(
 
     imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.kea"))
 
-    numOutBands = rsgislib.imageutils.getImageBandCount(input_img)
+    numOutBands = rsgislib.imageutils.get_image_band_count(input_img)
 
-    imageutils.createCopyImage(
+    imageutils.create_copy_img(
         input_img, output_img, numOutBands, 0, gdalformat, datatype
     )
 
@@ -1114,7 +1114,7 @@ def performTiledImgMultiFilter(
                   tiledfilter.RSGISNormVarFilter(7, "KEA", rsgislib.TYPE_16UINT]
         tiledfilter.performTiledImgMultiFilter(input_img, outputImages,
                                                filters, width=2000, height=2000)
-        imageutils.popImageStats(output_img, False, 0, True)
+        imageutils.pop_img_stats(output_img, False, 0, True)
 
     """
     import rsgislib.tools.utils
@@ -1134,9 +1134,9 @@ def performTiledImgMultiFilter(
     if n_cores <= 0:
         n_cores = rsgislib.tools.utils.numProcessCores()
 
-    uidStr = rsgislib.tools.utils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uid_generator()
     if datatype is None:
-        datatype = rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_img)
+        datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
 
     baseName = os.path.splitext(os.path.basename(input_img))[0] + "_" + uidStr
 
@@ -1189,9 +1189,9 @@ def performTiledImgMultiFilter(
 
         imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.kea"))
 
-        numOutBands = rsgislib.imageutils.getImageBandCount(input_img)
+        numOutBands = rsgislib.imageutils.get_image_band_count(input_img)
 
-        imageutils.createCopyImage(
+        imageutils.create_copy_img(
             input_img, output_img, numOutBands, 0, gdalformat, datatype
         )
 

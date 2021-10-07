@@ -42,7 +42,7 @@ TYPE_RSGIS_MAPOFFS = 4
 
 
 
-def warpUseGCPsWithGDAL(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, useTPS=False, usePoly=True, polyOrder=3, useMutliThread=False):
+def warp_with_gcps_with_gdal(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, useTPS=False, usePoly=True, polyOrder=3, useMutliThread=False):
     """
 A utility function to warp an image file (inProcessImg) using GCPs defined within the image header - this is the same as using the 
 gdalwarp utility. However, the output image will have the same pixel grid and dimensions as the input reference image (inRefImg).
@@ -63,12 +63,12 @@ Where:
     import rsgislib.imageutils
     from osgeo import gdal
      
-    if not rsgislib.imageutils.hasGCPs(inProcessImg):
+    if not rsgislib.imageutils.has_gcps(inProcessImg):
         raise Exception("Input process image does not have GCPs within it's header - this is required.")
 
-    numBands = rsgislib.imageutils.getImageBandCount(inProcessImg)
+    numBands = rsgislib.imageutils.get_image_band_count(inProcessImg)
     noDataVal = rsgislib.imageutils.getImageNoDataValue(inProcessImg)
-    datatype = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inProcessImg)
+    datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(inProcessImg)
     
     interpolationMethod = gdal.GRA_NearestNeighbour
     if interpMethod == 'bilinear':
@@ -88,7 +88,7 @@ Where:
     else:
         raise Exception("Interpolation method was not recognised or known.")
     
-    rsgislib.imageutils.createCopyImage(inRefImg, outImg, numBands, 0, gdalformat, datatype)
+    rsgislib.imageutils.create_copy_img(inRefImg, outImg, numBands, 0, gdalformat, datatype)
 
     inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     outFile = gdal.Open(outImg, gdal.GA_Update)

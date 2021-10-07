@@ -253,7 +253,7 @@ def apply_keras_chips_pixel_classifier(classTrainInfo, keras_cls_mdl, imgMask, i
     writer.close(calcStats=False)
 
     if classClrNames:
-        rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+        rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
         max_val = rsgislib.imagecalc.getImageBandMinMax(outClassImg, 1, False, 0)[1]
         ratDataset = gdal.Open(outClassImg, gdal.GA_Update)
 

@@ -62,7 +62,7 @@ Create a list of these objects to provide the Coeffs for ElevLUTFeat and AOTLUTF
         
 
 
-def performDOSCalc(inputFile, outputFile, gdalformat='KEA', nonNegative=True, noDataVal=0, darkObjReflVal=0, darkObjPercentile=0.01, copyBandNames=True, calcStatsPyd=True):
+def perform_dos_calc(inputFile, outputFile, gdalformat='KEA', nonNegative=True, noDataVal=0, darkObjReflVal=0, darkObjPercentile=0.01, copyBandNames=True, calcStatsPyd=True):
     """
 A command to perform a dark object subtraction (DOS) on an input image.
 
@@ -79,7 +79,7 @@ A command to perform a dark object subtraction (DOS) on an input image.
 Example::
 
     import rsgislib.imagecalibration
-    rsgislib.imagecalibration.performDOSCalc("LS5TM_20110701_lat52lon421_r24p204_rad_toa.kea", 'LS5TM_20110701_lat52lon421_r24p204_rad_toa_dos.kea")
+    rsgislib.imagecalibration.perform_dos_calc("LS5TM_20110701_lat52lon421_r24p204_rad_toa.kea", 'LS5TM_20110701_lat52lon421_r24p204_rad_toa_dos.kea")
 
 """
     import rsgislib
@@ -87,27 +87,27 @@ Example::
     import rsgislib.imageutils
     import collections
     
-    outDataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputFile)
+    outDataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputFile)
     
-    percentList = rsgislib.imagecalc.bandPercentile(inputFile, darkObjPercentile, noDataVal)
+    percentList = rsgislib.imagecalc.calc_band_percentile(inputFile, darkObjPercentile, noDataVal)
         
     offsetsList = list()
     OffVal = collections.namedtuple('DOSOffset', ['offset'])
     for val in percentList:
         offsetsList.append(OffVal(offset=val))
     
-    applySubtractSingleOffsets(inputFile, outputFile, gdalformat, outDataType, nonNegative, True, noDataVal, darkObjReflVal, offsetsList)
+    apply_subtract_single_offsets(inputFile, outputFile, gdalformat, outDataType, nonNegative, True, noDataVal, darkObjReflVal, offsetsList)
     
     if copyBandNames:
         bandNames = rsgislib.imageutils.getBandNames(inputFile)
-        rsgislib.imageutils.setBandNames(outputFile, bandNames)
+        rsgislib.imageutils.set_band_names(outputFile, bandNames)
     
     if calcStatsPyd:
-        rsgislib.imageutils.popImageStats(outputFile, usenodataval=True, nodataval=noDataVal, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(outputFile, usenodataval=True, nodataval=noDataVal, calcpyramids=True)
 
 
 
-def calcClearSkyRegions(cloudsImg, validAreaImg, outputClearSkyMask, outFormat, tmpPath='./tmpClearSky', deleteTmpFiles=True, initClearSkyRegionDist=5000, initClearSkyRegionMinSize=3000, finalClearSkyRegionDist=1000, morphSize=21):
+def calc_clear_sky_regions(cloudsImg, validAreaImg, outputClearSkyMask, outFormat, tmpPath='./tmpClearSky', deleteTmpFiles=True, initClearSkyRegionDist=5000, initClearSkyRegionMinSize=3000, finalClearSkyRegionDist=1000, morphSize=21):
     """
 Given a cloud mask, identify the larger extent regions of useful clear-sky regions.
 
@@ -129,7 +129,7 @@ Example::
     validAreaImg = "./Outputs/LS8_20160605_lat52lon261_r24p203_valid.kea"
     outputMask = "./Outputs/LS8_20160605_lat52lon261_r24p203_openskyvalid.kea"
     tmpPath = "./temp"
-    rsgislib.imagecalibration.calcClearSkyRegions(cloudsImg, validAreaImg, outputMask, 'KEA', tmpPath)
+    rsgislib.imagecalibration.calc_clear_sky_regions(cloudsImg, validAreaImg, outputMask, 'KEA', tmpPath)
 
 """
     
@@ -165,25 +165,25 @@ Example::
     
     rsgislib.imagecalc.calcDist2ImgVals(cloudsImg, tmpCloudsImgDist2Clouds, pxlVals=[1,2])
         
-    rsgislib.imageutils.maskImage(tmpCloudsImgDist2Clouds, validAreaImg, tmpCloudsImgDist2CloudsNoData, 'KEA', rsgislib.TYPE_32INT, -1, 0)    
+    rsgislib.imageutils.mask_img(tmpCloudsImgDist2Clouds, validAreaImg, tmpCloudsImgDist2CloudsNoData, 'KEA', rsgislib.TYPE_32INT, -1, 0)
             
-    rsgislib.imagecalc.imageMath(tmpCloudsImgDist2CloudsNoData, tmpInitClearSkyRegions, 'b1 > '+str(initClearSkyRegionDist), outFormat, rsgislib.TYPE_32UINT)
+    rsgislib.imagecalc.image_math(tmpCloudsImgDist2CloudsNoData, tmpInitClearSkyRegions, 'b1 > '+str(initClearSkyRegionDist), outFormat, rsgislib.TYPE_32UINT)
     
     rsgislib.segmentation.clump(tmpInitClearSkyRegions, tmpInitClearSkyRegionsClumps, 'KEA', False, 0.0, False)
     
-    rsgislib.rastergis.populateStats(tmpInitClearSkyRegionsClumps, True, True)
+    rsgislib.rastergis.pop_rat_img_stats(tmpInitClearSkyRegionsClumps, True, True)
     
     rsgislib.segmentation.rmSmallClumps(tmpInitClearSkyRegionsClumps, tmpInitClearSkyRegionsRmSmall, initClearSkyRegionMinSize, 'KEA')
     
     rsgislib.segmentation.relabelClumps(tmpInitClearSkyRegionsRmSmall, tmpInitClearSkyRegionsFinal, 'KEA', False)
     
-    rsgislib.rastergis.populateStats(tmpInitClearSkyRegionsFinal, True, True)
+    rsgislib.rastergis.pop_rat_img_stats(tmpInitClearSkyRegionsFinal, True, True)
     
-    rsgislib.imagecalc.imageMath(tmpCloudsImgDist2CloudsNoData, tmpClearSkyRegionsFullExtent, 'b1 > '+str(finalClearSkyRegionDist), outFormat, rsgislib.TYPE_32UINT)
+    rsgislib.imagecalc.image_math(tmpCloudsImgDist2CloudsNoData, tmpClearSkyRegionsFullExtent, 'b1 > '+str(finalClearSkyRegionDist), outFormat, rsgislib.TYPE_32UINT)
     
     rsgislib.segmentation.clump(tmpClearSkyRegionsFullExtent, tmpClearSkyRegionsFullExtentClumps, 'KEA', False, 0.0, False)
     
-    rsgislib.rastergis.populateStats(tmpClearSkyRegionsFullExtentClumps, True, True)
+    rsgislib.rastergis.pop_rat_img_stats(tmpClearSkyRegionsFullExtentClumps, True, True)
     
     rsgislib.rastergis.populateRATWithStats(tmpInitClearSkyRegionsFinal, tmpClearSkyRegionsFullExtentClumps, [rsgislib.rastergis.BandAttStats(band=1, maxField='InitRegionInter')])
     
@@ -196,7 +196,7 @@ Example::
     
     rsgislib.rastergis.collapseRAT(tmpClearSkyRegionsFullExtentClumps, 'ValidClumps', tmpClearSkyRegionsFullExtentSelectClumps, 'KEA', 1)
     
-    rsgislib.rastergis.populateStats(tmpClearSkyRegionsFullExtentSelectClumps, True, True)
+    rsgislib.rastergis.pop_rat_img_stats(tmpClearSkyRegionsFullExtentSelectClumps, True, True)
     
     rsgislib.imagemorphology.createCircularOp(outputFile=tmpMorphOperator, opSize=morphSize)
     
@@ -204,30 +204,30 @@ Example::
     
     rsgislib.segmentation.clump(tmpClearSkyRegionsFullExtentSelectClumpsOpen, tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, 'KEA', False, 0.0, False)
     
-    rsgislib.rastergis.populateStats(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, True, True)
+    rsgislib.rastergis.pop_rat_img_stats(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, True, True)
 
     rsgislib.segmentation.rmSmallClumps(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall, initClearSkyRegionMinSize, 'KEA')
     
-    rsgislib.imagecalc.imageMath(tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall, outputClearSkyMask, "b1>0?1:0", outFormat, rsgislib.TYPE_8UINT)
+    rsgislib.imagecalc.image_math(tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall, outputClearSkyMask, "b1>0?1:0", outFormat, rsgislib.TYPE_8UINT)
         
     if deleteTmpFiles:
         import rsgislib.tools.filetools
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpCloudsImgDist2Clouds)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpCloudsImgDist2CloudsNoData)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpInitClearSkyRegions)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpInitClearSkyRegionsClumps)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpInitClearSkyRegionsRmSmall)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpInitClearSkyRegionsFinal)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtent)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentClumps)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumps)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumpsOpen)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall)
-        rsgislib.tools.filetools.deleteFileWithBasename(tmpMorphOperator)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpCloudsImgDist2Clouds)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpCloudsImgDist2CloudsNoData)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpInitClearSkyRegions)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpInitClearSkyRegionsClumps)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpInitClearSkyRegionsRmSmall)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpInitClearSkyRegionsFinal)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpClearSkyRegionsFullExtent)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpClearSkyRegionsFullExtentClumps)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpClearSkyRegionsFullExtentSelectClumps)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpClearSkyRegionsFullExtentSelectClumpsOpen)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall)
+        rsgislib.tools.filetools.delete_file_with_basename(tmpMorphOperator)
 
 
-def getESUNValue(radiance, toaRefl, day, month, year, solarZenith):
+def get_esun_value(radiance, toaRefl, day, month, year, solarZenith):
     """
 Get the ESUN value where a radiance and TOA Reflectance value are known for a pixel.
 
@@ -242,8 +242,8 @@ Get the ESUN value where a radiance and TOA Reflectance value are known for a pi
 """
     import rsgislib.imagecalibration
     import math
-    julianDay = rsgislib.imagecalibration.getJulianDay(year, month, day)
-    solarDist = rsgislib.imagecalibration.calcSolarDistance(julianDay)
+    julianDay = rsgislib.imagecalibration.get_julian_day(year, month, day)
+    solarDist = rsgislib.imagecalibration.calc_solar_distance(julianDay)
     # pi * L * d2
     step1 = math.pi * radiance * (solarDist * solarDist)
     # step1 / toaRefl
@@ -296,7 +296,7 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
     
     # Rescale input TOA 
     rescaledInputImg = os.path.join(tmpImgDIR, baseName+'_rescaled.kea')
-    rsgislib.imagecalc.rescaleImgPxlVals(inputTOAImg, rescaledInputImg, 'KEA', rsgislib.TYPE_32FLOAT, bandRescale, trim2Limits=True)
+    rsgislib.imagecalc.rescale_img_pxl_vals(inputTOAImg, rescaledInputImg, 'KEA', rsgislib.TYPE_32FLOAT, bandRescale, trim2Limits=True)
     
     # Calculate the minium value (across all bands) within the window.
     minValInWinImg = os.path.join(tmpImgDIR, baseName+'_minValInWin.kea')
@@ -317,11 +317,11 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
     ###############################################
     
     # Calculate the 99th percentile.
-    percentVals = rsgislib.imagecalc.bandPercentile(minValInWinImg, 0.99, 0)
+    percentVals = rsgislib.imagecalc.calc_band_percentile(minValInWinImg, 0.99, 0)
     
     # Create mask of regions over 99th percentile
     atmosMaskImg = os.path.join(tmpImgDIR, baseName+'_atmosMask.kea')
-    rsgislib.imagecalc.imageMath(minValInWinImg, atmosMaskImg, '(b1==0)?0:(b1>='+str(percentVals[0])+')?1:0', 'KEA', rsgislib.TYPE_8UINT)
+    rsgislib.imagecalc.image_math(minValInWinImg, atmosMaskImg, '(b1==0)?0:(b1>='+str(percentVals[0])+')?1:0', 'KEA', rsgislib.TYPE_8UINT)
     
     # Calculate the mean value within the atmospheric light mask
     imgMeanVal = rsgislib.imagecalc.calcImgMeanInMask(rescaledInputImg, atmosMaskImg, 1, imgBands, 1, True)
@@ -329,7 +329,7 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
     # Calculate the atmospheric transmission
     # transmission = 1 - omega * imgDark / atomsphericLight
     transImg = os.path.join(tmpImgDIR, baseName+'_transmission.kea')
-    rsgislib.imagecalc.imageMath(minValInWinImg, transImg, '(b1==0)?0:(1 - (1 * (b1/'+str(imgMeanVal)+')))<0.025?0.025:(1 - (1 * (b1/'+str(imgMeanVal)+')))', 'KEA', rsgislib.TYPE_32FLOAT)
+    rsgislib.imagecalc.image_math(minValInWinImg, transImg, '(b1==0)?0:(1 - (1 * (b1/'+str(imgMeanVal)+')))<0.025?0.025:(1 - (1 * (b1/'+str(imgMeanVal)+')))', 'KEA', rsgislib.TYPE_32FLOAT)
     
     #####################################################################
     # Calculate the scaled SREF pixel values.
@@ -386,8 +386,8 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
         bandRescaleSREF.append(rsgislib.imagecalc.ImageBandRescale(outBand, bandRescale[band-1].outMin, bandRescale[band-1].outMax, bandRescale[band-1].outNoData, 5, (bandRescale[band-1].inMax-bandRescale[band-1].inMin), 0))
         outBand = outBand + 1
         
-    rsgislib.imagecalc.rescaleImgPxlVals(srefScaledImg, outImage, gdalformat, dataType, bandRescaleSREF, trim2Limits=True)
-    rsgislib.imageutils.popImageStats(outImage, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imagecalc.rescale_img_pxl_vals(srefScaledImg, outImage, gdalformat, dataType, bandRescaleSREF, trim2Limits=True)
+    rsgislib.imageutils.pop_img_stats(outImage, usenodataval=True, nodataval=0, calcpyramids=True)
     
     if not tmpPresent:
         shutil.rmtree(tmpImgDIR, ignore_errors=True)

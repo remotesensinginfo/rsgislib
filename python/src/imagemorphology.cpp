@@ -54,7 +54,7 @@ static PyObject *ImageMorphology_CreateCircularOp(PyObject *self, PyObject *args
     int morphOpSize;
     
     static char *kwlist[] = {RSGIS_PY_C_TEXT("output_file"), RSGIS_PY_C_TEXT("op_size"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "si:createCircularOp", kwlist, &pszOutputFile, &morphOpSize))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "si:create_circular_op", kwlist, &pszOutputFile, &morphOpSize))
     {
         return nullptr;
     }
@@ -85,7 +85,7 @@ static PyObject *ImageMorphology_ImageDilate(PyObject *self, PyObject *args, PyO
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageDilate", kwlist, &pszInputImage, &pszOutputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:image_dilate", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return nullptr;
@@ -119,7 +119,7 @@ static PyObject *ImageMorphology_ImageErode(PyObject *self, PyObject *args, PyOb
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageErode", kwlist, &pszInputImage, &pszOutputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:image_erode", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return nullptr;
@@ -153,7 +153,7 @@ static PyObject *ImageMorphology_ImageGradiant(PyObject *self, PyObject *args, P
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageGradiant", kwlist, &pszInputImage, &pszOutputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:image_gradiant", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return nullptr;
@@ -188,7 +188,7 @@ static PyObject *ImageMorphology_ImageDilateCombinedOut(PyObject *self, PyObject
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageDilateCombinedOut", kwlist, &pszInputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:image_dilate_combined_out", kwlist, &pszInputImage,
                                     &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
@@ -224,7 +224,7 @@ static PyObject *ImageMorphology_ImageErodeCombinedOut(PyObject *self, PyObject 
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageErodeCombinedOut", kwlist, &pszInputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:image_erode_combined_out", kwlist, &pszInputImage,
                                     &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
@@ -259,7 +259,7 @@ static PyObject *ImageMorphology_ImageGradiantCombinedOut(PyObject *self, PyObje
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageGradiantCombinedOut", kwlist, &pszInputImage, &pszOutputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:image_gradiant_combined_out", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return nullptr;
@@ -296,7 +296,7 @@ static PyObject *ImageMorphology_ImageLocalMinima(PyObject *self, PyObject *args
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:imageLocalMinima", kwlist, &pszInputImage, &pszOutputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:image_local_minima", kwlist, &pszInputImage, &pszOutputImage,
                                     &outputSequencial, &allowEquals, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
@@ -335,7 +335,7 @@ static PyObject *ImageMorphology_ImageLocalMinimaCombinedOut(PyObject *self, PyO
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:imageLocalMinimaCombinedOut", kwlist, &pszInputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:image_local_minima_combined_out", kwlist, &pszInputImage,
                                     &pszOutputImage, &outputSequencial, &allowEquals, &pszMorphOperator, &useOperatorFile,
                                     &morphOpSize, &pszImageFormat, &datatype))
     {
@@ -373,7 +373,7 @@ static PyObject *ImageMorphology_ImageOpening(PyObject *self, PyObject *args, Py
                              RSGIS_PY_C_TEXT("use_op_file"), RSGIS_PY_C_TEXT("op_size"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
                              RSGIS_PY_C_TEXT("niters"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageOpening", kwlist, &pszInputImage, &pszOutputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:image_opening", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat,
                                     &datatype, &numIterations))
     {
@@ -411,7 +411,7 @@ static PyObject *ImageMorphology_ImageClosing(PyObject *self, PyObject *args, Py
                              RSGIS_PY_C_TEXT("use_op_file"), RSGIS_PY_C_TEXT("op_size"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
                              RSGIS_PY_C_TEXT("niters"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageClosing", kwlist, &pszInputImage, &pszOutputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:image_closing", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat,
                                     &datatype, &numIterations))
     {
@@ -447,7 +447,7 @@ static PyObject *ImageMorphology_ImageBlackTopHat(PyObject *self, PyObject *args
                              RSGIS_PY_C_TEXT("tmp_img"), RSGIS_PY_C_TEXT("morph_op_file"),
                              RSGIS_PY_C_TEXT("use_op_file"), RSGIS_PY_C_TEXT("op_size"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageBlackTopHat", kwlist, &pszInputImage, &pszOutputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:image_black_top_hat", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
@@ -483,7 +483,7 @@ static PyObject *ImageMorphology_ImageWhiteTopHat(PyObject *self, PyObject *args
                              RSGIS_PY_C_TEXT("tmp_img"), RSGIS_PY_C_TEXT("morph_op_file"),
                              RSGIS_PY_C_TEXT("use_op_file"), RSGIS_PY_C_TEXT("op_size"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageWhiteTopHat", kwlist, &pszInputImage, &pszOutputImage,
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:image_white_top_hat", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
@@ -510,8 +510,8 @@ static PyObject *ImageMorphology_ImageWhiteTopHat(PyObject *self, PyObject *args
 
 // Our list of functions in this module
 static PyMethodDef ImageMorphologyMethods[] = {
-{"createCircularOp", (PyCFunction)ImageMorphology_CreateCircularOp, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.createCircularOp(output_file=string, op_size=int)\n"
+{"create_circular_op", (PyCFunction)ImageMorphology_CreateCircularOp, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.create_circular_op(output_file=string, op_size=int)\n"
 "Performs an image morphology dilate operation. \n"
 "\n"
 "Where:\n"
@@ -523,12 +523,12 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"
 "   import rsgislib.imagemorphology\n"
 "   \n"
-"   rsgislib.imagemorphology.createCircularOp(output_file='CircularOp5.gmtxt', op_size=5)\n"
+"   rsgislib.imagemorphology.create_circular_op(output_file='CircularOp5.gmtxt', op_size=5)\n"
 "\n"},
     
     
-{"imageDilate", (PyCFunction)ImageMorphology_ImageDilate, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageDilate(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_dilate", (PyCFunction)ImageMorphology_ImageDilate, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_dilate(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology dilate operation.\n"
 "\n"
 "Where:\n"
@@ -549,11 +549,11 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "   inImg = 'clumpsImage.kea'\n"
 "   outImg = 'clumpsImage_Dilate.kea'\n"
 "   \n"
-"   rsgislib.imagemorphology.imageDilate(input_img=inImg, output_img=outImg, morph_op_file="", use_op_file=False, op_size=5, gdalformat='KEA', datatype=rsgislib.TYPE_32UINT)\n"
+"   rsgislib.imagemorphology.image_dilate(input_img=inImg, output_img=outImg, morph_op_file="", use_op_file=False, op_size=5, gdalformat='KEA', datatype=rsgislib.TYPE_32UINT)\n"
 "\n"},
     
-{"imageErode", (PyCFunction)ImageMorphology_ImageErode, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageErode(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_erode", (PyCFunction)ImageMorphology_ImageErode, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_erode(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology erode operation. \n"
 "\n"
 "Where:\n"
@@ -567,8 +567,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
-{"imageGradiant", (PyCFunction)ImageMorphology_ImageGradiant, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageGradiant(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_gradiant", (PyCFunction)ImageMorphology_ImageGradiant, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_gradiant(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology gradiant operation. \n"
 "\n"
 "Where:\n"
@@ -582,8 +582,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
     
-{"imageDilateCombinedOut", (PyCFunction)ImageMorphology_ImageDilateCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageDilateCombinedOut(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_dilate_combined_out", (PyCFunction)ImageMorphology_ImageDilateCombinedOut, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_dilate_combined_out(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology dilate operation, where the outputs will be combined into a single image. \n"
 "\n"
 "Where:\n"
@@ -597,8 +597,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
-{"imageErodeCombinedOut", (PyCFunction)ImageMorphology_ImageErodeCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageErodeCombinedOut(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_erode_combined_out", (PyCFunction)ImageMorphology_ImageErodeCombinedOut, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_erode_combined_out(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology erode operation, where the outputs will be combined into a single image. \n"
 "\n"
 "Where:\n"
@@ -612,8 +612,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
-{"imageGradiantCombinedOut", (PyCFunction)ImageMorphology_ImageGradiantCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageGradiantCombinedOut(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_gradiant_combined_out", (PyCFunction)ImageMorphology_ImageGradiantCombinedOut, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_gradiant_combined_out(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology gradiant operation, where the outputs will be combined into a single image. \n"
 "\n"
 "Where:\n"
@@ -627,8 +627,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
     
-{"imageLocalMinima", (PyCFunction)ImageMorphology_ImageLocalMinima, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageLocalMinima(input_img=string, output_img=string, sequencial_out=boolean, allow_equal=boolean, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_local_minima", (PyCFunction)ImageMorphology_ImageLocalMinima, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_local_minima(input_img=string, output_img=string, sequencial_out=boolean, allow_equal=boolean, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Uses image morphology to find local minima. \n"
 "\n"
 "Where:\n"
@@ -644,8 +644,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
     
-{"imageLocalMinimaCombinedOut", (PyCFunction)ImageMorphology_ImageLocalMinimaCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageLocalMinimaCombinedOut(input_img=string, output_img=string, sequencial_out=boolean, allow_equal=boolean, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_local_minima_combined_out", (PyCFunction)ImageMorphology_ImageLocalMinimaCombinedOut, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_local_minima_combined_out(input_img=string, output_img=string, sequencial_out=boolean, allow_equal=boolean, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Uses image morphology to find local minima, where the outputs will be combined into a single image.\n"
 "\n"
 "Where:\n"
@@ -661,8 +661,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
-{"imageOpening", (PyCFunction)ImageMorphology_ImageOpening, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageOpening(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int, niters=int)\n"
+{"image_opening", (PyCFunction)ImageMorphology_ImageOpening, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_opening(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int, niters=int)\n"
 "Performs an image morphology opening operation. \n"
 "\n"
 "Where:\n"
@@ -678,8 +678,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param niters: is an int for the number of iterations of the operators (Optional, default = 1)\n"
 "\n"},
 
-{"imageClosing", (PyCFunction)ImageMorphology_ImageClosing, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageClosing(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int, niters=int)\n"
+{"image_closing", (PyCFunction)ImageMorphology_ImageClosing, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_closing(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int, niters=int)\n"
 "Performs an image morphology closing operation. \n"
 "\n"
 "Where:\n"
@@ -695,8 +695,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param niters: is an int for the number of iterations of the operators (Optional, default = 1)\n"
 "\n"},
 
-{"imageBlackTopHat", (PyCFunction)ImageMorphology_ImageBlackTopHat, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageBlackTopHat(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_black_top_hat", (PyCFunction)ImageMorphology_ImageBlackTopHat, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_black_top_hat(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology black top hat operation. \n"
 "\n"
 "Where:\n"
@@ -711,8 +711,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
-{"imageWhiteTopHat", (PyCFunction)ImageMorphology_ImageWhiteTopHat, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageWhiteTopHat(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+{"image_white_top_hat", (PyCFunction)ImageMorphology_ImageWhiteTopHat, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.image_white_top_hat(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology white top hat operation. \n"
 "\n"
 "Where:\n"

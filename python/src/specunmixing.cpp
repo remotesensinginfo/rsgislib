@@ -53,7 +53,7 @@ static PyObject *SpecUnmix_ExhconLinearSpecUnmix(PyObject *self, PyObject *args,
     float stepResolution;
     int datatype;
 
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssisf|ff:exhconLinearSpecUnmix", kwlist, &inputImage, &outputFile, &imageFormat, &datatype, &endmembersFile, &stepResolution, &lsumGain, &lsumOffset))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssisf|ff:exhcon_linear_spec_unmix", kwlist, &inputImage, &outputFile, &imageFormat, &datatype, &endmembersFile, &stepResolution, &lsumGain, &lsumOffset))
     {
         return nullptr;
     }
@@ -80,7 +80,7 @@ static PyObject *SpecUnmix_ExtractAvgEndMembers(PyObject *self, PyObject *args, 
                              RSGIS_PY_C_TEXT("pxl_in_poly_method"), nullptr};
     const char *pszInputImage, *pszInputVector, *pszInputVecLyr, *pszOutputMatrix;
     int pixelInPolyMethod = 1;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|i:extractAvgEndMembers", kwlist, &pszInputImage, &pszInputVector, &pszInputVecLyr, &pszOutputMatrix, &pixelInPolyMethod))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|i:extract_avg_endmembers", kwlist, &pszInputImage, &pszInputVector, &pszInputVecLyr, &pszOutputMatrix, &pixelInPolyMethod))
     {
         return nullptr;
     }
@@ -102,11 +102,11 @@ static PyObject *SpecUnmix_ExtractAvgEndMembers(PyObject *self, PyObject *args, 
 // Our list of functions in this module
 static PyMethodDef SpecUnmixMethods[] = {
 
-{"exhconLinearSpecUnmix", (PyCFunction)SpecUnmix_ExhconLinearSpecUnmix, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.specunmixing.exhconLinearSpecUnmix(input_img, output_img, gdalformat, datatype, endmember_file, step_res, gain, offset)\n"
+{"exhcon_linear_spec_unmix", (PyCFunction)SpecUnmix_ExhconLinearSpecUnmix, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imagecalc.specunmixing.exhcon_linear_spec_unmix(input_img, output_img, gdalformat, datatype, endmember_file, step_res, gain, offset)\n"
 "Performs an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers.\n"
 "\n**Warning. This methods is slow (!!) to execute**\n\n"
-"Endmember polygons are extracted using rsgislib.imagecalc.specunmixing.extractAvgEndMembers() where each polygon \n"
+"Endmember polygons are extracted using rsgislib.imagecalc.specunmixing.extract_avg_endmembers() where each polygon \n"
 "defines an endmember.\n"
 "\n"
 "Where:\n"
@@ -131,20 +131,20 @@ static PyMethodDef SpecUnmixMethods[] = {
 "    roiSHPLyr = \"ROIs\"\n"
 "    endmembersFile = \"./endmembers\"\n"
 "\n"
-"    rsgislib.imagecalc.specunmixing.extractAvgEndMembers(imageLSImage, roiSHP, roiSHPLyr, endmembersFile)\n"
+"    rsgislib.imagecalc.specunmixing.extract_avg_endmembers(imageLSImage, roiSHP, roiSHPLyr, endmembersFile)\n"
 "\n"
 "    lsumGain = 1.0\n"
 "    lsumOffset = 0.0\n"
 "\n"
 "    endmembersFile = \"./endmembers.mtxt\"\n"
 "    stepResolution = 0.1\n"
-"    rsgislib.imagecalc.specunmixing.exhconLinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, unmixedImage, endmembersFile, stepResolution, lsumGain, lsumOffset)\n"
+"    rsgislib.imagecalc.specunmixing.exhcon_linear_spec_unmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, unmixedImage, endmembersFile, stepResolution, lsumGain, lsumOffset)\n"
 "\n"
 "\n"
 },
 
-{"extractAvgEndMembers", (PyCFunction)SpecUnmix_ExtractAvgEndMembers, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.specunmixing.extractAvgEndMembers(input_img, vec_file, vec_lyr, out_file, pxl_in_poly_method)\n"
+{"extract_avg_endmembers", (PyCFunction)SpecUnmix_ExtractAvgEndMembers, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imagecalc.specunmixing.extract_avg_endmembers(input_img, vec_file, vec_lyr, out_file, pxl_in_poly_method)\n"
 "Extract the average endmembers per class which are saved as an appropriate \n"
 "matrix file to be used within the linear spectral unmixing commands. \n"
 "Each polygon defined is another endmember in the outputted matric file.\n"

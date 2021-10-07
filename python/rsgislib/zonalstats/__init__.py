@@ -9,19 +9,19 @@ polygons with respect to the size of the pixels being intersected.
 Where the pixels are small with respect to the polygons so there is at least one pixel
 within the polygon then the best function to use is:
 
-* rsgislib.zonalstats.calcZonalBandStats
+* rsgislib.zonalstats.calc_zonal_band_stats
 
 If the pixels are large with respect to the polygons then use the following function
 which intersects the polygon centroid.
 
-* rsgislib.zonalstats.calcZonalPolyPtsBandStats
+* rsgislib.zonalstats.calc_zonal_poly_pts_band_stats
 
 If the pixel size in between and/or polygons are varied in size such that it is not
 certain that all polygons will contain a pixel then the following function will first
 attempt to intersect the polygon with the pixels and if there is not a pixel within
 the polygon then the centriod is used.
 
-* rsgislib.zonalstats.calcZonalBandStatsTestPolyPts
+* rsgislib.zonalstats.calc_zonal_band_stats_test_poly_pts
 
 """
 # import the C++ extension into this level
@@ -71,7 +71,7 @@ METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within 
 """
 
 
-def calcZonalBandStatsFile(
+def calc_zonal_band_stats_file(
     vec_file,
     vec_lyr,
     input_img,
@@ -136,7 +136,7 @@ def calcZonalBandStatsFile(
         if vec_lyr_obj is None:
             raise Exception("Could not open layer '{}'".format(vec_lyr))
 
-        calcZonalBandStats(
+        calc_zonal_band_stats(
             vec_lyr_obj,
             input_img,
             img_band,
@@ -162,7 +162,7 @@ def calcZonalBandStatsFile(
         raise e
 
 
-def calcZonalBandStats(
+def calc_zonal_band_stats(
     vec_lyr_obj,
     input_img,
     img_band,
@@ -517,7 +517,7 @@ def calcZonalBandStats(
         raise e
 
 
-def calcZonalPolyPtsBandStatsFile(
+def calc_zonal_poly_pts_band_stats_file(
     vec_file, vec_lyr, input_img, img_band, out_field, vec_def_epsg=None
 ):
     """
@@ -546,7 +546,7 @@ def calcZonalPolyPtsBandStatsFile(
         if vec_lyr_obj is None:
             raise Exception("Could not open layer '{}'".format(vec_lyr))
 
-        calcZonalPolyPtsBandStats(
+        calc_zonal_poly_pts_band_stats(
             vec_lyr_obj, input_img, img_band, out_field, vec_def_epsg
         )
 
@@ -558,7 +558,7 @@ def calcZonalPolyPtsBandStatsFile(
         raise e
 
 
-def calcZonalPolyPtsBandStats(
+def calc_zonal_poly_pts_band_stats(
     vec_lyr_obj, input_img, img_band, out_field, vec_def_epsg=None
 ):
     """
@@ -762,7 +762,7 @@ def calcZonalPolyPtsBandStats(
         raise e
 
 
-def calcZonalBandStatsTestPolyPtsFile(
+def calc_zonal_band_stats_test_poly_pts_file(
     vec_file,
     vec_lyr,
     input_img,
@@ -837,7 +837,7 @@ def calcZonalBandStatsTestPolyPtsFile(
         if vec_lyr_obj is None:
             raise Exception("Could not open layer '{}'".format(vec_lyr))
 
-        calcZonalBandStatsTestPolyPts(
+        calc_zonal_band_stats_test_poly_pts(
             vec_lyr_obj,
             input_img,
             img_band,
@@ -865,7 +865,7 @@ def calcZonalBandStatsTestPolyPtsFile(
         raise e
 
 
-def calcZonalBandStatsTestPolyPts(
+def calc_zonal_band_stats_test_poly_pts(
     vec_lyr_obj,
     input_img,
     img_band,
@@ -1306,7 +1306,7 @@ def calcZonalBandStatsTestPolyPts(
         raise e
 
 
-def extPointBandValuesFile(
+def ext_point_band_values_file(
     vec_file,
     vec_lyr,
     input_img,
@@ -1353,7 +1353,7 @@ def extPointBandValuesFile(
         if vec_lyr_obj is None:
             raise Exception("Could not open layer '{}'".format(vec_lyr))
 
-        extPointBandValues(
+        ext_point_band_values(
             vec_lyr_obj,
             input_img,
             img_band,
@@ -1373,7 +1373,7 @@ def extPointBandValuesFile(
         raise e
 
 
-def extPointBandValues(
+def ext_point_band_values(
     vec_lyr_obj,
     input_img,
     img_band,

@@ -63,8 +63,8 @@ Clump the input image using a tiled processing chain allowing large images to be
         os.makedirs(tmpDIR)
         createdTmp = True
     
-    uidStr = rsgislib.tools.utils.uidGenerator()
-    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
+    uidStr = rsgislib.tools.utils.uid_generator()
+    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImage)
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
     imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
     tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
@@ -85,7 +85,7 @@ Clump the input image using a tiled processing chain allowing large images to be
     
     clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
     print("Create Blank Image")
-    imageutils.createCopyImage(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+    imageutils.create_copy_img(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
@@ -127,8 +127,8 @@ Clump the input image using a tiled processing chain allowing large images to be
     if nCores <= 0:
         nCores = multiprocessing.cpu_count()
     
-    uidStr = rsgislib.tools.utils.uidGenerator()
-    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
+    uidStr = rsgislib.tools.utils.uid_generator()
+    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImage)
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
     imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
     tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
@@ -153,7 +153,7 @@ Clump the input image using a tiled processing chain allowing large images to be
     
     clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
     print("Create Blank Image")
-    imageutils.createCopyImage(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+    imageutils.create_copy_img(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
@@ -188,8 +188,8 @@ Clump and union with the reference image the input image using a tiled processin
         os.makedirs(tmpDIR)
         createdTmp = True
     
-    uidStr = rsgislib.tools.utils.uidGenerator()
-    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
+    uidStr = rsgislib.tools.utils.uid_generator()
+    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImage)
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
     imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
     tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
@@ -210,7 +210,7 @@ Clump and union with the reference image the input image using a tiled processin
     
     clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
     print("Create Blank Image")
-    imageutils.createCopyImage(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+    imageutils.create_copy_img(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
@@ -251,8 +251,8 @@ Clump and union with the reference image the input image using a tiled processin
     if nCores <= 0:
         nCores = multiprocessing.cpu_count()
     
-    uidStr = rsgislib.tools.utils.uidGenerator()
-    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
+    uidStr = rsgislib.tools.utils.uid_generator()
+    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImage)
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
     imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
     tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
@@ -277,7 +277,7 @@ Clump and union with the reference image the input image using a tiled processin
     
     clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
     print("Create Blank Image")
-    imageutils.createCopyImage(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+    imageutils.create_copy_img(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")

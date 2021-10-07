@@ -6,7 +6,7 @@ The elevation module contains functions for performing analysis on elevation dat
 # import the C++ extension into this level
 from ._elevation import *
 
-def fftDEMFusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20):
+def fft_dem_fusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20):
     """
 This function merges DEMs (any single band file) using a fourier 
 transformation where the low frequency component is taken from the 
@@ -34,7 +34,7 @@ low_res_DEM_img = "N09E009_SRTM_30m_EGM08.tif"
 fused_DEM_img = "NO9E009_SRTM_TDX_EGM08_fusion.tif"
 c_size = 10
 
-elevation.fftDEMFusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20)
+elevation.fft_dem_fusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20)
 
 """
     # TODO Add checks that images are covering the same geographic area etc. Same number of pixels as well?
@@ -74,7 +74,7 @@ elevation.fftDEMFusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20)
     img_back = numpy.fft.ifft2(f_ishift)
     img_back = numpy.abs(img_back)
         
-    rsgislib.imageutils.createCopyImage(highResDEMImg, fusedDEMImg, 1, -9999, 'KEA', rsgislib.TYPE_32FLOAT)
+    rsgislib.imageutils.create_copy_img(highResDEMImg, fusedDEMImg, 1, -9999, 'KEA', rsgislib.TYPE_32FLOAT)
     
     try:
         srcDSOutput = gdal.Open( fusedDEMImg, gdal.GA_Update )

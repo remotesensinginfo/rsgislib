@@ -123,7 +123,7 @@ Create a list of these objects to pass to the fillTimeSeriesGaps function
     def __repr__(self):
         return repr((self.year, self.day, self.compImg, self.imgRef, self.outRef))
 
-def setEnvVarsLZWGTiffOuts(bigtiff=True):
+def set_env_vars_lzw_gtiff_outs(bigtiff=True):
     """
     Set environmental variables such that outputted
     GeoTIFF files are outputted as tiled and compressed.
@@ -137,7 +137,7 @@ def setEnvVarsLZWGTiffOuts(bigtiff=True):
     else:
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=LZW"
 
-def getRSGISLibDataTypeFromImg(input_img):
+def get_rsgislib_datatype_from_img(input_img):
     """
     Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT)
     for the inputted raster file
@@ -153,9 +153,9 @@ def getRSGISLibDataTypeFromImg(input_img):
         raise rsgislib.RSGISPyException('Could not open raster band 1 in image: \'' + input_img + '\'')
     gdal_dtype = gdal.GetDataTypeName(band.DataType)
     raster = None
-    return rsgislib.getRSGISLibDataType(gdal_dtype)
+    return rsgislib.get_rsgislib_datatype(gdal_dtype)
 
-def getGDALDataTypeFromImg(input_img):
+def get_gdal_datatype_from_img(input_img):
     """
     Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
 
@@ -172,7 +172,7 @@ def getGDALDataTypeFromImg(input_img):
     raster = None
     return gdal_dtype
 
-def getGDALDataTypeNameFromImg(input_img):
+def get_gdal_datatype_name_from_img(input_img):
     """
     Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
 
@@ -189,7 +189,7 @@ def getGDALDataTypeNameFromImg(input_img):
     raster = None
     return dtypeName
 
-def renameGDALLayer(input_img, output_img):
+def rename_gdal_layer(input_img, output_img):
     """
     Rename all the files associated with a GDAL layer.
 
@@ -202,7 +202,7 @@ def renameGDALLayer(input_img, output_img):
     layerDS = None
     gdalDriver.Rename(output_img, input_img)
 
-def getImageRes(input_img, abs_vals=False):
+def get_image_res(input_img, abs_vals=False):
     """
     A function to retrieve the image resolution.
 
@@ -225,7 +225,7 @@ def getImageRes(input_img, abs_vals=False):
     rasterDS = None
     return xRes, yRes
 
-def doImageResMatch(in_a_img, in_b_img):
+def do_image_res_match(in_a_img, in_b_img):
     """
     A function to test whether two images have the same
     image pixel resolution.
@@ -233,12 +233,12 @@ def doImageResMatch(in_a_img, in_b_img):
     :return: boolean
 
     """
-    img1XRes, img1YRes = getImageRes(in_a_img)
-    img2XRes, img2YRes = getImageRes(in_b_img)
+    img1XRes, img1YRes = get_image_res(in_a_img)
+    img2XRes, img2YRes = get_image_res(in_b_img)
 
     return ((img1XRes == img2XRes) and (img1YRes == img2YRes))
 
-def getImageSize(input_img):
+def get_image_size(input_img):
     """
     A function to retrieve the image size in pixels.
 
@@ -254,7 +254,7 @@ def getImageSize(input_img):
     rasterDS = None
     return xSize, ySize
 
-def getImageBBOX(input_img):
+def get_image_bbox(input_img):
     """
     A function to retrieve the bounding box in the spatial
     coordinates of the image.
@@ -283,7 +283,7 @@ def getImageBBOX(input_img):
 
     return [tlX, brX, brY, tlY]
 
-def getImageBBOXInProj(input_img, out_epsg):
+def get_image_bbox_in_proj(input_img, out_epsg):
     """
     A function to retrieve the bounding box in the spatial
     coordinates of the image.
@@ -291,18 +291,18 @@ def getImageBBOXInProj(input_img, out_epsg):
     :return: (MinX, MaxX, MinY, MaxY)
 
     """
-    inProjWKT = getWKTProjFromImage(input_img)
+    inProjWKT = get_wkt_proj_from_image(input_img)
     inSpatRef = osr.SpatialReference()
     inSpatRef.ImportFromWkt(inProjWKT)
 
     outSpatRef = osr.SpatialReference()
     outSpatRef.ImportFromEPSG(int(out_epsg))
 
-    img_bbox = rsgislib.tools.getImageBBOX(input_img)
+    img_bbox = get_image_bbox(input_img)
     reproj_img_bbox = rsgislib.tools.reprojBBOX(img_bbox, inSpatRef, outSpatRef)
     return reproj_img_bbox
 
-def getImageBandStats(input_img, band, compute=True):
+def get_image_band_stats(input_img, band, compute=True):
     """
     A function which calls the GDAL function on the band selected to calculate the pixel stats
     (min, max, mean, standard deviation).
@@ -328,7 +328,7 @@ def getImageBandStats(input_img, band, compute=True):
         raise Exception("Band specified is not within the image: '{}'".format(input_img))
     return img_stats
 
-def getImageBandCount(input_img):
+def get_image_band_count(input_img):
     """
     A function to retrieve the number of image bands in an image file.
 
@@ -343,7 +343,7 @@ def getImageBandCount(input_img):
     rasterDS = None
     return nBands
 
-def getImageNoDataValue(input_img, band=1):
+def get_image_no_data_value(input_img, band=1):
     """
     A function to retrieve the no data value for the image
     (from band; default 1).
@@ -359,7 +359,7 @@ def getImageNoDataValue(input_img, band=1):
     rasterDS = None
     return noDataVal
 
-def setImageNoDataValue(input_img, noDataValue, band=None):
+def set_image_no_data_value(input_img, noDataValue, band=None):
     """
     A function to set the no data value for an image.
     If band is not specified sets value for all bands.
@@ -377,7 +377,7 @@ def setImageNoDataValue(input_img, noDataValue, band=None):
 
     rasterDS = None
 
-def getImgBandColourInterp(input_img, band):
+def get_img_band_colour_interp(input_img, band):
     """
     A function to get the colour interpretation for a specific band.
 
@@ -410,7 +410,7 @@ def getImgBandColourInterp(input_img, band):
     rasterDS = None
     return clrItrpVal
 
-def setImgBandColourInterp(input_img, band, clrItrpVal):
+def set_img_band_colour_interp(input_img, band, clrItrpVal):
     """
     A function to set the colour interpretation for a specific band.
     input is a GDALColorInterp value:
@@ -441,7 +441,7 @@ def setImgBandColourInterp(input_img, band, clrItrpVal):
     rasterDS.GetRasterBand(band).SetColorInterpretation(clrItrpVal)
     rasterDS = None
 
-def getWKTProjFromImage(input_img):
+def get_wkt_proj_from_image(input_img):
     """
     A function which returns the WKT string representing the projection
     of the input image.
@@ -456,7 +456,7 @@ def getWKTProjFromImage(input_img):
     rasterDS = None
     return projStr
 
-def getEPSGProjFromImage(input_img):
+def get_epsg_proj_from_image(input_img):
     """
     Using GDAL to return the EPSG code for the input layer.
     :return: EPSG code
@@ -479,7 +479,7 @@ def getEPSGProjFromImage(input_img):
         epsgCode = None
     return epsgCode
 
-def getImageFiles(input_img):
+def get_image_files(input_img):
     """
     A function which returns a list of the files associated (e.g., header etc.)
     with the input image file.
@@ -492,7 +492,7 @@ def getImageFiles(input_img):
     imgDS = None
     return fileList
 
-def getUTMZone(input_img):
+def get_utm_zone(input_img):
     """
     A function which returns a string with the UTM (XXN | XXS) zone of the input image
     but only if it is projected within the UTM projection/coordinate system.
@@ -526,7 +526,7 @@ def getUTMZone(input_img):
     return utmZone
 
 
-def doGDALLayersHaveSameProj(in_a_img, in_b_img):
+def do_gdal_layers_have_same_proj(in_a_img, in_b_img):
     """
     A function which tests whether two gdal compatiable layers are in the same
     projection/coordinate system. This is done using the GDAL SpatialReference
@@ -536,8 +536,8 @@ def doGDALLayersHaveSameProj(in_a_img, in_b_img):
     :return: boolean
 
     """
-    layer1EPSG = getEPSGProjFromImage(in_a_img)
-    layer2EPSG = getEPSGProjFromImage(in_b_img)
+    layer1EPSG = get_epsg_proj_from_image(in_a_img)
+    layer2EPSG = get_epsg_proj_from_image(in_b_img)
 
     sameEPSG = False
     if layer1EPSG == layer2EPSG:
@@ -547,7 +547,7 @@ def doGDALLayersHaveSameProj(in_a_img, in_b_img):
 
 
 
-def setBandNames(input_img, band_names, feedback=False):
+def set_band_names(input_img, band_names, feedback=False):
     """A utility function to set band names.
 Where:
 
@@ -562,7 +562,7 @@ Example::
     input_img = 'injune_p142_casi_sub_utm.kea'
     band_names = ['446nm','530nm','549nm','569nm','598nm','633nm','680nm','696nm','714nm','732nm','741nm','752nm','800nm','838nm']
     
-    imageutils.setBandNames(input_img, band_names)
+    imageutils.set_band_names(input_img, band_names)
     
 """
     dataset = gdal.Open(input_img, gdal.GA_Update)
@@ -580,7 +580,7 @@ Example::
         else:
             raise Exception("Could not open the image band: ", band)
 
-def getBandNames(input_img):
+def get_band_names(input_img):
     """
 A utility function to get band names.
 
@@ -595,7 +595,7 @@ Example::
     from rsgislib import imageutils
 
     input_img = 'injune_p142_casi_sub_utm.kea'
-    bandNames = imageutils.getBandNames(input_img)
+    bandNames = imageutils.get_band_names(input_img)
 
 """
     dataset = gdal.Open(input_img, gdal.GA_Update)
@@ -611,7 +611,7 @@ Example::
     return bandNames
 
 
-def setImgThematic(input_img):
+def set_img_thematic(input_img):
     """
 Set all image bands to be thematic. 
 
@@ -627,7 +627,7 @@ Set all image bands to be thematic.
     ds = None
 
 
-def setImgNotThematic(input_img):
+def set_img_not_thematic(input_img):
     """
 Set all image bands to be not thematic (athematic).
 
@@ -643,7 +643,7 @@ Set all image bands to be not thematic (athematic).
     ds = None
 
 
-def hasGCPs(input_img):
+def has_gcps(input_img):
     """
 Test whether the input image has GCPs - returns boolean
 
@@ -663,7 +663,7 @@ Test whether the input image has GCPs - returns boolean
     return hasGCPs
 
 
-def copyGCPs(input_img, output_img):
+def copy_gcps(input_img, output_img):
     """
 Copy the GCPs from the input_img to the output_img
 
@@ -689,7 +689,7 @@ Copy the GCPs from the input_img to the output_img
     destDS = None
 
 
-def setImgBandMetaData(input_img, band, meta_field_name, meta_field_value):
+def set_img_band_metadata(input_img, band, meta_field_name, meta_field_value):
     """
     Function to set image band metadata value.
 
@@ -715,7 +715,7 @@ def setImgBandMetaData(input_img, band, meta_field_name, meta_field_value):
     ds = None
 
 
-def getImgBandMetaData(input_img, band, meta_field_name):
+def get_img_band_metadata(input_img, band, meta_field_name):
     """
     Function to get image band metadata value.
 
@@ -743,7 +743,7 @@ def getImgBandMetaData(input_img, band, meta_field_name):
     return meta_field_value
 
 
-def getImgBandMetaDataFields(input_img, band):
+def get_img_band_metadata_fields(input_img, band):
     """
     Function to get a list of the image band metadata names.
 
@@ -769,7 +769,7 @@ def getImgBandMetaDataFields(input_img, band):
     return list(meta_data_dict.keys())
 
 
-def getImgBandMetaDataFieldsDict(input_img, band):
+def get_img_band_metadata_fields_dict(input_img, band):
     """
     Function to get image band metadata names and values as a dict.
 
@@ -795,7 +795,7 @@ def getImgBandMetaDataFieldsDict(input_img, band):
     return meta_data_dict
 
 
-def setImgMetaData(input_img, meta_field_name, meta_field_value):
+def set_img_metadata(input_img, meta_field_name, meta_field_value):
     """
     Function to set image metadata value.
 
@@ -812,7 +812,7 @@ def setImgMetaData(input_img, meta_field_name, meta_field_value):
     ds = None
 
 
-def getImgMetaData(input_img, meta_field_name):
+def get_img_metadata(input_img, meta_field_name):
     """
     Function to get image metadata value.
 
@@ -829,7 +829,7 @@ def getImgMetaData(input_img, meta_field_name):
     return meta_field_value
 
 
-def getImgMetaDataFields(input_img):
+def get_img_metadata_fields(input_img):
     """
     Function to get a list of the image metadata names.
 
@@ -847,7 +847,7 @@ def getImgMetaDataFields(input_img):
     return list(meta_data_dict.keys())
 
 
-def getImgMetaDataFieldsDict(input_img):
+def get_img_metadata_fields_dict(input_img):
     """
     Function to get image metadata names and values as a dict.
 
@@ -864,8 +864,8 @@ def getImgMetaDataFieldsDict(input_img):
     return meta_data_dict
 
 
-def createBlankImagePy(output_img, n_bands, width, height, tlX, tlY, out_img_res_x, out_img_res_y, wkt_string,
-                       gdalformat, datatype, options=[], no_data_val=0):
+def create_blank_image_py(output_img, n_bands, width, height, tlX, tlY, out_img_res_x, out_img_res_y, wkt_string,
+                          gdalformat, datatype, options=[], no_data_val=0):
     """
     Create a blank output image file - this is a pure python implementation of rsgislib.imageutils.createBlankImage
 
@@ -884,13 +884,13 @@ def createBlankImagePy(output_img, n_bands, width, height, tlX, tlY, out_img_res
     :param no_data_val: the output image no data value.
 
     """
-    gdal_data_type = rsgislib.getGDALDataType(datatype)
+    gdal_data_type = rsgislib.get_gdal_datatype(datatype)
     gdal_driver = gdal.GetDriverByName(gdalformat)
     out_img_ds_obj = gdal_driver.Create(output_img, width, height, n_bands, gdal_data_type, options=options)
     out_img_ds_obj.SetGeoTransform((tlX, out_img_res_x, 0, tlY, 0, out_img_res_y))
     out_img_ds_obj.SetProjection(wkt_string)
 
-    raster = numpy.zeros((height, width), dtype=rsgislib.getNumpyDataType(datatype))
+    raster = numpy.zeros((height, width), dtype=rsgislib.get_numpy_datatype(datatype))
     raster[...] = no_data_val
     for band in range(n_bands):
         band_obj = out_img_ds_obj.GetRasterBand(band + 1)
@@ -899,8 +899,8 @@ def createBlankImagePy(output_img, n_bands, width, height, tlX, tlY, out_img_res
     out_img_ds_obj = None
 
 
-def createBlankBufImgFromRefImg(input_img, output_img, gdalformat, datatype, buf_pxl_ext=None, buf_spt_ext=None,
-                                no_data_val=None):
+def create_blank_buf_img_from_ref_img(input_img, output_img, gdalformat, datatype, buf_pxl_ext=None, buf_spt_ext=None,
+                                      no_data_val=None):
     """
     A function to create a new image file based on the input image but buffered by the specified amount
     (e.g., 100 pixels bigger on all sides. The buffer amount can ba specified in pixels or spatial units.
@@ -926,18 +926,18 @@ def createBlankBufImgFromRefImg(input_img, output_img, gdalformat, datatype, buf
         raise Exception("You cannot specify both the buf_pxl_ext or buf_spt_ext value.")
 
     if no_data_val is None:
-        no_data_val = getImageNoDataValue(input_img)
+        no_data_val = get_image_no_data_value(input_img)
 
         if no_data_val is None:
             raise Exception("You must specify a no data value ")
 
-    x_res, y_res = getImageRes(input_img, abs_vals=False)
+    x_res, y_res = get_image_res(input_img, abs_vals=False)
     x_res_abs = abs(x_res)
     y_res_abs = abs(y_res)
-    x_in_size, y_in_size = getImageSize(input_img)
-    in_img_bbox = getImageBBOX(input_img)
-    n_bands = getImageBandCount(input_img)
-    wkt_str = getWKTProjFromImage(input_img)
+    x_in_size, y_in_size = get_image_size(input_img)
+    in_img_bbox = get_image_bbox(input_img)
+    n_bands = get_image_band_count(input_img)
+    wkt_str = get_wkt_proj_from_image(input_img)
 
     if buf_spt_ext is not None:
         buf_pxl_ext_x = math.ceil(buf_spt_ext / x_res_abs)
@@ -959,7 +959,7 @@ def createBlankBufImgFromRefImg(input_img, output_img, gdalformat, datatype, buf
                                          no_data_val, '', wkt_str, gdalformat, datatype)
 
 
-def createBlankImgFromRefVector(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype):
+def create_blank_img_from_ref_vector(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype):
     """
 A function to create a new image file based on a vector layer to define the extent and projection
 of the output image. 
@@ -995,7 +995,7 @@ of the output image.
                                          outImgRes, (outImgRes*-1), 0.0, '', wktString, gdalformat, datatype)
     
 
-def createCopyImageVecExtentSnap2Grid(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype, bufnpxl=0):
+def create_copy_image_vec_extent_snap_to_grid(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype, bufnpxl=0):
     """
 A function to create a new image file based on a vector layer to define the extent and projection
 of the output image. The image file extent is snapped on to the grid defined by the vector layer.
@@ -1035,7 +1035,7 @@ of the output image. The image file extent is snapped on to the grid defined by 
     rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, (outImgRes*-1), 0.0, '', wktString, gdalformat, datatype)
     
 
-def createBlankImgFromBBOX(bbox, wktstr, outputImg, outImgRes, outImgPxlVal, outImgNBands, gdalformat, datatype, snap2grid=False):
+def create_blank_img_from_bbox(bbox, wktstr, outputImg, outImgRes, outImgPxlVal, outImgNBands, gdalformat, datatype, snap2grid=False):
     """
 A function to create a new image file based on a bbox to define the extent. 
 
@@ -1071,7 +1071,7 @@ A function to create a new image file based on a bbox to define the extent.
     rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, (outImgRes*-1), outImgPxlVal, '', wktstr, gdalformat, datatype)
 
    
-def createImageForEachVecFeat(vectorFile, vectorLyr, fileNameCol, outImgPath, outImgExt, outImgPxlVal, outImgNBands, outImgRes, gdalformat, datatype, snap2grid=False):
+def create_image_for_each_vec_feat(vectorFile, vectorLyr, fileNameCol, outImgPath, outImgExt, outImgPxlVal, outImgNBands, outImgRes, gdalformat, datatype, snap2grid=False):
     """
 A function to create a set of image files representing the extent of each feature in the 
 inputted vector file.
@@ -1125,10 +1125,10 @@ inputted vector file.
             tilebasename = feat.GetFieldAsString(feat_idx)
             outputImg = os.path.join(outImgPath, "{0}{1}".format(tilebasename, outImgExt))
             print(outputImg)
-            createBlankImgFromBBOX(env, wktstr, outputImg, outImgRes, outImgPxlVal, outImgNBands, gdalformat, datatype, snap2grid)
+            create_blank_img_from_bbox(env, wktstr, outputImg, outImgRes, outImgPxlVal, outImgNBands, gdalformat, datatype, snap2grid)
 
 
-def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None, noDataVal=None, multicore=False):
+def resample_image_to_match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None, noDataVal=None, multicore=False):
     """
 A utility function to resample an existing image to the projection and/or pixel size of another image.
 
@@ -1143,12 +1143,12 @@ Where:
 :param multicore: use multiple processing cores (Default = False)
 
 """ 
-    numBands = getImageBandCount(inProcessImg)
+    numBands = get_image_band_count(inProcessImg)
     if noDataVal == None:
-        noDataVal = getImageNoDataValue(inProcessImg)
+        noDataVal = get_image_no_data_value(inProcessImg)
     
     if datatype == None:
-        datatype = getRSGISLibDataTypeFromImg(inProcessImg)
+        datatype = get_gdal_datatype_from_img(inProcessImg)
         
     interpolationMethod = gdal.GRA_NearestNeighbour
     if interpMethod == 'bilinear':
@@ -1174,7 +1174,7 @@ Where:
         backVal = float(noDataVal)
         haveNoData = True
     
-    rsgislib.imageutils.createCopyImage(inRefImg, outImg, numBands, backVal, gdalformat, datatype)
+    rsgislib.imageutils.create_copy_img(inRefImg, outImg, numBands, backVal, gdalformat, datatype)
 
     inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     outFile = gdal.Open(outImg, gdal.GA_Update)
@@ -1204,7 +1204,7 @@ Where:
     outFile = None
 
 
-def reprojectImage(input_img, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False, gdal_options=[]):
+def reproject_image(input_img, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False, gdal_options=[]):
     """
 This function provides a tool which uses the gdalwarp function to reproject an input image. When you want an simpler
 interface use the rsgislib.imageutils.gdal_warp function. This handles more automatically.
@@ -1263,7 +1263,7 @@ Where:
     if not inWKT is None:
         if not os.path.exists(inWKT):
             raise Exception('The input WKT file does not exist: \'' + inWKT + '\'')
-        inWKTStr = rsgislib.tools.utils.readTextFileNoNewLines(inWKT)
+        inWKTStr = rsgislib.tools.utils.read_text_file_no_new_lines(inWKT)
         inImgProj.ImportFromWkt(inWKTStr)
     else:
         inImgProj.ImportFromWkt(inImgDS.GetProjectionRef())
@@ -1271,7 +1271,7 @@ Where:
     if not os.path.exists(outWKT):
         raise Exception('The output WKT file does not exist: \'' + outWKT + '\'')
     outImgProj = osr.SpatialReference()
-    outWKTStr = rsgislib.tools.utils.readTextFileNoNewLines(outWKT)
+    outWKTStr = rsgislib.tools.utils.read_text_file_no_new_lines(outWKT)
     outImgProj.ImportFromWkt(outWKTStr)
     
     geoTransform = inImgDS.GetGeoTransform()
@@ -1304,7 +1304,7 @@ Where:
     
     inImgBand = inImgDS.GetRasterBand( 1 )
     gdalDataType = gdal.GetDataTypeName(inImgBand.DataType)
-    rsgisDataType = rsgislib.getRSGISLibDataType(gdalDataType)
+    rsgisDataType = rsgislib.get_rsgislib_datatype(gdalDataType)
 
     tlXOut, tlYOut = rsgislib.tools.geometrytools.reprojPoint(inImgProj, outImgProj, tlXIn, tlYIn)
     brXOut, brYOut = rsgislib.tools.geometrytools.reprojPoint(inImgProj, outImgProj, brXIn, brYIn)
@@ -1352,8 +1352,8 @@ Where:
         outHeight = int(round((yMax - yMin) / outRes)) + 10
     
     print('Creating blank image')
-    rsgislib.imageutils.createBlankImagePy(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes,
-                       (outRes * (-1)), outWKTStr, gdalformat, rsgisDataType, options=gdal_options, no_data_val=noData)
+    rsgislib.imageutils.create_blank_image_py(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes,
+                                              (outRes * (-1)), outWKTStr, gdalformat, rsgisDataType, options=gdal_options, no_data_val=noData)
 
     outImgDS = gdal.Open(outputImage, gdal.GA_Update)
     
@@ -1383,7 +1383,7 @@ Where:
 def gdal_warp(input_img, output_img, out_epsg, interp='near', gdalformat='KEA', use_multi_threaded=True, options=[]):
     """
     A function which runs GDAL Warp function to tranform an image from one projection to another. Use this function
-    when you want GDAL to do procesing of pixel size and image size automatically. rsgislib.imageutils.reprojectImage
+    when you want GDAL to do procesing of pixel size and image size automatically. rsgislib.imageutils.reproject_image
     should be used when you want to put the output image on a particular grid etc.
 
     :param input_img: input image file
@@ -1397,8 +1397,8 @@ def gdal_warp(input_img, output_img, out_epsg, interp='near', gdalformat='KEA', 
     """
     from osgeo import gdal
     gdal.UseExceptions()
-    in_no_data_val = getImageNoDataValue(input_img)
-    in_epsg = getEPSGProjFromImage(input_img)
+    in_no_data_val = get_image_no_data_value(input_img)
+    in_epsg = get_epsg_proj_from_image(input_img)
     img_data_type = getGDALDataTypeFromImg(input_img)
 
     eResampleAlg = gdal.GRA_CubicSpline
@@ -1431,7 +1431,7 @@ def gdal_warp(input_img, output_img, out_epsg, interp='near', gdalformat='KEA', 
                                  workingType=gdal.GDT_Float32, multithread=use_multi_threaded)
     gdal.Warp(output_img, input_img, options=warp_opts)
 
-def subsetPxlBBox(input_img, outputimage, gdalformat, datatype, xMinPxl, xMaxPxl, yMinPxl, yMaxPxl):
+def subset_pxl_bbox(input_img, outputimage, gdalformat, datatype, xMinPxl, xMaxPxl, yMinPxl, yMaxPxl):
     """
 Function to subset an input image using a defined pixel bbox.
 
@@ -1445,9 +1445,9 @@ Function to subset an input image using a defined pixel bbox.
 :param yMaxPxl: max y in pixels
 
 """
-    bbox = getImageBBOX(input_img)
-    xRes, yRes = getImageRes(input_img, abs_vals=True)
-    xSize, ySize = getImageSize(input_img)
+    bbox = get_image_bbox(input_img)
+    xRes, yRes = get_image_res(input_img, abs_vals=True)
+    xSize, ySize = get_image_size(input_img)
     
     if (xMaxPxl > xSize) or (yMaxPxl > ySize):
         raise Exception("The pixel extent defined is bigger than the input image.")
@@ -1459,7 +1459,7 @@ Function to subset an input image using a defined pixel bbox.
     
     rsgislib.imageutils.subsetbbox(input_img, outputimage, gdalformat, datatype, xMin, xMax, yMin, yMax)
 
-def createTilesMultiCore(input_img, baseimage, width, height, gdalformat, datatype, ext, ncores=1):
+def create_tiles_multi_core(input_img, baseimage, width, height, gdalformat, datatype, ext, ncores=1):
     """
 Function to generate a set of tiles for the input image.
 
@@ -1474,7 +1474,7 @@ Function to generate a set of tiles for the input image.
 
 """
     import multiprocessing
-    xSize, ySize = getImageSize(input_img)
+    xSize, ySize = get_image_size(input_img)
     
     n_full_xtiles = math.floor(xSize/width)
     x_remain_width = xSize - (n_full_xtiles * width)
@@ -1518,15 +1518,15 @@ Function to generate a set of tiles for the input image.
         tile['datatype'] = datatype
 
     def _runSubset(tileinfo):
-        """ Internal function for createTilesMultiCore for multiprocessing Pool. """
-        subsetPxlBBox(tileinfo['input_img'], tileinfo['outfile'], tileinfo['gdalformat'], tileinfo['datatype'],
-                      tileinfo['bbox'][0], tileinfo['bbox'][1], tileinfo['bbox'][2], tileinfo['bbox'][3])
+        """ Internal function for create_tiles_multi_core for multiprocessing Pool. """
+        subset_pxl_bbox(tileinfo['input_img'], tileinfo['outfile'], tileinfo['gdalformat'], tileinfo['datatype'],
+                        tileinfo['bbox'][0], tileinfo['bbox'][1], tileinfo['bbox'][2], tileinfo['bbox'][3])
 
     poolobj = multiprocessing.Pool(ncores)
     poolobj.map(_runSubset, tiles)
 
 
-def subsetImgs2CommonExtent(inImagesDict, outShpEnv, gdalformat):
+def subset_imgs_to_common_extent(inImagesDict, outShpEnv, gdalformat):
     """
 A command to subset a set of images to the same overlapped extent.
 
@@ -1546,7 +1546,7 @@ Example::
     inImagesDict.append({'IN': './Images/peakBGclip.tif', 'OUT':'./Subsets/peakBGclip_sub.kea', 'TYPE':rsgislib.TYPE_32FLOAT})
     
     outputVector = 'imgSubExtent.shp'
-    imageutils.subsetImgs2CommonExtent(inImagesDict, outputVector, 'KEA')
+    imageutils.subset_imgs_to_common_extent(inImagesDict, outputVector, 'KEA')
     
 """
     import rsgislib.vectorutils
@@ -1561,10 +1561,10 @@ Example::
         rsgislib.imageutils.subset(inImgDict['IN'], outShpEnv, inImgDict['OUT'], gdalformat, inImgDict['TYPE'])
 
 
-def buildImgSubDict(globFindImgsStr, outDir, suffix, ext):
+def build_img_sub_dict(globFindImgsStr, outDir, suffix, ext):
     """
 Automate building the dictionary of image to be used within the 
-subsetImgs2CommonExtent(inImagesDict, outShpEnv, imgFormat) function.
+subset_imgs_to_common_extent(inImagesDict, outShpEnv, imgFormat) function.
 
 Where:
 
@@ -1577,11 +1577,11 @@ Example::
     
     from rsgislib import imageutils
     
-    inImagesDict = imageutils.buildImgSubDict("./Images/*.tif", "./Subsets/", "_sub", ".kea")
+    inImagesDict = imageutils.build_img_sub_dict("./Images/*.tif", "./Subsets/", "_sub", ".kea")
     print(inImagesDict)
     
     outputVector = 'imgSubExtent.shp'
-    imageutils.subsetImgs2CommonExtent(inImagesDict, outputVector, 'KEA')
+    imageutils.subset_imgs_to_common_extent(inImagesDict, outputVector, 'KEA')
 
 """
     import glob
@@ -1622,7 +1622,7 @@ Example::
     return inImagesDict
 
 
-def calcPixelLocations(inputImg, outputImg, gdalformat):
+def calc_pixel_locations(inputImg, outputImg, gdalformat):
     """
 Function which produces a 2 band output image with the X and Y locations of the image pixels.
 
@@ -1661,7 +1661,7 @@ Where:
     applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
 
 
-def mergeExtractedHDF5Data(h5Files, outH5File, datatype=None):
+def merge_extracted_hdf5_data(h5Files, outH5File, datatype=None):
     """
 A function to merge a list of HDF files (e.g., from rsgislib.imageutils.extractZoneImageBandValues2HDF)
 with the same number of variables (i.e., columns) into a single file. For example, if class training
@@ -1676,7 +1676,7 @@ Example::
 
     inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
     cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
-    rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
+    rsgislib.imageutils.merge_extracted_hdf5_data(inTrainSamples, cloudTrainSamples)
 
 """
     import h5py
@@ -1714,7 +1714,7 @@ Example::
     if numVals < chunk_len:
         chunk_len = numVals
 
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
@@ -1726,7 +1726,7 @@ Example::
     fH5Out.close()
 
 
-def doImagesOverlap(image1, image2, overThres=0.0):
+def do_images_overlap(image1, image2, overThres=0.0):
     """
 Function to test whether two images overlap with one another.
 If the images have a difference projection/coordinate system then corners 
@@ -1743,7 +1743,7 @@ Example::
     img = "/Users/pete/Temp/LandsatStatsImgs/MSS/ClearSkyMsks/LS1MSS_19720823_lat52lon114_r24p218_osgb_clearsky.tif"
     tile = "/Users/pete/Temp/LandsatStatsImgs/MSS/RefImages/LandsatWalesRegion_60m_tile8.kea"
     
-    overlap = rsgislib.imageutils.doImagesOverlap(tile, img)
+    overlap = rsgislib.imageutils.do_images_overlap(tile, img)
     print("Images Overlap: " + str(overlap))
 
 """
@@ -1751,7 +1751,7 @@ Example::
     overlap = True
     
     projSame = False
-    if doGDALLayersHaveSameProj(image1, image2):
+    if do_gdal_layers_have_same_proj(image1, image2):
         projSame = True
     
     img1DS = gdal.Open(image1, gdal.GA_ReadOnly)
@@ -1786,8 +1786,8 @@ Example::
     img2BRX_orig = img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])
     img2BRY_orig = img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5])
     
-    img1EPSG = getEPSGProjFromImage(image1)
-    img2EPSG = getEPSGProjFromImage(image2)
+    img1EPSG = get_epsg_proj_from_image(image1)
+    img2EPSG = get_epsg_proj_from_image(image2)
     
     if projSame:
         img2TLX = img2GeoTransform[0]
@@ -1799,7 +1799,7 @@ Example::
         inProj = osr.SpatialReference()
         
         if img2EPSG is None:
-            wktImg2 = getWKTProjFromImage(image2)
+            wktImg2 = get_wkt_proj_from_image(image2)
             if (wktImg2 is None) or (wktImg2 == ""):
                 raise rsgislib.RSGISPyException('Could not retrieve EPSG or WKT for image: ' + image2)
             inProj.ImportFromWkt(wktImg2)
@@ -1808,7 +1808,7 @@ Example::
         
         outProj = osr.SpatialReference()
         if img1EPSG is None:
-            wktImg1 = getWKTProjFromImage(image1)
+            wktImg1 = get_wkt_proj_from_image(image1)
             if (wktImg1 is None) or (wktImg1 == ""):
                 raise rsgislib.RSGISPyException('Could not retrieve EPSG or WKT for image: ' + image1)
             outProj.ImportFromWkt(wktImg1)
@@ -1843,7 +1843,7 @@ Example::
     return overlap
 
 
-def generateRandomPxlValsImg(inputImg, outputImg, gdalformat, lowVal, upVal):
+def generate_random_pxl_vals_img(inputImg, outputImg, gdalformat, lowVal, upVal):
     """
 Function which produces a 1 band image with random values between lowVal and upVal.
 
@@ -1878,7 +1878,7 @@ Where:
     
     def _popPxlsRanVals(info, inputs, outputs, otherargs):
         """
-        This is an internal rios function for generateRandomPxlValsImg()
+        This is an internal rios function for generate_random_pxl_vals_img()
         """
         outputs.outimage = numpy.random.random_integers(otherargs.lowVal, high=otherargs.upVal, size=inputs.inImg.shape)
         outputs.outimage = outputs.outimage.astype(numpy.int32, copy=False)
@@ -1886,7 +1886,7 @@ Where:
     applier.apply(_popPxlsRanVals, infiles, outfiles, otherargs, controls=aControls)
 
 
-def extractImgPxlSample(inputImg, pxlNSample, noData=None):
+def extract_img_pxl_sample(inputImg, pxlNSample, noData=None):
     """
 A function which extracts a sample of pixels from the 
 input image file to a number array.
@@ -1927,7 +1927,7 @@ input image file to a number array.
     return outArr
 
 
-def extractImgPxlValsInMsk(img, img_bands, img_mask, img_mask_val, no_data=None):
+def extract_img_pxl_vals_in_msk(img, img_bands, img_mask, img_mask_val, no_data=None):
     """
 A function which extracts the image values within a mask for the specified image bands.
 
@@ -1975,8 +1975,8 @@ A function which extracts the image values within a mask for the specified image
     return out_arr
 
 
-def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chipSize, outputHDF,
-                                       rotateChips=None, datatype=None):
+def extract_chip_zone_image_band_values_to_hdf(inputImageInfo, imageMask, maskValue, chipSize, outputHDF,
+                                               rotateChips=None, datatype=None):
     """
     A function which extracts a chip/window of image pixel values. The expectation is that
     this is used to train a classifer (see deep learning functions in classification) but it
@@ -2157,7 +2157,7 @@ def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chi
         chunkFeatures = nFeats
     else:
         chunkFeatures = 250
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
     dataGrp.create_dataset('DATA', data=featArr, chunks=(chunkFeatures, chipSize, chipSize, nBands),
                            compression="gzip", shuffle=True, dtype=h5_dtype)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
@@ -2166,9 +2166,9 @@ def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chi
     ######################################################################
 
 
-def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None):
+def split_sample_chip_hdf5_file(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None):
     """
-    A function to split the HDF5 outputs from the rsgislib.imageutils.extractChipZoneImageBandValues2HDF
+    A function to split the HDF5 outputs from the rsgislib.imageutils.extract_chip_zone_image_band_values_to_hdf
     function into two sets by taking a random set with the defined sample size from the input file,
     saving the sample and the remainder to output HDF5 files.
 
@@ -2227,7 +2227,7 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     remain_samples = in_samples[remain_idxs]
     f.close()
 
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     # Create an output HDF5 file and populate with sample data.
     if sample_size < 250:
@@ -2258,10 +2258,10 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     fSampleH5Out.close()
 
 
-def mergeExtractedHDF5ChipData(h5Files, outH5File, datatype=None):
+def merge_extracted_hdf5_chip_data(h5Files, outH5File, datatype=None):
     """
 A function to merge a list of HDF files
-(e.g., from rsgislib.imageutils.extractChipZoneImageBandValues2HDF)
+(e.g., from rsgislib.imageutils.extract_chip_zone_image_band_values_to_hdf)
 with the same number of variables (i.e., image bands) and chip size into
 a single file. For example, if class training regions have been sourced
 from multiple images.
@@ -2275,7 +2275,7 @@ Example::
 
     inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
     cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
-    rsgislib.imageutils.mergeExtractedHDF5ChipData(inTrainSamples, cloudTrainSamples)
+    rsgislib.imageutils.merge_extracted_hdf5_chip_data(inTrainSamples, cloudTrainSamples)
 
 """
     import h5py
@@ -2315,7 +2315,7 @@ Example::
         row_init += n_rows
         fH5.close()
 
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     chunk_size = 250
     if n_feats < chunk_size:
@@ -2331,8 +2331,8 @@ Example::
     fH5Out.close()
 
 
-def extractRefChipZoneImageBandValues2HDF(inputImageInfo, refImg, refImgBand, imageMask, maskValue, chipSize, outputHDF,
-                                          rotateChips=None, datatype=None):
+def extract_ref_chip_zone_image_band_values_to_hdf(inputImageInfo, refImg, refImgBand, imageMask, maskValue, chipSize, outputHDF,
+                                                   rotateChips=None, datatype=None):
     """
 A function which extracts a chip/window of image pixel values. The expectation is that
 this is used to train a classifer (see deep learning functions in classification) but it
@@ -2507,7 +2507,7 @@ could be used to extract image 'chips' for other purposes.
     ######################################################################
     # Create the output HDF5 file and populate with data.
     ######################################################################
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     fH5Out = h5py.File(outputHDF, 'w')
     dataGrp = fH5Out.create_group("DATA")
@@ -2527,9 +2527,9 @@ could be used to extract image 'chips' for other purposes.
     ######################################################################
 
 
-def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None):
+def split_sample_ref_chip_hdf5_file(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None):
     """
-    A function to split the HDF5 outputs from the rsgislib.imageutils.extractChipZoneImageBandValues2HDF
+    A function to split the HDF5 outputs from the rsgislib.imageutils.extract_chip_zone_image_band_values_to_hdf
     function into two sets by taking a random set with the defined sample size from the input file,
     saving the sample and the remainder to output HDF5 files.
 
@@ -2591,7 +2591,7 @@ def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sa
     remain_ref_samples = in_ref_samples[remain_idxs]
     f.close()
 
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     # Create an output HDF5 file and populate with sample data.
     fSampleH5Out = h5py.File(sample_h5_file, 'w')
@@ -2618,10 +2618,10 @@ def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sa
     fSampleH5Out.close()
 
 
-def mergeExtractedHDF5ChipRefData(h5Files, outH5File, datatype=None):
+def merge_extracted_hdf5_chip_ref_data(h5Files, outH5File, datatype=None):
     """
 A function to merge a list of HDF files
-(e.g., from rsgislib.imageutils.extractRefChipZoneImageBandValues2HDF)
+(e.g., from rsgislib.imageutils.extract_ref_chip_zone_image_band_values_to_hdf)
 with the same number of variables (i.e., image bands) and chip size into
 a single file. For example, if class training regions have been sourced
 from multiple images.
@@ -2635,7 +2635,7 @@ Example::
 
     inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
     cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
-    rsgislib.imageutils.mergeExtractedHDF5ChipRefData(inTrainSamples, cloudTrainSamples)
+    rsgislib.imageutils.merge_extracted_hdf5_chip_ref_data(inTrainSamples, cloudTrainSamples)
 
 """
     import h5py
@@ -2677,7 +2677,7 @@ Example::
         row_init += n_rows
         fH5.close()
 
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     chunk_size = 250
     if n_feats < chunk_size:
@@ -2713,7 +2713,7 @@ def msk_h5_smpls_to_finite_values(input_h5, output_h5, datatype=None, lower_limi
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
-    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     fH5 = h5py.File(input_h5, 'r')
     data_shp = fH5['DATA/DATA'].shape
@@ -2740,7 +2740,7 @@ def msk_h5_smpls_to_finite_values(input_h5, output_h5, datatype=None, lower_limi
     fH5Out.close()
 
 
-def combineBinaryMasks(msk_imgs_dict, out_img, output_lut, gdalformat='KEA'):
+def combine_binary_masks(msk_imgs_dict, out_img, output_lut, gdalformat='KEA'):
     """
 A function which combines up to 8 binary image masks to create a single 
 output image with a unique value for each combination of intersecting 
@@ -2843,7 +2843,7 @@ def gdal_translate(input_img, output_img, gdalformat='KEA', options=''):
     gdal.Translate(output_img, input_img, options=trans_opt)
 
 
-def gdalStackImagesVRT(input_imgs, output_vrt_file):
+def create_stack_images_vrt(input_imgs, output_vrt_file):
     """
     A function which creates a GDAL VRT file from a set of input images by stacking the input images
     in a multi-band output file.
@@ -2862,7 +2862,7 @@ def gdalStackImagesVRT(input_imgs, output_vrt_file):
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
 
 
-def gdalMosaicImagesVRT(input_imgs, output_vrt_file, vrt_extent=None):
+def create_mosaic_images_vrt(input_imgs, output_vrt_file, vrt_extent=None):
     """
     A function which creates a GDAL VRT file from a set of input images by mosaicking
     the input images.
@@ -2885,7 +2885,7 @@ def gdalMosaicImagesVRT(input_imgs, output_vrt_file, vrt_extent=None):
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
 
 
-def createVRTBandSubset(input_img, bands, out_vrt_img):
+def create_vrt_band_subset(input_img, bands, out_vrt_img):
     """
     A function which creates a GDAL VRT for the input image with the bands selected in
     the input list.
@@ -2919,14 +2919,14 @@ def subset_to_vec(in_img, out_img, gdalformat, roi_vec_file, roi_vec_lyr, dataty
     import rsgislib.tools.geometrytools
     if vec_epsg is None:
         vec_epsg = rsgislib.vectorutils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
-    img_epsg = getEPSGProjFromImage(in_img)
+    img_epsg = get_epsg_proj_from_image(in_img)
     if img_epsg == vec_epsg:
 
         projs_match = True
     else:
-        img_bbox = getImageBBOXInProj(in_img, vec_epsg)
+        img_bbox = get_image_bbox_in_proj(in_img, vec_epsg)
         projs_match = False
-    img_bbox = getImageBBOX(in_img)
+    img_bbox = get_image_bbox(in_img)
     vec_bbox = rsgislib.vectorutils.getVecLayerExtent(roi_vec_file, roi_vec_lyr, computeIfExp=True)
     if img_epsg != vec_epsg:
         vec_bbox = rsgislib.tools.geometrytools.reprojBBOX_epsg(vec_bbox, vec_epsg, img_epsg)
@@ -2934,7 +2934,7 @@ def subset_to_vec(in_img, out_img, gdalformat, roi_vec_file, roi_vec_lyr, dataty
     if rsgislib.tools.geometrytools.do_bboxes_intersect(img_bbox, vec_bbox):
         common_bbox = rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox)
         if datatype == None:
-            datatype = getRSGISLibDataTypeFromImg(in_img)
+            datatype = get_gdal_datatype_from_img(in_img)
         rsgislib.imageutils.subsetbbox(in_img, out_img, gdalformat, datatype, common_bbox[0], common_bbox[1],
                                        common_bbox[2], common_bbox[3])
     else:
@@ -2966,17 +2966,17 @@ def mask_img_with_vec(input_img, output_img, gdalformat, roi_vec_file, roi_vec_l
     # Does the input image BBOX intersect the BBOX of the ROI vector?
     if vec_epsg is None:
         vec_epsg = rsgislib.vectorutils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
-    img_epsg = getEPSGProjFromImage(input_img)
+    img_epsg = get_epsg_proj_from_image(input_img)
     if img_epsg == vec_epsg:
-        img_bbox = getImageBBOX(input_img)
+        img_bbox = get_image_bbox(input_img)
         projs_match = True
     else:
-        img_bbox = getImageBBOXInProj(input_img, vec_epsg)
+        img_bbox = get_image_bbox_in_proj(input_img, vec_epsg)
         projs_match = False
     vec_bbox = rsgislib.vectorutils.getVecLayerExtent(roi_vec_file, roi_vec_lyr, computeIfExp=True)
 
     if rsgislib.tools.geometrytools.do_bboxes_intersect(img_bbox, vec_bbox):
-        uid_str = rsgislib.tools.utils.uidGenerator()
+        uid_str = rsgislib.tools.utils.uid_generator()
         base_vmsk_img = rsgislib.tools.filetools.get_file_basename(input_img)
 
         tmp_file_dir = os.path.join(tmp_dir, "{}_{}".format(base_vmsk_img, uid_str))
@@ -2996,14 +2996,14 @@ def mask_img_with_vec(input_img, output_img, gdalformat, roi_vec_file, roi_vec_l
             mem_result_lyr = mem_lyr
 
         roi_img = os.path.join(tmp_file_dir, "{}_roiimg.kea".format(base_vmsk_img))
-        rsgislib.imageutils.createCopyImage(input_img, roi_img, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
+        rsgislib.imageutils.create_copy_img(input_img, roi_img, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
         rsgislib.vectorutils.rasteriseVecLyrObj(mem_result_lyr, roi_img, burnVal=1, vecAtt=None, calcstats=True,
                                                 thematic=True, nodata=0)
         mem_result_ds = None
 
         if datatype == None:
-            datatype = rsgislib.getRSGISLibDataTypeFromImg(input_img)
-        rsgislib.imageutils.maskImage(input_img, roi_img, output_img, gdalformat, datatype, outvalue, 0)
+            datatype = rsgislib.get_gdal_data_type_from_img(input_img)
+        rsgislib.imageutils.mask_img(input_img, roi_img, output_img, gdalformat, datatype, outvalue, 0)
         shutil.rmtree(tmp_file_dir)
     else:
         raise Exception("The vector file and image file do not intersect.")
@@ -3023,10 +3023,10 @@ def create_valid_mask(imgBandInfo, out_msk_file, gdalformat, tmpdir):
     import rsgislib.tools.utils
     import rsgislib.tools.filetools
     if len(imgBandInfo) == 1:
-        no_data_val = getImageNoDataValue(imgBandInfo[0].fileName)
+        no_data_val = get_image_no_data_value(imgBandInfo[0].fileName)
         rsgislib.imageutils.genValidMask(imgBandInfo[0].fileName, out_msk_file, gdalformat, no_data_val)
     else:
-        uid_str = rsgislib.tools.utils.uidGenerator()
+        uid_str = rsgislib.tools.utils.uid_generator()
         tmp_lcl_dir = os.path.join(tmpdir, "create_valid_mask_{}".format(uid_str))
         if not os.path.exists(tmp_lcl_dir):
             os.makedirs(tmp_lcl_dir)
@@ -3035,7 +3035,7 @@ def create_valid_mask(imgBandInfo, out_msk_file, gdalformat, tmpdir):
         for imgInfo in imgBandInfo:
             tmpBaseName = rsgislib.tools.filetools.get_file_basename(imgInfo.fileName)
             vdmskFile = os.path.join(tmp_lcl_dir, '{}_vmsk.kea'.format(tmpBaseName))
-            no_data_val = getImageNoDataValue(imgInfo.fileName)
+            no_data_val = get_image_no_data_value(imgInfo.fileName)
             rsgislib.imageutils.genValidMask(imgInfo.fileName, vdmskFile, gdalformat='KEA', nodata=no_data_val)
             validMasks.append(vdmskFile)
 
@@ -3138,7 +3138,7 @@ def assign_random_pxls(input_img, output_img, n_pts, img_band=1, gdalformat='KEA
         assign_random_pxls(input_img, output_img, n_pts, img_band=1, gdalformat='KEA')
         # Calculate the image stats and pyramids for display
         import rsgislib.rastergis
-        rsgislib.rastergis.populateStats(output_img, True, True, True)
+        rsgislib.rastergis.pop_rat_img_stats(output_img, True, True, True)
 
     """
     import numpy
@@ -3150,7 +3150,7 @@ def assign_random_pxls(input_img, output_img, n_pts, img_band=1, gdalformat='KEA
     if edge_pxl < 0:
         raise Exception("edge_pxl value must be greater than 0.")
 
-    xSize, ySize = getImageSize(input_img)
+    xSize, ySize = get_image_size(input_img)
 
     x_min = edge_pxl
     x_max = xSize - edge_pxl
@@ -3159,7 +3159,7 @@ def assign_random_pxls(input_img, output_img, n_pts, img_band=1, gdalformat='KEA
     y_max = ySize - edge_pxl
 
     if use_no_data:
-        no_data_val = getImageNoDataValue(input_img, img_band)
+        no_data_val = get_image_no_data_value(input_img, img_band)
 
         out_x_coords = numpy.zeros(n_pts, dtype=numpy.uint16)
         out_y_coords = numpy.zeros(n_pts, dtype=numpy.uint16)
@@ -3181,7 +3181,7 @@ def assign_random_pxls(input_img, output_img, n_pts, img_band=1, gdalformat='KEA
         out_x_coords = numpy.random.randint(x_min, high=x_max, size=n_pts, dtype=numpy.uint16)
         out_y_coords = numpy.random.randint(y_min, high=y_max, size=n_pts, dtype=numpy.uint16)
 
-    rsgislib.imageutils.createCopyImage(input_img, output_img, 1, 0, gdalformat, rsgislib.TYPE_8UINT)
+    rsgislib.imageutils.create_copy_img(input_img, output_img, 1, 0, gdalformat, rsgislib.TYPE_8UINT)
     set_image_pxl_values(output_img, 1, out_x_coords, out_y_coords, 1)
 
 
@@ -3204,9 +3204,9 @@ def check_img_lst(imglst, exp_x_res, exp_y_res, bbox=None, print_errors=True, ab
         exp_y_res = abs(exp_y_res)
     out_imgs = list()
     for img in imglst:
-        img_res = getImageRes(img, abs_vals=abs_res)
+        img_res = get_image_res(img, abs_vals=abs_res)
         if bbox is not None:
-            img_bbox = getImageBBOX(img)
+            img_bbox = get_image_bbox(img)
         if (img_res[0] != exp_x_res) or (img_res[1] != exp_y_res):
             if print_errors:
                 print("{} has resolution: {}".format(img, img_res))
@@ -3237,16 +3237,16 @@ def check_img_file_comparison(base_img, comp_img, test_n_bands=False, test_eql_b
     import rsgislib.tools.geometrytools
     imgs_match = True
 
-    if not doImageResMatch(base_img, comp_img):
+    if not do_image_res_match(base_img, comp_img):
         if print_errors:
-            base_img_res = getImageRes(base_img)
-            comp_img_res = getImageRes(comp_img)
+            base_img_res = get_image_res(base_img)
+            comp_img_res = get_image_res(comp_img)
             print("Base Image Res: {}".format(base_img_res))
             print("Comp Image Res: {}".format(comp_img_res))
         imgs_match = False
 
-    base_img_bbox = getImageBBOX(base_img)
-    comp_img_bbox = getImageBBOX(comp_img)
+    base_img_bbox = get_image_bbox(base_img)
+    comp_img_bbox = get_image_bbox(comp_img)
     if not rsgislib.tools.geometrytools.bbox_intersection(base_img_bbox, comp_img_bbox):
         if print_errors:
             print("Base Image BBOX: {}".format(base_img_bbox))
@@ -3261,8 +3261,8 @@ def check_img_file_comparison(base_img, comp_img, test_n_bands=False, test_eql_b
             imgs_match = False
 
     if test_n_bands:
-        base_img_nbands = getImageBandCount(base_img)
-        comp_img_nbands = getImageBandCount(comp_img)
+        base_img_nbands = get_image_band_count(base_img)
+        comp_img_nbands = get_image_band_count(comp_img)
         if base_img_nbands != comp_img_nbands:
             if print_errors:
                 print("Base Image n-bands: {}".format(base_img_nbands))
@@ -3288,9 +3288,9 @@ def test_img_lst_intersects(imgs, stop_err=False):
     first = True
     for img in imgs:
         print(img)
-        img_bbox = getImageBBOX(img)
-        img_proj = getEPSGProjFromImage(img)
-        img_res = getImageRes(img)
+        img_bbox = get_image_bbox(img)
+        img_proj = get_epsg_proj_from_image(img)
+        img_res = get_image_res(img)
         if first:
             first = False
             ref_img = img
@@ -3327,7 +3327,7 @@ def test_img_lst_intersects(imgs, stop_err=False):
                 print("\tOK")
 
 
-def whitenImage(input_img, valid_msk_img, valid_msk_val, output_img, gdalformat):
+def whiten_image(input_img, valid_msk_img, valid_msk_val, output_img, gdalformat):
     """
     A function which whitens the input image where the noise covariance matrix is
     used to decorrelate and rescale the noise in the data (noise whitening).
@@ -3445,7 +3445,7 @@ def whitenImage(input_img, valid_msk_img, valid_msk_val, output_img, gdalformat)
     img_flat_white = _whiten(img_data)
 
     print("Create empty output image file")
-    rsgislib.imageutils.createCopyImage(input_img, output_img, n_bands, 0, gdalformat, rsgislib.TYPE_32FLOAT)
+    rsgislib.imageutils.create_copy_img(input_img, output_img, n_bands, 0, gdalformat, rsgislib.TYPE_32FLOAT)
 
     # Open output image
     outImgDS = gdal.Open(output_img, gdal.GA_Update)
@@ -3467,8 +3467,8 @@ def whitenImage(input_img, valid_msk_img, valid_msk_val, output_img, gdalformat)
     outImgDS = None
 
 
-def spectralSmoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_len=5, polyorder=3, gdalformat='KEA',
-                      datatype=rsgislib.TYPE_32FLOAT, calc_stats=True):
+def spectral_smoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_len=5, polyorder=3, gdalformat='KEA',
+                       datatype=rsgislib.TYPE_32FLOAT, calc_stats=True):
     """
     This function performs spectral smoothing using a Savitzky-Golay filter.
     Typically applied to hyperspectral data to remove noise.
@@ -3496,7 +3496,7 @@ def spectralSmoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_l
         from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
-    np_dtype = rsgislib.getNumpyDataType(datatype)
+    np_dtype = rsgislib.get_numpy_datatype(datatype)
     in_no_date = rsgislib.getImageNoDataValue(input_img)
 
     infiles = applier.FilenameAssociations()
@@ -3541,10 +3541,10 @@ def spectralSmoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_l
     applier.apply(_applySmoothing, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=in_no_date, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(output_img, usenodataval=True, nodataval=in_no_date, calcpyramids=True)
 
 
-def calcWSG84PixelSize(img, out_img, gdalformat='KEA'):
+def calc_wsg84_pixel_size(img, out_img, gdalformat='KEA'):
     """
 A function which calculates the x and y pixel resolution (in metres) of each pixel projected in WGS84.
 
@@ -3563,7 +3563,7 @@ A function which calculates the x and y pixel resolution (in metres) of each pix
         from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
-    x_res, y_res = getImageRes(img, abs_vals=True)
+    x_res, y_res = get_image_res(img, abs_vals=True)
 
     infiles = applier.FilenameAssociations()
     infiles.img = img
@@ -3591,7 +3591,7 @@ A function which calculates the x and y pixel resolution (in metres) of each pix
     applier.apply(_calcPixelRes, infiles, outfiles, otherargs, controls=aControls)
 
 
-def maskAllBZeroVals(input_img, output_img, gdalformat, out_val=1):
+def mask_all_band_zero_vals(input_img, output_img, gdalformat, out_val=1):
     """
 Function which identifies image pixels which have a value of zero
 all bands which are defined as true 'no data' regions while other

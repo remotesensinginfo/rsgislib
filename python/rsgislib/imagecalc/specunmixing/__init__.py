@@ -44,7 +44,7 @@ import rsgislib
 
 class ImageEndmemberInfo(object):
     """
-    Create a list of these objects to pass to the summariseMultiEndmemberLinearUnmixing
+    Create a list of these objects to pass to the summarise_multi_endmember_linear_unmixing
     function
 
     :param in_unmix_img: is the input image file with the linear unmixed results.
@@ -68,7 +68,7 @@ class ImageEndmemberInfo(object):
         self.endmember_names = endmember_names
 
 
-def readEndmembersMTXT(endmembers_file, gain=1, weight=None):
+def read_endmembers_mtxt(endmembers_file, gain=1, weight=None):
     """
     A function to read endmembers mtxt file
     :param endmembers_file: File path to the mtxt input file.
@@ -111,7 +111,7 @@ def readEndmembersMTXT(endmembers_file, gain=1, weight=None):
     return m, n, endmemarr
 
 
-def plotEndmembers(
+def plot_endmembers(
     endmembers_file,
     endmember_names,
     out_plot_file,
@@ -136,7 +136,7 @@ def plotEndmembers(
     """
     import matplotlib.pyplot as plt
 
-    n_endmembers, n_bands, endmembers = readEndmembersMTXT(endmembers_file, gain=gain)
+    n_endmembers, n_bands, endmembers = read_endmembers_mtxt(endmembers_file, gain=gain)
 
     x_axis_lbl = "Wavelength"
 
@@ -171,7 +171,7 @@ def plotEndmembers(
     plt.savefig(out_plot_file)
 
 
-def areEndmembersEqual(ref_endmember_file, cmp_endmember_file, flt_dif=0.0001):
+def are_endmembers_equal(ref_endmember_file, cmp_endmember_file, flt_dif=0.0001):
     """
     A function which compares two endmembers files to check whether they are
     equal or not.
@@ -184,10 +184,10 @@ def areEndmembersEqual(ref_endmember_file, cmp_endmember_file, flt_dif=0.0001):
     :return: boolean
 
     """
-    n_ref_endmembers, n_ref_bands, ref_endmembers = readEndmembersMTXT(
+    n_ref_endmembers, n_ref_bands, ref_endmembers = read_endmembers_mtxt(
         ref_endmember_file, gain=1, weight=None
     )
-    n_cmp_endmembers, n_cmp_bands, cmp_endmembers = readEndmembersMTXT(
+    n_cmp_endmembers, n_cmp_bands, cmp_endmembers = read_endmembers_mtxt(
         cmp_endmember_file, gain=1, weight=None
     )
 
@@ -208,7 +208,7 @@ def areEndmembersEqual(ref_endmember_file, cmp_endmember_file, flt_dif=0.0001):
     return endmembers_eq
 
 
-def specUnmixSpTsUCLS(
+def spec_unmix_spts_ucls(
     input_img,
     valid_msk_img,
     valid_msk_val,
@@ -260,7 +260,7 @@ def specUnmixSpTsUCLS(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain, weight)
+    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain, weight)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -324,12 +324,12 @@ def specUnmixSpTsUCLS(
     applier.apply(_applyUCLS, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
 
 
-def specUnmixSpTsNNLS(
+def spec_unmix_spts_nnls(
     input_img,
     valid_msk_img,
     valid_msk_val,
@@ -380,7 +380,7 @@ def specUnmixSpTsNNLS(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain, weight)
+    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain, weight)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -444,12 +444,12 @@ def specUnmixSpTsNNLS(
     applier.apply(_applyNNLS, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
 
 
-def specUnmixSpTsFCLS(
+def spec_unmix_spts_fcls(
     input_img,
     valid_msk_img,
     valid_msk_val,
@@ -489,7 +489,7 @@ def specUnmixSpTsFCLS(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain)
+    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -547,12 +547,12 @@ def specUnmixSpTsFCLS(
     applier.apply(_applyFCLS, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
 
 
-def specUnmixPyMcrNNLS(
+def spec_unmix_pymcr_nnls(
     input_img,
     valid_msk_img,
     valid_msk_val,
@@ -605,7 +605,7 @@ def specUnmixPyMcrNNLS(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain, weight)
+    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain, weight)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -673,12 +673,12 @@ def specUnmixPyMcrNNLS(
     applier.apply(_apply_pymcr_nnls, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
 
 
-def specUnmixPyMcrFCLS(
+def spec_unmix_pymcr_fcls(
     input_img,
     valid_msk_img,
     valid_msk_val,
@@ -720,7 +720,7 @@ def specUnmixPyMcrFCLS(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain)
+    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -782,15 +782,15 @@ def specUnmixPyMcrFCLS(
     applier.apply(_apply_pymcr_fcls, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
 
 
-def rescaleUnmixingResults(input_img, output_img, gdalformat="KEA", calc_stats=True):
+def rescale_unmixing_results(input_img, output_img, gdalformat="KEA", calc_stats=True):
     """
     A function which rescales an output from a spectral unmixing
-    (e.g., rsgislib.imagecalc.specunmixing.specUnmixSpTsUCLS) so that
+    (e.g., rsgislib.imagecalc.specunmixing.spec_unmix_spts_ucls) so that
     negative values are removed (set to 0) and each pixel sums to 1.
 
     :param inputImg: Input image with the spectral unmixing result
@@ -840,12 +840,12 @@ def rescaleUnmixingResults(input_img, output_img, gdalformat="KEA", calc_stats=T
     if calc_stats:
         import rsgislib.imageutils
 
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
 
 
-def predictReflLinearUnmixing(
+def predict_refl_linear_unmixing(
     in_unmix_coefs_img, endmembers_file, output_img, gdalformat="KEA", calc_stats=True
 ):
     """
@@ -869,7 +869,7 @@ def predictReflLinearUnmixing(
         from rios import cuiprogress
 
         progress_bar = cuiprogress.GDALProgressBar()
-    endmembers_info = readEndmembersMTXT(endmembers_file)
+    endmembers_info = read_endmembers_mtxt(endmembers_file)
 
     infiles = applier.FilenameAssociations()
     infiles.image_unmix = in_unmix_coefs_img
@@ -914,12 +914,12 @@ def predictReflLinearUnmixing(
     if calc_stats:
         import rsgislib.imageutils
 
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
 
 
-def calcUnmixingRMSEResidualErr(
+def calc_unmixing_rmse_residual_err(
     input_img,
     input_unmix_img,
     endmembers_file,
@@ -958,7 +958,7 @@ def calcUnmixingRMSEResidualErr(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    endmembers_info = readEndmembersMTXT(endmembers_file)
+    endmembers_info = read_endmembers_mtxt(endmembers_file)
 
     infiles = applier.FilenameAssociations()
     infiles.image_orig = input_img
@@ -1039,15 +1039,15 @@ def calcUnmixingRMSEResidualErr(
     if calc_stats:
         import rsgislib.imageutils
 
-        rsgislib.imageutils.setBandNames(
+        rsgislib.imageutils.set_band_names(
             output_img, ["RMSE", "RMSPE", "Residual"], feedback=False
         )
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=False, no_data_val=0, calc_pyramids=True
         )
 
 
-def summariseMultiEndmemberLinearUnmixing(
+def summarise_multi_endmember_linear_unmixing(
     input_img,
     in_unmixed_datasets,
     out_unmix_img,
@@ -1100,7 +1100,7 @@ def summariseMultiEndmemberLinearUnmixing(
         if not isinstance(unmixed_dataset.endmember_names, list):
             raise Exception("unmixed_dataset.endmember_names must be a list")
 
-        if rsgislib.imageutils.getImageBandCount(unmixed_dataset.in_unmix_img) != len(
+        if rsgislib.imageutils.get_image_band_count(unmixed_dataset.in_unmix_img) != len(
             unmixed_dataset.endmember_names
         ):
             print(unmixed_dataset.in_unmix_img)
@@ -1126,9 +1126,9 @@ def summariseMultiEndmemberLinearUnmixing(
     err_imgs_lst = list()
     endmember_files = list()
     for unmixed_dataset in in_unmixed_datasets:
-        basename = filetools.getFileBasename(unmixed_dataset.in_unmix_img)
+        basename = filetools.get_file_basename(unmixed_dataset.in_unmix_img)
         out_err_img = os.path.join(tmp_dir, "{}_err_img.kea".format(basename))
-        calcUnmixingRMSEResidualErr(
+        calc_unmixing_rmse_residual_err(
             input_img,
             unmixed_dataset.in_unmix_img,
             unmixed_dataset.endmembers_file,
@@ -1137,11 +1137,11 @@ def summariseMultiEndmemberLinearUnmixing(
             calc_stats=False,
         )
         out_rmspe_img = os.path.join(tmp_dir, "{}_rmspe_img.vrt".format(basename))
-        rsgislib.imageutils.createVRTBandSubset(out_err_img, [2], out_rmspe_img)
+        rsgislib.imageutils.create_vrt_band_subset(out_err_img, [2], out_rmspe_img)
         err_imgs_lst.append(out_rmspe_img)
         endmember_files.append(unmixed_dataset.endmembers_file)
 
-    rsgislib.imagecalc.getImgIdxForStat(
+    rsgislib.imagecalc.get_img_idx_for_stat(
         err_imgs_lst, out_ref_img, gdalformat, -999, rsgislib.SUMTYPE_MIN
     )
 
@@ -1149,7 +1149,7 @@ def summariseMultiEndmemberLinearUnmixing(
         import rios.rat
 
         # Pop Ref Image with stats
-        rsgislib.rastergis.populateStats(out_ref_img, True, True, True)
+        rsgislib.rastergis.pop_rat_img_stats(out_ref_img, True, True, True)
 
         # Open the clumps dataset as a gdal dataset
         ratDataset = gdal.Open(out_ref_img, gdal.GA_Update)
@@ -1157,16 +1157,16 @@ def summariseMultiEndmemberLinearUnmixing(
         rios.rat.writeColumn(ratDataset, "Endmembers", endmember_files)
         ratDataset = None
     elif calc_stats:
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.pop_img_stats(
             out_ref_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
 
     band_matched_unmixed_imgs = list()
     for unmixed_dataset in in_unmixed_datasets:
-        basename = filetools.getFileBasename(unmixed_dataset.in_unmix_img)
+        basename = filetools.get_file_basename(unmixed_dataset.in_unmix_img)
 
         band_order_matches = True
-        n_bands = rsgislib.imageutils.getImageBandCount(unmixed_dataset.in_unmix_img)
+        n_bands = rsgislib.imageutils.get_image_band_count(unmixed_dataset.in_unmix_img)
         if n_bands != len(endmember_names):
             band_order_matches = False
 
@@ -1189,7 +1189,7 @@ def summariseMultiEndmemberLinearUnmixing(
                 unmixed_dataset.endmember_names, range(n_bands)
             ):
                 band_img = os.path.join(tmp_dir, "{}_band_{}.vrt".format(basename, i))
-                rsgislib.imageutils.createVRTBandSubset(
+                rsgislib.imageutils.create_vrt_band_subset(
                     unmixed_dataset.in_unmix_img, [i + 1], band_img
                 )
                 img_band_to_stack[endmember_name_bands[endmember_name]] = band_img
@@ -1199,7 +1199,7 @@ def summariseMultiEndmemberLinearUnmixing(
             for img_band_idx in img_band_to_stack:
                 if img_band_to_stack[img_band_idx] == "":
                     if first:
-                        rsgislib.imageutils.createCopyImage(
+                        rsgislib.imageutils.create_copy_img(
                             unmixed_dataset.in_unmix_img,
                             zeros_img,
                             1,
@@ -1217,12 +1217,12 @@ def summariseMultiEndmemberLinearUnmixing(
             band_ordered_unmix_stack_img = os.path.join(
                 tmp_dir, "{}_band_ordered_stack.vrt".format(basename)
             )
-            rsgislib.imageutils.gdalStackImagesVRT(
+            rsgislib.imageutils.create_stack_images_vrt(
                 band_to_stack, band_ordered_unmix_stack_img
             )
             band_matched_unmixed_imgs.append(band_ordered_unmix_stack_img)
 
-    rsgislib.imageutils.createRefImgCompositeImg(
+    rsgislib.imageutils.create_ref_img_composite_img(
         band_matched_unmixed_imgs,
         out_unmix_img,
         out_ref_img,
@@ -1232,7 +1232,141 @@ def summariseMultiEndmemberLinearUnmixing(
     )
 
     if calc_stats:
-        rsgislib.imageutils.setBandNames(out_unmix_img, endmember_names, feedback=False)
-        rsgislib.imageutils.popImageStats(
+        rsgislib.imageutils.set_band_names(out_unmix_img, endmember_names, feedback=False)
+        rsgislib.imageutils.pop_img_stats(
             out_unmix_img, use_no_data=True, no_data_val=999, calc_pyramids=True
         )
+
+
+
+def calc_ppi(
+    input_img,
+    output_img,
+    gdalformat,
+    niters=1000,
+    lthres=0,
+    uthres=0,
+    img_gain=1,
+    seed=None,
+    calc_stats=True,
+):
+    """
+    A function which calculate the pixel purity index (PPI). Using an appropriate
+    number of iterations this can take a little while to run. Note, the whole input
+    image is read into memory.
+
+    It is recommended that you use the an MNF/PCA output and rescale that so all
+    bands have the same range to improve the PPI result.
+
+    Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
+        Partial Unmixing of AVIRIS Data," Pasadena, California, USA, 23 Jan 1995,
+        URI: http://hdl.handle.net/2014/33635
+
+    :param input_img: image values image file path.
+    :param output_img: output image
+    :param gdalformat: GDAL file format (e.g., KEA) of the output image.
+    :param niters: number of iterations
+    :param thres: a threshold in the image space (after again as been applied) to
+                  select more pixels around the extreme (e.g., 1% reflectance)
+    :param img_gain: the gain by which the image was multipled, reflectance images
+                     are typically multiplied by 1000 or 10000. The result should be
+                     an image with a range 0-1.
+    :param seed: seed for the random squence of numbers being generated. Using the
+                 same seed will result in the same seqence and therefore the
+                 same output.
+    :param calc_stats: whether to calculate image statistics and pyramids on
+                       the output image.
+    """
+    # Check gdal is available
+    import rsgislib.imageutils
+    import tqdm
+
+    imgDS = gdal.Open(input_img)
+    if imgDS is None:
+        raise Exception("Could not open input image")
+    n_bands = imgDS.RasterCount
+    x_size = imgDS.RasterXSize
+    y_size = imgDS.RasterYSize
+    img_data = numpy.zeros((n_bands, (x_size * y_size)), dtype=numpy.float32)
+    img_data_msk = numpy.ones((x_size * y_size), dtype=bool)
+    img_data_mean = numpy.zeros(n_bands, dtype=numpy.float32)
+
+    print("Importing Bands:")
+    for n in tqdm.tqdm(range(n_bands)):
+        imgBand = imgDS.GetRasterBand(n + 1)
+        if imgBand is None:
+            raise Exception("Could not open image band ({})".format(n + 1))
+        no_data_val = imgBand.GetNoDataValue()
+        band_arr = imgBand.ReadAsArray().flatten()
+        band_arr = band_arr.astype(numpy.float32)
+        img_data[n] = band_arr
+        img_data_msk[band_arr == no_data_val] = False
+        band_arr[band_arr == no_data_val] = numpy.nan
+        if img_gain > 1:
+            band_arr = band_arr / img_gain
+            img_data[n] = img_data[n] / img_gain
+        img_data_mean[n] = numpy.nanmean(band_arr)
+        img_data[n] = img_data[n] - img_data_mean[n]
+    imgDS = None
+    band_arr = None
+
+    print("Create empty output image file")
+    rsgislib.imageutils.create_copy_img(
+        input_img, output_img, 1, 0, gdalformat, rsgislib.TYPE_16UINT
+    )
+
+    # Open output image
+    outImgDS = gdal.Open(output_img, gdal.GA_Update)
+    if outImgDS is None:
+        raise Exception("Could not open output image")
+    outImgBand = outImgDS.GetRasterBand(1)
+    if outImgBand is None:
+        raise Exception("Could not open output image band (1)")
+    out_img_data = outImgBand.ReadAsArray()
+
+    # Mask the datasets to obtain just the valid pixel values
+    # (i.e., using the no data value)
+    img_data = img_data.T
+    out_img_data = out_img_data.flatten()
+    pxl_idxs = numpy.arange(out_img_data.shape[0])
+    pxl_idxs = pxl_idxs[img_data_msk]
+    out_img_count = out_img_data[img_data_msk]
+    img_data = img_data[img_data_msk]
+
+    if seed is not None:
+        numpy.random.seed(seed)
+
+    print("Perform PPI iterations.")
+    for i in tqdm.tqdm(range(niters)):
+        r = numpy.random.rand(n_bands) - 0.5
+        s = numpy.dot(img_data, r)
+
+        imin = numpy.argmin(s)
+        imax = numpy.argmax(s)
+        if lthres == 0:
+            # Only the two extreme pixels are incremented
+            out_img_count[imin] += 1
+        else:
+            # All pixels within threshold distance from the two extremes
+            out_img_count[s <= (s[imin] + lthres)] += 1
+
+        if uthres == 0:
+            # Only the two extreme pixels are incremented
+            out_img_count[imax] += 1
+        else:
+            # All pixels within threshold distance from the two extremes
+            out_img_count[s >= (s[imax] - uthres)] += 1
+    s = None
+
+    out_img_data[pxl_idxs] = out_img_count
+    out_img_data = out_img_data.reshape((y_size, x_size))
+
+    outImgBand.WriteArray(out_img_data)
+    outImgDS = None
+
+    if calc_stats:
+        print("Calculate Image stats and pyramids.")
+        rsgislib.imageutils.pop_img_stats(
+            output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )
+
