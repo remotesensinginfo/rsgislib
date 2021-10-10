@@ -67,7 +67,7 @@ Where:
         raise Exception("Input process image does not have GCPs within it's header - this is required.")
 
     numBands = rsgislib.imageutils.get_image_band_count(inProcessImg)
-    noDataVal = rsgislib.imageutils.getImageNoDataValue(inProcessImg)
+    noDataVal = rsgislib.imageutils.get_image_no_data_value(inProcessImg)
     datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(inProcessImg)
     
     interpolationMethod = gdal.GRA_NearestNeighbour

@@ -664,7 +664,7 @@ image and threshold can be applied to this image. Note. the softmax score is not
 
 :param model_file: a trained lightgbm binary model which can be loaded with lgb.Booster(model_file=model_file).
 :param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                valid data regions (rsgislib.imageutils.genValidMask)
+                valid data regions (rsgislib.imageutils.gen_valid_mask)
 :param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
 :param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
@@ -986,7 +986,7 @@ the maximum softmax score.
                        provide pixel value id and RGB class values.
 :param model_file: a trained lightgbm multiclass model which can be loaded with lgb.Booster(model_file=model_file).
 :param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                valid data regions (rsgislib.imageutils.genValidMask)
+                valid data regions (rsgislib.imageutils.gen_valid_mask)
 :param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
 :param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within

@@ -17,7 +17,7 @@ def test_ext_point_band_values_file(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -64,7 +64,7 @@ def test_ext_point_band_values_file_reproj(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -109,7 +109,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Min(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -162,7 +162,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Max(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -215,7 +215,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Mean(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -275,7 +275,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_StdDev(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -335,7 +335,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Sum(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -388,7 +388,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Count(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -441,7 +441,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Mode(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -494,7 +494,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Median(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -547,7 +547,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Percentile(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -600,7 +600,7 @@ def test_calc_zonal_poly_pts_band_stats_file(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -636,7 +636,7 @@ def test_calc_zonal_band_stats_file_Min(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -687,7 +687,7 @@ def test_calc_zonal_band_stats_file_Max(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -738,7 +738,7 @@ def test_calc_zonal_band_stats_file_Mean(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -796,7 +796,7 @@ def test_calc_zonal_band_stats_file_StdDev(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -854,7 +854,7 @@ def test_calc_zonal_band_stats_file_Sum(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -905,7 +905,7 @@ def test_calc_zonal_band_stats_file_Count(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -956,7 +956,7 @@ def test_calc_zonal_band_stats_file_Mode(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -1007,7 +1007,7 @@ def test_calc_zonal_band_stats_file_Median(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,

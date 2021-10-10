@@ -1,4 +1,4 @@
-def test_reprojPoint_OSGB_UTM():
+def test_reproj_point_OSGB_UTM():
     import rsgislib.tools.geometrytools
     from osgeo import osr
 
@@ -15,7 +15,7 @@ def test_reprojPoint_OSGB_UTM():
     osgb_x = 258051.0
     osgb_y = 281605.0
 
-    utm_x, utm_y = rsgislib.tools.geometrytools.reprojPoint(
+    utm_x, utm_y = rsgislib.tools.geometrytools.reproj_point(
         in_osr_proj_obj, out_osr_proj_obj, osgb_x, osgb_y
     )
 
@@ -24,7 +24,7 @@ def test_reprojPoint_OSGB_UTM():
     assert (abs(ref_utm_x - utm_x) < 2) and (abs(ref_utm_y - utm_y) < 2)
 
 
-def test_reprojPoint_OSGB_WGS84():
+def test_reproj_point_OSGB_WGS84():
     import rsgislib.tools.geometrytools
     from osgeo import osr
 
@@ -41,7 +41,7 @@ def test_reprojPoint_OSGB_WGS84():
     osgb_x = 258051.0
     osgb_y = 281605.0
 
-    lon, lat = rsgislib.tools.geometrytools.reprojPoint(
+    lon, lat = rsgislib.tools.geometrytools.reproj_point(
         in_osr_proj_obj, out_osr_proj_obj, osgb_x, osgb_y
     )
 
@@ -50,7 +50,7 @@ def test_reprojPoint_OSGB_WGS84():
     assert (abs(ref_lon - lon) < 0.001) and (abs(ref_lat - lat) < 0.001)
 
 
-def test_reprojPoint_WGS84_OSGB():
+def test_reproj_point_WGS84_OSGB():
     import rsgislib.tools.geometrytools
     from osgeo import osr
 
@@ -67,7 +67,7 @@ def test_reprojPoint_WGS84_OSGB():
     lon = -4.0885
     lat = 52.4140
 
-    osgb_x, osgb_y = rsgislib.tools.geometrytools.reprojPoint(
+    osgb_x, osgb_y = rsgislib.tools.geometrytools.reproj_point(
         in_osr_proj_obj, out_osr_proj_obj, lon, lat
     )
 
@@ -76,7 +76,7 @@ def test_reprojPoint_WGS84_OSGB():
     assert (abs(ref_osgb_x - osgb_x) < 2) and (abs(ref_osgb_y - osgb_y) < 2)
 
 
-def test_reprojPoint_WGS84_UTM():
+def test_reproj_point_WGS84_UTM():
     import rsgislib.tools.geometrytools
     from osgeo import osr
 
@@ -89,7 +89,7 @@ def test_reprojPoint_WGS84_UTM():
     lon = -4.0885
     lat = 52.4140
 
-    utm_x, utm_y = rsgislib.tools.geometrytools.reprojPoint(
+    utm_x, utm_y = rsgislib.tools.geometrytools.reproj_point(
         in_osr_proj_obj, out_osr_proj_obj, lon, lat
     )
 
@@ -98,7 +98,7 @@ def test_reprojPoint_WGS84_UTM():
     assert (abs(ref_utm_x - utm_x) < 0.1) and (abs(ref_utm_y - utm_y) < 0.1)
 
 
-def test_reprojPoint_UTM_WGS84():
+def test_reproj_point_UTM_WGS84():
     import rsgislib.tools.geometrytools
     from osgeo import osr
 
@@ -111,7 +111,7 @@ def test_reprojPoint_UTM_WGS84():
     utm_x = 425966.3
     utm_y = 5807643.4
 
-    lon, lat = rsgislib.tools.geometrytools.reprojPoint(
+    lon, lat = rsgislib.tools.geometrytools.reproj_point(
         in_osr_proj_obj, out_osr_proj_obj, utm_x, utm_y
     )
 
@@ -120,7 +120,7 @@ def test_reprojPoint_UTM_WGS84():
     assert (abs(ref_lon - lon) < 0.001) and (abs(ref_lat - lat) < 0.001)
 
 
-def test_reprojPoint_NZTM_WGS84():
+def test_reproj_point_NZTM_WGS84():
     import rsgislib.tools.geometrytools
     from osgeo import osr
 
@@ -137,7 +137,7 @@ def test_reprojPoint_NZTM_WGS84():
     nztm_x = 1822776.0
     nztm_y = 5527532.6
 
-    lon, lat = rsgislib.tools.geometrytools.reprojPoint(
+    lon, lat = rsgislib.tools.geometrytools.reproj_point(
         in_osr_proj_obj, out_osr_proj_obj, nztm_x, nztm_y
     )
 
@@ -147,7 +147,7 @@ def test_reprojPoint_NZTM_WGS84():
     assert (abs(ref_lat - lat) < 0.001) and (abs(ref_lon - lon) < 0.001)
 
 
-def test_reprojPoint_NZTM_UTM():
+def test_reproj_point_NZTM_UTM():
     import rsgislib.tools.geometrytools
     from osgeo import osr
 
@@ -164,7 +164,7 @@ def test_reprojPoint_NZTM_UTM():
     nztm_x = 1822776.0
     nztm_y = 5527532.6
 
-    utm_x, utm_y = rsgislib.tools.geometrytools.reprojPoint(
+    utm_x, utm_y = rsgislib.tools.geometrytools.reproj_point(
         in_osr_proj_obj, out_osr_proj_obj, nztm_x, nztm_y
     )
 

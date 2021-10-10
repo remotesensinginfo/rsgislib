@@ -302,8 +302,8 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     import rsgislib.imageutils
 
     # Read columns from vector file.
-    ref_vals = numpy.array(rsgislib.vectorutils.read_vec_column(in_vec_file, in_vec_lyr, ref_col))
-    cls_vals = numpy.array(rsgislib.vectorutils.read_vec_column(in_vec_file, in_vec_lyr, cls_col))
+    ref_vals = numpy.array(rsgislib.vectorattrs.read_vec_column(in_vec_file, in_vec_lyr, ref_col))
+    cls_vals = numpy.array(rsgislib.vectorattrs.read_vec_column(in_vec_file, in_vec_lyr, cls_col))
 
     # Find unique class values
     unq_cls_names = numpy.unique(numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals))))
@@ -513,8 +513,8 @@ def calc_acc_ptonly_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col
     import rsgislib.vectorutils
 
     # Read columns from vector file.
-    ref_vals = numpy.array(rsgislib.vectorutils.read_vec_column(in_vec_file, in_vec_lyr, ref_col))
-    cls_vals = numpy.array(rsgislib.vectorutils.read_vec_column(in_vec_file, in_vec_lyr, cls_col))
+    ref_vals = numpy.array(rsgislib.vectorattrs.read_vec_column(in_vec_file, in_vec_lyr, ref_col))
+    cls_vals = numpy.array(rsgislib.vectorattrs.read_vec_column(in_vec_file, in_vec_lyr, cls_col))
 
     # Find unique class values
     unq_cls_names = numpy.unique(numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals))))

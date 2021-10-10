@@ -14,57 +14,7 @@ import time
 import rsgislib
 
 
-def get_file_img_extension(gdalformat):
-    """
-    A function to get the extension for a given file format
-    (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
-
-    :return: string
-
-    """
-    ext = ".NA"
-    if gdalformat.lower() == "kea":
-        ext = ".kea"
-    elif gdalformat.lower() == "gtiff":
-        ext = ".tif"
-    elif gdalformat.lower() == "hfa":
-        ext = ".img"
-    elif gdalformat.lower() == "envi":
-        ext = ".env"
-    elif gdalformat.lower() == "pcidsk":
-        ext = ".pix"
-    else:
-        raise rsgislib.RSGISPyException(
-            "The extension for the gdalformat specified is unknown."
-        )
-    return ext
-
-
-def get_gdal_format_from_ext(input_file):
-    """
-    Get GDAL format, based on input_file
-
-    :return: string
-
-    """
-    gdalStr = ""
-    extension = os.path.splitext(input_file)[-1]
-    if extension == ".env":
-        gdalStr = "ENVI"
-    elif extension == ".kea":
-        gdalStr = "KEA"
-    elif extension == ".tif" or extension == ".tiff":
-        gdalStr = "GTiff"
-    elif extension == ".img":
-        gdalStr = "HFA"
-    elif extension == ".pix":
-        gdalStr = "PCIDSK"
-    else:
-        raise rsgislib.RSGISPyException("Type not recognised")
-    return gdalStr
-
-
-def get_file_basename(input_file, check_valid=False, n_comps=0):
+def get_file_basename(input_file:str, check_valid=False, n_comps=0, rm_n_exts=0):
     """
     Uses os.path module to return file basename (i.e., path and extension removed)
 
@@ -76,12 +26,27 @@ def get_file_basename(input_file, check_valid=False, n_comps=0):
     :param n_comps: if > 0 then the resulting basename will be split using underscores
                     and the return based name will be defined using the n_comps
                     components split by under scores.
+    :param rm_n_exts: used where an input file has more than one extension
+                      (e.g., tar.gz) and only n extensions should be removed.
+                      Default: 0 which will removed all extensions calculated
+                      based on the number of full-stops (.) within the file name.
+                      If a value of 1 was provided for filename.tar.gz then the
+                      returns output would be filename.tar.
     :return: basename for file
 
     """
     import string
 
-    basename = os.path.splitext(os.path.basename(input_file))[0]
+    file_base_name = os.path.basename(input_file)
+    n_exts = file_base_name.count('.')
+    if (rm_n_exts == 0) or (rm_n_exts > n_exts):
+        rm_n_exts = n_exts
+
+    basename = file_base_name
+    if n_exts > 0:
+        for i in range(rm_n_exts):
+            basename = os.path.splitext(basename)[0]
+
     if check_valid:
         basename = basename.replace(" ", "_")
         for punct in string.punctuation:
@@ -723,3 +688,189 @@ def create_sha3_512_hash(input_file, block_size=4096):
         for byte_block in iter(lambda: f.read(block_size), b""):
             sha512_hash.update(byte_block)
     return sha512_hash.hexdigest()
+
+
+def untar_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
+    """
+    A function which extracts data from a tar file into the specified
+    output directory. Optionally, an output directory of the same name
+    as the archive file can be created for the output files.
+
+    :param in_file: The input archive file.
+    :param out_dir: The output directory which must exist (if gen_arch_dir=True then
+                    a new directory will be created within the out_dir
+    :param gen_arch_dir: Create a new directory with the same name as the input file
+                         where the output files will be extracted to. (Default: True)
+    :param verbose: If True (default: False) then more user feedback will be printed
+                    to the console.
+    :return: output directory where data was extracted to.
+
+    """
+    if not os.path.exists(out_dir):
+        raise rsgislib.RSGISPyException("Output directory does not exist.")
+    if not os.path.exists(in_file):
+        raise rsgislib.RSGISPyException("Input file does not exist.")
+    in_file = os.path.abspath(in_file)
+    out_dir = os.path.abspath(out_dir)
+    process_dir = out_dir
+    if gen_arch_dir:
+        basename = get_file_basename(in_file)
+        process_dir = os.path.join(out_dir, basename)
+    if not os.path.exists(process_dir):
+        os.makedirs(process_dir)
+    c_dir = os.getcwd()
+    os.chdir(process_dir)
+    if verbose:
+        print("Extracting: {}".format(in_file))
+        print("Output to: {}".format(process_dir))
+        cmd = 'tar -xvf "{}"'.format(in_file)
+        print(cmd)
+    else:
+        cmd = 'tar -xf "{}"'.format(in_file)
+    try:
+        import subprocess
+        subprocess.call(cmd, shell=True)
+    except OSError as e:
+        os.chdir(c_dir)
+        raise rsgislib.RSGISPyException('Could not extract data: {}'.format(cmd))
+    os.chdir(c_dir)
+    return process_dir
+
+def untar_gz_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
+    """
+    A function which extracts data from a tar.gz file into the specified
+    output directory. Optionally, an output directory of the same name
+    as the archive file can be created for the output files.
+
+    :param in_file: The input archive file.
+    :param out_dir: The output directory which must exist (if gen_arch_dir=True then
+                    a new directory will be created within the out_dir
+    :param gen_arch_dir: Create a new directory with the same name as the input file
+                         where the output files will be extracted to. (Default: True)
+    :param verbose: If True (default: False) then more user feedback will be printed
+                    to the console.
+    :return: output directory where data was extracted to.
+
+    """
+    if not os.path.exists(out_dir):
+        raise rsgislib.RSGISPyException("Output directory does not exist.")
+    if not os.path.exists(in_file):
+        raise rsgislib.RSGISPyException("Input file does not exist.")
+    in_file = os.path.abspath(in_file)
+    out_dir = os.path.abspath(out_dir)
+    process_dir = out_dir
+    if gen_arch_dir:
+        basename = get_file_basename(in_file)
+        process_dir = os.path.join(out_dir, basename)
+    if not os.path.exists(process_dir):
+        os.makedirs(process_dir)
+    c_dir = os.getcwd()
+    os.chdir(process_dir)
+    if verbose:
+        print("Extracting: {}".format(in_file))
+        print("Output to: {}".format(process_dir))
+        cmd = 'tar -xvzf "{}"'.format(in_file)
+        print(cmd)
+    else:
+        cmd = 'tar -xzf "{}"'.format(in_file)
+    try:
+        import subprocess
+        subprocess.call(cmd, shell=True)
+    except OSError as e:
+        os.chdir(c_dir)
+        raise rsgislib.RSGISPyException('Could not extract data: {}'.format(cmd))
+    os.chdir(c_dir)
+    return process_dir
+
+def unzip_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
+    """
+    A function which extracts data from a zip file into the specified
+    output directory. Optionally, an output directory of the same name
+    as the archive file can be created for the output files.
+
+    :param in_file: The input archive file.
+    :param out_dir: The output directory which must exist (if gen_arch_dir=True then
+                    a new directory will be created within the out_dir
+    :param gen_arch_dir: Create a new directory with the same name as the input file
+                         where the output files will be extracted to. (Default: True)
+    :param verbose: If True (default: False) then more user feedback will be printed
+                    to the console.
+    :return: output directory where data was extracted to.
+
+    """
+    if not os.path.exists(out_dir):
+        raise rsgislib.RSGISPyException("Output directory does not exist.")
+    if not os.path.exists(in_file):
+        raise rsgislib.RSGISPyException("Input file does not exist.")
+    in_file = os.path.abspath(in_file)
+    out_dir = os.path.abspath(out_dir)
+    process_dir = out_dir
+    if gen_arch_dir:
+        basename = get_file_basename(in_file)
+        process_dir = os.path.join(out_dir, basename)
+    if not os.path.exists(process_dir):
+        os.makedirs(process_dir)
+    c_dir = os.getcwd()
+    os.chdir(process_dir)
+    cmd = 'unzip "{}"'.format(in_file)
+    if verbose:
+        print("Extracting: {}".format(in_file))
+        print("Output to: {}".format(process_dir))
+        print(cmd)
+    try:
+        import subprocess
+        subprocess.call(cmd, shell=True)
+    except OSError as e:
+        os.chdir(c_dir)
+        raise rsgislib.RSGISPyException('Could not extract data: {}'.format(cmd))
+    os.chdir(c_dir)
+    return process_dir
+
+
+def untar_bz_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
+    """
+    A function which extracts data from a tar.bz file into the specified
+    output directory. Optionally, an output directory of the same name
+    as the archive file can be created for the output files.
+
+    :param in_file: The input archive file.
+    :param out_dir: The output directory which must exist (if gen_arch_dir=True then
+                    a new directory will be created within the out_dir
+    :param gen_arch_dir: Create a new directory with the same name as the input file
+                         where the output files will be extracted to. (Default: True)
+    :param verbose: If True (default: False) then more user feedback will be printed
+                    to the console.
+    :return: output directory where data was extracted to.
+
+    """
+    if not os.path.exists(out_dir):
+        raise rsgislib.RSGISPyException("Output directory does not exist.")
+    if not os.path.exists(in_file):
+        raise rsgislib.RSGISPyException("Input file does not exist.")
+    in_file = os.path.abspath(in_file)
+    out_dir = os.path.abspath(out_dir)
+    process_dir = out_dir
+    if gen_arch_dir:
+        basename = get_file_basename(in_file)
+        process_dir = os.path.join(out_dir, basename)
+    if not os.path.exists(process_dir):
+        os.makedirs(process_dir)
+    c_dir = os.getcwd()
+    os.chdir(process_dir)
+    if verbose:
+        print("Extracting: {}".format(in_file))
+        print("Output to: {}".format(process_dir))
+        cmd = 'tar -xvjf "{}"'.format(in_file)
+        print(cmd)
+    else:
+        cmd = 'tar -xjf "{}"'.format(in_file)
+    try:
+        import subprocess
+        subprocess.call(cmd, shell=True)
+    except OSError as e:
+        os.chdir(c_dir)
+        raise rsgislib.RSGISPyException('Could not extract data: {}'.format(cmd))
+    os.chdir(c_dir)
+    return process_dir
+
+

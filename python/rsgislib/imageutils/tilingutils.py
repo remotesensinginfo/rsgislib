@@ -120,7 +120,7 @@ Where:
     if not maskIntersect == None:
         bs = []
         bs.append(rastergis.BandAttStats(band=1, maxField='Mask'))
-        rastergis.populateRATWithStats(maskIntersect, tileClumpsImage, bs)
+        rastergis.populate_rat_with_stats(maskIntersect, tileClumpsImage, bs)
         ratDS = gdal.Open(tileClumpsImage, gdal.GA_Update)
         MaskField = rat.readColumn(ratDS, "Mask")
         Selected = numpy.zeros_like(MaskField, dtype=int)
@@ -207,8 +207,8 @@ Where:
     for shpFile in shpFiles:
         imgTileFile = os.path.join(tilesMaskDIR, tilesNameBase + str(idx) + '.kea')
         shpFileLyr = os.path.splitext(os.path.basename(shpFile))[0]
-        vectorutils.convertvector.rasterise_vec_lyr(shpFile, shpFileLyr, inputImage, imgTileFile, gdalformat=imgFormat, burnVal=1,
-                        datatype=rsgislib.TYPE_8UINT, vecAtt=None, vecExt=False, thematic=True, nodata=0)
+        vectorutils.convertvector.rasterise_vec_lyr(shpFile, shpFileLyr, inputImage, imgTileFile, gdalformat=imgFormat, burn_val=1,
+                                                    datatype=rsgislib.TYPE_8UINT, att_column=None, use_vec_extent=False, thematic=True, no_data_val=0)
         drv.DeleteDataSource(shpFile)
         idx = idx + 1
     

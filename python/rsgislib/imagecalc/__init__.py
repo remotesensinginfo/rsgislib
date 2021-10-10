@@ -590,7 +590,7 @@ def perform_image_pca(
     :returns: an array with the ratio of the explained variance per band."""
     import rsgislib.imageutils
 
-    eigenVec, varExplain = rsgislib.imagecalc.get_pca_eigen_vector(
+    eigenVec, varExplain = get_pca_eigen_vector(
         input_img, pxl_n_sample, no_data_val, out_eigen_vec_file
     )
     outNComp = varExplain.shape[0]
@@ -602,9 +602,7 @@ def perform_image_pca(
             )
         outNComp = n_comps
 
-    rsgislib.imagecalc.pca(
-        input_img, out_eigen_vec_file, output_img, outNComp, gdalformat, datatype
-    )
+    pca(input_img, out_eigen_vec_file, output_img, outNComp, gdalformat, datatype)
     if calc_stats:
         use_no_data = False
         lcl_no_data_val = 0
@@ -661,12 +659,12 @@ def perform_image_mnf(
     img_basename = rsgislib.tools.filetools.get_file_basename(input_img)
 
     if in_img_no_data is None:
-        in_img_no_data = rsgislib.imageutils.getImageNoDataValue(input_img)
+        in_img_no_data = rsgislib.imageutils.get_image_no_data_value(input_img)
         if in_img_no_data is None:
             raise Exception("A no data value for the input image must be provided.")
 
     valid_msk_img = os.path.join(tmp_dir, "{}_vld_msk.kea".format(img_basename))
-    rsgislib.imageutils.genValidMask(input_img, valid_msk_img, "KEA", in_img_no_data)
+    rsgislib.imageutils.gen_valid_mask(input_img, valid_msk_img, "KEA", in_img_no_data)
 
     whiten_img = os.path.join(tmp_dir, "{}_whiten.kea".format(img_basename))
     rsgislib.imageutils.whitenImage(input_img, valid_msk_img, 1, whiten_img, "KEA")
@@ -711,9 +709,7 @@ def perform_image_mnf(
             )
         outNComp = n_comps
 
-    rsgislib.imagecalc.pca(
-        whiten_img, eigenVecFile, output_img, outNComp, gdalformat, datatype
-    )
+    pca(whiten_img, eigenVecFile, output_img, outNComp, gdalformat, datatype)
     if calc_stats:
         rsgislib.imageutils.pop_img_stats(output_img, True, in_img_no_data, True)
 
@@ -872,61 +868,6 @@ def calc_histograms_for_msk_vals(
     return hist_dict
 
 
-def calc_wgs84_pixel_area(input_img, out_img, scale=10000, gdalformat="KEA"):
-    """
-    A function which calculates the area (in metres) of the pixel projected in WGS84.
-
-    :param input_img: input image, for which the per-pixel area will be calculated.
-    :param out_img: output image file.
-    :param scale: scale the output area to unit of interest. Scale=10000(Ha),
-                        Scale=1(sq m), Scale=1000000(sq km), Scale=4046.856(Acre),
-                        Scale=2590000(sq miles), Scale=0.0929022668(sq feet)
-
-    """
-    import rsgislib.tools
-    from rios import applier
-
-    try:
-        progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
-
-    x_res, y_res = rsgislib.imageutils.get_image_res(input_img)
-
-    infiles = applier.FilenameAssociations()
-    infiles.input_img = input_img
-    outfiles = applier.FilenameAssociations()
-    outfiles.outimage = out_img
-    otherargs = applier.OtherInputs()
-    otherargs.x_res = x_res
-    otherargs.y_res = y_res
-    otherargs.scale = float(scale)
-    aControls = applier.ApplierControls()
-    aControls.progress = progress_bar
-    aControls.drivername = gdalformat
-    aControls.omitPyramids = False
-    aControls.calcStats = False
-
-    def _calcPixelArea(info, inputs, outputs, otherargs):
-        xBlock, yBlock = info.getBlockCoordArrays()
-
-        x_res_arr = numpy.zeros_like(yBlock, dtype=float)
-        x_res_arr[...] = otherargs.x_res
-        y_res_arr = numpy.zeros_like(yBlock, dtype=float)
-        y_res_arr[...] = otherargs.y_res
-        x_res_arr_m, y_res_arr_m = rsgislib.tools.degrees_to_metres(
-            yBlock, x_res_arr, y_res_arr
-        )
-        outputs.outimage = numpy.expand_dims(
-            (x_res_arr_m * y_res_arr_m) / otherargs.scale, axis=0
-        )
-
-    applier.apply(_calcPixelArea, infiles, outfiles, otherargs, controls=aControls)
-
-
-
 
 def calc_imgs_pxl_mode(input_imgs, output_img, gdalformat, no_data_val=0):
     """
@@ -1015,14 +956,14 @@ def calc_img_basic_stats_for_ref_region(
         print(img)
         if first:
             n_bands = rsgislib.imageutils.get_image_band_count(img)
-            no_data_val = rsgislib.imageutils.getImageNoDataValue(img)
+            no_data_val = rsgislib.imageutils.get_image_no_data_value(img)
             first = False
         else:
             if n_bands != rsgislib.imageutils.get_image_band_count(img):
                 raise Exception(
                     "The number of bands must be the same in all input images."
                 )
-            if no_data_val != rsgislib.imageutils.getImageNoDataValue(img):
+            if no_data_val != rsgislib.imageutils.get_image_no_data_value(img):
                 raise Exception(
                     "The no data value should be the same in all input images."
                 )
@@ -1109,22 +1050,18 @@ def normalise_image_band(input_img, band, output_img, gdal_format="KEA"):
     import rsgislib
     import rsgislib.imageutils
 
-    no_data_val = rsgislib.imageutils.getImageNoDataValue(input_img, band)
+    no_data_val = rsgislib.imageutils.get_image_no_data_value(input_img, band)
     use_no_data_val = True
     if no_data_val is None:
         use_no_data_val = False
         no_data_val = 0.0
 
-    band_min, band_max = rsgislib.imagecalc.getImageBandMinMax(
-        input_img, band, use_no_data_val, no_data_val
-    )
+    band_min, band_max = get_img_band_min_max(input_img, band, use_no_data_val, no_data_val)
 
-    band_defns = [rsgislib.imagecalc.BandDefn("b1", input_img, band)]
+    band_defns = [BandDefn("b1", input_img, band)]
     band_range = band_max - band_min
     exp = "(b1=={0})?0.0:(b1-{1})/{2}".format(no_data_val, band_min, band_range)
-    rsgislib.imagecalc.band_math(
-        output_img, exp, gdal_format, rsgislib.TYPE_32FLOAT, band_defns
-    )
+    band_math(output_img, exp, gdal_format, rsgislib.TYPE_32FLOAT, band_defns)
     rsgislib.imageutils.pop_img_stats(
         output_img, use_no_data=True, no_data_val=0.0, calc_pyramids=True
     )

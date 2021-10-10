@@ -27,13 +27,11 @@
 
 #include "common/RSGISException.h"
 
-#include "img/RSGISPixelInPoly.h"
-#include "img/RSGISPixelInPoly.cpp"
+#include "img/RSGISExtractImageValues.h"
 
 #include "vec/RSGISZonalImage2HDF.h"
 #include "vec/RSGISExtractEndMembers2Matrix.h"
 
-#include <boost/algorithm/string.hpp>
 
 namespace rsgis{ namespace cmds {
 
@@ -165,6 +163,111 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+
+    void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal, RSGISLibDataType dataType)
+    {
+        try
+        {
+            GDALAllRegister();
+
+            GDALDataset *maskDS = (GDALDataset *) GDALOpen(maskImage.c_str(), GA_ReadOnly);
+            if(maskDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + maskImage;
+                throw RSGISImageException(message.c_str());
+            }
+
+            GDALDataset *imageDS = (GDALDataset *) GDALOpen(imageFile.c_str(), GA_ReadOnly);
+            if(imageDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + imageFile;
+                throw RSGISImageException(message.c_str());
+            }
+
+            rsgis::img::RSGISExtractImageValues extractVals;
+            extractVals.extractDataWithinMask2HDF(maskDS, imageDS, outputHDF, maskVal, dataType);
+
+            GDALClose(maskDS);
+            GDALClose(imageDS);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+
+    void executeImageBandRasterZone2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outputHDF, float maskVal, RSGISLibDataType dataType)
+    {
+        try
+        {
+            rsgis::img::RSGISExtractImageValues extractVals;
+            extractVals.extractImgBandDataWithinMask2HDF(imageFiles, maskImage, outputHDF, maskVal, dataType);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+    void executeRandomSampleH5File(std::string inputH5, std::string outputH5, unsigned int nSample, int seed, RSGISLibDataType dataType)
+    {
+        try
+        {
+            rsgis::img::RSGISExtractImageValues extractVals;
+            extractVals.sampleExtractedHDFData(inputH5, outputH5, nSample, seed, dataType);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+    void executeSplitSampleH5File(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSample, int seed, RSGISLibDataType dataType)
+    {
+        try
+        {
+            rsgis::img::RSGISExtractImageValues extractVals;
+            extractVals.splitExtractedHDFData(inputH5, outputP1H5, outputP2H5, nSample, seed, dataType);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
 
 }}
 

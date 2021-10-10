@@ -32,11 +32,10 @@
 #
 ############################################################################
 
-import gdal, osr
+import osgeo.gdal as gdal
+import osgeo.osr as osr
 import skimage.graph
 import numpy
-
-
 
 def _coord2pixelOffset(rasterfn, x, y):
     raster = gdal.Open(rasterfn)

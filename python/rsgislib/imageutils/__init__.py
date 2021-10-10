@@ -21,25 +21,6 @@ from rios import applier
 
 gdal.UseExceptions()
 
-class ImageBandInfo(object):
-    """
-Create a list of these objects to pass to the extractZoneImageBandValues2HDF function
-
-:param fileName: is the input image file name and path.
-:param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
-:param bands: is a list of image bands within the fileName to be used for processing (band numbers start at 1).
-
-"""
-    def __init__(self, fileName=None, name=None, bands=None):
-        """
-        :param fileName: is the input image file name and path.
-        :param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
-        :param bands: is a list of image bands within the fileName to be used for processing (band numbers start at 1).
-        """
-        self.fileName = fileName
-        self.name = name
-        self.bands = bands
-
 
 class OutImageInfo(object):
     """
@@ -189,6 +170,57 @@ def get_gdal_datatype_name_from_img(input_img):
     raster = None
     return dtypeName
 
+
+def get_file_img_extension(gdalformat:str):
+    """
+    A function to get the extension for a given file format
+    (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
+
+    :return: string
+
+    """
+    ext = ".NA"
+    if gdalformat.lower() == "kea":
+        ext = "kea"
+    elif gdalformat.lower() == "gtiff":
+        ext = "tif"
+    elif gdalformat.lower() == "hfa":
+        ext = "img"
+    elif gdalformat.lower() == "envi":
+        ext = "env"
+    elif gdalformat.lower() == "pcidsk":
+        ext = "pix"
+    else:
+        raise rsgislib.RSGISPyException(
+            "The extension for the gdalformat specified is unknown."
+        )
+    return ext
+
+
+def get_gdal_format_from_ext(input_file:str):
+    """
+    Get GDAL format, based on input_file
+
+    :return: string
+
+    """
+    gdalStr = ""
+    extension = os.path.splitext(input_file)[-1]
+    if extension == ".env":
+        gdalStr = "ENVI"
+    elif extension == ".kea":
+        gdalStr = "KEA"
+    elif extension == ".tif" or extension == ".tiff":
+        gdalStr = "GTiff"
+    elif extension == ".img":
+        gdalStr = "HFA"
+    elif extension == ".pix":
+        gdalStr = "PCIDSK"
+    else:
+        raise rsgislib.RSGISPyException("Type not recognised")
+    return gdalStr
+
+
 def rename_gdal_layer(input_img, output_img):
     """
     Rename all the files associated with a GDAL layer.
@@ -291,6 +323,7 @@ def get_image_bbox_in_proj(input_img, out_epsg):
     :return: (MinX, MaxX, MinY, MaxY)
 
     """
+    import rsgislib.tools.geometrytools
     inProjWKT = get_wkt_proj_from_image(input_img)
     inSpatRef = osr.SpatialReference()
     inSpatRef.ImportFromWkt(inProjWKT)
@@ -299,7 +332,7 @@ def get_image_bbox_in_proj(input_img, out_epsg):
     outSpatRef.ImportFromEPSG(int(out_epsg))
 
     img_bbox = get_image_bbox(input_img)
-    reproj_img_bbox = rsgislib.tools.reprojBBOX(img_bbox, inSpatRef, outSpatRef)
+    reproj_img_bbox = rsgislib.tools.geometrytools.reproj_bbox(img_bbox, inSpatRef, outSpatRef)
     return reproj_img_bbox
 
 def get_image_band_stats(input_img, band, compute=True):
@@ -1128,56 +1161,56 @@ inputted vector file.
             create_blank_img_from_bbox(env, wktstr, outputImg, outImgRes, outImgPxlVal, outImgNBands, gdalformat, datatype, snap2grid)
 
 
-def resample_image_to_match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None, noDataVal=None, multicore=False):
+def resample_image_to_match(in_ref_img, in_process_img, output_img, gdalformat, interp_method=rsgislib.INTERP_NEAREST_NEIGHBOUR, datatype=None, no_data_val=None, multicore=False):
     """
 A utility function to resample an existing image to the projection and/or pixel size of another image.
 
 Where:
 
-:param inRefImg: is the input reference image to which the processing image is to resampled to.
-:param inProcessImg: is the image which is to be resampled.
-:param outImg: is the output image file.
+:param in_ref_img: is the input reference image to which the processing image is to resampled to.
+:param in_process_img: is the image which is to be resampled.
+:param output_img: is the output image file.
 :param gdalformat: is the gdal format for the output image.
-:param interpMethod: is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
+:param interp_method: is the interpolation method used to resample the image rsgislib.INTERP_XXXX (Default: rsgislib.INTERP_NEAREST_NEIGHBOUR)
 :param datatype: is the rsgislib datatype of the output image (if none then it will be the same as the input file).
 :param multicore: use multiple processing cores (Default = False)
 
 """ 
-    numBands = get_image_band_count(inProcessImg)
-    if noDataVal == None:
-        noDataVal = get_image_no_data_value(inProcessImg)
+    numBands = get_image_band_count(in_process_img)
+    if no_data_val == None:
+        no_data_val = get_image_no_data_value(in_process_img)
     
     if datatype == None:
-        datatype = get_gdal_datatype_from_img(inProcessImg)
-        
+        datatype = get_gdal_datatype_from_img(in_process_img)
+
     interpolationMethod = gdal.GRA_NearestNeighbour
-    if interpMethod == 'bilinear':
+    if interp_method == rsgislib.INTERP_BILINEAR:
         interpolationMethod = gdal.GRA_Bilinear 
-    elif interpMethod == 'lanczos':
+    elif interp_method == rsgislib.INTERP_LANCZOS:
         interpolationMethod = gdal.GRA_Lanczos 
-    elif interpMethod == 'cubicspline':
+    elif interp_method == rsgislib.INTERP_CUBICSPLINE:
         interpolationMethod = gdal.GRA_CubicSpline 
-    elif interpMethod == 'nearestneighbour':
+    elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
         interpolationMethod = gdal.GRA_NearestNeighbour 
-    elif interpMethod == 'cubic':
+    elif interp_method == rsgislib.INTERP_CUBIC:
         interpolationMethod = gdal.GRA_Cubic
-    elif interpMethod == 'average':
+    elif interp_method == rsgislib.INTERP_AVERAGE:
         interpolationMethod = gdal.GRA_Average
-    elif interpMethod == 'mode':
+    elif interp_method == rsgislib.INTERP_MODE:
         interpolationMethod = gdal.GRA_Mode
     else:
         raise Exception("Interpolation method was not recognised or known.")
     
     backVal = 0.0
     haveNoData = False
-    if noDataVal != None:
-        backVal = float(noDataVal)
+    if no_data_val != None:
+        backVal = float(no_data_val)
         haveNoData = True
     
-    rsgislib.imageutils.create_copy_img(inRefImg, outImg, numBands, backVal, gdalformat, datatype)
+    create_copy_img(in_ref_img, output_img, numBands, backVal, gdalformat, datatype)
 
-    inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
-    outFile = gdal.Open(outImg, gdal.GA_Update)
+    inFile = gdal.Open(in_process_img, gdal.GA_ReadOnly)
+    outFile = gdal.Open(output_img, gdal.GA_Update)
 
     try:
         import tqdm
@@ -1189,12 +1222,12 @@ Where:
     wrpOpts = []
     if multicore:
         if haveNoData:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=True, callback=callback )
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=no_data_val, dstNodata=no_data_val, multithread=True, callback=callback)
         else:
             wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=True, callback=callback )
     else:
         if haveNoData:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=False, callback=callback )
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=no_data_val, dstNodata=no_data_val, multithread=False, callback=callback)
         else:
             wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=False, callback=callback )
     
@@ -1204,7 +1237,7 @@ Where:
     outFile = None
 
 
-def reproject_image(input_img, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False, gdal_options=[]):
+def reproject_image(input_img, output_img, out_wkt, gdalformat='KEA', interp='cubic', in_wkt=None, no_data_val=0.0, out_pxl_res='image', snap_to_grid=True, multicore=False, gdal_options=[]):
     """
 This function provides a tool which uses the gdalwarp function to reproject an input image. When you want an simpler
 interface use the rsgislib.imageutils.gdal_warp function. This handles more automatically.
@@ -1212,20 +1245,20 @@ interface use the rsgislib.imageutils.gdal_warp function. This handles more auto
 Where:
 
 :param input_img: the input image name and path
-:param outputImage: the output image name and path
-:param outWKT: a WKT file representing the output projection
+:param output_img: the output image name and path
+:param out_wkt: a WKT file representing the output projection
 :param gdalformat: the output image file format (Default is KEA)
 :param interp: interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average,
                mode. (Default is cubic)
-:param inWKT: if input image is not well defined this is the input image projection as a WKT file (Default
+:param in_wkt: if input image is not well defined this is the input image projection as a WKT file (Default
               is None, i.e., ignored)
-:param noData: float representing the not data value (Default is 0.0)
-:param outPxlRes: three inputs can be provided. 1) 'image' where the output resolution will match the input
+:param no_data_val: float representing the not data value (Default is 0.0)
+:param out_pxl_res: three inputs can be provided. 1) 'image' where the output resolution will match the input
                   (Default is image). 2) 'auto' where an output resolution maintaining the image size of the
                   input image will be used. You may consider using rsgislib.imageutils.gdal_warp instead of
                   this option. 3) provide a floating point value for the image resolution (note. pixels will
                   be sqaure)
-:param snap2Grid: is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel
+:param snap_to_grid: is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel
                   resolution (Default is True).
 :param nCores: the number of processing cores available for processing (-1 is all cores: Default=-1)
 :param gdal_options: GDAL file creation options e.g., ["TILED=YES", "COMPRESS=LZW", "BIGTIFF=YES"]
@@ -1260,18 +1293,18 @@ Where:
         raise Exception('Could not open the Input Image: \'' + input_img + '\'')
     
     inImgProj = osr.SpatialReference()
-    if not inWKT is None:
-        if not os.path.exists(inWKT):
-            raise Exception('The input WKT file does not exist: \'' + inWKT + '\'')
-        inWKTStr = rsgislib.tools.utils.read_text_file_no_new_lines(inWKT)
+    if not in_wkt is None:
+        if not os.path.exists(in_wkt):
+            raise Exception('The input WKT file does not exist: \'' + in_wkt + '\'')
+        inWKTStr = rsgislib.tools.utils.read_text_file_no_new_lines(in_wkt)
         inImgProj.ImportFromWkt(inWKTStr)
     else:
         inImgProj.ImportFromWkt(inImgDS.GetProjectionRef())
         
-    if not os.path.exists(outWKT):
-        raise Exception('The output WKT file does not exist: \'' + outWKT + '\'')
+    if not os.path.exists(out_wkt):
+        raise Exception('The output WKT file does not exist: \'' + out_wkt + '\'')
     outImgProj = osr.SpatialReference()
-    outWKTStr = rsgislib.tools.utils.read_text_file_no_new_lines(outWKT)
+    outWKTStr = rsgislib.tools.utils.read_text_file_no_new_lines(out_wkt)
     outImgProj.ImportFromWkt(outWKTStr)
     
     geoTransform = inImgDS.GetGeoTransform()
@@ -1320,27 +1353,27 @@ Where:
     yMax = max(yValsOut)
     yMin = min(yValsOut)
     
-    outPxlRes = str(outPxlRes).strip()
+    out_pxl_res = str(out_pxl_res).strip()
     outRes = 0.0
-    if rsgislib.tools.utils.isNumber(outPxlRes):
-        outRes = math.fabs(float(outPxlRes))
-    elif outPxlRes == 'image':
+    if rsgislib.tools.utils.isNumber(out_pxl_res):
+        outRes = math.fabs(float(out_pxl_res))
+    elif out_pxl_res == 'image':
         outRes = inRes
-    elif outPxlRes == 'auto':
+    elif out_pxl_res == 'auto':
         xOutRes = (brXOut - tlXOut) / xSize
         yOutRes = (tlYOut - brYOut) / ySize
         outRes = xOutRes
         if yOutRes < xOutRes:
             outRes = yOutRes
     else: 
-        raise Exception('Was not able to defined the output resolution. Check Input: \'' + outPxlRes + '\'')
+        raise Exception('Was not able to defined the output resolution. Check Input: \'' + out_pxl_res + '\'')
 
     outTLX = xMin
     outTLY = yMax
     outWidth = int(round((xMax - xMin) / outRes)) + 1
     outHeight = int(round((yMax - yMin) / outRes)) + 1
     
-    if snap2Grid:
+    if snap_to_grid:
     
         xLeft = outTLX % outRes
         yLeft = outTLY % outRes
@@ -1352,13 +1385,13 @@ Where:
         outHeight = int(round((yMax - yMin) / outRes)) + 10
     
     print('Creating blank image')
-    rsgislib.imageutils.create_blank_image_py(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes,
-                                              (outRes * (-1)), outWKTStr, gdalformat, rsgisDataType, options=gdal_options, no_data_val=noData)
+    rsgislib.imageutils.create_blank_image_py(output_img, numBands, outWidth, outHeight, outTLX, outTLY, outRes,
+                                              (outRes * (-1)), outWKTStr, gdalformat, rsgisDataType, options=gdal_options, no_data_val=no_data_val)
 
-    outImgDS = gdal.Open(outputImage, gdal.GA_Update)
+    outImgDS = gdal.Open(output_img, gdal.GA_Update)
     
     for i in range(numBands):
-        outImgDS.GetRasterBand(i+1).SetNoDataValue(noData)
+        outImgDS.GetRasterBand(i+1).SetNoDataValue(no_data_val)
 
     try:
         import tqdm
@@ -1370,9 +1403,9 @@ Where:
     print("Performing the reprojection")
     wrpOpts = []
     if multicore:
-        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=True, callback=callback)
+        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=no_data_val, dstNodata=no_data_val, multithread=True, callback=callback)
     else:
-        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=False, callback=callback)
+        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=no_data_val, dstNodata=no_data_val, multithread=False, callback=callback)
 
     gdal.Warp(outImgDS, inImgDS, options=wrpOpts)
 
@@ -1399,7 +1432,7 @@ def gdal_warp(input_img, output_img, out_epsg, interp='near', gdalformat='KEA', 
     gdal.UseExceptions()
     in_no_data_val = get_image_no_data_value(input_img)
     in_epsg = get_epsg_proj_from_image(input_img)
-    img_data_type = getGDALDataTypeFromImg(input_img)
+    img_data_type = get_gdal_datatype_name_from_img(input_img)
 
     eResampleAlg = gdal.GRA_CubicSpline
     if interp == 'near':
@@ -1661,69 +1694,58 @@ Where:
     applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
 
 
-def merge_extracted_hdf5_data(h5Files, outH5File, datatype=None):
+def calc_wgs84_pixel_area(input_img, out_img, scale=10000, gdalformat="KEA"):
     """
-A function to merge a list of HDF files (e.g., from rsgislib.imageutils.extractZoneImageBandValues2HDF)
-with the same number of variables (i.e., columns) into a single file. For example, if class training
-regions have been sourced from multiple images. 
+    A function which calculates the area (in metres) of the pixel projected in WGS84.
 
-:param h5Files: a list of input files.
-:param outH5File: the output file.
-:param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
-                     then the output data type will be float32.
+    :param input_img: input image, for which the per-pixel area will be calculated.
+    :param out_img: output image file.
+    :param scale: scale the output area to unit of interest. Scale=10000(Ha),
+                        Scale=1(sq m), Scale=1000000(sq km), Scale=4046.856(Acre),
+                        Scale=2590000(sq miles), Scale=0.0929022668(sq feet)
 
-Example::
+    """
+    import rsgislib.tools
+    from rios import applier
 
-    inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
-    cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
-    rsgislib.imageutils.merge_extracted_hdf5_data(inTrainSamples, cloudTrainSamples)
+    try:
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
 
-"""
-    import h5py
-    import numpy
-    import rsgislib
+        progress_bar = cuiprogress.GDALProgressBar()
 
-    if datatype is None:
-        datatype = rsgislib.TYPE_32FLOAT
+    x_res, y_res = get_image_res(input_img)
 
-    first = True
-    numVars = 0
-    numVals = 0
-    for h5File in h5Files:
-        fH5 = h5py.File(h5File, 'r')
-        dataShp = fH5['DATA/DATA'].shape
-        if first:
-            numVars = dataShp[1]
-            first = False
-        elif numVars is not dataShp[1]:
-            raise rsgislib.RSGISPyException("The number of variables within the inputted HDF5 files was not the same.")
-        numVals += dataShp[0]
-        fH5.close()
+    infiles = applier.FilenameAssociations()
+    infiles.input_img = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = out_img
+    otherargs = applier.OtherInputs()
+    otherargs.x_res = x_res
+    otherargs.y_res = y_res
+    otherargs.scale = float(scale)
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = False
+    aControls.calcStats = False
 
-    dataArr = numpy.zeros([numVals, numVars], dtype=float)
+    def _calcPixelArea(info, inputs, outputs, otherargs):
+        xBlock, yBlock = info.getBlockCoordArrays()
 
-    rowInit = 0
-    for h5File in h5Files:
-        fH5 = h5py.File(h5File, 'r')
-        numRows = fH5['DATA/DATA'].shape[0]
-        dataArr[rowInit:(rowInit + numRows)] = fH5['DATA/DATA']
-        rowInit += numRows
-        fH5.close()
+        x_res_arr = numpy.zeros_like(yBlock, dtype=float)
+        x_res_arr[...] = otherargs.x_res
+        y_res_arr = numpy.zeros_like(yBlock, dtype=float)
+        y_res_arr[...] = otherargs.y_res
+        x_res_arr_m, y_res_arr_m = rsgislib.tools.degrees_to_metres(
+            yBlock, x_res_arr, y_res_arr
+        )
+        outputs.outimage = numpy.expand_dims(
+            (x_res_arr_m * y_res_arr_m) / otherargs.scale, axis=0
+        )
 
-    chunk_len = 1000
-    if numVals < chunk_len:
-        chunk_len = numVals
-
-    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
-
-    fH5Out = h5py.File(outH5File, 'w')
-    dataGrp = fH5Out.create_group("DATA")
-    metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=dataArr, chunks=(chunk_len, numVars), compression="gzip",
-                           shuffle=True, dtype=h5_dtype)
-    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describDS[0] = 'Merged'.encode()
-    fH5Out.close()
+    applier.apply(_calcPixelArea, infiles, outfiles, otherargs, controls=aControls)
 
 
 def do_images_overlap(image1, image2, overThres=0.0):
@@ -1973,771 +1995,6 @@ A function which extracts the image values within a mask for the specified image
             else:
                 out_arr = numpy.concatenate((out_arr, blk_bands_trans), axis=0)
     return out_arr
-
-
-def extract_chip_zone_image_band_values_to_hdf(inputImageInfo, imageMask, maskValue, chipSize, outputHDF,
-                                               rotateChips=None, datatype=None):
-    """
-    A function which extracts a chip/window of image pixel values. The expectation is that
-    this is used to train a classifer (see deep learning functions in classification) but it
-    could be used to extract image 'chips' for other purposes.
-
-    :param inputImageInfo: is a list of rsgislib.imageutils.ImageBandInfo objects specifying the input images and bands
-    :param imageMask: is a single band input image to specify the regions of interest
-    :param maskValue: is the pixel value within the imageMask to specify the region of interest
-    :param chipSize: is the chip size .
-    :param outputHDF: is the output HDF5 file. If it all ready exists then it is overwritten.
-    :param rotateChips: specify whether you wish to have the image chips rotated during extraction to
-                        increase the number of samples. Default is None and will therefore be ignored.
-                        Otherwise, provide a list of rotation angles in degrees (e.g., [30, 60, 90, 120, 180])
-    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
-                     then the output data type will be float32.
-
-    """
-    # Import the RIOS image reader
-    from rios.imagereader import ImageReader
-    import h5py
-    import tqdm
-    import numpy
-    import math
-    import rsgislib
-
-    if datatype is None:
-        datatype = rsgislib.TYPE_32FLOAT
-
-    chip_size_odd = False
-    if (chipSize % 2) != 0:
-        chip_size_odd = True
-
-    chipHSize = math.floor(chipSize / 2)
-
-    rotate = False
-    n_rotations = 0
-    if rotateChips is not None:
-        import scipy.ndimage
-        img_win_h_size = math.floor(math.sqrt((chipHSize * chipHSize) + (chipHSize * chipHSize)))
-        img_win_size = (img_win_h_size * 2)
-        rotate = True
-        n_rotations = len(rotateChips)
-        minSub = img_win_h_size - chipHSize
-        maxSub = img_win_size - minSub
-    else:
-        img_win_h_size = chipHSize
-        img_win_size = chipSize
-
-    ######################################################################
-    # Count the number of features to extract so arrays can be initialised
-    # at the correct size.
-    ######################################################################
-    nFeats = 0
-    reader = ImageReader(imageMask, windowxsize=200, windowysize=200)
-    for (info, block) in tqdm.tqdm(reader):
-        nFeats = nFeats + numpy.sum(block[0] == maskValue)
-    ######################################################################
-    if rotate:
-        nFeats = nFeats * (n_rotations + 1)
-        print("There are {} pixel samples (inc. rotations) in the mask.".format(nFeats))
-    else:
-        print("There are {} pixel samples in the mask.".format(nFeats))
-
-    ######################################################################
-    # Initialise the numpy array for the feature data
-    ######################################################################
-    nBands = 0
-    for inImgInfo in inputImageInfo:
-        for band in inImgInfo.bands:
-            nBands = nBands + 1
-    featArr = numpy.zeros([nFeats, chipSize, chipSize, nBands], dtype=numpy.float32)
-    sgl_feat_arr = numpy.zeros([nBands, chipSize, chipSize], dtype=numpy.float32)
-    ######################################################################
-
-    ######################################################################
-    # Populate the feature arrays with the input data
-    ######################################################################
-    inImgs = list()
-    inImgBands = list()
-
-    inImgs.append(imageMask)
-    inImgBands.append([1])
-
-    for inImgInfo in inputImageInfo:
-        inImgs.append(inImgInfo.fileName)
-        inImgBands.append(inImgInfo.bands)
-    nImgs = len(inputImageInfo)
-
-    scnOverlap = img_win_h_size
-
-    reader = ImageReader(inImgs, windowxsize=200, windowysize=200, overlap=scnOverlap, layerselection=inImgBands)
-    iFeat = 0
-    for (info, block) in tqdm.tqdm(reader):
-        classMskArr = block[0]
-        blkShape = classMskArr.shape
-
-        if rotate:
-            xSize = blkShape[2] - (scnOverlap * 2)
-            ySize = blkShape[1] - (scnOverlap * 2)
-            xRange = numpy.arange(scnOverlap, scnOverlap + xSize, 1)
-            yRange = numpy.arange(scnOverlap, scnOverlap + ySize, 1)
-
-            for y in yRange:
-                yMin = y - chipHSize
-                yMax = y + chipHSize
-                if chip_size_odd:
-                    yMax += 1
-                yMinExt = y - scnOverlap
-                yMaxExt = y + scnOverlap
-                if chip_size_odd:
-                    yMax += 1
-                for x in xRange:
-                    xMin = x - chipHSize
-                    xMax = x + chipHSize
-                    if chip_size_odd:
-                        xMax += 1
-                    xMinExt = x - scnOverlap
-                    xMaxExt = x + scnOverlap
-                    if chip_size_odd:
-                        xMaxExt += 1
-                    if classMskArr[0][y][x] == maskValue:
-                        # Rotation 0...
-                        sgl_feat_arr[...] = 0.0
-                        for nImg in range(nImgs):
-                            imgBlk = block[nImg + 1][..., yMin:yMax, xMin:xMax]
-                            for iBand in range(imgBlk.shape[0]):
-                                numpy.copyto(sgl_feat_arr[iBand], imgBlk[iBand], casting='safe')
-                        numpy.copyto(featArr[iFeat], sgl_feat_arr.T, casting='safe')
-                        iFeat = iFeat + 1
-                        # Iterate through rotation angles
-                        for rotate_angle in rotateChips:
-                            # Perform Rotate
-                            sgl_feat_arr[...] = 0.0
-                            for nImg in range(nImgs):
-                                imgBlk = block[nImg + 1][..., yMinExt:yMaxExt, xMinExt:xMaxExt]
-                                # Perform Rotate
-                                imgBlkRot = scipy.ndimage.rotate(imgBlk, rotate_angle, axes=[1, 2], reshape=False,
-                                                                 output=numpy.float32, mode='nearest')
-                                for iBand in range(imgBlk.shape[0]):
-                                    numpy.copyto(sgl_feat_arr[iBand], imgBlkRot[iBand, minSub:maxSub, minSub:maxSub],
-                                                 casting='safe')
-                            numpy.copyto(featArr[iFeat], sgl_feat_arr.T, casting='safe')
-                            iFeat = iFeat + 1
-        else:
-            xSize = blkShape[2] - (scnOverlap * 2)
-            ySize = blkShape[1] - (scnOverlap * 2)
-            xRange = numpy.arange(scnOverlap, scnOverlap + xSize, 1)
-            yRange = numpy.arange(scnOverlap, scnOverlap + ySize, 1)
-
-            for y in yRange:
-                yMin = y - scnOverlap
-                yMax = y + scnOverlap
-                if chip_size_odd:
-                    yMax += 1
-                for x in xRange:
-                    xMin = x - scnOverlap
-                    xMax = x + scnOverlap
-                    if chip_size_odd:
-                        xMax += 1
-                    if classMskArr[0][y][x] == maskValue:
-                        sgl_feat_arr[...] = 0.0
-                        for nImg in range(nImgs):
-                            imgBlk = block[nImg + 1][..., yMin:yMax, xMin:xMax]
-                            for iBand in range(imgBlk.shape[0]):
-                                numpy.copyto(sgl_feat_arr[iBand], imgBlk[iBand], casting='safe')
-                        numpy.copyto(featArr[iFeat], sgl_feat_arr.T, casting='safe')
-                        iFeat = iFeat + 1
-    ######################################################################
-
-    ######################################################################
-    # Create the output HDF5 file and populate with data.
-    ######################################################################
-    fH5Out = h5py.File(outputHDF, 'w')
-    dataGrp = fH5Out.create_group("DATA")
-    metaGrp = fH5Out.create_group("META-DATA")
-    # Chunk size needs to be less than number of data points
-    if nFeats < 250:
-        chunkFeatures = nFeats
-    else:
-        chunkFeatures = 250
-    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
-    dataGrp.create_dataset('DATA', data=featArr, chunks=(chunkFeatures, chipSize, chipSize, nBands),
-                           compression="gzip", shuffle=True, dtype=h5_dtype)
-    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describDS[0] = 'IMAGE TILES'.encode()
-    fH5Out.close()
-    ######################################################################
-
-
-def split_sample_chip_hdf5_file(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None):
-    """
-    A function to split the HDF5 outputs from the rsgislib.imageutils.extract_chip_zone_image_band_values_to_hdf
-    function into two sets by taking a random set with the defined sample size from the input file,
-    saving the sample and the remainder to output HDF5 files.
-
-    :param input_h5_file: The input HDF5 file to the split.
-    :param sample_h5_file: The output HDF5 file with the sample outputted.
-    :param remain_h5_file: The output HDF5 file with the remainder outputted.
-    :param sample_size: An integer specifying the size of the sample to be taken.
-    :param rnd_seed: An integer specifying the seed for the random number generator,
-                     allowing the same 'random' sample to be taken.
-    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
-                     then the output data type will be float32.
-
-    """
-    import numpy
-    import h5py
-    import rsgislib
-
-    if datatype is None:
-        datatype = rsgislib.TYPE_32FLOAT
-
-    f = h5py.File(input_h5_file, 'r')
-    n_rows = f['DATA/DATA'].shape[0]
-    chip_size = f['DATA/DATA'].shape[1]
-    n_bands = f['DATA/DATA'].shape[3]
-    f.close()
-
-    if sample_size > n_rows:
-        raise Exception("The requested sample is larger than the number samples in the input file.")
-
-    rnd_obj = numpy.random.RandomState(rnd_seed)
-    # Find sufficient unique sample indexes.
-    smp_idxs = numpy.zeros(sample_size, dtype=int)
-    while numpy.unique(smp_idxs).shape[0] != sample_size:
-        tmp_idxs = rnd_obj.randint(0, n_rows, sample_size)
-        tmp_uniq_idxs = numpy.unique(tmp_idxs)
-        c_idx = 0
-        if numpy.sum(smp_idxs) > 0:
-            c_smp = smp_idxs[smp_idxs > 0]
-            tmp_idxs = numpy.concatenate((c_smp, tmp_uniq_idxs))
-            tmp_uniq_idxs = numpy.unique(tmp_idxs)
-
-        max_idx = (sample_size - 1)
-        if tmp_uniq_idxs.shape[0] < max_idx:
-            max_idx = tmp_uniq_idxs.shape[0]
-        smp_idxs[0:max_idx] = tmp_uniq_idxs[0:max_idx]
-    smp_idxs = numpy.sort(smp_idxs)
-
-    # Get the remaining indexes
-    remain_idxs = numpy.arange(0, n_rows)
-    remain_idxs = remain_idxs[numpy.isin(remain_idxs, smp_idxs, assume_unique=True, invert=True)]
-
-    # Read the input HDF5 file.
-    f = h5py.File(input_h5_file, 'r')
-    in_samples = f['DATA/DATA']
-    out_samples = in_samples[smp_idxs]
-    remain_samples = in_samples[remain_idxs]
-    f.close()
-
-    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
-
-    # Create an output HDF5 file and populate with sample data.
-    if sample_size < 250:
-        sample_chunks = sample_size
-    else:
-        sample_chunks = 250
-    fSampleH5Out = h5py.File(sample_h5_file, 'w')
-    dataSampleGrp = fSampleH5Out.create_group("DATA")
-    metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=(sample_chunks, chip_size, chip_size, n_bands),
-                                 compression="gzip", shuffle=True, dtype=h5_dtype)
-    describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describSampleDS[0] = 'IMAGE TILES'.encode()
-    fSampleH5Out.close()
-
-    # Create an output HDF5 file and populate with remain data.
-    if (n_rows - sample_size) < 250:
-        sample_chunks = (n_rows - sample_size)
-    else:
-        sample_chunks = 250
-    fSampleH5Out = h5py.File(remain_h5_file, 'w')
-    dataSampleGrp = fSampleH5Out.create_group("DATA")
-    metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=(sample_chunks, chip_size, chip_size, n_bands),
-                                 compression="gzip", shuffle=True, dtype=h5_dtype)
-    describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describSampleDS[0] = 'IMAGE TILES'.encode()
-    fSampleH5Out.close()
-
-
-def merge_extracted_hdf5_chip_data(h5Files, outH5File, datatype=None):
-    """
-A function to merge a list of HDF files
-(e.g., from rsgislib.imageutils.extract_chip_zone_image_band_values_to_hdf)
-with the same number of variables (i.e., image bands) and chip size into
-a single file. For example, if class training regions have been sourced
-from multiple images.
-
-:param h5Files: a list of input files.
-:param outH5File: the output file.
-:param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
-                     then the output data type will be float32.
-
-Example::
-
-    inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
-    cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
-    rsgislib.imageutils.merge_extracted_hdf5_chip_data(inTrainSamples, cloudTrainSamples)
-
-"""
-    import h5py
-    import numpy
-    import rsgislib
-
-    if datatype is None:
-        datatype = rsgislib.TYPE_32FLOAT
-
-    first = True
-    n_feats = 0
-    chip_size = 0
-    n_bands = 0
-    for h5File in h5Files:
-        fH5 = h5py.File(h5File, 'r')
-        data_shp = fH5['DATA/DATA'].shape
-        if first:
-            n_bands = data_shp[3]
-            chip_size = data_shp[1]
-            first = False
-        else:
-            if n_bands != data_shp[3]:
-                raise rsgislib.RSGISPyException(
-                    "The number of bands (variables) within the inputted HDF5 files was not the same.")
-            if chip_size != data_shp[1]:
-                raise rsgislib.RSGISPyException("The chip size within the inputted HDF5 files was not the same.")
-        n_feats += data_shp[0]
-        fH5.close()
-
-    feat_arr = numpy.zeros([n_feats, chip_size, chip_size, n_bands], dtype=numpy.float32)
-
-    row_init = 0
-    for h5File in h5Files:
-        fH5 = h5py.File(h5File, 'r')
-        n_rows = fH5['DATA/DATA'].shape[0]
-        feat_arr[row_init:(row_init + n_rows)] = fH5['DATA/DATA']
-        row_init += n_rows
-        fH5.close()
-
-    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
-
-    chunk_size = 250
-    if n_feats < chunk_size:
-        chunk_size = n_feats
-
-    fH5Out = h5py.File(outH5File, 'w')
-    dataGrp = fH5Out.create_group("DATA")
-    metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(chunk_size, chip_size, chip_size, n_bands),
-                           compression="gzip", shuffle=True, dtype=h5_dtype)
-    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describDS[0] = 'Merged'.encode()
-    fH5Out.close()
-
-
-def extract_ref_chip_zone_image_band_values_to_hdf(inputImageInfo, refImg, refImgBand, imageMask, maskValue, chipSize, outputHDF,
-                                                   rotateChips=None, datatype=None):
-    """
-A function which extracts a chip/window of image pixel values. The expectation is that
-this is used to train a classifer (see deep learning functions in classification) but it
-could be used to extract image 'chips' for other purposes.
-
-:param inputImageInfo: is a list of rsgislib.imageutils.ImageBandInfo objects specifying the input images and bands
-:param refImg: is an image file (same pixel size and projection as the other input images)
-               which is used as the class training
-:param refImgBand: is the image band in the reference image to be used (only a single reference band can be used).
-:param imageMask: is a single band input image to specify the regions of interest
-:param maskValue: is the pixel value within the imageMask to specify the region of interest
-:param chipSize: is the chip size .
-:param outputHDF: is the output HDF5 file. If it all ready exists then it is overwritten.
-:param rotateChips: specify whether you wish to have the image chips rotated during extraction to
-                    increase the number of samples. Default is None and will therefore be ignored.
-                    Otherwise, provide a list of rotation angles in degrees (e.g., [30, 60, 90, 120, 180])
-:param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
-                     then the output data type will be float32.
-
-"""
-    # Import the RIOS image reader
-    from rios.imagereader import ImageReader
-    import h5py
-    import tqdm
-    import numpy
-    import math
-    import rsgislib
-
-    if datatype is None:
-        datatype = rsgislib.TYPE_32FLOAT
-
-    if (chipSize % 2) != 0:
-        raise Exception("The chip size must be an even number.")
-
-    chipHSize = math.floor(chipSize / 2)
-
-    rotate = False
-    n_rotations = 0
-    if rotateChips is not None:
-        import scipy.ndimage
-        img_win_h_size = math.floor(math.sqrt((chipHSize * chipHSize) + (chipHSize * chipHSize)))
-        img_win_size = (img_win_h_size * 2)
-        rotate = True
-        n_rotations = len(rotateChips)
-        minSub = img_win_h_size - chipHSize
-        maxSub = img_win_size - minSub
-    else:
-        img_win_h_size = chipHSize
-        img_win_size = chipSize
-
-    ######################################################################
-    # Count the number of features to extract so arrays can be initialised
-    # at the correct size.
-    ######################################################################
-    nFeats = 0
-    reader = ImageReader(imageMask, windowxsize=200, windowysize=200)
-    for (info, block) in tqdm.tqdm(reader):
-        nFeats = nFeats + numpy.sum(block[0] == maskValue)
-    ######################################################################
-    if rotate:
-        nFeats = nFeats * (n_rotations + 1)
-        print("There are {} pixel samples (inc. rotations) in the mask.".format(nFeats))
-    else:
-        print("There are {} pixel samples in the mask.".format(nFeats))
-
-    ######################################################################
-    # Initialise the numpy array for the feature data
-    ######################################################################
-    nBands = 0
-    for inImgInfo in inputImageInfo:
-        for band in inImgInfo.bands:
-            nBands = nBands + 1
-    featArr = numpy.zeros([nFeats, chipSize, chipSize, nBands],
-                          dtype=numpy.float32)  # [nFeats, chipSize, chipSize, nBands]
-    sgl_feat_arr = numpy.zeros([nBands, chipSize, chipSize], dtype=numpy.float32)  # [chipSize, chipSize, nBands]
-    featRefArr = numpy.zeros([nFeats, chipSize, chipSize], dtype=numpy.uint16)
-    ######################################################################
-
-    ######################################################################
-    # Populate the feature arrays with the input data
-    ######################################################################
-    inImgs = list()
-    inImgBands = list()
-
-    inImgs.append(imageMask)
-    inImgBands.append([1])
-    inImgs.append(refImg)
-    inImgBands.append([refImgBand])
-
-    for inImgInfo in inputImageInfo:
-        inImgs.append(inImgInfo.fileName)
-        inImgBands.append(inImgInfo.bands)
-    nImgs = len(inputImageInfo)
-
-    scnOverlap = img_win_h_size
-
-    reader = ImageReader(inImgs, windowxsize=200, windowysize=200, overlap=scnOverlap, layerselection=inImgBands)
-    iFeat = 0
-    for (info, block) in tqdm.tqdm(reader):
-        classMskArr = block[0]
-        blkShape = classMskArr.shape
-
-        if rotate:
-            xSize = blkShape[2] - (scnOverlap * 2)
-            ySize = blkShape[1] - (scnOverlap * 2)
-            xRange = numpy.arange(scnOverlap, scnOverlap + xSize, 1)
-            yRange = numpy.arange(scnOverlap, scnOverlap + ySize, 1)
-
-            for y in yRange:
-                yMin = y - chipHSize
-                yMax = y + chipHSize
-                yMinExt = y - scnOverlap
-                yMaxExt = y + scnOverlap
-                for x in xRange:
-                    xMin = x - chipHSize
-                    xMax = x + chipHSize
-                    xMinExt = x - scnOverlap
-                    xMaxExt = x + scnOverlap
-                    if classMskArr[0][y][x] == maskValue:
-                        # Rotation 0...
-                        refImgBlk = block[1][0, yMin:yMax, xMin:xMax]
-                        numpy.copyto(featRefArr[iFeat], refImgBlk, casting='safe')
-                        sgl_feat_arr[...] = 0.0
-                        for nImg in range(nImgs):
-                            imgBlk = block[nImg + 2][..., yMin:yMax, xMin:xMax]
-                            for iBand in range(imgBlk.shape[0]):
-                                numpy.copyto(sgl_feat_arr[iBand], imgBlk[iBand], casting='safe')
-                        numpy.copyto(featArr[iFeat], sgl_feat_arr.T, casting='safe')
-                        iFeat = iFeat + 1
-                        # Iterate through rotation angles
-                        for rotate_angle in rotateChips:
-                            refImgBlk = block[1][0, yMinExt:yMaxExt, xMinExt:xMaxExt]
-                            # Perform Rotate
-                            refImgBlkRot = scipy.ndimage.rotate(refImgBlk, rotate_angle, reshape=False,
-                                                                output=numpy.uint16, order=0, mode='nearest')
-                            numpy.copyto(featRefArr[iFeat], refImgBlkRot[minSub:maxSub, minSub:maxSub], casting='safe')
-                            sgl_feat_arr[...] = 0.0
-                            for nImg in range(nImgs):
-                                imgBlk = block[nImg + 2][..., yMinExt:yMaxExt, xMinExt:xMaxExt]
-                                # Perform Rotate
-                                imgBlkRot = scipy.ndimage.rotate(imgBlk, rotate_angle, axes=[1, 2], reshape=False,
-                                                                 output=numpy.float32, mode='nearest')
-                                for iBand in range(imgBlk.shape[0]):
-                                    numpy.copyto(sgl_feat_arr[iBand], imgBlkRot[iBand, minSub:maxSub, minSub:maxSub],
-                                                 casting='safe')
-                            numpy.copyto(featArr[iFeat], sgl_feat_arr.T, casting='safe')
-                            iFeat = iFeat + 1
-        else:
-            xSize = blkShape[2] - (scnOverlap * 2)
-            ySize = blkShape[1] - (scnOverlap * 2)
-            xRange = numpy.arange(scnOverlap, scnOverlap + xSize, 1)
-            yRange = numpy.arange(scnOverlap, scnOverlap + ySize, 1)
-
-            for y in yRange:
-                yMin = y - scnOverlap
-                yMax = y + scnOverlap
-                for x in xRange:
-                    xMin = x - scnOverlap
-                    xMax = x + scnOverlap
-                    if classMskArr[0][y][x] == maskValue:
-                        refImgBlk = block[1][0, yMin:yMax, xMin:xMax]
-                        numpy.copyto(featRefArr[iFeat], refImgBlk, casting='safe')
-                        sgl_feat_arr[...] = 0.0
-                        for nImg in range(nImgs):
-                            imgBlk = block[nImg + 2][..., yMin:yMax, xMin:xMax]
-                            for iBand in range(imgBlk.shape[0]):
-                                numpy.copyto(sgl_feat_arr[iBand], imgBlk[iBand], casting='safe')
-                        numpy.copyto(featArr[iFeat], sgl_feat_arr.T, casting='safe')
-                        iFeat = iFeat + 1
-    ######################################################################
-
-    ######################################################################
-    # Create the output HDF5 file and populate with data.
-    ######################################################################
-    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
-
-    fH5Out = h5py.File(outputHDF, 'w')
-    dataGrp = fH5Out.create_group("DATA")
-    metaGrp = fH5Out.create_group("META-DATA")
-    # Chunk size needs to be less than number of data points
-    if nFeats < 250:
-        chunkFeatures = nFeats
-    else:
-        chunkFeatures = 250
-    dataGrp.create_dataset('DATA', data=featArr, chunks=(chunkFeatures, chipSize, chipSize, nBands),
-                           compression="gzip", shuffle=True, dtype=h5_dtype)
-    dataGrp.create_dataset('REF', data=featRefArr, chunks=(chunkFeatures, chipSize, chipSize),
-                           compression="gzip", shuffle=True, dtype='H')
-    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describDS[0] = 'IMAGE REF TILES'.encode()
-    fH5Out.close()
-    ######################################################################
-
-
-def split_sample_ref_chip_hdf5_file(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None):
-    """
-    A function to split the HDF5 outputs from the rsgislib.imageutils.extract_chip_zone_image_band_values_to_hdf
-    function into two sets by taking a random set with the defined sample size from the input file,
-    saving the sample and the remainder to output HDF5 files.
-
-    :param input_h5_file: The input HDF5 file to the split.
-    :param sample_h5_file: The output HDF5 file with the sample outputted.
-    :param remain_h5_file: The output HDF5 file with the remainder outputted.
-    :param sample_size: An integer specifying the size of the sample to be taken.
-    :param rnd_seed: An integer specifying the seed for the random number generator,
-                     allowing the same 'random' sample to be taken.
-    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
-                     then the output data type will be float32.
-
-    """
-    import numpy
-    import h5py
-    import rsgislib
-
-    if datatype is None:
-        datatype = rsgislib.TYPE_32FLOAT
-
-    f = h5py.File(input_h5_file, 'r')
-    n_rows = f['DATA/REF'].shape[0]
-    chip_size = f['DATA/REF'].shape[1]
-    n_bands = f['DATA/REF'].shape[3]
-    f.close()
-
-    if sample_size > n_rows:
-        raise Exception("The requested sample is larger than the number samples in the input file.")
-
-    rnd_obj = numpy.random.RandomState(rnd_seed)
-    # Find sufficient unique sample indexes.
-    smp_idxs = numpy.zeros(sample_size, dtype=int)
-    while numpy.unique(smp_idxs).shape[0] != sample_size:
-        tmp_idxs = rnd_obj.randint(0, n_rows, sample_size)
-        tmp_uniq_idxs = numpy.unique(tmp_idxs)
-        c_idx = 0
-        if numpy.sum(smp_idxs) > 0:
-            c_smp = smp_idxs[smp_idxs > 0]
-            tmp_idxs = numpy.concatenate((c_smp, tmp_uniq_idxs))
-            tmp_uniq_idxs = numpy.unique(tmp_idxs)
-
-        max_idx = (sample_size - 1)
-        if tmp_uniq_idxs.shape[0] < max_idx:
-            max_idx = tmp_uniq_idxs.shape[0]
-        smp_idxs[0:max_idx] = tmp_uniq_idxs[0:max_idx]
-    smp_idxs = numpy.sort(smp_idxs)
-
-    # Get the remaining indexes
-    remain_idxs = numpy.arange(0, n_rows)
-    remain_idxs = remain_idxs[numpy.isin(remain_idxs, smp_idxs, assume_unique=True, invert=True)]
-
-    # Read the input HDF5 file.
-    f = h5py.File(input_h5_file, 'r')
-    in_data_samples = f['DATA/DATA']
-    out_data_samples = in_data_samples[smp_idxs]
-    remain_data_samples = in_data_samples[remain_idxs]
-    in_ref_samples = f['DATA/REF']
-    out_ref_samples = in_ref_samples[smp_idxs]
-    remain_ref_samples = in_ref_samples[remain_idxs]
-    f.close()
-
-    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
-
-    # Create an output HDF5 file and populate with sample data.
-    fSampleH5Out = h5py.File(sample_h5_file, 'w')
-    dataSampleGrp = fSampleH5Out.create_group("DATA")
-    metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=out_data_samples, chunks=(250, chip_size, chip_size, n_bands),
-                                 compression="gzip", shuffle=True, dtype=h5_dtype)
-    dataSampleGrp.create_dataset('REF', data=out_ref_samples, chunks=(250, chip_size, chip_size),
-                                 compression="gzip", shuffle=True, dtype='H')
-    describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describSampleDS[0] = 'IMAGE REF TILES'.encode()
-    fSampleH5Out.close()
-
-    # Create an output HDF5 file and populate with remain data.
-    fSampleH5Out = h5py.File(remain_h5_file, 'w')
-    dataSampleGrp = fSampleH5Out.create_group("DATA")
-    metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=remain_data_samples, chunks=(250, chip_size, chip_size, n_bands),
-                                 compression="gzip", shuffle=True, dtype=h5_dtype)
-    dataSampleGrp.create_dataset('REF', data=remain_ref_samples, chunks=(250, chip_size, chip_size),
-                                 compression="gzip", shuffle=True, dtype='H')
-    describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describSampleDS[0] = 'IMAGE REF TILES'.encode()
-    fSampleH5Out.close()
-
-
-def merge_extracted_hdf5_chip_ref_data(h5Files, outH5File, datatype=None):
-    """
-A function to merge a list of HDF files
-(e.g., from rsgislib.imageutils.extract_ref_chip_zone_image_band_values_to_hdf)
-with the same number of variables (i.e., image bands) and chip size into
-a single file. For example, if class training regions have been sourced
-from multiple images.
-
-:param h5Files: a list of input files.
-:param outH5File: the output file.
-:param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
-                     then the output data type will be float32.
-
-Example::
-
-    inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
-    cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
-    rsgislib.imageutils.merge_extracted_hdf5_chip_ref_data(inTrainSamples, cloudTrainSamples)
-
-"""
-    import h5py
-    import numpy
-    import rsgislib
-
-    if datatype is None:
-        datatype = rsgislib.TYPE_32FLOAT
-
-    first = True
-    n_feats = 0
-    chip_size = 0
-    n_bands = 0
-    for h5File in h5Files:
-        fH5 = h5py.File(h5File, 'r')
-        data_shp = fH5['DATA/DATA'].shape
-        if first:
-            n_bands = data_shp[3]
-            chip_size = data_shp[1]
-            first = False
-        else:
-            if n_bands != data_shp[3]:
-                raise rsgislib.RSGISPyException(
-                    "The number of bands (variables) within the inputted HDF5 files was not the same.")
-            if chip_size != data_shp[1]:
-                raise rsgislib.RSGISPyException("The chip size within the inputted HDF5 files was not the same.")
-        n_feats += data_shp[0]
-        fH5.close()
-
-    feat_arr = numpy.zeros([n_feats, chip_size, chip_size, n_bands], dtype=numpy.float32)
-    feat_ref_arr = numpy.zeros([n_feats, chip_size, chip_size], dtype=numpy.uint16)
-
-    row_init = 0
-    for h5File in h5Files:
-        fH5 = h5py.File(h5File, 'r')
-        n_rows = fH5['DATA/DATA'].shape[0]
-        feat_arr[row_init:(row_init + n_rows)] = fH5['DATA/DATA']
-        feat_ref_arr[row_init:(row_init + n_rows)] = fH5['DATA/REF']
-        row_init += n_rows
-        fH5.close()
-
-    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
-
-    chunk_size = 250
-    if n_feats < chunk_size:
-        chunk_size = n_feats
-
-    fH5Out = h5py.File(outH5File, 'w')
-    dataGrp = fH5Out.create_group("DATA")
-    metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(chunk_size, chip_size, chip_size, n_bands),
-                           compression="gzip", shuffle=True, dtype=h5_dtype)
-    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(chunk_size, chip_size, chip_size),
-                           compression="gzip", shuffle=True, dtype='H')
-    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describDS[0] = 'Merged'.encode()
-    fH5Out.close()
-
-
-def msk_h5_smpls_to_finite_values(input_h5, output_h5, datatype=None, lower_limit=None, upper_limit=None):
-    """
-    A function to remove values from a HDF5 sample file which are not finite. Upper and lower values
-    can also be specified.
-
-    :param input_h5: Input HDF5 file.
-    :param output_h5: Output HDF5 file.
-    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
-                     then the output data type will be float32.
-    :param lower_limit: Optional lower value threshold (if None then not used).
-    :param upper_limit: Optional upper value threshold (if None then not used).
-
-    """
-    import h5py
-    import numpy
-
-    if datatype is None:
-        datatype = rsgislib.TYPE_32FLOAT
-    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
-
-    fH5 = h5py.File(input_h5, 'r')
-    data_shp = fH5['DATA/DATA'].shape
-    num_vars = data_shp[1]
-    data = numpy.array(fH5['DATA/DATA'])
-    data = data[numpy.isfinite(data).all(axis=1)]
-    if lower_limit is not None:
-        data = data[numpy.any(data > lower_limit, axis=1)]
-    if upper_limit is not None:
-        data = data[numpy.any(data < upper_limit, axis=1)]
-
-    n_samples = data.shape[0]
-    chunk_size = 1000
-    if n_samples < 1000:
-        chunk_size = n_samples
-
-    fH5Out = h5py.File(output_h5, 'w')
-    dataGrp = fH5Out.create_group("DATA")
-    metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=data, chunks=(chunk_size, num_vars), compression="gzip",
-                           shuffle=True, dtype=h5_dtype)
-    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describDS[0] = 'finite values'.encode()
-    fH5Out.close()
 
 
 def combine_binary_masks(msk_imgs_dict, out_img, output_lut, gdalformat='KEA'):
@@ -3023,8 +2280,8 @@ def create_valid_mask(imgBandInfo, out_msk_file, gdalformat, tmpdir):
     import rsgislib.tools.utils
     import rsgislib.tools.filetools
     if len(imgBandInfo) == 1:
-        no_data_val = get_image_no_data_value(imgBandInfo[0].fileName)
-        rsgislib.imageutils.genValidMask(imgBandInfo[0].fileName, out_msk_file, gdalformat, no_data_val)
+        no_data_val = get_image_no_data_value(imgBandInfo[0].file_name)
+        rsgislib.imageutils.gen_valid_mask(imgBandInfo[0].file_name, out_msk_file, gdalformat, no_data_val)
     else:
         uid_str = rsgislib.tools.utils.uid_generator()
         tmp_lcl_dir = os.path.join(tmpdir, "create_valid_mask_{}".format(uid_str))
@@ -3033,13 +2290,13 @@ def create_valid_mask(imgBandInfo, out_msk_file, gdalformat, tmpdir):
 
         validMasks = []
         for imgInfo in imgBandInfo:
-            tmpBaseName = rsgislib.tools.filetools.get_file_basename(imgInfo.fileName)
+            tmpBaseName = rsgislib.tools.filetools.get_file_basename(imgInfo.file_name)
             vdmskFile = os.path.join(tmp_lcl_dir, '{}_vmsk.kea'.format(tmpBaseName))
-            no_data_val = get_image_no_data_value(imgInfo.fileName)
-            rsgislib.imageutils.genValidMask(imgInfo.fileName, vdmskFile, gdalformat='KEA', nodata=no_data_val)
+            no_data_val = get_image_no_data_value(imgInfo.file_name)
+            rsgislib.imageutils.gen_valid_mask(imgInfo.file_name, vdmskFile, gdalformat='KEA', nodata=no_data_val)
             validMasks.append(vdmskFile)
 
-        rsgislib.imageutils.genValidMask(validMasks, out_msk_file, gdalformat, nodata=0.0)
+        rsgislib.imageutils.gen_valid_mask(validMasks, out_msk_file, gdalformat, nodata=0.0)
         shutil.rmtree(tmp_lcl_dir)
 
 
@@ -3497,7 +2754,7 @@ def spectral_smoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_
         progress_bar = cuiprogress.GDALProgressBar()
 
     np_dtype = rsgislib.get_numpy_datatype(datatype)
-    in_no_date = rsgislib.getImageNoDataValue(input_img)
+    in_no_date = rsgislib.get_image_no_data_value(input_img)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img

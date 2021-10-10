@@ -24,6 +24,7 @@
 #define RSGISCopyImage_H
 
 #include <iostream>
+#include <bitset>
 #include <string>
 
 #include "gdal_priv.h"
@@ -63,6 +64,18 @@ namespace rsgis{namespace img{
         ~RSGISCopyImageBandSelect();
     protected:
         std::vector<unsigned int> bands;
+    };
+
+
+    class DllExport RSGISCopyImageBandToBits : public RSGISCalcImageValue
+    {
+    public:
+        RSGISCopyImageBandToBits(int numberOutBands, unsigned int img_band, GDALDataType gdalDataType);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output);
+        ~RSGISCopyImageBandToBits();
+    protected:
+        unsigned int imgBandIdx;
+        GDALDataType gdalDataType;
     };
 	
 }}

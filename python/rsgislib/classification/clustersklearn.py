@@ -116,7 +116,7 @@ image.
     writer.close(calcStats=False)
 
     if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
 def img_pixel_tiled_cluster(inputImg, outputImg, gdalformat='KEA', noDataVal=0, 
@@ -177,7 +177,7 @@ such that usage isn't excessive which it could be when processing a whole image.
     writer.close(calcStats=False)
 
     if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
 
@@ -250,7 +250,7 @@ applied without boundary artifacts.
     gdalDS = None
 
     if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
 

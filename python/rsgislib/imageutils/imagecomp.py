@@ -695,8 +695,8 @@ used to define the spatial extent of the output images and spatial projection.
                 ###refLyrGMNDWIImg = os.path.join(refLayersPath, baseImgName+'_gmndwi.kea')
                 rsgislib.imagecalc.calcindices.calcNDVI(img, rBand, nBand, refLyrNDVIImg, False)
                 rsgislib.imagecalc.calcindices.calcNDWI(img, nBand, sBand, refLyrNDWIImg, False)
-                ###rsgislib.imagecalc.calcindices.calcGNDWI(img, gBand, nBand, refLyrGNDWIImg, False)
-                ###rsgislib.imagecalc.calcindices.calcGMNDWI(img, gBand, sBand, refLyrGMNDWIImg, False)
+                ###rsgislib.imagecalc.calcindices.calc_gndwi(img, gBand, nBand, refLyrGNDWIImg, False)
+                ###rsgislib.imagecalc.calcindices.calc_gmndwi(img, gBand, sBand, refLyrGMNDWIImg, False)
 
                 refLyrMskImg = os.path.join(refLayersPath, baseImgName + '_waterLandMsk.kea')
                 bandDefns = []
@@ -735,7 +735,7 @@ used to define the spatial extent of the output images and spatial projection.
                 refLyrNDWIImg = os.path.join(refLayersPath, '{}_ndwi.kea'.format(baseImgName))
                 refLyrLclMskImg = os.path.join(refLayersPath, '{}_waterLandMsk.kea'.format(baseImgName))
 
-                nir_min, nir_max = rsgislib.imagecalc.getImageBandMinMax(img, nBand, True, 0.0)
+                nir_min, nir_max = rsgislib.imagecalc.get_img_band_min_max(img, nBand, True, 0.0)
 
                 nir_bright_img = os.path.join(refLayersPath, '{}_nir_brightness.kea'.format(baseImgName))
                 band_defns = [rsgislib.imagecalc.BandDefn('nir', img, nBand)]

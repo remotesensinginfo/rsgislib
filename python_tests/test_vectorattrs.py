@@ -83,7 +83,7 @@ def test_write_vec_column_Int(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -117,7 +117,7 @@ def test_write_vec_column_Float(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,
@@ -151,7 +151,7 @@ def test_write_vec_column_String(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.createCopyVectorLyr(
+    rsgislib.vectorutils.create_copy_vector_lyr(
         vec_file,
         vec_lyr,
         out_vec_file,

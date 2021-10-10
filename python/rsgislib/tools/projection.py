@@ -8,7 +8,7 @@ import osgeo.gdal as gdal
 import osgeo.osr as osr
 
 
-def getEPSGCodeFromWKT(wkt_str):
+def get_epsg_code_from_wkt(wkt_str):
     """
     Using GDAL to return the EPSG code for inputted WKT string.
 
@@ -26,7 +26,7 @@ def getEPSGCodeFromWKT(wkt_str):
     return epsg_code
 
 
-def getWKTFromEPSGCode(epsg_code):
+def get_wkt_from_epsg_code(epsg_code):
     """
     Using GDAL to return the WKT string for inputted EPSG Code.
 
@@ -126,4 +126,25 @@ Example::
 
     return lon_size, lat_size
 
+def get_deg_coord_as_str(lat, lon, n_chars=4):
+    """
+
+    :param lat:
+    :param lon:
+    :param n_chars:
+    :return:
+    """
+    import rsgislib.tools.utils
+    east_west = 'e'
+    if lon < 0:
+        east_west = 'w'
+    north_south = 'n'
+    if lat < 0:
+        north_south = 's'
+
+    lat_str = rsgislib.tools.utils.zero_pad_num_str(lat, str_len=n_chars, round_num=True, round_n_digts=1, integerise=True, absolute=True, gain=10)
+    lon_str = rsgislib.tools.utils.zero_pad_num_str(lon, str_len=n_chars, round_num=True, round_n_digts=1, integerise=True, absolute=True, gain=10)
+
+    pos = "{}{}{}{}".format(north_south, lat_str, east_west, lon_str)
+    return pos
 

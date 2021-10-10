@@ -157,7 +157,7 @@ can be used to train such as model. The output image will contain the hard membe
                       bands specified in the imgFileInfo input and output layer which provides an output array
                       of the length of the number of classes.
 :param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                valid data regions (rsgislib.imageutils.genValidMask)
+                valid data regions (rsgislib.imageutils.gen_valid_mask)
 :param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
 :param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within

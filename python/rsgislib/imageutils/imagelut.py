@@ -37,27 +37,24 @@ RSGISLib.
 ############################################################################
 
 import rsgislib
-import os.path
+import os
 
-haveGDALPy = True
-try:
-    import osgeo.gdal as gdal, ogr
-except ImportError as gdalErr:
-    haveGDALPy = False
+import osgeo.gdal as gdal
+import osgeo.ogr as ogr
 
 
-def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_imgs=False, out_proj_wgs84=False,
-                       overwrite_lut_file=False):
+def create_img_extent_lut(input_imgs, vec_file, vec_lyr, out_format, ignore_none_imgs=False, out_proj_wgs84=False,
+                          overwrite_lut_file=False):
     """
     Create a vector layer look up table (LUT) for a directory of images.
 
-    This function is the same as rsgislib.vectorutils.createImgExtentLUT and just calls that function but
+    This function is the same as rsgislib.vectorutils.create_img_extent_lut and just calls that function but
     is here as it might be a more logical place for people to find this functionality.
 
-    :param imgList: list of input images for the LUT. All input images should be the same projection/coordinate system.
-    :param vectorFile: output vector file/path
-    :param vectorLyr: output vector layer
-    :param vecDriver: the output vector layer type (e.g., GPKG).
+    :param input_imgs: list of input images for the LUT. All input images should be the same projection/coordinate system.
+    :param vec_file: output vector file/path
+    :param vec_lyr: output vector layer
+    :param out_format: the output vector layer type (e.g., GPKG).
     :param ignore_none_imgs: if a NULL epsg is returned from an image then ignore and don't include in LUT else throw exception.
     :param out_proj_wgs84: if True then the image bounding boxes will be re-projected to EPSG:4326.
     :param overwrite_lut_file: if True then output file will be overwritten. If false then not, e.g., can add extra layer to GPKG
@@ -67,12 +64,60 @@ def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_im
         import glob
         import rsgislib.imageutils.imagelut
         imgList = glob.glob('/Users/pete/Temp/GabonLandsat/Hansen*.kea')
-        rsgislib.imageutils.imagelut.createImgExtentLUT(imgList, './ImgExtents.gpkg', 'HansenImgExtents', 'GPKG')
+        rsgislib.imageutils.imagelut.create_img_extent_lut(imgList, './ImgExtents.gpkg', 'HansenImgExtents', 'GPKG')
 
     """
+    import tqdm
+    import rsgislib.imageutils
     import rsgislib.vectorutils
-    rsgislib.vectorutils.createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_imgs,
-                                            out_proj_wgs84, overwrite_lut_file)
+    import rsgislib.vectorutils.createvectors
+    gdal.UseExceptions()
+
+    bboxs = []
+    atts = dict()
+    atts['filename'] = []
+    atts['path'] = []
+
+    attTypes = dict()
+    attTypes['types'] = [ogr.OFTString, ogr.OFTString]
+    attTypes['names'] = ['filename', 'path']
+
+    epsgCode = 0
+
+    first = True
+    baseImg = ''
+    for img in tqdm.tqdm(input_imgs):
+        epsgCodeTmp = rsgislib.imageutils.get_epsg_proj_from_image(img)
+        epsg_found = True
+        if epsgCodeTmp is None:
+            epsg_found = False
+            if not ignore_none_imgs:
+                raise Exception("The EPSG code is None: '{}'".format(img))
+        if epsg_found:
+            if out_proj_wgs84:
+                epsgCode = 4326
+            else:
+                epsgCodeTmp = int(epsgCodeTmp)
+                if first:
+                    epsgCode = epsgCodeTmp
+                    baseImg = img
+                    first = False
+                else:
+                    if epsgCodeTmp != epsgCode:
+                        raise Exception("The EPSG codes ({0} & {1}) do not match. (Base: '{2}', Img: '{3}')".format(epsgCode, epsgCodeTmp, baseImg, img))
+
+            if out_proj_wgs84:
+                img_bbox = rsgislib.imageutils.get_image_bbox_in_proj(img, 4326)
+            else:
+                img_bbox = rsgislib.imageutils.get_image_bbox(img)
+
+            bboxs.append(img_bbox)
+            baseName = os.path.basename(img)
+            filePath = os.path.dirname(img)
+            atts['filename'].append(baseName)
+            atts['path'].append(filePath)
+    # Create vector layer
+    rsgislib.vectorutils.createvectors.create_poly_vec_bboxs(vec_file, vec_lyr, out_format, epsgCode, bboxs, atts, attTypes, overwrite=overwrite_lut_file)
 
 
 def query_img_lut(scn_bbox, lutdbfile, lyrname):
@@ -84,7 +129,7 @@ def query_img_lut(scn_bbox, lutdbfile, lyrname):
     :return: a list of files from the LUT
     """
     import rsgislib.vectorutils
-    fileListLUT = rsgislib.vectorutils.getAttLstSelectBBoxFeats(lutdbfile, lyrname, ['path', 'filename'], scn_bbox)
+    fileListLUT = rsgislib.vectorutils.get_att_lst_select_bbox_feats(lutdbfile, lyrname, ['path', 'filename'], scn_bbox)
     imgs = []
     for item in fileListLUT:
         imgs.append(os.path.join(item['path'], item['filename']))
@@ -94,19 +139,19 @@ def query_img_lut(scn_bbox, lutdbfile, lyrname):
 def get_all_lut_imgs(lutdbfile, lyrname):
     """
     Get a list of all the images within the LUT.
-    :param lutdbfile: The file path to the LUT datbase file (e.g., lut.gpkg).
+    :param lutdbfile: The file path to the LUT database file (e.g., lut.gpkg).
     :param lyrname: The layer name within the database file.
     :return: a list of files from the LUT
     """
-    import rsgislib.vectorutils
-    fileListLUT = rsgislib.vectorutils.readVecColumns(lutdbfile, lyrname, ['path', 'filename'])
+    import rsgislib.vectorattrs
+    fileListLUT = rsgislib.vectorattrs.read_vec_column(lutdbfile, lyrname, ['path', 'filename'])
     imgs = []
     for item in fileListLUT:
         imgs.append(os.path.join(item['path'], item['filename']))
     return imgs
 
 
-def getRasterLyr(scn_bbox, lutdbfile, lyrname, tmp_path):
+def get_raster_lyr(scn_bbox, lutdbfile, lyrname, tmp_path):
     """
     This function provides a single raster layer using the LUT file provided. If
     a single image file intersecting with the BBOX is not within the LUT then a
@@ -120,12 +165,10 @@ def getRasterLyr(scn_bbox, lutdbfile, lyrname, tmp_path):
     :param tmp_path: A directory where temporary files can be saved to.
     :return: a string with the file path to the raster layer. If no image intersects then None is returned.
     """
-    if not haveGDALPy:
-        raise Exception("Need to have GDAL library available for getRasterLyr function to work.")
     import rsgislib.vectorutils
     import rsgislib.tools.utils
 
-    fileListLUT = rsgislib.vectorutils.getAttLstSelectBBoxFeats(lutdbfile, lyrname, ['path', 'filename'], scn_bbox)
+    fileListLUT = rsgislib.vectorutils.get_att_lst_select_bbox_feats(lutdbfile, lyrname, ['path', 'filename'], scn_bbox)
 
     imgbase = "imglyr_{}".format(rsgislib.tools.utils.uid_generator())
     # if number of scenes available is > 0 then create VRT
@@ -142,3 +185,57 @@ def getRasterLyr(scn_bbox, lutdbfile, lyrname, tmp_path):
     return outimgfile
 
 
+def query_file_lut(lut_file, lut_lyr, roi_file, roi_lyr, out_dest, targz_out, cp_cmds):
+    """
+    A function which allows the file LUT to be queried (intersection) and commands
+    generated for completing operations. Must select (pass true) for either targz_out
+    or cp_cmds not both. If both are False then the list of intersecting files will
+    be returned.
+
+    :param lut_file: OGR vector file with the LUT.
+    :param lut_lyr: name of the layer within the LUT file.
+    :param roi_file: region of interest OGR vector file.
+    :param roi_lyr: layer name within the ROI file.
+    :param out_dest: the destination for outputs from command (e.g., where are the
+                     files to be copied to or output file name for tar.gz file.
+    :param targz_out: boolean which specifies that the command for generating
+                      a tar.gz file should be generated.
+    :param cp_cmds: boolean which specifies that the command for copying the
+                    LUT files to a out_dest should be generated.
+
+    :return: returns a list of commands to be executed.
+
+    """
+
+    if lut_lyr is None:
+        lut_lyr = os.path.splitext(os.path.basename(lut_file))[0]
+
+    if roi_lyr is None:
+        roi_lyr = os.path.splitext(os.path.basename(roi_file))[0]
+
+    roi_mem_ds, roi_mem_lyr = rsgislib.vectorutils.read_vec_lyr_to_mem(roi_file, roi_lyr)
+
+    roi_bbox = roi_mem_lyr.GetExtent(True)
+
+    lut_mem_ds, lut_mem_lyr = rsgislib.vectorutils.get_mem_vec_lyr_subset(lut_file, lut_lyr, roi_bbox)
+
+    fileListDict = rsgislib.vectorutils.get_att_lst_select_feats_lyr_objs(lut_mem_lyr, ['path', 'filename'], roi_mem_lyr)
+
+    out_cmds = []
+    if targz_out:
+        cmd = 'tar -czf ' + out_dest
+        for fileItem in fileListDict:
+            filepath = os.path.join(fileItem['path'], fileItem['filename'])
+            cmd = cmd + " " + filepath
+
+        out_cmds.append(cmd)
+    elif cp_cmds:
+        for fileItem in fileListDict:
+            filepath = os.path.join(fileItem['path'], fileItem['filename'])
+            out_cmds.append("cp {0} {1}".format(filepath, out_dest))
+    else:
+        for fileItem in fileListDict:
+            filepath = os.path.join(fileItem['path'], fileItem['filename'])
+            out_cmds.append(filepath)
+
+    return out_cmds

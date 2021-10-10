@@ -484,8 +484,8 @@ def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid
     print("Testing Accuracy: {}".format(test_acc))
 
 
-def apply_xgboost_binary_classifier(model_file, imgMask, imgMaskVal, imgFileInfo, outProbImg, gdalformat,
-                                    outClassImg=None, class_thres=5000, nthread=1):
+def apply_xgboost_binary_classifier(model_file, in_msk_img, img_mask_val, img_file_info, out_prob_img, gdalformat,
+                                    out_class_img=None, class_thres=5000, nthread=1):
     """
 This function applies a trained binary (i.e., two classes) xgboost model. The function train_xgboost_binary_classifer
 can be used to train such as model. The output image will contain the probability of membership to the class of
@@ -493,17 +493,17 @@ interest. You will need to threshold this image to get a final hard classificati
 image and threshold can be applied to this image.
 
 :param model_file: a trained xgboost binary model which can be loaded with lgb.Booster(model_file=model_file).
-:param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                valid data regions (rsgislib.imageutils.genValidMask)
-:param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
+:param in_msk_img: is an image file providing a mask to specify where should be classified. Simplest mask is all the
+                valid data regions (rsgislib.imageutils.gen_valid_mask)
+:param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
-:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
+:param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
                     rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
-:param outProbImg: output image file with the classification probabilities - this image is scaled by
+:param out_prob_img: output image file with the classification probabilities - this image is scaled by
                    multiplying by 10000.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
-:param outClassImg: Optional output image which will contain the hard classification, defined with a threshold on the
+:param out_class_img: Optional output image which will contain the hard classification, defined with a threshold on the
                     probability image.
 :param class_thres: The threshold used to define the hard classification. Default is 5000 (i.e., probability of 0.5).
 :param nthread: The number of threads to use for the classifier.
@@ -536,19 +536,19 @@ image and threshold can be applied to this image.
     classifier.load_model(model_file)
 
     infiles = applier.FilenameAssociations()
-    infiles.imageMask = imgMask
+    infiles.imageMask = in_msk_img
     numClassVars = 0
-    for imgFile in imgFileInfo:
-        infiles.__dict__[imgFile.name] = imgFile.fileName
+    for imgFile in img_file_info:
+        infiles.__dict__[imgFile.name] = imgFile.file_name
         numClassVars = numClassVars + len(imgFile.bands)
 
     outfiles = applier.FilenameAssociations()
-    outfiles.outimage = outProbImg
+    outfiles.outimage = out_prob_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
-    otherargs.mskVal = imgMaskVal
+    otherargs.mskVal = img_mask_val
     otherargs.numClassVars = numClassVars
-    otherargs.imgFileInfo = imgFileInfo
+    otherargs.imgFileInfo = img_file_info
 
     try:
         import tqdm
@@ -564,16 +564,16 @@ image and threshold can be applied to this image.
     print("Applying the Classifier")
     applier.apply(_applyXGBClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.imageutils.pop_img_stats(outProbImg, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imageutils.pop_img_stats(out_prob_img, usenodataval=True, nodataval=0, calcpyramids=True)
 
-    if outClassImg is not None:
-        rsgislib.imagecalc.image_math(outProbImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,
-                                     rsgislib.TYPE_8UINT)
+    if out_class_img is not None:
+        rsgislib.imagecalc.image_math(out_prob_img, out_class_img, 'b1>{}?1:0'.format(class_thres), gdalformat,
+                                      rsgislib.TYPE_8UINT)
         if gdalformat == 'KEA':
-            rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+            rsgislib.rastergis.pop_rat_img_stats(out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
-def optimise_xgboost_multiclass_classifer(out_params_file, clsinfodict, nthread=1,
+def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, nthread=1,
                                           mdl_cls_obj=None, sub_train_smpls=None, rnd_seed=42):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
@@ -584,7 +584,7 @@ def optimise_xgboost_multiclass_classifer(out_params_file, clsinfodict, nthread=
     This function requires that xgboost and skopt modules to be installed.
 
     :param out_params_file: The output model parameters which have been optimised.
-    :param clsinfodict: dict (key is string with class name) of ClassInfoObj objects defining the
+    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the
                         training and validation data.
     :param nthread: The number of threads to use to train the classifier.
     :param sub_train_smpls: Subset the training, if None or 0 then no sub-setting will occur. If
@@ -598,11 +598,11 @@ def optimise_xgboost_multiclass_classifer(out_params_file, clsinfodict, nthread=
 
     rnd_obj = numpy.random.RandomState(rnd_seed)
 
-    n_classes = len(clsinfodict)
-    for clsname in clsinfodict:
-        if clsinfodict[clsname].id >= n_classes:
+    n_classes = len(cls_info_dict)
+    for clsname in cls_info_dict:
+        if cls_info_dict[clsname].id >= n_classes:
             raise Exception("ClassInfoObj '{}' id ({}) is not consecutive "
-                   "starting from 0.".format(clsname, clsinfodict[clsname].id))
+                   "starting from 0.".format(clsname, cls_info_dict[clsname].id))
 
     cls_data_dict = {}
     train_data_lst = []
@@ -611,10 +611,10 @@ def optimise_xgboost_multiclass_classifer(out_params_file, clsinfodict, nthread=
     valid_lbls_lst = []
     cls_ids = []
     n_classes = 0
-    for clsname in clsinfodict:
+    for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(clsinfodict[clsname].trainfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].trainfileH5, 'r')
         sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
 
@@ -630,24 +630,24 @@ def optimise_xgboost_multiclass_classifer(out_params_file, clsinfodict, nthread=
                 sgl_cls_info['train_n_rows'] = sub_n_rows
 
         sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
-        sgl_cls_info['train_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['train_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
 
         train_data_lst.append(sgl_cls_info['train_data'])
         train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(clsinfodict[clsname].validfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].validfileH5, 'r')
         sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
-        sgl_cls_info['valid_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['valid_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         valid_data_lst.append(sgl_cls_info['valid_data'])
         valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
 
         cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(clsinfodict[clsname].id)
+        cls_ids.append(cls_info_dict[clsname].id)
         n_classes = n_classes + 1
 
     print("Finished Reading Data")
@@ -718,7 +718,7 @@ def optimise_xgboost_multiclass_classifer(out_params_file, clsinfodict, nthread=
         json.dump(params, fp, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, clsinfodict, nthread=1, mdl_cls_obj=None):
+def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_dict, nthread=1, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
     classifier producing a full trained model at the end. A dict of class information, as ClassInfoObj
@@ -728,15 +728,15 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, clsinfodic
 
     :param out_mdl_file: The output model which can be loaded to perform a classification.
     :param cls_params_file: A JSON file with the model parameters
-    :param clsinfodict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
+    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
     :param nthread: The number of threads to use to train the classifier.
 
     """
-    n_classes = len(clsinfodict)
-    for clsname in clsinfodict:
-        if clsinfodict[clsname].id >= n_classes:
+    n_classes = len(cls_info_dict)
+    for clsname in cls_info_dict:
+        if cls_info_dict[clsname].id >= n_classes:
             raise Exception("ClassInfoObj '{}' id ({}) is not consecutive "
-                            "starting from 0.".format(clsname, clsinfodict[clsname].id))
+                            "starting from 0.".format(clsname, cls_info_dict[clsname].id))
 
     cls_data_dict = {}
     train_data_lst = []
@@ -747,40 +747,40 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, clsinfodic
     test_lbls_lst = []
     cls_ids = []
     n_classes = 0
-    for clsname in clsinfodict:
+    for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(clsinfodict[clsname].trainfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].trainfileH5, 'r')
         sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
-        sgl_cls_info['train_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['train_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         train_data_lst.append(sgl_cls_info['train_data'])
         train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(clsinfodict[clsname].validfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].validfileH5, 'r')
         sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
-        sgl_cls_info['valid_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['valid_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         valid_data_lst.append(sgl_cls_info['valid_data'])
         valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
 
         print("Reading Class {} Testing".format(clsname))
-        f = h5py.File(clsinfodict[clsname].testfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].testfileH5, 'r')
         sgl_cls_info['test_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['test_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['test_n_rows'], dtype=int)
-        sgl_cls_info['test_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['test_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         test_data_lst.append(sgl_cls_info['test_data'])
         test_lbls_lst.append(sgl_cls_info['test_data_lbls'])
 
         cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(clsinfodict[clsname].id)
+        cls_ids.append(cls_info_dict[clsname].id)
         n_classes = n_classes + 1
 
     print("Finished Reading Data")
@@ -832,7 +832,7 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, clsinfodic
     print("Testing Accuracy: {}".format(test_acc_scr))
 
 
-def train_opt_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1, mdl_cls_obj=None):
+def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=1, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
     classifier producing a full trained model at the end. A dict of class information, as ClassInfoObj
@@ -841,18 +841,18 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1,
     This function requires that xgboost and skopt modules to be installed.
 
     :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param clsinfodict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
+    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
     :param nthread: The number of threads to use to train the classifier.
 
     """
     from skopt.space import Real, Integer
     from skopt import gp_minimize
 
-    n_classes = len(clsinfodict)
-    for clsname in clsinfodict:
-        if clsinfodict[clsname].id >= n_classes:
+    n_classes = len(cls_info_dict)
+    for clsname in cls_info_dict:
+        if cls_info_dict[clsname].id >= n_classes:
             raise ("ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(clsname,
-                                                                                          clsinfodict[clsname].id))
+                                                                                          cls_info_dict[clsname].id))
 
     cls_data_dict = {}
     train_data_lst = []
@@ -863,40 +863,40 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1,
     test_lbls_lst = []
     cls_ids = []
     n_classes = 0
-    for clsname in clsinfodict:
+    for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(clsinfodict[clsname].trainfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].trainfileH5, 'r')
         sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
-        sgl_cls_info['train_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['train_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         train_data_lst.append(sgl_cls_info['train_data'])
         train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(clsinfodict[clsname].validfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].validfileH5, 'r')
         sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
-        sgl_cls_info['valid_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['valid_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         valid_data_lst.append(sgl_cls_info['valid_data'])
         valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
 
         print("Reading Class {} Testing".format(clsname))
-        f = h5py.File(clsinfodict[clsname].testfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].testfileH5, 'r')
         sgl_cls_info['test_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['test_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['test_n_rows'], dtype=int)
-        sgl_cls_info['test_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['test_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         test_data_lst.append(sgl_cls_info['test_data'])
         test_lbls_lst.append(sgl_cls_info['test_data_lbls'])
 
         cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(clsinfodict[clsname].id)
+        cls_ids.append(cls_info_dict[clsname].id)
         n_classes = n_classes + 1
 
     print("Finished Reading Data")
@@ -984,28 +984,28 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1,
     print("Testing Accuracy: {}".format(test_acc_scr))
 
 
-def apply_xgboost_multiclass_classifier(classTrainInfo, model_file, imgMask, imgMaskVal, imgFileInfo,
-                                        outClassImg, gdalformat, classClrNames=True, nthread=1):
+def apply_xgboost_multiclass_classifier(class_train_info, model_file, in_mask_img, img_mask_val, img_file_info,
+                                        out_class_img, gdalformat, class_clr_names=True, nthread=1):
     """
 This function applies a trained multiple classes xgboost model. The function train_xgboost_multiclass_classifer
 can be used to train such as model. The output image will contain the probability of membership to the class of
 interest. You will need to threshold this image to get a final hard classification. Alternative, a hard class
 output image and threshold can be applied to this image.
 
-:param classTrainInfo: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
+:param class_train_info: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
                        objects which will be used to train the classifier (i.e., train_xgboost_multiclass_classifer()),
                        provide pixel value id and RGB class values.
 :param model_file: a trained xgboost multiclass model which can be loaded with lgb.Booster(model_file=model_file).
-:param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                valid data regions (rsgislib.imageutils.genValidMask)
-:param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
+:param in_mask_img: is an image file providing a mask to specify where should be classified. Simplest mask is all the
+                valid data regions (rsgislib.imageutils.gen_valid_mask)
+:param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
-:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
+:param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
                     rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
-:param outClassImg: Output image which will contain the hard classification defined as the maximum probability.
+:param out_class_img: Output image which will contain the hard classification defined as the maximum probability.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
-:param classClrNames: default is True and therefore a colour table will the colours specified in ClassInfoObj
+:param class_clr_names: default is True and therefore a colour table will the colours specified in ClassInfoObj
                       and a ClassName (from classTrainInfo) column will be added to the output file.
 :param nthread: The number of threads to use for the classifier.
 
@@ -1043,27 +1043,27 @@ output image and threshold can be applied to this image.
     classifier.load_model(model_file)
 
     infiles = applier.FilenameAssociations()
-    infiles.imageMask = imgMask
+    infiles.imageMask = in_mask_img
     numClassVars = 0
-    for imgFile in imgFileInfo:
-        infiles.__dict__[imgFile.name] = imgFile.fileName
+    for imgFile in img_file_info:
+        infiles.__dict__[imgFile.name] = imgFile.file_name
         numClassVars = numClassVars + len(imgFile.bands)
 
-    n_classes = len(classTrainInfo)
+    n_classes = len(class_train_info)
     cls_id_lut = numpy.zeros(n_classes)
-    for clsname in classTrainInfo:
-        if classTrainInfo[clsname].id >= n_classes:
+    for clsname in class_train_info:
+        if class_train_info[clsname].id >= n_classes:
             raise ("ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(clsname,
-                                                                                          classTrainInfo[clsname].id))
-        cls_id_lut[classTrainInfo[clsname].id] = classTrainInfo[clsname].out_id
+                                                                                          class_train_info[clsname].id))
+        cls_id_lut[class_train_info[clsname].id] = class_train_info[clsname].out_id
 
     outfiles = applier.FilenameAssociations()
-    outfiles.outclsimage = outClassImg
+    outfiles.outclsimage = out_class_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
-    otherargs.mskVal = imgMaskVal
+    otherargs.mskVal = img_mask_val
     otherargs.numClassVars = numClassVars
-    otherargs.imgFileInfo = imgFileInfo
+    otherargs.imgFileInfo = img_file_info
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
 
@@ -1082,21 +1082,21 @@ output image and threshold can be applied to this image.
     applier.apply(_applyXGBMClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed Classification")
 
-    if classClrNames:
-        rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
-        ratDataset = gdal.Open(outClassImg, gdal.GA_Update)
+    if class_clr_names:
+        rsgislib.rastergis.pop_rat_img_stats(out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        ratDataset = gdal.Open(out_class_img, gdal.GA_Update)
         red = rat.readColumn(ratDataset, 'Red')
         green = rat.readColumn(ratDataset, 'Green')
         blue = rat.readColumn(ratDataset, 'Blue')
         ClassName = numpy.empty_like(red, dtype=numpy.dtype('a255'))
         ClassName[...] = ""
 
-        for classKey in classTrainInfo:
+        for classKey in class_train_info:
             print("Apply Colour to class \'" + classKey + "\'")
-            red[classTrainInfo[classKey].out_id] = classTrainInfo[classKey].red
-            green[classTrainInfo[classKey].out_id] = classTrainInfo[classKey].green
-            blue[classTrainInfo[classKey].out_id] = classTrainInfo[classKey].blue
-            ClassName[classTrainInfo[classKey].out_id] = classKey
+            red[class_train_info[classKey].out_id] = class_train_info[classKey].red
+            green[class_train_info[classKey].out_id] = class_train_info[classKey].green
+            blue[class_train_info[classKey].out_id] = class_train_info[classKey].blue
+            ClassName[class_train_info[classKey].out_id] = classKey
 
         rat.writeColumn(ratDataset, "Red", red)
         rat.writeColumn(ratDataset, "Green", green)

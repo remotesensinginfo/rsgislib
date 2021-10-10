@@ -85,7 +85,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     gdalDS = None
     
     if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
         
         
 def performQuickshiftSegmentation(inputImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, pcaPxlSample=100, ratio=1.0, kernel_size=5, max_dist=10, sigma=0, convert2lab=True, random_seed=42):
@@ -149,7 +149,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     gdalDS = None
     
     if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 def performSlicSegmentation(inputImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, n_segments=100, compactness=10.0, max_iter=10, sigma=0, spacing=None, convert2lab=None, enforce_connectivity=True, min_size_factor=0.5, max_size_factor=3, slic_zero=False):
     """
@@ -229,7 +229,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     gdalDS = None
     
     if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
 def performWatershedSegmentation(inputImg, markersImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, compactness=0, watershed_line=False):
@@ -310,7 +310,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     gdalDS = None
     
     if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
 def performRandomWalkerSegmentation(inputImg, markersImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, beta=130, mode='bf', tol=0.001, spacing=None):
@@ -398,5 +398,5 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     gdalDS = None
     
     if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 

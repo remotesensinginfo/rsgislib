@@ -164,7 +164,7 @@ def apply_keras_chips_pixel_classifier(classTrainInfo, keras_cls_mdl, imgMask, i
                           bands specified in the imgFileInfo input and output layer which provides an output array
                           of the length of the number of classes.
     :param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                    valid data regions (rsgislib.imageutils.genValidMask)
+                    valid data regions (rsgislib.imageutils.gen_valid_mask)
     :param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
                        Can be used to create a heirachical classification.
     :param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
@@ -254,7 +254,7 @@ def apply_keras_chips_pixel_classifier(classTrainInfo, keras_cls_mdl, imgMask, i
 
     if classClrNames:
         rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
-        max_val = rsgislib.imagecalc.getImageBandMinMax(outClassImg, 1, False, 0)[1]
+        max_val = rsgislib.imagecalc.get_img_band_min_max(outClassImg, 1, False, 0)[1]
         ratDataset = gdal.Open(outClassImg, gdal.GA_Update)
 
         max_cls_val = 0

@@ -83,7 +83,7 @@ except ImportError as sklearnMBKMErr:
     raise Exception("The scikit-learn Mini Batch KMeans tools are required for this module could not be imported\n\t" + sklearnMBKMErr)
     
 
-def classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, preProcessor=None, justFit=False):
+def classify_within_rat(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, preProcessor=None, justFit=False):
     """
 A function which will perform a classification within the RAT using a classifier from scikit-learn
 
@@ -113,12 +113,12 @@ Example::
     classColours['NonForest'] = [200,200,200]
     
     variables = ['GreenAvg', 'RedAvg', 'NIR1Avg', 'NIR2Avg', 'NDVI']
-    classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours)
+    classify_within_rat(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours)
     
     from sklearn.preprocessing import MaxAbsScaler
     
     # With pre-processor
-    classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours, preProcessor=MaxAbsScaler())
+    classify_within_rat(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours, preProcessor=MaxAbsScaler())
 
 """
     # Check gdal is available
@@ -251,7 +251,7 @@ Example::
 
 def _extractTrainDataFromRAT(info, inputs, outputs, otherargs):
     """
-    This function is used internally within classifyWithinRATTiled using the RIOS ratapplier function
+    This function is used internally within classify_within_rat_tiled using the RIOS ratapplier function
     """
     progress = round((info.startrow / info.rowCount)*100)
     print("{} %".format(progress), end="\r")
@@ -272,7 +272,7 @@ def _extractTrainDataFromRAT(info, inputs, outputs, otherargs):
 
 def _applyClassifier(info, inputs, outputs, otherargs):
     """
-    This function is used internally within classifyWithinRATTiled using the RIOS ratapplier function
+    This function is used internally within classify_within_rat_tiled using the RIOS ratapplier function
     """
     progress = round((info.startrow / info.rowCount)*100)
     print("{} %".format(progress), end="\r")    
@@ -335,7 +335,7 @@ def _applyClassifier(info, inputs, outputs, otherargs):
     
     
 
-def classifyWithinRATTiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, scaleVarsRange=False, justFit=False):
+def classify_within_rat_tiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, scaleVarsRange=False, justFit=False):
     """
 A function which will perform a classification within the RAT using a classifier from scikit-learn using the rios ratapplier interface allowing very large RATs to be processed. 
 
@@ -365,10 +365,10 @@ Example::
     classColours['NonForest'] = [200,200,200]
     
     variables = ['GreenAvg', 'RedAvg', 'NIR1Avg', 'NIR2Avg', 'NDVI']
-    classifyWithinRATTiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours)
+    classify_within_rat_tiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours)
         
     # With using range scaling.
-    classifyWithinRATTiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours, scaleVarsRange=True)
+    classify_within_rat_tiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours, scaleVarsRange=True)
 
 """
     # Check gdal is available
@@ -473,7 +473,7 @@ Example::
 
 
 
-def clusterWithinRAT(clumpsImg, variables, clusterer=MiniBatchKMeans(n_clusters=8, init='k-means++', max_iter=100, batch_size=100), outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False, preProcessor=None):
+def cluster_within_rat(clumpsImg, variables, clusterer=MiniBatchKMeans(n_clusters=8, init='k-means++', max_iter=100, batch_size=100), outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False, preProcessor=None):
     """
 A function which will perform a clustering within the RAT using a clustering algorithm from scikit-learn
 
@@ -495,11 +495,11 @@ Example::
     from sklearn.cluster import DBSCAN
     
     sklearnClusterer = DBSCAN(eps=1, min_samples=50)
-    classratutils.clusterWithinRAT('MangroveClumps.kea', ['MinX', 'MinY'], clusterer=sklearnClusterer, outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False)
+    classratutils.cluster_within_rat('MangroveClumps.kea', ['MinX', 'MinY'], clusterer=sklearnClusterer, outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False)
     
     # With pre-processor
     from sklearn.preprocessing import MaxAbsScaler
-    classratutils.clusterWithinRAT('MangroveClumps.kea', ['MinX', 'MinY'], clusterer=sklearnClusterer, outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False, preProcessor=MaxAbsScaler())
+    classratutils.cluster_within_rat('MangroveClumps.kea', ['MinX', 'MinY'], clusterer=sklearnClusterer, outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False, preProcessor=MaxAbsScaler())
 
 """
     # Check gdal is available
@@ -601,7 +601,7 @@ Example::
     ratDataset = None
 
 
-def findClassifierParameters(clumpsImg, classesIntCol, variables, preProcessor=None, gridSearch=GridSearchCV(RandomForestClassifier(), {})):
+def find_classifier_parameters(clumpsImg, classesIntCol, variables, preProcessor=None, gridSearch=GridSearchCV(RandomForestClassifier(), {})):
     """
 Find the optimal parameters for a classifier using a grid search and return a classifier instance with those optimal parameters.
 
@@ -627,7 +627,7 @@ Example::
     variables = ['BlueRefl', 'GreenRefl', 'RedRefl', 'NIRRefl', 'SWIR1Refl', 'SWIR2Refl']
     
     gSearch = GridSearchCV(SVC(), classParameters)
-    classifier = classratutils.findClassifierParameters(clumpsImg, classesIntCol, variables, preProcessor=MaxAbsScaler(), gridSearch=gSearch)
+    classifier = classratutils.find_classifier_parameters(clumpsImg, classesIntCol, variables, preProcessor=MaxAbsScaler(), gridSearch=gSearch)
 
 """
     # Check gdal is available
@@ -690,7 +690,7 @@ Example::
     return gridSearch.best_estimator_
 
 
-def balanceSampleTrainingRandom(clumpsImg, trainCol, outTrainCol, minNoSamples, maxNoSamples):
+def balance_sample_training_random(clumpsImg, trainCol, outTrainCol, minNoSamples, maxNoSamples):
     """
 A function to balance the number of training samples for classification so the number is above
 a minimum threshold (min_no_samples) and all equal to the class with the smallest number of samples
@@ -713,7 +713,7 @@ out_train_col = "sampled_training"
 min_no_sample = 20
 max_no_samples = 50
 
-balanceSampleTrainingRandom(clumps_img, train_col, out_train_col, min_no_sample, max_no_samples)
+balance_sample_training_random(clumps_img, train_col, out_train_col, min_no_sample, max_no_samples)
 """
      # Check gdal is available
     if not haveGDALPy:

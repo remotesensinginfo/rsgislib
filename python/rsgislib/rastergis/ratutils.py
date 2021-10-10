@@ -204,7 +204,7 @@ Example::
     print('''Calculating statistics for %i Bands'''%(nBands))
     t = rsgislib.RSGISTime()
     t.start(True)
-    rastergis.populateRATWithStats(inputImage, clumpsFile, stats2Calc)
+    rastergis.populate_rat_with_stats(inputImage, clumpsFile, stats2Calc)
     t.end()
 
     # Calculate shapes, if required
@@ -1223,7 +1223,7 @@ Where:
         classImgFile = os.path.join(tmpPath, className+"_{}.kea".format(uid))
         classIntVal = classesDict[key][0]
         vectorutils.convertvector.rasterise_vec_lyr(classShpFile, classShpFileLyr, clumpsImg, classImgFile, gdalformat="KEA",
-                                    burnVal=classIntVal, datatype=rsgislib.TYPE_16UINT)
+                                                    burn_val=classIntVal, datatype=rsgislib.TYPE_16UINT)
         tmpClassImgLayers.append(classImgFile)
         classNamesDict[classIntVal] = className
     
@@ -1416,7 +1416,7 @@ Example::
     
         bs = []
         bs.append(rastergis.BandAttStats(band=1, maxField=outColName[i]))
-        rastergis.populateRATWithStats(smallClumpsMask, clumpsImg, bs)
+        rastergis.populate_rat_with_stats(smallClumpsMask, clumpsImg, bs)
     
 
     rsgislib.tools.filetools.delete_file_with_basename(classMaskImg)
@@ -1586,7 +1586,7 @@ Calculate the distance between all clumps
     vectorutils.dist2NearestGeom(polysShp, polysShpGeomDist, outColName, True, useIdx, maxDistThres)
     t.end()
     
-    rastergis.importVecAtts(clumpsImg, polysShpGeomDist, [outColName])
+    rastergis.import_vec_atts(clumpsImg, polysShpGeomDist, [outColName])
     
     if not tmpPresent:
         shutil.rmtree(tmpDIR, ignore_errors=True)
@@ -1643,11 +1643,11 @@ Calculate the distance from each small clump to a large clump. Split defined by 
     
     smClumpsImg = os.path.join(tmpDIR, baseName+'_smclumps.kea')
     rastergis.exportCol2GDALImage(clumpsImg, smClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'SmUnits')
-    rastergis.pop_rat_img_stats(clumps=smClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    rastergis.pop_rat_img_stats(clumps_img=smClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     
     lrgClumpsImg = os.path.join(tmpDIR, baseName+'_lrgclumps.kea')
     rastergis.exportCol2GDALImage(clumpsImg, lrgClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'LrgUnits')
-    rastergis.pop_rat_img_stats(clumps=lrgClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    rastergis.pop_rat_img_stats(clumps_img=lrgClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     
     smPolysShp = os.path.join(tmpDIR, baseName+'_smClumps_shp.shp')
     rsgislib.vectorutils.polygoniseRaster(smClumpsImg, smPolysShp, imgBandNo=1, maskImg=smClumpsImg, imgMaskBandNo=1)
@@ -1661,7 +1661,7 @@ Calculate the distance from each small clump to a large clump. Split defined by 
     smPolysDistShp = os.path.join(tmpDIR, baseName+'_smClumps_dist_shp.shp')
     rsgislib.vectorutils.dist2NearestSecGeomSet(smPolysShp, lgrPolysShp, smPolysDistShp, outColName, True, useIdx, maxDistThres)
     t.end()
-    rsgislib.rastergis.importVecAtts(smClumpsImg, smPolysDistShp, [outColName])
+    rsgislib.rastergis.import_vec_atts(smClumpsImg, smPolysDistShp, [outColName])
     
     smClumpsRATDataset = gdal.Open(smClumpsImg, gdal.GA_Update)
     minDistCol = rat.readColumn(smClumpsRATDataset, outColName)

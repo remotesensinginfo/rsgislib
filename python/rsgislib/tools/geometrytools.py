@@ -7,7 +7,7 @@ import math
 import osgeo.ogr as ogr
 
 
-def reprojBBOX(bbox, in_osr_proj_obj, out_osr_proj_obj):
+def reproj_bbox(bbox, in_osr_proj_obj, out_osr_proj_obj):
     """
     A function to reproject a bounding box.
 
@@ -27,10 +27,10 @@ def reprojBBOX(bbox, in_osr_proj_obj, out_osr_proj_obj):
     blX = bbox[0]
     blY = bbox[2]
 
-    out_tlX, out_tlY = reprojPoint(in_osr_proj_obj, out_osr_proj_obj, tlX, tlY)
-    out_trX, out_trY = reprojPoint(in_osr_proj_obj, out_osr_proj_obj, trX, trY)
-    out_brX, out_brY = reprojPoint(in_osr_proj_obj, out_osr_proj_obj, brX, brY)
-    out_blX, out_blY = reprojPoint(in_osr_proj_obj, out_osr_proj_obj, blX, blY)
+    out_tlX, out_tlY = reproj_point(in_osr_proj_obj, out_osr_proj_obj, tlX, tlY)
+    out_trX, out_trY = reproj_point(in_osr_proj_obj, out_osr_proj_obj, trX, trY)
+    out_brX, out_brY = reproj_point(in_osr_proj_obj, out_osr_proj_obj, brX, brY)
+    out_blX, out_blY = reproj_point(in_osr_proj_obj, out_osr_proj_obj, blX, blY)
 
     minX = out_tlX
     if out_blX < minX:
@@ -51,7 +51,7 @@ def reprojBBOX(bbox, in_osr_proj_obj, out_osr_proj_obj):
     return [minX, maxX, minY, maxY]
 
 
-def reprojBBOX_epsg(bbox, in_epsg, out_epsg):
+def reproj_bbox_epsg(bbox, in_epsg, out_epsg):
     """
     A function to reproject a bounding box.
 
@@ -68,7 +68,7 @@ def reprojBBOX_epsg(bbox, in_epsg, out_epsg):
     out_osr_proj_obj = osr.SpatialReference()
     out_osr_proj_obj.ImportFromEPSG(int(out_epsg))
 
-    out_bbox = reprojBBOX(bbox, in_osr_proj_obj, out_osr_proj_obj)
+    out_bbox = reproj_bbox(bbox, in_osr_proj_obj, out_osr_proj_obj)
     return out_bbox
 
 def do_bboxes_intersect(bbox1, bbox2):
@@ -243,7 +243,7 @@ def unwrap_wgs84_bbox(bbox):
     return bboxes
 
 
-def findCommonExtentOnGrid(base_extent, base_grid, other_extent, full_contain=True):
+def find_common_extent_on_grid(base_extent, base_grid, other_extent, full_contain=True):
     """
     A function which calculates the common extent between two extents but defines output on
     grid with defined resolutions. Useful for finding common extent on a particular image grid.
@@ -293,7 +293,7 @@ def findCommonExtentOnGrid(base_extent, base_grid, other_extent, full_contain=Tr
     return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
 
 
-def findExtentOnGrid(base_extent, base_grid, full_contain=True):
+def find_extent_on_grid(base_extent, base_grid, full_contain=True):
     """
     A function which calculates the extent but defined on a grid with defined resolution.
     Useful for finding extent on a particular image grid.
@@ -329,7 +329,7 @@ def findExtentOnGrid(base_extent, base_grid, full_contain=True):
     return [xMin, xMaxOut, yMinOut, yMax]
 
 
-def findExtentOnWholeNumGrid(base_extent, base_grid, full_contain=True, round_vals=None):
+def find_extent_on_whole_num_grid(base_extent, base_grid, full_contain=True, round_vals=None):
     """
     A function which calculates the extent but defined on a grid with defined resolution.
     Useful for finding extent on a particular image grid.
@@ -378,7 +378,7 @@ def findExtentOnWholeNumGrid(base_extent, base_grid, full_contain=True, round_va
     return out_bbox
 
 
-def getBBoxGrid(bbox, x_size, y_size):
+def get_bbox_grid(bbox, x_size, y_size):
     """
     Create a grid with size x_size, y_size for the area represented by bbox.
 
@@ -440,7 +440,7 @@ def getBBoxGrid(bbox, x_size, y_size):
     return bboxs
 
 
-def reprojPoint(in_osr_proj_obj, out_osr_proj_obj, x, y):
+def reproj_point(in_osr_proj_obj, out_osr_proj_obj, x, y):
     """
     Reproject a point from 'in_osr_proj_obj' to 'out_osr_proj_obj' where they are gdal
     osgeo.osr.SpatialReference objects.

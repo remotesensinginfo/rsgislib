@@ -138,9 +138,8 @@ Example::
     import rsgislib.imageutils
     import rsgislib.segmentation
     import rsgislib.rastergis
-    import rsgislib.vectorutils
     import rsgislib.imagemorphology
-    import os.path
+    import os
     import osgeo.gdal as gdal
     from rios import rat
     import numpy
@@ -163,7 +162,7 @@ Example::
     tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall = os.path.join(tmpPath, baseDataName+"clearskyClumpsFullExtentSelectClumpsOpenClumpRMSmall.kea")
     tmpMorphOperator = os.path.join(tmpPath, 'CircularMorphOp.gmtxt')
     
-    rsgislib.imagecalc.calcDist2ImgVals(cloudsImg, tmpCloudsImgDist2Clouds, pxlVals=[1,2])
+    rsgislib.imagecalc.calc_dist_to_img_vals(cloudsImg, tmpCloudsImgDist2Clouds, pxlVals=[1,2])
         
     rsgislib.imageutils.mask_img(tmpCloudsImgDist2Clouds, validAreaImg, tmpCloudsImgDist2CloudsNoData, 'KEA', rsgislib.TYPE_32INT, -1, 0)
             
@@ -173,9 +172,9 @@ Example::
     
     rsgislib.rastergis.pop_rat_img_stats(tmpInitClearSkyRegionsClumps, True, True)
     
-    rsgislib.segmentation.rmSmallClumps(tmpInitClearSkyRegionsClumps, tmpInitClearSkyRegionsRmSmall, initClearSkyRegionMinSize, 'KEA')
+    rsgislib.segmentation.rm_small_clumps(tmpInitClearSkyRegionsClumps, tmpInitClearSkyRegionsRmSmall, initClearSkyRegionMinSize, 'KEA')
     
-    rsgislib.segmentation.relabelClumps(tmpInitClearSkyRegionsRmSmall, tmpInitClearSkyRegionsFinal, 'KEA', False)
+    rsgislib.segmentation.relabel_clumps(tmpInitClearSkyRegionsRmSmall, tmpInitClearSkyRegionsFinal, 'KEA', False)
     
     rsgislib.rastergis.pop_rat_img_stats(tmpInitClearSkyRegionsFinal, True, True)
     
@@ -185,7 +184,7 @@ Example::
     
     rsgislib.rastergis.pop_rat_img_stats(tmpClearSkyRegionsFullExtentClumps, True, True)
     
-    rsgislib.rastergis.populateRATWithStats(tmpInitClearSkyRegionsFinal, tmpClearSkyRegionsFullExtentClumps, [rsgislib.rastergis.BandAttStats(band=1, maxField='InitRegionInter')])
+    rsgislib.rastergis.populate_rat_with_stats(tmpInitClearSkyRegionsFinal, tmpClearSkyRegionsFullExtentClumps, [rsgislib.rastergis.BandAttStats(band=1, maxField='InitRegionInter')])
     
     ratDataset = gdal.Open( tmpClearSkyRegionsFullExtentClumps, gdal.GA_Update )
     InitRegionInter = rat.readColumn(ratDataset, "InitRegionInter")
@@ -194,19 +193,19 @@ Example::
     rat.writeColumn(ratDataset, "ValidClumps", ValidClumps)
     ratDataset = None
     
-    rsgislib.rastergis.collapseRAT(tmpClearSkyRegionsFullExtentClumps, 'ValidClumps', tmpClearSkyRegionsFullExtentSelectClumps, 'KEA', 1)
+    rsgislib.rastergis.collapse_rat(tmpClearSkyRegionsFullExtentClumps, 'ValidClumps', tmpClearSkyRegionsFullExtentSelectClumps, 'KEA', 1)
     
     rsgislib.rastergis.pop_rat_img_stats(tmpClearSkyRegionsFullExtentSelectClumps, True, True)
     
-    rsgislib.imagemorphology.createCircularOp(outputFile=tmpMorphOperator, opSize=morphSize)
+    rsgislib.imagemorphology.create_circular_op(outputFile=tmpMorphOperator, opSize=morphSize)
     
-    rsgislib.imagemorphology.imageOpening(inputImage=tmpClearSkyRegionsFullExtentSelectClumps, outputImage=tmpClearSkyRegionsFullExtentSelectClumpsOpen, tempImage="", morphOperator=tmpMorphOperator, useOpFile=True, opSize=21, gdalformat='KEA', datatype=rsgislib.TYPE_32UINT)
+    rsgislib.imagemorphology.image_opening(inputImage=tmpClearSkyRegionsFullExtentSelectClumps, outputImage=tmpClearSkyRegionsFullExtentSelectClumpsOpen, tempImage="", morphOperator=tmpMorphOperator, useOpFile=True, opSize=21, gdalformat='KEA', datatype=rsgislib.TYPE_32UINT)
     
     rsgislib.segmentation.clump(tmpClearSkyRegionsFullExtentSelectClumpsOpen, tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, 'KEA', False, 0.0, False)
     
     rsgislib.rastergis.pop_rat_img_stats(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, True, True)
 
-    rsgislib.segmentation.rmSmallClumps(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall, initClearSkyRegionMinSize, 'KEA')
+    rsgislib.segmentation.rm_small_clumps(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall, initClearSkyRegionMinSize, 'KEA')
     
     rsgislib.imagecalc.image_math(tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall, outputClearSkyMask, "b1>0?1:0", outFormat, rsgislib.TYPE_8UINT)
         

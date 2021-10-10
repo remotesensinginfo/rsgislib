@@ -18,7 +18,7 @@ except ImportError as h5Err:
 
 
 class BandAttStats:
-    """ This is passed to the populateRATWithStats function """
+    """ This is passed to the populate_rat_with_stats function """
     def __init__(self, band, minField=None, maxField=None, sumField=None, stdDevField=None, meanField=None):
         self.band = band
         self.minField = minField

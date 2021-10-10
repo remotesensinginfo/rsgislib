@@ -108,9 +108,9 @@ class StdImgBlockIter:
         for img in self.img_info_lst:
             self.img_info[img.name] = dict()
             self.img_info[img.name]['res'] = rsgislib.imageutils.getImageRes(img.fileName, abs_vals=True)
-            self.img_info[img.name]['bbox'] = rsgislib.imageutils.getImageBBOX(img.fileName)
+            self.img_info[img.name]['bbox'] = rsgislib.imageutils.get_image_bbox(img.fileName)
             self.img_info[img.name]['pxl_size'] = rsgislib.imageutils.getImageSize(img.fileName)
-            self.img_info[img.name]['epsg'] = rsgislib.imageutils.getEPSGProjFromImage(img.fileName)
+            self.img_info[img.name]['epsg'] = rsgislib.imageutils.get_epsg_proj_from_image(img.fileName)
             if self.img_info[img.name]['epsg'] is None:
                 raise Exception("The input image ({}) does not have a defined projection - please correct.".format(img.fileName))
             if self.img_epsg is None:

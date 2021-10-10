@@ -31,7 +31,7 @@ def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_lin
 
     if os.path.exists(vec_line_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(vec_line_file)
+            rsgislib.vectorutils.delete_vector_file(vec_line_file)
         else:
             raise Exception("The output vector file ({}) already exists, "
                             "remove it and re-run.".format(vec_line_file))
@@ -194,7 +194,7 @@ def create_orthg_lines(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None,
     """
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception(
                 "The output vector file ({}) already exists, remove it and re-run.".format(
@@ -336,7 +336,7 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
     """
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception(
                 "The output vector file ({}) already exists, remove it and re-run.".format(
@@ -508,7 +508,7 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
     """
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception(
                 "The output vector file ({}) already exists, remove it and re-run.".format(
@@ -692,7 +692,7 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file,
     """
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception(
                 "The output vector file ({}) already exists, remove it and re-run.".format(
@@ -918,7 +918,7 @@ def create_rtree_index(vec_file, vec_lyr):
     return idx_obj, geom_lst
 
 
-def bboxIntersectsIndex(rt_idx, geom_lst, bbox):
+def bbox_intersects_index(rt_idx, geom_lst, bbox):
     """
     A function which tests for intersection between the geometries and the bounding box
     using a spatial index.
@@ -950,15 +950,15 @@ def bboxIntersectsIndex(rt_idx, geom_lst, bbox):
     return bbox_intersects
 
 
-def calcPolyCentroids(vec_file, vec_lyr, out_format, vecoutfile, vecoutlyrname):
+def calc_poly_centroids(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr):
     """
     Create a vector layer of the polygon centroids.
 
     :param vec_file: input vector file
     :param vec_lyr: input vector layer within the input file.
     :param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
-    :param vecoutfile: output file path for the vector.
-    :param vecoutlyrname: output vector layer name.
+    :param out_vec_file: output file path for the vector.
+    :param out_vec_lyr: output vector layer name.
 
     """
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
@@ -971,13 +971,13 @@ def calcPolyCentroids(vec_file, vec_lyr, out_format, vecoutfile, vecoutlyrname):
     lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
 
     out_driver = ogr.GetDriverByName(out_format)
-    result_ds = out_driver.CreateDataSource(vecoutfile)
+    result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(vecoutfile))
+        raise Exception("Could not open '{}'".format(out_vec_file))
 
-    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=ogr.wkbPoint)
+    result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=ogr.wkbPoint)
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -1035,7 +1035,7 @@ def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, "
                             "remove it and re-run.".format(out_vec_file))
@@ -1074,7 +1074,7 @@ def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_ve
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, "
                             "remove it and re-run.".format(out_vec_file))
@@ -1113,7 +1113,7 @@ def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, ou
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, "
                             "remove it and re-run.".format(out_vec_file))
@@ -1154,7 +1154,7 @@ def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, "
                             "remove it and re-run.".format(out_vec_file))
@@ -1193,7 +1193,7 @@ def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_fil
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.deleteVectorFile(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, "
                             "remove it and re-run.".format(out_vec_file))
@@ -1250,7 +1250,7 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            deleteVectorFile(out_vec_file)
+            delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -1383,7 +1383,7 @@ def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, vecoutfile, vec
 
     if os.path.exists(vecoutfile):
         if del_exist_vec:
-            deleteVectorFile(vecoutfile)
+            delete_vector_file(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
 
@@ -1498,7 +1498,7 @@ Create a simplified version of the input
 
     if os.path.exists(vecoutfile):
         if del_exist_vec:
-            deleteVectorFile(vecoutfile)
+            delete_vector_file(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
 
@@ -1578,7 +1578,7 @@ Delete holes from the input polygons in below the area threshold.
 
     if os.path.exists(vecoutfile):
         if del_exist_vec:
-            deleteVectorFile(vecoutfile)
+            delete_vector_file(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
 
@@ -1756,7 +1756,7 @@ Delete polygons with an area below a defined threshold.
 
     if os.path.exists(vecoutfile):
         if del_exist_vec:
-            deleteVectorFile(vecoutfile)
+            delete_vector_file(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
 
@@ -1853,7 +1853,7 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            deleteVectorFile(out_vec_file)
+            delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -1982,7 +1982,7 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            deleteVectorFile(out_vec_file)
+            delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -2093,7 +2093,7 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
 
 
 
-def getGeomPts(geom, pts_lst=None):
+def get_geom_pts(geom, pts_lst=None):
     """
     Recursive function which extracts all the points within the an OGR geometry.
 
@@ -2115,7 +2115,7 @@ def getGeomPts(geom, pts_lst=None):
                 c_geom = geom.GetGeometryRef(n)
                 n_pts = c_geom.GetPointCount()
                 if n_pts == 0:
-                    getGeomPts(c_geom, pts_lst)
+                    get_geom_pts(c_geom, pts_lst)
                 else:
                     for i in range(0, n_pts):
                         pt = c_geom.GetPoint(i)
@@ -2123,36 +2123,6 @@ def getGeomPts(geom, pts_lst=None):
     return pts_lst
 
 
-def getVecLyrAsPts(in_vec_file, in_vec_lyr):
-    """
-    Get a list of points from the vectors within an input file.
-
-    :param in_vec_file: Input vector file
-    :param in_vec_lyr: Input vector layer name
-    :return: returns a list of points.
-
-    """
-    from osgeo import gdal
-    import tqdm
-
-    gdal.UseExceptions()
-    vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
-    vec_lyr_obj = vec_ds_obj.GetLayer(in_vec_lyr)
-
-    pts_lst = list()
-    n_feats = vec_lyr_obj.GetFeatureCount(True)
-    pbar = tqdm.tqdm(total=n_feats)
-    counter = 0
-    in_feature = vec_lyr_obj.GetNextFeature()
-    while in_feature:
-        geom = in_feature.GetGeometryRef()
-        if geom is not None:
-            getGeomPts(geom, pts_lst)
-        in_feature = vec_lyr_obj.GetNextFeature()
-        counter = counter + 1
-        pbar.update(1)
-    pbar.close()
-    return pts_lst
 
 
 
@@ -2548,3 +2518,51 @@ def vec_crosses_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
     dsVecCompObj = None
 
     return does_cross
+
+
+def get_feat_envs(vec_file, vec_lyr):
+    """
+A function which returns a list of bounding boxes for each feature
+within the vector layer.
+
+:param vec_file: vector file.
+:param vec_lyr: layer within the vector file.
+:returns: list of BBOXs
+
+"""
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    if dsVecFile is None:
+        raise Exception("Could not open '{}'".format(vec_file))
+
+    vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not find layer '{}'".format(vec_lyr))
+
+    openTransaction = False
+    nFeats = vec_lyr_obj.GetFeatureCount(True)
+    step = math.floor(nFeats / 10)
+    feedback = 10
+    feedback_next = step
+    counter = 0
+    print("Started .0.", end='', flush=True)
+    outenvs = []
+    # loop through the input features
+    inFeature = vec_lyr_obj.GetNextFeature()
+    while inFeature:
+        if (nFeats > 10) and (counter == feedback_next):
+            print(".{}.".format(feedback), end='', flush=True)
+            feedback_next = feedback_next + step
+            feedback = feedback + 10
+
+        # get the input geometry
+        geom = inFeature.GetGeometryRef()
+        if geom is not None:
+            outenvs.append(geom.GetEnvelope())
+
+        inFeature = vec_lyr_obj.GetNextFeature()
+        counter = counter + 1
+    print(" Completed")
+    dsVecFile = None
+    return outenvs
+
+

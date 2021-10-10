@@ -8,6 +8,7 @@ import os
 import string
 
 import numpy
+import rsgislib
 
 
 def uid_generator(size=6):
@@ -26,7 +27,7 @@ def uid_generator(size=6):
     return randomStr[0:size]
 
 
-def is_number(str_val):
+def is_number(str_val: str):
     """
     A function which tests whether the input string contains a number of not.
 
@@ -43,9 +44,7 @@ def is_number(str_val):
     return True
 
 
-def zero_pad_num_str(
-    num_val, str_len=3, round_num=False, round_n_digts=0, integerise=False
-):
+def zero_pad_num_str(num_val, str_len=3, round_num=False, round_n_digts=0, integerise=False, absolute=False, gain=1):
     """
     A function which zero pads a number to make a string
 
@@ -55,13 +54,17 @@ def zero_pad_num_str(
     :param round_n_digts: If rounding, the number of digits following decimal
                           points to round to.
     :param integerise: boolean whether to integerise the input number
+    :param absolute: make number positive.
+    :param gain: apply a gain before integerising.
     :return: string with the padded numeric value.
 
     """
+    if absolute:
+        num_val = abs(num_val)
     if round_num:
         num_val = round(num_val, round_n_digts)
     if integerise:
-        num_val = int(num_val)
+        num_val = int(num_val*gain)
 
     num_str = "{}".format(num_val)
     num_str = num_str.zfill(str_len)
@@ -106,7 +109,7 @@ def powerset_lst(in_set, min_items=0):
     return out_pset
 
 
-def get_environment_variable(var):
+def get_environment_variable(var: str):
     """
     A function to get an environmental variable, if variable is not present
     returns None.
@@ -135,7 +138,7 @@ def num_process_cores():
     return multiprocessing.cpu_count()
 
 
-def read_text_file_no_new_lines(input_file):
+def read_text_file_no_new_lines(input_file: str):
     """
     Read a text file into a single string removing new lines.
 
@@ -154,7 +157,7 @@ def read_text_file_no_new_lines(input_file):
     return txtStr
 
 
-def read_text_file_to_list(input_file):
+def read_text_file_to_list(input_file: str):
     """
     Read a text file into a list where each line is an element in the list.
 
@@ -175,7 +178,7 @@ def read_text_file_to_list(input_file):
     return outList
 
 
-def write_list_to_file(data_lst, out_file):
+def write_list_to_file(data_lst: list, out_file: str):
     """
     Write a list a text file, one line per item.
 
@@ -193,7 +196,7 @@ def write_list_to_file(data_lst, out_file):
         raise e
 
 
-def write_data_to_file(data_val, out_file):
+def write_data_to_file(data_val, out_file: str):
     """
     Write some data (a string or can be converted to a string using str(data_val) to
     an output text file.
@@ -211,7 +214,7 @@ def write_data_to_file(data_val, out_file):
         raise e
 
 
-def write_dict_to_json(data_dict, out_file):
+def write_dict_to_json(data_dict: dict, out_file: str):
     """
     Write some data to a JSON file. The data would commonly be structured as a dict
     but could also be a list.
@@ -233,7 +236,27 @@ def write_dict_to_json(data_dict, out_file):
         )
 
 
-def read_json_to_dict(input_file):
+def write_dict_to_json_gz(data_dict: dict, out_file: str, encoding="utf-8"):
+    """
+    Write some data to a JSON file compressed with gzip. The data would commonly be
+    structured as a dict but could also be a list.
+
+    :param data_dict: The dict (or list) to be written to the output JSON file.
+    :param out_file: The file path to the output file.
+    :param encoding: the character set encoding (default: utf-8)
+
+    """
+    import json
+    import gzip
+
+    json_str = json.dump(data_dict, sort_keys=True, indent=4, separators=(",", ": "), ensure_ascii=False)
+    json_bytes = json_str.encode(encoding)
+
+    with gzip.GzipFile(out_file, "w") as fout:
+        fout.write(json_bytes)
+
+
+def read_json_to_dict(input_file: str):
     """
     Read a JSON file. Will return a list or dict.
 
@@ -244,6 +267,25 @@ def read_json_to_dict(input_file):
 
     with open(input_file) as f:
         data = json.load(f)
+    return data
+
+
+def read_gz_json_to_dict(input_file: str, encoding="utf-8"):
+    """
+    Read a JSON file. Will return a list or dict.
+
+    :param input_file: input JSON file path.
+    :param encoding: the character set encoding (default: utf-8)
+
+    """
+    import json
+    import gzip
+
+    with gzip.GzipFile(input_file, "r") as fin:
+        json_bytes = fin.read()
+
+    json_str = json_bytes.decode(encoding)
+    data = json.loads(json_str)
     return data
 
 
@@ -459,3 +501,241 @@ def get_days_since_date(year, month, day, base_date):
         raise Exception("The year specified is before the base date.")
     date_val = datetime.date(year=int(year), month=int(month), day=int(day))
     return (date_val - base_date).days
+
+
+def dict_struct_does_path_exist(dict_struct_obj, tree_sequence):
+    """
+    A function which tests whether a path exists within JSON file.
+    :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
+    :param tree_sequence: list of strings specifying the path within the structure
+    :return: boolean
+    """
+    curr_dict_struct_obj = dict_struct_obj
+    steps_str = ""
+    pathExists = True
+    for tree_step in tree_sequence:
+        steps_str = steps_str+":"+tree_step
+        if tree_step in curr_dict_struct_obj:
+            curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
+        else:
+            pathExists = False
+            break
+    return pathExists
+
+def dict_struct_get_str_value(dict_struct_obj, tree_sequence, valid_values=None):
+    """
+    A function which retrieves a single string value from a JSON structure.
+    :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
+    :param tree_sequence: list of strings specifying the path within the structure
+    :param valid_values:
+    :return:
+    """
+    curr_dict_struct_obj = dict_struct_obj
+    steps_str = ""
+    for tree_step in tree_sequence:
+        steps_str = steps_str+":"+tree_step
+        if tree_step in curr_dict_struct_obj:
+            curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
+        else:
+            raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
+    if valid_values is not None:
+        if curr_dict_struct_obj not in valid_values:
+            raise rsgislib.RSGISPyException("'{}' is not within the list of valid values.".format(curr_dict_struct_obj))
+    return curr_dict_struct_obj
+
+def dict_struct_get_boolean_value(dict_struct_obj, tree_sequence):
+    """
+    A function which retrieves a single boolean value from a JSON structure.
+    :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
+    :param tree_sequence: list of strings specifying the path within the structure
+    :return:
+    """
+    curr_dict_struct_obj = dict_struct_obj
+    steps_str = ""
+    for tree_step in tree_sequence:
+        steps_str = steps_str+":"+tree_step
+        if tree_step in curr_dict_struct_obj:
+            curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
+        else:
+            raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
+    if type(curr_dict_struct_obj).__name__ == "bool":
+        rtn_bool = curr_dict_struct_obj
+    else:
+        raise rsgislib.RSGISPyException("'{}' is not 'True' or 'False'.".format(curr_dict_struct_obj))
+    return rtn_bool
+
+def dict_struct_get_date_value(dict_struct_obj, tree_sequence, date_format="%Y-%m-%d"):
+    """
+    A function which retrieves a single date value from a JSON structure.
+    :param date_format:
+    :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
+    :param tree_sequence: list of strings specifying the path within the structure
+    :param date_format: a string or list of strings for the date/time format
+                             to be parsed by datetime.datetime.strptime.
+    :return:
+    """
+    curr_dict_struct_obj = dict_struct_obj
+    steps_str = ""
+    for tree_step in tree_sequence:
+        steps_str = steps_str+":"+tree_step
+        if tree_step in curr_dict_struct_obj:
+            curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
+        else:
+            raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
+
+    if type(date_format) is str:
+        try:
+            out_date_obj = datetime.datetime.strptime(curr_dict_struct_obj, date_format).date()
+        except Exception as e:
+            raise rsgislib.RSGISPyException(e)
+    elif type(date_format) is list:
+        found = False
+        except_obj = None
+        for date_format_str in date_format:
+            try:
+                out_date_obj = datetime.datetime.strptime(curr_dict_struct_obj, date_format_str).date()
+                found = True
+                break
+            except Exception as e:
+                except_obj = e
+        if not found:
+            raise rsgislib.RSGISPyException(except_obj)
+    else:
+        raise rsgislib.RSGISPyException("Do not know what the type is of date_format variable.")
+
+    return out_date_obj
+
+def dict_struct_get_datetime_value(dict_struct_obj, tree_sequence, date_time_format="%Y-%m-%dT%H:%M:%S.%f"):
+    """
+    A function which retrieves a single date value from a JSON structure.
+
+    :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
+    :param tree_sequence: list of strings specifying the path within the structure
+    :param date_time_format: a string or list of strings for the date/time format
+                             to be parsed by datetime.datetime.strptime.
+    :return:
+    """
+    curr_dict_struct_obj = dict_struct_obj
+    steps_str = ""
+    for tree_step in tree_sequence:
+        steps_str = steps_str + ":" + tree_step
+        if tree_step in curr_dict_struct_obj:
+            curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
+        else:
+            raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
+
+    curr_dict_struct_obj = curr_dict_struct_obj.replace('Z', '')
+    if type(date_time_format) is str:
+        try:
+            out_datetime_obj = datetime.datetime.strptime(curr_dict_struct_obj, date_time_format)
+        except Exception as e:
+            raise rsgislib.RSGISPyException(e)
+    elif type(date_time_format) is list:
+        found = False
+        except_obj = None
+        for date_time_format_str in date_time_format:
+            try:
+                out_datetime_obj = datetime.datetime.strptime(curr_dict_struct_obj, date_time_format_str)
+                found = True
+                break
+            except Exception as e:
+                except_obj = e
+        if not found:
+            raise rsgislib.RSGISPyException(except_obj)
+    else:
+        raise rsgislib.RSGISPyException("Do not know what the type is of date_time_format variable.")
+
+    return out_datetime_obj
+
+def dict_struct_get_str_list_value(dict_struct_obj, tree_sequence, valid_values=None):
+    """
+    A function which retrieves a list of string values from a JSON structure.
+
+    :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
+    :param tree_sequence: list of strings specifying the path within the structure
+    :param valid_values: optional list of valid values.
+    :return:
+    """
+    curr_dict_struct_obj = dict_struct_obj
+    steps_str = ""
+    for tree_step in tree_sequence:
+        steps_str = steps_str+":"+tree_step
+        if tree_step in curr_dict_struct_obj:
+            curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
+        else:
+            raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
+
+    if type(curr_dict_struct_obj).__name__ != "list":
+        raise rsgislib.RSGISPyException("Retrieved value is not a list.")
+    if valid_values is not None:
+        for val in curr_dict_struct_obj:
+            if type(val).__name__ != "str":
+                raise rsgislib.RSGISPyException("'{}' is not of type string.".format(val))
+            if val not in valid_values:
+                raise rsgislib.RSGISPyException("'{}' is not within the list of valid values.".format(val))
+    return curr_dict_struct_obj
+
+def dict_struct_get_numeric_value(dict_struct_obj, tree_sequence, valid_lower=None, valid_upper=None):
+    """
+    A function which retrieves a single numeric value from a JSON structure.
+
+    :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
+    :param tree_sequence: list of strings specifying the path within the structure
+    :param valid_lower: optional lower valid bounds, error throw if outside the bounds.
+    :param valid_upper: optional upper valid bounds, error throw if outside the bounds.
+    :return: numeric value at path
+
+    """
+    curr_dict_struct_obj = dict_struct_obj
+    steps_str = ""
+    for tree_step in tree_sequence:
+        steps_str = steps_str+":"+tree_step
+        if tree_step in curr_dict_struct_obj:
+            curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
+        else:
+            raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
+
+    out_value = 0.0
+    if (type(curr_dict_struct_obj).__name__ == "int") or (type(curr_dict_struct_obj).__name__ == "float"):
+        out_value = curr_dict_struct_obj
+    elif type(curr_dict_struct_obj).__name__ == "str":
+        if curr_dict_struct_obj.isnumeric():
+            out_value = float(curr_dict_struct_obj)
+        else:
+            try:
+                out_value = float(curr_dict_struct_obj)
+            except:
+                raise rsgislib.RSGISPyException("The identified value is not numeric '{}'".format(steps_str))
+    else:
+        raise rsgislib.RSGISPyException("The identified value is not numeric '{}'".format(steps_str))
+
+    if valid_lower is not None:
+        if out_value < valid_lower:
+            raise rsgislib.RSGISPyException("'"+str(out_value)+"' is less than the defined valid range.")
+    if valid_upper is not None:
+        if out_value > valid_upper:
+            raise rsgislib.RSGISPyException("'"+str(out_value)+"' is higher than the defined valid range.")
+    return out_value
+
+def dict_struct_get_list_value(dict_struct_obj, tree_sequence):
+    """
+    A function which retrieves a list of values from a JSON structure.
+
+    :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
+    :param tree_sequence: list of strings  specifying the path within the structure
+    :return:
+
+    """
+    curr_dict_struct_obj = dict_struct_obj
+    steps_str = ""
+    for tree_step in tree_sequence:
+        steps_str = steps_str+":"+tree_step
+        if tree_step in curr_dict_struct_obj:
+            curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
+        else:
+            raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
+
+    if type(curr_dict_struct_obj).__name__ != "list":
+        raise rsgislib.RSGISPyException("Retrieved value is not a list.")
+    return curr_dict_struct_obj
+

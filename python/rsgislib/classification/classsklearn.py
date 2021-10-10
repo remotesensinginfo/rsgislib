@@ -204,7 +204,7 @@ This function uses a trained classifier and applies it to the provided input ima
 :param skClassifier: a trained instance of a scikit-learn classifier
                      (e.g., use train_sklearn_classifier or train_sklearn_classifer_gridsearch)
 :param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all
-                the valid data regions (rsgislib.imageutils.genValidMask)
+                the valid data regions (rsgislib.imageutils.gen_valid_mask)
 :param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
 :param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
@@ -300,7 +300,7 @@ This function uses a trained classifier and applies it to the provided input ima
     print("Applying the Classifier")
     applier.apply(_applySKClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.rastergis.pop_rat_img_stats(clumps=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     if out_score_img:
         rsgislib.imageutils.pop_img_stats(outScoreImg, usenodataval=True, nodataval=0, calcpyramids=True)
 
@@ -465,7 +465,7 @@ Example::
     # Combine results using MODE.
     rsgislib.imagecalc.calcMultiImgBandStats(outClassImgs, outClassImg, rsgislib.SUMTYPE_MODE, gdalformat,
                                              rsgislib.TYPE_8UINT, 0, True)
-    rsgislib.rastergis.pop_rat_img_stats(clumps=outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    rsgislib.rastergis.pop_rat_img_stats(clumps_img=outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
     # Colour output classification image.
     ratDataset = gdal.Open(outClassImg, gdal.GA_Update)
