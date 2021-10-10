@@ -5,7 +5,7 @@ easily available else where.
 """
 
 
-def calc_pandas_VIF(df, cols=None):
+def calc_pandas_vif(df, cols=None):
     """
     A function to calculate variance inflation factors to
     investigate multicollinearity between predictor variables.
@@ -25,7 +25,7 @@ def calc_pandas_VIF(df, cols=None):
         cols = list(df.columns)
         # Subset to the column names of interest
         ind_vars = cols[6:]
-        vifs_series = calc_pandas_VIF(df, ind_vars)
+        vifs_series = calc_pandas_vif(df, ind_vars)
         vifs_series.to_csv('VIF_scores.csv')
 
     """

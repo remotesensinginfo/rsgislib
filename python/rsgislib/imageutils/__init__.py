@@ -82,7 +82,7 @@ Create a list of these objects to pass to the fillTimeSeriesGaps function
 :param year: year the composite represents.
 :param day: the (nominal) day within the year the composite represents (a value of zero and day will not be used)
 :param compImg: The input compsite image which has been generated.
-:param imgRef:  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
+:param imgRef:  The reference layer (e.g., from create_max_ndvi_composite or create_max_ndvi_ndwi_composite_landsat) with zero for no data regions
 :param outRef: A boolean variable specify which layer a fill reference layer is to be produced.
 
 """
@@ -91,7 +91,7 @@ Create a list of these objects to pass to the fillTimeSeriesGaps function
         :param year: year the composite represents.
         :param day: the (nominal) day within the year the composite represents (a value of zero and day will not be used)
         :param compImg: The input compsite image which has been generated.
-        :param imgRef:  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
+        :param imgRef:  The reference layer (e.g., from create_max_ndvi_composite or create_max_ndvi_ndwi_composite_landsat) with zero for no data regions
         :param outRef: A boolean variable specify which layer a fill reference layer is to be produced.
 
         """

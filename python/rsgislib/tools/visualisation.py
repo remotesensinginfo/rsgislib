@@ -11,7 +11,7 @@ import os
 import shutil
 import subprocess
 
-def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=False):
+def create_kmz_img(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=False):
     """
     A function to convert an input image to a KML/KMZ file, where the input image
     is stretched and bands sub-selected / ordered as required for visualisation.
@@ -84,19 +84,19 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
     shutil.rmtree(tmpDIR)
 
 
-def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='average', finiteMsk=False, tms=True):
+def create_web_tiles_img_no_stats_msk(input_img, out_dir, bands, zoom_levels='2-10', resample='average', finite_msk=False, tms=True):
     """
     A function to convert an input image to a tile cache for web map servers, where the input image
     is stretched and bands sub-selected / ordered as required for visualisation.
     
     Where:
     
-    :param inputImg: input image file (any format that gdal supports)
-    :param outputDIR: output directory within which the cache will be created.
+    :param input_img: input image file (any format that gdal supports)
+    :param out_dir: output directory within which the cache will be created.
     :param bands: a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
-    :param zoomLevels: The zoom levels to be created for the web tile cache.
+    :param zoom_levels: The zoom levels to be created for the web tile cache.
     :param resample: Method of resampling (average,near,bilinear,cubic,cubicspline,lanczos,antialias)
-    :param finiteMsk: specify whether the image data should be masked so all values are finite before stretching.
+    :param finite_msk: specify whether the image data should be masked so all values are finite before stretching.
     :param tms: if TMS is True then a tile grid in TMS format is returned with
                 the grid origin at the bottom-left. If False then an XYZ tile grid
                 format is used with the origin in the top-left.
@@ -113,35 +113,35 @@ def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='a
     else:
         print(bandLst)
         raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
-    nImgBands = rsgislib.imageutils.get_image_band_count(inputImg)
+    nImgBands = rsgislib.imageutils.get_image_band_count(input_img)
     
-    tmpDIR = os.path.join(os.path.dirname(inputImg), rsgislib.tools.utils.uid_generator())
+    tmpDIR = os.path.join(os.path.dirname(input_img), rsgislib.tools.utils.uid_generator())
     os.makedirs(tmpDIR)
-    baseName = os.path.splitext(os.path.basename(inputImg))[0]
+    baseName = os.path.splitext(os.path.basename(input_img))[0]
     
     selImgBandsImg = ''
     if (nImgBands == 1) and (not multiBand):
-        selImgBandsImg = inputImg
+        selImgBandsImg = input_img
     elif (nImgBands == 3) and (multiBand) and (bandLst[0] == '1') and (bandLst[1] == '2') and (bandLst[2] == '3'):
-        selImgBandsImg = inputImg
+        selImgBandsImg = input_img
     else:
         sBands = []
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName+'_sband.kea')
-        rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA', rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImg), sBands)
+        rsgislib.imageutils.selectImageBands(input_img, selImgBandsImg, 'KEA', rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), sBands)
     
     img2Stch = selImgBandsImg
-    if finiteMsk:
+    if finite_msk:
         finiteMskImg = os.path.join(tmpDIR, baseName+'_FiniteMsk.kea')
         rsgislib.imageutils.gen_finite_mask(selImgBandsImg, finiteMskImg, 'KEA')
         img2Stch = os.path.join(tmpDIR, baseName+'_Msk2FiniteRegions.kea')
-        rsgislib.imageutils.mask_img(selImgBandsImg, finiteMskImg, img2Stch, 'KEA', rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImg), 0, 0)
+        rsgislib.imageutils.mask_img(selImgBandsImg, finiteMskImg, img2Stch, 'KEA', rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), 0, 0)
     
     stretchImg = os.path.join(tmpDIR, baseName+'_stretch.kea')
     rsgislib.imageutils.stretch_img(img2Stch, stretchImg, False, '', True, False, 'KEA', rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
     
-    cmd = 'gdal2tiles.py -r {0} -z {1} -a  0 {2} {3}'.format(resample, zoomLevels, stretchImg, outputDIR)
+    cmd = 'gdal2tiles.py -r {0} -z {1} -a  0 {2} {3}'.format(resample, zoom_levels, stretchImg, out_dir)
     print(cmd)
     try:
         subprocess.check_call(cmd, shell=True)
@@ -150,20 +150,19 @@ def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='a
 
     if not tms:
         from rsgislib.tools import convert_between_tms_xyz
-        convert_between_tms_xyz(outputDIR)
+        convert_between_tms_xyz(out_dir)
 
     shutil.rmtree(tmpDIR)
 
 
-def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_msk=None, img_msk_vals=1, tmp_dir=None,
-                      webview=True, tms=True):
+def create_webtiles_img(input_img, bands, out_dir, zoom_levels='2-10', img_stats_msk=None, img_msk_vals=1, tmp_dir=None, webview=True, tms=True):
     """
     A function to produce a web cache for the input image.
 
-    :param inputImg: input image file (any format that gdal supports)
+    :param input_img: input image file (any format that gdal supports)
     :param bands: a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
-    :param outputDIR: output directory within which the cache will be created.
-    :param zoomLevels: The zoom levels to be created for the web tile cache.
+    :param out_dir: output directory within which the cache will be created.
+    :param zoom_levels: The zoom levels to be created for the web tile cache.
     :param img_stats_msk: Optional (default=None) input image which is used to define regions calculate
                           the image stats for stretch.
     :param img_msk_vals: The pixel(s) value define the region of interest in the image mask
@@ -188,53 +187,53 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
     else:
         print(bandLst)
         raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
-    nImgBands = rsgislib.imageutils.get_image_band_count(inputImg)
-    img_no_data_val = rsgislib.imageutils.get_image_no_data_value(inputImg)
+    nImgBands = rsgislib.imageutils.get_image_band_count(input_img)
+    img_no_data_val = rsgislib.imageutils.get_image_no_data_value(input_img)
 
     uid_str = rsgislib.tools.utils.uid_generator()
-    tmpDIR = os.path.join(os.path.dirname(inputImg), uid_str)
+    tmpDIR = os.path.join(os.path.dirname(input_img), uid_str)
     if tmp_dir is not None:
         tmpDIR = os.path.join(tmp_dir, uid_str)
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
-    baseName = os.path.splitext(os.path.basename(inputImg))[0]
+    baseName = os.path.splitext(os.path.basename(input_img))[0]
 
     selImgBandsImg = ''
     if (nImgBands == 1) and (not multiBand):
-        selImgBandsImg = inputImg
+        selImgBandsImg = input_img
     elif (nImgBands == 3) and (multiBand) and (bandLst[0] == '1') and (bandLst[1] == '2') and (bandLst[2] == '3'):
-        selImgBandsImg = inputImg
+        selImgBandsImg = input_img
     else:
         sBands = []
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName + '_sband.kea')
-        rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA',
-                                             rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImg), sBands)
+        rsgislib.imageutils.selectImageBands(input_img, selImgBandsImg, 'KEA',
+                                             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), sBands)
 
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
     if img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
         rsgislib.imageutils.mask_img(selImgBandsImg, img_stats_msk, img2StchMskd, 'KEA',
-                                      rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImg), img_no_data_val, img_msk_vals)
+                                     rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
-        rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
+        rsgislib.imageutils.stretch_img(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
                                                False, 'KEA', rsgislib.TYPE_8UINT,
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
-        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretchImgStats, 'KEA', rsgislib.TYPE_8UINT,
+        rsgislib.imageutils.stretch_img_with_stats(img2Stch, stretchImg, stretchImgStats, 'KEA', rsgislib.TYPE_8UINT,
                                                   img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImageNoData(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA', rsgislib.TYPE_8UINT,
+        rsgislib.imageutils.stretch_img(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA', rsgislib.TYPE_8UINT,
                                          rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     webview_opt = 'none'
     if webview:
         webview_opt = 'leaflet'
 
-    cmd = 'gdal2tiles.py -r average -z {0} -a 0 -w {1} {2} {3}'.format(zoomLevels, webview_opt, stretchImg, outputDIR)
+    cmd = 'gdal2tiles.py -r average -z {0} -a 0 -w {1} {2} {3}'.format(zoom_levels, webview_opt, stretchImg, out_dir)
     print(cmd)
     try:
         subprocess.check_call(cmd, shell=True)
@@ -244,10 +243,10 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
 
     if not tms:
         from rsgislib.tools import convert_between_tms_xyz
-        convert_between_tms_xyz(outputDIR)
+        convert_between_tms_xyz(out_dir)
 
-def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_sizes=250, scale_axis='auto',
-                        img_stats_msk=None, img_msk_vals=1, stretch_file=None, tmp_dir=None):
+def create_quicklook_imgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_sizes=250, scale_axis='auto',
+                          img_stats_msk=None, img_msk_vals=1, stretch_file=None, tmp_dir=None):
     """
     A function to produce
 
@@ -317,7 +316,7 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
     if stretch_file is not None:
-        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
+        rsgislib.imageutils.stretch_img_with_stats(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
                                                         img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     elif img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
@@ -325,15 +324,15 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
                                       rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImg), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
-        rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
+        rsgislib.imageutils.stretch_img(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
                                                False, 'KEA', rsgislib.TYPE_8UINT,
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
-        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretchImgStats, 'KEA',
+        rsgislib.imageutils.stretch_img_with_stats(img2Stch, stretchImg, stretchImgStats, 'KEA',
                                                         rsgislib.TYPE_8UINT, img_no_data_val,
                                                         rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImageNoData(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
+        rsgislib.imageutils.stretch_img(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     if scale_axis == 'auto':
@@ -373,8 +372,8 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
     shutil.rmtree(tmpDIR)
 
 
-def createMBTileFile(input_img, bands, output_mbtiles, scale_input_img=50, img_stats_msk=None, img_msk_vals=1,
-                     tmp_dir=None, tile_format='PNG'):
+def create_mbtile_file(input_img, bands, output_mbtiles, scale_input_img=50, img_stats_msk=None, img_msk_vals=1,
+                       tmp_dir=None, tile_format='PNG'):
     """
     A function to produce
 
@@ -435,14 +434,14 @@ def createMBTileFile(input_img, bands, output_mbtiles, scale_input_img=50, img_s
                                       rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
-        rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
+        rsgislib.imageutils.stretch_img(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
                                                False, 'KEA', rsgislib.TYPE_8UINT,
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
-        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretchImgStats, 'KEA',
+        rsgislib.imageutils.stretch_img_with_stats(img2Stch, stretchImg, stretchImgStats, 'KEA',
                                                         rsgislib.TYPE_8UINT, img_no_data_val,
                                                         rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImageNoData(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
+        rsgislib.imageutils.stretch_img(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     stretchImgReProj = os.path.join(tmpDIR, baseName + '_stretch_epsg3857.kea')
@@ -462,8 +461,8 @@ def createMBTileFile(input_img, bands, output_mbtiles, scale_input_img=50, img_s
     shutil.rmtree(tmpDIR)
 
 
-def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zoomLevels='2-10', img_stats_msk=None,
-                              img_msk_vals=1, stretch_file=None, tmp_dir=None, webview=True, scale=0, tms=True):
+def create_webtiles_vis_gtiff_img(input_img, bands, output_dir, scaled_gtiff_img, zoomLevels='2-10', img_stats_msk=None,
+                                  img_msk_vals=1, stretch_file=None, tmp_dir=None, webview=True, scale=0, tms=True):
     """
     A function to produce web cache and scaled and stretched geotiff.
 
@@ -527,7 +526,7 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
     if stretch_file is not None:
-        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
+        rsgislib.imageutils.stretch_img_with_stats(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
                                                         img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     elif img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
@@ -535,15 +534,15 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
                                       rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
-        rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
+        rsgislib.imageutils.stretch_img(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
                                                False, 'KEA', rsgislib.TYPE_8UINT,
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
-        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretchImgStats, 'KEA',
+        rsgislib.imageutils.stretch_img_with_stats(img2Stch, stretchImg, stretchImgStats, 'KEA',
                                                         rsgislib.TYPE_8UINT, img_no_data_val,
                                                         rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImageNoData(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
+        rsgislib.imageutils.stretch_img(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
                                                rsgislib.TYPE_8UINT,
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
@@ -575,8 +574,8 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
     shutil.rmtree(tmpDIR)
 
 
-def createQuicklookOverviewImgs(input_imgs, bands, tmp_dir, outputImgs='quicklook.jpg', output_img_sizes=250,
-                                scale_axis='auto', stretch_file=None):
+def create_quicklook_overview_imgs(input_imgs, bands, tmp_dir, outputImgs='quicklook.jpg', output_img_sizes=250,
+                                   scale_axis='auto', stretch_file=None):
     """
     A function to produce an overview quicklook for a number of input images.
 
@@ -664,11 +663,11 @@ def createQuicklookOverviewImgs(input_imgs, bands, tmp_dir, outputImgs='quickloo
 
     stretchImg = os.path.join(usr_tmp_dir, '{}_stretch.kea'.format(img_basename))
     if stretch_file is not None:
-        rsgislib.imageutils.stretchImageWithStatsNoData(tmp_vrt_img, stretchImg, stretch_file, 'KEA',
+        rsgislib.imageutils.stretch_img_with_stats(tmp_vrt_img, stretchImg, stretch_file, 'KEA',
                                                         rsgislib.TYPE_8UINT,
                                                         img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImageNoData(tmp_vrt_img, stretchImg, False, '', img_no_data_val, False, 'KEA',
+        rsgislib.imageutils.stretch_img(tmp_vrt_img, stretchImg, False, '', img_no_data_val, False, 'KEA',
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     if scale_axis == 'auto':
@@ -766,9 +765,9 @@ Where:
     applier.apply(_burnInValues, infiles, outfiles, otherargs, controls=aControls)
 
 
-def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overlay_file, vec_overlay_lyr,
-                                          outputImgs='quicklook.jpg', output_img_sizes=250, gdalformat='JPEG',
-                                          scale_axis='auto', stretch_file=None, overlay_clr=None):
+def create_quicklook_overview_imgs_vec_overlay(input_imgs, bands, tmp_dir, vec_overlay_file, vec_overlay_lyr,
+                                               outputImgs='quicklook.jpg', output_img_sizes=250, gdalformat='JPEG',
+                                               scale_axis='auto', stretch_file=None, overlay_clr=None):
     """
     A function to produce an overview quicklook with a vector overlain for a number of input images.
 
@@ -865,11 +864,11 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
 
     stretchImg = os.path.join(usr_tmp_dir, '{}_stretch.kea'.format(img_basename))
     if stretch_file is not None:
-        rsgislib.imageutils.stretchImageWithStatsNoData(tmp_vrt_img, stretchImg, stretch_file, 'KEA',
+        rsgislib.imageutils.stretch_img_with_stats(tmp_vrt_img, stretchImg, stretch_file, 'KEA',
                                                         rsgislib.TYPE_8UINT,
                                                         img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImageNoData(tmp_vrt_img, stretchImg, False, '', img_no_data_val, False, 'KEA',
+        rsgislib.imageutils.stretch_img(tmp_vrt_img, stretchImg, False, '', img_no_data_val, False, 'KEA',
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     if scale_axis == 'auto':
@@ -935,9 +934,9 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
     shutil.rmtree(usr_tmp_dir)
 
 
-def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_file, vec_extent_lyr,
-                                      outputImgs='quicklook.tif', output_img_sizes=500, gdalformat='GTIFF',
-                                      scale_axis='auto', stretch_file=None, export_stretch_file=False):
+def create_visual_overview_imgs_vec_extent(input_imgs, bands, tmp_dir, vec_extent_file, vec_extent_lyr,
+                                           outputImgs='quicklook.tif', output_img_sizes=500, gdalformat='GTIFF',
+                                           scale_axis='auto', stretch_file=None, export_stretch_file=False):
     """
     A function to produce an 8bit overview image (i.e., stretched visualisation) with an optional specified
     extent.
@@ -1041,11 +1040,11 @@ def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_fil
 
     stretchImg = os.path.join(usr_tmp_dir, '{}_stretch.kea'.format(img_basename))
     if (stretch_file is not None) and (export_stretch_file == False):
-        rsgislib.imageutils.stretchImageWithStatsNoData(tmp_vrt_img, stretchImg, stretch_file, 'KEA',
+        rsgislib.imageutils.stretch_img_with_stats(tmp_vrt_img, stretchImg, stretch_file, 'KEA',
                                                         rsgislib.TYPE_8UINT,
                                                         img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImageNoData(tmp_vrt_img, stretchImg, export_stretch_file, stretch_file,
+        rsgislib.imageutils.stretch_img(tmp_vrt_img, stretchImg, export_stretch_file, stretch_file,
                                                img_no_data_val, False, 'KEA', rsgislib.TYPE_8UINT,
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
     if scale_axis == 'auto':

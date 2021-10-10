@@ -15,8 +15,8 @@ import rsgislib.vectorutils
 
 gdal.UseExceptions()
 
-def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_line_lyr=None,
-                             out_format="ESRI Shapefile", del_exist_vec=False):
+def convert_polygon_to_polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_line_lyr=None,
+                                out_format="GPKG", del_exist_vec=False):
     """
     A function to convert a polygon vector file to a polyline file.
 
@@ -24,7 +24,7 @@ def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_lin
     :param vec_poly_lyr: The name of the vector layer
     :param vec_line_file: The output vector file
     :param vec_line_lyr: The output vector layer name
-    :param out_format: The output vector file format (default: ESRI Shapefile).
+    :param out_format: The output vector file format (default: GPKG).
     :param del_exist_vec: remove output file if it exists.
 
     """
@@ -174,7 +174,7 @@ def find_pt_to_side(pt_start, pt, pt_end, line_len, left_hand=False):
 
 def create_orthg_lines(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None,
                        pt_step=1000, line_len=10000, left_hand=False,
-                       out_format="GEOJSON", del_exist_vec=False):
+                       out_format="GPKG", del_exist_vec=False):
     """
     A function to create a set of lines which are orthogonal to the lines of the input
     vector file.
@@ -346,7 +346,7 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    vec_bbox = rsgislib.vectorutils.getVecLayerExtent(vec_line_file, vec_line_lyr)
+    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_line_file, vec_line_lyr)
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
     if ds_line_vec is None:
@@ -518,7 +518,7 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    vec_bbox = rsgislib.vectorutils.getVecLayerExtent(vec_line_file, vec_line_lyr)
+    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_line_file, vec_line_lyr)
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
     if ds_line_vec is None:
@@ -671,7 +671,7 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file,
                                  vec_objs_lyr, out_vec_file,
                                  out_vec_lyr=None, start_x_field='start_x',
                                  start_y_field='start_y', uid_field='uid',
-                                 out_format="GEOJSON", del_exist_vec=False):
+                                 out_format="GPKG", del_exist_vec=False):
     """
     A function which intersects a line with a set of polygons outputting the lines cut to their second point
     of intersection. Assume, first point of intersection would be entering the polygon and the second point
@@ -702,7 +702,7 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file,
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    vec_bbox = rsgislib.vectorutils.getVecLayerExtent(vec_line_file, vec_line_lyr)
+    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_line_file, vec_line_lyr)
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
     if ds_line_vec is None:
@@ -1214,7 +1214,38 @@ def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_fil
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_format='GEOJSON', alpha_val=None,
+def get_vec_lyr_as_pts(in_vec_file, in_vec_lyr):
+    """
+    Get a list of points from the vectors within an input file.
+
+    :param in_vec_file: Input vector file
+    :param in_vec_lyr: Input vector layer name
+    :return: returns a list of points.
+
+    """
+    from osgeo import gdal
+    import tqdm
+
+    gdal.UseExceptions()
+    vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
+    vec_lyr_obj = vec_ds_obj.GetLayer(in_vec_lyr)
+
+    pts_lst = list()
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    counter = 0
+    in_feature = vec_lyr_obj.GetNextFeature()
+    while in_feature:
+        geom = in_feature.GetGeometryRef()
+        if geom is not None:
+            get_geom_pts(geom, pts_lst)
+        in_feature = vec_lyr_obj.GetNextFeature()
+        counter = counter + 1
+        pbar.update(1)
+    pbar.close()
+    return pts_lst
+
+def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_format='GPKG', alpha_val=None,
                        alpha_vals=None, max_iter=10000, del_exist_vec=False):
     """
     Function which calculate an alpha shape for a set of vector features (which are converted to points).
@@ -1250,7 +1281,7 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -1364,28 +1395,29 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
     return vec_output, alpha_val
 
 
-def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, vecoutfile, vecoutlyrname, del_exist_vec=False):
+def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr, del_exist_vec=False):
     """
     A convert any multiple geometries into single geometries.
 
     :param vec_file: input vector file
     :param vec_lyr: input vector layer within the input file.
     :param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
-    :param vecoutfile: output file path for the vector.
-    :param vecoutlyrname: output vector layer name.
+    :param out_vec_file: output file path for the vector.
+    :param out_vec_lyr: output vector layer name.
     :param del_exist_vec: remove output file if it exists.
 
     """
+    import rsgislib.vectorutils
     from osgeo import gdal
     from osgeo import ogr
     import tqdm
     gdal.UseExceptions()
 
-    if os.path.exists(vecoutfile):
+    if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(vecoutfile)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
@@ -1407,13 +1439,13 @@ def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, vecoutfile, vec
         print("Changing to Polygon Type from Multi-Polygon")
 
     out_driver = ogr.GetDriverByName(out_format)
-    result_ds = out_driver.CreateDataSource(vecoutfile)
+    result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(vecoutfile))
+        raise Exception("Could not open '{}'".format(out_vec_file))
 
-    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=geom_type)
+    result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=geom_type)
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -1478,7 +1510,7 @@ def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, vecoutfile, vec
     result_ds = None
 
 
-def simplify_geometries(vec_file, vec_lyr, tolerance, out_format, vecoutfile, vecoutlyrname, del_exist_vec=False):
+def simplify_geometries(vec_file, vec_lyr, tolerance, out_format, out_vec_file, out_vec_lyr, del_exist_vec=False):
     """
 Create a simplified version of the input
 
@@ -1486,8 +1518,8 @@ Create a simplified version of the input
 :param vec_lyr: input vector layer within the input file.
 :param tolerance: simplification tolerance
 :param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
-:param vecoutfile: output file path for the vector.
-:param vecoutlyrname: output vector layer name.
+:param out_vec_file: output file path for the vector.
+:param out_vec_lyr: output vector layer name.
 :param del_exist_vec: remove output file if it exists.
 
 """
@@ -1496,11 +1528,11 @@ Create a simplified version of the input
     import tqdm
     gdal.UseExceptions()
 
-    if os.path.exists(vecoutfile):
+    if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(vecoutfile)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
@@ -1513,13 +1545,13 @@ Create a simplified version of the input
     geom_type = vec_lyr_obj.GetGeomType()
 
     out_driver = ogr.GetDriverByName(out_format)
-    result_ds = out_driver.CreateDataSource(vecoutfile)
+    result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(vecoutfile))
+        raise Exception("Could not open '{}'".format(out_vec_file))
 
-    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=geom_type)
+    result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=geom_type)
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -1558,15 +1590,15 @@ Create a simplified version of the input
     result_ds = None
 
 
-def delete_polygon_holes(vec_file, vec_lyr, out_format, vecoutfile, vecoutlyrname, area_thres=None, del_exist_vec=False):
+def delete_polygon_holes(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr, area_thres=None, del_exist_vec=False):
     """
 Delete holes from the input polygons in below the area threshold.
 
 :param vec_file: input vector file
 :param vec_lyr: input vector layer within the input file.
 :param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
-:param vecoutfile: output file path for the vector.
-:param vecoutlyrname: output vector layer name.
+:param out_vec_file: output file path for the vector.
+:param out_vec_lyr: output vector layer name.
 :param area_thres: threshold below which holes are removed. If threshold is None then all holes are removed.
 :param del_exist_vec: remove output file if it exists.
 
@@ -1576,11 +1608,11 @@ Delete holes from the input polygons in below the area threshold.
     import tqdm
     gdal.UseExceptions()
 
-    if os.path.exists(vecoutfile):
+    if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(vecoutfile)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
     def _remove_holes_polygon(polygon, area_thres=None):
         if polygon.GetGeometryName().lower() != 'polygon':
@@ -1617,13 +1649,13 @@ Delete holes from the input polygons in below the area threshold.
     geom_type = vec_lyr_obj.GetGeomType()
 
     out_driver = ogr.GetDriverByName(out_format)
-    result_ds = out_driver.CreateDataSource(vecoutfile)
+    result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(vecoutfile))
+        raise Exception("Could not open '{}'".format(out_vec_file))
 
-    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=geom_type)
+    result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=geom_type)
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -1736,15 +1768,15 @@ Get an array of the areas of the polygon holes.
     return hole_areas
 
 
-def remove_polygon_area(vec_file, vec_lyr, out_format, vecoutfile, vecoutlyrname, area_thres, del_exist_vec=False):
+def remove_polygon_area(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr, area_thres, del_exist_vec=False):
     """
 Delete polygons with an area below a defined threshold.
 
 :param vec_file: input vector file
 :param vec_lyr: input vector layer within the input file.
 :param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
-:param vecoutfile: output file path for the vector.
-:param vecoutlyrname: output vector layer name.
+:param out_vec_file: output file path for the vector.
+:param out_vec_lyr: output vector layer name.
 :param area_thres: threshold below which polygons are removed.
 :param del_exist_vec: remove output file if it exists.
 
@@ -1754,11 +1786,11 @@ Delete polygons with an area below a defined threshold.
     import tqdm
     gdal.UseExceptions()
 
-    if os.path.exists(vecoutfile):
+    if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(vecoutfile)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
@@ -1771,13 +1803,13 @@ Delete polygons with an area below a defined threshold.
     geom_type = vec_lyr_obj.GetGeomType()
 
     out_driver = ogr.GetDriverByName(out_format)
-    result_ds = out_driver.CreateDataSource(vecoutfile)
+    result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(vecoutfile))
+        raise Exception("Could not open '{}'".format(out_vec_file))
 
-    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=geom_type)
+    result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=geom_type)
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -1831,7 +1863,7 @@ Delete polygons with an area below a defined threshold.
 
 
 def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None,
-                         out_format="GEOJSON", del_exist_vec=False):
+                         out_format="GPKG", del_exist_vec=False):
     """
     A function which performs an intersection between the vector layer and the overlain vector.
 
@@ -1853,7 +1885,7 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -1861,7 +1893,7 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    vec_bbox = getVecLayerExtent(vec_file, vec_lyr)
+    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
@@ -1959,7 +1991,7 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
 
 
 def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None,
-                       out_format="GEOJSON", symmetric=False, del_exist_vec=False):
+                       out_format="GPKG", symmetric=False, del_exist_vec=False):
     """
     A function which performs an difference between the vector layer and the overlain vector.
 
@@ -1982,7 +2014,7 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -1990,7 +2022,7 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    vec_bbox = getVecLayerExtent(vec_file, vec_lyr)
+    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:

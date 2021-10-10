@@ -15,9 +15,9 @@ Example::
     height = 2500
     validDataThreshold = 0.3
     
-    tilingutils.createMinDataTiles(inputImage, tileShp, width, height, validDataThreshold)
+    tilingutils.create_min_data_tiles(inputImage, tileShp, width, height, validDataThreshold)
     tilingutils.createTileMaskImages(inputImage, tileShp, outTilesMaskBase)
-    tilingutils.createTilesFromMasks(inputImage, outTilesMaskBase, outTilesImgBase, rsgislib.TYPE_16UINT, 'KEA')
+    tilingutils.create_tiles_from_masks(inputImage, outTilesMaskBase, outTilesImgBase, rsgislib.TYPE_16UINT, 'KEA')
 
 """
 ############################################################################
@@ -86,7 +86,7 @@ except ImportError as numpyErr:
     haveNumpy = False
 
 
-def createMinDataTiles(inputImage, outshp, outclumpsFile, width, height, validDataThreshold, maskIntersect=None, offset=False, force=True, tmpdir='tilestemp', inImgNoDataVal=0.0):
+def create_min_data_tiles(inputImage, outshp, outclumpsFile, width, height, validDataThreshold, maskIntersect=None, offset=False, force=True, tmpdir='tilestemp', inImgNoDataVal=0.0):
     """
 A function to create a tiling for an input image where each tile has a minimum amount of valid data.
 
@@ -175,7 +175,7 @@ Where:
         os.remove(tileClumpsImage)
 
     
-def createTileMaskImagesFromShp(inputImage, tileShp, tilesNameBase, tilesMaskDIR, tmpdir='tilestemp', imgFormat='KEA'):
+def create_tile_mask_images_from_shp(inputImage, tileShp, tilesNameBase, tilesMaskDIR, tmpdir='tilestemp', imgFormat='KEA'):
     """
 A function to create individual image masks from the tiles shapefile which can be
 individually used to mask (using rsgislib mask function) each tile from the inputimage.
@@ -215,7 +215,7 @@ Where:
     if not tmpPresent:
         shutil.rmtree(tmpdir, ignore_errors=True)
 
-def createTileMaskImagesFromClumps(clumpsImage, tilesNameBase, tilesMaskDIR, gdalformat='KEA'):
+def create_tile_mask_images_from_clumps(clumpsImage, tilesNameBase, tilesMaskDIR, gdalformat='KEA'):
     """
 A function to create individual image masks from the tiles shapefile which can be
 individually used to mask (using rsgislib mask function) each tile from the inputimage.
@@ -234,7 +234,7 @@ Where:
     rastergis.exportClumps2Images(clumpsImage, outBaseImg, True, outImgExt, gdalformat, 1)
 
 
-def createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, datatype, gdalformat):
+def create_tiles_from_masks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, datatype, gdalformat):
     """
 A function to apply the image tile masks defined in createTileMaskImages to the input image to extract the individual tiles.
 

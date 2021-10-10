@@ -49,7 +49,7 @@ from abc import ABCMeta, abstractmethod
 class RSGISAbstractFilter:
     """
     Abstract class for filter defining the interface to be used within the
-    performTiledImgFilter function.
+    perform_tiled_img_filter function.
 
     :param self.filter_size: size of the image filter (must be an odd number)
     :param self.gdalformat: the output image file format
@@ -942,7 +942,7 @@ class RSGISLeeFilter(RSGISAbstractFilter):
         )
 
 
-def _performFilteringFunc(filter_params):
+def _perform_filtering_func(filter_params):
     """
     Clump an image with values provides as an array for use within a
     multiprocessing Pool
@@ -950,7 +950,7 @@ def _performFilteringFunc(filter_params):
     filter_params[2].applyFilter(filter_params[0], filter_params[1])
 
 
-def performTiledImgFilter(
+def perform_tiled_img_filter(
     input_img,
     output_img,
     filter_inst,
@@ -994,7 +994,7 @@ def performTiledImgFilter(
         output_img = 'LandsatImgMedianFilter.kea'
 
         medianFilter = tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT)
-        tiledfilter.performTiledImgFilter(input_img, output_img, medianFilter,
+        tiledfilter.perform_tiled_img_filter(input_img, output_img, medianFilter,
                                           width=2000, height=2000)
         imageutils.pop_img_stats(output_img, False, 0, True)
 
@@ -1047,7 +1047,7 @@ def performTiledImgFilter(
         filterImgsVals.append([tile, filterTile, filter_inst])
 
     with Pool(n_cores) as p:
-        p.map(_performFilteringFunc, filterImgsVals)
+        p.map(_perform_filtering_func, filterImgsVals)
 
     imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.kea"))
 
@@ -1065,7 +1065,7 @@ def performTiledImgFilter(
         shutil.rmtree(tmp_dir)
 
 
-def performTiledImgMultiFilter(
+def perform_tiled_img_multi_filter(
     input_img,
     output_imgs,
     filter_insts,
@@ -1112,7 +1112,7 @@ def performTiledImgMultiFilter(
 
         filters = [tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT),
                   tiledfilter.RSGISNormVarFilter(7, "KEA", rsgislib.TYPE_16UINT]
-        tiledfilter.performTiledImgMultiFilter(input_img, outputImages,
+        tiledfilter.perform_tiled_img_multi_filter(input_img, outputImages,
                                                filters, width=2000, height=2000)
         imageutils.pop_img_stats(output_img, False, 0, True)
 
@@ -1185,7 +1185,7 @@ def performTiledImgMultiFilter(
             filterImgsVals.append([tile, filterTile, filter_inst])
 
         with Pool(n_cores) as p:
-            p.map(_performFilteringFunc, filterImgsVals)
+            p.map(_perform_filtering_func, filterImgsVals)
 
         imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.kea"))
 

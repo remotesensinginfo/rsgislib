@@ -227,7 +227,7 @@ def calc_dist_to_img_vals(
 
 def _computeProximityArrArgsFunc(argVals):
     """
-    This function is used internally within calcDist2Classes
+    This function is used internally within calc_dist_to_classes
     for the multiprocessing Pool
     """
     import rsgislib.imageutils

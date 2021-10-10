@@ -10,14 +10,14 @@ import osgeo.gdal as gdal
 import osgeo.ogr as ogr
 
 
-def write_vec_column(vec_file, vec_lyr, att_column, att_col_datatype, att_col_data):
+def write_vec_column(out_vec_file, out_vec_lyr, att_column, att_col_datatype, att_col_data):
     """
     A function which will write a column to a vector file
 
     Where:
 
-    :param vec_file: The file / path to the vector data 'file'.
-    :param vec_lyr: The layer to which the data is to be added.
+    :param out_vec_file: The file / path to the vector data 'file'.
+    :param out_vec_lyr: The layer to which the data is to be added.
     :param att_column: Name of the output column
     :param att_col_datatype: ogr data type for the output column
                             (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
@@ -27,13 +27,13 @@ def write_vec_column(vec_file, vec_lyr, att_column, att_col_datatype, att_col_da
     """
     gdal.UseExceptions()
 
-    ds = gdal.OpenEx(vec_file, gdal.OF_UPDATE)
+    ds = gdal.OpenEx(out_vec_file, gdal.OF_UPDATE)
     if ds is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise Exception("Could not open '{}'".format(out_vec_file))
 
-    lyr = ds.GetLayerByName(vec_lyr)
+    lyr = ds.GetLayerByName(out_vec_lyr)
     if lyr is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise Exception("Could not find layer '{}'".format(out_vec_lyr))
 
     numFeats = lyr.GetFeatureCount()
     if not len(att_col_data) == numFeats:
@@ -96,13 +96,13 @@ def write_vec_column(vec_file, vec_lyr, att_column, att_col_datatype, att_col_da
         raise e
 
 
-def write_vec_column_to_layer(lyr, att_column, att_col_datatype, att_col_data):
+def write_vec_column_to_layer(out_vec_lyr_obj, att_column, att_col_datatype, att_col_data):
     """
     A function which will write a column to a vector layer.
 
     Where:
 
-    :param lyr: GDAL/OGR vector layer object
+    :param out_vec_lyr_obj: GDAL/OGR vector layer object
     :param att_column: Name of the output column
     :param att_col_datatype: ogr data type for the output column
                             (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
@@ -111,10 +111,10 @@ def write_vec_column_to_layer(lyr, att_column, att_col_datatype, att_col_data):
     """
     gdal.UseExceptions()
 
-    if lyr is None:
+    if out_vec_lyr_obj is None:
         raise Exception("The layer passed in is None...")
 
-    numFeats = lyr.GetFeatureCount()
+    numFeats = out_vec_lyr_obj.GetFeatureCount()
     if not len(att_col_data) == numFeats:
         print("Number of Features: {}".format(numFeats))
         print("Length of Data: {}".format(len(att_col_data)))
@@ -123,7 +123,7 @@ def write_vec_column_to_layer(lyr, att_column, att_col_datatype, att_col_data):
         )
 
     colExists = False
-    lyrDefn = lyr.GetLayerDefn()
+    lyrDefn = out_vec_lyr_obj.GetLayerDefn()
     for i in range(lyrDefn.GetFieldCount()):
         if lyrDefn.GetFieldDefn(i).GetName().lower() == att_column.lower():
             colExists = True
@@ -131,37 +131,37 @@ def write_vec_column_to_layer(lyr, att_column, att_col_datatype, att_col_data):
 
     if not colExists:
         field_defn = ogr.FieldDefn(att_column, att_col_datatype)
-        if lyr.CreateField(field_defn) != 0:
+        if out_vec_lyr_obj.CreateField(field_defn) != 0:
             raise Exception(
                 "Creating '{}' field failed; be careful with case, some "
                 "drivers are case insensitive but column might not "
                 "be found.".format(att_column)
             )
 
-    lyr.ResetReading()
+    out_vec_lyr_obj.ResetReading()
     # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
     fids = []
-    for feat in lyr:
+    for feat in out_vec_lyr_obj:
         fids.append(feat.GetFID())
 
     openTransaction = False
-    lyr.ResetReading()
+    out_vec_lyr_obj.ResetReading()
     i = 0
     # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
     for fid in fids:
         if not openTransaction:
-            lyr.StartTransaction()
+            out_vec_lyr_obj.StartTransaction()
             openTransaction = True
-        feat = lyr.GetFeature(fid)
+        feat = out_vec_lyr_obj.GetFeature(fid)
         if feat is not None:
             feat.SetField(att_column, att_col_data[i])
-            lyr.SetFeature(feat)
+            out_vec_lyr_obj.SetFeature(feat)
         if ((i % 20000) == 0) and openTransaction:
-            lyr.CommitTransaction()
+            out_vec_lyr_obj.CommitTransaction()
             openTransaction = False
         i = i + 1
     if openTransaction:
-        lyr.CommitTransaction()
+        out_vec_lyr_obj.CommitTransaction()
         openTransaction = False
 
 
@@ -270,17 +270,17 @@ def read_vec_columns(vec_file, vec_lyr, att_columns):
     return outvals
 
 
-def pop_bbox_cols(vec_file, vec_lyr, xminCol='xmin', xmaxCol='xmax', yminCol='ymin',
-                  ymaxCol='ymax'):
+def pop_bbox_cols(vec_file, vec_lyr, x_min_col='xmin', x_max_col='xmax', y_min_col='ymin',
+                  y_max_col='ymax'):
     """
     A function which adds a polygons boundary bbox as attributes to each feature.
 
     :param vec_file: vector file.
     :param vec_lyr: layer within the vector file.
-    :param xminCol: column name.
-    :param xmaxCol: column name.
-    :param yminCol: column name.
-    :param ymaxCol: column name.
+    :param x_min_col: column name.
+    :param x_max_col: column name.
+    :param y_min_col: column name.
+    :param y_max_col: column name.
 
     """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_UPDATE)
@@ -298,34 +298,34 @@ def pop_bbox_cols(vec_file, vec_lyr, xminCol='xmin', xmaxCol='xmax', yminCol='ym
 
     lyrDefn = vec_lyr_obj.GetLayerDefn()
     for i in range(lyrDefn.GetFieldCount()):
-        if lyrDefn.GetFieldDefn(i).GetName() == xminCol:
+        if lyrDefn.GetFieldDefn(i).GetName() == x_min_col:
             xminCol_exists = True
-        if lyrDefn.GetFieldDefn(i).GetName() == xmaxCol:
+        if lyrDefn.GetFieldDefn(i).GetName() == x_max_col:
             xmaxCol_exists = True
-        if lyrDefn.GetFieldDefn(i).GetName() == yminCol:
+        if lyrDefn.GetFieldDefn(i).GetName() == y_min_col:
             yminCol_exists = True
-        if lyrDefn.GetFieldDefn(i).GetName() == ymaxCol:
+        if lyrDefn.GetFieldDefn(i).GetName() == y_max_col:
             ymaxCol_exists = True
 
     if not xminCol_exists:
-        xmin_field_defn = ogr.FieldDefn(xminCol, ogr.OFTReal)
+        xmin_field_defn = ogr.FieldDefn(x_min_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(xmin_field_defn) != 0:
-            raise Exception("Creating '{}' field failed.".format(xminCol))
+            raise Exception("Creating '{}' field failed.".format(x_min_col))
 
     if not xmaxCol_exists:
-        xmax_field_defn = ogr.FieldDefn(xmaxCol, ogr.OFTReal)
+        xmax_field_defn = ogr.FieldDefn(x_max_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(xmax_field_defn) != 0:
-            raise Exception("Creating '{}' field failed.".format(xmaxCol))
+            raise Exception("Creating '{}' field failed.".format(x_max_col))
 
     if not yminCol_exists:
-        ymin_field_defn = ogr.FieldDefn(yminCol, ogr.OFTReal)
+        ymin_field_defn = ogr.FieldDefn(y_min_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(ymin_field_defn) != 0:
-            raise Exception("Creating '{}' field failed.".format(yminCol))
+            raise Exception("Creating '{}' field failed.".format(y_min_col))
 
     if not ymaxCol_exists:
-        ymax_field_defn = ogr.FieldDefn(ymaxCol, ogr.OFTReal)
+        ymax_field_defn = ogr.FieldDefn(y_max_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(ymax_field_defn) != 0:
-            raise Exception("Creating '{}' field failed.".format(ymaxCol))
+            raise Exception("Creating '{}' field failed.".format(y_max_col))
 
     # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
     fids = []
@@ -355,15 +355,15 @@ def pop_bbox_cols(vec_file, vec_lyr, xminCol='xmin', xmaxCol='xmax', yminCol='ym
         geom = feat.GetGeometryRef()
         if geom is not None:
             env = geom.GetEnvelope()
-            feat.SetField(xminCol, env[0])
-            feat.SetField(xmaxCol, env[1])
-            feat.SetField(yminCol, env[2])
-            feat.SetField(ymaxCol, env[3])
+            feat.SetField(x_min_col, env[0])
+            feat.SetField(x_max_col, env[1])
+            feat.SetField(y_min_col, env[2])
+            feat.SetField(y_max_col, env[3])
         else:
-            feat.SetField(xminCol, 0.0)
-            feat.SetField(xmaxCol, 0.0)
-            feat.SetField(yminCol, 0.0)
-            feat.SetField(ymaxCol, 0.0)
+            feat.SetField(x_min_col, 0.0)
+            feat.SetField(x_max_col, 0.0)
+            feat.SetField(y_min_col, 0.0)
+            feat.SetField(y_max_col, 0.0)
         rtn_val = vec_lyr_obj.SetFeature(feat)
         if rtn_val != ogr.OGRERR_NONE:
             raise Exception("An error has occurred setting a feature on a layer.")
@@ -379,8 +379,8 @@ def pop_bbox_cols(vec_file, vec_lyr, xminCol='xmin', xmaxCol='xmax', yminCol='ym
     print(" Completed")
 
 
-def create_name_col(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG', out_col='names', x_col='MinX',
-                    y_col='MaxY', prefix='', postfix='', latlong=True, int_coords=True, zero_x_pad=0, zero_y_pad=0,
+def create_name_col(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GPKG', out_col='names', x_col='MinX',
+                    y_col='MaxY', prefix='', postfix='', coords_lat_lon=True, int_coords=True, zero_x_pad=0, zero_y_pad=0,
                     round_n_digts=0, non_neg=False):
     """
     A function which creates a column in the vector layer which can define a name using coordinates associated
@@ -389,15 +389,15 @@ def create_name_col(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GP
 
     :param vec_file: input vector file
     :param vec_lyr: input vector layer name
-    :param vec_out_file: output vector file
-    :param vec_out_lyr: output vector layer name
+    :param out_vec_file: output vector file
+    :param out_vec_lyr: output vector layer name
     :param out_format: The output format of the output file. (Default: GPKG)
     :param out_col: The name of the output column
     :param x_col: The column with the x coordinate
     :param y_col: The column with the y coordinate
     :param prefix: A prefix to the name
     :param postfix: A postfix to the name
-    :param latlong: A boolean specifying if the coordinates are lat / long
+    :param coords_lat_lon: A boolean specifying if the coordinates are lat / long
     :param int_coords: A boolean specifying whether to integise the coordinates.
     :param zero_x_pad: An integer, if larger than zero then the X coordinate will be zero padded.
     :param zero_y_pad: An integer, if larger than zero then the Y coordinate will be zero padded.
@@ -441,7 +441,7 @@ def create_name_col(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GP
             y_col_val = int(y_col_val)
             y_col_val_str = '{}'.format(y_col_val)
 
-        if latlong:
+        if coords_lat_lon:
             hemi = 'N'
             if y_col_val_neg:
                 hemi = 'S'
@@ -457,14 +457,14 @@ def create_name_col(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GP
     base_gpdf[out_col] = numpy.array(names)
 
     if out_format == 'GPKG':
-        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        base_gpdf.to_file(vec_out_file, driver=out_format)
+        base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
 
 
-def add_unq_numeric_col(vec_file, vec_lyr, unq_col, out_col, vec_out_file, vec_out_lyr, out_format='GPKG'):
+def add_unq_numeric_col(vec_file, vec_lyr, unq_col, out_col, out_vec_file, out_vec_lyr, out_format='GPKG'):
     """
     A function which adds a numeric column based off an existing column in the vector file.
 
@@ -472,8 +472,8 @@ def add_unq_numeric_col(vec_file, vec_lyr, unq_col, out_col, vec_out_file, vec_o
     :param vec_lyr: Input vector layer within the input file.
     :param unq_col: The column within which the unique values will be identified.
     :param out_col: The output numeric column
-    :param vec_out_file: Output vector file
-    :param vec_out_lyr: output vector layer name.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: output vector layer name.
     :param out_format: output file format (default GPKG).
 
     """
@@ -491,12 +491,12 @@ def add_unq_numeric_col(vec_file, vec_lyr, unq_col, out_col, vec_out_file, vec_o
         num_unq_val += 1
 
     if out_format == 'GPKG':
-        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        base_gpdf.to_file(vec_out_file, driver=out_format)
+        base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, vec_out_file, vec_out_lyr, out_format='GPKG'):
+def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, out_vec_file, out_vec_lyr, out_format='GPKG'):
     """
     A function which adds a numeric column based off an existing column in the vector file,
     using an dict LUT to define the values.
@@ -506,8 +506,8 @@ def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, vec_out_fi
     :param ref_col: The column within which the unique values will be identified.
     :param val_lut: A dict LUT (key should be value in ref_col and value be the value outputted to out_col).
     :param out_col: The output numeric column
-    :param vec_out_file: Output vector file
-    :param vec_out_lyr: output vector layer name.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: output vector layer name.
     :param out_format: output file format (default GPKG).
 
     """
@@ -523,20 +523,20 @@ def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, vec_out_fi
         base_gpdf.loc[sel_rows, out_col] = val_lut[lut_key]
 
     if out_format == 'GPKG':
-        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        base_gpdf.to_file(vec_out_file, driver=out_format)
+        base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def add_numeric_col(vec_file, vec_lyr, out_col, vec_out_file, vec_out_lyr, out_val=1, out_format='GPKG', out_col_int=False):
+def add_numeric_col(vec_file, vec_lyr, out_col, out_vec_file, out_vec_lyr, out_val=1, out_format='GPKG', out_col_int=False):
     """
     A function which adds a numeric column with the same value for all the features.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer within the input file.
     :param out_col: The output numeric column
-    :param vec_out_file: Output vector file
-    :param vec_out_lyr: output vector layer name.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: output vector layer name.
     :param out_val: output numeric value
     :param out_format: output file format (default GPKG).
     :param out_col_int: Specify whether the output column should be an int datatype.
@@ -554,20 +554,20 @@ def add_numeric_col(vec_file, vec_lyr, out_col, vec_out_file, vec_out_lyr, out_v
         base_gpdf[out_col] = numpy.full((base_gpdf.shape[0]), out_val, dtype=float)
 
     if out_format == 'GPKG':
-        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        base_gpdf.to_file(vec_out_file, driver=out_format)
+        base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def add_string_col(vec_file, vec_lyr, out_col, vec_out_file, vec_out_lyr, out_val='str_val', out_format='GPKG'):
+def add_string_col(vec_file, vec_lyr, out_col, out_vec_file, out_vec_lyr, out_val='str_val', out_format='GPKG'):
     """
     A function which adds a string column with the same value for all the features.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer within the input file.
     :param out_col: The output numeric column
-    :param vec_out_file: Output vector file
-    :param vec_out_lyr: output vector layer name.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: output vector layer name.
     :param out_val: output numeric value
     :param out_format: output file format (default GPKG).
 
@@ -583,7 +583,7 @@ def add_string_col(vec_file, vec_lyr, out_col, vec_out_file, vec_out_lyr, out_va
     base_gpdf[out_col] = str_col
 
     if out_format == 'GPKG':
-        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        base_gpdf.to_file(vec_out_file, driver=out_format)
+        base_gpdf.to_file(out_vec_file, driver=out_format)
 

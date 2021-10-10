@@ -116,7 +116,7 @@ class RSGISRATThresDirection(Enum):
     lowerupper = 3
 
 
-def populateImageStats(inputImage, clumpsFile, outascii=None, threshold=0.0, calcMin=False, calcMax=False, calcSum=False, calcMean=False, calcStDev=False, calcMedian=False, calcCount=False, calcArea=False, calcLength=False, calcWidth=False, calcLengthWidth=False):
+def populate_image_stats(inputImage, clumpsFile, outascii=None, threshold=0.0, calcMin=False, calcMax=False, calcSum=False, calcMean=False, calcStDev=False, calcMedian=False, calcCount=False, calcArea=False, calcLength=False, calcWidth=False, calcLengthWidth=False):
     """ 
 Attribute RAT with statistics from from all bands in an input image.
 
@@ -137,7 +137,7 @@ Example::
     from rsgislib.rastergis import ratutils
     inputImage = 'jers1palsar_stack.kea'
     clumpsFile = 'jers1palsar_stack_clumps_elim_final.kea'
-    ratutils.populateImageStats(inputImage, clumpsFile, calcMean=True)
+    ratutils.populate_image_stats(inputImage, clumpsFile, calcMean=True)
 
     """
     # Check gdal is available
@@ -237,7 +237,7 @@ Example::
         t.end()
 
 
-def calcPlotGaussianHistoModel(clumpsFile, outGausH5File, outHistH5File, outPlotFile, varCol, binWidth, classColumn, classVal, plotTitle):
+def calc_plot_gaussian_histo_model(clumpsFile, outGausH5File, outHistH5File, outPlotFile, varCol, binWidth, classColumn, classVal, plotTitle):
     """ Extracts a column from the RAT, masking by a class calculating the histogram and 
         fitting a Gaussian mixture model to the histogram. Outputs include a plot and HDF5
         files of the histogram and gaussian parameters.
@@ -268,7 +268,7 @@ Example::
     classVal = "Mangrove"
     plotTitle = "HV dB Backscater from Mangroves; French Guiana"
     
-    ratutils.calcPlotGaussianHistoModel(clumpsFile, outGausH5File, outHistH5File, outPlotFile, varCol, binWidth, classColumn, classVal, plotTitle)
+    ratutils.calc_plot_gaussian_histo_model(clumpsFile, outGausH5File, outHistH5File, outPlotFile, varCol, binWidth, classColumn, classVal, plotTitle)
 
     """
     # Check numpy is available
@@ -343,7 +343,7 @@ Example::
     histFile.close()
     
 
-def findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
+def find_change_clumps_hist_skew_kurt_test(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
 This function identifies potential change features from both sides of the histogram 
 by slicing the histogram and finding an optimal skewness and kurtosis.
@@ -568,7 +568,7 @@ Where:
     return [lowerThres, upperThres]
 
 
-def findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
+def find_change_clumps_hist_skew_kurt_test_lower(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
 This function identifies potential change features from just the lower (left) side of the histogram 
 by slicing the histogram and finding an optimal skewness and kurtosis.
@@ -759,7 +759,7 @@ Where:
     return [lowerThres, upperThres]
 
 
-def findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
+def find_change_clumps_hist_skew_kurt_test_upper(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
 This function identifies potential change features from just the upper (right) side of the histogram 
 by slicing the histogram and finding an optimal skewness and kurtosis.
@@ -966,9 +966,9 @@ class RSGISRATChangeVarInfo:
         self.upperThreshold = upperThreshold
 
 
-def findChangeClumpsHistSkewKurtTestVoteMultiVars(inputClumps, inClassCol, classOfInterest, outChangeFeatCol, vars=[]):
+def find_change_clumps_hist_skew_kurt_test_vote_multi_vars(inputClumps, inClassCol, classOfInterest, outChangeFeatCol, vars=[]):
     """
-A function to call one of the findChangeClumpsHistSkewKurtTest functions for multiple 
+A function to call one of the find_change_clumps_hist_skew_kurt_test functions for multiple
 variables and then combine together by voting to find change features.
 
 Where:
@@ -994,15 +994,15 @@ Where:
     for var in vars:
         print(var.changeVarCol)
         if var.thresDirection == RSGISRATThresDirection.lower:
-            outThres = findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfInterest, var.changeVarCol, var.outChangeFeatCol, var.noDataVals, var.thresMeasure, var.exportPlot, var.showAllThreshPlot)
+            outThres = find_change_clumps_hist_skew_kurt_test_lower(inputClumps, inClassCol, classOfInterest, var.changeVarCol, var.outChangeFeatCol, var.noDataVals, var.thresMeasure, var.exportPlot, var.showAllThreshPlot)
             var.lowerThreshold = outThres[0]
             var.upperThreshold = outThres[1]
         elif var.thresDirection == RSGISRATThresDirection.upper:
-            outThres = findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfInterest, var.changeVarCol, var.outChangeFeatCol, var.noDataVals, var.thresMeasure, var.exportPlot, var.showAllThreshPlot)
+            outThres = find_change_clumps_hist_skew_kurt_test_upper(inputClumps, inClassCol, classOfInterest, var.changeVarCol, var.outChangeFeatCol, var.noDataVals, var.thresMeasure, var.exportPlot, var.showAllThreshPlot)
             var.lowerThreshold = outThres[0]
             var.upperThreshold = outThres[1]
         elif var.thresDirection == RSGISRATThresDirection.lowerupper:
-            outThres = findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, var.changeVarCol, var.outChangeFeatCol, var.noDataVals, var.thresMeasure, var.exportPlot, var.showAllThreshPlot)
+            outThres = find_change_clumps_hist_skew_kurt_test(inputClumps, inClassCol, classOfInterest, var.changeVarCol, var.outChangeFeatCol, var.noDataVals, var.thresMeasure, var.exportPlot, var.showAllThreshPlot)
             var.lowerThreshold = outThres[0]
             var.upperThreshold = outThres[1]
         else:
@@ -1022,10 +1022,10 @@ Where:
     ratDataset = None
 
 
-def findClumpsWithinExistingThresholds(inputClumps, inClassCol, classOfInterest, outFeatsCol, vars=[]):
+def find_clumps_within_existing_thresholds(inputClumps, inClassCol, classOfInterest, outFeatsCol, vars=[]):
     """
 A function to use the thresholds stored in the RSGISRATChangeVarInfo objects (var) 
-and populated from the findChangeClumpsHistSkewKurtTest functions to assess another class
+and populated from the find_change_clumps_hist_skew_kurt_test functions to assess another class
 creating a binary column as to whether a feature is within the threshold or now. Where multiple
 variables (i.e., len(var) > 1) then variables are combined with an and operation.
 
@@ -1084,7 +1084,7 @@ def _ratapplier_defClassNames(info, inputs, outputs, otherargs):
     setattr(outputs.outrat, otherargs.classNameCol, classNames)
 
 
-def defineClassNames(clumps, classNumCol, classNameCol, classNamesDict):
+def define_class_names(clumps, classNumCol, classNameCol, classNamesDict):
     """
 A function to create a class names column in a RAT based on segmented clumps where a number of clumps
 have the same number class.
@@ -1109,7 +1109,7 @@ have the same number class.
     ratapplier.apply(_ratapplier_defClassNames, in_rats, out_rats, otherargs)
 
 
-def setClassNamesColours(clumpsImg, classNamesCol, classInfoDict):
+def set_class_names_colours(clumpsImg, classNamesCol, classInfoDict):
     """
 A function to define a class names column and define the class colours.
 
@@ -1189,7 +1189,7 @@ classInfoDict[2] = {'classname':'Water', 'red':0, 'green':0, 'blue':255}
     ratDataset = None
 
 
-def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntCol, classesNameCol):
+def populate_clumps_with_class_training(clumpsImg, classesDict, tmpPath, classesIntCol, classesNameCol):
     """
 A function to populate a clumps file with training from a series of shapefiles (1 per class)
 
@@ -1232,7 +1232,7 @@ Where:
     
     rastergis.populateRATWithMode(valsimage=combinedClassesImage, clumps=clumpsImg, outcolsname=classesIntCol,
                                   usenodata=False, nodataval=0, outnodata=False, modeband=1, ratband=1)
-    defineClassNames(clumpsImg, classesIntCol, classesNameCol, classNamesDict)
+    define_class_names(clumpsImg, classesIntCol, classesNameCol, classNamesDict)
     
     for file in tmpClassImgLayers:
         rsgislib.tools.filetools.delete_file_with_basename(file)
@@ -1242,7 +1242,7 @@ Where:
         shutil.rmtree(tmpPath)
     
 
-def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyrName, roundInt=False, ignoreFirstRow=False):
+def create_clumps_shp_bbox(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyrName, roundInt=False, ignoreFirstRow=False):
     """
 A function to create a shapefile of polygons with the bboxs of the clumps defined using 
 the minX, maxX, minY and maxY coordinates for the features.
@@ -1336,7 +1336,7 @@ Where:
     print("Completed")
 
 
-def identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres, useTiledClump=False, nCores=2, tileWidth=4000, tileHeight=4000):
+def identify_small_units(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres, useTiledClump=False, nCores=2, tileWidth=4000, tileHeight=4000):
     """
 Identify small connected units within a classification. The threshold to define small
 is provided by the user in pixels. Note, the outColName and smallClumpsThres variables
@@ -1361,7 +1361,7 @@ Example::
     classCol = "OutClass"
     outColName = ["SmallUnits25", "SmallUnits50", "SmallUnits100"]
     smallClumpsThres = [25, 50, 100]
-    rastergis.identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres)
+    rastergis.identify_small_units(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres)
 
     """
     # Check numpy is available
@@ -1429,7 +1429,7 @@ Example::
 
 def _computeProximityArrArgsFunc(argVals):
     """
-    This function is used internally within calcDist2Classes for the multiprocessing Pool
+    This function is used internally within calc_dist_to_classes for the multiprocessing Pool
 
     """
     classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
@@ -1450,7 +1450,7 @@ def _computeProximityArrArgsFunc(argVals):
     classImgDS = None
 
 
-def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2000, maxDist=1000, nodata=1000, nCores=-1):
+def calc_dist_to_classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2000, maxDist=1000, nodata=1000, nCores=-1):
     """
     A function which will calculate proximity rasters for a set of classes defined within the RAT.
     
@@ -1556,7 +1556,7 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
         os.remove(classesImg)
 
 
-def calcDistBetweenClumps(clumpsImg, outColName, tmpDIR='./tmp', useIdx=False, maxDistThres=10):
+def calc_dist_between_clumps(clumpsImg, outColName, tmpDIR='./tmp', useIdx=False, maxDistThres=10):
     """
 Calculate the distance between all clumps
 
@@ -1592,7 +1592,7 @@ Calculate the distance between all clumps
         shutil.rmtree(tmpDIR, ignore_errors=True)
 
 
-def calcDistToLargeClumps(clumpsImg, outColName, sizeThres, tmpDIR='./tmp', useIdx=False, maxDistThres=10):
+def calc_dist_to_large_clumps(clumpsImg, outColName, sizeThres, tmpDIR='./tmp', useIdx=False, maxDistThres=10):
     """
 Calculate the distance from each small clump to a large clump. Split defined by the threshold provided.
 
@@ -1678,7 +1678,7 @@ Calculate the distance from each small clump to a large clump. Split defined by 
         shutil.rmtree(tmpDIR, ignore_errors=True)
 
 
-def takeRandomSample(clumpsImg, inColName, inColVal, outColName, sampleRatio, seed=0):
+def take_random_sample(clumpsImg, inColName, inColVal, outColName, sampleRatio, seed=0):
     """
 A function to take a random sample of an input column.
 
@@ -1726,7 +1726,7 @@ A function to take a random sample of an input column.
     ratDataset = None
 
 
-def getColumnData(clumpsImg, columnName):
+def get_column_data(clumpsImg, columnName):
     """
 A function to read a column of data from a RAT.
 
@@ -1760,7 +1760,7 @@ A function to read a column of data from a RAT.
     return col_data
 
 
-def setColumnData(clumpsImg, columnName, columnData):
+def set_column_data(clumpsImg, columnName, columnData):
     """
 A function to read a column of data from a RAT.
 
@@ -1801,5 +1801,5 @@ def create_uid_col(clumps_img, col_name='UID'):
     """
     n_rows = rsgislib.rastergis.getRATLength(clumps_img)
     uid_col = numpy.arange(0, n_rows, 1, dtype=numpy.uint32)
-    setColumnData(clumps_img, col_name, uid_col)
+    set_column_data(clumps_img, col_name, uid_col)
 

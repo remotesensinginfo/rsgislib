@@ -14,7 +14,7 @@ import skimage.segmentation
 import os.path
 
 
-def performFelsenszwalbSegmentation(inputImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, scale=1, sigma=0.8, min_size=20):
+def perform_felsenszwalb_segmentation(inputImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, scale=1, sigma=0.8, min_size=20):
     """
 A function to perform the Felsenszwalb segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).
@@ -88,7 +88,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
         rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
         
         
-def performQuickshiftSegmentation(inputImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, pcaPxlSample=100, ratio=1.0, kernel_size=5, max_dist=10, sigma=0, convert2lab=True, random_seed=42):
+def perform_quickshift_segmentation(inputImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, pcaPxlSample=100, ratio=1.0, kernel_size=5, max_dist=10, sigma=0, convert2lab=True, random_seed=42):
     """
 A function to perform the quickshift segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).
@@ -151,7 +151,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     if calcStats:
         rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
-def performSlicSegmentation(inputImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, n_segments=100, compactness=10.0, max_iter=10, sigma=0, spacing=None, convert2lab=None, enforce_connectivity=True, min_size_factor=0.5, max_size_factor=3, slic_zero=False):
+def perform_slic_segmentation(inputImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, n_segments=100, compactness=10.0, max_iter=10, sigma=0, spacing=None, convert2lab=None, enforce_connectivity=True, min_size_factor=0.5, max_size_factor=3, slic_zero=False):
     """
 A function to perform the slic segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).
@@ -232,7 +232,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
         rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
-def performWatershedSegmentation(inputImg, markersImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, compactness=0, watershed_line=False):
+def perform_watershed_segmentation(inputImg, markersImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, compactness=0, watershed_line=False):
     """
 A function to perform the watershed segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).
@@ -313,7 +313,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
         rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
-def performRandomWalkerSegmentation(inputImg, markersImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, beta=130, mode='bf', tol=0.001, spacing=None):
+def perform_random_walker_segmentation(inputImg, markersImg, outputImg, gdalformat='KEA', noDataVal=0, tmpDIR='./tmp', calcStats=True, usePCA=False, nPCABands=3, pcaPxlSample=100, beta=130, mode='bf', tol=0.001, spacing=None):
     """
 A function to perform the random walker segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).

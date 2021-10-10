@@ -34,7 +34,7 @@ class FilterParameters:
         self.angle = angle
 
 
-def applyMedianFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_median_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a median filter to the specified input image.
 
@@ -52,7 +52,7 @@ def applyMedianFilter(input_img, output_img, filter_size, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_median3.kea'
-        imagefilter.applyMedianFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_median_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -65,7 +65,7 @@ def applyMedianFilter(input_img, output_img, filter_size, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyMeanFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_mean_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a mean filter to the specified input image.
 
@@ -83,7 +83,7 @@ def applyMeanFilter(input_img, output_img, filter_size, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_mean3.kea'
-        imagefilter.applyMeanFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_mean_filter(input_img, outImgFile, 3, "KEA",
                                     rsgislib.TYPE_32FLOAT)
 
     """
@@ -96,7 +96,7 @@ def applyMeanFilter(input_img, output_img, filter_size, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyMinFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_min_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a min filter to the specified input image.
 
@@ -114,7 +114,7 @@ def applyMinFilter(input_img, output_img, filter_size, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_min3.kea'
-        imagefilter.applyMinFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_min_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -127,7 +127,7 @@ def applyMinFilter(input_img, output_img, filter_size, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyMaxFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_max_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a max filter to the specified input image.
 
@@ -145,7 +145,7 @@ def applyMaxFilter(input_img, output_img, filter_size, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_max3.kea'
-        imagefilter.applyMaxFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_max_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -158,7 +158,7 @@ def applyMaxFilter(input_img, output_img, filter_size, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyModeFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_mode_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a mode filter to the specified input image.
 
@@ -176,7 +176,7 @@ def applyModeFilter(input_img, output_img, filter_size, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_mode3.kea'
-        imagefilter.applyModeFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_mode_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -189,7 +189,7 @@ def applyModeFilter(input_img, output_img, filter_size, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyStdDevFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_stddev_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a std dev filter to the specified input image.
 
@@ -207,7 +207,7 @@ def applyStdDevFilter(input_img, output_img, filter_size, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_stdev3.kea'
-        imagefilter.applyStdDevFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_stddev_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -220,7 +220,7 @@ def applyStdDevFilter(input_img, output_img, filter_size, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyRangeFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_range_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a range filter to the specified input image.
 
@@ -238,7 +238,7 @@ def applyRangeFilter(input_img, output_img, filter_size, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_range3.kea'
-        imagefilter.applyRangeFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_range_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -251,7 +251,7 @@ def applyRangeFilter(input_img, output_img, filter_size, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyMeanDiffFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_mean_diff_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a mean difference filter to the specified input image.
 
@@ -269,7 +269,7 @@ def applyMeanDiffFilter(input_img, output_img, filter_size, gdalformat, datatype
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_meandiff3.kea'
-        imagefilter.applyMeanDiffFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_mean_diff_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -282,7 +282,7 @@ def applyMeanDiffFilter(input_img, output_img, filter_size, gdalformat, datatype
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyMeanDiffAbsFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_mean_diff_abs_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a mean absolute difference filter to the specified input image.
 
@@ -300,7 +300,7 @@ def applyMeanDiffAbsFilter(input_img, output_img, filter_size, gdalformat, datat
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_meandiffabs3.kea'
-        imagefilter.applyMeanDiffAbsFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_mean_diff_abs_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -313,7 +313,7 @@ def applyMeanDiffAbsFilter(input_img, output_img, filter_size, gdalformat, datat
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyTotalDiffFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_total_diff_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a total (i.e., sum) difference filter to the specified input image.
 
@@ -331,7 +331,7 @@ def applyTotalDiffFilter(input_img, output_img, filter_size, gdalformat, datatyp
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_totaldiff3.kea'
-        imagefilter.applyTotalDiffFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_total_diff_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -344,7 +344,7 @@ def applyTotalDiffFilter(input_img, output_img, filter_size, gdalformat, datatyp
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyTotalDiffAbsFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_total_diff_abs_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a total absolute difference filter to the specified input image.
 
@@ -362,7 +362,7 @@ def applyTotalDiffAbsFilter(input_img, output_img, filter_size, gdalformat, data
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_totaldiffabs3.kea'
-        imagefilter.applyTotalDiffAbsFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_total_diff_abs_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -375,7 +375,7 @@ def applyTotalDiffAbsFilter(input_img, output_img, filter_size, gdalformat, data
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyCoeffOfVarFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_coeff_of_var_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a coefficient of variance filter to the specified input image.
 
@@ -393,7 +393,7 @@ def applyCoeffOfVarFilter(input_img, output_img, filter_size, gdalformat, dataty
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_cofvar3.kea'
-        imagefilter.applyCoeffOfVarFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_coeff_of_var_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -406,7 +406,7 @@ def applyCoeffOfVarFilter(input_img, output_img, filter_size, gdalformat, dataty
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyTotalFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_total_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a total filter to the specified input image.
 
@@ -424,7 +424,7 @@ def applyTotalFilter(input_img, output_img, filter_size, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_total3.kea'
-        imagefilter.applyTotalFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_total_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -437,7 +437,7 @@ def applyTotalFilter(input_img, output_img, filter_size, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyNormVarFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_norm_var_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a normalised variance filter to the specified input image.
 
@@ -455,7 +455,7 @@ def applyNormVarFilter(input_img, output_img, filter_size, gdalformat, datatype)
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_NormVar3.kea'
-        imagefilter.applyNormVarFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_norm_var_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -468,7 +468,7 @@ def applyNormVarFilter(input_img, output_img, filter_size, gdalformat, datatype)
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyNormVarSqrtFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_norm_var_sqrt_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a normalised variance square root filter to the specified input image.
 
@@ -486,7 +486,7 @@ def applyNormVarSqrtFilter(input_img, output_img, filter_size, gdalformat, datat
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_NormVarSqrt3.kea'
-        imagefilter.applyNormVarSqrtFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_norm_var_sqrt_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -499,7 +499,7 @@ def applyNormVarSqrtFilter(input_img, output_img, filter_size, gdalformat, datat
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyNormVarLnFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_norm_var_ln_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a normalised variance natural log filter to the specified input image.
 
@@ -517,7 +517,7 @@ def applyNormVarLnFilter(input_img, output_img, filter_size, gdalformat, datatyp
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_NormVarLn3.kea'
-        imagefilter.applyNormVarLnFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_norm_var_ln_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -530,7 +530,7 @@ def applyNormVarLnFilter(input_img, output_img, filter_size, gdalformat, datatyp
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyTextureVarFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_texture_var_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a texture variance filter to the specified input image.
 
@@ -548,7 +548,7 @@ def applyTextureVarFilter(input_img, output_img, filter_size, gdalformat, dataty
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_NormVarLn3.kea'
-        imagefilter.applyTextureVarFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_texture_var_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -561,7 +561,7 @@ def applyTextureVarFilter(input_img, output_img, filter_size, gdalformat, dataty
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyKuwaharaFilter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_kuwahara_filter(input_img, output_img, filter_size, gdalformat, datatype):
     """
     Apply a kuwahara filter to the specified input image.
 
@@ -579,7 +579,7 @@ def applyKuwaharaFilter(input_img, output_img, filter_size, gdalformat, datatype
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_kuwa3.kea'
-        imagefilter.applyKuwaharaFilter(input_img, outImgFile, 3, "KEA",
+        imagefilter.apply_kuwahara_filter(input_img, outImgFile, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -592,7 +592,7 @@ def applyKuwaharaFilter(input_img, output_img, filter_size, gdalformat, datatype
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applySobelFilter(input_img, output_img, gdalformat, datatype):
+def apply_sobel_filter(input_img, output_img, gdalformat, datatype):
     """
     Apply a sobel filter to the specified input image.
 
@@ -608,7 +608,7 @@ def applySobelFilter(input_img, output_img, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_sobel.kea'
-        imagefilter.applySobelFilter(input_img, outImgFile, "KEA",
+        imagefilter.apply_sobel_filter(input_img, outImgFile, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -619,7 +619,7 @@ def applySobelFilter(input_img, output_img, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applySobelXFilter(input_img, output_img, gdalformat, datatype):
+def apply_sobel_x_filter(input_img, output_img, gdalformat, datatype):
     """
     Apply a sobel filter in X axis to the specified input image.
 
@@ -635,7 +635,7 @@ def applySobelXFilter(input_img, output_img, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_sobelx.kea'
-        imagefilter.applySobelXFilter(input_img, outImgFile, "KEA",
+        imagefilter.apply_sobel_x_filter(input_img, outImgFile, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -646,7 +646,7 @@ def applySobelXFilter(input_img, output_img, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applySobelYFilter(input_img, output_img, gdalformat, datatype):
+def apply_sobel_y_filter(input_img, output_img, gdalformat, datatype):
     """
     Apply a sobel filter in Y axis to the specified input image.
 
@@ -662,7 +662,7 @@ def applySobelYFilter(input_img, output_img, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_sobely.kea'
-        imagefilter.applySobelYFilter(input_img, outImgFile, "KEA",
+        imagefilter.apply_sobel_y_filter(input_img, outImgFile, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -673,7 +673,7 @@ def applySobelYFilter(input_img, output_img, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyPrewittFilter(input_img, output_img, gdalformat, datatype):
+def apply_prewitt_filter(input_img, output_img, gdalformat, datatype):
     """
     Apply a Prewitt filter to the specified input image.
 
@@ -689,7 +689,7 @@ def applyPrewittFilter(input_img, output_img, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_prewitt.kea'
-        imagefilter.applyPrewittFilter(input_img, outImgFile, "KEA",
+        imagefilter.apply_prewitt_filter(input_img, outImgFile, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -700,7 +700,7 @@ def applyPrewittFilter(input_img, output_img, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyPrewittXFilter(input_img, output_img, gdalformat, datatype):
+def apply_prewitt_x_filter(input_img, output_img, gdalformat, datatype):
     """
     Apply a Prewitt filter in X axis to the specified input image.
 
@@ -716,7 +716,7 @@ def applyPrewittXFilter(input_img, output_img, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_prewitt.kea'
-        imagefilter.applyPrewittXFilter(input_img, outImgFile, "KEA",
+        imagefilter.apply_prewitt_x_filter(input_img, outImgFile, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -727,7 +727,7 @@ def applyPrewittXFilter(input_img, output_img, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyPrewittYFilter(input_img, output_img, gdalformat, datatype):
+def apply_prewitt_y_filter(input_img, output_img, gdalformat, datatype):
     """
     Apply a Prewitt filter in Y axis to the specified input image.
 
@@ -743,7 +743,7 @@ def applyPrewittYFilter(input_img, output_img, gdalformat, datatype):
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_prewitt.kea'
-        imagefilter.applyPrewittYFilter(input_img, outImgFile, "KEA",
+        imagefilter.apply_prewitt_y_filter(input_img, outImgFile, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -754,7 +754,7 @@ def applyPrewittYFilter(input_img, output_img, gdalformat, datatype):
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyGaussianSmoothFilter(
+def apply_gaussian_smooth_filter(
     input_img,
     output_img,
     filter_size,
@@ -784,7 +784,7 @@ def applyGaussianSmoothFilter(
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_gausmooth.kea'
-        imagefilter.applyGaussianSmoothFilter(input_img, outImgFile, 3, 1.0, 1.0. 0.0,
+        imagefilter.apply_gaussian_smooth_filter(input_img, outImgFile, 3, 1.0, 1.0. 0.0,
                                               "KEA", rsgislib.TYPE_32FLOAT)
 
     """
@@ -804,7 +804,7 @@ def applyGaussianSmoothFilter(
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyGaussian1stDerivFilter(
+def apply_gaussian_1st_deriv_filter(
     input_img,
     output_img,
     filter_size,
@@ -834,7 +834,7 @@ def applyGaussian1stDerivFilter(
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_gau1st.kea'
-        imagefilter.applyGaussian1stDerivFilter(input_img, outImgFile, 3, 1.0, 1.0. 0.0,
+        imagefilter.apply_gaussian_1st_deriv_filter(input_img, outImgFile, 3, 1.0, 1.0. 0.0,
                                                 "KEA", rsgislib.TYPE_32FLOAT)
 
     """
@@ -854,7 +854,7 @@ def applyGaussian1stDerivFilter(
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyGaussian2ndDerivFilter(
+def apply_gaussian_2nd_deriv_filter(
     input_img,
     output_img,
     filter_size,
@@ -884,7 +884,7 @@ def applyGaussian2ndDerivFilter(
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_gau1st.kea'
-        imagefilter.applyGaussian2ndDerivFilter(input_img, outImgFile, 3, 1.0, 1.0. 0.0,
+        imagefilter.apply_gaussian_2nd_deriv_filter(input_img, outImgFile, 3, 1.0, 1.0. 0.0,
                                                 "KEA", rsgislib.TYPE_32FLOAT)
 
     """
@@ -904,7 +904,7 @@ def applyGaussian2ndDerivFilter(
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyLaplacianFilter(
+def apply_laplacian_filter(
     input_img, output_img, filter_size, stddev, gdalformat, datatype
 ):
     """
@@ -925,7 +925,7 @@ def applyLaplacianFilter(
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_laplacian.kea'
-        imagefilter.applyLaplacianFilter(input_img, outImgFile, 3, 1.0, "KEA",
+        imagefilter.apply_laplacian_filter(input_img, outImgFile, 3, 1.0, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """
@@ -940,7 +940,7 @@ def applyLaplacianFilter(
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def applyLeeFilter(input_img, output_img, filter_size, n_looks, gdalformat, datatype):
+def apply_lee_filter(input_img, output_img, filter_size, n_looks, gdalformat, datatype):
     """Apply a Lee SAR filter to the specified input image.
 
     :param input_img: string specifying the input image to be filtered.
@@ -958,7 +958,7 @@ def applyLeeFilter(input_img, output_img, filter_size, n_looks, gdalformat, data
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_lee.kea'
-        imagefilter.applyLeeFilter(input_img, outImgFile, 3, 3, "KEA",
+        imagefilter.apply_lee_filter(input_img, outImgFile, 3, 3, "KEA",
                                       rsgislib.TYPE_32FLOAT)
 
     """

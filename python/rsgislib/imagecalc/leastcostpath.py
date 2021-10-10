@@ -89,7 +89,7 @@ def _array2raster(newRasterfn, rasterfn, array, outFormat):
     raster = None
 
 
-def performLeastCostPathCalc(costSurfaceImg, outputPathImg, startCoord, stopCoord, gdalformat="KEA", costImgBand=1):
+def perform_least_cost_path_calc(costSurfaceImg, outputPathImg, startCoord, stopCoord, gdalformat="KEA", costImgBand=1):
     """
     Calculates least cost path for a raster surface from start coord to stop coord:
 

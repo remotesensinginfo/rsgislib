@@ -48,7 +48,7 @@ import osgeo.gdal
 import rios.rat
 
 
-def createMaxNDVIComposite(inImgsPattern, rBand, nBand, outRefImg, outCompImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True):
+def create_max_ndvi_composite(inImgsPattern, rBand, nBand, outRefImg, outCompImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True):
     """
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI.
@@ -151,7 +151,7 @@ the maximum NDVI.
         raise rsgislib.RSGISPyException("There were no input images for " + inImgsPattern)
 
 
-def createMaxNDVINDWICompositeLandsat(inImgsPattern, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, use_mode=True):
+def create_max_ndvi_ndwi_composite_landsat(inImgsPattern, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, use_mode=True):
     """
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI over land and NDWI over water. A mask of land and water regions is also produced. Landsat 8 images are 
@@ -320,11 +320,11 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
         raise rsgislib.RSGISPyException("There were no input images for " + inImgsPattern)
 
 
-def checkBuildLS8VRTs(in_imgs, outdir):
+def check_build_ls8_vrts(in_imgs, outdir):
     """
 A function which checks for Landsat 8 (LS8) images in the input list and creates
 a band subset (i.e., removes the coastal (1) band). This function should be used
-ahead of createMaxNDVINDWIComposite when combining LS8 with earlier landsat (i.e., 
+ahead of create_max_ndvi_ndwi_composite when combining LS8 with earlier landsat (i.e.,
 LS5 and LS7) data. Note, files who's file name contain 'LS8' are considered to be 
 Landsat 8 images.
 
@@ -346,7 +346,7 @@ Landsat 8 images.
     return out_imgs
 
 
-def createMaxNDVINDWIComposite(refImg, inImages, rBand, nBand, sBand, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, reprojmethod='cubic', use_mode=True):
+def create_max_ndvi_ndwi_composite(refImg, inImages, rBand, nBand, sBand, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, reprojmethod='cubic', use_mode=True):
     """
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI over land and NDWI over water. A mask of land and water regions is also produced. The reference image is
@@ -562,9 +562,9 @@ used to define the spatial extent of the output images and spatial projection.
         raise rsgislib.RSGISPyException("List of input images was empty ")
 
 
-def createMaxScaledNDVINDWIComposite(refImg, inImages, gBand, rBand, nBand, sBand, outRefImg, outCompImg, outMskImg,
-                                     tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True,
-                                     reprojmethod='cubic', use_mode=True):
+def create_max_scaled_ndvi_ndwi_composite(refImg, inImages, gBand, rBand, nBand, sBand, outRefImg, outCompImg, outMskImg,
+                                          tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True,
+                                          reprojmethod='cubic', use_mode=True):
     """
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI over land and NDWI over water. A mask of land and water regions is also produced. The reference image is

@@ -156,8 +156,8 @@ class SamplesInfoObj(object):
         self.blue = blue
 
 
-def generateTransectAccuracyPts(inputImage, inputLinesShp, outputPtsShp, classImgCol, classImgVecCol,
-                                classRefVecCol, lineStep, force=False):
+def generate_transect_accuracy_pts(inputImage, inputLinesShp, outputPtsShp, classImgCol, classImgVecCol,
+                                   classRefVecCol, lineStep, force=False):
     """ A tool for converting a set of lines in to point transects and 
 populating with the information for undertaking an accuracy assessment.
 
@@ -440,7 +440,7 @@ def split_chip_sample_ref_train_valid_test(in_h5_file, train_h5_file, valid_h5_f
     os.remove(tmp_train_valid_sample_file)
 
 
-def flipChipHDF5File(input_h5_file, output_h5_file, datatype=None):
+def flip_chip_hdf5_file(input_h5_file, output_h5_file, datatype=None):
     """
     A function which flips each sample in both the x and y axis. So the
     output file will have double the number of samples as the input file.
@@ -497,7 +497,7 @@ def flipChipHDF5File(input_h5_file, output_h5_file, datatype=None):
     ######################################################################
 
 
-def flipRefChipHDF5File(input_h5_file, output_h5_file, datatype=None):
+def flip_ref_chip_hdf5_file(input_h5_file, output_h5_file, datatype=None):
     """
     A function which flips each sample in both the x and y axis. So the
     output file will have double the number of samples as the input file.

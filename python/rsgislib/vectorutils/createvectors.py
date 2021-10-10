@@ -94,7 +94,7 @@ Where:
         gdalImgMaskDS = None
 
 
-def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_out_lyr=None, out_format='GPKG',
+def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, out_vec_file, out_vec_lyr=None, out_format='GPKG',
                           out_epsg_code=None, del_exist_vec=False):
     """
     Function which creates a new output vector file for the pixels within the input image file
@@ -105,8 +105,8 @@ def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_ou
     :param input_img: the input image
     :param img_band: the band within the image to use
     :param img_msk_val: the image value selecting the pixels to be converted to points
-    :param vec_out_file: Output vector file
-    :param vec_out_lyr: output vector layer name.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: output vector layer name.
     :param out_format: output file format (default GPKG).
     :param out_epsg_code: optionally provide an EPSG code for the output layer. If None then taken from input image.
     :param del_exist_vec: remove output file if it exists.
@@ -123,11 +123,11 @@ def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_ou
         from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
-    if os.path.exists(vec_out_file):
+    if os.path.exists(out_vec_file):
         if del_exist_vec:
-            rsgislib.vectorutils.delete_vector_file(vec_out_file)
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vec_out_file))
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
     if out_epsg_code is None:
         out_epsg_code = rsgislib.imageutils.get_epsg_proj_from_image(input_img)
@@ -173,21 +173,22 @@ def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_ou
                                      crs="EPSG:{}".format(out_epsg_code))
 
         if out_format == "GPKG":
-            if vec_out_lyr is None:
+            if out_vec_lyr is None:
                 raise Exception("If output format is GPKG then an output layer is required.")
-            gdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+            gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
-            gdf.to_file(vec_out_file, driver=out_format)
+            gdf.to_file(out_vec_file, driver=out_format)
 
 
-def extract_image_footprint(inputImg, outVec, tmpDIR='./tmp', rePrjTo=None):
+def extract_image_footprint(input_img, out_vec_file, out_vec_lyr, out_format, tmp_dir='./tmp', reproj_to=None):
     """
 A function to extract an image footprint as a vector.
 
-:param inputImg: the input image file for which the footprint will be extracted.
-:param outVec: output shapefile path and name.
-:param tmpDIR: temp directory which will be used during processing. It will be created and deleted once processing complete.
-:param rePrjTo: optional command
+:param input_img: the input image file for which the footprint will be extracted.
+:param out_vec_file: output vector file path and name.
+:param out_vec_lyr: output vector layer name.
+:param tmp_dir: temp directory which will be used during processing. It will be created and deleted once processing complete.
+:param reproj_to: optional command
 
 """
     gdal.UseExceptions()
@@ -198,24 +199,23 @@ A function to extract an image footprint as a vector.
     uidStr = rsgislib.tools.utils.uid_generator()
 
     createdTmp = False
-    if not os.path.exists(tmpDIR):
-        os.makedirs(tmpDIR)
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
         createdTmp = True
 
-    inImgBase = os.path.splitext(os.path.basename(inputImg))[0]
+    inImgBase = os.path.splitext(os.path.basename(input_img))[0]
 
-    validOutImg = os.path.join(tmpDIR, inImgBase + '_' + uidStr + '_validimg.kea')
-    inImgNoData = rsgislib.imageutils.get_image_no_data_value(inputImg)
-    rsgislib.imageutils.gen_valid_mask(inimages=inputImg, outimage=validOutImg,
-                                     gdalformat='KEA', nodata=inImgNoData)
+    validOutImg = os.path.join(tmp_dir, inImgBase + '_' + uidStr + '_validimg.kea')
+    inImgNoData = rsgislib.imageutils.get_image_no_data_value(input_img)
+    rsgislib.imageutils.gen_valid_mask(inimages=input_img, outimage=validOutImg,
+                                       gdalformat='KEA', nodata=inImgNoData)
 
-    outVecTmpFile = outVec
-    if not (rePrjTo is None):
-        outVecTmpFile = os.path.join(tmpDIR,
-                                     inImgBase + '_' + uidStr + '_initVecOut.shp')
+    outVecTmpFile = out_vec_file
+    if not (reproj_to is None):
+        outVecTmpFile = os.path.join(tmp_dir, inImgBase + '_' + uidStr + '_initVecOut.gpkg')
 
-    rsgislib.vectorutils.polygoniseRaster(validOutImg, outVecTmpFile, imgBandNo=1,
-                                          maskImg=validOutImg, imgMaskBandNo=1)
+    polygonise_raster_to_vec_lyr(outVecTmpFile, out_vec_lyr, out_format, validOutImg, 1, validOutImg, 1)
+
     vecLayerName = os.path.splitext(os.path.basename(outVecTmpFile))[0]
     ds = gdal.OpenEx(outVecTmpFile, gdal.OF_READONLY)
     if ds is None:
@@ -230,31 +230,32 @@ A function to extract an image footprint as a vector.
 
     fileName = []
     for i in range(numFeats):
-        fileName.append(os.path.basename(inputImg))
-    rsgislib.vectorutils.write_vec_column(outVecTmpFile, vecLayerName, 'FileName',
+        fileName.append(os.path.basename(input_img))
+    rsgislib.vectoratts.write_vec_column(outVecTmpFile, vecLayerName, 'FileName',
                                         ogr.OFTString, fileName)
 
-    if not (rePrjTo is None):
-        if os.path.exists(outVec):
-            driver = ogr.GetDriverByName('ESRI Shapefile')
-            driver.DeleteDataSource(outVec)
+    if not (reproj_to is None):
+        if os.path.exists(out_vec_file):
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
 
-        cmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs ' + rePrjTo + ' ' + outVec + ' ' + outVecTmpFile
+        cmd = 'ogr2ogr -f "{}" -t_srs {} {} {}'.format(out_format, reproj_to, out_vec_file, outVecTmpFile)
         print(cmd)
         try:
+            import subprocess
             subprocess.check_call(cmd, shell=True)
         except OSError as e:
-            raise Exception('Could not re-projection shapefile: ' + cmd)
+            raise Exception('Could not re-projection vector file: ' + cmd)
 
     if createdTmp:
-        shutil.rmtree(tmpDIR)
+        import shutil
+        shutil.rmtree(tmp_dir)
     else:
-        if not (rePrjTo is None):
+        if not (reproj_to is None):
             driver = ogr.GetDriverByName('ESRI Shapefile')
             driver.DeleteDataSource(outVecTmpFile)
 
 
-def createPolySHP4LstBBOXs(csvFile, outSHP, epsgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, del_exist_vec=False):
+def create_poly_shp_for_lst_bboxs(csvFile, outSHP, epsgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, del_exist_vec=False):
     """
 This function takes a CSV file of bounding boxes (1 per line) and creates a polygon shapefile.
 
@@ -323,8 +324,8 @@ This function takes a CSV file of bounding boxes (1 per line) and creates a poly
         raise e
 
 
-def defineGrid(bbox, x_size, y_size, in_epsg_code, out_vec, out_vec_lyr, vec_drv='GPKG', out_epsg_code=None,
-               utm_grid=False, utm_hemi=False):
+def define_grid(bbox, x_size, y_size, in_epsg_code, out_vec, out_vec_lyr, vec_drv='GPKG', out_epsg_code=None,
+                utm_grid=False, utm_hemi=False):
     """
 Define a grid of bounding boxes for a specified bounding box. The output grid can be in a different projection
 to the inputted bounding box. Where a UTM grid is required and there are multiple UTM zones then the
@@ -387,8 +388,8 @@ multiple layers. A shapefile which only supports 1 layer will not work.
 
             utm_proj_epsg = rsgislib.tools.utm.epsg_for_UTM(utm_zone, utm_top_hemi)
 
-            defineGrid(bbox, x_size, y_size, in_epsg_code, out_vec, out_vec_lyr, vec_drv=vec_drv,
-                       out_epsg_code=utm_proj_epsg, utm_grid=False, utm_hemi=False)
+            define_grid(bbox, x_size, y_size, in_epsg_code, out_vec, out_vec_lyr, vec_drv=vec_drv,
+                        out_epsg_code=utm_proj_epsg, utm_grid=False, utm_hemi=False)
         else:
             multi_zones = True
 
@@ -568,6 +569,8 @@ A function which creates a regular grid across a defined area.
 :param out_vec_lyr: output vector layer
 
 """
+    import math
+
     minX = float(bbox[0])
     maxX = float(bbox[1])
     minY = float(bbox[2])
@@ -610,74 +613,75 @@ A function which creates a regular grid across a defined area.
     create_poly_vec_bboxs(out_vec_file, out_vec_lyr, out_format, epsg_code, bboxs)
 
 
-def writePts2Vec(vec_file, vectorLyr, out_format, epsgCode, ptsX, ptsY, atts=None, attTypes=None, replace=True, file_opts=[], lyr_opts=[]):
+def write_pts_to_vec(out_vec_file, out_vec_lyr, out_format, epsg_code, pts_x, pts_y, atts=None, att_types=None, replace=True, file_opts=[], lyr_opts=[]):
     """
 This function creates a set of polygons for a set of bounding boxes.
 When creating an attribute the available data types are ogr.OFTString, ogr.OFTInteger, ogr.OFTReal
 
-:param vec_file: output vector file/path
-:param vectorLyr: output vector layer
+:param out_vec_file: output vector file/path
+:param out_vec_lyr: output vector layer
 :param out_format: the output vector layer type.
-:param epsgCode: EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
-:param ptsX: is a list of x coordinates.
-:param ptsY: is a list of y coordinates.
+:param epsg_code: EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
+:param pts_x: is a list of x coordinates.
+:param pts_y: is a list of y coordinates.
 :param atts: is a dict of lists of attributes with the same length as the ptsX & ptsY lists.
              The dict should be named the same as the attTypes['names'] list.
-:param attTypes: is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
+:param att_types: is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
                  The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
 :param replace: if the output vector file exists overwrite.
 :param file_opts: Options passed when creating the file. Default: []. Common value might be ["OVERWRITE=YES"]
 :param lyr_opts: Options passed when create the layer Default: []. Common value might be ["OVERWRITE=YES"]
 
 """
+    import rsgislib.vectorutils
     import osgeo.ogr as ogr
     import osgeo.gdal as gdal
     import osgeo.osr as osr
 
     try:
-        if len(ptsX) != len(ptsY):
+        if len(pts_x) != len(pts_y):
             raise Exception("The X and Y coordinates lists are not the same length.")
-        nPts = len(ptsX)
+        nPts = len(pts_x)
 
         gdal.UseExceptions()
 
-        if os.path.exists(vec_file) and (not replace):
-            vecDS = gdal.OpenEx(vec_file, gdal.GA_Update)
+        if os.path.exists(out_vec_file) and (not replace):
+            vecDS = gdal.OpenEx(out_vec_file, gdal.GA_Update)
         else:
-            if os.path.exists(vec_file):
-                delete_vector_file(vec_file)
+            if os.path.exists(out_vec_file):
+                rsgislib.vectorutils.delete_vector_file(out_vec_file)
             outdriver = ogr.GetDriverByName(out_format)
-            vecDS = outdriver.CreateDataSource(vec_file, options=file_opts)
+            vecDS = outdriver.CreateDataSource(out_vec_file, options=file_opts)
 
         srs = osr.SpatialReference()
-        srs.ImportFromEPSG(int(epsgCode))
-        outLayer = vecDS.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPoint, options=lyr_opts)
+        srs.ImportFromEPSG(int(epsg_code))
+        outLayer = vecDS.CreateLayer(out_vec_lyr, srs, geom_type=ogr.wkbPoint, options=lyr_opts)
 
         addAtts = False
-        if (atts is not None) and (attTypes is not None):
+        if (atts is not None) and (att_types is not None):
             nAtts = 0
-            if not 'names' in attTypes:
+            if not 'names' in att_types:
                 raise Exception('attTypes must include a list for "names"')
-            nAtts = len(attTypes['names'])
-            if not 'types' in attTypes:
+            nAtts = len(att_types['names'])
+            if not 'types' in att_types:
                 raise Exception('attTypes must include a list for "types"')
-            if nAtts != len(attTypes['types']):
+            if nAtts != len(att_types['types']):
                 raise Exception('attTypes "names" and "types" lists must be the same length.')
             for i in range(nAtts):
-                if attTypes['names'][i] not in atts:
+                if att_types['names'][i] not in atts:
                     raise Exception('"{}" is not within atts'.format(
-                        attTypes['names'][i]))
-                if len(atts[attTypes['names'][i]]) != len(ptsX):
+                        att_types['names'][i]))
+                if len(atts[att_types['names'][i]]) != len(pts_x):
                     raise Exception('"{}" in atts does not have the same len as bboxs'.format(
-                        attTypes['names'][i]))
+                        att_types['names'][i]))
 
             for i in range(nAtts):
-                field_defn = ogr.FieldDefn(attTypes['names'][i], attTypes['types'][i])
+                field_defn = ogr.FieldDefn(att_types['names'][i], att_types['types'][i])
                 if outLayer.CreateField(field_defn) != 0:
-                    raise Exception("Creating '" + attTypes['names'][
+                    raise Exception("Creating '" + att_types['names'][
                         i] + "' field failed.\n")
             addAtts = True
-        elif not ((atts is None) and (attTypes is None)):
+        elif not ((atts is None) and (att_types is None)):
             raise Exception('If atts or attTypes is not None then the other should also not be none and equivlent in length.')
 
         # Get the output Layer's Feature Definition
@@ -690,7 +694,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
                 openTransaction = True
             # Create Point
             pt = ogr.Geometry(ogr.wkbPoint)
-            pt.AddPoint(float(ptsX[n]), float(ptsY[n]))
+            pt.AddPoint(float(pts_x[n]), float(pts_y[n]))
             # Add to output shapefile.
             outFeature = ogr.Feature(featureDefn)
             outFeature.SetGeometry(pt)
@@ -698,7 +702,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
                 # Add Attributes
                 for i in range(nAtts):
                     outFeature.SetField(
-                        attTypes['names'][i], atts[attTypes['names'][i]][n])
+                        att_types['names'][i], atts[att_types['names'][i]][n])
             outLayer.CreateFeature(outFeature)
             outFeature = None
             if ((n % 20000) == 0) and openTransaction:
@@ -712,38 +716,6 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
     except Exception as e:
         raise e
 
-
-def getVecLyrAsPts(in_vec_file, in_vec_lyr):
-    """
-    Get a list of points from the vectors within an input file.
-
-    :param in_vec_file: Input vector file
-    :param in_vec_lyr: Input vector layer name
-    :return: returns a list of points.
-
-    """
-    import rsgislib.vectorgeoms
-    from osgeo import gdal
-    import tqdm
-
-    gdal.UseExceptions()
-    vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
-    vec_lyr_obj = vec_ds_obj.GetLayer(in_vec_lyr)
-
-    pts_lst = list()
-    n_feats = vec_lyr_obj.GetFeatureCount(True)
-    pbar = tqdm.tqdm(total=n_feats)
-    counter = 0
-    in_feature = vec_lyr_obj.GetNextFeature()
-    while in_feature:
-        geom = in_feature.GetGeometryRef()
-        if geom is not None:
-            rsgislib.vectorgeoms.get_geom_pts(geom, pts_lst)
-        in_feature = vec_lyr_obj.GetNextFeature()
-        counter = counter + 1
-        pbar.update(1)
-    pbar.close()
-    return pts_lst
 
 
 

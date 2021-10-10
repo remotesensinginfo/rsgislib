@@ -45,7 +45,7 @@ from rsgislib import imageutils
 
 ################################ Clumping Functions ################################
 
-def performClumpingSingleThread(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA'):
+def perform_clumping_single_thread(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA'):
     """
 Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
@@ -98,14 +98,14 @@ Clump the input image using a tiled processing chain allowing large images to be
         shutil.rmtree(tmpDIR)
 
 
-def clumpImgFunc(imgs):
+def _clump_img_func(imgs):
     """
     Clump an image with values provides as an array for use within a multiprocessing Pool
     """
     segmentation.clump(imgs[0], imgs[1], 'KEA', True, 0, True)
 
 
-def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA', nCores=-1):
+def perform_clumping_multi_process(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA', nCores=-1):
     """
 Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
@@ -149,7 +149,7 @@ Clump the input image using a tiled processing chain allowing large images to be
         clumpImgsVals.append([tile, clumpedTile])
     
     with Pool(nCores) as p:
-        p.map(clumpImgFunc, clumpImgsVals)
+        p.map(_clump_img_func, clumpImgsVals)
     
     clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
     print("Create Blank Image")
@@ -169,7 +169,7 @@ Clump the input image using a tiled processing chain allowing large images to be
 
 ################################ Union Clumping Functions ################################
 
-def performUnionClumpingSingleThread(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA'):
+def perform_union_clumping_single_thread(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA'):
     """
 Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
@@ -222,17 +222,17 @@ Clump and union with the reference image the input image using a tiled processin
     if createdTmp:
         shutil.rmtree(tmpDIR)
 
-def unionClumpImgFunc(imgs):
+def _union_clump_img_func(imgs):
     """
     Union Clump an image with values provides as an array for use within a multiprocessing Pool
     """
     segmentation.unionOfClumps(imgs[2], 'KEA', [imgs[0], imgs[1]], 0, True)
     
-def performUnionClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA', nCores=-1):
+def perform_union_clumping_multi_process(input_img, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA', nCores=-1):
     """
 Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
-:param inputImage: the input image to be clumped.
+:param input_img: the input image to be clumped.
 :param refImg: the reference image which the union is undertaken with (typically an existing classification)
 :param clumpsImage: the output clumped image.
 :param tmpDIR: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
@@ -252,8 +252,8 @@ Clump and union with the reference image the input image using a tiled processin
         nCores = multiprocessing.cpu_count()
     
     uidStr = rsgislib.tools.utils.uid_generator()
-    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImage)
-    baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
+    dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
+    baseName = os.path.splitext(os.path.basename(input_img))[0] + "_" + uidStr
     imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
     tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
     tilesImgBase = os.path.join(imgTilesDIR, baseName)
@@ -263,7 +263,7 @@ Clump and union with the reference image the input image using a tiled processin
     if not os.path.exists(tilesClumpsDIR):
         os.makedirs(tilesClumpsDIR)
     
-    imageutils.createTiles(inputImage, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
+    imageutils.createTiles(input_img, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
     imageTiles = glob.glob(tilesImgBase+"*")
     
     clumpImgsVals = []
@@ -273,11 +273,11 @@ Clump and union with the reference image the input image using a tiled processin
         clumpImgsVals.append([tile, refImg, clumpedTile])
     
     with Pool(nCores) as p:
-        p.map(unionClumpImgFunc, clumpImgsVals)
+        p.map(_union_clump_img_func, clumpImgsVals)
     
     clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
     print("Create Blank Image")
-    imageutils.create_copy_img(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+    imageutils.create_copy_img(input_img, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")

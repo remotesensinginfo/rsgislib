@@ -59,7 +59,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     This version can only used a single thread for execution. 
     
     It is not intended that this class will be directly used. Please use the 
-    function performTiledSegmentation to call this functionality.
+    function perform_tiled_segmentation to call this functionality.
 
     """
 
@@ -237,22 +237,22 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
         rastergis.pop_rat_img_stats(clumpsImage, True, True)
 
 
-def performTiledSegmentation(inputImage, clumpsImage, tmpDIR='segtmp', tileWidth=2000, tileHeight=2000, validDataThreshold = 0.3, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200):
+def perform_tiled_segmentation(input_img, clumps_img, tmp_dir='segtmp', tile_width=2000, tile_height=2000, valid_data_threshold = 0.3, num_clusters=60, min_pxls=100, dist_thres=100, bands=None, sampling=100, km_max_iter=200):
     """
 Utility function to call the segmentation algorithm of Shepherd et al. (2019) using the tiled process outlined in Clewley et al (2015).
 
-:param inputImage: is a string containing the name of the input file.
-:param clumpsImage: is a string containing the name of the output clump file.
+:param input_img: is a string containing the name of the input file.
+:param clumps_img: is a string containing the name of the output clump file.
 :param tmpath: is a file path for intermediate files (default is to create a directory 'segtmp'). If path does current not exist then it will be created and deleted afterwards.
-:param tileWidth: is an int specifying the width of the tiles used for processing (Default 2000)
-:param tileHeight: is an int specifying the height of the tiles used for processing (Default 2000)
-:param validDataThreshold: is a float (value between 0 - 1) used to specify the amount of valid image pixels (i.e., not a no data value of zero) are within a tile. Tiles failing to meet this threshold are merged with ones which do (Default 0.3).
-:param numClusters: is an int which specifies the number of clusters within the KMeans clustering (default = 60).
-:param minPxls: is an int which specifies the minimum number pixels within a segments (default = 100).
-:param distThres: specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
+:param tile_width: is an int specifying the width of the tiles used for processing (Default 2000)
+:param tile_height: is an int specifying the height of the tiles used for processing (Default 2000)
+:param valid_data_threshold: is a float (value between 0 - 1) used to specify the amount of valid image pixels (i.e., not a no data value of zero) are within a tile. Tiles failing to meet this threshold are merged with ones which do (Default 0.3).
+:param num_clusters: is an int which specifies the number of clusters within the KMeans clustering (default = 60).
+:param min_pxls: is an int which specifies the minimum number pixels within a segments (default = 100).
+:param dist_thres: specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
 :param bands: is an array providing a subset of image bands to use (default is None to use all bands).
 :param sampling: specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
-:param kmMaxIter: maximum iterations for KMeans (Default 200).
+:param km_max_iter: maximum iterations for KMeans (Default 200).
 
 Example::
 
@@ -261,21 +261,21 @@ Example::
     inputImage = 'LS5TM_20110428_sref_submask_osgb.kea'
     clumpsImage = 'LS5TM_20110428_sref_submask_osgb_clumps.kea'
 
-    tiledsegsingle.performTiledSegmentation(inputImage, clumpsImage, tmpDIR='./rsgislibsegtmp', tileWidth=2000, tileHeight=2000, validDataThreshold=0.3, numClusters=60, minPxls=100, distThres=100, bands=[4,5,3], sampling=100, kmMaxIter=200)
+    tiledsegsingle.perform_tiled_segmentation(inputImage, clumpsImage, tmpDIR='./rsgislibsegtmp', tileWidth=2000, tileHeight=2000, validDataThreshold=0.3, numClusters=60, minPxls=100, distThres=100, bands=[4,5,3], sampling=100, kmMaxIter=200)
 
     """
     import rsgislib.tools.utils
     import rsgislib.tools.filetools
     createdTmp = False
-    if not os.path.exists(tmpDIR):
-        os.makedirs(tmpDIR)
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
         createdTmp = True
     uidStr = rsgislib.tools.utils.uid_generator()
     
-    baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
+    baseName = os.path.splitext(os.path.basename(input_img))[0] + "_" + uidStr
         
-    tileSegInfo = os.path.join(tmpDIR, baseName+'_seginfo.json')
-    segStatsDIR = os.path.join(tmpDIR, 'segStats_' + uidStr)
+    tileSegInfo = os.path.join(tmp_dir, baseName + '_seginfo.json')
+    segStatsDIR = os.path.join(tmp_dir, 'segStats_' + uidStr)
     strchStatsBase = os.path.join(segStatsDIR, baseName + '_stch')
     kCentresBase = os.path.join(segStatsDIR, baseName + '_kcentres')
     if not os.path.exists(segStatsDIR):
@@ -285,14 +285,14 @@ Example::
     
     ######################## STAGE 1 #######################
     # Stage 1 Parameters (Internal)
-    stage1TileShp = os.path.join(tmpDIR, baseName+'_S1Tiles.shp')
-    stage1TileRAT = os.path.join(tmpDIR, baseName+'_S1Tiles.kea')
+    stage1TileShp = os.path.join(tmp_dir, baseName + '_S1Tiles.shp')
+    stage1TileRAT = os.path.join(tmp_dir, baseName + '_S1Tiles.kea')
     stage1TilesBase = baseName+'_S1Tile'
-    stage1TilesImgDIR = os.path.join(tmpDIR, 's1tilesimgs_'+uidStr)
-    stage1TilesMetaDIR = os.path.join(tmpDIR, 's1tilesmeta_'+uidStr)
-    stage1TilesSegsDIR = os.path.join(tmpDIR, 's1tilessegs_'+uidStr)
-    stage1TilesSegBordersDIR = os.path.join(tmpDIR, 's1tilessegborders_'+uidStr)
-    stage1BordersImage = os.path.join(tmpDIR, baseName+'_S1Borders.kea')
+    stage1TilesImgDIR = os.path.join(tmp_dir, 's1tilesimgs_' + uidStr)
+    stage1TilesMetaDIR = os.path.join(tmp_dir, 's1tilesmeta_' + uidStr)
+    stage1TilesSegsDIR = os.path.join(tmp_dir, 's1tilessegs_' + uidStr)
+    stage1TilesSegBordersDIR = os.path.join(tmp_dir, 's1tilessegborders_' + uidStr)
+    stage1BordersImage = os.path.join(tmp_dir, baseName + '_S1Borders.kea')
     
     if not os.path.exists(stage1TilesImgDIR):
         os.makedirs(stage1TilesImgDIR)
@@ -304,16 +304,16 @@ Example::
         os.makedirs(stage1TilesMetaDIR)
     
     # Initial Tiling
-    tiledSegObj.performStage1Tiling(inputImage, stage1TileShp, stage1TileRAT, stage1TilesBase, stage1TilesMetaDIR, stage1TilesImgDIR, os.path.join(tmpDIR, 's1tilingtemp'), tileWidth, tileHeight, validDataThreshold)
+    tiledSegObj.performStage1Tiling(input_img, stage1TileShp, stage1TileRAT, stage1TilesBase, stage1TilesMetaDIR, stage1TilesImgDIR, os.path.join(tmp_dir, 's1tilingtemp'), tile_width, tile_height, valid_data_threshold)
     
     # Perform Segmentation
-    tiledSegObj.performStage1TilesSegmentation(stage1TilesImgDIR, stage1TilesSegsDIR, tmpDIR, stage1TilesBase, tileSegInfo, strchStatsBase, kCentresBase, numClusters, minPxls, distThres, bands, sampling, kmMaxIter)
+    tiledSegObj.performStage1TilesSegmentation(stage1TilesImgDIR, stage1TilesSegsDIR, tmp_dir, stage1TilesBase, tileSegInfo, strchStatsBase, kCentresBase, num_clusters, min_pxls, dist_thres, bands, sampling, km_max_iter)
     
     # Define Boundaries
     tiledSegObj.defineStage1Boundaries(stage1TilesSegsDIR, stage1TilesSegBordersDIR, stage1TilesBase)
     
     # Merge the Initial Tiles
-    tiledSegObj.mergeStage1TilesToOutput(inputImage, stage1TilesSegsDIR, stage1TilesSegBordersDIR, stage1TilesBase, clumpsImage, stage1BordersImage)    
+    tiledSegObj.mergeStage1TilesToOutput(input_img, stage1TilesSegsDIR, stage1TilesSegBordersDIR, stage1TilesBase, clumps_img, stage1BordersImage)
     
     shutil.rmtree(stage1TilesImgDIR)
     shutil.rmtree(stage1TilesSegsDIR)
@@ -327,15 +327,15 @@ Example::
     
     ######################## STAGE 2 #######################
     # Stage 2 Parameters (Internal)
-    stage2TileShp = os.path.join(tmpDIR, baseName+'_S2Tiles.shp')
-    stage2TileRAT = os.path.join(tmpDIR, baseName+'_S2Tiles.kea')
+    stage2TileShp = os.path.join(tmp_dir, baseName + '_S2Tiles.shp')
+    stage2TileRAT = os.path.join(tmp_dir, baseName + '_S2Tiles.kea')
     stage2TilesBase = baseName+'_S2Tile'
-    stage2TilesImgDIR = os.path.join(tmpDIR, 's2tilesimg_'+uidStr)
-    stage2TilesMetaDIR = os.path.join(tmpDIR, 's2tilesmeta_'+uidStr)
-    stage2TilesImgMaskedDIR = os.path.join(tmpDIR, 's2tilesimgmask_'+uidStr)
-    stage2TilesSegsDIR = os.path.join(tmpDIR, 's2tilessegs_'+uidStr)
-    stage2TilesSegBordersDIR = os.path.join(tmpDIR, 's2tilessegborders_'+uidStr)
-    stage2BordersImage = os.path.join(tmpDIR, baseName+'_S2Borders.kea')
+    stage2TilesImgDIR = os.path.join(tmp_dir, 's2tilesimg_' + uidStr)
+    stage2TilesMetaDIR = os.path.join(tmp_dir, 's2tilesmeta_' + uidStr)
+    stage2TilesImgMaskedDIR = os.path.join(tmp_dir, 's2tilesimgmask_' + uidStr)
+    stage2TilesSegsDIR = os.path.join(tmp_dir, 's2tilessegs_' + uidStr)
+    stage2TilesSegBordersDIR = os.path.join(tmp_dir, 's2tilessegborders_' + uidStr)
+    stage2BordersImage = os.path.join(tmp_dir, baseName + '_S2Borders.kea')
     
     if not os.path.exists(stage2TilesImgDIR):
         os.makedirs(stage2TilesImgDIR)
@@ -349,13 +349,13 @@ Example::
         os.makedirs(stage2TilesSegBordersDIR)
     
     # Perform offset tiling
-    tiledSegObj.performStage2Tiling(inputImage, stage2TileShp, stage2TileRAT, stage2TilesBase, stage2TilesMetaDIR, stage2TilesImgDIR, os.path.join(tmpDIR, 's2tilingtemp'), tileWidth, tileHeight, validDataThreshold, stage1BordersImage)
+    tiledSegObj.performStage2Tiling(input_img, stage2TileShp, stage2TileRAT, stage2TilesBase, stage2TilesMetaDIR, stage2TilesImgDIR, os.path.join(tmp_dir, 's2tilingtemp'), tile_width, tile_height, valid_data_threshold, stage1BordersImage)
     
     # Perform Segmentation of the Offset Tiles
-    tiledSegObj.performStage2TilesSegmentation(stage2TilesImgDIR, stage2TilesImgMaskedDIR, stage2TilesSegsDIR, stage2TilesSegBordersDIR, tmpDIR, stage2TilesBase, stage1BordersImage, segStatsInfo, minPxls, distThres, bands)
+    tiledSegObj.performStage2TilesSegmentation(stage2TilesImgDIR, stage2TilesImgMaskedDIR, stage2TilesSegsDIR, stage2TilesSegBordersDIR, tmp_dir, stage2TilesBase, stage1BordersImage, segStatsInfo, min_pxls, dist_thres, bands)
     
     # Merge in the next set of boundaries
-    tiledSegObj.mergeStage2TilesToOutput(clumpsImage, stage2TilesSegsDIR, stage2TilesSegBordersDIR, stage2TilesBase, stage2BordersImage)
+    tiledSegObj.mergeStage2TilesToOutput(clumps_img, stage2TilesSegsDIR, stage2TilesSegBordersDIR, stage2TilesBase, stage2BordersImage)
     
     shutil.rmtree(stage2TilesImgDIR)
     shutil.rmtree(stage2TilesMetaDIR)
@@ -366,10 +366,10 @@ Example::
     
     ######################## STAGE 3 #######################
     # Stage 3 Parameters (Internal)
-    stage3BordersClumps = os.path.join(tmpDIR, baseName+'_S3BordersClumps.kea')
-    stage3SubsetsDIR = os.path.join(tmpDIR, 's3subsetimgs_'+uidStr)
-    stage3SubsetsMaskedDIR = os.path.join(tmpDIR, 's3subsetimgsmask_'+uidStr)
-    stage3SubsetsSegsDIR = os.path.join(tmpDIR, 's3subsetsegs_'+uidStr)
+    stage3BordersClumps = os.path.join(tmp_dir, baseName + '_S3BordersClumps.kea')
+    stage3SubsetsDIR = os.path.join(tmp_dir, 's3subsetimgs_' + uidStr)
+    stage3SubsetsMaskedDIR = os.path.join(tmp_dir, 's3subsetimgsmask_' + uidStr)
+    stage3SubsetsSegsDIR = os.path.join(tmp_dir, 's3subsetsegs_' + uidStr)
     stage3Base = baseName+'_S3Subset'
     
     if not os.path.exists(stage3SubsetsDIR):
@@ -380,13 +380,13 @@ Example::
         os.makedirs(stage3SubsetsSegsDIR)
     
     #Create the final boundary image subsets
-    tiledSegObj.createStage3ImageSubsets(inputImage, stage2BordersImage, stage3BordersClumps, stage3SubsetsDIR, stage3SubsetsMaskedDIR, stage3Base, minPxls)
+    tiledSegObj.createStage3ImageSubsets(input_img, stage2BordersImage, stage3BordersClumps, stage3SubsetsDIR, stage3SubsetsMaskedDIR, stage3Base, min_pxls)
     
     # Perform Segmentation of the stage 3 regions
-    tiledSegObj.performStage3SubsetsSegmentation(stage3SubsetsMaskedDIR, stage3SubsetsSegsDIR, tmpDIR, stage3Base, segStatsInfo, minPxls, distThres, bands)
+    tiledSegObj.performStage3SubsetsSegmentation(stage3SubsetsMaskedDIR, stage3SubsetsSegsDIR, tmp_dir, stage3Base, segStatsInfo, min_pxls, dist_thres, bands)
     
     # Merge the stage 3 regions into the final clumps image
-    tiledSegObj.mergeStage3TilesToOutput(clumpsImage, stage3SubsetsSegsDIR, stage3SubsetsMaskedDIR, stage3Base)
+    tiledSegObj.mergeStage3TilesToOutput(clumps_img, stage3SubsetsSegsDIR, stage3SubsetsMaskedDIR, stage3Base)
     
     shutil.rmtree(stage3SubsetsDIR)
     shutil.rmtree(stage3SubsetsMaskedDIR) 
@@ -403,7 +403,7 @@ Example::
     rsgislib.tools.filetools.delete_file_with_basename(stage2TileRAT)
     os.remove(tileSegInfo)
     if createdTmp:
-        shutil.rmtree(tmpDIR)
+        shutil.rmtree(tmp_dir)
 
 
 

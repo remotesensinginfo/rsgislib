@@ -66,6 +66,7 @@ def delete_vector_file(vec_file: str, feedback:bool =True):
             print("Deleting: {}".format(cfile))
         os.remove(cfile)
 
+
 def get_proj_wkt_from_vec(vec_file, vec_lyr=None):
     """
     A function which gets the WKT projection from the inputted vector file.
@@ -113,20 +114,13 @@ def get_proj_epsg_from_vec(vec_file, vec_lyr=None):
     return spatialRef.GetAuthorityCode(None)
 
 
-
-
-
-
-
-
-
-def get_vec_feat_count(vec_file, vec_lyr=None, computeCount=True):
+def get_vec_feat_count(vec_file, vec_lyr=None, compute_count=True):
     """
 Get a count of the number of features in the vector layers.
 
 :param vec_file: is a string with the input vector file name and path.
 :param vec_lyr: is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
-:param computeCount: is a boolean which specifies whether the layer extent
+:param compute_count: is a boolean which specifies whether the layer extent
                      should be calculated (rather than estimated from header)
                      even if that operation is computationally expensive.
 
@@ -141,7 +135,7 @@ Get a count of the number of features in the vector layers.
         inLayer = inDataSource.GetLayer()
     if inLayer is None:
         raise Exception("Check layer name as did not open layer.")
-    nFeats = inLayer.GetFeatureCount(computeCount)
+    nFeats = inLayer.GetFeatureCount(compute_count)
     return nFeats
 
 
@@ -441,7 +435,7 @@ A function which splits the input vector layer into a number of output layers.
     datasrc = None
 
 
-def reproj_vector_layer(vec_file, out_vec_file, out_proj_wkt, out_format='ESRI Shapefile', out_vec_lyr=None,
+def reproj_vector_layer(vec_file, out_vec_file, out_proj_wkt, out_format='GPKG', out_vec_lyr=None,
                         vec_lyr=None, in_proj_wkt=None, del_exist_vec=False):
     """
 A function which reprojects a vector layer. You might also consider using
@@ -2093,14 +2087,14 @@ def get_unq_col_values(vec_file, vec_lyr, col_name):
 
 
 
-def merge_vector_files(in_vec_files, vec_out_file, vec_out_lyr=None, out_format='GPKG', out_epsg=None):
+def merge_vector_files(in_vec_files, out_vec_file, out_vec_lyr=None, out_format='GPKG', out_epsg=None):
     """
     A function which merges the input files into a single output file using geopandas. If the input files
     have multiple layers they are all merged into the output file.
 
     :param in_vec_files: list of input files
-    :param vec_out_file: output vector file.
-    :param vec_out_lyr: output vector layer.
+    :param out_vec_file: output vector file.
+    :param out_vec_lyr: output vector layer.
     :param out_format: output file format.
     :param out_epsg: if input layers are different projections then option can be used to define the output
                      projection.
@@ -2126,21 +2120,21 @@ def merge_vector_files(in_vec_files, vec_out_file, vec_out_lyr=None, out_format=
 
     if not first:
         if out_format == "GPKG":
-            if vec_out_lyr is None:
+            if out_vec_lyr is None:
                 raise Exception("If output format is GPKG then an output layer is required.")
-            data_gdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+            data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
-            data_gdf.to_file(vec_out_file, driver=out_format)
+            data_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def merge_vector_layers(in_vecs_dict, vec_out_file, vec_out_lyr=None, out_format='GPKG', out_epsg=None):
+def merge_vector_layers(in_vecs_dict, out_vec_file, out_vec_lyr=None, out_format='GPKG', out_epsg=None):
     """
     A function which merges the input vector layers into a single output file using geopandas.
 
     :param in_vecs_dict: list of dicts with keys [{'file': '/file/path/to/file.gpkg', 'layer': 'layer_name'}]
                         providing the file paths and layer names.
-    :param vec_out_file: output vector file.
-    :param vec_out_lyr: output vector layer.
+    :param out_vec_file: output vector file.
+    :param out_vec_lyr: output vector layer.
     :param out_format: output file format.
     :param out_epsg: if input layers are different projections then option can be used to define the output
                      projection.
@@ -2167,14 +2161,14 @@ def merge_vector_layers(in_vecs_dict, vec_out_file, vec_out_lyr=None, out_format
 
     if not first:
         if out_format == "GPKG":
-            if vec_out_lyr is None:
+            if out_vec_lyr is None:
                 raise Exception("If output format is GPKG then an output layer is required.")
-            data_gdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+            data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
-            data_gdf.to_file(vec_out_file, driver=out_format)
+            data_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def explode_vec_lyr(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG'):
+def explode_vec_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GPKG'):
     """
     A function to explode a vector layer separating any multiple geometries (e.g., multipolygons)
     to single geometries.
@@ -2183,8 +2177,8 @@ def explode_vec_lyr(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GP
 
     :param vec_file: vector layer file
     :param vec_lyr: vector layer name
-    :param vec_out_file: output vector layer file
-    :param vec_out_lyr: output vector layer name (Can be None if output format is not GPKG).
+    :param out_vec_file: output vector layer file
+    :param out_vec_lyr: output vector layer name (Can be None if output format is not GPKG).
     :param out_format: The output format for the vector file.
 
     """
@@ -2194,9 +2188,9 @@ def explode_vec_lyr(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GP
 
     if len(data_explode_gdf) > 0:
         if out_format == "GPKG":
-            data_explode_gdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+            data_explode_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
-            data_explode_gdf.to_file(vec_out_file, driver=out_format)
+            data_explode_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def explode_vec_files(in_vec_files, output_dir, out_format='GPKG', out_vec_ext='gpkg'):
@@ -2342,15 +2336,15 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
     return out_gdf
 
 
-def merge_utm_vecs_wgs84(in_vec_files, vec_out_file, vec_out_lyr=None, out_format='GPKG',
+def merge_utm_vecs_wgs84(in_vec_files, out_vec_file, out_vec_lyr=None, out_format='GPKG',
                          n_hemi_utm_file=None, s_hemi_utm_file=None, width_thres=350):
     """
     A function which merges input files in UTM projections to the WGS84 projection cutting
     polygons which wrap from one side of the world to other (i.e., 180/-180 boundary).
 
     :param in_vec_files: list of input files
-    :param vec_out_file: output vector file.
-    :param vec_out_lyr: output vector layer - only used if output format is GPKG
+    :param out_vec_file: output vector file.
+    :param out_vec_lyr: output vector layer - only used if output format is GPKG
     :param out_format: output file format.
     :param n_utm_zones_vec: GPKG file with layer per zone (layer names: 01, 02, ... 59, 60) each projected in
                             the northern hemisphere UTM projections.
@@ -2428,14 +2422,14 @@ def merge_utm_vecs_wgs84(in_vec_files, vec_out_file, vec_out_lyr=None, out_forma
 
     if not first:
         if out_format == "GPKG":
-            if vec_out_lyr is None:
+            if out_vec_lyr is None:
                 raise Exception("If output format is GPKG then an output layer is required.")
-            out_gdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+            out_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
-            out_gdf.to_file(vec_out_file, driver=out_format)
+            out_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def clip_vec_lyr(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, vec_out_file, vec_out_lyr, out_format='GPKG'):
+def clip_vec_lyr(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, out_vec_lyr, out_format='GPKG'):
     """
     A function which clips a vector layer using an input region of interest (ROI) polygon layer.
 
@@ -2443,8 +2437,8 @@ def clip_vec_lyr(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, vec_out_file, vec
     :param vec_lyr: Input vector layer within the input file.
     :param vec_roi_file: Input vector file defining the ROI polygon(s)
     :param vec_roi_lyr: Input vector layer within the roi input file.
-    :param vec_out_file: Output vector file
-    :param vec_out_lyr: Output vector layer name.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
     :param out_format: Output file format (default GPKG).
 
     """
@@ -2456,12 +2450,12 @@ def clip_vec_lyr(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, vec_out_file, vec
     cliped_gpdf = geopandas.clip(base_gpdf, roi_gpdf, keep_geom_type=True)
 
     if out_format == 'GPKG':
-        cliped_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        cliped_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        cliped_gpdf.to_file(vec_out_file, driver=out_format)
+        cliped_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def shiftxy_vec_lyr(vec_file, vec_lyr, x_shift, y_shift, vec_out_file, vec_out_lyr, out_format='GPKG'):
+def shiftxy_vec_lyr(vec_file, vec_lyr, x_shift, y_shift, out_vec_file, out_vec_lyr, out_format='GPKG'):
     """
     A function which shifts (translates) a vector layer in the x and y axis'.
 
@@ -2469,8 +2463,8 @@ def shiftxy_vec_lyr(vec_file, vec_lyr, x_shift, y_shift, vec_out_file, vec_out_l
     :param vec_lyr: Input vector layer within the input file.
     :param x_shift: The shift in the x axis. In the units of the coordinate system the file is projected in.
     :param y_shift: The shift in the y axis. In the units of the coordinate system the file is projected in.
-    :param vec_out_file: Output vector file
-    :param vec_out_lyr: Output vector layer name.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
     :param out_format: Output file format (default GPKG).
 
     """
@@ -2487,9 +2481,9 @@ def shiftxy_vec_lyr(vec_file, vec_lyr, x_shift, y_shift, vec_out_file, vec_out_l
             shifted_gpdf[col_name] = base_gpdf[col_name]
 
     if out_format == 'GPKG':
-        shifted_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        shifted_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        shifted_gpdf.to_file(vec_out_file, driver=out_format)
+        shifted_gpdf.to_file(out_vec_file, driver=out_format)
 
 
 def split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format='GPKG'):
@@ -2516,15 +2510,15 @@ def split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format='GPKG'):
     base_gpdf = None
 
 
-def add_geom_bbox_cols(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG',
+def add_geom_bbox_cols(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GPKG',
                        min_x_col='MinX', max_x_col='MaxX', min_y_col='MinY', max_y_col='MaxY'):
     """
     A function which adds columns to the vector layer with the bbox of each geometry.
 
     :param vec_file: input vector file
     :param vec_lyr: input vector layer name
-    :param vec_out_file: output vector file
-    :param vec_out_lyr: output vector layer name
+    :param out_vec_file: output vector file
+    :param out_vec_lyr: output vector layer name
     :param out_format: The output format of the output file. (Default: GPKG)
     :param min_x_col: Name of the MinX column (Default: MinX)
     :param max_x_col: Name of the MaxX column (Default: MaxX)
@@ -2547,9 +2541,9 @@ def add_geom_bbox_cols(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format=
 
     # Output the file.
     if out_format == 'GPKG':
-        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        base_gpdf.to_file(vec_out_file, driver=out_format)
+        base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
 

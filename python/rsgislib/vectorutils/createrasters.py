@@ -9,8 +9,8 @@ import rsgislib
 
 gdal.UseExceptions()
 
-def rasterise_vec_lyr(vec_file: str, vec_lyr: str, input_img, output_img, gdalformat="KEA",
-                      burn_val=1, datatype=rsgislib.TYPE_8UINT, att_column=None, use_vec_extent=False,
+def rasterise_vec_lyr(vec_file: str, vec_lyr: str, input_img: str, output_img: str, gdalformat: str ="KEA",
+                      burn_val:int =1, datatype=rsgislib.TYPE_8UINT, att_column=None, use_vec_extent=False,
                       thematic=True, no_data_val=0):
     """
     A utility to rasterise a vector layer to an image covering the same region and at
@@ -141,16 +141,17 @@ def rasterise_vec_lyr_obj(vec_lyr_obj, outImage, burnVal=1, vecAtt=None, calcsta
         raise e
 
 
-def copy_vec_to_rat(vec_file, vec_lyr, inputImage, outputImage):
+def copy_vec_to_rat(vec_file, vec_lyr, input_img, output_img):
     """
-    A utility to create raster copy of a shapefile. The output image is a KEA file and the attribute table has the attributes from the shapefile.
+    A utility to create raster copy of a polygon vector layer. The output image is
+    a KEA file and the attribute table has the attributes from the vector layer.
 
     Where:
 
     :param vec_file: is a string specifying the input vector file
     :param vec_lyr: is a string specifying the layer within the input vector file
-    :param inputImage: is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation
-    :param outputImage: is a string specifying the output KEA image for the rasterised shapefile
+    :param input_img: is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation
+    :param output_img: is a string specifying the output KEA image for the rasterised shapefile
 
     Example::
 
@@ -164,9 +165,9 @@ def copy_vec_to_rat(vec_file, vec_lyr, inputImage, outputImage):
 
     """
     import rsgislib.rastergis
-    rasterise_vec_lyr(vec_file, vec_lyr, inputImage, outputImage, gdalformat="KEA",
+    rasterise_vec_lyr(vec_file, vec_lyr, input_img, output_img, gdalformat="KEA",
                       datatype=rsgislib.TYPE_32UINT, att_column="FID", use_vec_extent=False,
                       thematic=True, no_data_val=0)
-    rsgislib.rastergis.import_vec_atts(outputImage, vec_file, vec_lyr, 'pxlval', None)
+    rsgislib.rastergis.import_vec_atts(output_img, vec_file, vec_lyr, 'pxlval', None)
 
 

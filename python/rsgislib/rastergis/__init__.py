@@ -50,7 +50,7 @@ class ShapeIndex:
         self.colIdx = colIdx
         self.idx = idx
 
-def exportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields, ratband=1, tempDIR=None):
+def export_cols_to_gdal_image(clumps, outimage, gdalformat, datatype, fields, ratband=1, tempDIR=None):
     """Exports columns of the raster attribute table as bands in a GDAL image. Utility function, exports each column individually then stacks them.
 
 Where:
@@ -69,7 +69,7 @@ Example::
    gdalformat = 'KEA'
    datatype = rsgislib.TYPE_32FLOAT
    fields = ['RedAvg','GreenAvg','BlueAvg']
-   rastergis.exportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields)
+   rastergis.export_cols_to_gdal_image(clumps, outimage, gdalformat, datatype, fields)
 
 """
     import os
@@ -99,7 +99,7 @@ Example::
         rsgislib.tools.filetools.delete_file_with_basename(tempFile)
 
 
-def getRATLength(clumps_img, rat_band=1):
+def get_rat_length(clumps_img, rat_band=1):
     """
 A function which returns the length (i.e., number of rows) within the RAT.
 
@@ -126,7 +126,7 @@ A function which returns the length (i.e., number of rows) within the RAT.
     return nrows
 
 
-def getRATColumns(clumps_img, rat_band=1):
+def get_rat_columns(clumps_img, rat_band=1):
     """
 A function which returns a list of column names within the RAT.
 
@@ -157,7 +157,7 @@ A function which returns a list of column names within the RAT.
     return col_names
 
 
-def getRATColumnsInfo(clumps_img, rat_band=1):
+def get_rat_columns_info(clumps_img, rat_band=1):
     """
 A function which returns a dictionary of column names with type (GFT_Integer, GFT_Real, GFT_String)
 and usage (e.g., GFU_Generic, GFU_PixelCount, GFU_Name, etc.) within the RAT.
@@ -194,7 +194,7 @@ and usage (e.g., GFU_Generic, GFU_PixelCount, GFU_Name, etc.) within the RAT.
     return col_info
 
 
-def readRATNeighbours(clumps_img, start_row=None, end_row=None, rat_band=1):
+def read_rat_neighbours(clumps_img, start_row=None, end_row=None, rat_band=1):
     """
 A function which returns a list of clumps neighbours from a KEA RAT. Note, the
 neighbours are popualted using the function rsgislib.rastergis.findNeighbours. 
@@ -212,11 +212,11 @@ and end_row variables can be used to read a subset of the RAT.
         raise Exception("Need the h5py library for this function")
        
     # Check that 'NumNeighbours' column exists
-    rat_columns = getRATColumns(clumps_img, rat_band)
+    rat_columns = get_rat_columns(clumps_img, rat_band)
     if 'NumNeighbours' not in rat_columns:
         raise Exception("Clumps image RAT does not contain 'NumNeighbours' column - have you populated neightbours?")
     
-    n_rows = getRATLength(clumps_img)
+    n_rows = get_rat_length(clumps_img)
     
     if start_row is None:
         start_row = 0

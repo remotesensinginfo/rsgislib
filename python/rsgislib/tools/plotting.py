@@ -37,18 +37,19 @@ except ImportError as numErr:
     haveNumpy = False    
     
     
-def plotImageSpectra(inputImage, roiFile, outputPlotFile, wavelengths, plotTitle, scaleFactor=0.1, showReflStd=True, reflMax=None):
+def plot_image_spectra(input_img, vec_file, vec_lyr, output_plot_file, wavelengths, plot_title, scale_factor=0.1, show_refl_std=True, refl_max=None):
     """A utility function to extract and plot image spectra.
 Where:
 
-:param inputImage: is the input image
-:param roiFile: is the region of interest file as a shapefile - if multiple polygons are defined the spectra for each will be added to the plot.
-:param outputPlotFile: is the output PDF file for the plot which has been create
+:param input_img: is the input image
+:param vec_file: is the region of interest file as a vector file - if multiple polygons are defined the spectra for each will be added to the plot.
+:param vec_lyr:
+:param output_plot_file: is the output PDF file for the plot which has been create
 :param wavelengths: is list of numbers with the wavelength of each band (must have the same number of wavelengths as image bands)
-:param plotTitle: is a string with the title for the plot
-:param scaleFactor: is a float specifying the scaling to percentage (0 - 100). (Default is 0.1, i.e., pixel values are scaled between 0-1000; ARCSI default).
-:param showReflStd: is a boolean (default: True) to specify whether a shaded region showing 1 standard deviation from the mean on the plot alongside the mean spectra.
-:param reflMax: is a parameter for setting the maximum reflectance value on the Y axis (if None the maximum value in the dataset is used
+:param plot_title: is a string with the title for the plot
+:param scale_factor: is a float specifying the scaling to percentage (0 - 100). (Default is 0.1, i.e., pixel values are scaled between 0-1000; ARCSI default).
+:param show_refl_std: is a boolean (default: True) to specify whether a shaded region showing 1 standard deviation from the mean on the plot alongside the mean spectra.
+:param refl_max: is a parameter for setting the maximum reflectance value on the Y axis (if None the maximum value in the dataset is used
 
 Example::
 
@@ -60,7 +61,7 @@ Example::
     wavelengths = [446.0, 530.0, 549.0, 569.0, 598.0, 633.0, 680.0, 696.0, 714.0, 732.0, 741.0, 752.0, 800.0, 838.0]
     plotTitle = "Image Spectral from CASI Image"
     
-    tools.plotting.plotImageSpectra(inputImage, roiFile, outputPlotFile, wavelengths, plotTitle)
+    tools.plotting.plot_image_spectra(inputImage, roiFile, outputPlotFile, wavelengths, plotTitle)
     
 """
 
@@ -72,16 +73,16 @@ Example::
         if not haveMatPlotLib:
             raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
         
-        dataset = gdal.Open(inputImage, gdal.GA_ReadOnly)
+        dataset = gdal.Open(input_img, gdal.GA_ReadOnly)
         numBands = dataset.RasterCount
         dataset = None
         
         if not len(wavelengths) == numBands:
             raise Exception("The number of wavelengths and image bands must be equal.")
         
-        tmpOutFile = os.path.splitext(outputPlotFile)[0] + "_statstmp.txt"
+        tmpOutFile = os.path.splitext(output_plot_file)[0] + "_statstmp.txt"
         zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=False, calcMin=False, calcMax=False, calcMean=True, calcStdDev=True, calcMode=False, calcSum=False)
-        zonalstats.pixelStats2TXT(inputImage, roiFile, tmpOutFile, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER, False)
+        zonalstats.pixelStats2TXT(input_img, vec_file, tmpOutFile, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER, False)
         
         meanVals = []
         stdDevVals = []
@@ -97,8 +98,8 @@ Example::
                 if not len(data) == (numBands * 2) + 2:
                     raise Exception("The number of outputted stats values is incorrect!")
                 for band in range(numBands):
-                    meanVal.append(float(data[(band*2)+1])*scaleFactor)
-                    stdDevVal.append(float(data[(band*2)+2])*scaleFactor)
+                    meanVal.append(float(data[(band*2)+1]) * scale_factor)
+                    stdDevVal.append(float(data[(band*2)+2]) * scale_factor)
                 meanVals.append(meanVal)
                 stdDevVals.append(stdDevVal)
             row+=1
@@ -111,7 +112,7 @@ Example::
         ax1 = fig.add_subplot(111)
         for feat in range(len(meanVals)):
             ax1.plot(wavelengths, meanVals[feat], 'k-', zorder=10)
-            if showReflStd:
+            if show_refl_std:
                 lowerVals = []
                 upperVals = []
                 for band in range(numBands):
@@ -121,17 +122,17 @@ Example::
         
         ax1Range = ax1.axis('tight')
                 
-        if reflMax is None:
+        if refl_max is None:
             ax1.axis((ax1Range[0], ax1Range[1], 0, ax1Range[3]))
         else:
-            ax1.axis((ax1Range[0], ax1Range[1], 0, reflMax))
+            ax1.axis((ax1Range[0], ax1Range[1], 0, refl_max))
         
         plt.grid(color='k', linestyle='--', linewidth=0.5)
-        plt.title(plotTitle)
+        plt.title(plot_title)
         plt.xlabel("Wavelength")
         plt.ylabel("Reflectance (%)")
     
-        plt.savefig(outputPlotFile, format='PDF')
+        plt.savefig(output_plot_file, format='PDF')
         os.remove(tmpOutFile)
         print("Completed.\n")
 
@@ -139,7 +140,7 @@ Example::
         raise e
 
 
-def plotImageComparison(inputImage1, inputImage2, img1Band, img2Band, outputPlotFile, numBins=100, img1Min=None, img1Max=None, img2Min=None, img2Max=None, img1Scale=1, img2Scale=1, img1Off=0, img2Off=0, normOutput=False, plotTitle='2D Histogram', xLabel='X Axis', yLabel='Y Axis', ctable='jet', interp='nearest'):
+def plot_image_comparison(inputImage1, inputImage2, img1Band, img2Band, outputPlotFile, numBins=100, img1Min=None, img1Max=None, img2Min=None, img2Max=None, img1Scale=1, img2Scale=1, img1Off=0, img2Off=0, normOutput=False, plotTitle='2D Histogram', xLabel='X Axis', yLabel='Y Axis', ctable='jet', interp='nearest'):
     """A function to plot two images against each other. 
 Where:
 
@@ -172,7 +173,7 @@ Example::
     inputImage2 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_ndvi.kea'
     outputPlotFile = 'ARCSI_RAD_SREF_NDVI.pdf'
     
-    plotting.plotImageComparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
+    plotting.plot_image_comparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
     
     """
     try:
@@ -264,13 +265,13 @@ Example::
         raise e
 
 
-def plotImageHistogram(inputImage, imgBand, outputPlotFile, numBins=100, imgMin=None, imgMax=None, normOutput=False, plotTitle='Histogram', xLabel='X Axis', colour='blue', edgecolour='black', linewidth=None):
+def plot_image_histogram(input_img, imgBand, outputPlotFile, numBins=100, imgMin=None, imgMax=None, normOutput=False, plotTitle='Histogram', xLabel='X Axis', colour='blue', edgecolour='black', linewidth=None):
     """
 A function to plot the histogram of an image.
 
 Where:
 
-:param inputImage: is a string with the path to the image.
+:param input_img: is a string with the path to the image.
 :param imgBand: is an int specifying the band in the image to be plotted.
 :param outputPlotFile: is a string specifying the output PDF for the plot.
 :param numBins: is an int specifying the number of bins within each axis of the histogram (default: 100)
@@ -287,7 +288,7 @@ Example::
 
     from rsgislib.tools import plotting
     
-    plotting.plotImageHistogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
+    plotting.plot_image_histogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
     
     """
     try:
@@ -304,7 +305,7 @@ Example::
         
         if (imgMin is None) or (imgMax is None):
             # Calculate image 1 stats
-            imgGDALDS = gdal.Open(inputImage, gdal.GA_ReadOnly)
+            imgGDALDS = gdal.Open(input_img, gdal.GA_ReadOnly)
             imgGDALBand = imgGDALDS.GetRasterBand(imgBand)
             min, max = imgGDALBand.ComputeRasterMinMax(False)
             imgGDALDS = None
@@ -316,7 +317,7 @@ Example::
         binWidth = (imgMax - imgMin) / numBins
         print("Bin Size: ", binWidth)
         
-        bins, hMin, hMax = imagecalc.getHistogram(inputImage, imgBand, binWidth, False, imgMin, imgMax)
+        bins, hMin, hMax = imagecalc.getHistogram(input_img, imgBand, binWidth, False, imgMin, imgMax)
                 
         if normOutput:
             sumBins = numpy.sum(bins)
