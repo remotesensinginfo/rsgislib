@@ -59,7 +59,7 @@ This should be the same for all zones.
     return min_utm[0], max_utm[0]
 
 
-def epsg_for_UTM(zone, hemisphere):
+def epsg_for_utm(zone, hemisphere):
     """
 Return EPSG code for given UTM zone and hemisphere using WGS84 datum.
 

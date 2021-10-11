@@ -667,7 +667,7 @@ def perform_image_mnf(
     rsgislib.imageutils.gen_valid_mask(input_img, valid_msk_img, "KEA", in_img_no_data)
 
     whiten_img = os.path.join(tmp_dir, "{}_whiten.kea".format(img_basename))
-    rsgislib.imageutils.whitenImage(input_img, valid_msk_img, 1, whiten_img, "KEA")
+    rsgislib.imageutils.whiten_image(input_img, valid_msk_img, 1, whiten_img, "KEA")
 
     # Read input data from image file.
     X = rsgislib.imageutils.extract_img_pxl_sample(

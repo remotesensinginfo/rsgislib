@@ -443,7 +443,7 @@ def get_img_band_colour_interp(input_img, band):
     rasterDS = None
     return clrItrpVal
 
-def set_img_band_colour_interp(input_img, band, clrItrpVal):
+def set_img_band_colour_interp(input_img, band, clr_itrp_val):
     """
     A function to set the colour interpretation for a specific band.
     input is a GDALColorInterp value:
@@ -471,7 +471,7 @@ def set_img_band_colour_interp(input_img, band, clrItrpVal):
     rasterDS = gdal.Open(input_img, gdal.GA_Update)
     if rasterDS is None:
         raise rsgislib.RSGISPyException('Could not open raster image: \'' + input_img + '\'')
-    rasterDS.GetRasterBand(band).SetColorInterpretation(clrItrpVal)
+    rasterDS.GetRasterBand(band).SetColorInterpretation(clr_itrp_val)
     rasterDS = None
 
 def get_wkt_proj_from_image(input_img):

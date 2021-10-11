@@ -178,7 +178,7 @@ Where:
     # Import the RSGISLib Image Utils module
     import rsgislib.vectorutils
     rsgislib.vectorutils.createLinesOfPoints(inputLinesShp, outputPtsShp, lineStep, force)
-    popClassInfoAccuracyPts(input_img, outputPtsShp, classImgCol, classImgVecCol, classRefVecCol)
+    pop_class_info_accuracy_pts(input_img, outputPtsShp, classImgCol, classImgVecCol, classRefVecCol)
 
 
 def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=None, refImg=None):

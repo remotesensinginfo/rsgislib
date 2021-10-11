@@ -1106,20 +1106,6 @@ output image and threshold can be applied to this image.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def apply_xgboost_multiclass_classifier_rat(clumps_img, variables, model_file, class_train_info, out_col_int="OutClass", out_col_str="OutClassName", roi_col=None, roi_val=1, class_colours=True, nthread=1):
     """
 A function which will apply an XGBoost model within a Raster Attribute Table (RAT).
