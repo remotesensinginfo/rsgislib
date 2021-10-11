@@ -230,7 +230,7 @@ Where:
 """
     import rsgislib.tools.filetools
     outBaseImg = os.path.join(tilesMaskDIR, tilesNameBase)
-    outImgExt = rsgislib.tools.filetools.getFileExtension(gdalformat)[1:]
+    outImgExt = rsgislib.imageutils.get_file_img_extension(gdalformat)[1:]
     rastergis.exportClumps2Images(clumpsImage, outBaseImg, True, outImgExt, gdalformat, 1)
 
 

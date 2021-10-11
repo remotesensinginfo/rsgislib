@@ -278,7 +278,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
                 if 'LS8' in img:
                     baseImgName = os.path.splitext(os.path.basename(img))[0]
                     reflSubImg = os.path.join(tmpPath, baseImgName+'_bandsub.kea')
-                    rsgislib.imageutils.selectImageBands(img, reflSubImg, 'KEA', dataType, [2,3,4,5,6,7])
+                    rsgislib.imageutils.select_img_bands(img, reflSubImg, 'KEA', dataType, [2,3,4,5,6,7])
                     inImagesTmp.append(reflSubImg)
                 else:
                     inImagesTmp.append(img)

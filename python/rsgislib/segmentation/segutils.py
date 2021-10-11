@@ -105,7 +105,7 @@ Example::
     basefile = os.path.basename(input_img)
     basename = os.path.splitext(basefile)[0]
     
-    outFileExt = rsgislib.tools.filetools.getFileExtension(gdalformat)
+    out_file_ext = rsgislib.imageutils.get_file_img_extension(gdalformat)
     
     createdDIR = False
     if not os.path.isdir(tmp_dir):
@@ -121,16 +121,16 @@ Example::
     if not bands == None:
         print("Subsetting the image bands")
         selectBands = True
-        inputImgBands = os.path.join(tmp_dir,basename+str("_bselect")+outFileExt)
-        rsgislib.imageutils.selectImageBands(input_img, inputImgBands, gdalformat, input_datatype, bands)
+        inputImgBands = os.path.join(tmp_dir, "{}_bselect.{}".format(basename, out_file_ext))
+        rsgislib.imageutils.select_img_bands(input_img, inputImgBands, gdalformat, input_datatype, bands)
     
     # Stretch input data if required.
     segmentFile = inputImgBands
     if not no_stretch:
-        segmentFile = os.path.join(tmp_dir,basename+str("_stchd")+outFileExt)
-        strchFile = os.path.join(tmp_dir,basename+str("_stchdonly")+outFileExt)
-        strchFileOffset = os.path.join(tmp_dir,basename+str("_stchdonlyOff")+outFileExt)
-        strchMaskFile = os.path.join(tmp_dir,basename+str("_stchdmaskonly")+outFileExt)
+        segmentFile = os.path.join(tmp_dir, "{}_stchd.{}".format(basename, out_file_ext))
+        strchFile = os.path.join(tmp_dir, "{}_stchdonly.{}".format(basename, out_file_ext))
+        strchFileOffset = os.path.join(tmp_dir, "{}_stchdonly_off.{}".format(basename, out_file_ext))
+        strchMaskFile = os.path.join(tmp_dir, "{}_stchdmaskonly.{}".format(basename, out_file_ext))
         
         print("Stretch Input Image")
         rsgislib.imageutils.stretch_img(inputImgBands, strchFile, save_process_stats, img_stretch_stats, True, False, gdalformat, rsgislib.TYPE_8INT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
@@ -139,9 +139,7 @@ Example::
         rsgislib.imagecalc.image_math(strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT)
         
         print("Create Input Image Mask.")
-        ImgBand = collections.namedtuple('ImgBands', ['bandName', 'fileName', 'bandIndex'])
-        bandMathBands = list()
-        bandMathBands.append(ImgBand(bandName="b1", fileName=inputImgBands, bandIndex=1))
+        bandMathBands = [rsgislib.imagecalc.BandDefn(band_name="b1", input_img=inputImgBands, img_band=1)]
         rsgislib.imagecalc.band_math(strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_8INT, bandMathBands)
         
         print("Mask stretched Image.")
@@ -149,37 +147,37 @@ Example::
         
         if not no_delete:
             # Deleting extra files
-            rsgisUtils.delete_file_with_basename(strchFile)
-            rsgisUtils.delete_file_with_basename(strchFileOffset)
-            rsgisUtils.delete_file_with_basename(strchMaskFile)
+            rsgislib.tools.filetools.delete_file_with_basename(strchFile)
+            rsgislib.tools.filetools.delete_file_with_basename(strchFileOffset)
+            rsgislib.tools.filetools.delete_file_with_basename(strchMaskFile)
             
     # Perform KMEANS
     print("Performing KMeans.")
-    outMatrixFile = os.path.join(tmp_dir,basename+str("_kmeansclusters"))
+    outMatrixFile = os.path.join(tmp_dir, "{}_kmeansclusters".format(basename))
     if save_process_stats:
         outMatrixFile = kmeans_centres
-    rsgislib.imagecalc.kMeansClustering(segmentFile, outMatrixFile, num_clusters, km_max_iter, sampling, True, 0.0025, rsgislib.imagecalc.INITCLUSTER_DIAGONAL_FULL_ATTACH)
+    rsgislib.imagecalc.kmeans_clustering(segmentFile, outMatrixFile, num_clusters, km_max_iter, sampling, True, 0.0025, rsgislib.imagecalc.INITCLUSTER_DIAGONAL_FULL_ATTACH)
     
     # Apply KMEANS
     print("Apply KMeans to image.")
-    kMeansFileZones = os.path.join(tmp_dir,basename+str("_kmeans")+outFileExt)
-    rsgislib.segmentation.labelPixelsFromClusterCentres(segmentFile, kMeansFileZones, outMatrixFile+str(".gmtxt"), True, gdalformat)
+    kMeansFileZones = os.path.join(tmp_dir, "{}_kmeans.{}".format(basename, out_file_ext))
+    rsgislib.segmentation.label_pixels_from_cluster_centres(segmentFile, kMeansFileZones, outMatrixFile+str(".gmtxt"), True, gdalformat)
     
-    # Elimininate Single Pixels
+    # Eliminate Single Pixels
     print("Eliminate Single Pixels.")
-    kMeansFileZonesNoSgls = os.path.join(tmp_dir,basename+str("_kmeans_nosgl")+outFileExt)
-    kMeansFileZonesNoSglsTmp = os.path.join(tmp_dir,basename+str("_kmeans_nosglTMP")+outFileExt)
-    rsgislib.segmentation.eliminateSinglePixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalformat, process_in_mem, True)
+    kMeansFileZonesNoSgls = os.path.join(tmp_dir, "{}_kmeans_nosgl.{}".format(basename, out_file_ext))
+    kMeansFileZonesNoSglsTmp = os.path.join(tmp_dir, "{}_kmeans_nosgl_tmp.{}".format(basename, out_file_ext))
+    rsgislib.segmentation.eliminate_single_pixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalformat, process_in_mem, True)
     
     # Clump
     print("Perform clump.")
-    initClumpsFile = os.path.join(tmp_dir,basename+str("_clumps")+outFileExt)
+    initClumpsFile = os.path.join(tmp_dir, "{}_clumps.{}".format(basename, out_file_ext))
     rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, process_in_mem, 0)
     
     # Elimininate small clumps
     print("Eliminate small pixels.")
-    elimClumpsFile = os.path.join(tmp_dir,basename+str("_clumps_elim")+outFileExt)
-    rsgislib.segmentation.rmSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalformat, False, "", False, process_in_mem, min_n_pxls, dist_thres)
+    elimClumpsFile = os.path.join(tmp_dir, "{}_clumps_elim.{}".format(basename, out_file_ext))
+    rsgislib.segmentation.rm_small_clumps_stepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalformat, False, "", False, process_in_mem, min_n_pxls, dist_thres)
     
     # Relabel clumps
     print("Relabel clumps.")
@@ -192,7 +190,7 @@ Example::
     
     # Create mean image if required.
     if not (out_mean_img == None):
-        rsgislib.segmentation.meanImage(input_img, out_clumps_img, out_mean_img, gdalformat, input_datatype)
+        rsgislib.segmentation.mean_image(input_img, out_clumps_img, out_mean_img, gdalformat, input_datatype)
         if calc_stats:
             rsgislib.imageutils.pop_img_stats(out_mean_img, True, 0, True)
     
@@ -231,16 +229,16 @@ Example::
     if not no_delete:
         # Deleting extra files
         if not save_process_stats:
-            rsgisUtils.delete_file_with_basename(outMatrixFile + str(".gmtxt"))
-        rsgisUtils.delete_file_with_basename(kMeansFileZones)
-        rsgisUtils.delete_file_with_basename(kMeansFileZonesNoSgls)
-        rsgisUtils.delete_file_with_basename(kMeansFileZonesNoSglsTmp)
-        rsgisUtils.delete_file_with_basename(initClumpsFile)
-        rsgisUtils.delete_file_with_basename(elimClumpsFile)
+            rsgislib.tools.filetools.delete_file_with_basename(outMatrixFile + str(".gmtxt"))
+        rsgislib.tools.filetools.delete_file_with_basename(kMeansFileZones)
+        rsgislib.tools.filetools.delete_file_with_basename(kMeansFileZonesNoSgls)
+        rsgislib.tools.filetools.delete_file_with_basename(kMeansFileZonesNoSglsTmp)
+        rsgislib.tools.filetools.delete_file_with_basename(initClumpsFile)
+        rsgislib.tools.filetools.delete_file_with_basename(elimClumpsFile)
         if selectBands:
-            rsgisUtils.delete_file_with_basename(inputImgBands)
+            rsgislib.tools.filetools.delete_file_with_basename(inputImgBands)
         if not no_stretch:
-            rsgisUtils.delete_file_with_basename(segmentFile)
+            rsgislib.tools.filetools.delete_file_with_basename(segmentFile)
         if createdDIR:
             shutil.rmtree(tmp_dir)
             
@@ -290,7 +288,7 @@ Example::
     basefile = os.path.basename(input_img)
     basename = os.path.splitext(basefile)[0]
     
-    outFileExt = rsgislib.tools.filetools.getFileExtension(gdalformat)
+    out_file_ext = rsgislib.imageutils.get_file_img_extension(gdalformat)
     
     createdDIR = False
     if not os.path.isdir(tmp_dir):
@@ -308,16 +306,16 @@ Example::
     if not bands == None:
         print("Subsetting the image bands")
         selectBands = True
-        inputImgBands = os.path.join(tmp_dir,basename+str("_bselect")+outFileExt)
-        rsgislib.imageutils.selectImageBands(input_img, inputImgBands, gdalformat, input_datatype, bands)
+        inputImgBands = os.path.join(tmp_dir, "{}_bselect.{}".format(basename, out_file_ext))
+        rsgislib.imageutils.select_img_bands(input_img, inputImgBands, gdalformat, input_datatype, bands)
     
     # Stretch input data if required.
     segmentFile = inputImgBands
     if not no_stretch:
-        segmentFile = os.path.join(tmp_dir,basename+str("_stchd")+outFileExt)
-        strchFile = os.path.join(tmp_dir,basename+str("_stchdonly")+outFileExt)
-        strchFileOffset = os.path.join(tmp_dir,basename+str("_stchdonlyOff")+outFileExt)
-        strchMaskFile = os.path.join(tmp_dir,basename+str("_stchdmaskonly")+outFileExt)
+        segmentFile = os.path.join(tmp_dir, "{}_stchd.{}".format(basename, out_file_ext))
+        strchFile = os.path.join(tmp_dir, "{}_stchdonly.{}".format(basename, out_file_ext))
+        strchFileOffset = os.path.join(tmp_dir, "{}_stchdonly_off.{}".format(basename, out_file_ext))
+        strchMaskFile = os.path.join(tmp_dir, "{}_stchdmaskonly.{}".format(basename, out_file_ext))
         
         print("Stretch Input Image")
         rsgislib.imageutils.stretch_img_with_stats(inputImgBands, strchFile, img_stretch_stats, gdalformat, rsgislib.TYPE_8INT, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
@@ -326,9 +324,7 @@ Example::
         rsgislib.imagecalc.image_math(strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT)
         
         print("Create Input Image Mask.")
-        ImgBand = collections.namedtuple('ImgBands', ['bandName', 'fileName', 'bandIndex'])
-        bandMathBands = list()
-        bandMathBands.append(ImgBand(bandName="b1", fileName=inputImgBands, bandIndex=1))
+        bandMathBands = [rsgislib.imagecalc.BandDefn(band_name="b1", input_img=inputImgBands, img_band=1)]
         rsgislib.imagecalc.band_math(strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_8INT, bandMathBands)
         
         print("Mask stretched Image.")
@@ -336,30 +332,30 @@ Example::
         
         if not no_delete:
             # Deleting extra files
-            rsgisUtils.delete_file_with_basename(strchFile)
-            rsgisUtils.delete_file_with_basename(strchFileOffset)
-            rsgisUtils.delete_file_with_basename(strchMaskFile)
+            rsgislib.tools.filetools.delete_file_with_basename(strchFile)
+            rsgislib.tools.filetools.delete_file_with_basename(strchFileOffset)
+            rsgislib.tools.filetools.delete_file_with_basename(strchMaskFile)
     
     # Apply KMEANS
     print("Apply KMeans to image.")
-    kMeansFileZones = os.path.join(tmp_dir,basename+str("_kmeans")+outFileExt)
-    rsgislib.segmentation.labelPixelsFromClusterCentres(segmentFile, kMeansFileZones, kmeans_centres, True, gdalformat)
+    kMeansFileZones = os.path.join(tmp_dir, "{}_kmeans.{}".format(basename, out_file_ext))
+    rsgislib.segmentation.label_pixels_from_cluster_centres(segmentFile, kMeansFileZones, kmeans_centres, True, gdalformat)
     
     # Elimininate Single Pixels
     print("Eliminate Single Pixels.")
-    kMeansFileZonesNoSgls = os.path.join(tmp_dir,basename+str("_kmeans_nosgl")+outFileExt)
-    kMeansFileZonesNoSglsTmp = os.path.join(tmp_dir,basename+str("_kmeans_nosglTMP")+outFileExt)
-    rsgislib.segmentation.eliminateSinglePixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalformat, process_in_mem, True)
+    kMeansFileZonesNoSgls = os.path.join(tmp_dir, "{}_kmeans_nosgl.{}".format(basename, out_file_ext))
+    kMeansFileZonesNoSglsTmp = os.path.join(tmp_dir, "{}_kmeans_nosgl_tmp.{}".format(basename, out_file_ext))
+    rsgislib.segmentation.eliminate_single_pixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalformat, process_in_mem, True)
     
     # Clump
     print("Perform clump.")
-    initClumpsFile = os.path.join(tmp_dir,basename+str("_clumps")+outFileExt)
+    initClumpsFile = os.path.join(tmp_dir, "{}_clumps.{}".format(basename, out_file_ext))
     rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, process_in_mem, 0)
     
     # Elimininate small clumps
     print("Eliminate small pixels.")
-    elimClumpsFile = os.path.join(tmp_dir,basename+str("_clumps_elim")+outFileExt)
-    rsgislib.segmentation.rmSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalformat, False, "", False, process_in_mem, min_n_pxls, dist_thres)
+    elimClumpsFile = os.path.join(tmp_dir, "{}_clumps_elim.{}".format(basename, out_file_ext))
+    rsgislib.segmentation.rm_small_clumps_stepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalformat, False, "", False, process_in_mem, min_n_pxls, dist_thres)
     
     # Relabel clumps
     print("Relabel clumps.")
@@ -372,21 +368,21 @@ Example::
     
     # Create mean image if required.
     if not (out_mean_img == None):
-        rsgislib.segmentation.meanImage(input_img, out_clumps_img, out_mean_img, gdalformat, input_datatype)
+        rsgislib.segmentation.mean_image(input_img, out_clumps_img, out_mean_img, gdalformat, input_datatype)
         if calc_stats:
             rsgislib.imageutils.pop_img_stats(out_mean_img, True, 0, True)
      
     if not no_delete:
         # Deleting extra files
-        rsgisUtils.delete_file_with_basename(kMeansFileZones)
-        rsgisUtils.delete_file_with_basename(kMeansFileZonesNoSgls)
-        rsgisUtils.delete_file_with_basename(kMeansFileZonesNoSglsTmp)
-        rsgisUtils.delete_file_with_basename(initClumpsFile)
-        rsgisUtils.delete_file_with_basename(elimClumpsFile)
+        rsgislib.tools.filetools.delete_file_with_basename(kMeansFileZones)
+        rsgislib.tools.filetools.delete_file_with_basename(kMeansFileZonesNoSgls)
+        rsgislib.tools.filetools.delete_file_with_basename(kMeansFileZonesNoSglsTmp)
+        rsgislib.tools.filetools.delete_file_with_basename(initClumpsFile)
+        rsgislib.tools.filetools.delete_file_with_basename(elimClumpsFile)
         if selectBands:
-            rsgisUtils.delete_file_with_basename(inputImgBands)
+            rsgislib.tools.filetools.delete_file_with_basename(inputImgBands)
         if not no_stretch:
-            rsgisUtils.delete_file_with_basename(segmentFile)
+            rsgislib.tools.filetools.delete_file_with_basename(segmentFile)
         if createdDIR:
             shutil.rmtree(tmp_dir)
 

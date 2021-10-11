@@ -217,7 +217,7 @@ def create_datejson_file(image_list, out_msk_dir, out_json_file, gdal_format='KE
     import os.path
     import rsgislib.tools.filetools
 
-    out_img_ext = rsgislib.tools.filetools.getFileExtension(gdal_format)
+    out_img_ext = rsgislib.imageutils.get_file_img_extension(gdal_format)
     date_imgs = dict()
     for img in image_list:
         basename = rsgislib.tools.filetools.get_file_basename(img)

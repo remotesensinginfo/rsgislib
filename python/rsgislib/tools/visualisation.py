@@ -54,7 +54,7 @@ def create_kmz_img(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fa
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName+'_sband.kea')
-        rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA', rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImg), sBands)
+        rsgislib.imageutils.select_img_bands(inputImg, selImgBandsImg, 'KEA', rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImg), sBands)
     
     img2Stch = selImgBandsImg
     if finiteMsk:
@@ -129,7 +129,7 @@ def create_web_tiles_img_no_stats_msk(input_img, out_dir, bands, zoom_levels='2-
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName+'_sband.kea')
-        rsgislib.imageutils.selectImageBands(input_img, selImgBandsImg, 'KEA', rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), sBands)
+        rsgislib.imageutils.select_img_bands(input_img, selImgBandsImg, 'KEA', rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), sBands)
     
     img2Stch = selImgBandsImg
     if finite_msk:
@@ -208,7 +208,7 @@ def create_webtiles_img(input_img, bands, out_dir, zoom_levels='2-10', img_stats
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName + '_sband.kea')
-        rsgislib.imageutils.selectImageBands(input_img, selImgBandsImg, 'KEA',
+        rsgislib.imageutils.select_img_bands(input_img, selImgBandsImg, 'KEA',
                                              rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), sBands)
 
     img2Stch = selImgBandsImg
@@ -310,7 +310,7 @@ def create_quicklook_imgs(inputImg, bands, outputImgs='quicklook.jpg', output_im
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName + '_sband.kea')
-        rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA',
+        rsgislib.imageutils.select_img_bands(inputImg, selImgBandsImg, 'KEA',
                                              rsgislib.imageutils.get_rsgislib_datatype_from_img(inputImg), sBands)
 
     img2Stch = selImgBandsImg
@@ -423,7 +423,7 @@ def create_mbtile_file(input_img, bands, output_mbtiles, scale_input_img=50, img
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName + '_sband.kea')
-        rsgislib.imageutils.selectImageBands(input_img, selImgBandsImg, 'KEA',
+        rsgislib.imageutils.select_img_bands(input_img, selImgBandsImg, 'KEA',
                                              rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), sBands)
 
     img2Stch = selImgBandsImg
@@ -520,7 +520,7 @@ def create_webtiles_vis_gtiff_img(input_img, bands, output_dir, scaled_gtiff_img
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName + '_sband.kea')
-        rsgislib.imageutils.selectImageBands(input_img, selImgBandsImg, 'KEA',
+        rsgislib.imageutils.select_img_bands(input_img, selImgBandsImg, 'KEA',
                                              rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img), sBands)
 
     img2Stch = selImgBandsImg
@@ -653,7 +653,7 @@ def create_quicklook_overview_imgs(input_imgs, bands, tmp_dir, outputImgs='quick
         else:
             lcl_img_basename = rsgislib.tools.filetools.get_file_basename(img, check_valid=True)
             selImgBandsImg = os.path.join(usr_tmp_dir, '{}_sband.kea'.format(lcl_img_basename))
-            rsgislib.imageutils.selectImageBands(img, selImgBandsImg, 'KEA',
+            rsgislib.imageutils.select_img_bands(img, selImgBandsImg, 'KEA',
                                                  rsgislib.imageutils.get_rsgislib_datatype_from_img(img), sBands)
             rsgislib.imageutils.set_image_no_data_value(selImgBandsImg, img_no_data_val)
         b_sel_imgs.append(selImgBandsImg)
@@ -849,7 +849,7 @@ def create_quicklook_overview_imgs_vec_overlay(input_imgs, bands, tmp_dir, vec_o
         else:
             lcl_img_basename = rsgislib.tools.filetools.get_file_basename(img, checkvalid=True)
             selImgBandsImg = os.path.join(usr_tmp_dir, '{}_sband.kea'.format(lcl_img_basename))
-            rsgislib.imageutils.selectImageBands(img, selImgBandsImg, 'KEA',
+            rsgislib.imageutils.select_img_bands(img, selImgBandsImg, 'KEA',
                                                  rsgislib.imageutils.get_rsgislib_datatype_from_img(img), sBands)
             rsgislib.imageutils.set_image_no_data_value(selImgBandsImg, img_no_data_val)
         b_sel_imgs.append(selImgBandsImg)
@@ -1025,7 +1025,7 @@ def create_visual_overview_imgs_vec_extent(input_imgs, bands, tmp_dir, vec_exten
         else:
             lcl_img_basename = rsgislib.tools.filetools.get_file_basename(img, checkvalid=True)
             selImgBandsImg = os.path.join(usr_tmp_dir, '{}_sband.kea'.format(lcl_img_basename))
-            rsgislib.imageutils.selectImageBands(img, selImgBandsImg, 'KEA',
+            rsgislib.imageutils.select_img_bands(img, selImgBandsImg, 'KEA',
                                                  rsgislib.imageutils.get_rsgislib_datatype_from_img(img), sBands)
             rsgislib.imageutils.set_image_no_data_value(selImgBandsImg, img_no_data_val)
         b_sel_imgs.append(selImgBandsImg)
