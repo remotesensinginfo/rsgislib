@@ -1622,7 +1622,7 @@ static PyObject *RasterGIS_ExportClumps2Images(PyObject *self, PyObject *args, P
 
 static PyMethodDef RasterGISMethods[] = {
     {"pop_rat_img_stats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
-"rastergis.pop_rat_img_stats(clumps_img=string, add_clr_tab=boolean, calc_pyramids=boolean, ignore_zero=boolean, rat_band=int)\n"
+"rsgislib.rastergis.pop_rat_img_stats(clumps_img=string, add_clr_tab=boolean, calc_pyramids=boolean, ignore_zero=boolean, rat_band=int)\n"
 "Populates statics for thematic images.\n"
 "\n"
 "Where:\n"
@@ -1643,7 +1643,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"copy_rat", (PyCFunction)RasterGIS_CopyRAT, METH_VARARGS | METH_KEYWORDS,
-"rastergis.copy_rat(clumps_img, output_img, rat_band=1)\n"
+"rsgislib.rastergis.copy_rat(clumps_img, output_img, rat_band=1)\n"
 "Copies a GDAL RAT from one image to another\n"
 "\n"
 "Where:\n"
@@ -1661,7 +1661,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
 {"copy_gdal_rat_columns", (PyCFunction)RasterGIS_CopyGDALATTColumns, METH_VARARGS | METH_KEYWORDS,
-"rastergis.copy_gdal_rat_columns(clumps_img, outimage, fields, copy_colours=True, copy_hist=True, rat_band=1)\n"
+"rsgislib.rastergis.copy_gdal_rat_columns(clumps_img, outimage, fields, copy_colours=True, copy_hist=True, rat_band=1)\n"
 "Copies GDAL RAT columns from one image to another\n"
 "\n"
 "Where:\n"
@@ -1696,7 +1696,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
 {"clumps_spatial_location", (PyCFunction)RasterGIS_SpatialLocation, METH_VARARGS | METH_KEYWORDS,
-"rastergis.clumps_spatial_location(clumps_img=string, eastings=string, northings=string, rat_band=int)\n"
+"rsgislib.rastergis.clumps_spatial_location(clumps_img=string, eastings=string, northings=string, rat_band=int)\n"
 "Adds spatial location columns to the attribute table\n"
 "\n"
 "Where:\n"
@@ -1716,7 +1716,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"clumps_spatial_extent", (PyCFunction)RasterGIS_SpatialExtent, METH_VARARGS | METH_KEYWORDS,
-"rastergis.clumps_spatial_extent(clumps_img=string, min_xx=string, min_xy=string, max_xx=string, max_xy=string, min_yx=string, min_yy=string, max_yx=string, max_yy=string, rat_band=int)\n"
+"rsgislib.rastergis.clumps_spatial_extent(clumps_img=string, min_xx=string, min_xy=string, max_xx=string, max_xy=string, min_yx=string, min_yy=string, max_yx=string, max_yy=string, rat_band=int)\n"
 "Adds spatial extent for each clump to the attribute table\n"
 "\n"
 "Where:\n"
@@ -1777,7 +1777,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"populate_rat_with_percentiles", (PyCFunction)RasterGIS_PopulateRATWithPercentiles, METH_VARARGS | METH_KEYWORDS,
-"rastergis.populate_rat_with_percentiles(input_img=string, clumps_img=string, img_band=int, band_stats=rsgislib.rastergis.BandAttStats, n_hist_bins=int, rat_band=int)\n"
+"rsgislib.rastergis.populate_rat_with_percentiles(input_img=string, clumps_img=string, img_band=int, band_stats=rsgislib.rastergis.BandAttStats, n_hist_bins=int, rat_band=int)\n"
 "Populates an attribute table with a percentile of the pixel values from an image.\n"
 "\n"
 "Where:\n"
@@ -1804,7 +1804,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
    {"populate_rat_with_cat_proportions", (PyCFunction)RasterGIS_PopulateCategoryProportions, METH_VARARGS | METH_KEYWORDS,
-"rastergis.populate_rat_with_cat_proportions(in_cats_img=string, clumps_img=string, out_cols_name=string, maj_col_name=string, cp_cls_names=boolean, maj_cls_name_field=string cls_name_field=string, rat_band_clumps=int, rat_band_cats=int)\n"
+"rsgislib.rastergis.populate_rat_with_cat_proportions(in_cats_img=string, clumps_img=string, out_cols_name=string, maj_col_name=string, cp_cls_names=boolean, maj_cls_name_field=string cls_name_field=string, rat_band_clumps=int, rat_band_cats=int)\n"
 "Populates the attribute table with the proportions of intersecting categories\n"
 "\n"
 "Where:\n"
@@ -1821,7 +1821,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"populate_rat_with_mode", (PyCFunction)RasterGIS_PopulateRATWithMode, METH_VARARGS | METH_KEYWORDS,
-"rastergis.populate_rat_with_mode(input_img=string, clumps_img=string, out_cols_name=string, use_no_data=boolean, no_data_val=long, out_no_data=boolean, mode_band=uint, rat_band=uint)\n"
+"rsgislib.rastergis.populate_rat_with_mode(input_img=string, clumps_img=string, out_cols_name=string, use_no_data=boolean, no_data_val=long, out_no_data=boolean, mode_band=uint, rat_band=uint)\n"
 "Populates the attribute table with the mode of from a single band in the input image.\n"
 "Note this only makes sense if the input pixel values are integers.\n"
 "\n"
@@ -1838,7 +1838,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
    {"export_col_to_gdal_img", (PyCFunction)RasterGIS_ExportCol2GDALImage, METH_VARARGS | METH_KEYWORDS,
-"rastergis.export_col_to_gdal_img(clumps_img, output_img, gdalformat, datatype, field, rat_band=1)\n"
+"rsgislib.rastergis.export_col_to_gdal_img(clumps_img, output_img, gdalformat, datatype, field, rat_band=1)\n"
 "Exports column of the raster attribute table as bands in a GDAL image.\n"
 "\n"
 "Where:\n"
@@ -1861,7 +1861,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
     {"export_rat_cols_to_ascii",  (PyCFunction)RasterGIS_Export2Ascii, METH_VARARGS | METH_KEYWORDS,
-"rastergis.export_rat_cols_to_ascii(clumps_img, out_file, fields, rat_band=1)\n"
+"rsgislib.rastergis.export_rat_cols_to_ascii(clumps_img, out_file, fields, rat_band=1)\n"
 "Exports selected columns from a GDAL RAT to ASCII file (comma separated). The first column is the object ID (FID).\n"
 "\n"
 "Where:\n"
@@ -1881,7 +1881,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
 {"colour_rat_classes", (PyCFunction)RasterGIS_ColourClasses, METH_VARARGS | METH_KEYWORDS,
-"rastergis.colour_rat_classes(clumps_img, field, class_colours, rat_band)\n"
+"rsgislib.rastergis.colour_rat_classes(clumps_img, field, class_colours, rat_band)\n"
 "Sets a colour table for a set of classes within the attribute table\n"
 "\n"
 "Where:\n"
@@ -1909,7 +1909,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"str_class_majority", (PyCFunction)RasterGIS_StrClassMajority, METH_VARARGS | METH_KEYWORDS,
-"rastergis.str_class_majority(base_clumps_img, info_clumps_img, base_class_col, info_class_col, ignore_zero=True, rat_band_base=1, rat_band_info=1)\n"
+"rsgislib.rastergis.str_class_majority(base_clumps_img, info_clumps_img, base_class_col, info_class_col, ignore_zero=True, rat_band_base=1, rat_band_info=1)\n"
 "Finds the majority for class (string - field) from a set of small objects to large objects\n"
 "\n"
 "Where:\n"
@@ -1931,7 +1931,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"find_neighbours", (PyCFunction)RasterGIS_FindNeighbours, METH_VARARGS | METH_KEYWORDS,
-"rastergis.find_neighbours(clumps_img, rat_band)\n"
+"rsgislib.rastergis.find_neighbours(clumps_img, rat_band)\n"
 "Finds the clump neighbours from an image\n"
 "\n"
 "Where:\n"
@@ -1941,7 +1941,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"find_boundary_pixels", (PyCFunction)RasterGIS_FindBoundaryPixels, METH_VARARGS | METH_KEYWORDS,
-"rastergis.find_boundary_pixels(clumps_img, output_img, gdalformat, rat_band)\n"
+"rsgislib.rastergis.find_boundary_pixels(clumps_img, output_img, gdalformat, rat_band)\n"
 "Identifies the pixels on the boundary of the clumps\n"
 "\n"
 "Where:\n"
@@ -1953,7 +1953,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"calc_border_length", (PyCFunction)RasterGIS_CalcBorderLength, METH_VARARGS | METH_KEYWORDS,
-"rastergis.calc_border_length(clumps_img, out_col, ignore_zero_edges)\n"
+"rsgislib.rastergis.calc_border_length(clumps_img, out_col, ignore_zero_edges)\n"
 "Calculate the border length of clumps\n"
 "\n"
 "Where:\n"
@@ -1965,7 +1965,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"calc_rel_border", (PyCFunction)RasterGIS_CalcRelBorder, METH_VARARGS | METH_KEYWORDS,
-"rastergis.calc_rel_border(clumps_img, out_col, class_names_col, class_name, ignore_zero_edges)\n"
+"rsgislib.rastergis.calc_rel_border(clumps_img, out_col, class_names_col, class_name, ignore_zero_edges)\n"
 "Calculates the relative border length of the clumps to a class\n"
 "\n"
 "Where:\n"
@@ -1978,7 +1978,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"define_clump_tile_positions", (PyCFunction)RasterGIS_DefineClumpTilePositions, METH_VARARGS | METH_KEYWORDS,
-"rastergis.define_clump_tile_positions(clumps_img, tile_img, out_col, tile_overlap, tile_boundary, tile_body)\n"
+"rsgislib.rastergis.define_clump_tile_positions(clumps_img, tile_img, out_col, tile_overlap, tile_boundary, tile_body)\n"
 "Defines the position within the file of the clumps.\n"
 "\n"
 "Where:\n"
@@ -1992,7 +1992,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"define_border_clumps", (PyCFunction)RasterGIS_DefineBorderClumps, METH_VARARGS | METH_KEYWORDS,
-"rastergis.define_border_clumps(clumps_img, out_col)\n"
+"rsgislib.rastergis.define_border_clumps(clumps_img, out_col)\n"
 "Defines the clumps which are on the border within the file of the clumps using a mask\n"
 "\n"
 "Where:\n"
@@ -2002,7 +2002,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
    {"get_global_class_stats", (PyCFunction)RasterGIS_GetGlobalClassStats, METH_VARARGS | METH_KEYWORDS,
-"rastergis.get_global_class_stats(clumps_img, class_field, attributes, cls_chg_cols, rat_band)\n"
+"rsgislib.rastergis.get_global_class_stats(clumps_img, class_field, attributes, cls_chg_cols, rat_band)\n"
 "Similar to 'findChangeClumpsFromStdDev' but rather than applying a threshold to calculate change clumps adds global (over all objects) class mean and standard deviation to RAT.\n"
 "\n"
 "Where:\n"
@@ -2123,7 +2123,7 @@ static PyMethodDef RasterGISMethods[] = {
 
 
 {"import_vec_atts", (PyCFunction)RasterGIS_ImportVecAtts, METH_VARARGS | METH_KEYWORDS,
-"rastergis.import_vec_atts(clumps_img, vec_file, vec_lyr, fid_col, col_names, rat_band=1)\n"
+"rsgislib.rastergis.import_vec_atts(clumps_img, vec_file, vec_lyr, fid_col, col_names, rat_band=1)\n"
 "Copies the attributes from an input shapefile to the RAT.\n"
 "\n"
 "Where:\n"
@@ -2245,7 +2245,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"populate_rat_with_prop_valid_pxls", (PyCFunction)RasterGIS_PopulateRATWithPropValidPxls, METH_VARARGS | METH_KEYWORDS,
-"rastergis.populate_rat_with_prop_valid_pxls(input_img=string, clumps_img=string, out_col=string, no_data_val=float, rat_band=uint)\n"
+"rsgislib.rastergis.populate_rat_with_prop_valid_pxls(input_img=string, clumps_img=string, out_col=string, no_data_val=float, rat_band=uint)\n"
 "Populates the attribute table with the proportion of valid pixels within the clump.\n"
 "\n"
 "Where:\n"
@@ -2258,7 +2258,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"calc_1d_jm_distance", (PyCFunction)RasterGIS_Calc1DJMDistance, METH_VARARGS | METH_KEYWORDS,
-"rastergis.calc_1d_jm_distance(clumps_img=string, val_col=string, bin_width=float, cls_col=string, class1=string, class2=string, rat_band=uint)\n"
+"rsgislib.rastergis.calc_1d_jm_distance(clumps_img=string, val_col=string, bin_width=float, cls_col=string, class1=string, class2=string, rat_band=uint)\n"
 "Calculate the Jeffries and Matusita distance for a single variable between two classes.\n"
 "\n"
 "Where:\n"
@@ -2275,7 +2275,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"calc_2d_jm_distance", (PyCFunction)RasterGIS_Calc2DJMDistance, METH_VARARGS | METH_KEYWORDS,
-"rastergis.calc_2d_jm_distance(clumps_img=string, val1_col=string, val2_col=string, val1_bin_width=float, val2_bin_width=float, cls_col=string, class1=string, class2=string, rat_band=uint)\n"
+"rsgislib.rastergis.calc_2d_jm_distance(clumps_img=string, val1_col=string, val2_col=string, val1_bin_width=float, val2_bin_width=float, cls_col=string, class1=string, class2=string, rat_band=uint)\n"
 "Calculate the Jeffries and Matusita distance for two variables between two classes.\n"
 "\n"
 "Where:\n"
@@ -2294,7 +2294,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"calc_bhattacharyya_distance", (PyCFunction)RasterGIS_CalcBhattacharyyaDistance, METH_VARARGS | METH_KEYWORDS,
-"rastergis.calc_bhattacharyya_distance(clumps_img=string, val_col=string, cls_col=string, class1=string, class2=string, rat_band=uint)\n"
+"rsgislib.rastergis.calc_bhattacharyya_distance(clumps_img=string, val_col=string, cls_col=string, class1=string, class2=string, rat_band=uint)\n"
 "Calculate the Bhattacharyya distance for a single variable between two classes.\n"
 "\n"
 "Where:\n"
@@ -2310,7 +2310,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
 {"export_clumps_to_images", (PyCFunction)RasterGIS_ExportClumps2Images, METH_VARARGS | METH_KEYWORDS,
-"rastergis.export_clumps_to_images(clumps_img, out_img_base, bin_out, out_img_ext, gdalformat, rat_band=1)\n"
+"rsgislib.rastergis.export_clumps_to_images(clumps_img, out_img_base, bin_out, out_img_ext, gdalformat, rat_band=1)\n"
 "Exports each clump to a seperate raster which is the minimum extent for the clump.\n"
 "\n"
 "Where:\n"

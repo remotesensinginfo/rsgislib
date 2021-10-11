@@ -777,7 +777,7 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
     for clsname in clsinfodict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(clsinfodict[clsname].trainfileH5, 'r')
+        f = h5py.File(clsinfodict[clsname].train_file_h5, 'r')
         sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
@@ -787,7 +787,7 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
         train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(clsinfodict[clsname].validfileH5, 'r')
+        f = h5py.File(clsinfodict[clsname].valid_file_h5, 'r')
         sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
@@ -797,7 +797,7 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
         valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
 
         print("Reading Class {} Testing".format(clsname))
-        f = h5py.File(clsinfodict[clsname].testfileH5, 'r')
+        f = h5py.File(clsinfodict[clsname].test_file_h5, 'r')
         sgl_cls_info['test_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['test_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['test_n_rows'], dtype=int)

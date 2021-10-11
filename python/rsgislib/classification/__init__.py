@@ -11,7 +11,7 @@ class ClassSimpleInfoObj(object):
     This is a class to store the information associated within the classification.
 
     :param id: Output pixel value for this class
-    :param fileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
+    :param file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
                    data for the class
     :param red: Red colour for visualisation (0-255)
     :param green: Green colour for visualisation (0-255)
@@ -19,11 +19,11 @@ class ClassSimpleInfoObj(object):
 
     """
 
-    def __init__(self, id=None, fileH5=None, red=None, green=None, blue=None):
+    def __init__(self, id=None, file_h5=None, red=None, green=None, blue=None):
         """
 
         :param id: Output pixel value for this class
-        :param fileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
+        :param file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
                data for the class
         :param red: Red colour for visualisation (0-255)
         :param green: Green colour for visualisation (0-255)
@@ -31,7 +31,7 @@ class ClassSimpleInfoObj(object):
 
         """
         self.id = id
-        self.fileH5 = fileH5
+        self.file_h5 = file_h5
         self.red = red
         self.green = green
         self.blue = blue
@@ -44,11 +44,11 @@ class ClassInfoObj(object):
     :param id: Internal unique ID value for this class (must start 0 and be consecutive between the classes)
     :param out_id: External unique ID for ther class which will be used as the output image pixel value, can
                    be any integer.
-    :param trainfileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
+    :param train_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
                         data for the class
-    :param testfileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the testing
+    :param test_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the testing
                        data for the class
-    :param validfileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the validation
+    :param valid_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the validation
                         data for the class
     :param red: Red colour for visualisation (0-255)
     :param green: Green colour for visualisation (0-255)
@@ -56,18 +56,18 @@ class ClassInfoObj(object):
 
     """
 
-    def __init__(self, id=None, out_id=None, trainfileH5=None, testfileH5=None, validfileH5=None, red=None, green=None,
+    def __init__(self, id=None, out_id=None, train_file_h5=None, test_file_h5=None, valid_file_h5=None, red=None, green=None,
                  blue=None):
         """
 
         :param id: Internal unique ID value for this class (must start 0 and be consecutive between the classes)
         :param out_id: External unique ID for ther class which will be used as the output image pixel value,
                        can be any integer.
-        :param trainfileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
+        :param train_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
                             data for the class
-        :param testfileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the testing
+        :param test_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the testing
                            data for the class
-        :param validfileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the validation
+        :param valid_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the validation
                             data for the class
         :param red: Red colour for visualisation (0-255)
         :param green: Green colour for visualisation (0-255)
@@ -76,9 +76,9 @@ class ClassInfoObj(object):
         """
         self.id = id
         self.out_id = out_id
-        self.trainfileH5 = trainfileH5
-        self.testfileH5 = testfileH5
-        self.validfileH5 = validfileH5
+        self.train_file_h5 = train_file_h5
+        self.test_file_h5 = test_file_h5
+        self.valid_file_h5 = valid_file_h5
         self.red = red
         self.green = green
         self.blue = blue
@@ -88,82 +88,82 @@ class ClassVecSamplesInfoObj(object):
     This is a class to store the information associated with the classification vector training regions.
 
     :param id: Unique ID for the class (will probably be the pixel value for this class)
-    :param classname: Unique name for the class.
-    :param vecfile: A vector file path with the training samples
-    :param veclyr: The vector layer name within the vecfile for the training samples.
-    :param fileH5: A file path for a HDF5 file where the pixel values for these samples will be stored.
+    :param class_name: Unique name for the class.
+    :param vec_file: A vector file path with the training samples
+    :param vec_lyr: The vector layer name within the vecfile for the training samples.
+    :param file_h5: A file path for a HDF5 file where the pixel values for these samples will be stored.
     """
 
-    def __init__(self, id=None, classname=None,  vecfile=None, veclyr=None, fileH5=None):
+    def __init__(self, id=None, class_name=None, vec_file=None, vec_lyr=None, file_h5=None):
         """
 
         :param id: Unique ID for the class (will probably be the pixel value for this class)
-        :param classname: Unique name for the class.
-        :param vecfile: A vector file path with the training samples
-        :param veclyr: The vector layer name within the vecfile for the training samples.
-        :param fileH5: A file path for a HDF5 file where the pixel values for these samples will be stored.
+        :param class_name: Unique name for the class.
+        :param vec_file: A vector file path with the training samples
+        :param vec_lyr: The vector layer name within the vecfile for the training samples.
+        :param file_h5: A file path for a HDF5 file where the pixel values for these samples will be stored.
 
         """
         self.id = id
-        self.classname = classname
-        self.vecfile = vecfile
-        self.veclyr = veclyr
-        self.fileH5 = fileH5
+        self.class_name = class_name
+        self.vec_file = vec_file
+        self.vec_lyr = vec_lyr
+        self.file_h5 = file_h5
 
 
 class SamplesInfoObj(object):
     """
     This is a class to store the information associated within the classification.
 
-    :param className: The name of the class
-    :param classID: Is the classification numeric ID (i.e., output pixel value)
-    :param maskImg: The input image mask from which samples are taken
-    :param maskPxlVal: The pixel value within the mask for the class
-    :param outSampImgFile: Temporary file which will store the sampled pixels.
-    :param numSamps: The number of samples required.
-    :param samplesH5File: File location for the HDF5 file with the input image values for training.
+    :param class_name: The name of the class
+    :param class_id: Is the classification numeric ID (i.e., output pixel value)
+    :param mask_img: The input image mask from which samples are taken
+    :param mask_pxl_val: The pixel value within the mask for the class
+    :param out_samp_img_file: Temporary file which will store the sampled pixels.
+    :param num_samps: The number of samples required.
+    :param samples_h5_file: File location for the HDF5 file with the input image values for training.
     :param red: for visualisation red value.
     :param green: for visualisation green value.
     :param blue: for visualisation blue value.
 
     """
 
-    def __init__(self, className=None, classID=None, maskImg=None, maskPxlVal=None, outSampImgFile=None, numSamps=None,
-                 samplesH5File=None, red=None, green=None, blue=None):
+    def __init__(self, class_name=None, class_id=None, mask_img=None, mask_pxl_val=None, out_samp_img_file=None, num_samps=None,
+                 samples_h5_file=None, red=None, green=None, blue=None):
         """
 
-        :param className: The name of the class
-        :param classID: Is the classification numeric ID (i.e., output pixel value)
-        :param maskImg: The input image mask from which samples are taken
-        :param maskPxlVal: The pixel value within the mask for the class
-        :param outSampImgFile: Temporary file which will store the sampled pixels.
-        :param numSamps: The number of samples required.
-        :param samplesH5File: File location for the HDF5 file with the input image values for training.
+        :param class_name: The name of the class
+        :param class_id: Is the classification numeric ID (i.e., output pixel value)
+        :param mask_img: The input image mask from which samples are taken
+        :param mask_pxl_val: The pixel value within the mask for the class
+        :param out_samp_img_file: Temporary file which will store the sampled pixels.
+        :param num_samps: The number of samples required.
+        :param samples_h5_file: File location for the HDF5 file with the input image values for training.
         :param red: for visualisation red value.
         :param green: for visualisation green value.
         :param blue: for visualisation blue value.
 
         """
-        self.className = className
-        self.classID = classID
-        self.maskImg = maskImg
-        self.maskPxlVal = maskPxlVal
-        self.outSampImgFile = outSampImgFile
-        self.numSamps = numSamps
-        self.samplesH5File = samplesH5File
+        self.class_name = class_name
+        self.class_id = class_id
+        self.mask_img = mask_img
+        self.mask_pxl_val = mask_pxl_val
+        self.out_samp_img_file = out_samp_img_file
+        self.num_samps = num_samps
+        self.samples_h5_file = samples_h5_file
         self.red = red
         self.green = green
         self.blue = blue
 
 
-def generate_transect_accuracy_pts(inputImage, inputLinesShp, outputPtsShp, classImgCol, classImgVecCol,
+def generate_transect_accuracy_pts(input_img, inputLinesShp, outputPtsShp, classImgCol, classImgVecCol,
                                    classRefVecCol, lineStep, force=False):
     """ A tool for converting a set of lines in to point transects and 
 populating with the information for undertaking an accuracy assessment.
 
 Where:
 
-:param inputImage: is a string specifying the input image file with classification.
+:param input_img: is a string specifying the input image file with classification.
 :param inputLinesShp: is a string specifying the input lines shapefile path.
 :param outputPtsShp: is a string specifying the output points shapefile path.
 :param classImgCol: is a string speciyfing the name of the column in the image file containing the class names.
@@ -178,7 +178,7 @@ Where:
     # Import the RSGISLib Image Utils module
     import rsgislib.vectorutils
     rsgislib.vectorutils.createLinesOfPoints(inputLinesShp, outputPtsShp, lineStep, force)
-    popClassInfoAccuracyPts(inputImage, outputPtsShp, classImgCol, classImgVecCol, classRefVecCol)
+    popClassInfoAccuracyPts(input_img, outputPtsShp, classImgCol, classImgVecCol, classRefVecCol)
 
 
 def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=None, refImg=None):
@@ -217,7 +217,7 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=
 
     classInfo = dict()
     for class_sample_info in classVecSampleInfo:
-        cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.fileH5)
+        cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.file_h5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
         rsgislib.vectorutils.convertvector.rasterise_vec_lyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
                                                              out_vec_img, gdalformat="KEA", burn_val=class_sample_info.id,
@@ -231,13 +231,13 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=
                                                                         numSamples=sub_sample)
             out_vec_img = out_vec_img_subsample
 
-        rsgislib.imageutils.extractZoneImageBandValues2HDF(imgBandInfo, out_vec_img, class_sample_info.fileH5,
+        rsgislib.imageutils.extractZoneImageBandValues2HDF(imgBandInfo, out_vec_img, class_sample_info.file_h5,
                                                            class_sample_info.id)
         rand_red_val = random.randint(1, 255)
         rand_grn_val = random.randint(1, 255)
         rand_blu_val = random.randint(1, 255)
         classInfo[class_sample_info.classname] = ClassSimpleInfoObj(id=class_sample_info.id,
-                                                                    fileH5=class_sample_info.fileH5,
+                                                                    file_h5=class_sample_info.file_h5,
                                                                     red=rand_red_val,
                                                                     green=rand_grn_val,
                                                                     blue=rand_blu_val)
@@ -282,19 +282,19 @@ def get_class_training_chips_data(imgBandInfo, classVecSampleInfo, chip_h_size, 
 
     classInfo = dict()
     for class_sample_info in classVecSampleInfo:
-        cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.fileH5)
+        cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.file_h5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
         rsgislib.vectorutils.convertvector.rasterise_vec_lyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
                                                              out_vec_img, gdalformat="KEA", burn_val=class_sample_info.id,
                                                              datatype=rsgislib.TYPE_16UINT, att_column=None, use_vec_extent=False, thematic=True,
                                                              no_data_val=0)
         rsgislib.imageutils.extractChipZoneImageBandValues2HDF(imgBandInfo, out_vec_img, class_sample_info.id,
-                                                               chip_h_size, class_sample_info.fileH5)
+                                                               chip_h_size, class_sample_info.file_h5)
         rand_red_val = random.randint(1, 255)
         rand_grn_val = random.randint(1, 255)
         rand_blu_val = random.randint(1, 255)
         classInfo[class_sample_info.classname] = ClassSimpleInfoObj(id=class_sample_info.id,
-                                                                    fileH5=class_sample_info.fileH5, red=rand_red_val,
+                                                                    file_h5=class_sample_info.file_h5, red=rand_red_val,
                                                                     green=rand_grn_val, blue=rand_blu_val)
     shutil.rmtree(tmp_lcl_dir)
     return classInfo
@@ -758,5 +758,8 @@ def plot_train_data(cls1_h5_file, cls2_h5_file, out_plots_dir, cls1_name="Class 
             fig.update_yaxes(showline=True, linewidth=1, linecolor='black', ticks="inside", col=1, gridwidth=1,
                              gridcolor='Grey', mirror=True)
             fig.write_image(out_plot_file)
+
+
+
 
 

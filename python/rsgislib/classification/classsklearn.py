@@ -64,8 +64,7 @@ from rios import cuiprogress
 from rios import rat
 
 
-def train_sklearn_classifer_gridsearch(classTrainInfo, paramSearchSampNum=0,
-                                       gridSearch=GridSearchCV(RandomForestClassifier(), {})):
+def train_sklearn_classifer_gridsearch(classTrainInfo, paramSearchSampNum=0, gridSearch=GridSearchCV(RandomForestClassifier(), {})):
     """
 A function to find the 'optimal' parameters for classification using a Grid Search
 (http://scikit-learn.org/stable/modules/grid_search.html).
@@ -88,7 +87,7 @@ The returned classifier instance will be trained using all the inputted data.
     numVars = 0
     numVals = 0
     for classInfoVal in classTrainInfo.values():
-        dataShp = h5py.File(classInfoVal.fileH5, 'r')['DATA/DATA'].shape
+        dataShp = h5py.File(classInfoVal.file_h5, 'r')['DATA/DATA'].shape
         if first:
             numVars = dataShp[1]
             first = False
@@ -105,7 +104,7 @@ The returned classifier instance will be trained using all the inputted data.
     rowInitSamp = 0
     for key in classTrainInfo:
         # Open the dataset
-        f = h5py.File(classTrainInfo[key].fileH5, 'r')
+        f = h5py.File(classTrainInfo[key].file_h5, 'r')
         numRows = f['DATA/DATA'].shape[0]
         # Copy data and populate classid array
         dataArr[rowInit:(rowInit + numRows)] = f['DATA/DATA']
@@ -114,8 +113,7 @@ The returned classifier instance will be trained using all the inputted data.
             # Create random index to sample the whole dataset.
             sampleIdxs = numpy.random.randint(0, high=numRows, size=paramSearchSampNum)
             # Sample the input data for classifier optimisation.
-            dataArrSamp[rowInitSamp:(rowInitSamp + paramSearchSampNum)] = dataArr[rowInit:(rowInit + numRows)][
-                sampleIdxs]
+            dataArrSamp[rowInitSamp:(rowInitSamp + paramSearchSampNum)] = dataArr[rowInit:(rowInit + numRows)][sampleIdxs]
             classArrSamp[rowInitSamp:(rowInitSamp + paramSearchSampNum)] = classTrainInfo[key].id
             rowInitSamp += paramSearchSampNum
         rowInit += numRows
@@ -162,7 +160,7 @@ This function trains the classifier.
     numVars = 0
     numVals = 0
     for classInfoVal in classTrainInfo.values():
-        dataShp = h5py.File(classInfoVal.fileH5, 'r')['DATA/DATA'].shape
+        dataShp = h5py.File(classInfoVal.file_h5, 'r')['DATA/DATA'].shape
         if first:
             numVars = dataShp[1]
             first = False
@@ -174,7 +172,7 @@ This function trains the classifier.
     rowInit = 0
     for key in classTrainInfo:
         # Open the dataset
-        f = h5py.File(classTrainInfo[key].fileH5, 'r')
+        f = h5py.File(classTrainInfo[key].file_h5, 'r')
         numRows = f['DATA/DATA'].shape[0]
         # Copy data and populate classid array
         dataArr[rowInit:(rowInit + numRows)] = f['DATA/DATA']
@@ -193,8 +191,7 @@ This function trains the classifier.
     print('Classifier Train Score = {}%'.format(round(accVal * 100, 2)))
 
 
-def apply_sklearn_classifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInfo, outputImg, gdalformat,
-                            classClrNames=True, outScoreImg=None):
+def apply_sklearn_classifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInfo, outputImg, gdalformat, classClrNames=True, outScoreImg=None):
     """
 This function uses a trained classifier and applies it to the provided input image.
 
@@ -324,175 +321,6 @@ This function uses a trained classifier and applies it to the provided input ima
         rat.writeColumn(ratDataset, "Blue", blue)
         rat.writeColumn(ratDataset, "ClassName", ClassName)
         ratDataset = None
-
-
-def perform_voting_classification(skClassifiers, trainSamplesInfo, imgFileInfo, classAreaMask, classMaskPxlVal, tmpDIR,
-                                  tmpImgBase, outClassImg, gdalformat='KEA', numCores=-1):
-    """
-A function which will perform a number of classification creating a combined classification by a simple vote.
-The classifier parameters can be differed as a list of classifiers is provided (the length of the list is equal
-to the number of votes), where the training data is resampled for each classifier. The analysis can be performed
-using multiple processing cores.
-
-Where:
-
-:param skClassifiers: a list of classifiers (from scikit-learn), the number of classifiers defined
-                      will be equal to the number of votes.
-:param trainSamplesInfo: a list of rsgislib.classification.classimgutils.SamplesInfoObj objects used to
-                         parameters the classifer and extract training data.
-:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                    rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are
-                    to be used for the classification so it adheres to the training data.
-:param classAreaMask: a mask image which is used to specified the areas of the scene which are to be classified.
-:param classMaskPxlVal: is the pixel value within the classAreaMask image for the areas of the image
-                        which are to be classified.
-:param tmpDIR: a temporary file location which will be created and removed during processing.
-:param tmpImgBase: the same name of files written to the tmpDIR
-:param outClassImg: the final output image file.
-:param gdalformat: the output file format for outClassImg
-:param numCores: is the number of processing cores to be used for the analysis (if -1 then all cores on the machine will be used).
-
-Example::
-
-    classVoteTemp = os.path.join(imgTmp, 'ClassVoteTemp')
-
-    imgFileInfo = [rsgislib.imageutils.ImageBandInfo(img2010dB, 'sardb', [1,2]), rsgislib.imageutils.ImageBandInfo(imgSRTM, 'srtm', [1])]
-    trainSamplesInfo = []
-    trainSamplesInfo.append(SamplesInfoObj(className='Water', classID=1, maskImg=classTrainRegionsMask, maskPxlVal=1, outSampImgFile='WaterSamples.kea', numSamps=500, samplesH5File='WaterSamples_pxlvals.h5', red=0, green=0, blue=255))
-    trainSamplesInfo.append(SamplesInfoObj(className='Land', classID=2, maskImg=classTrainRegionsMask, maskPxlVal=2, outSampImgFile='LandSamples.kea', numSamps=500, samplesH5File='LandSamples_pxlvals.h5', red=150, green=150, blue=150))
-    trainSamplesInfo.append(SamplesInfoObj(className='Mangroves', classID=3, maskImg=classTrainRegionsMask, maskPxlVal=3, outSampImgFile='MangroveSamples.kea', numSamps=500, samplesH5File='MangroveSamples_pxlvals.h5', red=0, green=153, blue=0))
-
-    skClassifiers = []
-    for i in range(5):
-        skClassifiers.append(ExtraTreesClassifier(n_estimators=50))
-
-    for i in range(5):
-        skClassifiers.append(ExtraTreesClassifier(n_estimators=100))
-
-    for i in range(5):
-        skClassifiers.append(ExtraTreesClassifier(n_estimators=50, max_depth=2))
-
-    for i in range(5):
-        skClassifiers.append(ExtraTreesClassifier(n_estimators=100, max_depth=2))
-
-    mangroveRegionClassImg = MangroveRegionClass.kea
-    classsklearn.perform_voting_classification(skClassifiers, trainSamplesInfo, imgFileInfo, classWithinMask, 1, classVoteTemp, 'ClassImgSample', mangroveRegionClassImg, gdalformat='KEA', numCores=-1)
-
-    """
-
-    def _apply_voting_classifier(inParams):
-        """
-        Internal function which is used by performVotingClassification
-        """
-
-        skClassifier = inParams['skClassifier']
-        cTmpDIR = inParams['cTmpDIR']
-        classAreaMask = inParams['classAreaMask']
-        classMaskPxlVal = inParams['classMaskPxlVal']
-        imgFileInfo = inParams['imgFileInfo']
-        tmpClassImgOut = inParams['tmpClassImgOut']
-        gdalformat = inParams['gdalformat']
-        trainSamplesInfo = inParams['trainSamplesInfo']
-        rndSeed = inParams['rndSeed']
-
-        classTrainInfo = dict()
-        for trainSamples in trainSamplesInfo:
-            rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(inputImage=trainSamples.maskImg,
-                                                                        outputImage=os.path.join(cTmpDIR,
-                                                                        trainSamples.outSampImgFile),
-                                                                        gdalformat=gdalformat,
-                                                                        maskvals=[trainSamples.maskPxlVal],
-                                                                        numSamples=trainSamples.numSamps,
-                                                                        rndSeed=rndSeed)
-            rsgislib.imageutils.extractZoneImageBandValues2HDF(imgFileInfo,
-                                                               os.path.join(cTmpDIR, trainSamples.outSampImgFile),
-                                                               os.path.join(cTmpDIR, trainSamples.samplesH5File),
-                                                               trainSamples.maskPxlVal)
-            classTrainInfo[trainSamples.className] = ClassSimpleInfoObj(id=trainSamples.classID,
-                                                                        fileH5=os.path.join(cTmpDIR,
-                                                                        trainSamples.samplesH5File),
-                                                                        red=trainSamples.red,
-                                                                        green=trainSamples.green,
-                                                                        blue=trainSamples.blue)
-
-        train_sklearn_classifier(classTrainInfo, skClassifier)
-        apply_sklearn_classifer(classTrainInfo, skClassifier, classAreaMask, classMaskPxlVal, imgFileInfo,
-                                tmpClassImgOut, gdalformat)
-
-    if type(skClassifiers) is not list:
-        raise Exception("A list of classifiers must be provided")
-
-    numOfVotes = len(skClassifiers)
-
-    if numCores <= 0:
-        import rsgislib.tools.utils
-        numCores = rsgislib.tools.utils.numProcessCores()
-
-    tmpPresent = True
-    if not os.path.exists(tmpDIR):
-        os.makedirs(tmpDIR)
-        tmpPresent = False
-
-    outClassImgs = []
-    mCoreParams = []
-    dirs2DEL = []
-    rndGen = random.seed()
-    for i in range(numOfVotes):
-        cTmpDIR = os.path.join(tmpDIR, str(i))
-        if os.path.exists(cTmpDIR):
-            shutil.rmtree(cTmpDIR, ignore_errors=True)
-        os.makedirs(cTmpDIR)
-        dirs2DEL.append(cTmpDIR)
-
-        tmpClassImgOut = os.path.join(tmpDIR, tmpImgBase + '_' + str(i) + '.kea')
-        outClassImgs.append(tmpClassImgOut)
-        inParams = dict()
-        inParams['skClassifier'] = skClassifiers[i]
-        inParams['cTmpDIR'] = cTmpDIR
-        inParams['classAreaMask'] = classAreaMask
-        inParams['classMaskPxlVal'] = classMaskPxlVal
-        inParams['imgFileInfo'] = imgFileInfo
-        inParams['tmpClassImgOut'] = tmpClassImgOut
-        inParams['gdalformat'] = 'KEA'
-        inParams['trainSamplesInfo'] = trainSamplesInfo
-        inParams['rndSeed'] = random.randrange(1000)
-        mCoreParams.append(inParams)
-
-    # Run processing on multiple cores.
-    mProccesPool = Pool(numCores)
-    mProccesPool.map(_apply_voting_classifier, mCoreParams)
-
-    # Combine results using MODE.
-    rsgislib.imagecalc.calcMultiImgBandStats(outClassImgs, outClassImg, rsgislib.SUMTYPE_MODE, gdalformat,
-                                             rsgislib.TYPE_8UINT, 0, True)
-    rsgislib.rastergis.pop_rat_img_stats(clumps_img=outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
-
-    # Colour output classification image.
-    ratDataset = gdal.Open(outClassImg, gdal.GA_Update)
-    red = rat.readColumn(ratDataset, 'Red')
-    green = rat.readColumn(ratDataset, 'Green')
-    blue = rat.readColumn(ratDataset, 'Blue')
-    ClassName = numpy.empty_like(red, dtype=numpy.dtype('a255'))
-
-    for trainSample in trainSamplesInfo:
-        print("Apply Colour to class \'" + trainSample.className + "\'")
-        red[trainSample.classID] = trainSample.red
-        green[trainSample.classID] = trainSample.green
-        blue[trainSample.classID] = trainSample.blue
-        ClassName[trainSample.classID] = trainSample.className
-
-    rat.writeColumn(ratDataset, "Red", red)
-    rat.writeColumn(ratDataset, "Green", green)
-    rat.writeColumn(ratDataset, "Blue", blue)
-    rat.writeColumn(ratDataset, "ClassName", ClassName)
-    ratDataset = None
-
-    if not tmpPresent:
-        shutil.rmtree(tmpDIR, ignore_errors=True)
-    else:
-        for cDIR in dirs2DEL:
-            shutil.rmtree(cDIR, ignore_errors=True)
-
 
 
 

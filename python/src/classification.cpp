@@ -230,7 +230,7 @@ static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject
 // Our list of functions in this module
 static PyMethodDef ClassificationMethods[] = {
 {"collapse_classes", (PyCFunction)Classification_CollapseClasses, METH_VARARGS | METH_KEYWORDS,
-"classification.collapse_classes(input_img, output_img, gdalformat, class_col, class_int_col)\n"
+"rsgislib.classification.collapse_classes(input_img, output_img, gdalformat, class_col, class_int_col)\n"
 "Collapses an attribute table with a large number of classified clumps (segments) to\n"
 "a attribute table with a single row per class (i.e. a classification rather than segmentation.\n"
 "\n"
@@ -243,7 +243,7 @@ static PyMethodDef ClassificationMethods[] = {
 ":param class_int_col: is a sting specifying the name of a column with the integer class representation. This is an optional parameter but if specified then the int reprentation of the classes will be reserved."},
 
 {"gen_rgb_img_from_clr_tbl", (PyCFunction)Classification_Colour3Bands, METH_VARARGS | METH_KEYWORDS,
-"classification.gen_rgb_img_from_clr_tbl(input_img, output_img, gdalformat)\n"
+"rsgislib.classification.gen_rgb_img_from_clr_tbl(input_img, output_img, gdalformat)\n"
 "Generates a 3 band colour image from the colour table in the input file.\n"
 "\n"
 "Where:\n"
@@ -253,7 +253,7 @@ static PyMethodDef ClassificationMethods[] = {
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
 {"generate_random_accuracy_pts", (PyCFunction)Classification_GenRandomAccuracyPts, METH_VARARGS | METH_KEYWORDS,
-"classification.generate_random_accuracy_pts(input_img, out_vec_file, out_vec_lyr, out_format, rat_class_col, vec_class_col, vec_ref_col, num_pts, seed, del_exist_vec)\n"
+"rsgislib.classification.generate_random_accuracy_pts(input_img, out_vec_file, out_vec_lyr, out_format, rat_class_col, vec_class_col, vec_ref_col, num_pts, seed, del_exist_vec)\n"
 "Generates a set of random points for accuracy assessment.\n"
 "\n"
 "Where:\n"
@@ -271,7 +271,7 @@ static PyMethodDef ClassificationMethods[] = {
 },
 
 {"generate_stratified_random_accuracy_pts", (PyCFunction)Classification_GenStratifiedRandomAccuracyPts, METH_VARARGS | METH_KEYWORDS,
-"classification.generate_stratified_random_accuracy_pts(input_img, out_vec_file, out_vec_lyr, out_format, rat_class_col, vec_class_col, vec_ref_col, num_pts, seed, del_exist_vec, use_pxl_lst)\n"
+"rsgislib.classification.generate_stratified_random_accuracy_pts(input_img, out_vec_file, out_vec_lyr, out_format, rat_class_col, vec_class_col, vec_ref_col, num_pts, seed, del_exist_vec, use_pxl_lst)\n"
 "Generates a set of stratified random points for accuracy assessment.\n"
 "\n"
 "Where:\n"
@@ -290,7 +290,7 @@ static PyMethodDef ClassificationMethods[] = {
 },
     
 {"pop_class_info_accuracy_pts", (PyCFunction)Classification_PopClassInfoAccuracyPts, METH_VARARGS | METH_KEYWORDS,
-"classification.pop_class_info_accuracy_pts(input_img, vec_file, vec_lyr, rat_class_col, vec_class_col, vec_ref_col)\n"
+"rsgislib.classification.pop_class_info_accuracy_pts(input_img, vec_file, vec_lyr, rat_class_col, vec_class_col, vec_ref_col)\n"
 "Generates a set of stratified random points for accuracy assessment.\n"
 "\n"
 "Where:\n"

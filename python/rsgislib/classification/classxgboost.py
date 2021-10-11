@@ -614,7 +614,7 @@ def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, nthrea
     for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].trainfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].train_file_h5, 'r')
         sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
 
@@ -637,7 +637,7 @@ def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, nthrea
         train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].validfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].valid_file_h5, 'r')
         sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
@@ -750,7 +750,7 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_d
     for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].trainfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].train_file_h5, 'r')
         sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
@@ -760,7 +760,7 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_d
         train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].validfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].valid_file_h5, 'r')
         sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
@@ -770,7 +770,7 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_d
         valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
 
         print("Reading Class {} Testing".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].testfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].test_file_h5, 'r')
         sgl_cls_info['test_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['test_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['test_n_rows'], dtype=int)
@@ -866,7 +866,7 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=
     for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].trainfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].train_file_h5, 'r')
         sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
@@ -876,7 +876,7 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=
         train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].validfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].valid_file_h5, 'r')
         sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
@@ -886,7 +886,7 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=
         valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
 
         print("Reading Class {} Testing".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].testfileH5, 'r')
+        f = h5py.File(cls_info_dict[clsname].test_file_h5, 'r')
         sgl_cls_info['test_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['test_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['test_n_rows'], dtype=int)
@@ -1104,4 +1104,144 @@ output image and threshold can be applied to this image.
         rat.writeColumn(ratDataset, "ClassName", ClassName)
         ratDataset = None
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def apply_xgboost_multiclass_classifier_rat(clumps_img, variables, model_file, class_train_info, out_col_int="OutClass", out_col_str="OutClassName", roi_col=None, roi_val=1, class_colours=True, nthread=1):
+    """
+A function which will apply an XGBoost model within a Raster Attribute Table (RAT).
+
+:param clumps_img: is the clumps image on which the classification is to be performed
+:param variables: is an array of column names which are to be used for the classification
+:param class_train_info: dict (where the key is the class name) of
+                         rsgislib.classification.ClassInfoObj objects which will be
+                         used to train the classifier (i.e.,
+                         train_xgboost_multiclass_classifer()), provide pixel value
+                         id and RGB class values.
+:param model_file: a trained xgboost multiclass model which can be loaded with lgb.Booster(model_file=model_file).
+:param out_col_int: is the output column name for the int class representation (Default: 'OutClass')
+:param out_col_str: is the output column name for the class names column (Default: 'OutClassName')
+:param roi_col: is a column name for a column which specifies the region to be classified. If None ignored (Default: None)
+:param roi_val: is a int value used within the roi_col to select a region to be classified (Default: 1)
+:param class_colours: is a boolean specifying whether the RAT colour table should be
+                      updated using the classification colours (default: True)
+:param nthread: The number of threads to use for the classifier.
+"""
+    from rios import ratapplier
+
+    def _apply_rat_classifier(info, inputs, outputs, otherargs):
+        """
+        This function is used internally within classify_within_rat_tiled using the RIOS ratapplier function
+        """
+        numpyVars = []
+        for var in otherargs.vars:
+            varVals = getattr(inputs.inrat, var)
+            numpyVars.append(varVals)
+
+        xData = numpy.array(numpyVars)
+        xData = xData.transpose()
+
+        ID = numpy.arange(xData.shape[0])
+        outClassIntVals = numpy.zeros(xData.shape[0], dtype=numpy.int16)
+        outClassNamesVals = numpy.empty(xData.shape[0], dtype=numpy.dtype('a255'))
+        outClassNamesVals[...] = ''
+
+        ID = ID[numpy.isfinite(xData).all(axis=1)]
+        vData = xData[numpy.isfinite(xData).all(axis=1)]
+
+        if otherargs.roiCol is not None:
+            roi = getattr(inputs.inrat, otherargs.roiCol)
+            roi = roi[numpy.isfinite(xData).all(axis=1)]
+            vData = vData[roi == otherargs.roiVal]
+            ID = ID[roi == otherargs.roiVal]
+
+        preds_idxs = otherargs.classifier.predict(xgb.DMatrix(vData))
+
+        preds_cls_ids = numpy.zeros_like(preds_idxs, dtype=numpy.uint16)
+        for cld_id, idx in zip(otherargs.cls_id_lut, numpy.arange(0, len(otherargs.cls_id_lut))):
+            preds_cls_ids[preds_idxs == idx] = cld_id
+
+        outClassIntVals[ID] = preds_cls_ids
+        setattr(outputs.outrat, otherargs.outColInt, outClassIntVals)
+
+        for cls_id in otherargs.cls_name_lut:
+            outClassNamesVals[outClassIntVals == cls_id] = otherargs.cls_name_lut[cls_id]
+        setattr(outputs.outrat, otherargs.outColStr, outClassNamesVals)
+
+        if otherargs.class_colours:
+            red = getattr(inputs.inrat, "Red")
+            green = getattr(inputs.inrat, "Green")
+            blue = getattr(inputs.inrat, "Blue")
+
+            # Set Background to black
+            red[...] = 0
+            green[...] = 0
+            blue[...] = 0
+
+            # Set colours
+            for class_name in otherargs.class_train_info:
+                cls_id = otherargs.class_train_info[class_name].out_id
+                red = numpy.where(outClassIntVals == cls_id, otherargs.class_train_info[class_name].red, red)
+                green = numpy.where(outClassIntVals == cls_id, otherargs.class_train_info[class_name].green, green)
+                blue = numpy.where(outClassIntVals == cls_id, otherargs.class_train_info[class_name].blue, blue)
+
+            setattr(outputs.outrat, "Red", red)
+            setattr(outputs.outrat, "Green", green)
+            setattr(outputs.outrat, "Blue", blue)
+
+
+
+    classifier = xgb.Booster({'nthread': nthread})
+    classifier.load_model(model_file)
+
+    n_classes = len(class_train_info)
+    cls_id_lut = numpy.zeros(n_classes)
+    cls_name_lut = dict()
+    for clsname in class_train_info:
+        if class_train_info[clsname].id >= n_classes:
+            raise ("ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(clsname, class_train_info[clsname].id))
+        cls_id_lut[class_train_info[clsname].id] = class_train_info[clsname].out_id
+        cls_name_lut[class_train_info[clsname].out_id] = clsname
+
+    in_rats = ratapplier.RatAssociations()
+    out_rats = ratapplier.RatAssociations()
+    in_rats.inrat = ratapplier.RatHandle(clumps_img)
+    out_rats.outrat = ratapplier.RatHandle(clumps_img)
+
+    otherargs = ratapplier.OtherArguments()
+    otherargs.vars = variables
+    otherargs.classifier = classifier
+    otherargs.outColInt = out_col_int
+    otherargs.outColStr = out_col_str
+    otherargs.roiCol = roi_col
+    otherargs.roiVal = roi_val
+    otherargs.n_classes = n_classes
+    otherargs.cls_id_lut = cls_id_lut
+    otherargs.cls_name_lut = cls_name_lut
+    otherargs.class_colours = class_colours
+    otherargs.class_train_info = class_train_info
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    ratapplier.apply(_apply_rat_classifier, in_rats, out_rats, otherargs=otherargs, controls=None)
 
