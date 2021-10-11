@@ -1,7 +1,7 @@
 import os
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-IMGCALC_DATA_DIR = os.path.join(DATA_DIR, "segmentation")
+SEGMENT_DATA_DIR = os.path.join(DATA_DIR, "segmentation")
 
 
 def test_run_shepherd_segmentation_all_bands(tmp_path):

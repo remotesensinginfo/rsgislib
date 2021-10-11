@@ -267,23 +267,23 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, 
             return nullptr;
         }
 
-        pMinField = PyObject_GetAttrString(o, "minField");
+        pMinField = PyObject_GetAttrString(o, "min_field");
         extractedAttributes.push_back(pMinField);
         cmdObj->calcMin =  !(pMinField == nullptr || !RSGISPY_CHECK_STRING(pMinField));
 
-        pMaxField = PyObject_GetAttrString(o, "maxField");
+        pMaxField = PyObject_GetAttrString(o, "max_field");
         extractedAttributes.push_back(pMaxField);
         cmdObj->calcMax = !(pMaxField == nullptr || !RSGISPY_CHECK_STRING(pMaxField));
 
-        pMeanField = PyObject_GetAttrString(o, "meanField");
+        pMeanField = PyObject_GetAttrString(o, "mean_field");
         extractedAttributes.push_back(pMeanField);
         cmdObj->calcMean = !(pMeanField == nullptr || !RSGISPY_CHECK_STRING(pMeanField));
 
-        pStdDevField = PyObject_GetAttrString(o, "stdDevField");
+        pStdDevField = PyObject_GetAttrString(o, "std_dev_field");
         extractedAttributes.push_back(pStdDevField);
         cmdObj->calcStdDev = !(pStdDevField == nullptr || !RSGISPY_CHECK_STRING(pStdDevField));
 
-        pSumField = PyObject_GetAttrString(o, "sumField");
+        pSumField = PyObject_GetAttrString(o, "sum_field");
         extractedAttributes.push_back(pSumField);
         cmdObj->calcSum = !(pSumField == nullptr || !RSGISPY_CHECK_STRING(pSumField));
 
@@ -392,7 +392,7 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
             return nullptr;
         }
 
-        pFieldName = PyObject_GetAttrString(o, "fieldName");
+        pFieldName = PyObject_GetAttrString(o, "field_name");
         extractedAttributes.push_back(pFieldName);
         if( ( pFieldName == nullptr ) || ( pFieldName == Py_None ) || !RSGISPY_CHECK_STRING(pFieldName))
         {
@@ -1017,23 +1017,23 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
         return nullptr;
     }
     
-    pMinField = PyObject_GetAttrString(fieldObj, "minField");
+    pMinField = PyObject_GetAttrString(fieldObj, "min_field");
     extractedAttributes.push_back(pMinField);
     cmdObj->calcMin =  !(pMinField == nullptr || !RSGISPY_CHECK_STRING(pMinField));
     
-    pMaxField = PyObject_GetAttrString(fieldObj, "maxField");
+    pMaxField = PyObject_GetAttrString(fieldObj, "max_field");
     extractedAttributes.push_back(pMaxField);
     cmdObj->calcMax = !(pMaxField == nullptr || !RSGISPY_CHECK_STRING(pMaxField));
     
-    pMeanField = PyObject_GetAttrString(fieldObj, "meanField");
+    pMeanField = PyObject_GetAttrString(fieldObj, "mean_field");
     extractedAttributes.push_back(pMeanField);
     cmdObj->calcMean = !(pMeanField == nullptr || !RSGISPY_CHECK_STRING(pMeanField));
     
-    pStdDevField = PyObject_GetAttrString(fieldObj, "stdDevField");
+    pStdDevField = PyObject_GetAttrString(fieldObj, "std_dev_field");
     extractedAttributes.push_back(pStdDevField);
     cmdObj->calcStdDev = !(pStdDevField == nullptr || !RSGISPY_CHECK_STRING(pStdDevField));
     
-    pSumField = PyObject_GetAttrString(fieldObj, "sumField");
+    pSumField = PyObject_GetAttrString(fieldObj, "sum_field");
     extractedAttributes.push_back(pSumField);
     cmdObj->calcSum = !(pSumField == nullptr || !RSGISPY_CHECK_STRING(pSumField));
     
@@ -1131,23 +1131,23 @@ static PyObject *RasterGIS_PopulateRATWithMeanLitStats(PyObject *self, PyObject 
             return nullptr;
         }
         
-        pMinField = PyObject_GetAttrString(o, "minField");
+        pMinField = PyObject_GetAttrString(o, "min_field");
         extractedAttributes.push_back(pMinField);
         cmdObj->calcMin =  !(pMinField == nullptr || !RSGISPY_CHECK_STRING(pMinField));
         
-        pMaxField = PyObject_GetAttrString(o, "maxField");
+        pMaxField = PyObject_GetAttrString(o, "max_field");
         extractedAttributes.push_back(pMaxField);
         cmdObj->calcMax = !(pMaxField == nullptr || !RSGISPY_CHECK_STRING(pMaxField));
         
-        pMeanField = PyObject_GetAttrString(o, "meanField");
+        pMeanField = PyObject_GetAttrString(o, "mean_field");
         extractedAttributes.push_back(pMeanField);
         cmdObj->calcMean = !(pMeanField == nullptr || !RSGISPY_CHECK_STRING(pMeanField));
         
-        pStdDevField = PyObject_GetAttrString(o, "stdDevField");
+        pStdDevField = PyObject_GetAttrString(o, "std_dev_field");
         extractedAttributes.push_back(pStdDevField);
         cmdObj->calcStdDev = !(pStdDevField == nullptr || !RSGISPY_CHECK_STRING(pStdDevField));
         
-        pSumField = PyObject_GetAttrString(o, "sumField");
+        pSumField = PyObject_GetAttrString(o, "sum_field");
         extractedAttributes.push_back(pSumField);
         cmdObj->calcSum = !(pSumField == nullptr || !RSGISPY_CHECK_STRING(pSumField));
         
@@ -1757,11 +1757,11 @@ static PyMethodDef RasterGISMethods[] = {
 ":param clumps_img: is a string containing the name of the input clumps image file\n"
 ":param band_stats: is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
 "        * band: int defining the image band to process\n"
-"        * minField: string defining the name of the field for min value\n"
-"        * maxField: string defining the name of the field for max value\n"
-"        * sumField: string defining the name of the field for sum value\n"
-"        * meanField: string defining the name of the field for mean value\n"
-"        * stdDevField: string defining the name of the field for standard deviation value\n"
+"        * min_field: string defining the name of the field for min value\n"
+"        * max_field: string defining the name of the field for max value\n"
+"        * sum_field: string defining the name of the field for sum value\n"
+"        * mean_field: string defining the name of the field for mean value\n"
+"        * std_dev_field: string defining the name of the field for standard deviation value\n"
 "* rat_band is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
 "\n"
 "Example::\n"
@@ -1770,9 +1770,9 @@ static PyMethodDef RasterGISMethods[] = {
 "	clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea'\n"
 "	input='./Rasters/injune_p142_casi_sub_utm.kea'\n"
 "	bs = []\n"
-"	bs.append(rastergis.BandAttStats(band=1, minField='b1Min', maxField='b1Max', meanField='b1Mean', sumField='b1Sum', stdDevField='b1StdDev'))\n"
-"	bs.append(rastergis.BandAttStats(band=2, minField='b2Min', maxField='b2Max', meanField='b2Mean', sumField='b2Sum', stdDevField='b2StdDev'))\n"
-"	bs.append(rastergis.BandAttStats(band=3, minField='b3Min', maxField='b3Max', meanField='b3Mean', sumField='b3Sum', stdDevField='b3StdDev'))\n"
+"	bs.append(rastergis.BandAttStats(band=1, min_field='b1Min', max_field='b1Max', mean_field='b1Mean', sum_field='b1Sum', std_dev_field='b1StdDev'))\n"
+"	bs.append(rastergis.BandAttStats(band=2, min_field='b2Min', max_field='b2Max', mean_field='b2Mean', sum_field='b2Sum', std_dev_field='b2StdDev'))\n"
+"	bs.append(rastergis.BandAttStats(band=3, min_field='b3Min', max_field='b3Max', mean_field='b3Mean', sum_field='b3Sum', std_dev_field='b3StdDev'))\n"
 "	rastergis.populate_rat_with_stats(input, clumps, bs)\n"
 "\n"},
 
@@ -2053,11 +2053,11 @@ static PyMethodDef RasterGISMethods[] = {
 ":param clumps_img: is a string containing the name of the input clump file\n"
 ":param field_stats: has the following fields\n"
 "      * field: string defining the field in the RAT to compare to.\n"
-"      * minField: string defining the name of the field for min value\n"
-"      * maxField: string defining the name of the field for max value\n"
-"      * sumField: string defining the name of the field for sum value\n"
-"      * meanField: string defining the name of the field for mean value\n"
-"      * stdDevField: string defining the name of the field for standard deviation value\n"
+"      * min_field: string defining the name of the field for min value\n"
+"      * max_field: string defining the name of the field for max value\n"
+"      * sum_field: string defining the name of the field for sum value\n"
+"      * mean_field: string defining the name of the field for mean value\n"
+"      * std_dev_field: string defining the name of the field for standard deviation value\n"
 ":param use_abs_diff: calculate the absolute difference."
 ":param rat_band: is the image band with which the RAT is associated.\n"
 "\n"
@@ -2067,7 +2067,7 @@ static PyMethodDef RasterGISMethods[] = {
 "    inputImage = './RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs_neigh.kea'\n"
 "    ratBand = 1\n"
 "    rsgislib.rastergis.find_neighbours(inputImage, ratBand)\n"
-"    fieldInfo = rsgislib.rastergis.FieldAttStats(field='NIRMean', minField='MinNIRMeanDiff', maxField='MaxNIRMeanDiff')\n"
+"    fieldInfo = rsgislib.rastergis.FieldAttStats(field='NIRMean', min_field='MinNIRMeanDiff', max_field='MaxNIRMeanDiff')\n"
 "    rsgislib.rastergis.calc_rel_diff_neigh_stats(inputImage, fieldInfo, False, ratBand)\n"
 "\n"},
 
@@ -2086,11 +2086,11 @@ static PyMethodDef RasterGISMethods[] = {
 ":param pxl_count_col: is a string specifying the output column in the RAT where the count for the number of pixels within each clump used for the stats is outputted.\n"
 ":param band_stats: is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
 "                    * band: int defining the image band to process\n"
-"                    * minField: string defining the name of the field for min value\n"
-"                    * maxField: string defining the name of the field for max value\n"
-"                    * sumField: string defining the name of the field for sum value\n"
-"                    * meanField: string defining the name of the field for mean value\n"
-"                    * stdDevField: string defining the name of the field for standard deviation value\n"
+"                    * min_field: string defining the name of the field for min value\n"
+"                    * max_field: string defining the name of the field for max value\n"
+"                    * sum_field: string defining the name of the field for sum value\n"
+"                    * mean_field: string defining the name of the field for mean value\n"
+"                    * std_dev_field: string defining the name of the field for standard deviation value\n"
 ":param rat_band: is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
 "\n"
 "Example::\n"
@@ -2100,11 +2100,11 @@ static PyMethodDef RasterGISMethods[] = {
 "   segmentClumps = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs.kea\"\n"
 "   ndviImage = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_ndvi.kea\"\n"
 "   bandStats = []\n"
-"   bandStats.append(rastergis.BandAttStats(band=1, meanField='BlueMeanML', stdDevField='BlueStdDevML'))\n"
-"   bandStats.append(rastergis.BandAttStats(band=2, meanField='GreenMeanML', stdDevField='GreenStdDevML'))\n"
-"   bandStats.append(rastergis.BandAttStats(band=3, meanField='RedMeanML', stdDevField='RedStdDevML'))\n"
-"   bandStats.append(rastergis.BandAttStats(band=4, meanField='RedEdgeMeanML', stdDevField='RedEdgeStdDevML'))\n"
-"   bandStats.append(rastergis.BandAttStats(band=5, meanField='NIRMeanML', stdDevField='NIRStdDevML'))\n"
+"   bandStats.append(rastergis.BandAttStats(band=1, mean_field='BlueMeanML', std_dev_field='BlueStdDevML'))\n"
+"   bandStats.append(rastergis.BandAttStats(band=2, mean_field='GreenMeanML', std_dev_field='GreenStdDevML'))\n"
+"   bandStats.append(rastergis.BandAttStats(band=3, mean_field='RedMeanML', std_dev_field='RedStdDevML'))\n"
+"   bandStats.append(rastergis.BandAttStats(band=4, mean_field='RedEdgeMeanML', std_dev_field='RedEdgeStdDevML'))\n"
+"   bandStats.append(rastergis.BandAttStats(band=5, mean_field='NIRMeanML', std_dev_field='NIRStdDevML'))\n"
 "   rastergis.populate_rat_with_meanlit_stats(valsimage=inputImage, clumps=segmentClumps, meanLitImage=ndviImage, meanlitBand=1, meanLitCol='NDVIMean', pxlCountCol='MLPxlCount', bandstats=bandStats, rat_band=1)\n"
 "\n"},
 

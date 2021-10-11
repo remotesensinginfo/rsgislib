@@ -1027,7 +1027,7 @@ def perform_tiled_img_filter(
 
     tileOverlap = math.ceil(filter_inst.getFilterHSize())
 
-    imageutils.createTiles(
+    imageutils.create_tiles(
         input_img,
         tilesImgBase,
         int(width),
@@ -1158,7 +1158,7 @@ def perform_tiled_img_multi_filter(
         elif tmpOverlap > tileOverlap:
             tileOverlap = tmpOverlap
 
-    imageutils.createTiles(
+    imageutils.create_tiles(
         input_img,
         tilesImgBase,
         int(width),

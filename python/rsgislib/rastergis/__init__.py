@@ -19,44 +19,44 @@ except ImportError as h5Err:
 
 class BandAttStats:
     """ This is passed to the populate_rat_with_stats function """
-    def __init__(self, band, minField=None, maxField=None, sumField=None, stdDevField=None, meanField=None):
+    def __init__(self, band, min_field=None, max_field=None, sum_field=None, std_dev_field=None, mean_field=None):
         self.band = band
-        self.minField = minField
-        self.maxField = maxField
-        self.sumField = sumField
-        self.meanField = meanField
-        self.stdDevField = stdDevField
+        self.min_field = min_field
+        self.max_field = max_field
+        self.sum_field = sum_field
+        self.mean_field = mean_field
+        self.std_dev_field = std_dev_field
         
 class FieldAttStats:
     """ This is passed to the calcRelDiffNeighStats function """
-    def __init__(self, field, minField=None, maxField=None, sumField=None, stdDevField=None, meanField=None):
+    def __init__(self, field, min_field=None, max_field=None, sum_field=None, std_dev_field=None, mean_field=None):
         self.field = field
-        self.minField = minField
-        self.maxField = maxField
-        self.sumField = sumField
-        self.meanField = meanField
-        self.stdDevField = stdDevField
+        self.min_field = min_field
+        self.max_field = max_field
+        self.sum_field = sum_field
+        self.mean_field = mean_field
+        self.std_dev_field = std_dev_field
 
 class BandAttPercentiles:
     """ This is passed to the populateRATWithPercentiles function """
-    def __init__(self, percentile, fieldName):
+    def __init__(self, percentile, field_name):
         self.percentile = percentile
-        self.fieldName = fieldName
+        self.field_name = field_name
 
 class ShapeIndex:
     """ This is passed to the calcShapeIndices function """
-    def __init__(self, colName, idx, colIdx=0):
-        self.colName = colName
-        self.colIdx = colIdx
+    def __init__(self, col_name, idx, col_idx=0):
+        self.col_name = col_name
+        self.col_idx = col_idx
         self.idx = idx
 
-def export_cols_to_gdal_image(clumps, outimage, gdalformat, datatype, fields, ratband=1, tempDIR=None):
+def export_cols_to_gdal_image(clumps_img, output_img, gdalformat, datatype, fields, ratband=1, tmp_dir=None):
     """Exports columns of the raster attribute table as bands in a GDAL image. Utility function, exports each column individually then stacks them.
 
 Where:
 
-:param clumps: is a string containing the name of the input image file with RAT
-:param outimage: is a string containing the name of the output gdal file
+:param clumps_img: is a string containing the name of the input image file with RAT
+:param output_img: is a string containing the name of the output gdal file
 :param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'
 :param datatype: is an int containing one of the values from rsgislib.TYPE_*
 :param field: is a list of strings, providing the names of the column to be exported.
@@ -76,22 +76,22 @@ Example::
     import rsgislib.tools.filetools
     from rsgislib import imageutils
 
-    if tempDIR is None:
-        tempDIR = os.path.split(outimage)[0]
+    if tmp_dir is None:
+        tmp_dir = os.path.split(output_img)[0]
 
-    outExt=os.path.splitext(outimage)[-1]
+    outExt=os.path.splitext(output_img)[-1]
     tempFileList = []
 
     # Export each field
     for field in fields:
         print('Exporting: ' + field)
-        outTempFile = os.path.join(tempDIR, field + outExt)
-        exportCol2GDALImage(clumps, outTempFile, gdalformat, datatype, field, ratband=1)
+        outTempFile = os.path.join(tmp_dir, field + outExt)
+        export_col_to_gdal_img(clumps_img, outTempFile, gdalformat, datatype, field, ratband)
         tempFileList.append(outTempFile)
 
     # Stack Bands
     print('Stacking Bands')
-    imageutils.stackImageBands(tempFileList, fields, outimage, None, 0, gdalformat, datatype)
+    imageutils.stack_img_bands(tempFileList, fields, output_img, None, 0, gdalformat, datatype)
 
     # Remove temp files
     print('Removing temp files')
@@ -232,11 +232,11 @@ and end_row variables can be used to read a subset of the RAT.
     return neighbours_data
 
 
-def check_string_col_valid(clumps, str_col, rm_punc=False, rm_spaces=False, rm_non_ascii=False, rm_dashs=False):
+def check_string_col_valid(clumps_img, str_col, rm_punc=False, rm_spaces=False, rm_non_ascii=False, rm_dashs=False):
     """
     A function which checks a string column to ensure nothing is invalid.
 
-    :param clumps: input clumps image.
+    :param clumps_img: input clumps image.
     :param str_col: the column to check
     :param rm_punc: If True removes punctuation from column name other than dashs and underscores.
     :param rm_spaces: If True removes spaces from the column name, replacing them with underscores.
@@ -264,8 +264,8 @@ def check_string_col_valid(clumps, str_col, rm_punc=False, rm_spaces=False, rm_n
     in_rats = ratapplier.RatAssociations()
     out_rats = ratapplier.RatAssociations()
 
-    in_rats.inrat = ratapplier.RatHandle(clumps)
-    out_rats.outrat = ratapplier.RatHandle(clumps)
+    in_rats.inrat = ratapplier.RatHandle(clumps_img)
+    out_rats.outrat = ratapplier.RatHandle(clumps_img)
 
     otherargs = ratapplier.OtherArguments()
     otherargs.str_col = str_col

@@ -139,7 +139,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
             baseName = os.path.splitext(os.path.basename(segTile))[0]        
             borderMaskFile = os.path.join(stage1TilesSegBordersDIR, baseName + '_segsborder.kea')
             rastergis.defineBorderClumps(segTile, 'BoundaryClumps')
-            rastergis.exportCol2GDALImage(segTile, borderMaskFile, 'KEA', rsgislib.TYPE_8UINT, 'BoundaryClumps')
+            rastergis.export_col_to_gdal_img(segTile, borderMaskFile, 'KEA', rsgislib.TYPE_8UINT, 'BoundaryClumps')
     
     def mergeStage1TilesToOutput(self, inputImage, tilesSegsDIR, tilesSegsBordersDIR, tilesBase, clumpsImage, bordersImage):
         segTiles = glob.glob(os.path.join(tilesSegsDIR, tilesBase+"*_segs.kea"))
@@ -179,7 +179,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
             baseName = os.path.splitext(os.path.basename(segTile))[0]        
             borderMaskFile = os.path.join(tilesSegBordersDIR, baseName + '_segsborder.kea')
             rastergis.defineBorderClumps(segTile, 'BoundaryClumps')
-            rastergis.exportCol2GDALImage(segTile, borderMaskFile, 'KEA', rsgislib.TYPE_8UINT, 'BoundaryClumps')
+            rastergis.export_col_to_gdal_img(segTile, borderMaskFile, 'KEA', rsgislib.TYPE_8UINT, 'BoundaryClumps')
     
     
     def mergeStage2TilesToOutput(self, clumpsImage, tilesSegsDIR, tilesSegBordersDIR, tilesBase, s2BordersImage):

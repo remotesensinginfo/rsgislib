@@ -242,7 +242,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
         imgLyrs[0] = ""        
         
         refLyrMskStackImg = os.path.join(refLayersPath, uidStr+'_waterLandMskStack.kea')
-        rsgislib.imageutils.stackImageBands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
+        rsgislib.imageutils.stack_img_bands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
         if use_mode:
             rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
                                                        rsgislib.imagecalc.StatsSummary(calcMode=True), 'KEA',
@@ -484,7 +484,7 @@ used to define the spatial extent of the output images and spatial projection.
             imgLyrs[0] = ""        
             
             refLyrMskStackImg = os.path.join(refLayersPath, uidStr+'_waterLandMskStack.kea')
-            rsgislib.imageutils.stackImageBands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
+            rsgislib.imageutils.stack_img_bands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
             if use_mode:
                 rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
                                                            rsgislib.imagecalc.StatsSummary(calcMode=True), 'KEA',
@@ -713,7 +713,7 @@ used to define the spatial extent of the output images and spatial projection.
 
             print("Creating land/Water mask.")
             refLyrMskStackImg = os.path.join(refLayersPath, uidStr + '_waterLandMskStack.kea')
-            rsgislib.imageutils.stackImageBands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
+            rsgislib.imageutils.stack_img_bands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
             if use_mode:
                 rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
                                                            rsgislib.imagecalc.StatsSummary(calcMode=True), 'KEA',

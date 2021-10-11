@@ -116,127 +116,6 @@ class RSGISRATThresDirection(Enum):
     lowerupper = 3
 
 
-def populate_image_stats(inputImage, clumpsFile, outascii=None, threshold=0.0, calcMin=False, calcMax=False, calcSum=False, calcMean=False, calcStDev=False, calcMedian=False, calcCount=False, calcArea=False, calcLength=False, calcWidth=False, calcLengthWidth=False):
-    """ 
-Attribute RAT with statistics from from all bands in an input image.
-
-Where:
-
-:param inputImage: input image to calculate statistics from, if band names are avaialble these will be used for attribute names in the output RAT.
-:param clumpsFile: input clumps file, statistics are added to RAT.
-:param threshold: float, values below this are ignored (default=0)
-:param outascii: string providing output CSV file (optional).
-:param calcMin: Calculate minimum
-:param calcMax: Calculate maximum
-:param calcSum: Calculate sum
-:param calcMean: Calculate mean
-:param calcStDev: Calculate standard deviation
-
-Example::
-
-    from rsgislib.rastergis import ratutils
-    inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_clumps_elim_final.kea'
-    ratutils.populate_image_stats(inputImage, clumpsFile, calcMean=True)
-
-    """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
-    
-    # Open image
-    dataset = gdal.Open(inputImage, gdal.GA_ReadOnly)
-    
-    # Set up list to hold statistics to calculate
-    stats2Calc = list()
-    
-    # Loop through number of bands in image
-    nBands = dataset.RasterCount
-
-    # Set up array to hold all column names (used when exporting to ASCII)
-    outFieldsList = []
-    
-    for i in range(nBands):
-        bandName = dataset.GetRasterBand(i+1).GetDescription()
-        # If band name is not set set to bandN
-        if bandName == '':
-            bandName = 'Band' + str(i+1)
-
-        # Initialise stats to calculate at None
-        minName = None
-        maxName = None
-        sumName = None
-        meanName = None
-        stDevName = None
-        medianName = None
-        countName = None
-
-        if calcMin:
-            minName = bandName + 'Min'
-            outFieldsList.append(minName)
-        if calcMax:
-            maxName = bandName + 'Max'
-            outFieldsList.append(maxName)
-        if calcSum:
-            sumName = bandName + 'Sum'
-            outFieldsList.append(sumName)
-        if calcMean:
-            meanName = bandName + 'Avg'
-            outFieldsList.append(meanName)
-        if calcStDev:
-            stDevName = bandName + 'Std'
-            outFieldsList.append(stDevName)
-        if calcMedian:
-            raise Exception('Median is not currently supported.')
-            medianName = bandName + 'Med'
-            outFieldsList.append(medianName)
-        if calcCount:
-            raise Exception('Count is not currently supported.')
-            countName = bandName + 'Pix'
-            outFieldsList.append(countName)
-
-        stats2Calc.append(rastergis.BandAttStats(band=i+1, 
-                    minField=minName, maxField=maxName, 
-                    sumField=sumName, stdDevField=stDevName, 
-                    meanField=meanName))
-    
-    # Calc stats
-    print('''Calculating statistics for %i Bands'''%(nBands))
-    t = rsgislib.RSGISTime()
-    t.start(True)
-    rastergis.populate_rat_with_stats(inputImage, clumpsFile, stats2Calc)
-    t.end()
-
-    # Calculate shapes, if required
-    if calcArea or calcLength or calcWidth or calcLengthWidth:
-        raise Exception('Shape features are not currently supported.')
-        print("\nCalculating shape indices")
-        shapes = list()
-        if calcArea:
-            shapes.append(rastergis.ShapeIndex(colName="Area", idx=rsgislib.SHAPE_SHAPEAREA))
-            outFieldsList.append("Area")
-        if calcLength:
-            shapes.append(rastergis.ShapeIndex(colName="Length", idx=rsgislib.SHAPE_LENGTH))
-            outFieldsList.append("Length")
-        if calcWidth:
-            shapes.append(rastergis.ShapeIndex(colName="Width", idx=rsgislib.SHAPE_WIDTH))
-            outFieldsList.append("Width")
-        if calcLengthWidth:
-            shapes.append(rastergis.ShapeIndex(colName="LengthWidthRatio", idx=rsgislib.SHAPE_LENGTHWIDTH))
-            outFieldsList.append("LengthWidthRatio")
-
-        t.start(True)
-        rastergis.calcShapeIndices(clumpsFile, shapes)
-        t.end()
-    
-    # Export to ASCII if required
-    if outascii is not None:
-        print("\nExporting as ASCII")
-        t.start(True)
-        rastergis.export2Ascii(clumpsFile, outascii, outFieldsList)
-        t.end()
-
-
 def calc_plot_gaussian_histo_model(clumpsFile, outGausH5File, outHistH5File, outPlotFile, varCol, binWidth, classColumn, classVal, plotTitle):
     """ Extracts a column from the RAT, masking by a class calculating the histogram and 
         fitting a Gaussian mixture model to the histogram. Outputs include a plot and HDF5
@@ -285,9 +164,8 @@ Example::
         raise Exception("The hdf5 module is required for this function could not be imported\n\t" + h5Err)
         
     # Calculate histogram and fit Gaussian Mixture Model
-    rastergis.fitHistGausianMixtureModel(clumps=clumpsFile, outH5File=outGausH5File, outHistFile=outHistH5File, varCol=varCol, binWidth=binWidth, classColumn=classColumn, classVal=classVal)
-    
-    
+    rastergis.fit_hist_gausian_mixture_model(clumps=clumpsFile, outH5File=outGausH5File, outHistFile=outHistH5File, varCol=varCol, binWidth=binWidth, classColumn=classColumn, classVal=classVal)
+
     if not h5py.is_hdf5(outGausH5File):
         raise Exception(outGausH5File + " is not a HDF5 file.")
         
@@ -296,8 +174,7 @@ Example::
 
     gausFile = h5py.File(outGausH5File,'r')
     gausParams = gausFile['/DATA/DATA']
-    
-    
+
     histFile = h5py.File(outHistH5File,'r')
     histData = histFile['/DATA/DATA']
     
@@ -1133,8 +1010,8 @@ classInfoDict[2] = {'classname':'Water', 'red':0, 'green':0, 'blue':255}
     if not haveRIOSRat:
         raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
 
-    n_rows = rsgislib.rastergis.getRATLength(clumpsImg)
-    col_names = rsgislib.rastergis.getRATColumns(clumpsImg)
+    n_rows = rsgislib.rastergis.get_rat_length(clumpsImg)
+    col_names = rsgislib.rastergis.get_rat_columns(clumpsImg)
 
     red_avail = False
     green_avail = False
@@ -1230,7 +1107,7 @@ Where:
     combinedClassesImage = os.path.join(tmpPath, "CombinedClasses_{}.kea".format(uid))
     imageutils.combineImages2Band(tmpClassImgLayers, combinedClassesImage, 'KEA', rsgislib.TYPE_8UINT, 0.0)
     
-    rastergis.populateRATWithMode(valsimage=combinedClassesImage, clumps=clumpsImg, outcolsname=classesIntCol,
+    rastergis.populate_rat_with_mode(valsimage=combinedClassesImage, clumps=clumpsImg, outcolsname=classesIntCol,
                                   usenodata=False, nodataval=0, outnodata=False, modeband=1, ratband=1)
     define_class_names(clumpsImg, classesIntCol, classesNameCol, classNamesDict)
     
@@ -1392,13 +1269,13 @@ Example::
     classMaskClumps = os.path.join(tmpPath, baseName+"_TmpClassMaskClumps.kea")
     smallClumpsMask = os.path.join(tmpPath, baseName+"_SmallClassClumps.kea")
     
-    rastergis.exportCol2GDALImage(clumpsImg, classMaskImg, "KEA", rsgislib.TYPE_16UINT, classCol)
+    rastergis.export_col_to_gdal_img(clumpsImg, classMaskImg, "KEA", rsgislib.TYPE_16UINT, classCol)
     if useTiledClump:
         from rsgislib.segmentation import tiledclump
         if nCores > 1:
-            tiledclump.performClumpingMultiProcess(classMaskImg, classMaskClumps, tmpDIR=os.path.join(tmpPath, baseName+'_ClumpTmp'), width=tileWidth, height=tileHeight, nCores=nCores)
+            tiledclump.perform_clumping_multi_process(classMaskImg, classMaskClumps, tmpDIR=os.path.join(tmpPath, baseName+'_ClumpTmp'), width=tileWidth, height=tileHeight, nCores=nCores)
         else:
-            tiledclump.performClumpingSingleThread(classMaskImg, classMaskClumps, tmpDIR=os.path.join(tmpPath, baseName+'_ClumpTmp', width=tileWidth, height=tileHeight))
+            tiledclump.perform_clumping_single_thread(classMaskImg, classMaskClumps, tmpDIR=os.path.join(tmpPath, baseName+'_ClumpTmp', width=tileWidth, height=tileHeight))
     else:
         segmentation.clump(classMaskImg, classMaskClumps, "KEA", False, 0)
     rastergis.pop_rat_img_stats(classMaskClumps, False, False)
@@ -1412,7 +1289,7 @@ Example::
         rat.writeColumn(ratDataset, "smallUnits", smallUnits)
         ratDataset = None
     
-        rastergis.exportCol2GDALImage(classMaskClumps, smallClumpsMask, "KEA", rsgislib.TYPE_8UINT, "smallUnits")
+        rastergis.export_col_to_gdal_img(classMaskClumps, smallClumpsMask, "KEA", rsgislib.TYPE_8UINT, "smallUnits")
     
         bs = []
         bs.append(rastergis.BandAttStats(band=1, maxField=outColName[i]))
@@ -1478,7 +1355,7 @@ def calc_dist_to_classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSi
     uid = rsgislib.tools.utils.uid_generator()
         
     classesImg = os.path.join(tmpDIR, 'ClassImg_'+uid+'.kea')
-    rastergis.exportCol2GDALImage(clumpsImg, classesImg, 'KEA', rsgislib.TYPE_32UINT, classCol)
+    rastergis.export_col_to_gdal_img(clumpsImg, classesImg, 'KEA', rsgislib.TYPE_32UINT, classCol)
     
     ratDataset = gdal.Open(clumpsImg, gdal.GA_ReadOnly)
     classColInt = rat.readColumn(ratDataset, classCol)
@@ -1486,7 +1363,7 @@ def calc_dist_to_classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSi
 
     classIDs = numpy.unique(classColInt)
     
-    xRes, yRes = rsgislib.imageutils.getImageRes(classesImg)
+    xRes, yRes = rsgislib.imageutils.get_image_res(classesImg)
     
     #print("Image Res {} x {}".format(xRes, yRes))
     
@@ -1506,7 +1383,7 @@ def calc_dist_to_classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSi
         classTilesDIRPresent = False
     
     classesImgTileBase = os.path.join(classTilesDIR, 'ClassImgTile')
-    imageutils.createTiles(classesImg, classesImgTileBase, tileSize, tileSize, tileOverlap, 0, 'KEA', rsgislib.TYPE_32UINT, 'kea')
+    imageutils.create_tiles(classesImg, classesImgTileBase, tileSize, tileSize, tileOverlap, 0, 'KEA', rsgislib.TYPE_32UINT, 'kea')
     imgTileFiles = glob.glob(classesImgTileBase+'*.kea')
     
     distTilesDIR = os.path.join(tmpDIR, 'DistTiles_'+uid)
@@ -1642,11 +1519,11 @@ Calculate the distance from each small clump to a large clump. Split defined by 
     rat.writeColumn(ratDataset, "smallUnitsBin", smallUnits)    
     
     smClumpsImg = os.path.join(tmpDIR, baseName+'_smclumps.kea')
-    rastergis.exportCol2GDALImage(clumpsImg, smClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'SmUnits')
+    rastergis.export_col_to_gdal_img(clumpsImg, smClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'SmUnits')
     rastergis.pop_rat_img_stats(clumps_img=smClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     
     lrgClumpsImg = os.path.join(tmpDIR, baseName+'_lrgclumps.kea')
-    rastergis.exportCol2GDALImage(clumpsImg, lrgClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'LrgUnits')
+    rastergis.export_col_to_gdal_img(clumpsImg, lrgClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'LrgUnits')
     rastergis.pop_rat_img_stats(clumps_img=lrgClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     
     smPolysShp = os.path.join(tmpDIR, baseName+'_smClumps_shp.shp')
@@ -1746,7 +1623,7 @@ A function to read a column of data from a RAT.
     if not haveRIOSRat:
         raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
 
-    col_names = rsgislib.rastergis.getRATColumns(clumpsImg)
+    col_names = rsgislib.rastergis.get_rat_columns(clumpsImg)
 
     if columnName not in col_names:
         raise Exception("Column specified is not within the RAT.")
@@ -1779,7 +1656,7 @@ A function to read a column of data from a RAT.
     if not haveRIOSRat:
         raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
 
-    rat_length = rsgislib.rastergis.getRATLength(clumpsImg)
+    rat_length = rsgislib.rastergis.get_rat_length(clumpsImg)
     if rat_length != (columnData.shape[0]):
         raise Exception("The input data array is not the same length as the RAT.")
 
@@ -1799,7 +1676,7 @@ def create_uid_col(clumps_img, col_name='UID'):
     :param col_name: The output column name (default is UID).
 
     """
-    n_rows = rsgislib.rastergis.getRATLength(clumps_img)
+    n_rows = rsgislib.rastergis.get_rat_length(clumps_img)
     uid_col = numpy.arange(0, n_rows, 1, dtype=numpy.uint32)
     set_column_data(clumps_img, col_name, uid_col)
 

@@ -44,7 +44,7 @@ def rasterise_vec_lyr(vec_file: str, vec_lyr: str, input_img: str, output_img: s
     import rsgislib.imageutils
     try:
         if use_vec_extent:
-            xRes, yRes = rsgislib.imageutils.getImageRes(input_img)
+            xRes, yRes = rsgislib.imageutils.get_image_res(input_img)
             if yRes < -1:
                 yRes = yRes * (-1)
             outRes = xRes

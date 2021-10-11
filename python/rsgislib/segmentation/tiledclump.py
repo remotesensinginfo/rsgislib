@@ -75,7 +75,7 @@ Clump the input image using a tiled processing chain allowing large images to be
     if not os.path.exists(tilesClumpsDIR):
         os.makedirs(tilesClumpsDIR)
     
-    imageutils.createTiles(inputImage, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
+    imageutils.create_tiles(inputImage, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
     imageTiles = glob.glob(tilesImgBase+"*")
 
     for tile in imageTiles:
@@ -139,7 +139,7 @@ Clump the input image using a tiled processing chain allowing large images to be
     if not os.path.exists(tilesClumpsDIR):
         os.makedirs(tilesClumpsDIR)
     
-    imageutils.createTiles(inputImage, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
+    imageutils.create_tiles(inputImage, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
     imageTiles = glob.glob(tilesImgBase+"*")
     
     clumpImgsVals = []
@@ -200,7 +200,7 @@ Clump and union with the reference image the input image using a tiled processin
     if not os.path.exists(tilesClumpsDIR):
         os.makedirs(tilesClumpsDIR)
     
-    imageutils.createTiles(inputImage, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
+    imageutils.create_tiles(inputImage, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
     imageTiles = glob.glob(tilesImgBase+"*")
 
     for tile in imageTiles:
@@ -263,7 +263,7 @@ Clump and union with the reference image the input image using a tiled processin
     if not os.path.exists(tilesClumpsDIR):
         os.makedirs(tilesClumpsDIR)
     
-    imageutils.createTiles(input_img, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
+    imageutils.create_tiles(input_img, tilesImgBase, int(width), int(height), 0, False, 'KEA', dataType, 'kea')
     imageTiles = glob.glob(tilesImgBase+"*")
     
     clumpImgsVals = []
