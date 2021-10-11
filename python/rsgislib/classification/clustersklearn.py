@@ -49,48 +49,62 @@ from sklearn.cluster import MiniBatchKMeans
 from rios.imagereader import ImageReader
 from rios.imagewriter import ImageWriter
 
-def img_pixel_sample_cluster(inputImg, outputImg, gdalformat='KEA', noDataVal=0, imgSamp=100,
-                             clusterer=MiniBatchKMeans(n_clusters=60, init='k-means++', max_iter=100, batch_size=100),
-                             calcStats=True, useMeanShiftEstBandWidth=False):
+
+def img_pixel_sample_cluster(
+    input_img,
+    output_img,
+    gdalformat="KEA",
+    no_data_val=0,
+    n_img_smpl=100,
+    clusterer=MiniBatchKMeans(
+        n_clusters=60, init="k-means++", max_iter=100, batch_size=100
+    ),
+    calc_stats=True,
+    use_mean_shift_est_band_width=False,
+):
     """
-A function which allows a clustering to be performed using the algorithms available
-within the scikit-learn library. The clusterer is trained on a sample of the input
-image and then applied using the predict function (therefore this function is only
-compatiable with clusterers which have the predict function implemented) to the whole
-image.
+    A function which allows a clustering to be performed using the algorithms available
+    within the scikit-learn library. The clusterer is trained on a sample of the input
+    image and then applied using the predict function (therefore this function is only
+    compatible with clusterers which have the predict function implemented) to the
+    whole image.
 
-:param inputImg: input image file.
-:param outputImg: output image file.
-:param gdalformat: output image file format.
-:param noDataVal: no data value associated with the input image.
-:param imgSamp: the input image sampling. (e.g., 100 is every 100th pixel)
-:param clusterer: clusterer from scikit-learn which must have a predict function.
-:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a
-                  KEA file then the format needs to support RATs for this option as histogram and colour table
-                  are written to RAT.
-:param useMeanShiftEstBandWidth: use the mean-shift algorithm as the clusterer (pass None as the clusterer) where
-                                 the bandwidth is calculated from the data itself.
+    :param input_img: input image file.
+    :param output_img: output image file.
+    :param gdalformat: output image file format.
+    :param no_data_val: no data value associated with the input image.
+    :param n_img_smpl: the input image sampling. (e.g., 100 is every 100th pixel)
+    :param clusterer: clusterer from scikit-learn which must have a predict function.
+    :param calc_stats: calculate image pixel statistics, histogram and image pyramids -
+                       note if you are not using a KEA file then the format needs to
+                       support RATs for this option as histogram and colour table
+                       are written to RAT.
+    :param use_mean_shift_est_band_width: use the mean-shift algorithm as the clusterer
+                                          (pass None as the clusterer) where the
+                                          bandwidth is calculated from the data itself.
+    """
+    print("Sample input image:")
+    dataSamp = rsgislib.imageutils.extract_img_pxl_sample(
+        input_img, n_img_smpl, no_data_val
+    )
 
-"""
-    print('Sample input image:')
-    dataSamp = rsgislib.imageutils.extractImgPxlSample(inputImg, imgSamp, noDataVal)
-
-    if useMeanShiftEstBandWidth:
-        print('Using Mean-Shift predict bandwidth')
+    if use_mean_shift_est_band_width:
+        print("Using Mean-Shift predict bandwidth")
         from sklearn.cluster import MeanShift, estimate_bandwidth
+
         bandwidth = estimate_bandwidth(dataSamp, quantile=0.2, n_samples=500)
         clusterer = MeanShift(bandwidth=bandwidth, bin_seeding=True)
 
-    print('Fit Clusterer')
-    outClust = clusterer.fit(dataSamp)
-    print('Fitted Clusterer')
+    print("Fit Clusterer")
+    clusterer.fit(dataSamp)
+    print("Fitted Clusterer")
 
-    print('Apply to whole image:')
-    reader = ImageReader(inputImg, windowxsize=200, windowysize=200)
+    print("Apply to whole image:")
+    reader = ImageReader(input_img, windowxsize=200, windowysize=200)
     writer = None
     for (info, block) in tqdm.tqdm(reader):
         blkShape = block.shape
-        blkBands = block.reshape((blkShape[0], (blkShape[1 ] *blkShape[2]))).T
+        blkBands = block.reshape((blkShape[0], (blkShape[1] * blkShape[2]))).T
         ID = numpy.arange(blkBands.shape[0])
         outClusterVals = numpy.zeros((blkBands.shape[0]))
 
@@ -98,55 +112,82 @@ image.
         ID = ID[finiteMskArr]
         blkBands = blkBands[finiteMskArr]
 
-        noDataValArr = numpy.logical_not(numpy.where(blkBands == noDataVal, True, False).all(axis=1))
+        noDataValArr = numpy.logical_not(
+            numpy.where(blkBands == no_data_val, True, False).all(axis=1)
+        )
 
         blkBandsNoData = blkBands[noDataValArr]
         ID = ID[noDataValArr]
 
         if ID.shape[0] > 0:
-            outPred = clusterer.predict(blkBandsNoData ) +1
+            outPred = clusterer.predict(blkBandsNoData) + 1
             outClusterVals[ID] = outPred
 
-        outClusterValsOutArr = outClusterVals.reshape([1 ,blkShape[1] ,blkShape[2]])
+        outClusterValsOutArr = outClusterVals.reshape([1, blkShape[1], blkShape[2]])
 
         if writer is None:
-            writer = ImageWriter(outputImg, info=info, firstblock=outClusterValsOutArr, drivername=gdalformat, creationoptions=[])
+            writer = ImageWriter(
+                output_img,
+                info=info,
+                firstblock=outClusterValsOutArr,
+                drivername=gdalformat,
+                creationoptions=[],
+            )
         else:
             writer.write(outClusterValsOutArr)
     writer.close(calcStats=False)
 
-    if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    if calc_stats:
+        rsgislib.rastergis.pop_rat_img_stats(
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
+        )
 
 
-def img_pixel_tiled_cluster(inputImg, outputImg, gdalformat='KEA', noDataVal=0, 
-                            clusterer=MiniBatchKMeans(n_clusters=60, init='k-means++', max_iter=100, batch_size=100), 
-                            calcStats=True, useMeanShiftEstBandWidth=False, tileXSize=200, tileYSize=200):
+def img_pixel_tiled_cluster(
+    input_img,
+    output_img,
+    gdalformat="KEA",
+    no_data_val=0,
+    clusterer=MiniBatchKMeans(
+        n_clusters=60, init="k-means++", max_iter=100, batch_size=100
+    ),
+    calc_stats=True,
+    use_mean_shift_est_band_width=False,
+    tile_x_size=200,
+    tile_y_size=200,
+):
     """
-A function which allows a clustering to be performed using the algorithms available
-within the scikit-learn library. The clusterer is applied to a single tile at a time
-and therefore produces tile boundaries in the result. However, memory is controlled
-such that usage isn't excessive which it could be when processing a whole image.
+    A function which allows a clustering to be performed using the algorithms available
+    within the scikit-learn library. The clusterer is applied to a single tile at a time
+    and therefore produces tile boundaries in the result. However, memory is controlled
+    such that usage isn't excessive which it could be when processing a whole image.
 
-:param inputImg: input image file.
-:param outputImg: output image file.
-:param gdalformat: output image file format.
-:param noDataVal: no data value associated with the input image.
-:param clusterer: clusterer from scikit-learn which must have a predict function.
-:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-:param useMeanShiftEstBandWidth: use the mean-shift algorithm as the clusterer (pass None as the clusterer) where the bandwidth is calculated from the data itself.
-:param tileXSize: tile size in the x-axis in pixels.
-:param tileYSize: tile size in the y-axis in pixels.
-
-"""
-    if useMeanShiftEstBandWidth:
+    :param input_img: input image file.
+    :param output_img: output image file.
+    :param gdalformat: output image file format.
+    :param no_data_val: no data value associated with the input image.
+    :param clusterer: clusterer from scikit-learn which must have a predict function.
+    :param calc_stats: calculate image pixel statistics, histogram and image pyramids -
+                       note if you are not using a KEA file then the format needs to
+                       support RATs for this option as histogram and colour table
+                       are written to RAT.
+    :param use_mean_shift_est_band_width: use the mean-shift algorithm as the clusterer
+                                          (pass None as the clusterer) where the
+                                          bandwidth is calculated from the data itself.
+    :param tile_x_size: tile size in the x-axis in pixels.
+    :param tile_y_size: tile size in the y-axis in pixels.
+    """
+    if use_mean_shift_est_band_width:
         from sklearn.cluster import MeanShift, estimate_bandwidth
 
-    reader = ImageReader(inputImg, windowxsize=tileXSize, windowysize=tileYSize)
+    reader = ImageReader(input_img, windowxsize=tile_x_size, windowysize=tile_y_size)
     writer = None
     for (info, block) in tqdm.tqdm(reader):
         blkShape = block.shape
-        blkBands = block.reshape((blkShape[0], (blkShape[1 ] *blkShape[2]))).T
+        blkBands = block.reshape((blkShape[0], (blkShape[1] * blkShape[2]))).T
         ID = numpy.arange(blkBands.shape[0])
         outClusterVals = numpy.zeros((blkBands.shape[0]))
 
@@ -154,65 +195,93 @@ such that usage isn't excessive which it could be when processing a whole image.
         ID = ID[finiteMskArr]
         blkBands = blkBands[finiteMskArr]
 
-        noDataValArr = numpy.logical_not(numpy.where(blkBands == noDataVal, True, False).all(axis=1))
+        noDataValArr = numpy.logical_not(
+            numpy.where(blkBands == no_data_val, True, False).all(axis=1)
+        )
 
         blkBandsNoData = blkBands[noDataValArr]
         ID = ID[noDataValArr]
 
         if ID.shape[0] > 0:
-            if useMeanShiftEstBandWidth:
-                bandwidth = estimate_bandwidth(blkBandsNoData, quantile=0.2, n_samples=1000)
+            if use_mean_shift_est_band_width:
+                bandwidth = estimate_bandwidth(
+                    blkBandsNoData, quantile=0.2, n_samples=1000
+                )
                 clusterer = MeanShift(bandwidth=bandwidth, bin_seeding=True)
 
             clusterer.fit(blkBandsNoData)
             outPred = clusterer.labels_ + 1
             outClusterVals[ID] = outPred
 
-        outClusterValsOutArr = outClusterVals.reshape([1 ,blkShape[1] ,blkShape[2]])
+        outClusterValsOutArr = outClusterVals.reshape([1, blkShape[1], blkShape[2]])
 
         if writer is None:
-            writer = ImageWriter(outputImg, info=info, firstblock=outClusterValsOutArr, drivername=gdalformat, creationoptions=[])
+            writer = ImageWriter(
+                output_img,
+                info=info,
+                firstblock=outClusterValsOutArr,
+                drivername=gdalformat,
+                creationoptions=[],
+            )
         else:
             writer.write(outClusterValsOutArr)
     writer.close(calcStats=False)
 
-    if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    if calc_stats:
+        rsgislib.rastergis.pop_rat_img_stats(
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
+        )
 
 
-
-def img_pixel_cluster(inputImg, outputImg, gdalformat='KEA', noDataVal=0, 
-                      clusterer=MiniBatchKMeans(n_clusters=60, init='k-means++', max_iter=100, batch_size=100), 
-                      calcStats=True, useMeanShiftEstBandWidth=False):
+def img_pixel_cluster(
+    input_img,
+    output_img,
+    gdalformat="KEA",
+    no_data_val=0,
+    clusterer=MiniBatchKMeans(
+        n_clusters=60, init="k-means++", max_iter=100, batch_size=100
+    ),
+    calc_stats=True,
+    use_mean_shift_est_band_width=False,
+):
     """
-A function which allows a clustering to be performed using the algorithms available
-within the scikit-learn library. The clusterer is applied to the whole image in one
-operation so therefore requires the whole image to be loaded into memory. However,
-if there is sufficent memory all the clustering algorithms within scikit-learn can be
-applied without boundary artifacts.
+    A function which allows a clustering to be performed using the algorithms available
+    within the scikit-learn library. The clusterer is applied to the whole image in one
+    operation so therefore requires the whole image to be loaded into memory. However,
+    if there is sufficient memory all the clustering algorithms within scikit-learn can
+    be applied without boundary artifacts.
 
-:param inputImg: input image file.
-:param outputImg: output image file.
-:param gdalformat: output image file format.
-:param noDataVal: no data value associated with the input image.
-:param clusterer: clusterer from scikit-learn which must have a predict function.
-:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-:param useMeanShiftEstBandWidth: use the mean-shift algorithm as the clusterer (pass None as the clusterer) where the bandwidth is calculated from the data itself.
-
-"""
+    :param input_img: input image file.
+    :param output_img: output image file.
+    :param gdalformat: output image file format.
+    :param no_data_val: no data value associated with the input image.
+    :param clusterer: clusterer from scikit-learn which must have a predict function.
+    :param calc_stats: calculate image pixel statistics, histogram and image pyramids -
+                       note if you are not using a KEA file then the format needs to
+                       support RATs for this option as histogram and colour table
+                       are written to RAT.
+    :param use_mean_shift_est_band_width: use the mean-shift algorithm as the clusterer
+                                          (pass None as the clusterer) where the
+                                          bandwidth is calculated from the data itself.
+    """
     # Create output image
-    rsgislib.imageutils.create_copy_img(inputImg, outputImg, 1, 0, gdalformat, rsgislib.TYPE_16UINT)
+    rsgislib.imageutils.create_copy_img(
+        input_img, output_img, 1, 0, gdalformat, rsgislib.TYPE_16UINT
+    )
 
-    if useMeanShiftEstBandWidth:
+    if use_mean_shift_est_band_width:
         from sklearn.cluster import MeanShift, estimate_bandwidth
 
-    gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
+    gdalDS = gdal.Open(input_img, gdal.GA_ReadOnly)
     nPxls = gdalDS.RasterXSize * gdalDS.RasterYSize
 
     pxlVals = numpy.zeros((gdalDS.RasterCount, nPxls))
 
     for nBand in numpy.arange(gdalDS.RasterCount):
-        gdalBand = gdalDS.GetRasterBand(int(nBand +1))
+        gdalBand = gdalDS.GetRasterBand(int(nBand + 1))
         imgArr = gdalBand.ReadAsArray().flatten()
         pxlVals[nBand] = imgArr
 
@@ -225,32 +294,38 @@ applied without boundary artifacts.
     ID = ID[finiteMskArr]
     pxlVals = pxlVals[finiteMskArr]
 
-    noDataValArr = numpy.logical_not(numpy.where(pxlVals == noDataVal, True, False).all(axis=1))
+    noDataValArr = numpy.logical_not(
+        numpy.where(pxlVals == no_data_val, True, False).all(axis=1)
+    )
 
     pxlVals = pxlVals[noDataValArr]
     ID = ID[noDataValArr]
 
     if ID.shape[0] > 0:
-        if useMeanShiftEstBandWidth:
+        if use_mean_shift_est_band_width:
             bandwidth = estimate_bandwidth(pxlVals, quantile=0.2, n_samples=1000)
             clusterer = MeanShift(bandwidth=bandwidth, bin_seeding=True)
-        print('Perform Clustering')
+        print("Perform Clustering")
         clusterer.fit(pxlVals)
-        print('Performed Clustering')
+        print("Performed Clustering")
         outPred = clusterer.labels_ + 1
         outClusterVals[ID] = outPred
 
-    outClusterValsOutArr = outClusterVals.reshape([gdalDS.RasterYSize, gdalDS.RasterXSize])
+    outClusterValsOutArr = outClusterVals.reshape(
+        [gdalDS.RasterYSize, gdalDS.RasterXSize]
+    )
     print(outClusterValsOutArr.shape)
 
-    gdalOutDS = gdal.Open(outputImg, gdal.GA_Update)
+    gdalOutDS = gdal.Open(output_img, gdal.GA_Update)
     gdalOutBand = gdalOutDS.GetRasterBand(1)
     gdalOutBand.WriteArray(outClusterValsOutArr)
     gdalOutDS = None
     gdalDS = None
 
-    if calcStats:
-        rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
-
-
-
+    if calc_stats:
+        rsgislib.rastergis.pop_rat_img_stats(
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
+        )

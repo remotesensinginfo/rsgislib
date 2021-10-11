@@ -527,7 +527,7 @@ def get_pca_eigen_vector(input_img, pxl_n_sample, no_data_val=None, out_matrix_f
     import rsgislib.imageutils
 
     # Read input data from image file.
-    X = rsgislib.imageutils.extractImgPxlSample(input_img, pxl_n_sample, no_data_val)
+    X = rsgislib.imageutils.extract_img_pxl_sample(input_img, pxl_n_sample, no_data_val)
 
     print(str(X.shape[0]) + " values were extracted from the input image.")
 
@@ -670,7 +670,7 @@ def perform_image_mnf(
     rsgislib.imageutils.whitenImage(input_img, valid_msk_img, 1, whiten_img, "KEA")
 
     # Read input data from image file.
-    X = rsgislib.imageutils.extractImgPxlSample(
+    X = rsgislib.imageutils.extract_img_pxl_sample(
         whiten_img, pxl_n_sample, in_img_no_data
     )
     print("{} values were extracted from the input image.".format(X.shape[0]))
