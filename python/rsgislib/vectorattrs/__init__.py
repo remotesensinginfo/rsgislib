@@ -587,3 +587,74 @@ def add_string_col(vec_file, vec_lyr, out_col, out_vec_file, out_vec_lyr, out_va
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
+
+def get_unq_col_values(vec_file, vec_lyr, col_name):
+    """
+    A function which splits a vector layer by an attribute value into either different layers or different output
+    files.
+
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param col_name: The column name for which a list of unique values will be returned.
+
+    """
+    import geopandas
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    unq_vals = base_gpdf[col_name].unique()
+    base_gpdf = None
+    return unq_vals
+
+
+
+
+def add_fid_col(vec_file:str, vec_lyr:str, out_vec_file:str, out_vec_lyr:str, out_format:str ='GPKG', out_col:str = "fid"):
+    """
+    A function which adds a numeric feature ID (FID) column with unique values per
+    feature within the file.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: output vector layer name.
+    :param out_format: output file format (default GPKG).
+    :param out_col: The output FID column name (Default: fid)
+
+    """
+    import geopandas
+    import numpy
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    base_gpdf[out_col] = numpy.arange(1, (base_gpdf.shape[0])+1, 1, dtype=int)
+
+    if out_format == 'GPKG':
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def get_vec_cols_as_array(vec_file:str, vec_lyr:str, cols: list, lower_limit:float =None, upper_limit:float =None):
+    """
+    A function returns an nxm numpy array with the values for the columns specified.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param cols: list of columns to be read and returned.
+    :param no_data_val: no data value used within the column values. Rows with
+                        a no data value will be dropped. If None then ignored
+                        (Default: None)
+
+    """
+    import geopandas
+    import rsgislib.tools.stats
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    sub_base_gpdf = base_gpdf.loc[:, cols]
+    out_arr = sub_base_gpdf.values
+    out_arr = out_arr.astype(float)
+
+    out_arr = rsgislib.tools.stats.mask_data_to_valid(out_arr, lower_limit, upper_limit)
+
+    return out_arr
+
+

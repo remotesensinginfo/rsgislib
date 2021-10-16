@@ -3,7 +3,7 @@
 The tools.stats module contains some useful tools for calculating useful statistics which aren't
 easily available else where.
 """
-
+import numpy
 
 def calc_pandas_vif(df, cols=None):
     """
@@ -31,7 +31,6 @@ def calc_pandas_vif(df, cols=None):
     """
     # Import the linear model module.
     import sklearn.linear_model
-    import numpy
     import pandas
 
     # If the cols is None then get a list of all the columns
@@ -100,8 +99,6 @@ def cqv_threshold(df, cols=None, lowthreshold=0.25, highthreshold=0.75):
     :return: list of column names for good predictor variables
 
     """
-    import numpy
-
     # If the cols is None then get a list of all the columns
     if cols is None:
         cols = list(df.columns)
@@ -149,7 +146,6 @@ def corr_feature_selection(df, dep_vars, ind_vars, n_min_clusters=3, n_max_clust
     :return: list of column names for good predictor variables
 
     """
-    import numpy
     import tqdm
     import scipy.stats
     import sklearn.cluster
@@ -254,7 +250,6 @@ def lassolars_feature_selection(df, dep_vars, ind_vars, alpha_val=None):
     import sklearn.linear_model
     import sklearn.feature_selection
     import sklearn.exceptions
-    import numpy
 
     # Create the nd array from the pandas data range with all the predictor
     # variables listed.
@@ -311,7 +306,6 @@ def breusch_pagan_test(x, y):
 
     """
     import sklearn.linear_model
-    import numpy
 
     if x.shape[0] != y.shape[0]:
         raise SystemExit('Error: the number of samples differs between x and y.')
@@ -369,7 +363,6 @@ def bin_accuracy_scores_prob(y_true, y_prob):
     https://machinelearningmastery.com/how-to-score-probability-predictions-in-python
 
     """
-    import numpy
     # check inputs:
     if not isinstance(y_true, numpy.ndarray):
         y_true = numpy.array(y_true)
@@ -432,8 +425,6 @@ def accuracy_scores_binary(y_true, y_pred):
     Guisan et al. (2017). Habitat suitability and distribution models: with applications in R.
     
     """
-    import numpy
-
     # check inputs:
     if not isinstance(y_true, numpy.ndarray):
         y_true = numpy.array(y_true)
@@ -541,7 +532,6 @@ def get_nbins_histogram(data):
     :return: (n_bins, bin_width) n_bins: int for the number of bins. bin_width: float with the width of the bins.
 
     """
-    import numpy
     n = data.shape[0]
     lq = numpy.percentile(data, 25)
     uq = numpy.percentile(data, 75)
@@ -564,7 +554,6 @@ def get_bin_centres(bin_edges, geometric=False):
     :returns: bin_centres - numpy array
 
     """
-    import numpy
     if geometric:
         bin_centres = numpy.sqrt(bin_edges[1:] * bin_edges[:-1])
     else:
@@ -583,7 +572,6 @@ def calc_otsu_threshold(data):
     :returns: float (threshold)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     # Calculate the histogram
@@ -624,7 +612,6 @@ def calc_yen_threshold(data):
     :returns: float (threshold)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     # Calculate the histogram
@@ -663,7 +650,6 @@ def calc_isodata_threshold(data):
     :returns: float (threshold)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     # Calculate the histogram
@@ -741,7 +727,6 @@ def calc_hist_cross_entropy(data, threshold):
     :returns: float (cross-entropy target value)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     n_bins, bin_width = get_nbins_histogram(data)
@@ -790,7 +775,6 @@ def calc_li_threshold(data, tolerance=None, initial_guess=None):
     :returns: float (threshold)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     # At this point, the data only contains numpy.inf, -numpy.inf, or valid numbers
@@ -851,7 +835,7 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
     """
     import scipy.optimize
     import scipy.stats
-    import numpy
+
     if len(data.shape) > 1:
         raise Exception("Expecting a single variable.")
 
@@ -915,5 +899,82 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
         raise Exception("Optimisation failed, no threshold found.")
 
     return out_thres
+
+
+def mask_data_to_valid(data:numpy.array, lower_limit:float =None, upper_limit:float =None):
+    """
+    A function which removes rows from an nxm numpy array which are
+    not finite or outside of the upper and lower thresholds provided.
+
+    :param data: nxm numpy array (n rows, m features)
+    :param lower_limit: lower threshold valid data is greater than this value.
+    :param upper_limit: upper threshold valid data is lower than this value.
+
+    """
+    data = data[numpy.all(numpy.isfinite(data), axis=1)]
+    if lower_limit is not None:
+        data = data[numpy.all(data > lower_limit, axis=1)]
+    if upper_limit is not None:
+        data = data[numpy.all(data < upper_limit, axis=1)]
+    return data
+
+
+
+def bias_score(y_true, y_pred):
+    """
+    A function to calculate the regression model bias for each response variable
+    in a multivariate regression.
+
+    :param y_true: numpy.ndarray of true y values, shape=(n_samples, n_responses).
+    :param y_true: numpy.ndarray of predicted y values, shape=(n_samples, n_responses).
+    :return: bias (absolute bias), norm_bias (normalised bias (aka percentage bias))
+
+    """
+    import numpy
+    if not isinstance(y_true, numpy.ndarray):
+        y_true = numpy.array(y_true)
+    if not isinstance(y_pred, numpy.ndarray):
+        y_pred = numpy.array(y_pred)
+    if y_true.ndim != y_pred.ndim:
+        raise Exception('Error: y_true dimensions != y_pred.')
+    if y_true.size != y_pred.size:
+        raise Exception('Error: y_true size != y_pred.')
+
+    bias = numpy.mean(y_pred - y_true, axis=0)
+    norm_bias = (bias / numpy.mean(y_true, axis=0)) * 100
+    return bias, norm_bias
+
+
+def decompose_bias_variance(y_true, y_pred):
+    """
+    A function to perform bias-variance decomposition.
+    Decompose the mean squared error into: Bias^2 + Variance + Irreducible Error.
+    Useful example: https://towardsdatascience.com/mse-and-bias-variance-decomposition-77449dd2ff55
+
+    :param y_true: numpy.ndarray of true y values, shape=(n_samples, n_responses).
+    :param y_true: numpy.ndarray of predicted y values, shape=(n_samples, n_responses).
+    :return: set (mse, bias_squared, variance, noise)
+
+    """
+    import numpy
+    if not isinstance(y_true, numpy.ndarray):
+        y_true = numpy.array(y_true)
+    if not isinstance(y_pred, numpy.ndarray):
+        y_pred = numpy.array(y_pred)
+    if y_true.ndim != y_pred.ndim:
+        raise SystemExit('Error: y_true dimensions != y_pred.')
+    if y_true.size != y_pred.size:
+        raise SystemExit('Error: y_true size != y_pred.')
+
+    mse = numpy.mean((y_pred - y_true) ** 2, axis=0)
+    bias_squared = numpy.mean(y_pred - y_true, axis=0) ** 2
+    variance = numpy.var(y_pred - y_true, axis=0)
+    noise = mse - (bias_squared + variance)
+    if isinstance(noise, numpy.ndarray):
+        noise[noise < 0] = 0
+    else:
+        if noise < 0:
+            noise = 0
+    return mse, bias_squared, variance, noise
 
 

@@ -732,7 +732,7 @@ image and threshold can be applied to this image. Note. the softmax score is not
     print("Applying the Classifier")
     applier.apply(_applyLGBMClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.imageutils.pop_img_stats(outScoreImg, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imageutils.pop_img_stats(outScoreImg, use_no_data=True, no_data_val=0, calc_pyramids=True)
 
     if outClassImg is not None:
         rsgislib.imagecalc.image_math(outScoreImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,

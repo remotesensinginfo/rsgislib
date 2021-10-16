@@ -2068,24 +2068,6 @@ def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_
         raise Exception("No output file as no features selected.")
 
 
-def get_unq_col_values(vec_file, vec_lyr, col_name):
-    """
-    A function which splits a vector layer by an attribute value into either different layers or different output
-    files.
-
-    :param vec_file: Input vector file
-    :param vec_lyr: Input vector layer
-    :param col_name: The column name for which a list of unique values will be returned.
-
-    """
-    import geopandas
-
-    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
-    unq_vals = base_gpdf[col_name].unique()
-    base_gpdf = None
-    return unq_vals
-
-
 
 def merge_vector_files(in_vec_files, out_vec_file, out_vec_lyr=None, out_format='GPKG', out_epsg=None):
     """
@@ -2547,5 +2529,79 @@ def add_geom_bbox_cols(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format=
 
 
 
+def split_vec_lyr_random_subset(vec_file: str, vec_lyr: str, out_main_vec_file: str, out_main_vec_lyr: str, out_smpl_vec_file: str, out_smpl_vec_lyr: str, n_smpl: int, out_format:str ='GPKG', rand_seed : int =None):
+    """
+    A function to split a vector layer into two subsets by randomly sampling the input file.
+    This function uses geopandas so that library must therefore be installed.
 
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer.
+    :param out_main_vec_file: Output vector file with the 'main' outputs (i.e., the remainder once the sample if taken)
+    :param out_main_vec_lyr: Output vector layer with the 'main' outputs (i.e., the remainder once the sample if taken)
+    :param out_smpl_vec_file: Output vector file with the sampled outputs
+    :param out_smpl_vec_lyr: Output vector layer with the sampled outputs
+    :param n_smpl: the number of samples to be randomly selected
+    :param out_format: The output format of the output file. (Default: GPKG)
+    :param rand_seed: A seed for the random number generator.
+
+    """
+    import geopandas
+    n_feats = get_vec_feat_count(vec_file, vec_lyr)
+    if n_smpl >= n_feats:
+        raise rsgislib.RSGISPyException("The number of samples must be less than the number of features in the file.")
+
+    # Read input vector file.
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    smpl_gpdf = base_gpdf.sample(n=n_smpl, random_state=rand_seed)
+    base_gpdf = base_gpdf.drop(smpl_gpdf.index)
+
+    if out_format == 'GPKG':
+        base_gpdf.to_file(out_main_vec_file, layer=out_main_vec_lyr, driver=out_format)
+        smpl_gpdf.to_file(out_smpl_vec_file, layer=out_smpl_vec_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(out_main_vec_file, driver=out_format)
+        smpl_gpdf.to_file(out_smpl_vec_file, driver=out_format)
+
+
+def create_train_test_smpls(vec_file: str, vec_lyr: str, out_train_vec_file: str, out_train_vec_lyr: str, out_test_vec_file: str, out_test_vec_lyr: str, out_format: str="GPKG", prop_test: float =0.2, tmp_dir: str='./tmp', rand_seed: int=None):
+    """
+    A function for splitting a vector dataset into training and testing datasets.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer.
+    :param out_train_vec_file: Output vector file with the training data.
+    :param out_train_vec_lyr: Output vector layer with the training data.
+    :param out_test_vec_file: Output vector file with the testing data.
+    :param out_test_vec_lyr: Output vector layer with the testing data.
+    :param out_format: The output format of the output file. (Default: GPKG)
+    :param prop_test: Proportion of the dataset to be defined as a the test data
+    :param tmp_dir: a temporary directory for intimediate outputs.
+    :param rand_seed: A seed for the random number generator.
+
+    """
+    import rsgislib.vectorattrs
+    import rsgislib.tools.filetools
+
+    created_tmp_dir = False
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+        created_tmp_dir = True
+
+    basename = rsgislib.tools.filetools.get_file_basename(vec_file)
+
+    vec_fid_file = os.path.join(tmp_dir, "{}_fid.gpkg".format(basename))
+    rsgislib.vectorattrs.add_fid_col(vec_file, vec_lyr, vec_fid_file, vec_lyr)
+
+    n_feats = get_vec_feat_count(vec_file, vec_lyr)
+
+    n_test_feats = int(n_feats * prop_test)
+    print("Number of Training Features: {}".format(n_feats - n_test_feats))
+    print("Number of Testing Features: {}".format(n_test_feats))
+
+    split_vec_lyr_random_subset(vec_fid_file, vec_lyr, out_train_vec_file, out_train_vec_lyr, out_test_vec_file, out_test_vec_lyr, n_test_feats, out_format=out_format, rand_seed=rand_seed)
+
+    if created_tmp_dir:
+        import shutil
+        shutil.rmtree(tmp_dir)
 

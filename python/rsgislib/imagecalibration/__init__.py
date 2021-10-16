@@ -103,7 +103,7 @@ Example::
         rsgislib.imageutils.set_band_names(outputFile, bandNames)
     
     if calcStatsPyd:
-        rsgislib.imageutils.pop_img_stats(outputFile, usenodataval=True, nodataval=noDataVal, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(outputFile, use_no_data=True, no_data_val=noDataVal, calc_pyramids=True)
 
 
 
@@ -386,7 +386,7 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
         outBand = outBand + 1
         
     rsgislib.imagecalc.rescale_img_pxl_vals(srefScaledImg, outImage, gdalformat, dataType, bandRescaleSREF, trim2Limits=True)
-    rsgislib.imageutils.pop_img_stats(outImage, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imageutils.pop_img_stats(outImage, use_no_data=True, no_data_val=0, calc_pyramids=True)
     
     if not tmpPresent:
         shutil.rmtree(tmpImgDIR, ignore_errors=True)

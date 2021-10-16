@@ -96,22 +96,52 @@ def get_pls_obj_params(n_predictors):
     return pls_obj, pls_grid, False
 
 
-def create_search_obj(regrs_obj, regrs_params, n_sims=250, n_cv=5, n_cores=1):
+def create_search_obj(regrs_obj, regrs_params, n_runs=250, n_cv=5, n_cores=1):
     """
+    A function which creates a scikit-learn search object (i.e., GridSearchCV or
+    RandomizedSearchCV) to be used within the perform_search_param_opt function
+    to identify the optimal algorithms for the algorithm.
+
+    Default is to use a Grid Search which tries all combinations but if that
+    is too many runs then a random search is used.
+
+    :param regrs_obj: The scikit-learn object (e.g., ExtraTreesRegressor)
+    :param regrs_params: a dict of the parameters to search. i.e., provided by
+                         get_XX_obj_params functions (e.g., get_et_obj_params)
+    :param n_runs: The maximum number of runs to perform. If the required number of
+                   runs is > n_runs then RandomizedSearchCV is used.
+    :param n_cv: the number of cross-validations to use for the analysis
+    :param n_cores: the number of cores to use.
+    :return: the instance of a scikit-learn BaseSearchCV (i.e., either GridSearchCV
+             or RandomizedSearchCV)
+
     """
     from sklearn.model_selection import ParameterGrid
     from sklearn.model_selection import RandomizedSearchCV
     from sklearn.model_selection import GridSearchCV
     
-    if len(ParameterGrid(regrs_params)) > n_sims:
+    if len(ParameterGrid(regrs_params)) > n_runs:
         skl_srch_obj = GridSearchCV(regrs_obj, regrs_params, scoring='neg_mean_squared_error', cv=n_cv, n_jobs=n_cores, verbose=1)
     else:
-        skl_srch_obj = RandomizedSearchCV(regrs_obj, regrs_params, scoring='neg_mean_squared_error', cv=n_cv, n_iter=n_sims, n_jobs=n_cores, verbose=1)
+        skl_srch_obj = RandomizedSearchCV(regrs_obj, regrs_params, scoring='neg_mean_squared_error', cv=n_cv, n_iter=n_runs, n_jobs=n_cores, verbose=1)
     
     return skl_srch_obj
 
 def perform_search_param_opt(opt_params_file, x, y, skl_srch_obj=None, data_scaler=None):
     """
+    A function which performs a parameter optimisation using an instance of a
+    scikit-learn BaseSearchCV (i.e., either GridSearchCV or RandomizedSearchCV).
+
+    :param opt_params_file: output JSON file where there optimal parameters
+                            will be written.
+    :param x: The independent variables used to estimate y.
+    :param y: The dependent variable(s) to for the which the regression will be
+              carried out.
+    :param skl_srch_obj: a scikit-learn BaseSearchCV (i.e., either GridSearchCV or
+                         RandomizedSearchCV) instance.
+    :param data_scaler: optional data scaler from scikit learn
+    :return: the optimal scikit learn regression object.
+    
     """
     import json
     import numpy
@@ -132,11 +162,26 @@ def perform_search_param_opt(opt_params_file, x, y, skl_srch_obj=None, data_scal
 
 def perform_kfold_fit(skl_regrs_obj, x, y, n_splits=5, repeats=1, shuffle=False, data_scaler=None):
     """
+    A function which performs a k-fold fitting of a regression model to a dataset
+    to estimate the output model variance in the relevant summary metrics.
+
+    :param skl_regrs_obj: A scikit learn regression object.
+    :param x: The independent variables used to estimate y.
+    :param y: The dependent variable(s) to for the which the regression will be
+              carried out.
+    :param n_splits: number of splits to perform
+    :param repeats: the number of times to repeat each split.
+    :param shuffle: if not using repeats and shuffle=True then the data will be
+                    shuffled before splitting.
+    :param data_scaler: optional data scaler from scikit learn
+    :return: acc_metrics, residuals
+
     """
     from sklearn.model_selection import KFold, RepeatedKFold
     import sklearn.metrics
     import numpy
-    import stats_tools
+    import rsgislib.tools.stats
+    import tqdm
     
     if repeats > 1:
         kf = RepeatedKFold(n_splits=n_splits, n_repeats=repeats)
@@ -164,7 +209,7 @@ def perform_kfold_fit(skl_regrs_obj, x, y, n_splits=5, repeats=1, shuffle=False,
         acc_metrics_dict['noise'] = list()
         acc_metrics.append(acc_metrics_dict)
     
-    for train_idx, test_idx in kf.split(x):
+    for train_idx, test_idx in tqdm.tqdm(kf.split(x)):
         x_train, x_test = x[train_idx], x[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
         y_true.append(y_test)
@@ -189,10 +234,10 @@ def perform_kfold_fit(skl_regrs_obj, x, y, n_splits=5, repeats=1, shuffle=False,
             rmse = numpy.sqrt(sklearn.metrics.mean_squared_error(y_test[...,i], y_hat[...,i]))
             acc_metrics[i]['root_mean_squared_error'].append(rmse)
             acc_metrics[i]['norm_root_mean_squared_error'].append(100*(rmse/numpy.mean(y_test[...,i])))
-            bias, norm_bias = stats_tools.bias_score(y_test[...,i], y_hat[...,i])
+            bias, norm_bias = rsgislib.tools.stats.bias_score(y_test[...,i], y_hat[...,i])
             acc_metrics[i]['bias'].append(bias)
             acc_metrics[i]['norm_bias'].append(norm_bias)
-            mse, bias_squared, variance, noise = stats_tools.decompose_bias_variance(y_test[...,i], y_hat[...,i])
+            mse, bias_squared, variance, noise = rsgislib.tools.stats.decompose_bias_variance(y_test[...,i], y_hat[...,i])
             acc_metrics[i]['bias_squared'].append(bias_squared)
             acc_metrics[i]['variance'].append(variance)
             acc_metrics[i]['noise'].append(noise)
@@ -217,7 +262,26 @@ def perform_kfold_fit(skl_regrs_obj, x, y, n_splits=5, repeats=1, shuffle=False,
 
 def apply_regress_sklearn_mdl(regrs_mdl, n_out_vars, predictor_img, predictor_img_bands, vld_msk_img, vld_msk_val, out_img, gdalformat='KEA', out_band_names=None, calc_stats=True, out_no_date_val=0.0):
     """
+
+    :param regrs_mdl: the scikit-learn model
+    :param n_out_vars: the number of output variables (i.e., image bands)
+    :param predictor_img: the input image file providing the independent predictor
+                          variables used as the inputs to the model.
+    :param predictor_img_bands: list of the image bands used. Ensure this is in the
+                                same order as the variables used to train the model.
+    :param vld_msk_img: An input image file defining where the model should be applied
+    :param vld_msk_val: the pixel value within the vld_msk_img specifying the pixels
+                        to which the model should be applied to.
+    :param out_img: the output image file path.
+    :param gdalformat: output image file format (Default: KEA)
+    :param out_band_names: Optional list of band names for the output image. If None
+                           (Default) then not band names will be defined.
+    :param calc_stats: boolean specifying whether image statistics and pyramids
+                       should be build (default: True)
+    :param out_no_date_val: Output no data value to be used within the image file.
+
     """
+
     from rios import applier
     from rios import cuiprogress
     import numpy
@@ -310,7 +374,7 @@ def apply_regress_sklearn_mdl(regrs_mdl, n_out_vars, predictor_img, predictor_im
             print("The number of output variables and the number of bands names provided do not match so ignoring.")
     
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(out_img, usenodataval=True, nodataval=out_no_date_val, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(out_img, use_no_data=True, no_data_val=out_no_date_val, calc_pyramids=True)
     
     
     

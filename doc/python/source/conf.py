@@ -65,7 +65,7 @@ copyright = u'{}, Pete Bunting and Daniel Clewley'.format(datetime.datetime.now(
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-version_str = '{}'.format(rsgislib.getRSGISLibVersion())
+version_str = '{}'.format(rsgislib.get_rsgislib_version())
 version_comps = version_str.split('.')
 short_version = '{}.{}'.format(version_comps[0], version_comps[1])
 # The short X.Y version.
@@ -118,7 +118,8 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #html_theme = 'default'
-html_theme = 'python_docs_theme'
+#html_theme = 'python_docs_theme'
+html_theme = 'karma_sphinx_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -151,11 +152,11 @@ html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
-#html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
-#html_use_smartypants = True
+html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
@@ -193,8 +194,7 @@ html_use_opensearch = 'True'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'RSGISLibdoc'
 
-extlinks = {'issue': ('https://bitbucket.org/petebunting/rsgislib/issue/%s/',
-                      'issue ')}
+extlinks = {'issue': ('https://github.com/remotesensinginfo/rsgislib/issues')}
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -276,4 +276,4 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+#intersphinx_mapping = {'http://docs.python.org/': None}

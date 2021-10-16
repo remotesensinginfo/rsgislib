@@ -166,4 +166,4 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
 
     rsgislib.rastergis.pop_rat_img_stats(clumps_img=out_lbls_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     if out_scores_img is not None:
-        rsgislib.imageutils.pop_img_stats(out_scores_img, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(out_scores_img, use_no_data=True, no_data_val=0, calc_pyramids=True)

@@ -1414,7 +1414,7 @@ def calc_dist_to_classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSi
         distImage = outImgBase + '_' + str(classID) + '.kea'
         # Mosaic Tiles
         imageutils.create_img_mosaic(distTiles, distImage, nodata, nodata, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
-        imageutils.pop_img_stats(distImage, usenodataval=True, nodataval=nodata, calcpyramids=True)
+        imageutils.pop_img_stats(distImage, use_no_data=True, no_data_val=nodata, calc_pyramids=True)
         for imgFile in distTiles:
             rsgislib.tools.filetools.delete_file_with_basename(imgFile)
     

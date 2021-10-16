@@ -175,21 +175,25 @@ INTERP_AVERAGE = 5
 INTERP_MODE = 6
 
 
-def getRSGISLibVersion():
+def get_rsgislib_version():
     """ Calls rsgis-config to get the version number. """
 
     # Try calling rsgis-config to get minor version number
     try:
-        import subprocess
-        out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (stdout, stderr) = out.communicate()
-        versionStr = stdout.decode()
-        versionStr = versionStr.split('\n')[0]
+        import distutils.spawn
+        if distutils.spawn.find_executable("rsgis-config") is not None:
+            import subprocess
+            out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            (stdout, stderr) = out.communicate()
+            version_str = stdout.decode()
+            version_str = version_str.split('\n')[0]
+        else:
+            version_str = 'NA.NA'
     except Exception:
-        versionStr = 'NA'
-    return(versionStr)
+        version_str = 'NA.NA'
+    return(version_str)
 
-__version__ = getRSGISLibVersion()
+__version__ = get_rsgislib_version()
 
 py_sys_version_str = "{}.{}".format(sys.version_info.major, sys.version_info.minor)
 py_sys_version_flt = float(py_sys_version_str)

@@ -2798,7 +2798,7 @@ def spectral_smoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_
     applier.apply(_applySmoothing, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, usenodataval=True, nodataval=in_no_date, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(output_img, use_no_data=True, no_data_val=in_no_date, calc_pyramids=True)
 
 
 def calc_wsg84_pixel_size(img, out_img, gdalformat='KEA'):

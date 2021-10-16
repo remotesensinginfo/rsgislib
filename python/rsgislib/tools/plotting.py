@@ -340,6 +340,121 @@ Example::
         raise e
 
 
+def residual_plot(y_true, residuals, out_file, out_format='PNG', title=None):
+    """
+    A function to create a residual plot to investigate the
+    normality and homoscedasticity of model residuals.
+
+    :param y_true: A numpy 1D array containing true/observed values.
+    :param residuals: A numpy 1D array containing model residuals.
+    :param out_file: Path to the output file.
+    :param out_format: Output format supported by matplotlib (e.g. "PNG" or "PDF"). Default: PNG
+    :param title: A title for the plot. Optional, if None then ignored. (Default: None)
+
+    """
+    import numpy
+    import matplotlib.pyplot as plt
+    from matplotlib import rcParams
+    from matplotlib import gridspec
+
+    if not isinstance(residuals, numpy.ndarray):
+        residuals = numpy.array(residuals)
+    if not isinstance(y_true, numpy.ndarray):
+        y_true = numpy.array(y_true)
+    if y_true.ndim != 1:
+        raise Exception('y_true has more than 1 dimension.')
+    if residuals.ndim != 1:
+        raise Exception('Residuals has more than 1 dimension.')
+    if residuals.size != y_true.size:
+        raise Exception('y_true.size != residuals.size.')
+
+    # setup plot:
+    # rcParams.update({'font.family': 'cmr10'})  # use latex fonts.
+    # rcParams['axes.unicode_minus'] = False
+    rcParams.update({'font.size': 8.5})
+    rcParams['axes.linewidth'] = 0.5
+    rcParams['xtick.major.pad'] = '2'
+    rcParams['ytick.major.pad'] = '2'
+    fig = plt.figure(figsize=(5, 2.5))
+    gs = gridspec.GridSpec(nrows=1, ncols=2, width_ratios=[3.5, 1])
+    ax1 = plt.subplot(gs[0])
+    ax2 = plt.subplot(gs[1])
+    plt.tight_layout(w_pad=-1, h_pad=0)
+
+    # draw scatterplot:
+    ax1.axhline(y=0.0, c='k', ls=':', lw=0.5, zorder=2)
+    ax1.scatter(y_true, residuals, s=16, color='C0', marker='.', linewidth=0, zorder=1)
+    ax1.set_xlabel('Observed value', fontsize=9)
+    ax1.set_ylabel('Residuals', fontsize=9)
+    if title is not None:
+        ax1.set_title(title)
+
+    # draw histogram:
+    ax2.get_xaxis().tick_bottom()
+    ax2.get_yaxis().tick_right()
+    ax2.get_yaxis().set_visible(False)
+    ax2.hist(residuals, bins=50, orientation='horizontal', color='C0')
+    ax2.axhline(y=0.0, c='k', ls=':', lw=0.5, zorder=2)
+    ax2.set_xlabel('Frequency', fontsize=9)
+    plt.savefig(out_file, format=out_format, dpi=300, bbox_inches='tight')
+    plt.close()
+
+
+def quantile_plot(residuals, ylabel, out_file, out_format='PNG', title=None):
+    """
+    A function to create a Quantile-Quantile plot to investigate the
+    normality of model residuals.
+
+    :param residuals: A numpy 1D array containing model residuals.
+    :param ylabel: A string defining a label for the y axis
+    :param out_file: Path to the output file.
+    :param out_format: Output format supported by matplotlib (e.g. "PNG" or "PDF"). Default: PNG
+    :param title: A title for the plot. Optional, if None then ignored. (Default: None)
+
+    """
+    import numpy
+    import matplotlib.pyplot as plt
+    from matplotlib import rcParams
+    from scipy.stats import probplot
+
+    if not isinstance(residuals, numpy.ndarray):
+        residuals = numpy.array(residuals)
+
+        # rcParams.update({'font.family': 'cmr10'})  # use latex fonts.
+    # rcParams['axes.unicode_minus'] = False
+    rcParams.update({'font.size': 8.5})
+    rcParams['axes.linewidth'] = 0.5
+    rcParams['xtick.major.pad'] = '2'
+    rcParams['ytick.major.pad'] = '2'
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.5, 2.5))
+    ax.get_yaxis().set_tick_params(which='major', direction='out')
+    ax.get_xaxis().set_tick_params(which='major', direction='out')
+    ax.get_xaxis().set_tick_params(which='minor', direction='out', length=0, width=0)
+    ax.get_yaxis().set_tick_params(which='minor', direction='out', length=0, width=0)
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.xaxis.set_tick_params(width=0.5)
+    ax.yaxis.set_tick_params(width=0.5)
+
+    probplot(residuals, dist='norm', plot=ax)
+
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title('')
+    ax.set_ylabel(ylabel)
+    ax.get_lines()[0].set_marker('.')
+    ax.get_lines()[0].set_markerfacecolor('k')
+    ax.get_lines()[0].set_markeredgecolor('k')
+    ax.get_lines()[0].set_markeredgewidth(0)
+    ax.get_lines()[0].set_markersize(4.0)
+    ax.get_lines()[1].set_linewidth(1.0)
+    ax.get_lines()[1].set_color('r')
+    plt.savefig(out_file, format=out_format, dpi=300, bbox_inches='tight')
+    plt.close()
+
 
 
 

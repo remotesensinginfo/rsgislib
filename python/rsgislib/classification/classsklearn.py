@@ -299,7 +299,7 @@ This function uses a trained classifier and applies it to the provided input ima
     print("Completed")
     rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     if out_score_img:
-        rsgislib.imageutils.pop_img_stats(outScoreImg, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.pop_img_stats(outScoreImg, use_no_data=True, no_data_val=0, calc_pyramids=True)
 
     if classClrNames:
         ratDataset = gdal.Open(outputImg, gdal.GA_Update)

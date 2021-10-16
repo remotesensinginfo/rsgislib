@@ -137,7 +137,7 @@ the maximum NDVI.
         
         if calcStats:
             # Calc Stats
-            rsgislib.imageutils.pop_img_stats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+            rsgislib.imageutils.pop_img_stats(outCompImg, use_no_data=True, no_data_val=0, calc_pyramids=True)
     
         if not refImgTmpPresent:
             shutil.rmtree(refLayersPath, ignore_errors=True)
@@ -305,7 +305,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
         
         if calcStats:
             # Calc Stats
-            rsgislib.imageutils.pop_img_stats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+            rsgislib.imageutils.pop_img_stats(outCompImg, use_no_data=True, no_data_val=0, calc_pyramids=True)
         
         if not refImgTmpPresent:
             shutil.rmtree(refLayersPath, ignore_errors=True)
@@ -535,7 +535,7 @@ used to define the spatial extent of the output images and spatial projection.
             
             if calcStats:
                 # Calc Stats
-                rsgislib.imageutils.pop_img_stats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+                rsgislib.imageutils.pop_img_stats(outCompImg, use_no_data=True, no_data_val=0, calc_pyramids=True)
             
             if not refImgTmpPresent:
                 shutil.rmtree(refLayersPath, ignore_errors=True)
@@ -783,7 +783,7 @@ used to define the spatial extent of the output images and spatial projection.
 
             if calcStats:
                 # Calc Stats
-                rsgislib.imageutils.pop_img_stats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+                rsgislib.imageutils.pop_img_stats(outCompImg, use_no_data=True, no_data_val=0, calc_pyramids=True)
 
             if not refImgTmpPresent:
                 shutil.rmtree(refLayersPath, ignore_errors=True)

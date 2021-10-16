@@ -457,7 +457,7 @@ def create_mbtile_file(input_img, bands, output_mbtiles, scale_input_img=50, img
     trans_opt = gdal.TranslateOptions(format='MBTiles', widthPct=scale_input_img, heightPct=scale_input_img, noData=0,
                                       options=["TILE_FORMAT={}".format(tile_format)], callback=callback)
     gdal.Translate(output_mbtiles, stretchImgReProj, options=trans_opt)
-    rsgislib.imageutils.pop_img_stats(output_mbtiles, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imageutils.pop_img_stats(output_mbtiles, use_no_data=True, no_data_val=0, calc_pyramids=True)
     shutil.rmtree(tmpDIR)
 
 
@@ -570,7 +570,7 @@ def create_webtiles_vis_gtiff_img(input_img, bands, output_dir, scaled_gtiff_img
         subprocess.check_call(cmd, shell=True)
     except OSError as e:
         raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
-    rsgislib.imageutils.pop_img_stats(scaled_gtiff_img, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imageutils.pop_img_stats(scaled_gtiff_img, use_no_data=True, no_data_val=0, calc_pyramids=True)
     shutil.rmtree(tmpDIR)
 
 

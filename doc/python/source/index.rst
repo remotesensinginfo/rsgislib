@@ -36,19 +36,19 @@ Python documentation
    rsgislib_calibration
    rsgislib_changedetection
    rsgislib_classification
-   rsgislib_datacube
    rsgislib_elevation
-   rsgislib_histocube
    rsgislib_imagecalc
    rsgislib_imagefilter
    rsgislib_imagemorphology
    rsgislib_imageregistration
    rsgislib_imageutils
    rsgislib_rastergis
-   rsgislib_sdm
+   rsgislib_regression
    rsgislib_segmentation
    rsgislib_timeseries
    rsgislib_tools
+   rsgislib_vectorattrs
+   rsgislib_vectorgeoms
    rsgislib_vectorutils
    rsgislib_zonalstats
 

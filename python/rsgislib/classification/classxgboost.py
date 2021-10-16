@@ -564,7 +564,7 @@ image and threshold can be applied to this image.
     print("Applying the Classifier")
     applier.apply(_applyXGBClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.imageutils.pop_img_stats(out_prob_img, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imageutils.pop_img_stats(out_prob_img, use_no_data=True, no_data_val=0, calc_pyramids=True)
 
     if out_class_img is not None:
         rsgislib.imagecalc.image_math(out_prob_img, out_class_img, 'b1>{}?1:0'.format(class_thres), gdalformat,
