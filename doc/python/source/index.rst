@@ -33,14 +33,15 @@ Python documentation
    :maxdepth: 1
 
    rsgislib
-   rsgislib_calibration
    rsgislib_changedetection
    rsgislib_classification
    rsgislib_elevation
    rsgislib_imagecalc
+   rsgislib_imagecalibration
    rsgislib_imagefilter
    rsgislib_imagemorphology
    rsgislib_imageregistration
+   rsgislib_imagecalc_spectralunmixing
    rsgislib_imageutils
    rsgislib_rastergis
    rsgislib_regression

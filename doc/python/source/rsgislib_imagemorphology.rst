@@ -1,30 +1,26 @@
 RSGISLib Image Morphology Module
 ===================================
 
-.. automodule:: rsgislib.imagemorphology
-   :members:
-   :undoc-members:
-
 Generate Operator
 -----------------
 
-.. autofunction:: rsgislib.imagemorphology.createCircularOp
+.. autofunction:: rsgislib.imagemorphology.create_circular_op
 
 Morphology Operations
 ---------------------
 
-.. autofunction:: rsgislib.imagemorphology.imageDilate
-.. autofunction:: rsgislib.imagemorphology.imageDilateCombinedOut
-.. autofunction:: rsgislib.imagemorphology.imageErode
-.. autofunction:: rsgislib.imagemorphology.imageErodeCombinedOut
-.. autofunction:: rsgislib.imagemorphology.imageGradiant
-.. autofunction:: rsgislib.imagemorphology.imageGradiantCombinedOut
-.. autofunction:: rsgislib.imagemorphology.imageLocalMinima
-.. autofunction:: rsgislib.imagemorphology.imageLocalMinimaCombinedOut
-.. autofunction:: rsgislib.imagemorphology.imageOpening
-.. autofunction:: rsgislib.imagemorphology.imageClosing
-.. autofunction:: rsgislib.imagemorphology.imageBlackTopHat
-.. autofunction:: rsgislib.imagemorphology.imageWhiteTopHat
+.. autofunction:: rsgislib.imagemorphology.image_dilate
+.. autofunction:: rsgislib.imagemorphology.image_dilate_combined_out
+.. autofunction:: rsgislib.imagemorphology.image_erode
+.. autofunction:: rsgislib.imagemorphology.image_erode_combined_out
+.. autofunction:: rsgislib.imagemorphology.image_gradiant
+.. autofunction:: rsgislib.imagemorphology.image_gradiant_combined_out
+.. autofunction:: rsgislib.imagemorphology.image_local_minima
+.. autofunction:: rsgislib.imagemorphology.image_local_minima_combined_out
+.. autofunction:: rsgislib.imagemorphology.image_opening
+.. autofunction:: rsgislib.imagemorphology.image_closing
+.. autofunction:: rsgislib.imagemorphology.image_black_top_hat
+.. autofunction:: rsgislib.imagemorphology.image_white_top_hat
 
 * :ref:`genindex`
 * :ref:`modindex`

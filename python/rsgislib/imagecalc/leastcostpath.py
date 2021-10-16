@@ -34,7 +34,6 @@
 
 import osgeo.gdal as gdal
 import osgeo.osr as osr
-import skimage.graph
 import numpy
 
 def _coord2pixelOffset(rasterfn, x, y):
@@ -49,7 +48,7 @@ def _coord2pixelOffset(rasterfn, x, y):
     return xOffset,yOffset
 
 def _createPath(CostSurfaceImg, costSurfaceArray, startCoord, stopCoord):
-
+    import skimage.graph
     # coordinates to array index
     startCoordX = startCoord[0]
     startCoordY = startCoord[1]

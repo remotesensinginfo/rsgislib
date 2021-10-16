@@ -1,9 +1,6 @@
-RSGISLib Image Change Detection Module
-======================================
+RSGISLib Image Change Detection
+==================================
 
-.. automodule:: rsgislib.changedetect
-   :members:
-   :undoc-members:
 
 Image Pixel Change Detection
 -----------------------------

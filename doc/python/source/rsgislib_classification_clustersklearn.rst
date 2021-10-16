@@ -1,7 +1,5 @@
-RSGISLib Scikit-Learn Unsupervised Pixel Classification Module
-===============================================================
-
-.. automodule:: rsgislib.classification.clustersklearn
+RSGISLib Scikit-Learn Unsupervised Pixel Classification
+==========================================================
 
 
 To use the unsupervised classification functions you need to create an instance of a scikit-learn cluster (https://scikit-learn.org/stable/modules/clustering.html). For example K-Means::
