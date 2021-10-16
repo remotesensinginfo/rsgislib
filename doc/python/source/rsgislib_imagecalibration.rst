@@ -1,5 +1,5 @@
-RSGISLib Image Calibration Module
-=================================
+RSGISLib Image Calibration
+=============================
 .. automodule:: rsgislib.imagecalibration
    :members:
    :undoc-members:

@@ -1,5 +1,5 @@
-RSGISLib Image Filter Module
-=================================
+RSGISLib Image Filter
+=========================
 .. automodule:: rsgislib.imagefilter
 
 Tiled (Multi Processing Core) Filtering

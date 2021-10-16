@@ -1,5 +1,5 @@
-RSGISLib Image Morphology Module
-===================================
+RSGISLib Image Morphology
+============================
 
 Generate Operator
 -----------------

@@ -1,5 +1,5 @@
 RSGISLib Spectral Unmixing
-============================
+==============================
 
 
 Endmembers
