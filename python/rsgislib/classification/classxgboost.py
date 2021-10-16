@@ -51,7 +51,11 @@ from rios import applier
 from rios import cuiprogress
 from rios import rat
 
-import xgboost as xgb
+HAVE_XGBOOST = True
+try:
+    import xgboost as xgb
+except ImportError:
+    HAVE_XGBOOST = False
 
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import accuracy_score
@@ -81,6 +85,9 @@ def optimise_xgboost_binary_classifer(out_params_file, cls1_train_file, cls1_val
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
 
     """
+    if not HAVE_XGBOOST:
+        raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
+
     from skopt.space import Real, Integer
     from skopt import gp_minimize
 
@@ -205,8 +212,8 @@ def train_xgboost_binary_classifer(out_mdl_file, cls_params_file, cls1_train_fil
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
 
     """
-    from skopt.space import Real, Integer
-    from skopt import gp_minimize
+    if not HAVE_XGBOOST:
+        raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, 'r')
@@ -326,6 +333,9 @@ def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid
                             If None then no file will be outputted.
 
     """
+    if not HAVE_XGBOOST:
+        raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
+
     from skopt.space import Real, Integer
     from skopt import gp_minimize
 
@@ -509,6 +519,8 @@ image and threshold can be applied to this image.
 :param nthread: The number of threads to use for the classifier.
 
     """
+    if not HAVE_XGBOOST:
+        raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
     def _applyXGBClassifier(info, inputs, outputs, otherargs):
         outClassVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
@@ -593,6 +605,9 @@ def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, nthrea
     :param rnd_seed: the seed for the random selection of the training data.
 
     """
+    if not HAVE_XGBOOST:
+        raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
+
     from skopt.space import Real, Integer
     from skopt import gp_minimize
 
@@ -732,6 +747,9 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_d
     :param nthread: The number of threads to use to train the classifier.
 
     """
+    if not HAVE_XGBOOST:
+        raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
+
     n_classes = len(cls_info_dict)
     for clsname in cls_info_dict:
         if cls_info_dict[clsname].id >= n_classes:
@@ -845,6 +863,9 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=
     :param nthread: The number of threads to use to train the classifier.
 
     """
+    if not HAVE_XGBOOST:
+        raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
+
     from skopt.space import Real, Integer
     from skopt import gp_minimize
 
@@ -1010,6 +1031,8 @@ output image and threshold can be applied to this image.
 :param nthread: The number of threads to use for the classifier.
 
     """
+    if not HAVE_XGBOOST:
+        raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
     def _applyXGBMClassifier(info, inputs, outputs, otherargs):
         outClassIdVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
@@ -1126,6 +1149,9 @@ A function which will apply an XGBoost model within a Raster Attribute Table (RA
                       updated using the classification colours (default: True)
 :param nthread: The number of threads to use for the classifier.
 """
+    if not HAVE_XGBOOST:
+        raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
+
     from rios import ratapplier
 
     def _apply_rat_classifier(info, inputs, outputs, otherargs):

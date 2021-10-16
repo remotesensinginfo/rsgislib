@@ -8,7 +8,6 @@ Band & Image Maths
 .. autofunction:: rsgislib.imagecalc.image_math
 .. autofunction:: rsgislib.imagecalc.image_band_math
 .. autofunction:: rsgislib.imagecalc.all_bands_equal_to
-.. autofunction:: rsgislib.imagecalc.replaceValuesLessThan
 .. autoclass:: rsgislib.imagecalc.BandDefn
 
 
@@ -55,7 +54,6 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.perform_image_mnf
 .. autofunction:: rsgislib.imagecalc.calculate_img_band_rmse
 .. autofunction:: rsgislib.imagecalc.covariance
-.. autofunction:: rsgislib.imagecalc.correlation
 .. autofunction:: rsgislib.imagecalc.correlation_window
 .. autofunction:: rsgislib.imagecalc.calc_mask_img_pxl_val_prob
 .. autofunction:: rsgislib.imagecalc.calc_img_difference
@@ -73,7 +71,6 @@ Histogram
 Normalise
 ----------
 
-.. autofunction:: rsgislib.imagecalc.standardise
 .. autofunction:: rsgislib.imagecalc.normalise_image_band
 .. autofunction:: rsgislib.imagecalc.calc_img_rescale
 .. autofunction:: rsgislib.imagecalc.rescale_img_pxl_vals
