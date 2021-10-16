@@ -1,29 +1,34 @@
-RSGISLib Image Registration Module
-===================================
+RSGISLib Image Registration
+==============================
 
 .. automodule:: rsgislib.imageregistration
    :members:
    :undoc-members:
 
+
+Whole Image Shift
+---------------------
+
+.. autofunction:: rsgislib.imageregistration.find_image_offset
+.. autofunction:: rsgislib.imageregistration.apply_offset_to_image
+
+
+
 Tie Point Generation
 ---------------------
 
-.. autofunction:: rsgislib.imageregistration.basicregistration
-.. autofunction:: rsgislib.imageregistration.singlelayerregistration
+.. autofunction:: rsgislib.imageregistration.basic_registration
+.. autofunction:: rsgislib.imageregistration.single_layer_registration
 
 Warping
 --------
 
-.. autofunction:: rsgislib.imageregistration.nnwarp
-.. autofunction:: rsgislib.imageregistration.triangularwarp
-.. autofunction:: rsgislib.imageregistration.polywarp
-.. autofunction:: rsgislib.imageregistration.applyOffset2Image
-.. autofunction:: rsgislib.imageregistration.warpUseGCPsWithGDAL
+.. autofunction:: rsgislib.imageregistration.warp_with_gcps_with_gdal
 
 Other
 ------
 
-.. autofunction:: rsgislib.imageregistration.gcp2gdal
+.. autofunction:: rsgislib.imageregistration.gcp_to_gdal
 
 * :ref:`genindex`
 * :ref:`modindex`
