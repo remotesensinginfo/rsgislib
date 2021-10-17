@@ -53,7 +53,6 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.perform_image_pca
 .. autofunction:: rsgislib.imagecalc.perform_image_mnf
 .. autofunction:: rsgislib.imagecalc.calculate_img_band_rmse
-.. autofunction:: rsgislib.imagecalc.covariance
 .. autofunction:: rsgislib.imagecalc.correlation_window
 .. autofunction:: rsgislib.imagecalc.calc_mask_img_pxl_val_prob
 .. autofunction:: rsgislib.imagecalc.calc_img_difference

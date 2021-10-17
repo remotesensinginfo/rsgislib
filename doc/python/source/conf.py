@@ -17,6 +17,8 @@ import os
 import rsgislib
 import datetime
 
+import stanford_theme
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -119,7 +121,9 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #html_theme = 'default'
 #html_theme = 'python_docs_theme'
-html_theme = 'karma_sphinx_theme'
+#html_theme = 'karma_sphinx_theme'
+html_theme = 'stanford_theme'
+html_theme_path = [stanford_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -138,7 +142,7 @@ html_title = "RSGISLib"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "rsgislib-logo.png"
+html_logo = "rsgislib-logo-white-sml.png"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -175,7 +179,7 @@ html_use_smartypants = True
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 #html_show_sphinx = True
