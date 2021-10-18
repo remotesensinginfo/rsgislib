@@ -16,7 +16,7 @@ RSGISLib Image Utilities Module
 
 Image Stats and Pyramids
 ------------------------
-.. autofunction:: rsgislib.imageutils.popImageStats
+.. autofunction:: rsgislib.imageutils.pop_img_stats
 .. autofunction:: rsgislib.imageutils.combineImageOverviews
 
 
