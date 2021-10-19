@@ -64,29 +64,30 @@ from rios import cuiprogress
 from rios import rat
 
 
-def train_sklearn_classifer_gridsearch(classTrainInfo, paramSearchSampNum=0, gridSearch=GridSearchCV(RandomForestClassifier(), {})):
+def train_sklearn_classifer_gridsearch(cls_train_info, param_search_samp_num=0,
+                                       grid_search=GridSearchCV(RandomForestClassifier(), {})):
     """
 A function to find the 'optimal' parameters for classification using a Grid Search
 (http://scikit-learn.org/stable/modules/grid_search.html).
 The returned classifier instance will be trained using all the inputted data.
 
-:param classTrainInfo: list of rsgislib.classification.ClassSimpleInfoObj objects which will be used to
+:param cls_train_info: list of rsgislib.classification.ClassSimpleInfoObj objects which will be used to
                        train the classifier.
-:param paramSearchSampNum: the number of samples that will be randomly sampled from the training data for each class
+:param param_search_samp_num: the number of samples that will be randomly sampled from the training data for each class
                            for applying the grid search (tend to use a small data sample as can take a long time).
                            A value of 500 would use 500 samples per class.
-:param gridSearch: is an instance of the sklearn.model_selection.GridSearchCV with an instance of the choosen
+:param grid_search: is an instance of the sklearn.model_selection.GridSearchCV with an instance of the choosen
                    classifier and parameters to be searched.
 
     """
-    if len(classTrainInfo) < 2:
+    if len(cls_train_info) < 2:
         rsgislib.RSGISPyException(
             "Need at least 2 classes to be worth running findClassifierParametersAndTrain function.")
 
     first = True
     numVars = 0
     numVals = 0
-    for classInfoVal in classTrainInfo.values():
+    for classInfoVal in cls_train_info.values():
         dataShp = h5py.File(classInfoVal.file_h5, 'r')['DATA/DATA'].shape
         if first:
             numVars = dataShp[1]
@@ -96,70 +97,70 @@ The returned classifier instance will be trained using all the inputted data.
     dataArr = numpy.zeros([numVals, numVars], dtype=float)
     classArr = numpy.zeros([numVals], dtype=int)
 
-    if paramSearchSampNum != 0:
-        dataArrSamp = numpy.zeros([(len(classTrainInfo) * paramSearchSampNum), numVars], dtype=float)
-        classArrSamp = numpy.zeros([(len(classTrainInfo) * paramSearchSampNum)], dtype=int)
+    if param_search_samp_num != 0:
+        dataArrSamp = numpy.zeros([(len(cls_train_info) * param_search_samp_num), numVars], dtype=float)
+        classArrSamp = numpy.zeros([(len(cls_train_info) * param_search_samp_num)], dtype=int)
 
     rowInit = 0
     rowInitSamp = 0
-    for key in classTrainInfo:
+    for key in cls_train_info:
         # Open the dataset
-        f = h5py.File(classTrainInfo[key].file_h5, 'r')
+        f = h5py.File(cls_train_info[key].file_h5, 'r')
         numRows = f['DATA/DATA'].shape[0]
         # Copy data and populate classid array
         dataArr[rowInit:(rowInit + numRows)] = f['DATA/DATA']
-        classArr[rowInit:(rowInit + numRows)] = classTrainInfo[key].id
-        if paramSearchSampNum != 0:
+        classArr[rowInit:(rowInit + numRows)] = cls_train_info[key].id
+        if param_search_samp_num != 0:
             # Create random index to sample the whole dataset.
-            sampleIdxs = numpy.random.randint(0, high=numRows, size=paramSearchSampNum)
+            sampleIdxs = numpy.random.randint(0, high=numRows, size=param_search_samp_num)
             # Sample the input data for classifier optimisation.
-            dataArrSamp[rowInitSamp:(rowInitSamp + paramSearchSampNum)] = dataArr[rowInit:(rowInit + numRows)][sampleIdxs]
-            classArrSamp[rowInitSamp:(rowInitSamp + paramSearchSampNum)] = classTrainInfo[key].id
-            rowInitSamp += paramSearchSampNum
+            dataArrSamp[rowInitSamp:(rowInitSamp + param_search_samp_num)] = dataArr[rowInit:(rowInit + numRows)][sampleIdxs]
+            classArrSamp[rowInitSamp:(rowInitSamp + param_search_samp_num)] = cls_train_info[key].id
+            rowInitSamp += param_search_samp_num
         rowInit += numRows
         f.close()
 
-    if paramSearchSampNum == 0:
+    if param_search_samp_num == 0:
         dataArrSamp = dataArr
         classArrSamp = classArr
 
     print("Training data size: {} x {}".format(dataArr.shape[0], dataArr.shape[1]))
     print("Training Sample data size: {} x {}".format(dataArrSamp.shape[0], dataArrSamp.shape[1]))
 
-    gridSearch.fit(dataArrSamp, classArrSamp)
-    if not gridSearch.refit:
+    grid_search.fit(dataArrSamp, classArrSamp)
+    if not grid_search.refit:
         raise Exception("Grid Search did no find a fit therefore failed...")
 
-    print("Best score was {} and has parameters {}.".format(gridSearch.best_score_, gridSearch.best_params_))
+    print("Best score was {} and has parameters {}.".format(grid_search.best_score_, grid_search.best_params_))
 
     print('Training Classifier')
-    gridSearch.best_estimator_.fit(dataArr, classArr)
+    grid_search.best_estimator_.fit(dataArr, classArr)
     print("Completed")
 
     print('Calc Classifier Accuracy')
-    accVal = gridSearch.best_estimator_.score(dataArr, classArr)
+    accVal = grid_search.best_estimator_.score(dataArr, classArr)
     print('Classifier Train Score = {}%'.format(round(accVal * 100, 2)))
 
-    return gridSearch.best_estimator_
+    return grid_search.best_estimator_
 
 
-def train_sklearn_classifier(classTrainInfo, skClassifier):
+def train_sklearn_classifier(cls_train_info, sk_classifier):
     """
 This function trains the classifier.
 
-:param classTrainInfo: list of rsgislib.classification.ClassSimpleInfoObj objects which will be used to
+:param cls_train_info: list of rsgislib.classification.ClassSimpleInfoObj objects which will be used to
                        train the classifier.
-:param skClassifier: an instance of a parameterised scikit-learn classifier
+:param sk_classifier: an instance of a parameterised scikit-learn classifier
                      (http://scikit-learn.org/stable/supervised_learning.html)
 
     """
-    if len(classTrainInfo) < 2:
+    if len(cls_train_info) < 2:
         rsgislib.RSGISPyException("Need at least 2 classes to be worth running trainClassifier function.")
 
     first = True
     numVars = 0
     numVals = 0
-    for classInfoVal in classTrainInfo.values():
+    for classInfoVal in cls_train_info.values():
         dataShp = h5py.File(classInfoVal.file_h5, 'r')['DATA/DATA'].shape
         if first:
             numVars = dataShp[1]
@@ -170,75 +171,77 @@ This function trains the classifier.
     classArr = numpy.zeros([numVals], dtype=int)
 
     rowInit = 0
-    for key in classTrainInfo:
+    for key in cls_train_info:
         # Open the dataset
-        f = h5py.File(classTrainInfo[key].file_h5, 'r')
+        f = h5py.File(cls_train_info[key].file_h5, 'r')
         numRows = f['DATA/DATA'].shape[0]
         # Copy data and populate classid array
         dataArr[rowInit:(rowInit + numRows)] = f['DATA/DATA']
-        classArr[rowInit:(rowInit + numRows)] = classTrainInfo[key].id
+        classArr[rowInit:(rowInit + numRows)] = cls_train_info[key].id
         rowInit += numRows
         f.close()
 
     print("Training data size: {} x {}".format(dataArr.shape[0], dataArr.shape[1]))
 
     print('Training Classifier')
-    skClassifier.fit(dataArr, classArr)
+    sk_classifier.fit(dataArr, classArr)
     print("Completed")
 
     print('Calc Classifier Accuracy')
-    accVal = skClassifier.score(dataArr, classArr)
+    accVal = sk_classifier.score(dataArr, classArr)
     print('Classifier Train Score = {}%'.format(round(accVal * 100, 2)))
 
 
-def apply_sklearn_classifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInfo, outputImg, gdalformat, classClrNames=True, outScoreImg=None):
+def apply_sklearn_classifer(cls_train_info, sk_classifier, in_img_mask, img_mask_val,
+                            img_file_info, output_img, gdalformat, class_clr_names=True,
+                            out_score_img=None):
     """
 This function uses a trained classifier and applies it to the provided input image.
 
-:param classTrainInfo: dict (where the key is the class name) of rsgislib.classification.ClassSimpleInfoObj
+:param cls_train_info: dict (where the key is the class name) of rsgislib.classification.ClassSimpleInfoObj
                        objects which will be used to train the classifier (i.e., train_sklearn_classifier()),
                        provide pixel value id and RGB class values.
-:param skClassifier: a trained instance of a scikit-learn classifier
+:param sk_classifier: a trained instance of a scikit-learn classifier
                      (e.g., use train_sklearn_classifier or train_sklearn_classifer_gridsearch)
-:param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all
+:param in_img_mask: is an image file providing a mask to specify where should be classified. Simplest mask is all
                 the valid data regions (rsgislib.imageutils.gen_valid_mask)
-:param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
+:param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
-:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
+:param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
                     rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
-:param outputImg: output image file with the classification. Note. by default a colour table and class names column
+:param output_img: output image file with the classification. Note. by default a colour table and class names column
                   is added to the image. If an error is produced use HFA or KEA formats.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
-:param classClrNames: default is True and therefore a colour table will the colours specified in classTrainInfo
+:param class_clr_names: default is True and therefore a colour table will the colours specified in classTrainInfo
                       and a ClassName column (from imgFileInfo) will be added to the output file.
-:param outScoreImg: A file path for a score image. If None then not outputted. Note, this function uses the
+:param out_score_img: A file path for a score image. If None then not outputted. Note, this function uses the
                     predict_proba() function from the scikit-learn model which isn't available for all classifiers
                     and therefore might produce an error if called on a model which doesn't have this function. For
                     example, sklearn.svm.SVC.
 
     """
     out_score_img = False
-    if outScoreImg is not None:
+    if out_score_img is not None:
         out_score_img = True
 
     infiles = applier.FilenameAssociations()
-    infiles.imageMask = imgMask
+    infiles.imageMask = in_img_mask
     numClassVars = 0
-    for imgFile in imgFileInfo:
+    for imgFile in img_file_info:
         infiles.__dict__[imgFile.name] = imgFile.fileName
         numClassVars = numClassVars + len(imgFile.bands)
 
     outfiles = applier.FilenameAssociations()
-    outfiles.outimage = outputImg
+    outfiles.outimage = output_img
     if out_score_img:
-        outfiles.out_score_img = outScoreImg
+        outfiles.out_score_img = out_score_img
     otherargs = applier.OtherInputs()
-    otherargs.classifier = skClassifier
-    otherargs.mskVal = imgMaskVal
+    otherargs.classifier = sk_classifier
+    otherargs.mskVal = img_mask_val
     otherargs.numClassVars = numClassVars
-    otherargs.n_classes = len(classTrainInfo)
-    otherargs.imgFileInfo = imgFileInfo
+    otherargs.n_classes = len(cls_train_info)
+    otherargs.imgFileInfo = img_file_info
     otherargs.out_score_img = out_score_img
 
     try:
@@ -297,24 +300,24 @@ This function uses a trained classifier and applies it to the provided input ima
     print("Applying the Classifier")
     applier.apply(_applySKClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.rastergis.pop_rat_img_stats(clumps_img=outputImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    rsgislib.rastergis.pop_rat_img_stats(clumps_img=output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
     if out_score_img:
-        rsgislib.imageutils.pop_img_stats(outScoreImg, use_no_data=True, no_data_val=0, calc_pyramids=True)
+        rsgislib.imageutils.pop_img_stats(out_score_img, use_no_data=True, no_data_val=0, calc_pyramids=True)
 
-    if classClrNames:
-        ratDataset = gdal.Open(outputImg, gdal.GA_Update)
+    if class_clr_names:
+        ratDataset = gdal.Open(output_img, gdal.GA_Update)
         red = rat.readColumn(ratDataset, 'Red')
         green = rat.readColumn(ratDataset, 'Green')
         blue = rat.readColumn(ratDataset, 'Blue')
         ClassName = numpy.empty_like(red, dtype=numpy.dtype('a255'))
         ClassName[...] = ''
 
-        for classKey in classTrainInfo:
+        for classKey in cls_train_info:
             print("Apply Colour to class \'" + classKey + "\'")
-            red[classTrainInfo[classKey].id] = classTrainInfo[classKey].red
-            green[classTrainInfo[classKey].id] = classTrainInfo[classKey].green
-            blue[classTrainInfo[classKey].id] = classTrainInfo[classKey].blue
-            ClassName[classTrainInfo[classKey].id] = classKey
+            red[cls_train_info[classKey].id] = cls_train_info[classKey].red
+            green[cls_train_info[classKey].id] = cls_train_info[classKey].green
+            blue[cls_train_info[classKey].id] = cls_train_info[classKey].blue
+            ClassName[cls_train_info[classKey].id] = classKey
 
         rat.writeColumn(ratDataset, "Red", red)
         rat.writeColumn(ratDataset, "Green", green)

@@ -480,7 +480,8 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
 
 
 
-def calc_acc_ptonly_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, out_json_file=None, out_csv_file=None):
+def calc_acc_ptonly_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col,
+                                       out_json_file=None, out_csv_file=None):
     """
     A function which calculates classification accuracy metrics using a set of
     reference samples in a vector file.

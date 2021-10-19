@@ -64,8 +64,9 @@ import gc
 
 import json
 
-def optimise_xgboost_binary_classifer(out_params_file, cls1_train_file, cls1_valid_file, cls2_train_file,
-                                      cls2_valid_file, nthread=2, scale_pos_weight=None, mdl_cls_obj=None):
+def optimise_xgboost_binary_classifer(out_params_file, cls1_train_file, cls1_valid_file,
+                                      cls2_train_file, cls2_valid_file, n_threads=1,
+                                      scale_pos_weight=None, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary xgboost
     classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
@@ -79,7 +80,7 @@ def optimise_xgboost_binary_classifer(out_params_file, cls1_train_file, cls1_val
     :param cls2_train_file: Training samples HDF5 file for the 'other' class
     :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
     :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param nthread: The number of threads to use for the training.
+    :param n_threads: The number of threads to use for the training.
     :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
                              Parameter used to balance imbalanced training data.
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
@@ -150,7 +151,7 @@ def optimise_xgboost_binary_classifer(out_params_file, cls1_train_file, cls1_val
                   'min_child_weight': values[3],
                   'max_delta_step'  : values[4],
                   'subsample'       : values[5],
-                  'nthread'         : nthread,
+                  'nthread'         : n_threads,
                   'eval_metric'     : 'auc',
                   'objective'       : 'binary:logistic'}
 
@@ -181,7 +182,7 @@ def optimise_xgboost_binary_classifer(out_params_file, cls1_train_file, cls1_val
               'min_child_weight': int(best_params[3]),
               'max_delta_step'  : int(best_params[4]),
               'subsample'       : float(best_params[5]),
-              'nthread'         : int(nthread),
+              'nthread'         : int(n_threads),
               'eval_metric'     : 'auc',
               'objective'       : 'binary:logistic',
               'num_boost_round' : int(best_params[6])}
@@ -190,8 +191,10 @@ def optimise_xgboost_binary_classifer(out_params_file, cls1_train_file, cls1_val
         json.dump(params, fp, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def train_xgboost_binary_classifer(out_mdl_file, cls_params_file, cls1_train_file, cls1_valid_file, cls1_test_file,
-                                   cls2_train_file, cls2_valid_file, cls2_test_file, nthread=2, mdl_cls_obj=None):
+def train_xgboost_binary_classifer(out_mdl_file, cls_params_file, cls1_train_file,
+                                   cls1_valid_file, cls1_test_file,
+                                   cls2_train_file, cls2_valid_file,
+                                   cls2_test_file, n_threads=1, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary xgboost
     classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
@@ -206,7 +209,7 @@ def train_xgboost_binary_classifer(out_mdl_file, cls_params_file, cls1_train_fil
     :param cls2_train_file: Training samples HDF5 file for the 'other' class
     :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
     :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param nthread: The number of threads to use for the training.
+    :param n_threads: The number of threads to use for the training.
     :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
                              Parameter used to balance imbalanced training data.
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
@@ -281,7 +284,7 @@ def train_xgboost_binary_classifer(out_mdl_file, cls_params_file, cls1_train_fil
               'min_child_weight': cls_params['min_child_weight'],
               'max_delta_step'  : cls_params['max_delta_step'],
               'subsample'       : cls_params['subsample'],
-              'nthread'         : nthread,
+              'nthread'         : n_threads,
               'eval_metric'     : cls_params['eval_metric'],
               'objective'       : cls_params['objective']}
 
@@ -309,9 +312,11 @@ def train_xgboost_binary_classifer(out_mdl_file, cls_params_file, cls1_train_fil
     print("Testing Accuracy: {}".format(test_acc))
 
 
-def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_file, cls1_test_file,
-                                       cls2_train_file, cls2_valid_file, cls2_test_file, nthread=2,
-                                       scale_pos_weight=None, mdl_cls_obj=None, out_params_file=None):
+def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_file,
+                                       cls1_test_file, cls2_train_file,
+                                       cls2_valid_file, cls2_test_file, n_threads=1,
+                                       scale_pos_weight=None, mdl_cls_obj=None,
+                                       out_params_file=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary xgboost
     classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
@@ -325,7 +330,7 @@ def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid
     :param cls2_train_file: Training samples HDF5 file for the 'other' class
     :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
     :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param nthread: The number of threads to use for the training.
+    :param n_threads: The number of threads to use for the training.
     :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
                              Parameter used to balance imbalanced training data.
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
@@ -416,7 +421,7 @@ def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid
                   'min_child_weight': values[3],
                   'max_delta_step'  : values[4],
                   'subsample'       : values[5],
-                  'nthread'         : nthread,
+                  'nthread'         : n_threads,
                   'eval_metric'     : 'auc',
                   'objective'       : 'binary:logistic'}
 
@@ -450,7 +455,7 @@ def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid
                       'min_child_weight': int(best_params[3]),
                       'max_delta_step'  : int(best_params[4]),
                       'subsample'       : float(best_params[5]),
-                      'nthread'         : int(nthread),
+                      'nthread'         : int(n_threads),
                       'eval_metric'     : 'auc',
                       'objective'       : 'binary:logistic',
                       'num_boost_round' : int(best_params[6])}
@@ -466,7 +471,7 @@ def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid
               'min_child_weight': best_params[3],
               'max_delta_step'  : best_params[4],
               'subsample'       : best_params[5],
-              'nthread'         : nthread,
+              'nthread'         : n_threads,
               'eval_metric'     : 'auc',
               'objective'       : 'binary:logistic'}
 
@@ -494,8 +499,9 @@ def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid
     print("Testing Accuracy: {}".format(test_acc))
 
 
-def apply_xgboost_binary_classifier(model_file, in_msk_img, img_mask_val, img_file_info, out_prob_img, gdalformat,
-                                    out_class_img=None, class_thres=5000, nthread=1):
+def apply_xgboost_binary_classifier(model_file, in_msk_img, img_mask_val, img_file_info,
+                                    out_prob_img, gdalformat, out_class_img=None,
+                                    class_thres=5000, n_threads=1):
     """
 This function applies a trained binary (i.e., two classes) xgboost model. The function train_xgboost_binary_classifer
 can be used to train such as model. The output image will contain the probability of membership to the class of
@@ -516,7 +522,7 @@ image and threshold can be applied to this image.
 :param out_class_img: Optional output image which will contain the hard classification, defined with a threshold on the
                     probability image.
 :param class_thres: The threshold used to define the hard classification. Default is 5000 (i.e., probability of 0.5).
-:param nthread: The number of threads to use for the classifier.
+:param n_threads: The number of threads to use for the classifier.
 
     """
     if not HAVE_XGBOOST:
@@ -544,7 +550,7 @@ image and threshold can be applied to this image.
                     outClassVals.reshape((inputs.imageMask.shape[1], inputs.imageMask.shape[2])), axis=0)
         outputs.outimage = outClassVals
 
-    classifier = xgb.Booster({'nthread': nthread})
+    classifier = xgb.Booster({'nthread': n_threads})
     classifier.load_model(model_file)
 
     infiles = applier.FilenameAssociations()
@@ -585,7 +591,7 @@ image and threshold can be applied to this image.
             rsgislib.rastergis.pop_rat_img_stats(out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
-def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, nthread=1,
+def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, n_threads=1,
                                           mdl_cls_obj=None, sub_train_smpls=None, rnd_seed=42):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
@@ -598,7 +604,7 @@ def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, nthrea
     :param out_params_file: The output model parameters which have been optimised.
     :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the
                         training and validation data.
-    :param nthread: The number of threads to use to train the classifier.
+    :param n_threads: The number of threads to use to train the classifier.
     :param sub_train_smpls: Subset the training, if None or 0 then no sub-setting will occur. If
                             between 0-1 then a ratio subset (e.g., 0.25 = 25 % subset) will be taken.
                             If > 1 then that number of points will be taken per class.
@@ -689,7 +695,7 @@ def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, nthrea
                   'min_child_weight': values[3],
                   'max_delta_step'  : values[4],
                   'subsample'       : values[5],
-                  'nthread'         : nthread,
+                  'nthread'         : n_threads,
                   'eval_metric'     : 'merror',
                   'objective'       : 'multi:softmax',
                   'num_class'       : n_classes}
@@ -723,7 +729,7 @@ def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, nthrea
               'min_child_weight': int(best_params[3]),
               'max_delta_step': int(best_params[4]),
               'subsample': float(best_params[5]),
-              'nthread': int(nthread),
+              'nthread': int(n_threads),
               'eval_metric': 'merror',
               'objective': 'multi:softmax',
               'num_class': int(n_classes),
@@ -733,7 +739,8 @@ def optimise_xgboost_multiclass_classifer(out_params_file, cls_info_dict, nthrea
         json.dump(params, fp, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_dict, nthread=1, mdl_cls_obj=None):
+def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_dict,
+                                       n_threads=1, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
     classifier producing a full trained model at the end. A dict of class information, as ClassInfoObj
@@ -744,7 +751,7 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_d
     :param out_mdl_file: The output model which can be loaded to perform a classification.
     :param cls_params_file: A JSON file with the model parameters
     :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
-    :param nthread: The number of threads to use to train the classifier.
+    :param n_threads: The number of threads to use to train the classifier.
 
     """
     if not HAVE_XGBOOST:
@@ -828,7 +835,7 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_d
               'min_child_weight': cls_params['min_child_weight'],
               'max_delta_step'  : cls_params['max_delta_step'],
               'subsample'       : cls_params['subsample'],
-              'nthread'         : nthread,
+              'nthread'         : n_threads,
               'eval_metric'     : cls_params['eval_metric'],
               'objective'       : cls_params['objective'],
               'num_class'       : n_classes}
@@ -850,7 +857,7 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, cls_info_d
     print("Testing Accuracy: {}".format(test_acc_scr))
 
 
-def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=1, mdl_cls_obj=None):
+def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
     classifier producing a full trained model at the end. A dict of class information, as ClassInfoObj
@@ -860,7 +867,7 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=
 
     :param out_mdl_file: The output model which can be loaded to perform a classification.
     :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
-    :param nthread: The number of threads to use to train the classifier.
+    :param n_threads: The number of threads to use to train the classifier.
 
     """
     if not HAVE_XGBOOST:
@@ -948,7 +955,7 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=
                   'min_child_weight': values[3],
                   'max_delta_step'  : values[4],
                   'subsample'       : values[5],
-                  'nthread'         : nthread,
+                  'nthread'         : n_threads,
                   'eval_metric'     : 'merror',
                   'objective'       : 'multi:softmax',
                   'num_class'       : n_classes}
@@ -983,7 +990,7 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=
               'min_child_weight': best_params[3],
               'max_delta_step'  : best_params[4],
               'subsample'       : best_params[5],
-              'nthread'         : nthread,
+              'nthread'         : n_threads,
               'eval_metric'     : 'merror',
               'objective'       : 'multi:softmax',
               'num_class'       : n_classes}
@@ -1005,8 +1012,10 @@ def train_opt_xgboost_multiclass_classifer(out_mdl_file, cls_info_dict, nthread=
     print("Testing Accuracy: {}".format(test_acc_scr))
 
 
-def apply_xgboost_multiclass_classifier(class_train_info, model_file, in_mask_img, img_mask_val, img_file_info,
-                                        out_class_img, gdalformat, class_clr_names=True, nthread=1):
+def apply_xgboost_multiclass_classifier(class_train_info, model_file, in_mask_img,
+                                        img_mask_val, img_file_info,
+                                        out_class_img, gdalformat,
+                                        class_clr_names=True, n_threads=1):
     """
 This function applies a trained multiple classes xgboost model. The function train_xgboost_multiclass_classifer
 can be used to train such as model. The output image will contain the probability of membership to the class of
@@ -1028,7 +1037,7 @@ output image and threshold can be applied to this image.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
 :param class_clr_names: default is True and therefore a colour table will the colours specified in ClassInfoObj
                       and a ClassName (from classTrainInfo) column will be added to the output file.
-:param nthread: The number of threads to use for the classifier.
+:param n_threads: The number of threads to use for the classifier.
 
     """
     if not HAVE_XGBOOST:
@@ -1062,7 +1071,7 @@ output image and threshold can be applied to this image.
 
         outputs.outclsimage = outClassIdVals
 
-    classifier = xgb.Booster({'nthread': nthread})
+    classifier = xgb.Booster({'nthread': n_threads})
     classifier.load_model(model_file)
 
     infiles = applier.FilenameAssociations()
@@ -1129,7 +1138,10 @@ output image and threshold can be applied to this image.
 
 
 
-def apply_xgboost_multiclass_classifier_rat(clumps_img, variables, model_file, class_train_info, out_col_int="OutClass", out_col_str="OutClassName", roi_col=None, roi_val=1, class_colours=True, nthread=1):
+def apply_xgboost_multiclass_classifier_rat(clumps_img, variables, model_file,
+                                            class_train_info, out_col_int="OutClass",
+                                            out_col_str="OutClassName", roi_col=None,
+                                            roi_val=1, class_colours=True, nthread=1):
     """
 A function which will apply an XGBoost model within a Raster Attribute Table (RAT).
 

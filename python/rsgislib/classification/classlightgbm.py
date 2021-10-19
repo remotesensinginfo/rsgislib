@@ -65,10 +65,13 @@ import gc
 import json
 
 
-def optimise_lightgbm_binary_classifer(out_params_file, cls1_train_file, cls1_valid_file, cls2_train_file,
-                                       cls2_valid_file, unbalanced=False, nthread=2, scale_pos_weight=None,
-                                       early_stopping_rounds=100, num_iterations=5000, num_boost_round=100,
-                                       max_n_leaves=50, learning_rate=0.05, mdl_cls_obj=None):
+def optimise_lightgbm_binary_classifer(out_params_file, cls1_train_file,
+                                       cls1_valid_file, cls2_train_file,
+                                       cls2_valid_file, unbalanced=False,
+                                       n_threads=1, scale_pos_weight=None,
+                                       early_stopping_rounds=100, num_iterations=5000,
+                                       num_boost_round=100, max_n_leaves=50,
+                                       learning_rate=0.05, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
     classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
@@ -84,7 +87,7 @@ def optimise_lightgbm_binary_classifer(out_params_file, cls1_train_file, cls1_va
     :param cls2_test_file: Testing samples HDF5 file for the 'other' class
     :param unbalanced: Specify that the training data is unbalance (i.e., a different number of samples per class)
                        and LightGBM will try to take this into account during training.
-    :param nthread: The number of threads to use for the training.
+    :param n_threads: The number of threads to use for the training.
     :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
                              Parameter used to balance imbalanced training data.
 
@@ -158,7 +161,7 @@ def optimise_lightgbm_binary_classifer(out_params_file, cls1_train_file, cls1_va
                       'lambda_l1'         : values[3],
                       'lambda_l2'         : values[4],
                       'metric'            : 'auc,binary_error',
-                      'nthread'           : nthread,
+                      'nthread'           : n_threads,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'binary',
                       'learning_rate'     : learning_rate,
@@ -180,7 +183,7 @@ def optimise_lightgbm_binary_classifer(out_params_file, cls1_train_file, cls1_va
                       'lambda_l1'         : values[3],
                       'lambda_l2'         : values[4],
                       'metric'            : 'auc,binary_error',
-                      'nthread'           : nthread,
+                      'nthread'           : n_threads,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'binary',
                       'learning_rate'     : learning_rate,
@@ -240,10 +243,13 @@ def optimise_lightgbm_binary_classifer(out_params_file, cls1_train_file, cls1_va
         json.dump(params, fp, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def train_lightgbm_binary_classifer(out_mdl_file, cls_params_file, cls1_train_file, cls1_valid_file,
-                                    cls1_test_file, cls2_train_file, cls2_valid_file, cls2_test_file,
-                                    unbalanced=False, nthread=2, scale_pos_weight=None, early_stopping_rounds=100,
-                                    num_iterations=5000, num_boost_round=100, learning_rate=0.05, mdl_cls_obj=None):
+def train_lightgbm_binary_classifer(out_mdl_file, cls_params_file, cls1_train_file,
+                                    cls1_valid_file, cls1_test_file, cls2_train_file,
+                                    cls2_valid_file, cls2_test_file, unbalanced=False,
+                                    n_threads=1, scale_pos_weight=None,
+                                    early_stopping_rounds=100, num_iterations=5000,
+                                    num_boost_round=100, learning_rate=0.05,
+                                    mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
     classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
@@ -260,7 +266,7 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls_params_file, cls1_train_fi
     :param cls2_test_file: Testing samples HDF5 file for the 'other' class
     :param unbalanced: Specify that the training data is unbalance (i.e., a different number of samples per class)
                        and LightGBM will try to take this into account during training.
-    :param nthread: The number of threads to use for the training.
+    :param n_threads: The number of threads to use for the training.
     :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
                              Parameter used to balance imbalanced training data.
 
@@ -337,7 +343,7 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls_params_file, cls1_train_fi
                   'lambda_l1'         : cls_params['lambda_l1'],
                   'lambda_l2'         : cls_params['lambda_l2'],
                   'metric'            : 'auc,binary_error',
-                  'nthread'           : nthread,
+                  'nthread'           : n_threads,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'binary',
                   'learning_rate'     : learning_rate,
@@ -360,7 +366,7 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls_params_file, cls1_train_fi
                   'lambda_l1'         : cls_params['lambda_l1'],
                   'lambda_l2'         : cls_params['lambda_l2'],
                   'metric'            : 'auc,binary_error',
-                  'nthread'           : nthread,
+                  'nthread'           : n_threads,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'binary',
                   'learning_rate'     : learning_rate,
@@ -399,11 +405,15 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls_params_file, cls1_train_fi
     print("Testing Accuracy: {}".format(test_acc))
 
 
-def train_opt_lightgbm_binary_classifer(out_mdl_file, out_params_file, cls1_train_file, cls1_valid_file,
-                                        cls1_test_file, cls2_train_file, cls2_valid_file, cls2_test_file,
-                                        unbalanced=False, nthread=2, scale_pos_weight=None, early_stopping_rounds=100,
-                                        num_iterations=5000, num_boost_round=100, learning_rate=0.05,
-                                        max_n_leaves=50, mdl_cls_obj=None):
+def train_opt_lightgbm_binary_classifer(out_mdl_file, out_params_file, cls1_train_file,
+                                        cls1_valid_file, cls1_test_file,
+                                        cls2_train_file, cls2_valid_file,
+                                        cls2_test_file, unbalanced=False, n_threads=1,
+                                        scale_pos_weight=None,
+                                        early_stopping_rounds=100,
+                                        num_iterations=5000, num_boost_round=100,
+                                        learning_rate=0.05, max_n_leaves=50,
+                                        mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
     classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
@@ -420,7 +430,7 @@ def train_opt_lightgbm_binary_classifer(out_mdl_file, out_params_file, cls1_trai
     :param cls2_test_file: Testing samples HDF5 file for the 'other' class
     :param unbalanced: Specify that the training data is unbalance (i.e., a different number of samples per class)
                        and LightGBM will try to take this into account during training.
-    :param nthread: The number of threads to use for the training.
+    :param n_threads: The number of threads to use for the training.
     :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
                              Parameter used to balance imbalanced training data.
 
@@ -513,7 +523,7 @@ def train_opt_lightgbm_binary_classifer(out_mdl_file, out_params_file, cls1_trai
                       'lambda_l1'         : values[3],
                       'lambda_l2'         : values[4],
                       'metric'            : 'auc,binary_error',
-                      'nthread'           : nthread,
+                      'nthread'           : n_threads,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'binary',
                       'learning_rate'     : learning_rate,
@@ -535,7 +545,7 @@ def train_opt_lightgbm_binary_classifer(out_mdl_file, out_params_file, cls1_trai
                       'lambda_l1'         : values[3],
                       'lambda_l2'         : values[4],
                       'metric'            : 'auc,binary_error',
-                      'nthread'           : nthread,
+                      'nthread'           : n_threads,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'binary',
                       'learning_rate'     : learning_rate,
@@ -604,7 +614,7 @@ def train_opt_lightgbm_binary_classifer(out_mdl_file, out_params_file, cls1_trai
                   'lambda_l1'         : best_params[3],
                   'lambda_l2'         : best_params[4],
                   'metric'            : 'auc,binary_error',
-                  'nthread'           : nthread,
+                  'nthread'           : n_threads,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'binary',
                   'learning_rate'     : learning_rate,
@@ -627,7 +637,7 @@ def train_opt_lightgbm_binary_classifer(out_mdl_file, out_params_file, cls1_trai
                   'lambda_l1'         : best_params[3],
                   'lambda_l2'         : best_params[4],
                   'metric'            : 'auc,binary_error',
-                  'nthread'           : nthread,
+                  'nthread'           : n_threads,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'binary',
                   'learning_rate'     : learning_rate,
@@ -666,8 +676,9 @@ def train_opt_lightgbm_binary_classifer(out_mdl_file, out_params_file, cls1_trai
     print("Testing Accuracy: {}".format(test_acc))
 
 
-def apply_lightgbm_binary_classifier(model_file, imgMask, imgMaskVal, imgFileInfo, outScoreImg, gdalformat,
-                                     outClassImg=None, class_thres=5000):
+def apply_lightgbm_binary_classifier(model_file, in_img_msk, img_mask_val,
+                                     img_file_info, out_score_img, gdalformat,
+                                     out_class_img=None, class_thres=5000):
     """
 This function applies a trained binary (i.e., two classes) lightgbm model. The function train_lightgbm_binary_classifer
 can be used to train such as model. The output image will contain the softmax score for the class of interest.
@@ -675,17 +686,17 @@ You will need to threshold this image to get a final hard classification. Altern
 image and threshold can be applied to this image. Note. the softmax score is not a probability.
 
 :param model_file: a trained lightgbm binary model which can be loaded with lgb.Booster(model_file=model_file).
-:param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
+:param in_img_msk: is an image file providing a mask to specify where should be classified. Simplest mask is all the
                 valid data regions (rsgislib.imageutils.gen_valid_mask)
-:param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
+:param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
-:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
+:param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
                     rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
-:param outScoreImg: output image file with the classification softmax score - this image is scaled by
+:param out_score_img: output image file with the classification softmax score - this image is scaled by
                    multiplying by 10000.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
-:param outClassImg: Optional output image which will contain the hard classification, defined with a threshold on the
+:param out_class_img: Optional output image which will contain the hard classification, defined with a threshold on the
                     probability image.
 :param class_thres: The threshold used to define the hard classification. Default is 5000 (i.e., probability of 0.5).
 
@@ -718,19 +729,19 @@ image and threshold can be applied to this image. Note. the softmax score is not
     classifier = lgb.Booster(model_file=model_file)
 
     infiles = applier.FilenameAssociations()
-    infiles.imageMask = imgMask
+    infiles.imageMask = in_img_msk
     numClassVars = 0
-    for imgFile in imgFileInfo:
+    for imgFile in img_file_info:
         infiles.__dict__[imgFile.name] = imgFile.fileName
         numClassVars = numClassVars + len(imgFile.bands)
 
     outfiles = applier.FilenameAssociations()
-    outfiles.outimage = outScoreImg
+    outfiles.outimage = out_score_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
-    otherargs.mskVal = imgMaskVal
+    otherargs.mskVal = img_mask_val
     otherargs.numClassVars = numClassVars
-    otherargs.imgFileInfo = imgFileInfo
+    otherargs.imgFileInfo = img_file_info
 
     try:
         import tqdm
@@ -746,17 +757,19 @@ image and threshold can be applied to this image. Note. the softmax score is not
     print("Applying the Classifier")
     applier.apply(_applyLGBMClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.imageutils.pop_img_stats(outScoreImg, use_no_data=True, no_data_val=0, calc_pyramids=True)
+    rsgislib.imageutils.pop_img_stats(out_score_img, use_no_data=True, no_data_val=0, calc_pyramids=True)
 
-    if outClassImg is not None:
-        rsgislib.imagecalc.image_math(outScoreImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,
-                                     rsgislib.TYPE_8UINT)
-        rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    if out_class_img is not None:
+        rsgislib.imagecalc.image_math(out_score_img, out_class_img, 'b1>{}?1:0'.format(class_thres), gdalformat,
+                                      rsgislib.TYPE_8UINT)
+        rsgislib.rastergis.pop_rat_img_stats(out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
 
 
-def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file=None, unbalanced=False,
-                                        nthread=2, early_stopping_rounds=100, num_iterations=5000,
-                                        num_boost_round=100, learning_rate=0.05, mdl_cls_obj=None):
+def train_lightgbm_multiclass_classifer(out_mdl_file, cls_info_dict, out_info_file=None,
+                                        unbalanced=False, n_threads=1,
+                                        early_stopping_rounds=100, num_iterations=5000,
+                                        num_boost_round=100, learning_rate=0.05,
+                                        mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass lightgbm
     classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
@@ -764,10 +777,10 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
     This function requires that lightgbm and skopt modules to be installed.
 
     :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param clsinfodict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
+    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
     :param out_info_file: An optional output JSON file with information about the classifier which has been created.
     :param unbalanced:
-    :param nthread:
+    :param n_threads:
     :param scale_pos_weight:
 
     """
@@ -777,11 +790,11 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
     from skopt.space import Real, Integer
     from skopt import gp_minimize
 
-    n_classes = len(clsinfodict)
-    for clsname in clsinfodict:
-        if clsinfodict[clsname].id >= n_classes:
+    n_classes = len(cls_info_dict)
+    for clsname in cls_info_dict:
+        if cls_info_dict[clsname].id >= n_classes:
             raise ("ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(clsname,
-                                                                                          clsinfodict[clsname].id))
+                                                                                          cls_info_dict[clsname].id))
 
     cls_data_dict = {}
     train_data_lst = []
@@ -791,40 +804,40 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
     test_data_lst = []
     test_lbls_lst = []
     cls_ids = []
-    for clsname in clsinfodict:
+    for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(clsinfodict[clsname].train_file_h5, 'r')
+        f = h5py.File(cls_info_dict[clsname].train_file_h5, 'r')
         sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
-        sgl_cls_info['train_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['train_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         train_data_lst.append(sgl_cls_info['train_data'])
         train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(clsinfodict[clsname].valid_file_h5, 'r')
+        f = h5py.File(cls_info_dict[clsname].valid_file_h5, 'r')
         sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
-        sgl_cls_info['valid_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['valid_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         valid_data_lst.append(sgl_cls_info['valid_data'])
         valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
 
         print("Reading Class {} Testing".format(clsname))
-        f = h5py.File(clsinfodict[clsname].test_file_h5, 'r')
+        f = h5py.File(cls_info_dict[clsname].test_file_h5, 'r')
         sgl_cls_info['test_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['test_data'] = numpy.array(f['DATA/DATA'])
         sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['test_n_rows'], dtype=int)
-        sgl_cls_info['test_data_lbls'][...] = clsinfodict[clsname].id
+        sgl_cls_info['test_data_lbls'][...] = cls_info_dict[clsname].id
         f.close()
         test_data_lst.append(sgl_cls_info['test_data'])
         test_lbls_lst.append(sgl_cls_info['test_data_lbls'])
 
         cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(clsinfodict[clsname].id)
+        cls_ids.append(cls_info_dict[clsname].id)
 
     print("Finished Reading Data")
 
@@ -859,7 +872,7 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
                       'lambda_l1'         : values[3],
                       'lambda_l2'         : values[4],
                       'metric'            : 'multi_logloss',
-                      'nthread'           : nthread,
+                      'nthread'           : n_threads,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'multiclass',
                       'num_class'         : n_classes,
@@ -881,7 +894,7 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
                       'lambda_l1'         : values[3],
                       'lambda_l2'         : values[4],
                       'metric'            : 'multi_logloss',
-                      'nthread'           : nthread,
+                      'nthread'           : n_threads,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'multiclass',
                       'num_class'         : n_classes,
@@ -928,7 +941,7 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
                   'lambda_l1'         : best_params[3],
                   'lambda_l2'         : best_params[4],
                   'metric'            : 'multi_logloss',
-                  'nthread'           : nthread,
+                  'nthread'           : n_threads,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'multiclass',
                   'num_class'         : n_classes,
@@ -950,7 +963,7 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
                   'lambda_l1'         : best_params[3],
                   'lambda_l2'         : best_params[4],
                   'metric'            : 'multi_logloss',
-                  'nthread'           : nthread,
+                  'nthread'           : n_threads,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'multiclass',
                   'num_class'         : n_classes,
@@ -991,27 +1004,29 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
             json.dump(out_info, outfile, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def apply_lightgbm_multiclass_classifier(classTrainInfo, model_file, imgMask, imgMaskVal, imgFileInfo,
-                                         outClassImg, gdalformat, classClrNames=True):
+def apply_lightgbm_multiclass_classifier(cls_train_info, model_file, in_img_mask,
+                                         img_mask_val, img_file_info,
+                                         out_class_img, gdalformat,
+                                         class_clr_names=True):
     """
 This function applies a trained multiple classes lightgbm model. The function train_lightgbm_multiclass_classifer
 can be used to train such as model. The output image will be a final hard classification using the class with
 the maximum softmax score.
 
-:param classTrainInfo: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
+:param cls_train_info: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
                        objects which will be used to train the classifier (i.e., train_lightgbm_multiclass_classifer()),
                        provide pixel value id and RGB class values.
 :param model_file: a trained lightgbm multiclass model which can be loaded with lgb.Booster(model_file=model_file).
-:param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
+:param in_img_mask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
                 valid data regions (rsgislib.imageutils.gen_valid_mask)
-:param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
+:param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
-:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
+:param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
                     rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
-:param outClassImg: Output image which will contain the hard classification defined as the maximum probability.
+:param out_class_img: Output image which will contain the hard classification defined as the maximum probability.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
-:param classClrNames: default is True and therefore a colour table will the colours specified in ClassInfoObj
+:param class_clr_names: default is True and therefore a colour table will the colours specified in ClassInfoObj
                       and a ClassName (from classTrainInfo) column will be added to the output file.
 
     """
@@ -1057,27 +1072,27 @@ the maximum softmax score.
     classifier = lgb.Booster(model_file=model_file)
 
     infiles = applier.FilenameAssociations()
-    infiles.imageMask = imgMask
+    infiles.imageMask = in_img_mask
     numClassVars = 0
-    for imgFile in imgFileInfo:
+    for imgFile in img_file_info:
         infiles.__dict__[imgFile.name] = imgFile.fileName
         numClassVars = numClassVars + len(imgFile.bands)
 
-    n_classes = len(classTrainInfo)
+    n_classes = len(cls_train_info)
     cls_id_lut = numpy.zeros(n_classes)
-    for clsname in classTrainInfo:
-        if classTrainInfo[clsname].id >= n_classes:
+    for clsname in cls_train_info:
+        if cls_train_info[clsname].id >= n_classes:
             raise ("ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(clsname,
-                                                                                          classTrainInfo[clsname].id))
-        cls_id_lut[classTrainInfo[clsname].id] = classTrainInfo[clsname].out_id
+                                                                                          cls_train_info[clsname].id))
+        cls_id_lut[cls_train_info[clsname].id] = cls_train_info[clsname].out_id
 
     outfiles = applier.FilenameAssociations()
-    outfiles.outclsimage = outClassImg
+    outfiles.outclsimage = out_class_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
-    otherargs.mskVal = imgMaskVal
+    otherargs.mskVal = img_mask_val
     otherargs.numClassVars = numClassVars
-    otherargs.imgFileInfo = imgFileInfo
+    otherargs.imgFileInfo = img_file_info
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
 
@@ -1096,21 +1111,21 @@ the maximum softmax score.
     applier.apply(_applyLGMClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed Classification")
 
-    if classClrNames:
-        rsgislib.rastergis.pop_rat_img_stats(outClassImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
-        ratDataset = gdal.Open(outClassImg, gdal.GA_Update)
+    if class_clr_names:
+        rsgislib.rastergis.pop_rat_img_stats(out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        ratDataset = gdal.Open(out_class_img, gdal.GA_Update)
         red = rat.readColumn(ratDataset, 'Red')
         green = rat.readColumn(ratDataset, 'Green')
         blue = rat.readColumn(ratDataset, 'Blue')
         ClassName = numpy.empty_like(red, dtype=numpy.dtype('a255'))
         ClassName[...] = ""
 
-        for classKey in classTrainInfo:
+        for classKey in cls_train_info:
             print("Apply Colour to class \'" + classKey + "\'")
-            red[classTrainInfo[classKey].out_id] = classTrainInfo[classKey].red
-            green[classTrainInfo[classKey].out_id] = classTrainInfo[classKey].green
-            blue[classTrainInfo[classKey].out_id] = classTrainInfo[classKey].blue
-            ClassName[classTrainInfo[classKey].out_id] = classKey
+            red[cls_train_info[classKey].out_id] = cls_train_info[classKey].red
+            green[cls_train_info[classKey].out_id] = cls_train_info[classKey].green
+            blue[cls_train_info[classKey].out_id] = cls_train_info[classKey].blue
+            ClassName[cls_train_info[classKey].out_id] = classKey
 
         rat.writeColumn(ratDataset, "Red", red)
         rat.writeColumn(ratDataset, "Green", green)

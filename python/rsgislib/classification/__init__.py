@@ -156,42 +156,44 @@ class SamplesInfoObj(object):
         self.blue = blue
 
 
-def generate_transect_accuracy_pts(input_img, inputLinesShp, outputPtsShp, classImgCol, classImgVecCol,
-                                   classRefVecCol, lineStep, force=False):
+def generate_transect_accuracy_pts(input_img, in_lines_vec_file, out_pts_vec_file,
+                                   class_img_col, class_img_vec_col, class_ref_vec_col,
+                                   line_step, del_exist_vec=False):
     """ A tool for converting a set of lines in to point transects and 
 populating with the information for undertaking an accuracy assessment.
 
 Where:
 
 :param input_img: is a string specifying the input image file with classification.
-:param inputLinesShp: is a string specifying the input lines shapefile path.
-:param outputPtsShp: is a string specifying the output points shapefile path.
-:param classImgCol: is a string speciyfing the name of the column in the image file containing the class names.
-:param classImgVecCol: is a string specifiying the output column in the shapefile for the classified class names.
-:param classRefVecCol: is an optional string specifiying an output column in the shapefile which can be used in the
+:param in_lines_vec_file: is a string specifying the input lines shapefile path.
+:param out_pts_vec_file: is a string specifying the output points shapefile path.
+:param class_img_col: is a string speciyfing the name of the column in the image file containing the class names.
+:param class_img_vec_col: is a string specifiying the output column in the shapefile for the classified class names.
+:param class_ref_vec_col: is an optional string specifiying an output column in the shapefile which can be used in the
                        accuracy assessment for the reference data.
-:param lineStep: is a double specifying the step along the lines between the points
-:param force: is an optional boolean specifying whether the output shapefile should be deleted if is already exists
+:param line_step: is a double specifying the step along the lines between the points
+:param del_exist_vec: is an optional boolean specifying whether the output shapefile should be deleted if is already exists
               (True and it will be deleted; Default is False)
 
     """
     # Import the RSGISLib Image Utils module
     import rsgislib.vectorutils
-    rsgislib.vectorutils.createLinesOfPoints(inputLinesShp, outputPtsShp, lineStep, force)
-    pop_class_info_accuracy_pts(input_img, outputPtsShp, classImgCol, classImgVecCol, classRefVecCol)
+    rsgislib.vectorutils.createLinesOfPoints(in_lines_vec_file, out_pts_vec_file, line_step, del_exist_vec)
+    pop_class_info_accuracy_pts(input_img, out_pts_vec_file, class_img_col, class_img_vec_col, class_ref_vec_col)
 
 
-def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=None, refImg=None):
+def get_class_training_data(img_band_info, class_vec_sample_info, tmp_dir,
+                            sub_sample=None, ref_img=None):
     """
     A function to extract training for vector regions for a given input image set.
 
-    :param imgBandInfo: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and bands of interest.
-    :param classVecSampleInfo: A list of rsgislib.classification.ClassVecSamplesInfoObj objects to define the
+    :param img_band_info: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and bands of interest.
+    :param class_vec_sample_info: A list of rsgislib.classification.ClassVecSamplesInfoObj objects to define the
                                training regions.
-    :param tmpdir: A directory for temporary outputs created during the processing.
+    :param tmp_dir: A directory for temporary outputs created during the processing.
     :param sub_sample: If not None then an integer needs to be provided which takes a random selection from the
                        available samples to balance the number of samples used for the classification.
-    :param refImg: A reference image which defines the area of interest, pixel size etc. for the processing.
+    :param ref_img: A reference image which defines the area of interest, pixel size etc. for the processing.
                    If None then an image will be generated using the input images but the tmpdir needs to be defined.
     :return: dictionary of ClassSimpleInfoObj objects.
 
@@ -206,17 +208,17 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=
 
     # Get valid mask, rasterised to this
     uid_str = rsgislib.tools.utils.uid_generator()
-    tmp_lcl_dir = os.path.join(tmpdir, "get_class_training_data_{}".format(uid_str))
+    tmp_lcl_dir = os.path.join(tmp_dir, "get_class_training_data_{}".format(uid_str))
     if not os.path.exists(tmp_lcl_dir):
         os.makedirs(tmp_lcl_dir)
 
-    rasterise_ref_img = refImg
-    if refImg is None:
+    rasterise_ref_img = ref_img
+    if ref_img is None:
         rasterise_ref_img = os.path.join(tmp_lcl_dir, "ref_img_vmsk.kea")
-        rsgislib.imageutils.create_valid_mask(imgBandInfo, rasterise_ref_img, 'KEA', tmp_lcl_dir)
+        rsgislib.imageutils.create_valid_mask(img_band_info, rasterise_ref_img, 'KEA', tmp_lcl_dir)
 
     classInfo = dict()
-    for class_sample_info in classVecSampleInfo:
+    for class_sample_info in class_vec_sample_info:
         cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.file_h5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
         rsgislib.vectorutils.convertvector.rasterise_vec_lyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
@@ -231,7 +233,7 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=
                                                                         numSamples=sub_sample)
             out_vec_img = out_vec_img_subsample
 
-        rsgislib.imageutils.extractZoneImageBandValues2HDF(imgBandInfo, out_vec_img, class_sample_info.file_h5,
+        rsgislib.imageutils.extractZoneImageBandValues2HDF(img_band_info, out_vec_img, class_sample_info.file_h5,
                                                            class_sample_info.id)
         rand_red_val = random.randint(1, 255)
         rand_grn_val = random.randint(1, 255)
@@ -246,17 +248,18 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=
     return classInfo
 
 
-def get_class_training_chips_data(imgBandInfo, classVecSampleInfo, chip_h_size, tmpdir, refImg=None):
+def get_class_training_chips_data(img_band_info, class_vec_sample_info, chip_h_size,
+                                  tmp_dir, ref_img=None):
     """
     A function to extract training chips (windows/regions) for vector regions for a given input image set.
 
-    :param imgBandInfo: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and bands of interest.
-    :param classVecSampleInfo: A list of rsgislib.classification.ClassVecSamplesInfoObj objects to define the
+    :param img_band_info: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and bands of interest.
+    :param class_vec_sample_info: A list of rsgislib.classification.ClassVecSamplesInfoObj objects to define the
                                training regions.
     :param chip_h_size: is half the chip size to be extracted (i.e., 10 with output image chips 21x21, 10 pixels
                         either size of the one of interest).
-    :param tmpdir: A directory for temporary outputs created during the processing.
-    :param refImg: A reference image which defines the area of interest, pixel size etc. for the processing.
+    :param tmp_dir: A directory for temporary outputs created during the processing.
+    :param ref_img: A reference image which defines the area of interest, pixel size etc. for the processing.
                    If None then an image will be generated using the input images but the tmpdir needs to be defined.
     :return: dictionary of ClassSimpleInfoObj objects.
 
@@ -271,24 +274,24 @@ def get_class_training_chips_data(imgBandInfo, classVecSampleInfo, chip_h_size, 
 
     # Get valid mask, rasterised to this
     uid_str = rsgislib.tools.utils.uid_generator()
-    tmp_lcl_dir = os.path.join(tmpdir, "get_class_training_chips_data_{}".format(uid_str))
+    tmp_lcl_dir = os.path.join(tmp_dir, "get_class_training_chips_data_{}".format(uid_str))
     if not os.path.exists(tmp_lcl_dir):
         os.makedirs(tmp_lcl_dir)
 
-    rasterise_ref_img = refImg
-    if refImg is None:
+    rasterise_ref_img = ref_img
+    if ref_img is None:
         rasterise_ref_img = os.path.join(tmp_lcl_dir, "ref_img_vmsk.kea")
-        rsgislib.imageutils.create_valid_mask(imgBandInfo, rasterise_ref_img, 'KEA', tmp_lcl_dir)
+        rsgislib.imageutils.create_valid_mask(img_band_info, rasterise_ref_img, 'KEA', tmp_lcl_dir)
 
     classInfo = dict()
-    for class_sample_info in classVecSampleInfo:
+    for class_sample_info in class_vec_sample_info:
         cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.file_h5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
         rsgislib.vectorutils.convertvector.rasterise_vec_lyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
                                                              out_vec_img, gdalformat="KEA", burn_val=class_sample_info.id,
                                                              datatype=rsgislib.TYPE_16UINT, att_column=None, use_vec_extent=False, thematic=True,
                                                              no_data_val=0)
-        rsgislib.imageutils.extractChipZoneImageBandValues2HDF(imgBandInfo, out_vec_img, class_sample_info.id,
+        rsgislib.imageutils.extractChipZoneImageBandValues2HDF(img_band_info, out_vec_img, class_sample_info.id,
                                                                chip_h_size, class_sample_info.file_h5)
         rand_red_val = random.randint(1, 255)
         rand_grn_val = random.randint(1, 255)
@@ -559,7 +562,7 @@ def flip_ref_chip_hdf5_file(input_h5_file, output_h5_file, datatype=None):
     ######################################################################
 
 
-def label_pxl_sample_chips(sample_pxls_img, cls_msk_img, output_image, gdalformat, chip_size, cls_lut,
+def label_pxl_sample_chips(sample_pxls_img, cls_msk_img, out_image, gdalformat, chip_size, cls_lut,
                            sample_pxl_img_band=1, cls_msk_img_band=1):
     """
     A function which labels image pixels based on the proportions of a class within a chip around the
@@ -572,7 +575,7 @@ def label_pxl_sample_chips(sample_pxls_img, cls_msk_img, output_image, gdalforma
 
     :param sample_pxls_img: The input binary image with the pixel locations (value == 1)
     :param cls_msk_img: The classification image used to assign the output pixel values.
-    :param output_image: The output image. Single pixels with the class value will be outputted.
+    :param out_image: The output image. Single pixels with the class value will be outputted.
     :param gdalformat: The output image file format.
     :param chip_size: The size of the chip used to identify the class - would probably correspond
                       to the chip size being used for the deep learning classification. Areas used
@@ -660,11 +663,11 @@ def label_pxl_sample_chips(sample_pxls_img, cls_msk_img, output_image, gdalforma
                         out_samp_arr[0][y][x] = max_val
 
         if writer is None:
-            writer = ImageWriter(output_image, info=info, firstblock=out_samp_arr, drivername=gdalformat)
+            writer = ImageWriter(out_image, info=info, firstblock=out_samp_arr, drivername=gdalformat)
         else:
             writer.write(out_samp_arr)
     writer.close(calcStats=False)
-    rsgislib.rastergis.pop_rat_img_stats(output_image, True, True, True)
+    rsgislib.rastergis.pop_rat_img_stats(out_image, True, True, True)
 
 
 def plot_train_data(cls1_h5_file, cls2_h5_file, out_plots_dir, cls1_name="Class 1", cls2_name="Class 2",

@@ -42,7 +42,8 @@ from rios import ratapplier
 
 import rsgislib
 
-def extract_rat_col_data(clumps_img, cols, sel_col, sel_col_val, out_h5_file, datatype=None, rat_band=1):
+def extract_rat_col_data(clumps_img, cols, sel_col, sel_col_val, out_h5_file,
+                         datatype=None, rat_band=1):
     """
     A function which extracts column values to be used as training, testing, validation
     sets for building a classifier. The data will be saved within a HDF5 file. Note,
