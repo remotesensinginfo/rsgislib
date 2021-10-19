@@ -54,6 +54,15 @@ Extracting Image Chips to HDF5
 -------------------------------
 
 .. autofunction:: rsgislib.zonalstats.extract_chip_zone_image_band_values_to_hdf
+.. autofunction:: rsgislib.zonalstats.split_sample_chip_hdf5_file
+.. autofunction:: rsgislib.zonalstats.merge_extracted_hdf5_chip_data
+.. autofunction:: rsgislib.zonalstats.extract_ref_chip_zone_image_band_values_to_hdf
+.. autofunction:: rsgislib.zonalstats.split_sample_ref_chip_hdf5_file
+.. autofunction:: rsgislib.zonalstats.merge_extracted_hdf5_chip_ref_data
+
+HDF Utilities
+-------------------------------
+.. autofunction:: rsgislib.zonalstats.msk_h5_smpls_to_finite_values
 
 
 * :ref:`genindex`
