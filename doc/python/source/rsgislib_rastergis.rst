@@ -1,9 +1,6 @@
 RSGISLib Raster GIS Module
 =================================
 
-.. automodule:: rsgislib.rastergis
-   :members:
-   :undoc-members:
 
 Utilities
 ----------
