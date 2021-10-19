@@ -643,6 +643,12 @@ def get_vec_cols_as_array(vec_file:str, vec_lyr:str, cols: list, lower_limit:flo
     :param no_data_val: no data value used within the column values. Rows with
                         a no data value will be dropped. If None then ignored
                         (Default: None)
+    :param lower_limit: Optional lower limit to define valid values. Note the same
+                        value is used for all the columns listed. If a value is found
+                        to be outside of the threshold the whole row is removed.
+    :parma upper_limit: Optional upper limit to define valid values. Note the same
+                        value is used for all the columns listed. If a value is found
+                        to be outside of the threshold the whole row is removed.
 
     """
     import geopandas
