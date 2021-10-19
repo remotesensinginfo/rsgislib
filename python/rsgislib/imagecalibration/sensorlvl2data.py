@@ -34,97 +34,104 @@
 ############################################################################
 
 
-def extract_ls8_col2_lvl2(in_tar_file, output_dir, gdalformat, tmp_dir, delete_extracted_data=True):
+def create_stacked_ls8_cl2_lv2_img(input_file, out_dir, tmp_dir, scale_factor=10000,
+                                   gdalformat="KEA", delete_inter_data=True):
     """
     A function which extracts the USGS collection-2 level-2 data and creates a single
-    multi-data image file in the output directory.
+    multi-band image file in the output directory. Note the output data type is
+    32bit integer and the no data value is -9999.
 
-    :param in_tar_file: file name and path to the input TAR file.
-    :param output_dir: output directory where the output file will be saved.
-    :param gdalformat: output file format.
-    :param tmp_dir: tmp directory where the tar will be extracted to.
-    :param delete_extracted_data: If True (default) then the extracted data will be
-                                  deleted when analysis is finished.
+    :param input_file: file name and path to the input TAR file.
+    :param out_dir: output directory where the output file will be written.
+    :param tmp_dir: a temporary directory where intermediate files will be written.
+    :param scale_factor: the scale factor applied to the output reflectance values.
+                         default is 10,000
+    :param gdalformat: the output file format.
+    :param delete_inter_data: delete any intermediate files created is True (Default)
+
+    Example::
+
+        import rsgislib.imagecalibration.sensorlvl2data
+        rsgislib.imagecalibration.sensorlvl2data.create_stacked_ls8_cl2_lv2_img("LC08_L2SP_135046_20210319_20210328_02_T1.tar", "./outputs", "./tmp", gdalformat="GTIFF")
 
     """
-    import os
-    import shutil
 
-    import rsgislib
-    import rsgislib.imageutils
-    import rsgislib.imagecalc
+    import os
     import rsgislib.tools.filetools
     import rsgislib.tools.sensors
     import rsgislib.tools.utils
+    import rsgislib.imagecalc
+    import rsgislib.imageutils
 
-    if gdalformat == 'GTIFF':
-        rsgislib.imageutils.set_env_vars_lzw_gtiff_outs(bigtiff=False)
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
 
-    extracted_dir = rsgislib.tools.filetools.untar_file(in_tar_file, tmp_dir)
-    mtl_txt_file = rsgislib.tools.filetools.find_file_none(extracted_dir, "*MTL.txt")
-    if mtl_txt_file is None:
-        raise rsgislib.RSGISPyException("Could not find MTL TXT file.")
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
 
-    mtl_dict = rsgislib.tools.sensors.read_landsat_mtl_to_dict(mtl_txt_file)
+    if gdalformat == "GTIFF":
+        rsgislib.imageutils.set_env_vars_lzw_gtiff_outs()
 
-    spacecraft = rsgislib.tools.utils.dict_struct_get_str_value(mtl_dict, ["IMAGE_ATTRIBUTES", "SPACECRAFT_ID"])
-    if spacecraft != "LANDSAT_8":
-        raise rsgislib.RSGISPyException("Expecting Landsat 8 imagery")
+    raw_dir = rsgislib.tools.filetools.untar_file(input_file, tmp_dir)
 
-    l2_processing = rsgislib.tools.utils.dict_struct_get_str_value(mtl_dict, ["LEVEL2_PROCESSING_RECORD", "PROCESSING_LEVEL"])
-    if l2_processing != "L2SP":
-        raise rsgislib.RSGISPyException("Expecting Level 2 landsat imagery")
+    mtl_header = rsgislib.tools.filetools.find_file_none(raw_dir, "*MTL.txt")
 
-    acq_date = rsgislib.tools.utils.dict_struct_get_date_value(mtl_dict, ["IMAGE_ATTRIBUTES", "DATE_ACQUIRED"], date_format="%Y-%m-%d")
+    if mtl_header is None:
+        raise Exception("Could not find the MTL header")
 
-    wrs_row = int(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["IMAGE_ATTRIBUTES", "WRS_ROW"]))
-    wrs_path = int(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["IMAGE_ATTRIBUTES", "WRS_PATH"]))
+    ls8_head_info = rsgislib.tools.sensors.read_landsat_mtl_to_dict(mtl_header)
 
-    ll_lat = float(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["PROJECTION_ATTRIBUTES", "CORNER_LL_LAT_PRODUCT"]))
-    ll_lon = float(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["PROJECTION_ATTRIBUTES", "CORNER_LL_LON_PRODUCT"]))
+    ls_prod_id = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "LANDSAT_PRODUCT_ID"]).lower()
 
-    lr_lat = float(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["PROJECTION_ATTRIBUTES", "CORNER_LR_LAT_PRODUCT"]))
-    lr_lon = float(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["PROJECTION_ATTRIBUTES", "CORNER_LR_LON_PRODUCT"]))
+    b1_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_1"])
+    b2_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_2"])
+    b3_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_3"])
+    b4_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_4"])
+    b5_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_5"])
+    b6_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_6"])
+    b7_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_7"])
 
-    ul_lat = float(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["PROJECTION_ATTRIBUTES", "CORNER_UL_LAT_PRODUCT"]))
-    ul_lon = float(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["PROJECTION_ATTRIBUTES", "CORNER_UL_LON_PRODUCT"]))
+    b1_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_1"])
+    b2_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_2"])
+    b3_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_3"])
+    b4_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_4"])
+    b5_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_5"])
+    b6_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_6"])
+    b7_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_7"])
 
-    ur_lat = float(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["PROJECTION_ATTRIBUTES", "CORNER_UR_LAT_PRODUCT"]))
-    ur_lon = float(rsgislib.tools.utils.dict_struct_get_numeric_value(mtl_dict, ["PROJECTION_ATTRIBUTES", "CORNER_UR_LON_PRODUCT"]))
+    b1_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_1"])
+    b2_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_2"])
+    b3_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_3"])
+    b4_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_4"])
+    b5_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_5"])
+    b6_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_6"])
+    b7_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_7"])
 
-    l_lon_mid = ll_lon + (lr_lon - ll_lon) / 2
-    u_lon_mid = ul_lon + (ur_lon - ul_lon) / 2
-    lon_mid = min(l_lon_mid, u_lon_mid) + (max(l_lon_mid, u_lon_mid) - min(l_lon_mid, u_lon_mid)) / 2
+    band_info = []
+    band_info.append({"img": os.path.join(raw_dir, b1_img), "multi": b1_multi, "add": b1_add})
+    band_info.append({"img": os.path.join(raw_dir, b2_img), "multi": b2_multi, "add": b2_add})
+    band_info.append({"img": os.path.join(raw_dir, b3_img), "multi": b3_multi, "add": b3_add})
+    band_info.append({"img": os.path.join(raw_dir, b4_img), "multi": b4_multi, "add": b4_add})
+    band_info.append({"img": os.path.join(raw_dir, b5_img), "multi": b5_multi, "add": b5_add})
+    band_info.append({"img": os.path.join(raw_dir, b6_img), "multi": b6_multi, "add": b6_add})
+    band_info.append({"img": os.path.join(raw_dir, b7_img), "multi": b7_multi, "add": b7_add})
 
-    l_lat_mid = ll_lat + (ul_lat - ll_lat) / 2
-    r_lat_mid = lr_lat + (ur_lat - lr_lat) / 2
-    lat_mid = min(l_lat_mid, r_lat_mid) + (max(l_lat_mid, r_lat_mid) - min(l_lat_mid, r_lat_mid)) / 2
+    sref_bands = []
+    for i, band in enumerate(band_info):
+        out_img_band = os.path.join(tmp_dir, "{}_b{}_sref.kea".format(ls_prod_id, i + 1))
+        rsgislib.imagecalc.image_math(band["img"], out_img_band, "b1==0?-9999:((b1*{})+{})*{}".format(band["multi"], band["add"], scale_factor),'KEA', rsgislib.TYPE_32INT)
+        sref_bands.append(out_img_band)
 
-    pos_str = rsgislib.tools.projection.get_deg_coord_as_str(lat_mid, lon_mid, n_chars=3)
+    band_names = ["coastal", "blue", "green", "red", "nir", "swir1", "swir2"]
+    out_img_ext = rsgislib.imageutils.get_file_img_extension(gdalformat)
+    output_img = os.path.join(out_dir, "{}_sref.{}".format(ls_prod_id, out_img_ext))
+    rsgislib.imageutils.stack_img_bands(sref_bands, band_names, output_img, None, -9999, gdalformat, rsgislib.TYPE_32INT)
+    rsgislib.imageutils.pop_img_stats(output_img, use_no_data=True, no_data_val=-9999, calc_pyramids=True)
 
-    acq_date_str = acq_date.strftime('%Y%m%d')
-    basename = 'ls8_{}_{}_r{}p{}'.format(pos_str, acq_date_str, wrs_row, wrs_path)
-    print(basename)
+    if delete_inter_data:
+        import shutil
+        shutil.rmtree(raw_dir)
+        for img_band in sref_bands:
+            rsgislib.imageutils.delete_gdal_layer(img_band)
 
-    img_band1 = os.path.join(extracted_dir, rsgislib.tools.utils.dict_struct_get_str_value(mtl_dict, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_1"]))
-    img_band2 = os.path.join(extracted_dir, rsgislib.tools.utils.dict_struct_get_str_value(mtl_dict, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_2"]))
-    img_band3 = os.path.join(extracted_dir, rsgislib.tools.utils.dict_struct_get_str_value(mtl_dict, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_3"]))
-    img_band4 = os.path.join(extracted_dir, rsgislib.tools.utils.dict_struct_get_str_value(mtl_dict, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_4"]))
-    img_band5 = os.path.join(extracted_dir, rsgislib.tools.utils.dict_struct_get_str_value(mtl_dict, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_5"]))
-    img_band6 = os.path.join(extracted_dir, rsgislib.tools.utils.dict_struct_get_str_value(mtl_dict, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_6"]))
-    img_band7 = os.path.join(extracted_dir, rsgislib.tools.utils.dict_struct_get_str_value(mtl_dict, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_7"]))
-    band_names = ['coastal', 'blue', 'green', 'red', 'nir', 'swir1', 'swir2']
-
-    img_ext = rsgislib.imageutils.get_file_img_extension(gdalformat)
-
-    stacked_sref_scaled_img = os.path.join(extracted_dir, "{}_sref_scaled.{}".format(basename, img_ext))
-    rsgislib.imageutils.stack_img_bands([img_band1, img_band2, img_band3, img_band4, img_band5, img_band6, img_band7], band_names, stacked_sref_scaled_img, skip_value=None, no_data_val=0, gdalformat=gdalformat, datatype=rsgislib.TYPE_16UINT)
-
-    out_sref_img = os.path.join(output_dir, "{}_sref.{}".format(basename, img_ext))
-    rsgislib.imagecalc.image_math(stacked_sref_scaled_img, out_sref_img, "b1==0?0:((b1*0.0000275)-0.2)<0.0?1:((b1*0.0000275)-0.2)*1000", gdalformat, rsgislib.TYPE_16UINT)
-    rsgislib.imageutils.set_band_names(out_sref_img, band_names)
-    rsgislib.imageutils.pop_img_stats(out_sref_img, use_no_data=True, no_data_val=0, calc_pyramids=True)
-
-    if delete_extracted_data:
-        shutil.rmtree(extracted_dir)
 

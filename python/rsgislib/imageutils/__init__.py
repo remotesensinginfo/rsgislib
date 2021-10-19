@@ -104,7 +104,7 @@ Create a list of these objects to pass to the fillTimeSeriesGaps function
     def __repr__(self):
         return repr((self.year, self.day, self.compImg, self.imgRef, self.outRef))
 
-def set_env_vars_lzw_gtiff_outs(bigtiff=True):
+def set_env_vars_lzw_gtiff_outs(bigtiff=False):
     """
     Set environmental variables such that outputted
     GeoTIFF files are outputted as tiled and compressed.
@@ -179,7 +179,7 @@ def get_file_img_extension(gdalformat:str):
     :return: string
 
     """
-    ext = ".NA"
+    ext = "NA"
     if gdalformat.lower() == "kea":
         ext = "kea"
     elif gdalformat.lower() == "gtiff":
@@ -233,6 +233,18 @@ def rename_gdal_layer(input_img, output_img):
     gdalDriver = layerDS.GetDriver()
     layerDS = None
     gdalDriver.Rename(output_img, input_img)
+
+def delete_gdal_layer(input_img):
+    """
+    Deletes all the files associated with a GDAL layer.
+
+    :param input_img: The file name and path of the GDAL layer to be deleted.
+
+    """
+    layerDS = gdal.Open(input_img, gdal.GA_ReadOnly)
+    gdalDriver = layerDS.GetDriver()
+    layerDS = None
+    gdalDriver.Delete(input_img)
 
 def get_image_res(input_img, abs_vals=False):
     """

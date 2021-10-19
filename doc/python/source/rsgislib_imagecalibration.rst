@@ -64,6 +64,12 @@ Solar Angles
 .. autofunction:: rsgislib.imagecalibration.solarangles.getSolarIrrConventionSolarAzimuthFromTrad
 .. autofunction:: rsgislib.imagecalibration.solarangles.calcSolarAzimuthZenith
 
+
+Sensor Level 2 Utilities
+-------------------------
+.. autofunction:: rsgislib.imagecalibration.sensorlvl2data.create_stacked_ls8_cl2_lv2_img
+
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

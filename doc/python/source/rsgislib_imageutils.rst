@@ -184,6 +184,7 @@ Other
 .. autofunction:: rsgislib.imageutils.get_gdal_format_from_ext
 .. autofunction:: rsgislib.imageutils.get_file_img_extension
 .. autofunction:: rsgislib.imageutils.rename_gdal_layer
+.. autofunction:: rsgislib.imageutils.delete_gdal_layer
 .. autofunction:: rsgislib.imageutils.get_image_res
 .. autofunction:: rsgislib.imageutils.do_image_res_match
 .. autofunction:: rsgislib.imageutils.get_image_size
