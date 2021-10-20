@@ -1,23 +1,10 @@
 RSGISLib Image Utilities Module
 =================================
 
-.. automodule:: rsgislib.imageutils
-   :undoc-members:
-
-.. autoclass:: ImageBandInfo
-    :members:
-    
-.. autoclass:: RSGISTimeseriesFillInfo
-    :members:
-    
-.. autoclass:: SharpBandInfo
-    :members:
-
 
 Image Stats and Pyramids
 ------------------------
 .. autofunction:: rsgislib.imageutils.pop_img_stats
-.. autofunction:: rsgislib.imageutils.combineImageOverviews
 .. autofunction:: rsgislib.imageutils.get_image_band_stats
 .. autofunction:: rsgislib.imageutils.get_image_no_data_value
 .. autofunction:: rsgislib.imageutils.set_image_no_data_value
@@ -51,7 +38,7 @@ Mosaic
 
 Composite
 ----------
-.. autofunction:: rsgislib.imageutils.gen_timeseries_fill_composite_img
+
 .. autofunction:: rsgislib.imageutils.create_ref_img_composite_img
 .. autofunction:: rsgislib.imageutils.combine_binary_masks
 .. autofunction:: rsgislib.imageutils.export_single_merged_img_band
@@ -60,6 +47,9 @@ Composite
 .. autofunction:: rsgislib.imagecomp.create_max_ndvi_ndwi_composite
 .. autofunction:: rsgislib.imagecomp.create_max_scaled_ndvi_ndwi_composite
 .. autofunction:: rsgislib.imagecomp.check_build_ls8_vrts
+.. autofunction:: rsgislib.imageutils.gen_timeseries_fill_composite_img
+.. autoclass:: RSGISTimeseriesFillInfo
+    :members:
 
 
 Tile
@@ -103,6 +93,8 @@ Subset / Mask
 .. autofunction:: rsgislib.imageutils.subset_to_vec
 .. autofunction:: rsgislib.imageutils.mask_img_with_vec
 .. autofunction:: rsgislib.imageutils.create_valid_mask
+.. autoclass:: ImageBandInfo
+    :members:
 
 
 Extract
@@ -146,8 +138,10 @@ Select / Stack bands
 Sharpen Image Bands
 -------------------
 .. autofunction:: rsgislib.imageutils.pan_sharpen_hcs
-.. autofunction:: rsgislib.imageutils.SharpBandInfo
 .. autofunction:: rsgislib.imageutils.sharpen_low_res_bands
+.. autoclass:: SharpBandInfo
+    :members:
+
 
 
 Band Names
