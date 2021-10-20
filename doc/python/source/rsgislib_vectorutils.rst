@@ -1,109 +1,117 @@
 RSGISLib Vector Utils Module
 =================================
 
-.. automodule:: rsgislib.vectorutils
 
-Geometry
----------
-.. autofunction:: rsgislib.vectorutils.addFIDColumn
-.. autofunction:: rsgislib.vectorutils.buffervector
-.. autofunction:: rsgislib.vectorutils.generateConvexHullsGroups
-.. autofunction:: rsgislib.vectorutils.createLinesOfPoints
-.. autofunction:: rsgislib.vectorutils.fitPolygon2Points
-.. autofunction:: rsgislib.vectorutils.fitPolygons2PointClusters
-.. autofunction:: rsgislib.vectorutils.generateConvexHullsGroups
-.. autofunction:: rsgislib.vectorutils.splitFeatures
-.. autofunction:: rsgislib.vectorutils.fitActiveContourBoundaries
-.. autofunction:: rsgislib.vectorutils.polygonsInPolygon
-.. autofunction:: rsgislib.vectorutils.bboxIntersectsVecLyr
-.. autofunction:: rsgislib.vectorutils.calcPolyCentroids
-.. autofunction:: rsgislib.vectorutils.checkValidateGeometries
-.. autofunction:: rsgislib.vectorutils.getFeatEnvs
+Vector Attributes
+--------------------
+
+.. autofunction:: rsgislib.vectorutils.vector_maths
+.. autofunction:: rsgislib.vectorutils.copy_rat_cols_to_vector_lyr
+.. autofunction:: rsgislib.vectorutils.perform_spatial_join
+.. autofunction:: rsgislib.vectorutils.get_unq_col_values
 
 
 Create Vectors
+----------------
+
+.. autofunction:: rsgislib.vectorutils.createvectors.polygonise_raster_to_vec_lyr
+.. autofunction:: rsgislib.vectorutils.createvectors.vectorise_pxls_to_pts
+.. autofunction:: rsgislib.vectorutils.createvectors.extract_image_footprint
+.. autofunction:: rsgislib.vectorutils.createvectors.create_poly_shp_for_lst_bboxs
+.. autofunction:: rsgislib.vectorutils.createvectors.define_grid
+.. autofunction:: rsgislib.vectorutils.createvectors.create_poly_vec_bboxs
+.. autofunction:: rsgislib.vectorutils.createvectors.create_vector_grid
+.. autofunction:: rsgislib.vectorutils.createvectors.write_pts_to_vec
+.. autofunction:: rsgislib.vectorutils.create_lines_of_points
+.. autofunction:: rsgislib.vectorutils.split_vec_lyr
+.. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
+.. autofunction:: rsgislib.vectorutils.add_geom_bbox_cols
+
+
+Vector I/O
+----------------
+
+.. autofunction:: rsgislib.vectorutils.open_gdal_vec_lyr
+.. autofunction:: rsgislib.vectorutils.get_mem_vec_lyr_subset
+.. autofunction:: rsgislib.vectorutils.write_vec_lyr_to_file
+.. autofunction:: rsgislib.vectorutils.vector_translate
+.. autofunction:: rsgislib.vectorutils.reproj_vector_layer
+.. autofunction:: rsgislib.vectorutils.reproj_vec_lyr
+.. autofunction:: rsgislib.vectorutils.reproj_wgs84_vec_to_utm
+.. autofunction:: rsgislib.vectorutils.reproj_vector_layer
+.. autofunction:: rsgislib.vectorutils.reproj_vec_lyr
+
+
+Create Rasters
+-------------------
+
+.. autofunction:: rsgislib.vectorutils.createrasters.rasterise_vec_lyr
+.. autofunction:: rsgislib.vectorutils.createrasters.rasterise_vec_lyr_obj
+.. autofunction:: rsgislib.vectorutils.createrasters.copy_vec_to_rat
+
+
+Merge Vectors
 ---------------
-.. autofunction:: rsgislib.vectorutils.readVecLyr2Mem
-.. autofunction:: rsgislib.vectorutils.writeVecLyr2File
-.. autofunction:: rsgislib.vectorutils.polygoniseRaster
-.. autofunction:: rsgislib.vectorutils.polygoniseRaster2VecLyr
-.. autofunction:: rsgislib.vectorutils.exportPxls2Pts
-.. autofunction:: rsgislib.vectorutils.createPolySHP4LstBBOXs
-.. autofunction:: rsgislib.vectorutils.createPolyVecBBOXs
-.. autofunction:: rsgislib.vectorutils.extractImageFootprint
-.. autofunction:: rsgislib.vectorutils.createImgExtentLUT
-.. autofunction:: rsgislib.vectorutils.createVectorGrid
-.. autofunction:: rsgislib.vectorutils.defineGrid
-.. autofunction:: rsgislib.vectorutils.exportSpatialSelectFeats
-.. autofunction:: rsgislib.vectorutils.selectIntersectFeats
-.. autofunction:: rsgislib.vectorutils.splitVecLyr
-.. autofunction:: rsgislib.vectorutils.subsetEnvsVecLyrObj
-.. autofunction:: rsgislib.vectorutils.writePts2Vec
+
+.. autofunction:: rsgislib.vectorutils.merge_vectors_to_gpkg
+.. autofunction:: rsgislib.vectorutils.merge_vector_lyrs_to_gpkg
+.. autofunction:: rsgislib.vectorutils.merge_vectors_to_gpkg_ind_lyrs
+.. autofunction:: rsgislib.vectorutils.merge_shapefiles
+.. autofunction:: rsgislib.vectorutils.merge_vector_layers
+.. autofunction:: rsgislib.vectorutils.merge_vector_files
+.. autofunction:: rsgislib.vectorutils.merge_utm_vecs_wgs84
+.. autofunction:: rsgislib.vectorutils.merge_to_multi_layer_vec
+.. autoclass:: rsgislib.vectorutils.VecLayersInfoObj
+    :members:
 
 
+Vector Select / Subset / Split
+-------------------------------
 
-
-Attributes
------------
-.. autofunction:: rsgislib.vectorutils.writeVecColumn
-.. autofunction:: rsgislib.vectorutils.writeVecColumn2Layer
-.. autofunction:: rsgislib.vectorutils.readVecColumn
-.. autofunction:: rsgislib.vectorutils.readVecColumns
-.. autofunction:: rsgislib.vectorutils.vectorMaths
-.. autofunction:: rsgislib.vectorutils.removeattributes
-.. autofunction:: rsgislib.vectorutils.findreplacetext
-.. autofunction:: rsgislib.vectorutils.calcarea
-.. autofunction:: rsgislib.vectorutils.populateGeomZField
-.. autofunction:: rsgislib.vectorutils.calcMaxDist2NearestGeom
-.. autofunction:: rsgislib.vectorutils.dist2NearestGeom
-.. autofunction:: rsgislib.vectorutils.dist2NearestSecGeomSet
-.. autofunction:: rsgislib.vectorutils.spatialGraphClusterGeoms
-.. autofunction:: rsgislib.vectorutils.copyRATCols2VectorLyr
-.. autofunction:: rsgislib.vectorutils.getAttLstSelectBBoxFeats
-.. autofunction:: rsgislib.vectorutils.getAttLstSelectBBoxFeatsLyrObjs
-.. autofunction:: rsgislib.vectorutils.getAttLstSelectFeats
-.. autofunction:: rsgislib.vectorutils.getAttLstSelectFeatsLyrObjs
-.. autofunction:: rsgislib.vectorutils.popBBOXCols
-.. autofunction:: rsgislib.vectorutils.performSpatialJoin
-
-Querying
----------
-.. autofunction:: rsgislib.vectorutils.queryFileLUT
-
-
-Management
------------
-.. autofunction:: rsgislib.vectorutils.getMemVecLyrSubset
-.. autofunction:: rsgislib.vectorutils.reProjVectorLayer
-.. autofunction:: rsgislib.vectorutils.mergeShapefiles
-.. autofunction:: rsgislib.vectorutils.mergeVectors2SQLiteDB
-.. autofunction:: rsgislib.vectorutils.mergeVectors2SQLiteDBIndLyrs
-.. autofunction:: rsgislib.vectorutils.mergeVectorLyrs2GPKG
-.. autofunction:: rsgislib.vectorutils.mergeVectors2GPKG
-.. autofunction:: rsgislib.vectorutils.mergeVectors2GPKGIndLyrs
-
-
-Rasterisation
---------------
-.. autofunction:: rsgislib.vectorutils.rasterise2Image
-.. autofunction:: rsgislib.vectorutils.rasteriseVecLyr
-.. autofunction:: rsgislib.vectorutils.rasteriseVecLyrObj
-.. autofunction:: rsgislib.vectorutils.copyVec2RAT
-
-Image Information
-------------------
-.. autofunction:: rsgislib.vectorutils.findCommonImgExtent
+.. autofunction:: rsgislib.vectorutils.get_att_lst_select_feats
+.. autofunction:: rsgislib.vectorutils.get_att_lst_select_feats_lyr_objs
+.. autofunction:: rsgislib.vectorutils.get_att_lst_select_bbox_feats
+.. autofunction:: rsgislib.vectorutils.get_att_lst_select_bbox_feats_lyr_objs
+.. autofunction:: rsgislib.vectorutils.select_intersect_feats
+.. autofunction:: rsgislib.vectorutils.export_spatial_select_feats
+.. autofunction:: rsgislib.vectorutils.bbox_intersects_vec_lyr
+.. autofunction:: rsgislib.vectorutils.subset_envs_vec_lyr_obj
+.. autofunction:: rsgislib.vectorutils.subset_veclyr_to_featboxs
 .. autofunction:: rsgislib.vectorutils.does_vmsk_img_intersect
+.. autofunction:: rsgislib.vectorutils.spatial_select
+.. autofunction:: rsgislib.vectorutils.split_by_attribute
+.. autofunction:: rsgislib.vectorutils.subset_by_attribute
+.. autofunction:: rsgislib.vectorutils.split_feats_to_mlyrs
+.. autofunction:: rsgislib.vectorutils.split_vec_lyr_random_subset
+.. autofunction:: rsgislib.vectorutils.create_train_test_smpls
 
-Utilities
----------
-.. autofunction:: rsgislib.vectorutils.printpolygeom
-.. autofunction:: rsgislib.vectorutils.getVecLayerExtent
-.. autofunction:: rsgislib.vectorutils.getVecFeatCount
-.. autofunction:: rsgislib.vectorutils.getProjWKTFromVec
-.. autofunction:: rsgislib.vectorutils.getVecLyrsLst
-.. autofunction:: rsgislib.vectorutils.lstveclyrcols
-.. autofunction:: rsgislib.vectorutils.ogrVectorColDataTypeFromGDALRATColType
+
+Vector Geometry
+----------------
+.. autofunction:: rsgislib.vectorutils.explode_vec_lyr
+.. autofunction:: rsgislib.vectorutils.explode_vec_files
+.. autofunction:: rsgislib.vectorutils.geopd_check_polys_wgs84bounds_geometry
+.. autofunction:: rsgislib.vectorutils.clip_vec_lyr
+
+
+Vector Info
+-------------
+
+.. autofunction:: rsgislib.vectorutils.get_proj_wkt_from_vec
+.. autofunction:: rsgislib.vectorutils.get_proj_epsg_from_vec
+.. autofunction:: rsgislib.vectorutils.get_vec_feat_count
+.. autofunction:: rsgislib.vectorutils.get_vec_lyrs_lst
+.. autofunction:: rsgislib.vectorutils.get_vec_layer_extent
+.. autofunction:: rsgislib.vectorutils.get_vec_lyr_cols
+.. autofunction:: rsgislib.vectorutils.get_ogr_vec_col_datatype_from_gdal_rat_col_datatype
+
+
+Vectors Utilities
+-------------------
+
+.. autofunction:: rsgislib.vectorutils.check_validate_geometries
+.. autofunction:: rsgislib.vectorutils.delete_vector_file
+.. autofunction:: rsgislib.vectorutils.shiftxy_vec_lyr
 
 
 * :ref:`genindex`

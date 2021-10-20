@@ -24,7 +24,8 @@ import rsgislib
 import rsgislib.imageutils
 
 # Import the RSGISLib RasterGIS module
-import rsgislib.rastergis 
+import rsgislib.rastergis
+
 
 class VecLayersInfoObj(object):
     """
@@ -36,7 +37,9 @@ class VecLayersInfoObj(object):
 
     """
 
-    def __init__(self, vec_file=None, vec_lyr=None, vec_out_lyr=None):
+    def __init__(
+        self, vec_file: str = None, vec_lyr: str = None, vec_out_lyr: str = None
+    ):
         """
         :param vec_file: input vector file.
         :param vec_lyr: input vector layer name
@@ -47,7 +50,8 @@ class VecLayersInfoObj(object):
         self.vec_lyr = vec_lyr
         self.vec_out_lyr = vec_out_lyr
 
-def delete_vector_file(vec_file: str, feedback:bool =True):
+
+def delete_vector_file(vec_file: str, feedback: bool = True):
     """
     Function to delete an existing vector file.
 
@@ -57,6 +61,7 @@ def delete_vector_file(vec_file: str, feedback:bool =True):
     """
     from osgeo import gdal
     import os
+
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
         raise Exception("Could not open '{}'".format(vec_file))
@@ -67,7 +72,7 @@ def delete_vector_file(vec_file: str, feedback:bool =True):
         os.remove(cfile)
 
 
-def get_proj_wkt_from_vec(vec_file, vec_lyr=None):
+def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None):
     """
     A function which gets the WKT projection from the inputted vector file.
 
@@ -90,7 +95,7 @@ def get_proj_wkt_from_vec(vec_file, vec_lyr=None):
     return spatialRef.ExportToWkt()
 
 
-def get_proj_epsg_from_vec(vec_file, vec_lyr=None):
+def get_proj_epsg_from_vec(vec_file: str, vec_lyr: str = None):
     """
     A function which gets the EPSG projection from the inputted vector file.
 
@@ -114,21 +119,21 @@ def get_proj_epsg_from_vec(vec_file, vec_lyr=None):
     return spatialRef.GetAuthorityCode(None)
 
 
-def get_vec_feat_count(vec_file, vec_lyr=None, compute_count=True):
+def get_vec_feat_count(vec_file: str, vec_lyr: str = None, compute_count: bool = True):
     """
-Get a count of the number of features in the vector layers.
+    Get a count of the number of features in the vector layers.
 
-:param vec_file: is a string with the input vector file name and path.
-:param vec_lyr: is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
-:param compute_count: is a boolean which specifies whether the layer extent
-                     should be calculated (rather than estimated from header)
-                     even if that operation is computationally expensive.
+    :param vec_file: is a string with the input vector file name and path.
+    :param vec_lyr: is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
+    :param compute_count: is a boolean which specifies whether the layer extent
+                         should be calculated (rather than estimated from header)
+                         even if that operation is computationally expensive.
 
-:return: nfeats
+    :return: nfeats
 
-"""
+    """
     gdal.UseExceptions()
-    inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
+    inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vec_lyr is not None:
         inLayer = inDataSource.GetLayer(vec_lyr)
     else:
@@ -139,18 +144,18 @@ Get a count of the number of features in the vector layers.
     return nFeats
 
 
-def merge_shapefiles(in_vec_files, out_vec_file):
+def merge_shapefiles(in_vec_files: list, out_vec_file: str):
     """
-Function which will merge a list of shapefiles into an single shapefile using ogr2ogr.
+    Function which will merge a list of shapefiles into an single shapefile using ogr2ogr.
 
-Where:
+    Where:
 
-:param in_vec_files: is a list of input files.
-:param out_vec_file: is the output shapefile
+    :param in_vec_files: is a list of input files.
+    :param out_vec_file: is the output shapefile
 
-"""
+    """
     if os.path.exists(out_vec_file):
-        driver = ogr.GetDriverByName('ESRI Shapefile')
+        driver = ogr.GetDriverByName("ESRI Shapefile")
         driver.DeleteDataSource(out_vec_file)
     first = True
     for inFile in in_vec_files:
@@ -158,31 +163,45 @@ Where:
         print("Processing: " + inFile + " has " + str(nFeat) + " features.")
         if nFeat > 0:
             if first:
-                cmd = 'ogr2ogr -f "ESRI Shapefile"  "' + out_vec_file + '" "' + inFile + '"'
+                cmd = (
+                    'ogr2ogr -f "ESRI Shapefile"  "'
+                    + out_vec_file
+                    + '" "'
+                    + inFile
+                    + '"'
+                )
                 try:
                     subprocess.check_call(cmd, shell=True)
                 except OSError as e:
-                    raise Exception('Error running ogr2ogr: ' + cmd)
+                    raise Exception("Error running ogr2ogr: " + cmd)
                 first = False
             else:
-                cmd = 'ogr2ogr -update -append -f "ESRI Shapefile" "' + out_vec_file + '" "' + inFile + '"'
+                cmd = (
+                    'ogr2ogr -update -append -f "ESRI Shapefile" "'
+                    + out_vec_file
+                    + '" "'
+                    + inFile
+                    + '"'
+                )
                 try:
                     subprocess.check_call(cmd, shell=True)
                 except OSError as e:
-                    raise Exception('Error running ogr2ogr: ' + cmd)
+                    raise Exception("Error running ogr2ogr: " + cmd)
 
-def merge_vectors_to_gpkg(in_vec_files, out_vec_file, out_vec_lyr, exists):
+
+def merge_vectors_to_gpkg(
+    in_vec_files: list, out_vec_file: str, out_vec_lyr: str, exists: bool = False
+):
     """
-Function which will merge a list of vector files into an single output GeoPackage (GPKG) file using ogr2ogr.
+    Function which will merge a list of vector files into an single output GeoPackage (GPKG) file using ogr2ogr.
 
-Where:
+    Where:
 
-:param in_vec_files: is a list of input files.
-:param out_vec_file: is the output GPKG database (\*.gpkg)
-:param out_vec_lyr: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
-:param exists: boolean which specifies whether the database file exists or not.
-
-"""
+    :param in_vec_files: is a list of input files.
+    :param out_vec_file: is the output GPKG database (\*.gpkg)
+    :param out_vec_lyr: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+    :param exists: boolean which specifies whether the database file exists or not.
+    """
     first = True
     for inFile in in_vec_files:
         nFeat = get_vec_feat_count(inFile)
@@ -190,39 +209,64 @@ Where:
         if nFeat > 0:
             if first:
                 if not exists:
-                    cmd = 'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln ' + out_vec_lyr + ' "' + out_vec_file + '" "' + inFile + '"'
+                    cmd = (
+                        'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln '
+                        + out_vec_lyr
+                        + ' "'
+                        + out_vec_file
+                        + '" "'
+                        + inFile
+                        + '"'
+                    )
                     try:
                         subprocess.check_call(cmd, shell=True)
                     except OSError as e:
-                        raise Exception('Error running ogr2ogr: ' + cmd)
+                        raise Exception("Error running ogr2ogr: " + cmd)
                 else:
-                    cmd = 'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln ' + out_vec_lyr + ' "' + out_vec_file + '" "' + inFile + '"'
+                    cmd = (
+                        'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln '
+                        + out_vec_lyr
+                        + ' "'
+                        + out_vec_file
+                        + '" "'
+                        + inFile
+                        + '"'
+                    )
                     try:
                         subprocess.check_call(cmd, shell=True)
                     except OSError as e:
-                        raise Exception('Error running ogr2ogr: ' + cmd)
+                        raise Exception("Error running ogr2ogr: " + cmd)
                 first = False
             else:
-                cmd = 'ogr2ogr -update -append -f "GPKG" -nln ' + out_vec_lyr + ' "' + out_vec_file + '" "' + inFile + '"'
+                cmd = (
+                    'ogr2ogr -update -append -f "GPKG" -nln '
+                    + out_vec_lyr
+                    + ' "'
+                    + out_vec_file
+                    + '" "'
+                    + inFile
+                    + '"'
+                )
                 try:
                     subprocess.check_call(cmd, shell=True)
                 except OSError as e:
-                    raise Exception('Error running ogr2ogr: ' + cmd)
+                    raise Exception("Error running ogr2ogr: " + cmd)
 
 
-def merge_vector_lyrs_to_gpkg(vec_file, out_vec_file, out_vec_lyr, exists):
+def merge_vector_lyrs_to_gpkg(
+    vec_file: str, out_vec_file: str, out_vec_lyr: str, exists: bool = False
+):
     """
-Function which will merge all the layers in the input vector file into an single output GeoPackage (GPKG)
-file using ogr2ogr.
+    Function which will merge all the layers in the input vector file into an single output GeoPackage (GPKG)
+    file using ogr2ogr.
 
-Where:
+    Where:
 
-:param vec_file: is a vector file which contains multiple layers which are to be merged
-:param out_vec_file: is the output GPKG database (\*.gpkg)
-:param out_vec_lyr: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
-:param exists: boolean which specifies whether the database file exists or not.
-
-"""
+    :param vec_file: is a vector file which contains multiple layers which are to be merged
+    :param out_vec_file: is the output GPKG database (\*.gpkg)
+    :param out_vec_lyr: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+    :param exists: boolean which specifies whether the database file exists or not.
+    """
     lyrs = get_vec_lyrs_lst(vec_file)
     first = True
     for lyr in lyrs:
@@ -231,83 +275,123 @@ Where:
         if nFeat > 0:
             if first:
                 if not exists:
-                    cmd = 'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln ' + out_vec_lyr + ' "' + out_vec_file + '" "' + vec_file + '" "' + lyr + '"'
+                    cmd = (
+                        'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln '
+                        + out_vec_lyr
+                        + ' "'
+                        + out_vec_file
+                        + '" "'
+                        + vec_file
+                        + '" "'
+                        + lyr
+                        + '"'
+                    )
                     try:
                         subprocess.check_call(cmd, shell=True)
                     except OSError as e:
-                        raise Exception('Error running ogr2ogr: ' + cmd)
+                        raise Exception("Error running ogr2ogr: " + cmd)
                 else:
-                    cmd = 'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln ' + out_vec_lyr + ' "' + out_vec_file + '" "' + vec_file + '" "' + lyr + '"'
+                    cmd = (
+                        'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln '
+                        + out_vec_lyr
+                        + ' "'
+                        + out_vec_file
+                        + '" "'
+                        + vec_file
+                        + '" "'
+                        + lyr
+                        + '"'
+                    )
                     try:
                         subprocess.check_call(cmd, shell=True)
                     except OSError as e:
-                        raise Exception('Error running ogr2ogr: ' + cmd)
+                        raise Exception("Error running ogr2ogr: " + cmd)
                 first = False
             else:
-                cmd = 'ogr2ogr -update -append -f "GPKG" -nln ' + out_vec_lyr + ' "' + out_vec_file + '" "' + vec_file + '" "' + lyr + '"'
+                cmd = (
+                    'ogr2ogr -update -append -f "GPKG" -nln '
+                    + out_vec_lyr
+                    + ' "'
+                    + out_vec_file
+                    + '" "'
+                    + vec_file
+                    + '" "'
+                    + lyr
+                    + '"'
+                )
                 try:
                     subprocess.check_call(cmd, shell=True)
                 except OSError as e:
-                    raise Exception('Error running ogr2ogr: ' + cmd)
+                    raise Exception("Error running ogr2ogr: " + cmd)
 
 
-def merge_vectors_to_gpkg_ind_lyrs(in_vec_files, out_vec_file, rename_dup_lyrs=False, geom_type=None):
+def merge_vectors_to_gpkg_ind_lyrs(
+    in_vec_files: list,
+    out_vec_file: str,
+    rename_dup_lyrs: bool = False,
+    geom_type: str = None,
+):
     """
-Function which will merge a list of vector files into an single output GPKG file where each input
-file forms a new layer using the existing layer name. This function wraps the ogr2ogr command.
+    Function which will merge a list of vector files into an single output GPKG file where each input
+    file forms a new layer using the existing layer name. This function wraps the ogr2ogr command.
 
-Where:
+    Where:
 
-:param in_vec_files: is a list of input files.
-:param out_vec_file: is the output GPKG database (\*.gpkg)
-:param rename_dup_lyrs: If False an exception will be throw if any input layers has the same name.
-                        If True a layer will be renamed - with a random set of letters/numbers on the end.
-:param geom_type: Force the output vector to have a particular geometry type (e.g., 'POLYGON'). Same options as ogr2ogr.
-
-"""
+    :param in_vec_files: is a list of input files.
+    :param out_vec_file: is the output GPKG database (\*.gpkg)
+    :param rename_dup_lyrs: If False an exception will be throw if any input layers has the same name.
+                            If True a layer will be renamed - with a random set of letters/numbers on the end.
+    :param geom_type: Force the output vector to have a particular geometry type (e.g., 'POLYGON'). Same options as ogr2ogr.
+    """
     import rsgislib.tools.utils
+
     out_lyr_names = []
 
-    out_geom_type = ''
+    out_geom_type = ""
     if geom_type is not None:
-        out_geom_type = ' -nlt {} '.format(geom_type)
+        out_geom_type = " -nlt {} ".format(geom_type)
 
     for inFile in in_vec_files:
         inlyrs = get_vec_lyrs_lst(inFile)
-        print("Processing File: {0} has {1} layers to copy.".format(inFile, len(inlyrs)))
+        print(
+            "Processing File: {0} has {1} layers to copy.".format(inFile, len(inlyrs))
+        )
         for lyr in inlyrs:
             nFeat = get_vec_feat_count(inFile, lyr)
             out_lyr = lyr
             if lyr in out_lyr_names:
                 if rename_dup_lyrs:
-                    out_lyr = '{}_{}'.format(lyr, rsgislib.tools.utils.uid_generator())
+                    out_lyr = "{}_{}".format(lyr, rsgislib.tools.utils.uid_generator())
                 else:
-                    raise Exception("Input files have layers with the same name, these will be over written.")
-            print("Processing Layer: {0} has {1} features to copy - output layer name: {2}".format(lyr, nFeat, out_lyr))
+                    raise Exception(
+                        "Input files have layers with the same name, these will be over written."
+                    )
+            print(
+                "Processing Layer: {0} has {1} features to copy - output layer name: {2}".format(
+                    lyr, nFeat, out_lyr
+                )
+            )
             if nFeat > 0:
-                cmd = 'ogr2ogr -overwrite -f "GPKG" {4} -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {3}'.format(out_lyr,
-                                                                                                                out_vec_file,
-                                                                                                                inFile,
-                                                                                                                lyr,
-                                                                                                                out_geom_type)
+                cmd = 'ogr2ogr -overwrite -f "GPKG" {4} -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {3}'.format(
+                    out_lyr, out_vec_file, inFile, lyr, out_geom_type
+                )
                 try:
                     subprocess.check_call(cmd, shell=True)
                 except OSError as e:
-                    raise Exception('Error running ogr2ogr: ' + cmd)
+                    raise Exception("Error running ogr2ogr: " + cmd)
                 out_lyr_names.append(out_lyr)
 
 
-
-def get_vec_lyrs_lst(vec_file):
+def get_vec_lyrs_lst(vec_file: str):
     """
-A function which returns a list of available layers within the inputted vector file.
+    A function which returns a list of available layers within the inputted vector file.
 
-:param vec_file: file name and path to input vector layer.
+    :param vec_file: file name and path to input vector layer.
 
-:return: list of layer names (can be used with gdal.Dataset.GetLayerByName()).
+    :return: list of layer names (can be used with gdal.Dataset.GetLayerByName()).
 
-"""
-    gdalDataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
+    """
+    gdalDataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     layerList = []
     for lyr_idx in range(gdalDataset.GetLayerCount()):
         lyr = gdalDataset.GetLayerByIndex(lyr_idx)
@@ -318,23 +402,24 @@ A function which returns a list of available layers within the inputted vector f
     return layerList
 
 
-def get_vec_layer_extent(vec_file, vec_lyr=None, compute_if_exp=True):
+def get_vec_layer_extent(
+    vec_file: str, vec_lyr: str = None, compute_if_exp: bool = True
+):
     """
-Get the extent of the vector layer.
+    Get the extent of the vector layer.
 
-:param vec_file: is a string with the input vector file name and path.
-:param vec_lyr: is the layer for which extent is to be calculated (Default: None)
-                  if None assume there is only one layer and that will be read.
-:param compute_if_exp: is a boolean which specifies whether the layer extent
-                     should be calculated (rather than estimated from header)
-                     even if that operation is computationally expensive.
+    :param vec_file: is a string with the input vector file name and path.
+    :param vec_lyr: is the layer for which extent is to be calculated (Default: None)
+                      if None assume there is only one layer and that will be read.
+    :param compute_if_exp: is a boolean which specifies whether the layer extent
+                         should be calculated (rather than estimated from header)
+                         even if that operation is computationally expensive.
 
-:return: boundary box is returned (MinX, MaxX, MinY, MaxY)
-
-"""
+    :return: boundary box is returned (MinX, MaxX, MinY, MaxY)
+    """
     gdal.UseExceptions()
     # Get a Layer's Extent
-    inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
+    inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vec_lyr is not None:
         inLayer = inDataSource.GetLayer(vec_lyr)
     else:
@@ -343,50 +428,59 @@ Get the extent of the vector layer.
     return extent
 
 
-
-def split_vec_lyr(vec_file, vec_lyr, nfeats, out_format, out_dir, out_vec_base, out_vec_ext):
+def split_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    n_feats: int,
+    out_format: str,
+    out_dir: str,
+    out_vec_base: str,
+    out_vec_ext: str,
+):
     """
-A function which splits the input vector layer into a number of output layers.
+    A function which splits the input vector layer into a number of output layers.
 
-:param vec_file: input vector file.
-:param vec_lyr: input layer name.
-:param nfeats: number of features within each output file.
-:param out_format: output file driver.
-:param out_dir: output directory for the created output files.
-:param out_vec_base: output layer name will be the same as the base file name.
-:param out_vec_ext: file ending (e.g., .shp).
+    :param vec_file: input vector file.
+    :param vec_lyr: input layer name.
+    :param n_feats: number of features within each output file.
+    :param out_format: output file driver.
+    :param out_dir: output directory for the created output files.
+    :param out_vec_base: output layer name will be the same as the base file name.
+    :param out_vec_ext: file ending (e.g., .shp).
 
-"""
+    """
     gdal.UseExceptions()
-    datasrc = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
+    datasrc = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     srcLyr = datasrc.GetLayer(vec_lyr)
     nInFeats = srcLyr.GetFeatureCount(True)
     print(nInFeats)
-    
-    nOutFiles = math.floor(nInFeats/nfeats)
-    remainFeats = nInFeats - (nOutFiles*nfeats)
+
+    nOutFiles = math.floor(nInFeats / n_feats)
+    remainFeats = nInFeats - (nOutFiles * n_feats)
     print(nOutFiles)
     print(remainFeats)
-    
+
     out_driver = ogr.GetDriverByName(out_format)
     src_lyr_spat_ref = srcLyr.GetSpatialRef()
-    
+
     cFeatN = 0
     sFeatN = 0
-    eFeatN = nfeats
+    eFeatN = n_feats
     for i in range(nOutFiles):
         outveclyr = "{0}{1}".format(out_vec_base, i + 1)
         outvecfile = os.path.join(out_dir, "{0}{1}".format(outveclyr, out_vec_ext))
         print("Creating: {}".format(outvecfile))
         result_ds = out_driver.CreateDataSource(outvecfile)
-        result_lyr = result_ds.CreateLayer(outveclyr, src_lyr_spat_ref, geom_type=srcLyr.GetGeomType())
-        
+        result_lyr = result_ds.CreateLayer(
+            outveclyr, src_lyr_spat_ref, geom_type=srcLyr.GetGeomType()
+        )
+
         srcLayerDefn = srcLyr.GetLayerDefn()
         for i in range(srcLayerDefn.GetFieldCount()):
             fieldDefn = srcLayerDefn.GetFieldDefn(i)
             result_lyr.CreateField(fieldDefn)
         rsltLayerDefn = result_lyr.GetLayerDefn()
-        
+
         cFeatN = 0
         srcLyr.ResetReading()
         inFeat = srcLyr.GetNextFeature()
@@ -402,29 +496,31 @@ A function which splits the input vector layer into a number of output layers.
             cFeatN = cFeatN + 1
         result_lyr.CommitTransaction()
         result_ds = None
-        
-        sFeatN = sFeatN + nfeats
-        eFeatN = eFeatN + nfeats
-    
+
+        sFeatN = sFeatN + n_feats
+        eFeatN = eFeatN + n_feats
+
     if remainFeats > 0:
         outveclyr = "{0}{1}".format(out_vec_base, nOutFiles + 1)
         outvecfile = os.path.join(out_dir, "{0}{1}".format(outveclyr, out_vec_ext))
         print("Creating: {}".format(outvecfile))
         result_ds = out_driver.CreateDataSource(outvecfile)
-        result_lyr = result_ds.CreateLayer(outveclyr, src_lyr_spat_ref, geom_type=srcLyr.GetGeomType())
+        result_lyr = result_ds.CreateLayer(
+            outveclyr, src_lyr_spat_ref, geom_type=srcLyr.GetGeomType()
+        )
 
         srcLayerDefn = srcLyr.GetLayerDefn()
         for i in range(srcLayerDefn.GetFieldCount()):
             fieldDefn = srcLayerDefn.GetFieldDefn(i)
             result_lyr.CreateField(fieldDefn)
         rsltLayerDefn = result_lyr.GetLayerDefn()
-        
+
         cFeatN = 0
         srcLyr.ResetReading()
         inFeat = srcLyr.GetNextFeature()
         result_lyr.StartTransaction()
         while inFeat:
-            if (cFeatN >= sFeatN):
+            if cFeatN >= sFeatN:
                 geom = inFeat.GetGeometryRef()
                 if geom is not None:
                     result_lyr.CreateFeature(inFeat)
@@ -435,30 +531,37 @@ A function which splits the input vector layer into a number of output layers.
     datasrc = None
 
 
-def reproj_vector_layer(vec_file, out_vec_file, out_proj_wkt, out_format='GPKG', out_vec_lyr=None,
-                        vec_lyr=None, in_proj_wkt=None, del_exist_vec=False):
+def reproj_vector_layer(
+    vec_file: str,
+    out_vec_file: str,
+    out_proj_wkt: str,
+    out_format: str = "GPKG",
+    out_vec_lyr: str = None,
+    vec_lyr: str = None,
+    in_proj_wkt: str = None,
+    del_exist_vec: bool = False,
+):
     """
-A function which reprojects a vector layer. You might also consider using
-rsgislib.vectorutils.vector_translate, particularly if you are reprojecting the data
-and changing between coordinate units (e.g., degrees to meters)
+    A function which reprojects a vector layer. You might also consider using
+    rsgislib.vectorutils.vector_translate, particularly if you are reprojecting the data
+    and changing between coordinate units (e.g., degrees to meters)
 
-:param vec_file: is a string with name and path to input vector file.
-:param out_vec_file: is a string with name and path to output vector file.
-:param out_proj_wkt: is a string with the WKT string for the output vector file.
-:param out_format: is the output vector file format. Default is ESRI Shapefile.
-:param out_vec_lyr: is a string for the output layer name. If None then ignored and
-                   assume there is just a single layer in the vector and layer name
-                   is the same as the file name.
-:param vec_lyr: is a string for the input layer name. If None then ignored and
-                  assume there is just a single layer in the vector.
-:param in_proj_wkt: is a string with the WKT string for the input shapefile
-                  (Optional; taken from input file if not specified).
-
-"""
+    :param vec_file: is a string with name and path to input vector file.
+    :param out_vec_file: is a string with name and path to output vector file.
+    :param out_proj_wkt: is a string with the WKT string for the output vector file.
+    :param out_format: is the output vector file format. Default is ESRI Shapefile.
+    :param out_vec_lyr: is a string for the output layer name. If None then ignored and
+                       assume there is just a single layer in the vector and layer name
+                       is the same as the file name.
+    :param vec_lyr: is a string for the input layer name. If None then ignored and
+                      assume there is just a single layer in the vector.
+    :param in_proj_wkt: is a string with the WKT string for the input shapefile
+                      (Optional; taken from input file if not specified).
+    """
     ## This code has been editted and updated for GDAL > version 2.0
     ## https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
     gdal.UseExceptions()
-        
+
     # get the input layer
     inDataSet = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if inDataSet is None:
@@ -467,70 +570,70 @@ and changing between coordinate units (e.g., degrees to meters)
         inLayer = inDataSet.GetLayer()
     else:
         inLayer = inDataSet.GetLayer(vec_lyr)
-    
+
     # input SpatialReference
     inSpatialRef = osr.SpatialReference()
     if in_proj_wkt is not None:
         inSpatialRef.ImportFromWkt(in_proj_wkt)
     else:
         inSpatialRef = inLayer.GetSpatialRef()
-    
+
     # output SpatialReference
     outSpatialRef = osr.SpatialReference()
     outSpatialRef.ImportFromWkt(out_proj_wkt)
-    
+
     # create the CoordinateTransformation
     coordTrans = osr.CoordinateTransformation(inSpatialRef, outSpatialRef)
-    
+
     # Create shapefile driver
     driver = gdal.GetDriverByName(out_format)
-    
+
     # create the output layer
     if os.path.exists(out_vec_file):
-        if (out_format == 'ESRI Shapefile'):
+        if out_format == "ESRI Shapefile":
             if del_exist_vec:
                 driver.DeleteDataSource(out_vec_file)
             else:
-                raise Exception('Output shapefile already exists - stopping.')
-            outDataSet = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown )
+                raise Exception("Output shapefile already exists - stopping.")
+            outDataSet = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
         else:
-            outDataSet = gdal.OpenEx(out_vec_file, gdal.OF_UPDATE )
+            outDataSet = gdal.OpenEx(out_vec_file, gdal.OF_UPDATE)
     else:
-        outDataSet = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown )
-    
+        outDataSet = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
+
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
     outLayer = outDataSet.CreateLayer(out_vec_lyr, outSpatialRef, inLayer.GetGeomType())
-    
+
     # add fields
     inLayerDefn = inLayer.GetLayerDefn()
     for i in range(0, inLayerDefn.GetFieldCount()):
         fieldDefn = inLayerDefn.GetFieldDefn(i)
         outLayer.CreateField(fieldDefn)
-    
+
     # get the output layer's feature definition
     outLayerDefn = outLayer.GetLayerDefn()
-    
+
     openTransaction = False
     nFeats = inLayer.GetFeatureCount(True)
-    step = math.floor(nFeats/10)
+    step = math.floor(nFeats / 10)
     feedback = 10
     feedback_next = step
     counter = 0
-    print("Started .0.", end='', flush=True)
-    
+    print("Started .0.", end="", flush=True)
+
     # loop through the input features
     inFeature = inLayer.GetNextFeature()
     while inFeature:
-        if (nFeats>10) and (counter == feedback_next):
-            print(".{}.".format(feedback), end='', flush=True)
+        if (nFeats > 10) and (counter == feedback_next):
+            print(".{}.".format(feedback), end="", flush=True)
             feedback_next = feedback_next + step
             feedback = feedback + 10
-        
+
         if not openTransaction:
             outLayer.StartTransaction()
             openTransaction = True
-    
+
         # get the input geometry
         geom = inFeature.GetGeometryRef()
         if geom is not None:
@@ -541,52 +644,60 @@ and changing between coordinate units (e.g., degrees to meters)
             # set the geometry and attribute
             outFeature.SetGeometry(geom)
             for i in range(0, outLayerDefn.GetFieldCount()):
-                outFeature.SetField(outLayerDefn.GetFieldDefn(i).GetNameRef(), inFeature.GetField(i))
+                outFeature.SetField(
+                    outLayerDefn.GetFieldDefn(i).GetNameRef(), inFeature.GetField(i)
+                )
             # add the feature to the shapefile
             outLayer.CreateFeature(outFeature)
         # dereference the features and get the next input feature
         outFeature = None
-        
+
         if ((counter % 20000) == 0) and openTransaction:
             outLayer.CommitTransaction()
             openTransaction = False
-        
+
         inFeature = inLayer.GetNextFeature()
         counter = counter + 1
-    
+
     if openTransaction:
         outLayer.CommitTransaction()
         openTransaction = False
     outLayer.SyncToDisk()
     print(" Completed")
-    
+
     # Save and close the shapefiles
     inDataSet = None
     outDataSet = None
 
 
-def reproj_vec_lyr(vec_lyr_obj, out_vec_file, out_epsg, out_format='MEMORY', out_vec_lyr=None, in_epsg=None,
-                   print_feedback=True):
+def reproj_vec_lyr(
+    vec_lyr_obj,
+    out_vec_file: str,
+    out_epsg: int,
+    out_format: str = "MEMORY",
+    out_vec_lyr: str = None,
+    in_epsg: int = None,
+    print_feedback: bool = True,
+):
     """
-A function which reprojects a vector layer. You might also consider using rsgislib.vectorutils.vector_translate,
-particularly if you are reprojecting the data and changing between coordinate units (e.g., degrees to meters)
+    A function which reprojects a vector layer. You might also consider using rsgislib.vectorutils.vector_translate,
+    particularly if you are reprojecting the data and changing between coordinate units (e.g., degrees to meters)
 
-:param vec_lyr_obj: is a GDAL vector layer object.
-:param out_vec_file: is a string with name and path to output vector file - is created.
-:param out_epsg: is an int with the EPSG code to which the input vector layer is to be reprojected to.
-:param out_format: is the output vector file format. Default is MEMORY - i.e., nothing written to disk.
-:param out_vec_lyr: is a string for the output layer name. If None then ignored and
-                   assume there is just a single layer in the vector and layer name
-                   is the same as the file name.
-:param inLyrName: is a string for the input layer name. If None then ignored and
-                  assume there is just a single layer in the vector.
-:param in_epsg: is an int with the EPSG code for the input vector file
-                  (Optional; taken from input file if not specified).
-:param print_feedback: is a boolean (Default True) specifying whether feedback should be printed to the console.
-:return: Returns the output datasource and layer objects (result_ds, result_lyr). datasource needs to be set to None
-         once you have finished using to free memory and if written to disk to ensure the whole dataset is written.
-
-"""
+    :param vec_lyr_obj: is a GDAL vector layer object.
+    :param out_vec_file: is a string with name and path to output vector file - is created.
+    :param out_epsg: is an int with the EPSG code to which the input vector layer is to be reprojected to.
+    :param out_format: is the output vector file format. Default is MEMORY - i.e., nothing written to disk.
+    :param out_vec_lyr: is a string for the output layer name. If None then ignored and
+                       assume there is just a single layer in the vector and layer name
+                       is the same as the file name.
+    :param inLyrName: is a string for the input layer name. If None then ignored and
+                      assume there is just a single layer in the vector.
+    :param in_epsg: is an int with the EPSG code for the input vector file
+                      (Optional; taken from input file if not specified).
+    :param print_feedback: is a boolean (Default True) specifying whether feedback should be printed to the console.
+    :return: Returns the output datasource and layer objects (result_ds, result_lyr). datasource needs to be set to None
+             once you have finished using to free memory and if written to disk to ensure the whole dataset is written.
+    """
     ## This code has been editted from https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
     ## Updated for GDAL 2.0
     gdal.UseExceptions()
@@ -615,10 +726,14 @@ particularly if you are reprojecting the data and changing between coordinate un
     # create the output layer
     result_ds = driver.CreateDataSource(out_vec_file)
     if result_ds == None:
-        raise Exception("The output vector data source was not created: {}".format(out_vec_file))
+        raise Exception(
+            "The output vector data source was not created: {}".format(out_vec_file)
+        )
     if out_vec_lyr == None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
-    result_lyr = result_ds.CreateLayer(out_vec_lyr, out_spat_ref, geom_type=vec_lyr_obj.GetGeomType())
+    result_lyr = result_ds.CreateLayer(
+        out_vec_lyr, out_spat_ref, geom_type=vec_lyr_obj.GetGeomType()
+    )
 
     # add fields
     in_vec_lyr_defn = vec_lyr_obj.GetLayerDefn()
@@ -636,14 +751,14 @@ particularly if you are reprojecting the data and changing between coordinate un
     feedback_next = step
     counter = 0
     if print_feedback:
-        print("Started .0.", end='', flush=True)
+        print("Started .0.", end="", flush=True)
 
     # loop through the input features
     inFeature = vec_lyr_obj.GetNextFeature()
     while inFeature:
         if (nFeats > 10) and (counter == feedback_next):
             if print_feedback:
-                print(".{}.".format(feedback), end='', flush=True)
+                print(".{}.".format(feedback), end="", flush=True)
             feedback_next = feedback_next + step
             feedback = feedback + 10
 
@@ -657,13 +772,19 @@ particularly if you are reprojecting the data and changing between coordinate un
             # reproject the geometry
             trans_err_code = geom.Transform(coord_trans)
             if trans_err_code != ogr.OGRERR_NONE:
-                raise Exception("Geometry transformation failed... Error Code: {}".format(trans_err_code))
+                raise Exception(
+                    "Geometry transformation failed... Error Code: {}".format(
+                        trans_err_code
+                    )
+                )
             # create a new feature
             outFeature = ogr.Feature(result_lyr_defn)
             # set the geometry and attribute
             outFeature.SetGeometry(geom)
             for i in range(0, result_lyr_defn.GetFieldCount()):
-                outFeature.SetField(result_lyr_defn.GetFieldDefn(i).GetNameRef(), inFeature.GetField(i))
+                outFeature.SetField(
+                    result_lyr_defn.GetFieldDefn(i).GetNameRef(), inFeature.GetField(i)
+                )
             # add the feature to the shapefile
             result_lyr.CreateFeature(outFeature)
         # dereference the features and get the next input feature
@@ -690,225 +811,34 @@ particularly if you are reprojecting the data and changing between coordinate un
 
 def get_att_lst_select_feats(vec_file, vec_lyr, att_names, vec_sel_file, vec_sel_lyr):
     """
-Function to get a list of attribute values from features which intersect
-with the select layer.
+    Function to get a list of attribute values from features which intersect
+    with the select layer.
 
-:param vec_file: vector layer from which the attribute data comes from.
-:param vec_lyr: the layer name from which the attribute data comes from.
-:param att_names: a list of attribute names to be outputted.
-:param vec_sel_file: the vector file which will be intersected within the vector file.
-:param vec_sel_lyr: the layer name which will be intersected within the vector file.
-:return: list of dictionaries with the output values.
-
-"""
+    :param vec_file: vector layer from which the attribute data comes from.
+    :param vec_lyr: the layer name from which the attribute data comes from.
+    :param att_names: a list of attribute names to be outputted.
+    :param vec_sel_file: the vector file which will be intersected within the vector file.
+    :param vec_sel_lyr: the layer name which will be intersected within the vector file.
+    :return: list of dictionaries with the output values.
+    """
     gdal.UseExceptions()
     att_vals = []
     try:
-        dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
+        dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if dsVecFile is None:
             raise Exception("Could not open '" + vec_file + "'")
-        
-        vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
+
+        vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
             raise Exception("Could not find layer '{}'".format(vec_lyr))
-            
+
         dsSelVecFile = gdal.OpenEx(vec_sel_file, gdal.OF_READONLY)
         if dsSelVecFile is None:
             raise Exception("Could not open '" + vec_sel_file + "'")
-        
+
         lyrSelVecObj = dsSelVecFile.GetLayerByName(vec_sel_lyr)
         if lyrSelVecObj is None:
             raise Exception("Could not find layer '" + vec_sel_lyr + "'")
-        
-        lyrDefn = vec_lyr_obj.GetLayerDefn()
-        feat_idxs = dict()
-        feat_types= dict()
-        found_atts = dict()
-        for attName in att_names:
-            found_atts[attName] = False
-        
-        for i in range(lyrDefn.GetFieldCount()):
-            if lyrDefn.GetFieldDefn(i).GetName() in att_names:
-                attName = lyrDefn.GetFieldDefn(i).GetName()
-                feat_idxs[attName] = i
-                feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
-                found_atts[attName] = True
-                
-        for attName in att_names:
-            if not found_atts[attName]:
-                dsSelVecFile = None            
-                dsVecFile = None
-                raise Exception("Could not find the attribute ({}) specified within the vector layer.".format(attName))
-            
-        mem_driver = ogr.GetDriverByName('MEMORY')
-        
-        mem_sel_ds = mem_driver.CreateDataSource('MemSelData')
-        mem_sel_lyr = mem_sel_ds.CopyLayer(lyrSelVecObj, vec_sel_lyr, ['OVERWRITE=YES'])
-        
-        mem_result_ds = mem_driver.CreateDataSource('MemResultData')
-        mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", geom_type=vec_lyr_obj.GetGeomType())
-        
-        for attName in att_names:
-            mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
-        
-        vec_lyr_obj.Intersection(mem_sel_lyr, mem_result_lyr)
-        
-        # loop through the input features
-        reslyrDefn = mem_result_lyr.GetLayerDefn()
-        inFeat = mem_result_lyr.GetNextFeature()
-        outvals = []
-        while inFeat:
-            outdict = dict()
-            for attName in att_names:
-                feat_idx = reslyrDefn.GetFieldIndex(attName)
-                if feat_types[attName] == ogr.OFTString:
-                    outdict[attName] = inFeat.GetFieldAsString(feat_idx)
-                elif feat_types[attName] == ogr.OFTReal:
-                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idx)
-                elif feat_types[attName] == ogr.OFTInteger:
-                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
-                else:
-                    outdict[attName] = inFeat.GetField(feat_idx)
-            outvals.append(outdict)
-            inFeat = mem_result_lyr.GetNextFeature()
-        
-        dsSelVecFile = None        
-        dsVecFile = None
-        mem_sel_ds = None
-        mem_result_ds = None
-    except Exception as e:
-        raise e
-    return outvals
-
-
-def get_att_lst_select_feats_lyr_objs(vec_lyr_obj, att_names, vec_sel_lyr_obj):
-    """
-Function to get a list of attribute values from features which intersect
-with the select layer.
-
-:param vec_lyr_obj: the OGR layer object from which the attribute data comes from.
-:param att_names: a list of attribute names to be outputted.
-:param vec_sel_lyr_obj: the OGR layer object which will be intersected within the vector file.
-
-:return: list of dictionaries with the output values.
-
-"""
-    gdal.UseExceptions()
-    att_vals = []
-    try:
-        if vec_lyr_obj is None:
-            raise Exception("The vector layer passed into the function was None.")
-        
-        if vec_sel_lyr_obj is None:
-            raise Exception("The select vector layer passed into the function was None.")
-        
-        lyrDefn = vec_lyr_obj.GetLayerDefn()
-        feat_idxs = dict()
-        feat_types= dict()
-        found_atts = dict()
-        for attName in att_names:
-            found_atts[attName] = False
-        
-        for i in range(lyrDefn.GetFieldCount()):
-            if lyrDefn.GetFieldDefn(i).GetName() in att_names:
-                attName = lyrDefn.GetFieldDefn(i).GetName()
-                feat_idxs[attName] = i
-                feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
-                found_atts[attName] = True
-                
-        for attName in att_names:
-            if not found_atts[attName]:
-                raise Exception("Could not find the attribute ({}) specified within the vector layer.".format(attName))
-            
-        mem_driver = ogr.GetDriverByName('MEMORY')
-                
-        mem_result_ds = mem_driver.CreateDataSource('MemResultData')
-        mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", geom_type=vec_lyr_obj.GetGeomType())
-        
-        for attName in att_names:
-            mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
-        
-        vec_lyr_obj.Intersection(vec_sel_lyr_obj, mem_result_lyr)
-        
-        # loop through the input features
-        reslyrDefn = mem_result_lyr.GetLayerDefn()
-        inFeat = mem_result_lyr.GetNextFeature()
-        outvals = []
-        while inFeat:
-            outdict = dict()
-            for attName in att_names:
-                feat_idx = reslyrDefn.GetFieldIndex(attName)
-                if feat_types[attName] == ogr.OFTString:
-                    outdict[attName] = inFeat.GetFieldAsString(feat_idx)
-                elif feat_types[attName] == ogr.OFTReal:
-                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idx)
-                elif feat_types[attName] == ogr.OFTInteger:
-                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
-                else:
-                    outdict[attName] = inFeat.GetField(feat_idx)
-            outvals.append(outdict)
-            inFeat = mem_result_lyr.GetNextFeature()
-        
-        mem_result_ds = None
-    except Exception as e:
-        raise e
-    return outvals
-
-
-def get_att_lst_select_bbox_feats(vec_file, vec_lyr, att_names, bbox, bbox_epsg=None):
-    """
-Function to get a list of attribute values from features which intersect
-with the select layer.
-
-:param vec_file: the OGR file from which the attribute data comes from.
-:param vec_lyr: the layer name within the file from which the attribute data comes from.
-:param att_names: a list of attribute names to be outputted.
-:param bbox: the bounding box for the region of interest (xMin, xMax, yMin, yMax).
-:param bbox_epsg: the projection of the BBOX (if None then ignore).
-
-:return: list of dictionaries with the output values.
-
-"""
-    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
-    if dsVecFile is None:
-        raise Exception("Could not open '{}'".format(vec_file))
-
-    vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
-    if vec_lyr_obj is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
-
-    outvals = get_att_lst_select_bbox_feats_lyr_objs(vec_lyr_obj, att_names, bbox, bbox_epsg)
-    dsVecFile = None
-
-    return outvals
-
-
-def get_att_lst_select_bbox_feats_lyr_objs(vec_lyr_obj, att_names, bbox, bbox_epsg=None):
-    """
-Function to get a list of attribute values from features which intersect
-with the select layer.
-
-:param vec_lyr_obj: the OGR layer object from which the attribute data comes from.
-:param att_names: a list of attribute names to be outputted.
-:param bbox: the bounding box for the region of interest (xMin, xMax, yMin, yMax).
-:param bbox_epsg: the projection of the BBOX (if None then ignore).
-
-:return: list of dictionaries with the output values.
-
-"""
-    gdal.UseExceptions()
-    outvals = []
-    try:
-        if vec_lyr_obj is None:
-            raise Exception("The vector layer passed into the function was None.")
-
-        in_vec_lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
-        if bbox_epsg is not None:
-            in_vec_lyr_spat_ref.AutoIdentifyEPSG()
-            in_vec_lyr_epsg = in_vec_lyr_spat_ref.GetAuthorityCode(None)
-
-            if (in_vec_lyr_epsg is not None) and (int(in_vec_lyr_epsg) != int(bbox_epsg)):
-                raise Exception("The EPSG codes for the BBOX and input vector layer are not the same.")
 
         lyrDefn = vec_lyr_obj.GetLayerDefn()
         feat_idxs = dict()
@@ -926,12 +856,227 @@ with the select layer.
 
         for attName in att_names:
             if not found_atts[attName]:
-                raise Exception("Could not find the attribute ({}) specified within the vector layer.".format(attName))
+                dsSelVecFile = None
+                dsVecFile = None
+                raise Exception(
+                    "Could not find the attribute ({}) specified within the vector layer.".format(
+                        attName
+                    )
+                )
+
+        mem_driver = ogr.GetDriverByName("MEMORY")
+
+        mem_sel_ds = mem_driver.CreateDataSource("MemSelData")
+        mem_sel_lyr = mem_sel_ds.CopyLayer(lyrSelVecObj, vec_sel_lyr, ["OVERWRITE=YES"])
+
+        mem_result_ds = mem_driver.CreateDataSource("MemResultData")
+        mem_result_lyr = mem_result_ds.CreateLayer(
+            "MemResultLyr", geom_type=vec_lyr_obj.GetGeomType()
+        )
+
+        for attName in att_names:
+            mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
+
+        vec_lyr_obj.Intersection(mem_sel_lyr, mem_result_lyr)
+
+        # loop through the input features
+        reslyrDefn = mem_result_lyr.GetLayerDefn()
+        inFeat = mem_result_lyr.GetNextFeature()
+        outvals = []
+        while inFeat:
+            outdict = dict()
+            for attName in att_names:
+                feat_idx = reslyrDefn.GetFieldIndex(attName)
+                if feat_types[attName] == ogr.OFTString:
+                    outdict[attName] = inFeat.GetFieldAsString(feat_idx)
+                elif feat_types[attName] == ogr.OFTReal:
+                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idx)
+                elif feat_types[attName] == ogr.OFTInteger:
+                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
+                else:
+                    outdict[attName] = inFeat.GetField(feat_idx)
+            outvals.append(outdict)
+            inFeat = mem_result_lyr.GetNextFeature()
+
+        dsSelVecFile = None
+        dsVecFile = None
+        mem_sel_ds = None
+        mem_result_ds = None
+    except Exception as e:
+        raise e
+    return outvals
+
+
+def get_att_lst_select_feats_lyr_objs(vec_lyr_obj, att_names, vec_sel_lyr_obj):
+    """
+    Function to get a list of attribute values from features which intersect
+    with the select layer.
+
+    :param vec_lyr_obj: the OGR layer object from which the attribute data comes from.
+    :param att_names: a list of attribute names to be outputted.
+    :param vec_sel_lyr_obj: the OGR layer object which will be intersected within the vector file.
+
+    :return: list of dictionaries with the output values.
+    """
+    gdal.UseExceptions()
+    att_vals = []
+    try:
+        if vec_lyr_obj is None:
+            raise Exception("The vector layer passed into the function was None.")
+
+        if vec_sel_lyr_obj is None:
+            raise Exception(
+                "The select vector layer passed into the function was None."
+            )
+
+        lyrDefn = vec_lyr_obj.GetLayerDefn()
+        feat_idxs = dict()
+        feat_types = dict()
+        found_atts = dict()
+        for attName in att_names:
+            found_atts[attName] = False
+
+        for i in range(lyrDefn.GetFieldCount()):
+            if lyrDefn.GetFieldDefn(i).GetName() in att_names:
+                attName = lyrDefn.GetFieldDefn(i).GetName()
+                feat_idxs[attName] = i
+                feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
+                found_atts[attName] = True
+
+        for attName in att_names:
+            if not found_atts[attName]:
+                raise Exception(
+                    "Could not find the attribute ({}) specified within the vector layer.".format(
+                        attName
+                    )
+                )
+
+        mem_driver = ogr.GetDriverByName("MEMORY")
+
+        mem_result_ds = mem_driver.CreateDataSource("MemResultData")
+        mem_result_lyr = mem_result_ds.CreateLayer(
+            "MemResultLyr", geom_type=vec_lyr_obj.GetGeomType()
+        )
+
+        for attName in att_names:
+            mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
+
+        vec_lyr_obj.Intersection(vec_sel_lyr_obj, mem_result_lyr)
+
+        # loop through the input features
+        reslyrDefn = mem_result_lyr.GetLayerDefn()
+        inFeat = mem_result_lyr.GetNextFeature()
+        outvals = []
+        while inFeat:
+            outdict = dict()
+            for attName in att_names:
+                feat_idx = reslyrDefn.GetFieldIndex(attName)
+                if feat_types[attName] == ogr.OFTString:
+                    outdict[attName] = inFeat.GetFieldAsString(feat_idx)
+                elif feat_types[attName] == ogr.OFTReal:
+                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idx)
+                elif feat_types[attName] == ogr.OFTInteger:
+                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
+                else:
+                    outdict[attName] = inFeat.GetField(feat_idx)
+            outvals.append(outdict)
+            inFeat = mem_result_lyr.GetNextFeature()
+
+        mem_result_ds = None
+    except Exception as e:
+        raise e
+    return outvals
+
+
+def get_att_lst_select_bbox_feats(vec_file, vec_lyr, att_names, bbox, bbox_epsg=None):
+    """
+    Function to get a list of attribute values from features which intersect
+    with the select layer.
+
+    :param vec_file: the OGR file from which the attribute data comes from.
+    :param vec_lyr: the layer name within the file from which the attribute data comes from.
+    :param att_names: a list of attribute names to be outputted.
+    :param bbox: the bounding box for the region of interest (xMin, xMax, yMin, yMax).
+    :param bbox_epsg: the projection of the BBOX (if None then ignore).
+
+    :return: list of dictionaries with the output values.
+    """
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
+    if dsVecFile is None:
+        raise Exception("Could not open '{}'".format(vec_file))
+
+    vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not find layer '{}'".format(vec_lyr))
+
+    outvals = get_att_lst_select_bbox_feats_lyr_objs(
+        vec_lyr_obj, att_names, bbox, bbox_epsg
+    )
+    dsVecFile = None
+
+    return outvals
+
+
+def get_att_lst_select_bbox_feats_lyr_objs(
+    vec_lyr_obj, att_names, bbox, bbox_epsg=None
+):
+    """
+    Function to get a list of attribute values from features which intersect
+    with the select layer.
+
+    :param vec_lyr_obj: the OGR layer object from which the attribute data comes from.
+    :param att_names: a list of attribute names to be outputted.
+    :param bbox: the bounding box for the region of interest (xMin, xMax, yMin, yMax).
+    :param bbox_epsg: the projection of the BBOX (if None then ignore).
+
+    :return: list of dictionaries with the output values.
+    """
+    gdal.UseExceptions()
+    outvals = []
+    try:
+        if vec_lyr_obj is None:
+            raise Exception("The vector layer passed into the function was None.")
+
+        in_vec_lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
+        if bbox_epsg is not None:
+            in_vec_lyr_spat_ref.AutoIdentifyEPSG()
+            in_vec_lyr_epsg = in_vec_lyr_spat_ref.GetAuthorityCode(None)
+
+            if (in_vec_lyr_epsg is not None) and (
+                int(in_vec_lyr_epsg) != int(bbox_epsg)
+            ):
+                raise Exception(
+                    "The EPSG codes for the BBOX and input vector layer are not the same."
+                )
+
+        lyrDefn = vec_lyr_obj.GetLayerDefn()
+        feat_idxs = dict()
+        feat_types = dict()
+        found_atts = dict()
+        for attName in att_names:
+            found_atts[attName] = False
+
+        for i in range(lyrDefn.GetFieldCount()):
+            if lyrDefn.GetFieldDefn(i).GetName() in att_names:
+                attName = lyrDefn.GetFieldDefn(i).GetName()
+                feat_idxs[attName] = i
+                feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
+                found_atts[attName] = True
+
+        for attName in att_names:
+            if not found_atts[attName]:
+                raise Exception(
+                    "Could not find the attribute ({}) specified within the vector layer.".format(
+                        attName
+                    )
+                )
 
         # Create in-memory layer for the BBOX layer.
-        mem_driver = ogr.GetDriverByName('MEMORY')
-        mem_bbox_ds = mem_driver.CreateDataSource('MemBBOXData')
-        mem_bbox_lyr = mem_bbox_ds.CreateLayer("MemBBOXLyr", in_vec_lyr_spat_ref, geom_type=ogr.wkbPolygon)
+        mem_driver = ogr.GetDriverByName("MEMORY")
+        mem_bbox_ds = mem_driver.CreateDataSource("MemBBOXData")
+        mem_bbox_lyr = mem_bbox_ds.CreateLayer(
+            "MemBBOXLyr", in_vec_lyr_spat_ref, geom_type=ogr.wkbPolygon
+        )
         mem_bbox_feat_defn = mem_bbox_lyr.GetLayerDefn()
         ring = ogr.Geometry(ogr.wkbLinearRing)
         ring.AddPoint(bbox[0], bbox[3])
@@ -947,9 +1092,10 @@ with the select layer.
         mem_bbox_lyr.CreateFeature(out_bbox_feat)
         mem_bbox_lyr.ResetReading()
 
-        mem_result_ds = mem_driver.CreateDataSource('MemResultData')
-        mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", in_vec_lyr_spat_ref,
-                                                   geom_type=vec_lyr_obj.GetGeomType())
+        mem_result_ds = mem_driver.CreateDataSource("MemResultData")
+        mem_result_lyr = mem_result_ds.CreateLayer(
+            "MemResultLyr", in_vec_lyr_spat_ref, geom_type=vec_lyr_obj.GetGeomType()
+        )
 
         for attName in att_names:
             mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
@@ -984,20 +1130,27 @@ with the select layer.
     return outvals
 
 
-def select_intersect_feats(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, out_vec_lyr, out_format='GPKG'):
+def select_intersect_feats(
+    vec_file,
+    vec_lyr,
+    vec_roi_file,
+    vec_roi_lyr,
+    out_vec_file,
+    out_vec_lyr,
+    out_format="GPKG",
+):
     """
-Function to select the features which intersect with region of interest (ROI) features which will be outputted
-into a new vector layer.
+    Function to select the features which intersect with region of interest (ROI) features which will be outputted
+    into a new vector layer.
 
-:param vec_file: vector layer from which the attribute data comes from.
-:param vec_lyr: the layer name from which the attribute data comes from.
-:param vec_roi_file: the vector file which will be intersected within the vector file.
-:param vec_roi_lyr: the layer name which will be intersected within the vector file.
-:param out_vec_file: the vector file which will be outputted.
-:param out_vec_lyr: the layer name which will be outputted.
-:param out_format: output vector format (default GPKG)
-
-"""
+    :param vec_file: vector layer from which the attribute data comes from.
+    :param vec_lyr: the layer name from which the attribute data comes from.
+    :param vec_roi_file: the vector file which will be intersected within the vector file.
+    :param vec_roi_lyr: the layer name which will be intersected within the vector file.
+    :param out_vec_file: the vector file which will be outputted.
+    :param out_vec_lyr: the layer name which will be outputted.
+    :param out_format: output vector format (default GPKG)
+    """
     gdal.UseExceptions()
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
@@ -1019,13 +1172,15 @@ into a new vector layer.
 
     lyrDefn = vec_lyr_obj.GetLayerDefn()
 
-    mem_driver = ogr.GetDriverByName('MEMORY')
-    mem_roi_ds = mem_driver.CreateDataSource('MemSelData')
-    mem_roi_lyr = mem_roi_ds.CopyLayer(lyrROIVecObj, vec_roi_lyr, ['OVERWRITE=YES'])
+    mem_driver = ogr.GetDriverByName("MEMORY")
+    mem_roi_ds = mem_driver.CreateDataSource("MemSelData")
+    mem_roi_lyr = mem_roi_ds.CopyLayer(lyrROIVecObj, vec_roi_lyr, ["OVERWRITE=YES"])
 
     out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(out_vec_file)
-    result_lyr = result_ds.CreateLayer(out_vec_lyr, in_vec_lyr_spat_ref, geom_type=vec_lyr_obj.GetGeomType())
+    result_lyr = result_ds.CreateLayer(
+        out_vec_lyr, in_vec_lyr_spat_ref, geom_type=vec_lyr_obj.GetGeomType()
+    )
 
     vec_lyr_obj.Intersection(mem_roi_lyr, result_lyr)
 
@@ -1035,35 +1190,36 @@ into a new vector layer.
     result_ds = None
 
 
-def export_spatial_select_feats(vec_file, vec_lyr, vec_sel_file, vec_sel_lyr, out_vec_file, out_vec_lyr, out_format):
+def export_spatial_select_feats(
+    vec_file, vec_lyr, vec_sel_file, vec_sel_lyr, out_vec_file, out_vec_lyr, out_format
+):
     """
-Function to get a list of attribute values from features which intersect
-with the select layer.
+    Function to get a list of attribute values from features which intersect
+    with the select layer.
 
-:param vec_file: vector layer from which the attribute data comes from.
-:param vec_lyr: the layer name from which the attribute data comes from.
-:param vec_sel_file: the vector file which will be intersected within the vector file.
-:param vec_sel_lyr: the layer name which will be intersected within the vector file.
-:param out_vec_file: output vector file/path
-:param out_vec_lyr: output vector layer
-:param out_format: the output vector layer type.
-
-"""
+    :param vec_file: vector layer from which the attribute data comes from.
+    :param vec_lyr: the layer name from which the attribute data comes from.
+    :param vec_sel_file: the vector file which will be intersected within the vector file.
+    :param vec_sel_lyr: the layer name which will be intersected within the vector file.
+    :param out_vec_file: output vector file/path
+    :param out_vec_lyr: output vector layer
+    :param out_format: the output vector layer type.
+    """
     gdal.UseExceptions()
     att_vals = []
     try:
-        dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
+        dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if dsVecFile is None:
             raise Exception("Could not open '{}'".format(vec_file))
-        
-        vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
+
+        vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
             raise Exception("Could not find layer '{}'".format(vec_lyr))
-        
+
         lyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
-        
+
         vec_lyr_bbox = vec_lyr_obj.GetExtent(True)
-        
+
         # Create polygon for bbox
         ring = ogr.Geometry(ogr.wkbLinearRing)
         ring.AddPoint(vec_lyr_bbox[0], vec_lyr_bbox[3])
@@ -1074,32 +1230,34 @@ with the select layer.
         # Create polygon.
         vec_lyr_bbox_poly = ogr.Geometry(ogr.wkbPolygon)
         vec_lyr_bbox_poly.AddGeometry(ring)
-            
+
         dsSelVecFile = gdal.OpenEx(vec_sel_file, gdal.OF_READONLY)
         if dsSelVecFile is None:
             raise Exception("Could not open '" + vec_sel_file + "'")
-        
+
         lyrSelVecObj = dsSelVecFile.GetLayerByName(vec_sel_lyr)
         if lyrSelVecObj is None:
             raise Exception("Could not find layer '" + vec_sel_lyr + "'")
-            
+
         geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
         for feat in lyrSelVecObj:
             geom = feat.GetGeometryRef()
             if geom is not None:
                 if geom.Intersects(vec_lyr_bbox_poly):
                     geom_collect.AddGeometry(geom)
-        
+
         out_driver = ogr.GetDriverByName(out_format)
         result_ds = out_driver.CreateDataSource(out_vec_file)
-        result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType())
-        
+        result_lyr = result_ds.CreateLayer(
+            out_vec_lyr, lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType()
+        )
+
         srcLayerDefn = vec_lyr_obj.GetLayerDefn()
         for i in range(srcLayerDefn.GetFieldCount()):
             fieldDefn = srcLayerDefn.GetFieldDefn(i)
             result_lyr.CreateField(fieldDefn)
-        rsltLayerDefn = result_lyr.GetLayerDefn()   
-        
+        rsltLayerDefn = result_lyr.GetLayerDefn()
+
         counter = 0
         openTransaction = False
         for feat in vec_lyr_obj:
@@ -1114,31 +1272,29 @@ with the select layer.
             if ((counter % 20000) == 0) and openTransaction:
                 result_lyr.CommitTransaction()
                 openTransaction = False
-                    
+
         if openTransaction:
             result_lyr.CommitTransaction()
             openTransaction = False
-                
-        dsSelVecFile = None        
+
+        dsSelVecFile = None
         dsVecFile = None
         result_ds = None
     except Exception as e:
         raise e
 
 
-
 def bbox_intersects_vec_lyr(vec_file, vec_lyr, bbox):
     """
-A function which tests whether a feature within an inputted vector layer intersects
-with a bounding box.
+    A function which tests whether a feature within an inputted vector layer intersects
+    with a bounding box.
 
-:param vec_file: vector file/path
-:param vec_lyr: vector layer name
-:param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
-:returns: boolean (True = Intersection)
-
-"""
-    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
+    :param vec_file: vector file/path
+    :param vec_lyr: vector layer name
+    :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
+    :returns: boolean (True = Intersection)
+    """
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
         raise Exception("Could not open '{}'".format(vec_file))
 
@@ -1169,44 +1325,40 @@ with a bounding box.
 
 def get_vec_lyr_cols(vec_file, vec_lyr):
     """
-A function which returns a list of columns from the input vector layer.
+    A function which returns a list of columns from the input vector layer.
 
-:param vec_file: input vector file.
-:param vec_lyr: input vector layer
-:returns: list of column names
-
-"""
+    :param vec_file: input vector file.
+    :param vec_lyr: input vector layer
+    :returns: list of column names
+    """
     gdal.UseExceptions()
     atts = []
-    
-    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
+
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
         raise Exception("Could not open '{}'".format(vec_file))
-    
-    vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
+
+    vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
         raise Exception("Could not find layer '{}'".format(vec_lyr))
-    
+
     lyrDefn = vec_lyr_obj.GetLayerDefn()
     for i in range(lyrDefn.GetFieldCount()):
         atts.append(lyrDefn.GetFieldDefn(i).GetName())
     return atts
 
 
-
-
 def subset_envs_vec_lyr_obj(vec_lyr_obj, bbox, epsg=None):
     """
-Function to get an ogr vector layer for the defined bounding box. The returned
-layer is returned as an in memory ogr Layer object.
+    Function to get an ogr vector layer for the defined bounding box. The returned
+    layer is returned as an in memory ogr Layer object.
 
-:param vec_lyr_obj: OGR Layer Object.
-:param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
-:param epsg: provide an EPSG code for the layer if not well defined by the input layer.
+    :param vec_lyr_obj: OGR Layer Object.
+    :param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+    :param epsg: provide an EPSG code for the layer if not well defined by the input layer.
 
-:return: OGR Layer and Dataset objects.
-
-"""
+    :return: OGR Layer and Dataset objects.
+    """
     gdal.UseExceptions()
     if vec_lyr_obj is None:
         raise Exception("Vector layer object which was provided was None.")
@@ -1217,65 +1369,83 @@ layer is returned as an in memory ogr Layer object.
     else:
         lyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
     if lyr_spatial_ref is None:
-        raise Exception("The spatial reference for the layer is None - please provide EPSG code.")
+        raise Exception(
+            "The spatial reference for the layer is None - please provide EPSG code."
+        )
     lyrDefn = vec_lyr_obj.GetLayerDefn()
-    
+
     # Copy the Layer to a new in memory OGR Layer.
-    mem_driver = ogr.GetDriverByName('MEMORY')
-    mem_result_ds = mem_driver.CreateDataSource('MemResultData')    
-    mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType())
+    mem_driver = ogr.GetDriverByName("MEMORY")
+    mem_result_ds = mem_driver.CreateDataSource("MemResultData")
+    mem_result_lyr = mem_result_ds.CreateLayer(
+        "MemResultLyr", lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType()
+    )
     for i in range(lyrDefn.GetFieldCount()):
         fieldDefn = lyrDefn.GetFieldDefn(i)
         mem_result_lyr.CreateField(fieldDefn)
-        
+
     openTransaction = False
     trans_step = 20000
     next_trans = trans_step
     nFeats = vec_lyr_obj.GetFeatureCount(True)
-    step = math.floor(nFeats/10)
+    step = math.floor(nFeats / 10)
     feedback = 10
     feedback_next = step
     counter = 0
     vec_lyr_obj.ResetReading()
-    print("Started .0.", end='', flush=True)
+    print("Started .0.", end="", flush=True)
     outenvs = []
     # loop through the input features
     inFeature = vec_lyr_obj.GetNextFeature()
     while inFeature:
-        if (nFeats>10) and (counter == feedback_next):
-            print(".{}.".format(feedback), end='', flush=True)
+        if (nFeats > 10) and (counter == feedback_next):
+            print(".{}.".format(feedback), end="", flush=True)
             feedback_next = feedback_next + step
             feedback = feedback + 10
-            
+
         if not openTransaction:
             mem_result_lyr.StartTransaction()
             openTransaction = True
-        
+
         if inFeature is not None:
             geom = inFeature.GetGeometryRef()
             if geom is not None:
                 env = geom.GetEnvelope()
-            
-                if bbox[0] <= env[1] and bbox[1] >= env[0] and bbox[2] <= env[3] and bbox[3] >= env[2]:
+
+                if (
+                    bbox[0] <= env[1]
+                    and bbox[1] >= env[0]
+                    and bbox[2] <= env[3]
+                    and bbox[3] >= env[2]
+                ):
                     mem_result_lyr.CreateFeature(inFeature)
-        
+
         if (counter == next_trans) and openTransaction:
             mem_result_lyr.CommitTransaction()
             openTransaction = False
             next_trans = next_trans + trans_step
-        
+
         inFeature = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
     print(" Completed")
-    
+
     if openTransaction:
         mem_result_lyr.CommitTransaction()
         openTransaction = False
-        
+
     return mem_result_ds, mem_result_lyr
 
 
-def subset_veclyr_to_featboxs(vec_file_bbox, vec_lyr_bbox, vec_file_tosub, vec_lyr_tosub, out_lyr_name, out_file_base, out_file_end='.gpkg', out_format='GPKG'):
+def subset_veclyr_to_featboxs(
+    vec_file_bbox,
+    vec_lyr_bbox,
+    vec_file_tosub,
+    vec_lyr_tosub,
+    out_lyr_name,
+    out_file_base,
+    out_file_end=".gpkg",
+    out_format="GPKG",
+):
     """
     A function which subsets an input vector layer using the BBOXs of the features within another vector
     layer.
@@ -1294,39 +1464,49 @@ def subset_veclyr_to_featboxs(vec_file_bbox, vec_lyr_bbox, vec_file_tosub, vec_l
     print("There are {} bboxes to subset to.".format(len(bboxes)))
     for i in range(len(bboxes)):
         print(bboxes[i])
-        grid_02d_ds, grid_02d_lyr = rsgislib.vectorutils.read_vec_lyr_to_mem(vec_file_tosub, vec_lyr_tosub)
-        mem_result_ds, mem_result_lyr = rsgislib.vectorutils.subset_envs_vec_lyr_obj(grid_02d_lyr, bboxes[i])
-        out_vec_file = '{0}{1}{2}'.format(out_file_base, i, out_file_end)
-        rsgislib.vectorutils.write_vec_lyr_to_file(mem_result_lyr, out_vec_file, out_lyr_name, out_format, options=['OVERWRITE=YES'], replace=True)
+        grid_02d_ds, grid_02d_lyr = rsgislib.vectorutils.read_vec_lyr_to_mem(
+            vec_file_tosub, vec_lyr_tosub
+        )
+        mem_result_ds, mem_result_lyr = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
+            grid_02d_lyr, bboxes[i]
+        )
+        out_vec_file = "{0}{1}{2}".format(out_file_base, i, out_file_end)
+        rsgislib.vectorutils.write_vec_lyr_to_file(
+            mem_result_lyr,
+            out_vec_file,
+            out_lyr_name,
+            out_format,
+            options=["OVERWRITE=YES"],
+            replace=True,
+        )
         mem_result_ds = None
         grid_02d_ds = None
 
 
 def read_vec_lyr_to_mem(vec_file, vec_lyr):
     """
-A function which reads a vector layer to an OGR in memory layer.
+    A function which reads a vector layer to an OGR in memory layer.
 
-:param vec_file: input vector file
-:param vec_lyr: input vector layer within the input file.
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer within the input file.
 
-:return: ogr_dataset, ogr_layer
-
-"""
+    :return: ogr_dataset, ogr_layer
+    """
     gdal.UseExceptions()
     try:
-        vecDS = gdal.OpenEx(vec_file, gdal.OF_READONLY )
+        vecDS = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if vecDS is None:
             raise Exception("Could not open '{}'".format(vec_file))
-        
-        vec_lyr_obj = vecDS.GetLayerByName( vec_lyr )
+
+        vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
             raise Exception("Could not find layer '{}'".format(vec_lyr))
-            
-        mem_driver = ogr.GetDriverByName('MEMORY')
-        
-        mem_ds = mem_driver.CreateDataSource('MemSelData')
-        mem_lyr = mem_ds.CopyLayer(vec_lyr_obj, vec_lyr, ['OVERWRITE=YES'])
-            
+
+        mem_driver = ogr.GetDriverByName("MEMORY")
+
+        mem_ds = mem_driver.CreateDataSource("MemSelData")
+        mem_lyr = mem_ds.CopyLayer(vec_lyr_obj, vec_lyr, ["OVERWRITE=YES"])
+
     except Exception as e:
         print("Error Vector File: {}".format(vec_file), file=sys.stderr)
         print("Error Vector Layer: {}".format(vec_lyr), file=sys.stderr)
@@ -1362,35 +1542,36 @@ def open_gdal_vec_lyr(vec_file, vec_lyr=None):
 
 def get_mem_vec_lyr_subset(vec_file, vec_lyr, bbox):
     """
-Function to get an ogr vector layer for the defined bounding box. The returned
-layer is returned as an in memory ogr Layer object.
+    Function to get an ogr vector layer for the defined bounding box. The returned
+    layer is returned as an in memory ogr Layer object.
 
-:param vec_file: vector layer from which the attribute data comes from.
-:param vec_lyr: the layer name from which the attribute data comes from.
-:param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+    :param vec_file: vector layer from which the attribute data comes from.
+    :param vec_lyr: the layer name from which the attribute data comes from.
+    :param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
 
-:return: OGR Layer and Dataset objects.
-
-"""
+    :return: OGR Layer and Dataset objects.
+    """
     gdal.UseExceptions()
     try:
-        dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
+        dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if dsVecFile is None:
             raise Exception("Could not open '{}'".format(vec_file))
-        
-        vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
+
+        vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
             raise Exception("Could not find layer '{}'".format(vec_lyr))
-            
+
         mem_result_ds, mem_result_lyr = subset_envs_vec_lyr_obj(vec_lyr_obj, bbox)
-        
+
     except Exception as e:
         print("Error: Layer: {} File: {}".format(vec_lyr, vec_file))
         raise e
     return mem_result_ds, mem_result_lyr
 
 
-def write_vec_lyr_to_file(vec_lyr_obj, out_vec_file, out_vec_lyr, out_format, options=[], replace=False):
+def write_vec_lyr_to_file(
+    vec_lyr_obj, out_vec_file, out_vec_lyr, out_format, options=[], replace=False
+):
     """
     A function which reads a vector layer to an OGR in memory layer.
 
@@ -1410,23 +1591,33 @@ def write_vec_lyr_to_file(vec_lyr_obj, out_vec_file, out_vec_lyr, out_format, op
             delete_vector_file(out_vec_file)
 
         if os.path.exists(out_vec_file) and (not replace):
-            vecDS = gdal.OpenEx(out_vec_file, gdal.GA_Update )
+            vecDS = gdal.OpenEx(out_vec_file, gdal.GA_Update)
         else:
             outdriver = ogr.GetDriverByName(out_format)
             vecDS = outdriver.CreateDataSource(out_vec_file)
-        
+
         if vecDS is None:
             raise Exception("Could not open or create '{}'".format(out_vec_file))
 
         vecDS_lyr = vecDS.CopyLayer(vec_lyr_obj, out_vec_lyr, options)
         vecDS = None
-            
+
     except Exception as e:
         print("Error Vector File: {}".format(out_vec_file), file=sys.stderr)
         print("Error Vector Layer: {}".format(out_vec_lyr), file=sys.stderr)
         raise e
 
-def create_copy_vector_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, options=[], replace=False, in_memory=False):
+
+def create_copy_vector_lyr(
+    vec_file,
+    vec_lyr,
+    out_vec_file,
+    out_vec_lyr,
+    out_format,
+    options=[],
+    replace=False,
+    in_memory=False,
+):
     """
     A function which creates a copy of the input vector layer.
 
@@ -1447,22 +1638,21 @@ def create_copy_vector_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_for
     else:
         vec_obj_ds, vec_lyr_obj = open_gdal_vec_lyr(vec_file, vec_lyr)
 
-    write_vec_lyr_to_file(vec_lyr_obj, out_vec_file, out_vec_lyr, out_format, options, replace)
+    write_vec_lyr_to_file(
+        vec_lyr_obj, out_vec_file, out_vec_lyr, out_format, options, replace
+    )
 
     vec_obj_ds = None
 
 
-
-
 def get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(rat_datatype):
     """
-Returns the data type to create a column in a OGR vector layer for equalivant to
-rat_datatype.
+    Returns the data type to create a column in a OGR vector layer for equalivant to
+    rat_datatype.
 
-:param rat_datatype: the datatype (GFT_Integer, GFT_Real, GFT_String) for the RAT column.
-:return: OGR datatype (OFTInteger, OFTReal, OFTString)
-
-"""
+    :param rat_datatype: the datatype (GFT_Integer, GFT_Real, GFT_String) for the RAT column.
+    :return: OGR datatype (OFTInteger, OFTReal, OFTString)
+    """
     if rat_datatype == gdal.GFT_Integer:
         rtn_type = ogr.OFTInteger
     elif rat_datatype == gdal.GFT_Real:
@@ -1474,7 +1664,15 @@ rat_datatype.
     return rtn_type
 
 
-def copy_rat_cols_to_vector_lyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratcols, out_col_names=None, out_col_types=None):
+def copy_rat_cols_to_vector_lyr(
+    vec_file,
+    vec_lyr,
+    rat_row_col,
+    clumps_img,
+    ratcols,
+    out_col_names=None,
+    out_col_types=None,
+):
     """
     A function to copy columns from RAT to a vector layer. Note, the vector layer needs a column, which already exists,
     that specifies the row from the RAT the feature is related to. If you created the vector using the polygonise
@@ -1498,20 +1696,28 @@ def copy_rat_cols_to_vector_lyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratc
         out_col_names = ratcols
     else:
         if len(out_col_names) != len(ratcols):
-            raise Exception("The output columns names list is not the same length ({}) as the length of "
-                            "the RAT columns list ({}) - they must be the same.".format(len(out_col_names), len(ratcols)))
+            raise Exception(
+                "The output columns names list is not the same length ({}) as the length of "
+                "the RAT columns list ({}) - they must be the same.".format(
+                    len(out_col_names), len(ratcols)
+                )
+            )
 
     if out_col_types is not None:
         if len(out_col_names) == len(out_col_types):
-            raise Exception("Either specify the column types as None or the length of the list needs to be "
-                            "the same as the number output columns.")
+            raise Exception(
+                "Either specify the column types as None or the length of the list needs to be "
+                "the same as the number output columns."
+            )
 
     if not os.path.exists(vec_file):
         raise Exception("Input vector does not exist, check path: {}".format(vec_file))
 
     clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
     if clumps_img_ds is None:
-        raise Exception("Could not open the inputted clumps image: {}".format(clumps_img))
+        raise Exception(
+            "Could not open the inputted clumps image: {}".format(clumps_img)
+        )
 
     vecDS = gdal.OpenEx(vec_file, gdal.GA_Update)
     if vecDS is None:
@@ -1526,13 +1732,17 @@ def copy_rat_cols_to_vector_lyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratc
     cols_exist = []
     for ratcol in ratcols:
         if ratcol not in rat_cols_all:
-            raise Exception("Column '{}' is not within the clumps image: {}".format(ratcol, clumps_img))
+            raise Exception(
+                "Column '{}' is not within the clumps image: {}".format(
+                    ratcol, clumps_img
+                )
+            )
         cols_exist.append(False)
 
     if out_col_types is None:
         out_col_types = []
         for att_column in ratcols:
-            rat_type = rat_cols_all[att_column]['type']
+            rat_type = rat_cols_all[att_column]["type"]
             ogr_type = get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(rat_type)
             out_col_types.append(ogr_type)
 
@@ -1544,7 +1754,9 @@ def copy_rat_cols_to_vector_lyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratc
             rat_row_col_exists = True
             break
     if not rat_row_col_exists:
-        raise Exception("Could not find column '{}' within the vector layers.".format(rat_row_col))
+        raise Exception(
+            "Could not find column '{}' within the vector layers.".format(rat_row_col)
+        )
 
     for i in range(lyrDefn.GetFieldCount()):
         col_n = 0
@@ -1561,7 +1773,9 @@ def copy_rat_cols_to_vector_lyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratc
             if vec_lyr_obj.CreateField(field_defn) != 0:
                 raise Exception(
                     "Creating '{}' field failed; becareful with case, some drivers are case insensitive but column might not be found.".format(
-                        att_column))
+                        att_column
+                    )
+                )
 
             cols_exist[col_n] = True
         col_n = col_n + 1
@@ -1590,13 +1804,24 @@ def copy_rat_cols_to_vector_lyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratc
             rat_row = feat.GetFieldAsInteger(rat_row_col)
             for n_col in range(len(out_col_names)):
                 if out_col_types[n_col] == ogr.OFTInteger:
-                    feat.SetField("{}".format(out_col_names[n_col]), int(rat_cols_data[n_col][rat_row]))
+                    feat.SetField(
+                        "{}".format(out_col_names[n_col]),
+                        int(rat_cols_data[n_col][rat_row]),
+                    )
                 elif out_col_types[n_col] == ogr.OFTReal:
-                    feat.SetField("{}".format(out_col_names[n_col]), float(rat_cols_data[n_col][rat_row]))
+                    feat.SetField(
+                        "{}".format(out_col_names[n_col]),
+                        float(rat_cols_data[n_col][rat_row]),
+                    )
                 elif out_col_types[n_col] == ogr.OFTString:
-                    feat.SetField("{}".format(out_col_names[n_col]), "{}".format(rat_cols_data[n_col][rat_row]))
+                    feat.SetField(
+                        "{}".format(out_col_names[n_col]),
+                        "{}".format(rat_cols_data[n_col][rat_row]),
+                    )
                 else:
-                    feat.SetField("{}".format(out_col_names[n_col]), rat_cols_data[n_col][rat_row])
+                    feat.SetField(
+                        "{}".format(out_col_names[n_col]), rat_cols_data[n_col][rat_row]
+                    )
             vec_lyr_obj.SetFeature(feat)
         if ((i % 20000) == 0) and openTransaction:
             vec_lyr_obj.CommitTransaction()
@@ -1610,8 +1835,17 @@ def copy_rat_cols_to_vector_lyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratc
     clumps_img_ds = None
 
 
-def perform_spatial_join(vec_base_file, vec_join_file, out_vec_file, vec_base_lyr=None, vec_join_lyr=None, out_vec_lyr=None,
-                         out_format=None, join_how="inner", join_op="within"):
+def perform_spatial_join(
+    vec_base_file,
+    vec_join_file,
+    out_vec_file,
+    vec_base_lyr=None,
+    vec_join_lyr=None,
+    out_vec_lyr=None,
+    out_format=None,
+    join_how="inner",
+    join_op="within",
+):
     """
     A function to perform a spatial join between two vector layers. This function
     uses geopandas so this needs to be installed. You also need to have the rtree
@@ -1631,15 +1865,16 @@ def perform_spatial_join(vec_base_file, vec_join_file, out_vec_file, vec_base_ly
     :param join_op: Defines whether or not to join the attributes of one object to another.
                    The options are [intersects, within, contains] and default is 'within'
     """
-    if join_how not in ['left', 'right', 'inner']:
-        raise Exception('The join_how specifed is not valid.')
-    if join_op not in ['intersects', 'within', 'contains']:
-        raise Exception('The join_op specifed is not valid.')
+    if join_how not in ["left", "right", "inner"]:
+        raise Exception("The join_how specifed is not valid.")
+    if join_op not in ["intersects", "within", "contains"]:
+        raise Exception("The join_op specifed is not valid.")
 
-    import geopandas # Import geopandas module.
-    import rtree # this is imported to provide useful error message as will be used in sjoin but if not present
-                 # the error message is not very user friendly:
-                 # AttributeError: 'NoneType' object has no attribute 'intersection'
+    import geopandas  # Import geopandas module.
+    import rtree  # this is imported to provide useful error message as will be used in sjoin but if not present
+
+    # the error message is not very user friendly:
+    # AttributeError: 'NoneType' object has no attribute 'intersection'
 
     if vec_base_lyr is None:
         base_gpd_df = geopandas.read_file(vec_base_file)
@@ -1662,7 +1897,9 @@ def perform_spatial_join(vec_base_file, vec_join_file, out_vec_file, vec_base_ly
             join_gpg_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
 
 
-def does_vmsk_img_intersect(input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir, vec_epsg=None):
+def does_vmsk_img_intersect(
+    input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir, vec_epsg=None
+):
     """
     This function checks whether the input binary raster mask intesects with the input vector
     layer. A check is first done as to whether the bounding boxes intersect, if they do then
@@ -1705,25 +1942,51 @@ def does_vmsk_img_intersect(input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir, 
         mem_ds, mem_lyr = get_mem_vec_lyr_subset(vec_roi_file, vec_roi_lyr, img_bbox)
 
         if not projs_match:
-            mem_result_ds, mem_result_lyr = reproj_vec_lyr(mem_lyr, 'mem_vec', img_epsg,
-                                                           out_format='MEMORY', out_vec_lyr=None,
-                                                           in_epsg=None, print_feedback=False)
+            mem_result_ds, mem_result_lyr = reproj_vec_lyr(
+                mem_lyr,
+                "mem_vec",
+                img_epsg,
+                out_format="MEMORY",
+                out_vec_lyr=None,
+                in_epsg=None,
+                print_feedback=False,
+            )
             mem_ds = None
         else:
             mem_result_ds = mem_ds
             mem_result_lyr = mem_lyr
 
         roi_img = os.path.join(tmp_file_dir, "{}_roiimg.kea".format(base_vmsk_img))
-        rsgislib.imageutils.create_copy_img(input_vmsk_img, roi_img, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
-        rasteriseVecLyrObj(mem_result_lyr, roi_img, burnVal=1, vecAtt=None, calcstats=True, thematic=True, nodata=0)
+        rsgislib.imageutils.create_copy_img(
+            input_vmsk_img, roi_img, 1, 0, "KEA", rsgislib.TYPE_8UINT
+        )
+        rasteriseVecLyrObj(
+            mem_result_lyr,
+            roi_img,
+            burnVal=1,
+            vecAtt=None,
+            calcstats=True,
+            thematic=True,
+            nodata=0,
+        )
         mem_result_ds = None
 
         bandDefns = []
-        bandDefns.append(rsgislib.imagecalc.BandDefn('vmsk', input_vmsk_img, 1))
-        bandDefns.append(rsgislib.imagecalc.BandDefn('roi', roi_img, 1))
-        intersect_img = os.path.join(tmp_file_dir, "{}_intersectimg.kea".format(base_vmsk_img))
-        rsgislib.imagecalc.band_math(intersect_img, "(vmsk==1) && (roi==1)?1:0", 'KEA', rsgislib.TYPE_8UINT, bandDefns)
-        rsgislib.rastergis.pop_rat_img_stats(intersect_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        bandDefns.append(rsgislib.imagecalc.BandDefn("vmsk", input_vmsk_img, 1))
+        bandDefns.append(rsgislib.imagecalc.BandDefn("roi", roi_img, 1))
+        intersect_img = os.path.join(
+            tmp_file_dir, "{}_intersectimg.kea".format(base_vmsk_img)
+        )
+        rsgislib.imagecalc.band_math(
+            intersect_img,
+            "(vmsk==1) && (roi==1)?1:0",
+            "KEA",
+            rsgislib.TYPE_8UINT,
+            bandDefns,
+        )
+        rsgislib.rastergis.pop_rat_img_stats(
+            intersect_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+        )
         n_vals = rsgislib.imagecalc.countPxlsOfVal(intersect_img, vals=[1])
         if n_vals[0] > 0:
             img_intersect = True
@@ -1731,7 +1994,9 @@ def does_vmsk_img_intersect(input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir, 
     return img_intersect
 
 
-def merge_to_multi_layer_vec(input_file_lyrs, out_vec_file, format='GPKG', overwrite=True):
+def merge_to_multi_layer_vec(
+    input_file_lyrs, out_vec_file, format="GPKG", overwrite=True
+):
     """
     A function which takes a list of vector files and layers (as VecLayersInfoObj objects)
     and merged them into a multi-layer vector file.
@@ -1739,7 +2004,7 @@ def merge_to_multi_layer_vec(input_file_lyrs, out_vec_file, format='GPKG', overw
     :param input_file_lyrs: list of VecLayersInfoObj objects.
     :param out_vec_file: output vector file.
     :param format: output format Default='GPKG'.
-    :param overwrite: bool (default = True) specifying whether the input file should be 
+    :param overwrite: bool (default = True) specifying whether the input file should be
                       overwritten if it already exists.
 
     """
@@ -1747,19 +2012,35 @@ def merge_to_multi_layer_vec(input_file_lyrs, out_vec_file, format='GPKG', overw
     for vec in input_file_lyrs:
         vec_lyr_obj = open_gdal_vec_lyr(vec.vec_file, vec.vec_lyr)
         if first and overwrite:
-            rsgislib.vectorutils.write_vec_lyr_to_file(vec_lyr_obj, out_vec_file, vec.vec_out_lyr, format,
-                                                       options=['OVERWRITE=YES'], replace=True)
+            rsgislib.vectorutils.write_vec_lyr_to_file(
+                vec_lyr_obj,
+                out_vec_file,
+                vec.vec_out_lyr,
+                format,
+                options=["OVERWRITE=YES"],
+                replace=True,
+            )
         else:
-            rsgislib.vectorutils.write_vec_lyr_to_file(vec_lyr_obj, out_vec_file, vec.vec_out_lyr, format)
+            rsgislib.vectorutils.write_vec_lyr_to_file(
+                vec_lyr_obj, out_vec_file, vec.vec_out_lyr, format
+            )
         vec_lyr_obj = None
         first = False
 
 
-
-
-def vector_translate(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, out_format='GPKG',
-                     drv_create_opts=[], lyr_create_opts=[], access_mode=None, src_srs=None,
-                     dst_srs=None, del_exist_vec=False):
+def vector_translate(
+    vec_file,
+    vec_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    out_format="GPKG",
+    drv_create_opts=[],
+    lyr_create_opts=[],
+    access_mode=None,
+    src_srs=None,
+    dst_srs=None,
+    del_exist_vec=False,
+):
     """
     A function which translates a vector file to another format, similar to ogr2ogr. If you wish
     to reproject the input file then provide a destination srs (e.g., "EPSG:27700", or wkt string,
@@ -1783,21 +2064,29 @@ def vector_translate(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, out_form
 
     """
     from osgeo import gdal
+
     gdal.UseExceptions()
 
     if access_mode is not None:
-        if access_mode not in ['update', 'append', 'overwrite']:
-            raise Exception("access_mode must be one of: [None (creation), "
-                            "'update', 'append', 'overwrite']")
+        if access_mode not in ["update", "append", "overwrite"]:
+            raise Exception(
+                "access_mode must be one of: [None (creation), "
+                "'update', 'append', 'overwrite']"
+            )
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, remove it and re-run.".format(
+                    out_vec_file
+                )
+            )
 
     try:
         import tqdm
+
         pbar = tqdm.tqdm(total=100)
         callback = lambda *args, **kw: pbar.update()
     except:
@@ -1814,24 +2103,34 @@ def vector_translate(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, out_form
         if dst_srs is None:
             dst_srs = src_srs
 
-    opts = gdal.VectorTranslateOptions(options=drv_create_opts,
-                                       format=out_format,
-                                       accessMode=access_mode,
-                                       srcSRS=src_srs,
-                                       dstSRS=dst_srs,
-                                       reproject=reproject_lyr,
-                                       layerCreationOptions=lyr_create_opts,
-                                       layers=vec_lyr,
-                                       layerName=out_vec_lyr,
-                                       callback=callback)
+    opts = gdal.VectorTranslateOptions(
+        options=drv_create_opts,
+        format=out_format,
+        accessMode=access_mode,
+        srcSRS=src_srs,
+        dstSRS=dst_srs,
+        reproject=reproject_lyr,
+        layerCreationOptions=lyr_create_opts,
+        layers=vec_lyr,
+        layerName=out_vec_lyr,
+        callback=callback,
+    )
 
     gdal.VectorTranslate(out_vec_file, vec_file, options=opts)
 
 
-
-def reproj_wgs84_vec_to_utm(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, use_hemi=True,
-                            out_format='GPKG', drv_create_opts=[], lyr_create_opts=[],
-                            access_mode='overwrite', del_exist_vec=False):
+def reproj_wgs84_vec_to_utm(
+    vec_file,
+    vec_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    use_hemi=True,
+    out_format="GPKG",
+    drv_create_opts=[],
+    lyr_create_opts=[],
+    access_mode="overwrite",
+    del_exist_vec=False,
+):
     """
     A function which reprojects an input file projected in WGS84 (EPSG:4326) to UTM, where the UTM zone is
     automatically identified using the mean x and y.
@@ -1859,7 +2158,11 @@ def reproj_wgs84_vec_to_utm(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, u
         if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, remove it and re-run.".format(
+                    out_vec_file
+                )
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -1895,22 +2198,38 @@ def reproj_wgs84_vec_to_utm(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, u
     print("{}, {}".format(lat, lon))
 
     utm_zone = rsgislib.tools.utm.latlon_to_zone_number(lat, lon)
-    hemi = 'N'
+    hemi = "N"
     if use_hemi and (lat < 0):
-        hemi = 'S'
+        hemi = "S"
     print("UTM Zone: {}{}".format(utm_zone, hemi))
 
     out_epsg = rsgislib.tools.utm.epsg_for_UTM(utm_zone, hemi)
     print("EPSG: {}".format(out_epsg))
 
     dst_srs_str = "EPSG:{}".format(out_epsg)
-    vector_translate(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format,
-                     drv_create_opts, lyr_create_opts, access_mode, src_srs='EPSG:4326',
-                     dst_srs=dst_srs_str)
+    vector_translate(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        out_format,
+        drv_create_opts,
+        lyr_create_opts,
+        access_mode,
+        src_srs="EPSG:4326",
+        dst_srs=dst_srs_str,
+    )
 
 
-
-def spatial_select(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, out_vec_lyr, out_format="GPKG"):
+def spatial_select(
+    vec_file,
+    vec_lyr,
+    vec_roi_file,
+    vec_roi_lyr,
+    out_vec_file,
+    out_vec_lyr,
+    out_format="GPKG",
+):
     """
     A function to perform a spatial selection within the input vector using a ROI vector layer.
     This function uses geopandas so ensure that is installed.
@@ -1927,17 +2246,18 @@ def spatial_select(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, o
     import geopandas
     import numpy
     import tqdm
+
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     roi_gpdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
-    base_gpdf['msk_rsgis_sel'] = numpy.zeros((base_gpdf.shape[0]), dtype=bool)
+    base_gpdf["msk_rsgis_sel"] = numpy.zeros((base_gpdf.shape[0]), dtype=bool)
     geoms = list()
     for i in tqdm.tqdm(range(roi_gpdf.shape[0])):
-        inter = base_gpdf['geometry'].intersects(roi_gpdf.iloc[i]['geometry'])
-        base_gpdf.loc[inter, 'msk_rsgis_sel'] = True
-    base_gpdf = base_gpdf[base_gpdf['msk_rsgis_sel']]
-    base_gpdf = base_gpdf.drop(['msk_rsgis_sel'], axis=1)
+        inter = base_gpdf["geometry"].intersects(roi_gpdf.iloc[i]["geometry"])
+        base_gpdf.loc[inter, "msk_rsgis_sel"] = True
+    base_gpdf = base_gpdf[base_gpdf["msk_rsgis_sel"]]
+    base_gpdf = base_gpdf.drop(["msk_rsgis_sel"], axis=1)
     if base_gpdf.shape[0] > 0:
-        if out_format == 'GPKG':
+        if out_format == "GPKG":
             base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
             base_gpdf.to_file(out_vec_file, driver=out_format)
@@ -1945,8 +2265,18 @@ def spatial_select(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, o
         raise Exception("No output file as no features intersect.")
 
 
-def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out_vec_file=None, out_file_path=None,
-                       out_file_ext=None, out_format="GPKG", dissolve=False, chk_lyr_names=True):
+def split_by_attribute(
+    vec_file,
+    vec_lyr,
+    split_col_name,
+    multi_layers=True,
+    out_vec_file=None,
+    out_file_path=None,
+    out_file_ext=None,
+    out_format="GPKG",
+    dissolve=False,
+    chk_lyr_names=True,
+):
     """
     A function which splits a vector layer by an attribute value into either different layers or different output
     files.
@@ -1970,14 +2300,19 @@ def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out
     import tqdm
     import os
     import rsgislib.tools.utils
+
     if multi_layers:
         if out_vec_file is None:
-            raise Exception("If a multiple layer output is specified then an output file needs to be specified "
-                            "to which the layer need to be added.")
+            raise Exception(
+                "If a multiple layer output is specified then an output file needs to be specified "
+                "to which the layer need to be added."
+            )
     if not multi_layers:
         if (out_file_path is None) or (out_file_ext is None):
-            raise Exception("If a single layer output is specified then an output file path "
-                            "and file extention needs to be specified.")
+            raise Exception(
+                "If a single layer output is specified then an output file path "
+                "and file extention needs to be specified."
+            )
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     unq_col = base_gpdf[split_col_name]
@@ -1996,26 +2331,40 @@ def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out
             try:
                 c_gpdf.dissolve(by=split_col_name)
             except:
-                c_gpdf['geometry'] = c_gpdf.buffer(0)
+                c_gpdf["geometry"] = c_gpdf.buffer(0)
                 c_gpdf = c_gpdf.dissolve(by=split_col_name)
         # Write output to disk.
-        if multi_layers and (out_format == 'GPKG'):
+        if multi_layers and (out_format == "GPKG"):
             if chk_lyr_names:
-                val = rsgislib.tools.utils.check_str(val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True)
-            c_gpdf.to_file(out_vec_file, layer=val, driver='GPKG')
+                val = rsgislib.tools.utils.check_str(
+                    val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True
+                )
+            c_gpdf.to_file(out_vec_file, layer=val, driver="GPKG")
         else:
             if chk_lyr_names:
-                val = rsgislib.tools.utils.check_str(val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True)
-            out_vec_file = os.path.join(out_file_path, "vec_{}.{}".format(val, out_file_ext))
+                val = rsgislib.tools.utils.check_str(
+                    val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True
+                )
+            out_vec_file = os.path.join(
+                out_file_path, "vec_{}.{}".format(val, out_file_ext)
+            )
             out_vec_lyr = "vec_{}".format(val)
-            if out_format == 'GPKG':
+            if out_format == "GPKG":
                 c_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
             else:
                 c_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_vec_lyr, out_format="GPKG",
-                        match_type='equals'):
+def subset_by_attribute(
+    vec_file,
+    vec_lyr,
+    sub_col,
+    sub_vals,
+    out_vec_file,
+    out_vec_lyr,
+    out_format="GPKG",
+    match_type="equals",
+):
     """
     A function which subsets an input vector layer based on a list of values.
 
@@ -2036,7 +2385,7 @@ def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_
     import pandas
 
     match_type = match_type.lower()
-    if match_type not in ['equals', 'contains', 'start']:
+    if match_type not in ["equals", "contains", "start"]:
         raise Exception("The match_type must be either 'equals', 'contains' or 'start'")
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
@@ -2044,14 +2393,16 @@ def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_
     first = True
     for val in sub_vals:
         print(val)
-        if match_type == 'equals':
+        if match_type == "equals":
             tmp_gpdf = base_gpdf[base_gpdf[sub_col] == val]
-        elif match_type == 'contains':
+        elif match_type == "contains":
             tmp_gpdf = base_gpdf[base_gpdf[sub_col].str.contains(val, na=False)]
-        elif match_type == 'start':
+        elif match_type == "start":
             tmp_gpdf = base_gpdf[base_gpdf[sub_col].str.match(val, na=False)]
         else:
-            raise Exception("The match_type must be either 'equals', 'contains' or 'start'")
+            raise Exception(
+                "The match_type must be either 'equals', 'contains' or 'start'"
+            )
 
         if first:
             out_gpdf = tmp_gpdf.copy(deep=True)
@@ -2060,7 +2411,7 @@ def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_
             out_gpdf = pandas.concat([out_gpdf, tmp_gpdf])
 
     if out_gpdf.shape[0] > 0:
-        if out_format == 'GPKG':
+        if out_format == "GPKG":
             out_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
             out_gpdf.to_file(out_vec_file, driver=out_format)
@@ -2068,8 +2419,9 @@ def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_
         raise Exception("No output file as no features selected.")
 
 
-
-def merge_vector_files(in_vec_files, out_vec_file, out_vec_lyr=None, out_format='GPKG', out_epsg=None):
+def merge_vector_files(
+    in_vec_files, out_vec_file, out_vec_lyr=None, out_format="GPKG", out_epsg=None
+):
     """
     A function which merges the input files into a single output file using geopandas. If the input files
     have multiple layers they are all merged into the output file.
@@ -2084,6 +2436,7 @@ def merge_vector_files(in_vec_files, out_vec_file, out_vec_lyr=None, out_format=
     """
     import tqdm
     import geopandas
+
     first = True
     for vec_file in tqdm.tqdm(in_vec_files):
         lyrs = rsgislib.vectorutils.get_vec_lyrs_lst(vec_file)
@@ -2103,13 +2456,17 @@ def merge_vector_files(in_vec_files, out_vec_file, out_vec_lyr=None, out_format=
     if not first:
         if out_format == "GPKG":
             if out_vec_lyr is None:
-                raise Exception("If output format is GPKG then an output layer is required.")
+                raise Exception(
+                    "If output format is GPKG then an output layer is required."
+                )
             data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
             data_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def merge_vector_layers(in_vecs_dict, out_vec_file, out_vec_lyr=None, out_format='GPKG', out_epsg=None):
+def merge_vector_layers(
+    in_vecs_dict, out_vec_file, out_vec_lyr=None, out_format="GPKG", out_epsg=None
+):
     """
     A function which merges the input vector layers into a single output file using geopandas.
 
@@ -2124,33 +2481,42 @@ def merge_vector_layers(in_vecs_dict, out_vec_file, out_vec_lyr=None, out_format
     """
     import tqdm
     import geopandas
+
     first = True
     for vec_info in tqdm.tqdm(in_vecs_dict):
-        if ('file' in vec_info) and ('layer' in vec_info):
+        if ("file" in vec_info) and ("layer" in vec_info):
             if first:
-                data_gdf = geopandas.read_file(vec_info['file'], layer=vec_info['layer'])
+                data_gdf = geopandas.read_file(
+                    vec_info["file"], layer=vec_info["layer"]
+                )
                 if out_epsg is not None:
                     data_gdf = data_gdf.to_crs(epsg=out_epsg)
                 first = False
             else:
-                tmp_data_gdf = geopandas.read_file(vec_info['file'], layer=vec_info['layer'])
+                tmp_data_gdf = geopandas.read_file(
+                    vec_info["file"], layer=vec_info["layer"]
+                )
                 if out_epsg is not None:
                     tmp_data_gdf = tmp_data_gdf.to_crs(epsg=out_epsg)
 
                 data_gdf = data_gdf.append(tmp_data_gdf)
         else:
-            raise Exception("The inputs should be a list of dicts with keys 'file' and 'layer'.")
+            raise Exception(
+                "The inputs should be a list of dicts with keys 'file' and 'layer'."
+            )
 
     if not first:
         if out_format == "GPKG":
             if out_vec_lyr is None:
-                raise Exception("If output format is GPKG then an output layer is required.")
+                raise Exception(
+                    "If output format is GPKG then an output layer is required."
+                )
             data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
             data_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def explode_vec_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GPKG'):
+def explode_vec_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format="GPKG"):
     """
     A function to explode a vector layer separating any multiple geometries (e.g., multipolygons)
     to single geometries.
@@ -2165,6 +2531,7 @@ def explode_vec_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GP
 
     """
     import geopandas
+
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     data_explode_gdf = data_gdf.explode()
 
@@ -2175,7 +2542,7 @@ def explode_vec_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GP
             data_explode_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def explode_vec_files(in_vec_files, output_dir, out_format='GPKG', out_vec_ext='gpkg'):
+def explode_vec_files(in_vec_files, output_dir, out_format="GPKG", out_vec_ext="gpkg"):
     """
     A function which explodes the multiple geometries within a list of input layers.
     The output directory must be different to the directory the input files as the
@@ -2193,13 +2560,13 @@ def explode_vec_files(in_vec_files, output_dir, out_format='GPKG', out_vec_ext='
     """
     import tqdm
     import rsgislib.tools.filetools
+
     for vec_file in tqdm.tqdm(in_vec_files):
         lyrs = get_vec_lyrs_lst(vec_file)
         basename = rsgislib.tools.filetools.get_file_basename(vec_file)
         out_vec_file = os.path.join(output_dir, "{}.{}".format(basename, out_vec_ext))
         for lyr in lyrs:
             explode_vec_lyr(vec_file, lyr, out_vec_file, lyr, out_format)
-
 
 
 def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
@@ -2221,17 +2588,17 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
     import geopandas
 
     out_gdf = geopandas.GeoDataFrame()
-    out_gdf['geometry'] = None
+    out_gdf["geometry"] = None
     i_geom = 0
 
     for index, row in data_gdf.iterrows():
         n_east = 0
         n_west = 0
-        row_bbox = row['geometry'].bounds
+        row_bbox = row["geometry"].bounds
         row_width = row_bbox[2] - row_bbox[0]
         if row_width > width_thres:
-            if row['geometry'].geom_type == 'Polygon':
-                for coord in row['geometry'].exterior.coords:
+            if row["geometry"].geom_type == "Polygon":
+                for coord in row["geometry"].exterior.coords:
                     if coord[0] < 0:
                         n_west += 1
                     else:
@@ -2241,7 +2608,7 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
                     east_focus = False
 
                 out_coords = []
-                for coord in row['geometry'].exterior.coords:
+                for coord in row["geometry"].exterior.coords:
                     out_coord = [coord[0], coord[1]]
                     if east_focus:
                         if coord[0] < 0:
@@ -2254,7 +2621,7 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
                     out_coords.append(out_coord)
 
                 out_holes = []
-                for hole in row['geometry'].interiors:
+                for hole in row["geometry"].interiors:
                     hole_coords = []
                     for coord in hole.coords:
                         out_coord = [coord[0], coord[1]]
@@ -2268,10 +2635,10 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
                                 out_coord[0] = -180 - diff
                         hole_coords.append(out_coord)
                     out_holes.append(LinearRing(hole_coords))
-                out_gdf.loc[i_geom, 'geometry'] = Polygon(out_coords, holes=out_holes)
+                out_gdf.loc[i_geom, "geometry"] = Polygon(out_coords, holes=out_holes)
                 i_geom += 1
-            elif row['geometry'].geom_type == 'MultiPolygon':
-                for poly in row['geometry']:
+            elif row["geometry"].geom_type == "MultiPolygon":
+                for poly in row["geometry"]:
                     for coord in poly.exterior.coords:
                         if coord[0] < 0:
                             n_west += 1
@@ -2309,17 +2676,26 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
                                     out_coord[0] = -180 - diff
                             hole_coords.append(out_coord)
                         out_holes.append(LinearRing(hole_coords))
-                    out_gdf.loc[i_geom, 'geometry'] = Polygon(out_coords, holes=out_holes)
+                    out_gdf.loc[i_geom, "geometry"] = Polygon(
+                        out_coords, holes=out_holes
+                    )
                     i_geom += 1
         else:
-            out_gdf.loc[i_geom, 'geometry'] = row['geometry']
+            out_gdf.loc[i_geom, "geometry"] = row["geometry"]
             i_geom += 1
 
     return out_gdf
 
 
-def merge_utm_vecs_wgs84(in_vec_files, out_vec_file, out_vec_lyr=None, out_format='GPKG',
-                         n_hemi_utm_file=None, s_hemi_utm_file=None, width_thres=350):
+def merge_utm_vecs_wgs84(
+    in_vec_files,
+    out_vec_file,
+    out_vec_lyr=None,
+    out_format="GPKG",
+    n_hemi_utm_file=None,
+    s_hemi_utm_file=None,
+    width_thres=350,
+):
     """
     A function which merges input files in UTM projections to the WGS84 projection cutting
     polygons which wrap from one side of the world to other (i.e., 180/-180 boundary).
@@ -2342,18 +2718,26 @@ def merge_utm_vecs_wgs84(in_vec_files, out_vec_file, out_vec_lyr=None, out_forma
     import rsgislib.tools.utils
     import rsgislib.tools.geometrytools
     import tqdm
-    
+
     if n_hemi_utm_file is None:
-        install_prefix = __file__[:__file__.find('lib')]
-        n_hemi_utm_file = os.path.join(install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_north.gpkg")
+        install_prefix = __file__[: __file__.find("lib")]
+        n_hemi_utm_file = os.path.join(
+            install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_north.gpkg"
+        )
         if n_hemi_utm_file is None:
-            raise Exception("An input is needed for n_hemi_utm_file. The RSGISLib installed version was not be found.")
+            raise Exception(
+                "An input is needed for n_hemi_utm_file. The RSGISLib installed version was not be found."
+            )
     if s_hemi_utm_file is None:
-        install_prefix = __file__[:__file__.find('lib')]
-        s_hemi_utm_file = os.path.join(install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_south.gpkg")
+        install_prefix = __file__[: __file__.find("lib")]
+        s_hemi_utm_file = os.path.join(
+            install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_south.gpkg"
+        )
         if s_hemi_utm_file is None:
-            raise Exception("An input is needed for s_hemi_utm_file. The RSGISLib installed version was not be found.")
-    
+            raise Exception(
+                "An input is needed for s_hemi_utm_file. The RSGISLib installed version was not be found."
+            )
+
     first = True
     for file in tqdm.tqdm(in_vec_files):
         lyrs = get_vec_lyrs_lst(file)
@@ -2363,9 +2747,11 @@ def merge_utm_vecs_wgs84(in_vec_files, out_vec_file, out_vec_lyr=None, out_forma
             if bbox_area > 0:
                 vec_epsg = get_proj_epsg_from_vec(file, vec_lyr=lyr)
                 zone, hemi = rsgislib.tools.utm.utm_from_epsg(int(vec_epsg))
-                zone_str = rsgislib.tools.utils.zero_pad_num_str(zone, str_len=2, round_num=False, round_n_digts=0, integerise=True)
+                zone_str = rsgislib.tools.utils.zero_pad_num_str(
+                    zone, str_len=2, round_num=False, round_n_digts=0, integerise=True
+                )
 
-                if hemi.upper() == 'S':
+                if hemi.upper() == "S":
                     utm_zones_file = s_hemi_utm_file
                 else:
                     utm_zones_file = n_hemi_utm_file
@@ -2375,8 +2761,12 @@ def merge_utm_vecs_wgs84(in_vec_files, out_vec_file, out_vec_lyr=None, out_forma
                     data_gdf = geopandas.read_file(file, layer=lyr)
                     utm_gdf = geopandas.read_file(utm_zones_file, layer=zone_str)
 
-                    data_inter_gdf = geopandas.overlay(data_gdf, utm_gdf, how='intersection')
-                    data_diff_gdf = geopandas.overlay(data_gdf, utm_gdf, how='difference')
+                    data_inter_gdf = geopandas.overlay(
+                        data_gdf, utm_gdf, how="intersection"
+                    )
+                    data_diff_gdf = geopandas.overlay(
+                        data_gdf, utm_gdf, how="difference"
+                    )
                     if (len(data_inter_gdf) > 0) and (len(data_diff_gdf) > 0):
                         data_split_gdf = pandas.concat([data_inter_gdf, data_diff_gdf])
                     elif len(data_diff_gdf) > 0:
@@ -2393,9 +2783,11 @@ def merge_utm_vecs_wgs84(in_vec_files, out_vec_file, out_vec_lyr=None, out_forma
 
                 if len(data_gdf) > 0:
                     data_gdf_bounds = data_gdf.bounds
-                    widths = data_gdf_bounds['maxx'] - data_gdf_bounds['minx']
+                    widths = data_gdf_bounds["maxx"] - data_gdf_bounds["minx"]
                     if widths.max() > width_thres:
-                        data_gdf = geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres)
+                        data_gdf = geopd_check_polys_wgs84_bounds_geometry(
+                            data_gdf, width_thres
+                        )
                     if first:
                         out_gdf = data_gdf
                         first = False
@@ -2405,13 +2797,23 @@ def merge_utm_vecs_wgs84(in_vec_files, out_vec_file, out_vec_lyr=None, out_forma
     if not first:
         if out_format == "GPKG":
             if out_vec_lyr is None:
-                raise Exception("If output format is GPKG then an output layer is required.")
+                raise Exception(
+                    "If output format is GPKG then an output layer is required."
+                )
             out_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
             out_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def clip_vec_lyr(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, out_vec_lyr, out_format='GPKG'):
+def clip_vec_lyr(
+    vec_file,
+    vec_lyr,
+    vec_roi_file,
+    vec_roi_lyr,
+    out_vec_file,
+    out_vec_lyr,
+    out_format="GPKG",
+):
     """
     A function which clips a vector layer using an input region of interest (ROI) polygon layer.
 
@@ -2431,13 +2833,15 @@ def clip_vec_lyr(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, out
 
     cliped_gpdf = geopandas.clip(base_gpdf, roi_gpdf, keep_geom_type=True)
 
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         cliped_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         cliped_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def shiftxy_vec_lyr(vec_file, vec_lyr, x_shift, y_shift, out_vec_file, out_vec_lyr, out_format='GPKG'):
+def shiftxy_vec_lyr(
+    vec_file, vec_lyr, x_shift, y_shift, out_vec_file, out_vec_lyr, out_format="GPKG"
+):
     """
     A function which shifts (translates) a vector layer in the x and y axis'.
 
@@ -2459,16 +2863,16 @@ def shiftxy_vec_lyr(vec_file, vec_lyr, x_shift, y_shift, out_vec_file, out_vec_l
 
     col_names = base_gpdf.columns
     for col_name in col_names:
-        if col_name != 'geometry':
+        if col_name != "geometry":
             shifted_gpdf[col_name] = base_gpdf[col_name]
 
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         shifted_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         shifted_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format='GPKG'):
+def split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format="GPKG"):
     """
     A function which splits an existing vector layer into multiple layers
 
@@ -2481,6 +2885,7 @@ def split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format='GPKG'):
     """
     import geopandas
     import tqdm
+
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
     for i in tqdm.tqdm(range(base_gpdf.shape[0])):
@@ -2492,8 +2897,17 @@ def split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format='GPKG'):
     base_gpdf = None
 
 
-def add_geom_bbox_cols(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GPKG',
-                       min_x_col='MinX', max_x_col='MaxX', min_y_col='MinY', max_y_col='MaxY'):
+def add_geom_bbox_cols(
+    vec_file,
+    vec_lyr,
+    out_vec_file,
+    out_vec_lyr,
+    out_format="GPKG",
+    min_x_col="MinX",
+    max_x_col="MaxX",
+    min_y_col="MinY",
+    max_y_col="MaxY",
+):
     """
     A function which adds columns to the vector layer with the bbox of each geometry.
 
@@ -2509,27 +2923,37 @@ def add_geom_bbox_cols(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format=
 
     """
     import geopandas
+
     # Read input vector file.
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
     # Get Geometry bounds
-    geom_bounds = base_gpdf['geometry'].bounds
+    geom_bounds = base_gpdf["geometry"].bounds
 
     # Add columns to the geodataframe
-    base_gpdf[min_x_col] = geom_bounds['minx']
-    base_gpdf[max_x_col] = geom_bounds['maxx']
-    base_gpdf[min_y_col] = geom_bounds['miny']
-    base_gpdf[max_y_col] = geom_bounds['maxy']
+    base_gpdf[min_x_col] = geom_bounds["minx"]
+    base_gpdf[max_x_col] = geom_bounds["maxx"]
+    base_gpdf[min_y_col] = geom_bounds["miny"]
+    base_gpdf[max_y_col] = geom_bounds["maxy"]
 
     # Output the file.
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-
-def split_vec_lyr_random_subset(vec_file: str, vec_lyr: str, out_main_vec_file: str, out_main_vec_lyr: str, out_smpl_vec_file: str, out_smpl_vec_lyr: str, n_smpl: int, out_format:str ='GPKG', rand_seed : int =None):
+def split_vec_lyr_random_subset(
+    vec_file: str,
+    vec_lyr: str,
+    out_main_vec_file: str,
+    out_main_vec_lyr: str,
+    out_smpl_vec_file: str,
+    out_smpl_vec_lyr: str,
+    n_smpl: int,
+    out_format: str = "GPKG",
+    rand_seed: int = None,
+):
     """
     A function to split a vector layer into two subsets by randomly sampling the input file.
     This function uses geopandas so that library must therefore be installed.
@@ -2546,9 +2970,12 @@ def split_vec_lyr_random_subset(vec_file: str, vec_lyr: str, out_main_vec_file: 
 
     """
     import geopandas
+
     n_feats = get_vec_feat_count(vec_file, vec_lyr)
     if n_smpl >= n_feats:
-        raise rsgislib.RSGISPyException("The number of samples must be less than the number of features in the file.")
+        raise rsgislib.RSGISPyException(
+            "The number of samples must be less than the number of features in the file."
+        )
 
     # Read input vector file.
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
@@ -2556,7 +2983,7 @@ def split_vec_lyr_random_subset(vec_file: str, vec_lyr: str, out_main_vec_file: 
     smpl_gpdf = base_gpdf.sample(n=n_smpl, random_state=rand_seed)
     base_gpdf = base_gpdf.drop(smpl_gpdf.index)
 
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         base_gpdf.to_file(out_main_vec_file, layer=out_main_vec_lyr, driver=out_format)
         smpl_gpdf.to_file(out_smpl_vec_file, layer=out_smpl_vec_lyr, driver=out_format)
     else:
@@ -2564,7 +2991,18 @@ def split_vec_lyr_random_subset(vec_file: str, vec_lyr: str, out_main_vec_file: 
         smpl_gpdf.to_file(out_smpl_vec_file, driver=out_format)
 
 
-def create_train_test_smpls(vec_file: str, vec_lyr: str, out_train_vec_file: str, out_train_vec_lyr: str, out_test_vec_file: str, out_test_vec_lyr: str, out_format: str="GPKG", prop_test: float =0.2, tmp_dir: str='./tmp', rand_seed: int=None):
+def create_train_test_smpls(
+    vec_file: str,
+    vec_lyr: str,
+    out_train_vec_file: str,
+    out_train_vec_lyr: str,
+    out_test_vec_file: str,
+    out_test_vec_lyr: str,
+    out_format: str = "GPKG",
+    prop_test: float = 0.2,
+    tmp_dir: str = "./tmp",
+    rand_seed: int = None,
+):
     """
     A function for splitting a vector dataset into training and testing datasets.
 
@@ -2599,9 +3037,19 @@ def create_train_test_smpls(vec_file: str, vec_lyr: str, out_train_vec_file: str
     print("Number of Training Features: {}".format(n_feats - n_test_feats))
     print("Number of Testing Features: {}".format(n_test_feats))
 
-    split_vec_lyr_random_subset(vec_fid_file, vec_lyr, out_train_vec_file, out_train_vec_lyr, out_test_vec_file, out_test_vec_lyr, n_test_feats, out_format=out_format, rand_seed=rand_seed)
+    split_vec_lyr_random_subset(
+        vec_fid_file,
+        vec_lyr,
+        out_train_vec_file,
+        out_train_vec_lyr,
+        out_test_vec_file,
+        out_test_vec_lyr,
+        n_test_feats,
+        out_format=out_format,
+        rand_seed=rand_seed,
+    )
 
     if created_tmp_dir:
         import shutil
-        shutil.rmtree(tmp_dir)
 
+        shutil.rmtree(tmp_dir)
