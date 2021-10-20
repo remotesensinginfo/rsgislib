@@ -44,14 +44,14 @@ def rasterise_vec_lyr(vec_file: str, vec_lyr: str, input_img: str, output_img: s
     import rsgislib.imageutils
     try:
         if use_vec_extent:
-            xRes, yRes = rsgislib.imageutils.get_image_res(input_img)
+            xRes, yRes = rsgislib.imageutils.get_img_res(input_img)
             if yRes < -1:
                 yRes = yRes * (-1)
             outRes = xRes
             if xRes > yRes:
                 outRes = yRes
 
-            rsgislib.imageutils.create_copy_image_vec_extent_snap_to_grid(vec_file, vec_lyr,
+            rsgislib.imageutils.create_copy_img_vec_extent_snap_to_grid(vec_file, vec_lyr,
                                                                     output_img, outRes, 1,
                                                                     gdalformat, datatype)
         elif input_img is None:

@@ -336,7 +336,7 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     img_clsname_data = rsgislib.rastergis.ratutils.getColumnData(cls_img, img_cls_name_col)
     img_clsname_data[0] = ''
 
-    pxl_size_x, pxl_size_y = rsgislib.imageutils.get_image_res(cls_img)
+    pxl_size_x, pxl_size_y = rsgislib.imageutils.get_img_res(cls_img)
     pxl_area = pxl_size_x * pxl_size_y
 
     # Find the class areas (pixel counts)

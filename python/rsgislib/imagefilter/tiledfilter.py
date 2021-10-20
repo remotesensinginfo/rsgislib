@@ -1051,7 +1051,7 @@ def perform_tiled_img_filter(
 
     imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.kea"))
 
-    numOutBands = rsgislib.imageutils.get_image_band_count(input_img)
+    numOutBands = rsgislib.imageutils.get_img_band_count(input_img)
 
     imageutils.create_copy_img(
         input_img, output_img, numOutBands, 0, gdalformat, datatype
@@ -1189,7 +1189,7 @@ def perform_tiled_img_multi_filter(
 
         imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.kea"))
 
-        numOutBands = rsgislib.imageutils.get_image_band_count(input_img)
+        numOutBands = rsgislib.imageutils.get_img_band_count(input_img)
 
         imageutils.create_copy_img(
             input_img, output_img, numOutBands, 0, gdalformat, datatype

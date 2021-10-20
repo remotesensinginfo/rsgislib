@@ -5,9 +5,9 @@ RSGISLib Image Utilities Module
 Image Stats and Pyramids
 ------------------------
 .. autofunction:: rsgislib.imageutils.pop_img_stats
-.. autofunction:: rsgislib.imageutils.get_image_band_stats
-.. autofunction:: rsgislib.imageutils.get_image_no_data_value
-.. autofunction:: rsgislib.imageutils.set_image_no_data_value
+.. autofunction:: rsgislib.imageutils.get_img_band_stats
+.. autofunction:: rsgislib.imageutils.get_img_no_data_value
+.. autofunction:: rsgislib.imageutils.set_img_no_data_value
 
 
 Projection
@@ -16,13 +16,13 @@ Projection
 .. autofunction:: rsgislib.imageutils.assign_spatial_info
 .. autofunction:: rsgislib.imageutils.copy_proj_from_img
 .. autofunction:: rsgislib.imageutils.copy_spatial_and_proj_from_img
-.. autofunction:: rsgislib.imageutils.get_wkt_proj_from_image
-.. autofunction:: rsgislib.imageutils.get_epsg_proj_from_image
+.. autofunction:: rsgislib.imageutils.get_wkt_proj_from_img
+.. autofunction:: rsgislib.imageutils.get_epsg_proj_from_img
 .. autofunction:: rsgislib.imageutils.get_utm_zone
 .. autofunction:: rsgislib.imageutils.do_gdal_layers_have_same_proj
 .. autofunction:: rsgislib.imageutils.has_gcps
 .. autofunction:: rsgislib.imageutils.copy_gcps
-.. autofunction:: rsgislib.imageutils.resample_image_to_match
+.. autofunction:: rsgislib.imageutils.resample_img_to_match
 .. autofunction:: rsgislib.imageutils.reproject_image
 .. autofunction:: rsgislib.imageutils.gdal_warp
 
@@ -114,14 +114,14 @@ Extract
 Create
 ---------
 .. autofunction:: rsgislib.imageutils.create_blank_img
-.. autofunction:: rsgislib.imageutils.create_blank_image_py
+.. autofunction:: rsgislib.imageutils.create_blank_img_py
 .. autofunction:: rsgislib.imageutils.create_copy_img
 .. autofunction:: rsgislib.imageutils.create_copy_img_def_extent
 .. autofunction:: rsgislib.imageutils.create_blank_buf_img_from_ref_img
 .. autofunction:: rsgislib.imageutils.create_blank_img_from_ref_vector
-.. autofunction:: rsgislib.imageutils.create_copy_image_vec_extent_snap_to_grid
+.. autofunction:: rsgislib.imageutils.create_copy_img_vec_extent_snap_to_grid
 .. autofunction:: rsgislib.imageutils.create_blank_img_from_bbox
-.. autofunction:: rsgislib.imageutils.create_image_for_each_vec_feat
+.. autofunction:: rsgislib.imageutils.create_img_for_each_vec_feat
 .. autofunction:: rsgislib.imageutils.gdal_translate
 .. autofunction:: rsgislib.create_stack_images_vrt
 .. autofunction:: rsgislib.create_mosaic_images_vrt
@@ -179,13 +179,13 @@ Other
 .. autofunction:: rsgislib.imageutils.get_file_img_extension
 .. autofunction:: rsgislib.imageutils.rename_gdal_layer
 .. autofunction:: rsgislib.imageutils.delete_gdal_layer
-.. autofunction:: rsgislib.imageutils.get_image_res
-.. autofunction:: rsgislib.imageutils.do_image_res_match
-.. autofunction:: rsgislib.imageutils.get_image_size
-.. autofunction:: rsgislib.imageutils.get_image_bbox
-.. autofunction:: rsgislib.imageutils.get_image_bbox_in_proj
-.. autofunction:: rsgislib.imageutils.get_image_files
-.. autofunction:: rsgislib.imageutils.get_image_band_count
+.. autofunction:: rsgislib.imageutils.get_img_res
+.. autofunction:: rsgislib.imageutils.do_img_res_match
+.. autofunction:: rsgislib.imageutils.get_img_size
+.. autofunction:: rsgislib.imageutils.get_img_bbox
+.. autofunction:: rsgislib.imageutils.get_img_bbox_in_proj
+.. autofunction:: rsgislib.imageutils.get_img_files
+.. autofunction:: rsgislib.imageutils.get_img_band_count
 .. autofunction:: rsgislib.imageutils.set_img_band_metadata
 .. autofunction:: rsgislib.imageutils.get_img_band_metadata
 .. autofunction:: rsgislib.imageutils.get_img_band_metadata_fields
@@ -196,8 +196,8 @@ Other
 .. autofunction:: rsgislib.imageutils.get_img_metadata_fields_dict
 .. autofunction:: rsgislib.imageutils.calc_wgs84_pixel_area
 .. autofunction:: rsgislib.imageutils.calc_wsg84_pixel_size
-.. autofunction:: rsgislib.imageutils.get_image_pxl_values
-.. autofunction:: rsgislib.imageutils.set_image_pxl_values
+.. autofunction:: rsgislib.imageutils.get_img_pxl_values
+.. autofunction:: rsgislib.imageutils.set_img_pxl_values
 .. autofunction:: rsgislib.imageutils.assign_random_pxls
 .. autofunction:: rsgislib.imageutils.check_img_lst
 .. autofunction:: rsgislib.imageutils.check_img_file_comparison

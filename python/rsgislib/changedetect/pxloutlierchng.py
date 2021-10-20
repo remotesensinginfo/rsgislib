@@ -68,10 +68,10 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
         if not ((type(img_bands) is list) or (type(img_bands) is tuple)):
             raise rsgislib.RSGISPyException("If provided then img_bands should be a list (or None)")
     else:
-        n_bands = rsgislib.imageutils.get_image_band_count(input_img)
+        n_bands = rsgislib.imageutils.get_img_band_count(input_img)
         img_bands = numpy.arange(1, n_bands + 1)
     num_vars = len(img_bands)
-    img_val_no_data = rsgislib.imageutils.get_image_no_data_value(input_img)
+    img_val_no_data = rsgislib.imageutils.get_img_no_data_value(input_img)
 
     msk_arr_vals = rsgislib.imageutils.extractImgPxlValsInMsk(input_img, img_bands, in_msk_img, img_mask_val, img_val_no_data)
     print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))

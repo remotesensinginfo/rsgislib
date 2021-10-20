@@ -51,7 +51,7 @@ def test_get_image_res():
     import rsgislib.imageutils
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    x_res, y_res = rsgislib.imageutils.get_image_res(input_img)
+    x_res, y_res = rsgislib.imageutils.get_img_res(input_img)
     assert (x_res == 10) and (y_res == -10)
 
 
@@ -59,15 +59,15 @@ def test_get_image_res_abs():
     import rsgislib.imageutils
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    x_res, y_res = rsgislib.imageutils.get_image_res(input_img, abs_vals=True)
+    x_res, y_res = rsgislib.imageutils.get_img_res(input_img, abs_vals=True)
     assert (x_res == 10) and (y_res == 10)
 
 
-def get_image_size():
+def get_img_size():
     import rsgislib.imageutils
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    x_size, y_size = rsgislib.imageutils.get_image_size(input_img)
+    x_size, y_size = rsgislib.imageutils.get_img_size(input_img)
     assert (x_size == 931) and (y_size == 947)
 
 
@@ -75,14 +75,14 @@ def test_get_image_band_count():
     import rsgislib.imageutils
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    assert rsgislib.imageutils.get_image_band_count(input_img) == 10
+    assert rsgislib.imageutils.get_img_band_count(input_img) == 10
 
 
 def test_get_image_bbox():
     import rsgislib.imageutils
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    bbox = rsgislib.imageutils.get_image_bbox(input_img)
+    bbox = rsgislib.imageutils.get_img_bbox(input_img)
     assert (
         (abs(bbox[0] - 257060.59483340546) < 0.0001)
         and (abs(bbox[1] - 266370.59483340546) < 0.0001)
@@ -105,15 +105,15 @@ def test_subset_roi_contained(tmp_path):
         input_img, vec_file, vec_lyr, output_img, "KEA", rsgislib.TYPE_16UINT
     )
 
-    n_bands = rsgislib.imageutils.get_image_band_count(output_img)
+    n_bands = rsgislib.imageutils.get_img_band_count(output_img)
     if n_bands != 10:
         assert False
 
-    x_res, y_res = rsgislib.imageutils.get_image_res(output_img)
+    x_res, y_res = rsgislib.imageutils.get_img_res(output_img)
     if (x_res != 10) and (y_res != 10):
         assert False
 
-    x_size, y_size = rsgislib.imageutils.get_image_size(output_img)
+    x_size, y_size = rsgislib.imageutils.get_img_size(output_img)
     if (x_size != 325) and (y_size != 340):
         assert False
 
@@ -135,15 +135,15 @@ def test_subset_roi_overlap(tmp_path):
         input_img, vec_file, vec_lyr, output_img, "KEA", rsgislib.TYPE_16UINT
     )
 
-    n_bands = rsgislib.imageutils.get_image_band_count(output_img)
+    n_bands = rsgislib.imageutils.get_img_band_count(output_img)
     if n_bands != 10:
         assert False
 
-    x_res, y_res = rsgislib.imageutils.get_image_res(output_img)
+    x_res, y_res = rsgislib.imageutils.get_img_res(output_img)
     if (x_res != 10) and (y_res != 10):
         assert False
 
-    x_size, y_size = rsgislib.imageutils.get_image_size(output_img)
+    x_size, y_size = rsgislib.imageutils.get_img_size(output_img)
     if (x_size != 931) and (y_size != 238):
         assert False
 

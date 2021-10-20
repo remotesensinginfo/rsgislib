@@ -334,7 +334,7 @@ def calc_dist_to_img_vals_tiled(
 
     uid = rsgislib.tools.utils.uid_generator()
 
-    xRes, yRes = rsgislib.imageutils.get_image_res(input_img)
+    xRes, yRes = rsgislib.imageutils.get_img_res(input_img)
     if unit_geo:
         xMaxDistPxl = math.ceil(max_dist / xRes) + 10
         yMaxDistPxl = math.ceil(max_dist / yRes) + 10
@@ -455,7 +455,7 @@ def count_pxls_of_val(input_img, vals, img_band=None):
         raise Exception(
             "At least 1 value should be provided within the vals input variable."
         )
-    n_bands = rsgislib.imageutils.get_image_band_count(input_img)
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if (img_band is not None) and ((img_band < 1) or (img_band > n_bands)):
         raise Exception("The specified input image band is not within the input image.")
     if img_band is not None:
@@ -659,7 +659,7 @@ def perform_image_mnf(
     img_basename = rsgislib.tools.filetools.get_file_basename(input_img)
 
     if in_img_no_data is None:
-        in_img_no_data = rsgislib.imageutils.get_image_no_data_value(input_img)
+        in_img_no_data = rsgislib.imageutils.get_img_no_data_value(input_img)
         if in_img_no_data is None:
             raise Exception("A no data value for the input image must be provided.")
 
@@ -955,15 +955,15 @@ def calc_img_basic_stats_for_ref_region(
     for img in in_stats_imgs:
         print(img)
         if first:
-            n_bands = rsgislib.imageutils.get_image_band_count(img)
-            no_data_val = rsgislib.imageutils.get_image_no_data_value(img)
+            n_bands = rsgislib.imageutils.get_img_band_count(img)
+            no_data_val = rsgislib.imageutils.get_img_no_data_value(img)
             first = False
         else:
-            if n_bands != rsgislib.imageutils.get_image_band_count(img):
+            if n_bands != rsgislib.imageutils.get_img_band_count(img):
                 raise Exception(
                     "The number of bands must be the same in all input images."
                 )
-            if no_data_val != rsgislib.imageutils.get_image_no_data_value(img):
+            if no_data_val != rsgislib.imageutils.get_img_no_data_value(img):
                 raise Exception(
                     "The no data value should be the same in all input images."
                 )
@@ -1050,7 +1050,7 @@ def normalise_image_band(input_img, band, output_img, gdal_format="KEA"):
     import rsgislib
     import rsgislib.imageutils
 
-    no_data_val = rsgislib.imageutils.get_image_no_data_value(input_img, band)
+    no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img, band)
     use_no_data_val = True
     if no_data_val is None:
         use_no_data_val = False
@@ -1185,7 +1185,7 @@ def calc_fill_regions_knn(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    x_res, y_res = rsgislib.imageutils.get_image_res(in_ref_img)
+    x_res, y_res = rsgislib.imageutils.get_img_res(in_ref_img)
     if x_res < 0:
         x_res *= -1
     if y_res < 0:
@@ -1234,7 +1234,7 @@ def calc_fill_regions_knn(
     applier.apply(_retrieve_idx_info, infiles, outfiles, otherargs, controls=aControls)
 
     print("\nFilling Image Regions using KNN (k={})".format(k))
-    x_res, y_res = rsgislib.imageutils.get_image_res(in_fill_regions_img)
+    x_res, y_res = rsgislib.imageutils.get_img_res(in_fill_regions_img)
     if x_res < 0:
         x_res *= -1
     if y_res < 0:
@@ -1322,9 +1322,9 @@ def are_imgs_equal(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
     import rsgislib.imageutils
     from rios import applier
 
-    if rsgislib.imageutils.get_image_band_count(
+    if rsgislib.imageutils.get_img_band_count(
         in_ref_img
-    ) != rsgislib.imageutils.get_image_band_count(in_cmp_img):
+    ) != rsgislib.imageutils.get_img_band_count(in_cmp_img):
         raise Exception(
             "The number of image bands is not the same between the two images."
         )
@@ -1395,8 +1395,8 @@ def are_img_bands_equal(
     import rsgislib.imageutils
     from rios import applier
 
-    n_ref_bands = rsgislib.imageutils.get_image_band_count(in_ref_img)
-    n_cmp_bands = rsgislib.imageutils.get_image_band_count(in_cmp_img)
+    n_ref_bands = rsgislib.imageutils.get_img_band_count(in_ref_img)
+    n_cmp_bands = rsgislib.imageutils.get_img_band_count(in_cmp_img)
 
     if (img_ref_band < 1) or (img_ref_band > n_ref_bands):
         raise Exception("The specified band is not within the reference image.")

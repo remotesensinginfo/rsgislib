@@ -1363,7 +1363,7 @@ def calc_dist_to_classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSi
 
     classIDs = numpy.unique(classColInt)
     
-    xRes, yRes = rsgislib.imageutils.get_image_res(classesImg)
+    xRes, yRes = rsgislib.imageutils.get_img_res(classesImg)
     
     #print("Image Res {} x {}".format(xRes, yRes))
     

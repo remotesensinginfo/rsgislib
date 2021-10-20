@@ -130,7 +130,7 @@ def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, out_vec_file, out_ve
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
     if out_epsg_code is None:
-        out_epsg_code = rsgislib.imageutils.get_epsg_proj_from_image(input_img)
+        out_epsg_code = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
 
     if out_epsg_code is None:
         raise Exception("The output ESPG code is None - tried to read from input image and "
@@ -206,7 +206,7 @@ A function to extract an image footprint as a vector.
     inImgBase = os.path.splitext(os.path.basename(input_img))[0]
 
     validOutImg = os.path.join(tmp_dir, inImgBase + '_' + uidStr + '_validimg.kea')
-    inImgNoData = rsgislib.imageutils.get_image_no_data_value(input_img)
+    inImgNoData = rsgislib.imageutils.get_img_no_data_value(input_img)
     rsgislib.imageutils.gen_valid_mask(inimages=input_img, outimage=validOutImg,
                                        gdalformat='KEA', nodata=inImgNoData)
 

@@ -1100,7 +1100,7 @@ def summarise_multi_endmember_linear_unmixing(
         if not isinstance(unmixed_dataset.endmember_names, list):
             raise Exception("unmixed_dataset.endmember_names must be a list")
 
-        if rsgislib.imageutils.get_image_band_count(unmixed_dataset.in_unmix_img) != len(
+        if rsgislib.imageutils.get_img_band_count(unmixed_dataset.in_unmix_img) != len(
             unmixed_dataset.endmember_names
         ):
             print(unmixed_dataset.in_unmix_img)
@@ -1166,7 +1166,7 @@ def summarise_multi_endmember_linear_unmixing(
         basename = filetools.get_file_basename(unmixed_dataset.in_unmix_img)
 
         band_order_matches = True
-        n_bands = rsgislib.imageutils.get_image_band_count(unmixed_dataset.in_unmix_img)
+        n_bands = rsgislib.imageutils.get_img_band_count(unmixed_dataset.in_unmix_img)
         if n_bands != len(endmember_names):
             band_order_matches = False
 

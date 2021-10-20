@@ -380,10 +380,10 @@ used to define the spatial extent of the output images and spatial projection.
         first = True
         for img in init_in_images:
             if first:
-                nBands = rsgislib.imageutils.get_image_band_count(img)
+                nBands = rsgislib.imageutils.get_img_band_count(img)
                 first = False
             else:
-                cBands = rsgislib.imageutils.get_image_band_count(img)
+                cBands = rsgislib.imageutils.get_img_band_count(img)
                 if cBands != nBands:
                     raise rsgislib.RSGISPyException("The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
 
@@ -553,7 +553,7 @@ used to define the spatial extent of the output images and spatial projection.
 
     elif len(inImages) == 1:
         print("Only 1 Input Image, Just Copying File to output")
-        nBands = rsgislib.imageutils.get_image_band_count(inImages[0])
+        nBands = rsgislib.imageutils.get_img_band_count(inImages[0])
         if dataType is None:
             dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages[0])
         rsgislib.imageutils.create_copy_img(refImg, outCompImg, nBands, 0, gdalformat, dataType)
@@ -599,10 +599,10 @@ used to define the spatial extent of the output images and spatial projection.
         first = True
         for img in init_in_images:
             if first:
-                nBands = rsgislib.imageutils.get_image_band_count(img)
+                nBands = rsgislib.imageutils.get_img_band_count(img)
                 first = False
             else:
-                cBands = rsgislib.imageutils.get_image_band_count(img)
+                cBands = rsgislib.imageutils.get_img_band_count(img)
                 if cBands != nBands:
                     raise rsgislib.RSGISPyException(
                         "The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
@@ -802,7 +802,7 @@ used to define the spatial extent of the output images and spatial projection.
 
     elif len(inImages) == 1:
         print("Only 1 Input Image, Just Copying File to output")
-        nBands = rsgislib.imageutils.get_image_band_count(inImages[0])
+        nBands = rsgislib.imageutils.get_img_band_count(inImages[0])
         if dataType is None:
             dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages[0])
         rsgislib.imageutils.create_copy_img(refImg, outCompImg, nBands, 0, gdalformat, dataType)

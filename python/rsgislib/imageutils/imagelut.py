@@ -43,8 +43,15 @@ import osgeo.gdal as gdal
 import osgeo.ogr as ogr
 
 
-def create_img_extent_lut(input_imgs, vec_file, vec_lyr, out_format, ignore_none_imgs=False, out_proj_wgs84=False,
-                          overwrite_lut_file=False):
+def create_img_extent_lut(
+    input_imgs,
+    vec_file,
+    vec_lyr,
+    out_format,
+    ignore_none_imgs=False,
+    out_proj_wgs84=False,
+    overwrite_lut_file=False,
+):
     """
     Create a vector layer look up table (LUT) for a directory of images.
 
@@ -71,23 +78,24 @@ def create_img_extent_lut(input_imgs, vec_file, vec_lyr, out_format, ignore_none
     import rsgislib.imageutils
     import rsgislib.vectorutils
     import rsgislib.vectorutils.createvectors
+
     gdal.UseExceptions()
 
     bboxs = []
     atts = dict()
-    atts['filename'] = []
-    atts['path'] = []
+    atts["filename"] = []
+    atts["path"] = []
 
     attTypes = dict()
-    attTypes['types'] = [ogr.OFTString, ogr.OFTString]
-    attTypes['names'] = ['filename', 'path']
+    attTypes["types"] = [ogr.OFTString, ogr.OFTString]
+    attTypes["names"] = ["filename", "path"]
 
     epsgCode = 0
 
     first = True
-    baseImg = ''
+    baseImg = ""
     for img in tqdm.tqdm(input_imgs):
-        epsgCodeTmp = rsgislib.imageutils.get_epsg_proj_from_image(img)
+        epsgCodeTmp = rsgislib.imageutils.get_epsg_proj_from_img(img)
         epsg_found = True
         if epsgCodeTmp is None:
             epsg_found = False
@@ -104,20 +112,33 @@ def create_img_extent_lut(input_imgs, vec_file, vec_lyr, out_format, ignore_none
                     first = False
                 else:
                     if epsgCodeTmp != epsgCode:
-                        raise Exception("The EPSG codes ({0} & {1}) do not match. (Base: '{2}', Img: '{3}')".format(epsgCode, epsgCodeTmp, baseImg, img))
+                        raise Exception(
+                            "The EPSG codes ({0} & {1}) do not match. (Base: '{2}', Img: '{3}')".format(
+                                epsgCode, epsgCodeTmp, baseImg, img
+                            )
+                        )
 
             if out_proj_wgs84:
-                img_bbox = rsgislib.imageutils.get_image_bbox_in_proj(img, 4326)
+                img_bbox = rsgislib.imageutils.get_img_bbox_in_proj(img, 4326)
             else:
-                img_bbox = rsgislib.imageutils.get_image_bbox(img)
+                img_bbox = rsgislib.imageutils.get_img_bbox(img)
 
             bboxs.append(img_bbox)
             baseName = os.path.basename(img)
             filePath = os.path.dirname(img)
-            atts['filename'].append(baseName)
-            atts['path'].append(filePath)
+            atts["filename"].append(baseName)
+            atts["path"].append(filePath)
     # Create vector layer
-    rsgislib.vectorutils.createvectors.create_poly_vec_bboxs(vec_file, vec_lyr, out_format, epsgCode, bboxs, atts, attTypes, overwrite=overwrite_lut_file)
+    rsgislib.vectorutils.createvectors.create_poly_vec_bboxs(
+        vec_file,
+        vec_lyr,
+        out_format,
+        epsgCode,
+        bboxs,
+        atts,
+        attTypes,
+        overwrite=overwrite_lut_file,
+    )
 
 
 def query_img_lut(scn_bbox, lutdbfile, lyrname):
@@ -129,10 +150,13 @@ def query_img_lut(scn_bbox, lutdbfile, lyrname):
     :return: a list of files from the LUT
     """
     import rsgislib.vectorutils
-    fileListLUT = rsgislib.vectorutils.get_att_lst_select_bbox_feats(lutdbfile, lyrname, ['path', 'filename'], scn_bbox)
+
+    fileListLUT = rsgislib.vectorutils.get_att_lst_select_bbox_feats(
+        lutdbfile, lyrname, ["path", "filename"], scn_bbox
+    )
     imgs = []
     for item in fileListLUT:
-        imgs.append(os.path.join(item['path'], item['filename']))
+        imgs.append(os.path.join(item["path"], item["filename"]))
     return imgs
 
 
@@ -144,10 +168,13 @@ def get_all_lut_imgs(lutdbfile, lyrname):
     :return: a list of files from the LUT
     """
     import rsgislib.vectorattrs
-    fileListLUT = rsgislib.vectorattrs.read_vec_column(lutdbfile, lyrname, ['path', 'filename'])
+
+    fileListLUT = rsgislib.vectorattrs.read_vec_column(
+        lutdbfile, lyrname, ["path", "filename"]
+    )
     imgs = []
     for item in fileListLUT:
-        imgs.append(os.path.join(item['path'], item['filename']))
+        imgs.append(os.path.join(item["path"], item["filename"]))
     return imgs
 
 
@@ -168,18 +195,20 @@ def get_raster_lyr(scn_bbox, lutdbfile, lyrname, tmp_path):
     import rsgislib.vectorutils
     import rsgislib.tools.utils
 
-    fileListLUT = rsgislib.vectorutils.get_att_lst_select_bbox_feats(lutdbfile, lyrname, ['path', 'filename'], scn_bbox)
+    fileListLUT = rsgislib.vectorutils.get_att_lst_select_bbox_feats(
+        lutdbfile, lyrname, ["path", "filename"], scn_bbox
+    )
 
     imgbase = "imglyr_{}".format(rsgislib.tools.utils.uid_generator())
     # if number of scenes available is > 0 then create VRT
     if len(fileListLUT) > 1:
         imgs = []
         for item in fileListLUT:
-            imgs.append(os.path.join(item['path'], item['filename']))
-        outimgfile = os.path.join(tmp_path, '{}_tmp.vrt'.format(imgbase))
+            imgs.append(os.path.join(item["path"], item["filename"]))
+        outimgfile = os.path.join(tmp_path, "{}_tmp.vrt".format(imgbase))
         gdal.BuildVRT(outimgfile, imgs)
     elif len(fileListLUT) == 1:
-        outimgfile = os.path.join(fileListLUT[0]['path'], fileListLUT[0]['filename'])
+        outimgfile = os.path.join(fileListLUT[0]["path"], fileListLUT[0]["filename"])
     else:
         outimgfile = None
     return outimgfile
@@ -213,29 +242,35 @@ def query_file_lut(lut_file, lut_lyr, roi_file, roi_lyr, out_dest, targz_out, cp
     if roi_lyr is None:
         roi_lyr = os.path.splitext(os.path.basename(roi_file))[0]
 
-    roi_mem_ds, roi_mem_lyr = rsgislib.vectorutils.read_vec_lyr_to_mem(roi_file, roi_lyr)
+    roi_mem_ds, roi_mem_lyr = rsgislib.vectorutils.read_vec_lyr_to_mem(
+        roi_file, roi_lyr
+    )
 
     roi_bbox = roi_mem_lyr.GetExtent(True)
 
-    lut_mem_ds, lut_mem_lyr = rsgislib.vectorutils.get_mem_vec_lyr_subset(lut_file, lut_lyr, roi_bbox)
+    lut_mem_ds, lut_mem_lyr = rsgislib.vectorutils.get_mem_vec_lyr_subset(
+        lut_file, lut_lyr, roi_bbox
+    )
 
-    fileListDict = rsgislib.vectorutils.get_att_lst_select_feats_lyr_objs(lut_mem_lyr, ['path', 'filename'], roi_mem_lyr)
+    fileListDict = rsgislib.vectorutils.get_att_lst_select_feats_lyr_objs(
+        lut_mem_lyr, ["path", "filename"], roi_mem_lyr
+    )
 
     out_cmds = []
     if targz_out:
-        cmd = 'tar -czf ' + out_dest
+        cmd = "tar -czf " + out_dest
         for fileItem in fileListDict:
-            filepath = os.path.join(fileItem['path'], fileItem['filename'])
+            filepath = os.path.join(fileItem["path"], fileItem["filename"])
             cmd = cmd + " " + filepath
 
         out_cmds.append(cmd)
     elif cp_cmds:
         for fileItem in fileListDict:
-            filepath = os.path.join(fileItem['path'], fileItem['filename'])
+            filepath = os.path.join(fileItem["path"], fileItem["filename"])
             out_cmds.append("cp {0} {1}".format(filepath, out_dest))
     else:
         for fileItem in fileListDict:
-            filepath = os.path.join(fileItem['path'], fileItem['filename'])
+            filepath = os.path.join(fileItem["path"], fileItem["filename"])
             out_cmds.append(filepath)
 
     return out_cmds

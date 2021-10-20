@@ -1683,12 +1683,12 @@ def does_vmsk_img_intersect(input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir, 
     # Does the input image BBOX intersect the BBOX of the ROI vector?
     if vec_epsg is None:
         vec_epsg = get_proj_epsg_from_vec(vec_roi_file, vec_roi_lyr)
-    img_epsg = rsgislib.imageutils.get_epsg_proj_from_image(input_vmsk_img)
+    img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_vmsk_img)
     if img_epsg == vec_epsg:
-        img_bbox = rsgislib.imageutils.get_image_bbox(input_vmsk_img)
+        img_bbox = rsgislib.imageutils.get_img_bbox(input_vmsk_img)
         projs_match = True
     else:
-        img_bbox = rsgislib.imageutils.get_image_bbox_in_proj(input_vmsk_img, vec_epsg)
+        img_bbox = rsgislib.imageutils.get_img_bbox_in_proj(input_vmsk_img, vec_epsg)
         projs_match = False
     vec_bbox = get_vec_layer_extent(vec_roi_file, vec_roi_lyr, compute_if_exp=True)
 
