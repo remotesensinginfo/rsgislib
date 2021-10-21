@@ -670,8 +670,8 @@ def reproj_vector_layer(
     outDataSet = None
 
 
-def reproj_vec_lyr(
-    vec_lyr_obj,
+def reproj_vec_lyr_obj(
+    vec_lyr_obj:ogr.Layer,
     out_vec_file: str,
     out_epsg: int,
     out_format: str = "MEMORY",
@@ -1447,15 +1447,17 @@ def subset_veclyr_to_featboxs(
     out_format="GPKG",
 ):
     """
-    A function which subsets an input vector layer using the BBOXs of the features within another vector
-    layer.
+    A function which subsets an input vector layer using the BBOXs of the features
+    within another vector layer.
+
     :param vec_file_bbox: The vector file for the features which define the BBOXs
     :param vec_lyr_bbox: The vector layer for the features which define the BBOXs
     :param vec_file_tosub: The vector file for the layer which is to be subset.
     :param vec_lyr_tosub: The vector layer for the layer which is to be subset.
-    :param out_lyr_name: The layer name for the output files - all output files will have the same layer name.
-    :param out_file_base: The base name for the output files.
-                          A numeric count 0-n will be inserted between this and the ending.
+    :param out_lyr_name: The layer name for the output files - all output files will
+                         have the same layer name.
+    :param out_file_base: The base name for the output files. A numeric count 0-n will
+                          be inserted between this and the ending.
     :param out_file_end: The output file ending (e.g., .gpkg).
     :param out_format: The output file driver (e.g., GPKG).
 
@@ -1942,7 +1944,7 @@ def does_vmsk_img_intersect(
         mem_ds, mem_lyr = get_mem_vec_lyr_subset(vec_roi_file, vec_roi_lyr, img_bbox)
 
         if not projs_match:
-            mem_result_ds, mem_result_lyr = reproj_vec_lyr(
+            mem_result_ds, mem_result_lyr = reproj_vec_lyr_obj(
                 mem_lyr,
                 "mem_vec",
                 img_epsg,

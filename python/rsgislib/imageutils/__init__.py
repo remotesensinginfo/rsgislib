@@ -2622,7 +2622,7 @@ def mask_img_with_vec(
         )
 
         if not projs_match:
-            mem_result_ds, mem_result_lyr = rsgislib.vectorutils.reproj_vec_lyr(
+            mem_result_ds, mem_result_lyr = rsgislib.vectorutils.reproj_vec_lyr_obj(
                 mem_lyr,
                 "mem_vec",
                 img_epsg,

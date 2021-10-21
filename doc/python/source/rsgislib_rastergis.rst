@@ -5,8 +5,7 @@ RSGISLib Raster GIS Module
 Utilities
 ----------
 
-.. autofunction:: rsgislib.rastergis.populateStats
-.. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
+.. autofunction:: rsgislib.rastergis.pop_rat_img_stats
 .. autofunction:: rsgislib.rastergis.collapse_rat
 .. autofunction:: rsgislib.rastergis.ratutils.create_clumps_shp_bbox
 .. autofunction:: rsgislib.rastergis.ratutils.get_column_data
@@ -46,12 +45,9 @@ Sampling
 Classification
 --------------
 
-.. autofunction:: rsgislib.rastergis.binaryClassification
-.. autofunction:: rsgislib.rastergis.regionGrowClass
-.. autofunction:: rsgislib.rastergis.regionGrowClassNeighCritera
 .. autofunction:: rsgislib.rastergis.ratutils.identify_small_units
 .. autofunction:: rsgislib.rastergis.ratutils.populate_clumps_with_class_training
-
+.. autofunction:: rsgislib.rastergis.class_split_fit_hist_gausian_mixture_model
 
 Extrapolation
 -------------
@@ -60,20 +56,17 @@ Extrapolation
 Change Detection
 -----------------
 
-.. autofunction:: rsgislib.rastergis.findChangeClumpsFromStdDev
 .. autofunction:: rsgislib.rastergis.get_global_class_stats
-.. autofunction:: rsgislib.rastergis.class_split_fit_hist_gausian_mixture_model
-.. autofunction:: rsgislib.rastergis.ratutils.calc_plot_gaussian_histo_model
 .. autofunction:: rsgislib.rastergis.ratutils.find_change_clumps_hist_skew_kurt_test
 .. autofunction:: rsgislib.rastergis.ratutils.find_change_clumps_hist_skew_kurt_test_lower
 .. autofunction:: rsgislib.rastergis.ratutils.find_change_clumps_hist_skew_kurt_test_upper
 .. autofunction:: rsgislib.rastergis.ratutils.find_change_clumps_hist_skew_kurt_test_vote_multi_vars
-.. autofunction:: rsgislib.rastergis.ratutils.findClumpsWithinExistingThresholds
+.. autofunction:: rsgislib.rastergis.ratutils.find_clumps_within_existing_thresholds
 
 Statistics
 ----------
 .. autofunction:: rsgislib.rastergis.fit_hist_gausian_mixture_model
-.. autofunction:: rsgislib.rastergis.ratutils.calcPlotGaussianHistoModel
+.. autofunction:: rsgislib.rastergis.ratutils.calc_plot_gaussian_histo_model
 .. autofunction:: rsgislib.rastergis.calc_1d_jm_distance
 .. autofunction:: rsgislib.rastergis.calc_2d_jm_distance
 .. autofunction:: rsgislib.rastergis.calc_bhattacharyya_distance
@@ -87,7 +80,6 @@ Copy & Export
 .. autofunction:: rsgislib.rastergis.export_clumps_to_images
 .. autofunction:: rsgislib.rastergis.copy_gdal_rat_columns
 .. autofunction:: rsgislib.rastergis.copy_rat
-.. autofunction:: rsgislib.rastergis.interpolateClumpValues2Image
 .. autofunction:: rsgislib.rastergis.import_vec_atts
 
 Colour Tables

@@ -144,9 +144,9 @@ Create
 
 Create VRT
 ------------
-.. autofunction:: rsgislib.create_stack_images_vrt
-.. autofunction:: rsgislib.create_mosaic_images_vrt
-.. autofunction:: rsgislib.create_vrt_band_subset
+.. autofunction:: rsgislib.imageutils.create_stack_images_vrt
+.. autofunction:: rsgislib.imageutils.create_mosaic_images_vrt
+.. autofunction:: rsgislib.imageutils.create_vrt_band_subset
 
 
 Select / Stack bands

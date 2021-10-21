@@ -8,7 +8,6 @@ Vector Attributes
 .. autofunction:: rsgislib.vectorutils.vector_maths
 .. autofunction:: rsgislib.vectorutils.copy_rat_cols_to_vector_lyr
 .. autofunction:: rsgislib.vectorutils.perform_spatial_join
-.. autofunction:: rsgislib.vectorutils.get_unq_col_values
 
 
 Create Vectors
@@ -36,10 +35,8 @@ Vector I/O
 .. autofunction:: rsgislib.vectorutils.write_vec_lyr_to_file
 .. autofunction:: rsgislib.vectorutils.vector_translate
 .. autofunction:: rsgislib.vectorutils.reproj_vector_layer
-.. autofunction:: rsgislib.vectorutils.reproj_vec_lyr
+.. autofunction:: rsgislib.vectorutils.reproj_vec_lyr_obj
 .. autofunction:: rsgislib.vectorutils.reproj_wgs84_vec_to_utm
-.. autofunction:: rsgislib.vectorutils.reproj_vector_layer
-.. autofunction:: rsgislib.vectorutils.reproj_vec_lyr
 
 
 Create Rasters
@@ -90,7 +87,7 @@ Vector Geometry
 ----------------
 .. autofunction:: rsgislib.vectorutils.explode_vec_lyr
 .. autofunction:: rsgislib.vectorutils.explode_vec_files
-.. autofunction:: rsgislib.vectorutils.geopd_check_polys_wgs84bounds_geometry
+.. autofunction:: rsgislib.vectorutils.geopd_check_polys_wgs84_bounds_geometry
 .. autofunction:: rsgislib.vectorutils.clip_vec_lyr
 
 

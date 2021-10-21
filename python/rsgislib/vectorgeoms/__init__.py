@@ -15,8 +15,15 @@ import rsgislib.vectorutils
 
 gdal.UseExceptions()
 
-def convert_polygon_to_polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_line_lyr=None,
-                                out_format="GPKG", del_exist_vec=False):
+
+def convert_polygon_to_polyline(
+    vec_poly_file,
+    vec_poly_lyr,
+    vec_line_file,
+    vec_line_lyr=None,
+    out_format="GPKG",
+    del_exist_vec=False,
+):
     """
     A function to convert a polygon vector file to a polyline file.
 
@@ -33,8 +40,10 @@ def convert_polygon_to_polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(vec_line_file)
         else:
-            raise Exception("The output vector file ({}) already exists, "
-                            "remove it and re-run.".format(vec_line_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(vec_line_file)
+            )
 
     if vec_line_lyr is None:
         vec_line_lyr = os.path.splitext(os.path.basename(vec_line_file))[0]
@@ -49,7 +58,9 @@ def convert_polygon_to_polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_
         raise Exception("Driver ('{}') has not be recognised.".format(out_format))
 
     out_ds_obj = out_vec_drv.Create(vec_line_file, 0, 0, 0, gdal.GDT_Unknown)
-    out_lyr_obj = out_ds_obj.CreateLayer(vec_line_lyr, vec_poly_spat_ref, geom_type=ogr.wkbLineString)
+    out_lyr_obj = out_ds_obj.CreateLayer(
+        vec_line_lyr, vec_poly_spat_ref, geom_type=ogr.wkbLineString
+    )
     feat_defn = out_lyr_obj.GetLayerDefn()
 
     n_feats = vec_poly_lyr_obj.GetFeatureCount(True)
@@ -97,6 +108,7 @@ def get_pt_on_line(pt1, pt2, dist):
 
     """
     import math
+
     out_pt_x = 0.0
     out_pt_y = 0.0
     if dist == 0:
@@ -129,12 +141,15 @@ def find_pt_to_side(pt_start, pt, pt_end, line_len, left_hand=False):
     A function to calculate a point location at a right-angle to the vector defined
     by the points pt_start and pt_end at the location pt.
 
-    :param pt_start: An ogr point geometry which has functions GetX(), GetY() and Distance().
+    :param pt_start: An ogr point geometry which has functions GetX(), GetY() and
+                     Distance().
     :param pt: An ogr point geometry which has functions GetX(), GetY() and Distance().
-    :param pt_end: An ogr point geometry which has functions GetX(), GetY() and Distance().
+    :param pt_end: An ogr point geometry which has functions GetX(), GetY() and
+                   Distance().
     :param line_len: The distance from the pt_start and pt_end vector to the new point.
-    :param left_hand: Specify which side the point is projected from the pt_start and pt_end vector.
-                      Default: False - project right-hand side of vector, True - project left-hand side of vector
+    :param left_hand: Specify which side the point is projected from the pt_start
+                      and pt_end vector. Default: False - project right-hand side of
+                      vector, True - project left-hand side of vector
     :return: The created point; returned as a set of floats: (x, y)
 
     """
@@ -143,6 +158,7 @@ def find_pt_to_side(pt_start, pt, pt_end, line_len, left_hand=False):
         pt_end = pt_start
         pt_start = tmp_pt
     import math
+
     dx = pt_end.GetX() - pt_start.GetX()
     dy = pt_end.GetY() - pt_start.GetY()
     beta = math.atan(dy / dx)
@@ -172,22 +188,35 @@ def find_pt_to_side(pt_start, pt, pt_end, line_len, left_hand=False):
     return out_pt_x, out_pt_y
 
 
-def create_orthg_lines(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None,
-                       pt_step=1000, line_len=10000, left_hand=False,
-                       out_format="GPKG", del_exist_vec=False):
+def create_orthg_lines(
+    in_vec_file,
+    in_vec_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    pt_step=1000,
+    line_len=10000,
+    left_hand=False,
+    out_format="GPKG",
+    del_exist_vec=False,
+):
     """
     A function to create a set of lines which are orthogonal to the lines of the input
     vector file.
 
-    :param in_vec_file: The inputted vector file path - this should be a polyline vector file
+    :param in_vec_file: The inputted vector file path - this should be a
+                        polyline vector file
     :param in_vec_lyr: The name of the vector layer
-    :param out_vec_file: The output vector file path - this will be a polyline vector file
-    :param out_vec_lyr: The name of the output vector layer (if None then created as the same as the file name)
-    :param pt_step: The steps (in the unit of the coordinate system) along lines in the layer at which lines
-                    are created.
+    :param out_vec_file: The output vector file path - this will be a polyline
+                         vector file
+    :param out_vec_lyr: The name of the output vector layer (if None then created
+                        as the same as the file name)
+    :param pt_step: The steps (in the unit of the coordinate system) along lines
+                    in the layer at which lines are created.
     :param line_len: The length of the lines created.
-    :param left_hand: Specify which side the point is projected from the line (i.e., left or right side)
-                      Default: False - project right-hand side of vector, True - project left-hand side of vector
+    :param left_hand: Specify which side the point is projected from the line
+                      (i.e., left or right side)
+                      Default: False - project right-hand side of vector, True -
+                      project left-hand side of vector
     :param out_format: The output file format of the vector file.
     :param del_exist_vec: remove output file if it exists.
 
@@ -197,8 +226,9 @@ def create_orthg_lines(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None,
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception(
-                "The output vector file ({}) already exists, remove it and re-run.".format(
-                    out_vec_file))
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -217,17 +247,18 @@ def create_orthg_lines(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None,
         raise Exception("Driver ('{}') has not be recognised.".format(out_format))
 
     out_ds_obj = out_vec_drv.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
-    out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, vec_spat_ref,
-                                         geom_type=ogr.wkbLineString)
-    uid_field = ogr.FieldDefn('uid', ogr.OFTInteger)
+    out_lyr_obj = out_ds_obj.CreateLayer(
+        out_vec_lyr, vec_spat_ref, geom_type=ogr.wkbLineString
+    )
+    uid_field = ogr.FieldDefn("uid", ogr.OFTInteger)
     out_lyr_obj.CreateField(uid_field)
-    start_x_field = ogr.FieldDefn('start_x', ogr.OFTReal)
+    start_x_field = ogr.FieldDefn("start_x", ogr.OFTReal)
     out_lyr_obj.CreateField(start_x_field)
-    start_y_field = ogr.FieldDefn('start_y', ogr.OFTReal)
+    start_y_field = ogr.FieldDefn("start_y", ogr.OFTReal)
     out_lyr_obj.CreateField(start_y_field)
-    end_x_field = ogr.FieldDefn('end_x', ogr.OFTReal)
+    end_x_field = ogr.FieldDefn("end_x", ogr.OFTReal)
     out_lyr_obj.CreateField(end_x_field)
-    end_y_field = ogr.FieldDefn('end_y', ogr.OFTReal)
+    end_y_field = ogr.FieldDefn("end_y", ogr.OFTReal)
     out_lyr_obj.CreateField(end_y_field)
     feat_defn = out_lyr_obj.GetLayerDefn()
 
@@ -264,24 +295,26 @@ def create_orthg_lines(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None,
                     n_step = 0
                     step_c_dist = c_dist
                     while True:
-                        if ((p_pt.Distance(c_pt) + step_c_dist) - (
-                                pt_step * n_step)) > pt_step:
+                        if (
+                            (p_pt.Distance(c_pt) + step_c_dist) - (pt_step * n_step)
+                        ) > pt_step:
                             pt_at_dist = ((pt_step * n_step) + pt_step) - step_c_dist
                             ptx, pty = get_pt_on_line(p_pt, c_pt, pt_at_dist)
                             base_pt = ogr.Geometry(ogr.wkbPoint)
                             base_pt.AddPoint(ptx, pty)
-                            ptx_end, pty_end = find_pt_to_side(p_pt, base_pt, c_pt,
-                                                               line_len, left_hand)
+                            ptx_end, pty_end = find_pt_to_side(
+                                p_pt, base_pt, c_pt, line_len, left_hand
+                            )
                             out_line = ogr.Geometry(ogr.wkbLineString)
                             out_line.AddPoint(ptx, pty)
                             out_line.AddPoint(ptx_end, pty_end)
                             out_feat = ogr.Feature(feat_defn)
                             out_feat.SetGeometry(out_line)
-                            out_feat.SetField('uid', line_uid)
-                            out_feat.SetField('start_x', ptx)
-                            out_feat.SetField('start_y', pty)
-                            out_feat.SetField('end_x', ptx_end)
-                            out_feat.SetField('end_y', pty_end)
+                            out_feat.SetField("uid", line_uid)
+                            out_feat.SetField("start_x", ptx)
+                            out_feat.SetField("start_y", pty)
+                            out_feat.SetField("end_x", ptx_end)
+                            out_feat.SetField("end_y", pty_end)
                             out_lyr_obj.CreateFeature(out_feat)
                             out_feat = None
                             line_uid = line_uid + 1
@@ -291,7 +324,8 @@ def create_orthg_lines(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None,
                                 c_dist = c_dist + p_pt.Distance(c_pt)
                             else:
                                 c_dist = (p_pt.Distance(c_pt) + step_c_dist) - (
-                                            pt_step * n_step)
+                                    pt_step * n_step
+                                )
                             break
 
         if ((counter % 20000) == 0) and open_transaction:
@@ -311,24 +345,38 @@ def create_orthg_lines(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None,
     vec_ds_obj = None
 
 
-def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs_lyr,
-                              out_vec_file, out_vec_lyr=None,
-                              start_x_field='start_x', start_y_field='start_y',
-                              uid_field='uid', out_format="GEOJSON",
-                              del_exist_vec=False):
+def closest_line_intersection(
+    vec_line_file,
+    vec_line_lyr,
+    vec_objs_file,
+    vec_objs_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    start_x_field="start_x",
+    start_y_field="start_y",
+    uid_field="uid",
+    out_format="GEOJSON",
+    del_exist_vec=False,
+):
     """
-    A function which intersects each line within the input vector layer (vec_objs_file, vec_objs_lyr)
-    creating a new line between the start point of the input layer (defined in the vector attribute table:
-    start_x_field, start_y_field) and the intersection point which is closest to the start point.
+    A function which intersects each line within the input vector layer
+    (vec_objs_file, vec_objs_lyr) creating a new line between the start
+    point of the input layer (defined in the vector attribute table:
+    start_x_field, start_y_field) and the intersection point which is
+    closest to the start point.
 
     :param vec_line_file: Input lines vector file path.
     :param vec_line_lyr: Input lines vector layer name.
-    :param vec_objs_file: The vector file for the objects (expecting polygons) to be intersected with.
-    :param vec_objs_lyr: The vector layer for the objects (expecting polygons) to be intersected with.
+    :param vec_objs_file: The vector file for the objects (expecting polygons)
+                          to be intersected with.
+    :param vec_objs_lyr: The vector layer for the objects (expecting polygons)
+                         to be intersected with.
     :param out_vec_file: The output vector file path.
     :param out_vec_lyr: The output vector layer name
-    :param start_x_field: The field name for the start point X coordinate for the input lines.
-    :param start_y_field: The field name for the start point Y coordinate for the input lines.
+    :param start_x_field: The field name for the start point X coordinate for
+                          the input lines.
+    :param start_y_field: The field name for the start point Y coordinate for
+                          the input lines.
     :param uid_field: The field name for the Unique ID (UID) of the input lines.
     :param out_format: The output file format of the vector file.
     :param del_exist_vec: remove output file if it exists.
@@ -339,8 +387,9 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception(
-                "The output vector file ({}) already exists, remove it and re-run.".format(
-                    out_vec_file))
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -373,7 +422,9 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
     if (not x_col_exists) or (not y_col_exists) or (not uid_col_exists):
         ds_line_vec = None
         raise Exception(
-            "The start x and y columns and/or UID column are not present within the input file.")
+            "The start x and y columns and/or UID column "
+            "are not present within the input file."
+        )
 
     ds_objs_vec = gdal.OpenEx(vec_objs_file, gdal.OF_READONLY)
     if ds_objs_vec is None:
@@ -383,17 +434,20 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
     if lyr_objs_vec is None:
         raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
 
-    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subsetEnvsVecLyrObj(lyr_objs_vec, vec_bbox)
+    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subsetEnvsVecLyrObj(
+        lyr_objs_vec, vec_bbox
+    )
 
     spat_ref = lyr_objs_vec.GetSpatialRef()
 
     out_driver = ogr.GetDriverByName(out_format)
     out_ds_obj = out_driver.CreateDataSource(out_vec_file)
-    out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, spat_ref,
-                                         geom_type=ogr.wkbLineString)
-    uid_field_obj = ogr.FieldDefn('uid', ogr.OFTInteger)
+    out_lyr_obj = out_ds_obj.CreateLayer(
+        out_vec_lyr, spat_ref, geom_type=ogr.wkbLineString
+    )
+    uid_field_obj = ogr.FieldDefn("uid", ogr.OFTInteger)
     out_lyr_obj.CreateField(uid_field_obj)
-    length_field = ogr.FieldDefn('len', ogr.OFTReal)
+    length_field = ogr.FieldDefn("len", ogr.OFTReal)
     out_lyr_obj.CreateField(length_field)
     feat_defn = out_lyr_obj.GetLayerDefn()
 
@@ -459,8 +513,8 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
                 out_line.AddPoint(min_dist_pt_x, min_dist_pt_y)
                 out_feat = ogr.Feature(feat_defn)
                 out_feat.SetGeometry(out_line)
-                out_feat.SetField('uid', uid_str)
-                out_feat.SetField('len', min_dist)
+                out_feat.SetField("uid", uid_str)
+                out_feat.SetField("len", min_dist)
                 out_lyr_obj.CreateFeature(out_feat)
                 out_feat = None
 
@@ -482,25 +536,38 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
     ds_objs_sub_vec = None
 
 
-def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs_lyr,
-                            out_vec_file, out_vec_lyr=None,
-                            start_x_field='start_x', start_y_field='start_y',
-                            uid_field='uid', out_format="GEOJSON",
-                            del_exist_vec=False):
+def line_intersection_range(
+    vec_line_file,
+    vec_line_lyr,
+    vec_objs_file,
+    vec_objs_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    start_x_field="start_x",
+    start_y_field="start_y",
+    uid_field="uid",
+    out_format="GEOJSON",
+    del_exist_vec=False,
+):
     """
-    A function which intersects each line within the input vector layer (vec_objs_file, vec_objs_lyr)
-    creating a new line between the closest intersection to the start point of the input layer
-    (defined in the vector attribute table: start_x_field, start_y_field) and the intersection point
+    A function which intersects each line within the input vector layer
+    (vec_objs_file, vec_objs_lyr) creating a new line between the closest
+    intersection to the start point of the input layer (defined in the vector
+    attribute table: start_x_field, start_y_field) and the intersection point
     which is furthest to the start point.
 
     :param vec_line_file: Input lines vector file path.
     :param vec_line_lyr: Input lines vector layer name.
-    :param vec_objs_file: The vector file for the objects (expecting polygons) to be intersected with.
-    :param vec_objs_lyr: The vector layer for the objects (expecting polygons) to be intersected with.
+    :param vec_objs_file: The vector file for the objects (expecting polygons)
+                          to be intersected with.
+    :param vec_objs_lyr: The vector layer for the objects (expecting polygons)
+                         to be intersected with.
     :param out_vec_file: The output vector file path.
     :param out_vec_lyr: The output vector layer name
-    :param start_x_field: The field name for the start point X coordinate for the input lines.
-    :param start_y_field: The field name for the start point Y coordinate for the input lines.
+    :param start_x_field: The field name for the start point X coordinate for
+                          the input lines.
+    :param start_y_field: The field name for the start point Y coordinate for
+                          the input lines.
     :param uid_field: The field name for the Unique ID (UID) of the input lines.
     :param out_format: The output file format of the vector file.
     :param del_exist_vec: remove output file if it exists.
@@ -511,8 +578,9 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception(
-                "The output vector file ({}) already exists, remove it and re-run.".format(
-                    out_vec_file))
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -545,7 +613,9 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
     if (not x_col_exists) or (not y_col_exists) or (not uid_col_exists):
         ds_line_vec = None
         raise Exception(
-            "The start x and y columns and/or UID column are not present within the input file.")
+            "The start x and y columns and/or UID column "
+            "are not present within the input file."
+        )
 
     ds_objs_vec = gdal.OpenEx(vec_objs_file, gdal.OF_READONLY)
     if ds_objs_vec is None:
@@ -555,17 +625,20 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
     if lyr_objs_vec is None:
         raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
 
-    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subsetEnvsVecLyrObj(lyr_objs_vec, vec_bbox)
+    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subsetEnvsVecLyrObj(
+        lyr_objs_vec, vec_bbox
+    )
 
     spat_ref = lyr_objs_vec.GetSpatialRef()
 
     out_driver = ogr.GetDriverByName(out_format)
     out_ds_obj = out_driver.CreateDataSource(out_vec_file)
-    out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, spat_ref,
-                                         geom_type=ogr.wkbLineString)
-    uid_field_obj = ogr.FieldDefn('uid', ogr.OFTInteger)
+    out_lyr_obj = out_ds_obj.CreateLayer(
+        out_vec_lyr, spat_ref, geom_type=ogr.wkbLineString
+    )
+    uid_field_obj = ogr.FieldDefn("uid", ogr.OFTInteger)
     out_lyr_obj.CreateField(uid_field_obj)
-    length_field = ogr.FieldDefn('len', ogr.OFTReal)
+    length_field = ogr.FieldDefn("len", ogr.OFTReal)
     out_lyr_obj.CreateField(length_field)
     feat_defn = out_lyr_obj.GetLayerDefn()
 
@@ -640,11 +713,11 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
                 out_line.AddPoint(max_dist_pt_x, max_dist_pt_y)
                 out_feat = ogr.Feature(feat_defn)
                 out_feat.SetGeometry(out_line)
-                out_feat.SetField('uid', uid_str)
+                out_feat.SetField("uid", uid_str)
                 start_pt.SetPoint(0, min_dist_pt_x, min_dist_pt_y)
                 c_pt.SetPoint(0, max_dist_pt_x, max_dist_pt_y)
                 dist = start_pt.Distance(c_pt)
-                out_feat.SetField('len', dist)
+                out_feat.SetField("len", dist)
                 out_lyr_obj.CreateFeature(out_feat)
                 out_feat = None
 
@@ -667,24 +740,37 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
     ds_objs_sub_vec = None
 
 
-def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file,
-                                 vec_objs_lyr, out_vec_file,
-                                 out_vec_lyr=None, start_x_field='start_x',
-                                 start_y_field='start_y', uid_field='uid',
-                                 out_format="GPKG", del_exist_vec=False):
+def scnd_line_intersection_range(
+    vec_line_file,
+    vec_line_lyr,
+    vec_objs_file,
+    vec_objs_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    start_x_field="start_x",
+    start_y_field="start_y",
+    uid_field="uid",
+    out_format="GPKG",
+    del_exist_vec=False,
+):
     """
-    A function which intersects a line with a set of polygons outputting the lines cut to their second point
-    of intersection. Assume, first point of intersection would be entering the polygon and the second point
-    of intersection would be leaving the polygon.
+    A function which intersects a line with a set of polygons outputting the
+    lines cut to their second point of intersection. Assume, first point of
+    intersection would be entering the polygon and the second point of
+    intersection would be leaving the polygon.
 
     :param vec_line_file: Input lines vector file path.
     :param vec_line_lyr: Input lines vector layer name.
-    :param vec_objs_file: The vector file for the objects (expecting polygons) to be intersected with.
-    :param vec_objs_lyr: The vector layer for the objects (expecting polygons) to be intersected with.
+    :param vec_objs_file: The vector file for the objects (expecting polygons)
+                          to be intersected with.
+    :param vec_objs_lyr: The vector layer for the objects (expecting polygons)
+                         to be intersected with.
     :param out_vec_file: The output vector file path.
     :param out_vec_lyr: The output vector layer name
-    :param start_x_field: The field name for the start point X coordinate for the input lines.
-    :param start_y_field: The field name for the start point Y coordinate for the input lines.
+    :param start_x_field: The field name for the start point X coordinate
+                          for the input lines.
+    :param start_y_field: The field name for the start point Y coordinate
+                          for the input lines.
     :param uid_field: The field name for the Unique ID (UID) of the input lines.
     :param out_format: The output file format of the vector file.
     :param del_exist_vec: remove output file if it exists.
@@ -695,8 +781,9 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file,
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
             raise Exception(
-                "The output vector file ({}) already exists, remove it and re-run.".format(
-                    out_vec_file))
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -729,7 +816,9 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file,
     if (not x_col_exists) or (not y_col_exists) or (not uid_col_exists):
         ds_line_vec = None
         raise Exception(
-            "The start x and y columns and/or UID column are not present within the input file.")
+            "The start x and y columns and/or UID column are "
+            "not present within the input file."
+        )
 
     ds_objs_vec = gdal.OpenEx(vec_objs_file, gdal.OF_READONLY)
     if ds_objs_vec is None:
@@ -740,25 +829,27 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file,
         raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
 
     ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subsetEnvsVecLyrObj(
-        lyr_objs_vec, vec_bbox)
+        lyr_objs_vec, vec_bbox
+    )
 
     spat_ref = lyr_objs_vec.GetSpatialRef()
 
     out_driver = ogr.GetDriverByName(out_format)
     out_ds_obj = out_driver.CreateDataSource(out_vec_file)
-    out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, spat_ref,
-                                         geom_type=ogr.wkbLineString)
-    uid_field_out_obj = ogr.FieldDefn('uid', ogr.OFTInteger)
+    out_lyr_obj = out_ds_obj.CreateLayer(
+        out_vec_lyr, spat_ref, geom_type=ogr.wkbLineString
+    )
+    uid_field_out_obj = ogr.FieldDefn("uid", ogr.OFTInteger)
     out_lyr_obj.CreateField(uid_field_out_obj)
-    start_x_out_field = ogr.FieldDefn('start_x', ogr.OFTReal)
+    start_x_out_field = ogr.FieldDefn("start_x", ogr.OFTReal)
     out_lyr_obj.CreateField(start_x_out_field)
-    start_y_out_field = ogr.FieldDefn('start_y', ogr.OFTReal)
+    start_y_out_field = ogr.FieldDefn("start_y", ogr.OFTReal)
     out_lyr_obj.CreateField(start_y_out_field)
-    end_x_out_field = ogr.FieldDefn('end_x', ogr.OFTReal)
+    end_x_out_field = ogr.FieldDefn("end_x", ogr.OFTReal)
     out_lyr_obj.CreateField(end_x_out_field)
-    end_y_out_field = ogr.FieldDefn('end_y', ogr.OFTReal)
+    end_y_out_field = ogr.FieldDefn("end_y", ogr.OFTReal)
     out_lyr_obj.CreateField(end_y_out_field)
-    length_field = ogr.FieldDefn('len', ogr.OFTReal)
+    length_field = ogr.FieldDefn("len", ogr.OFTReal)
     out_lyr_obj.CreateField(length_field)
     feat_defn = out_lyr_obj.GetLayerDefn()
 
@@ -849,14 +940,14 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file,
                 out_line.AddPoint(sec_dist_pt_x, sec_dist_pt_y)
                 out_feat = ogr.Feature(feat_defn)
                 out_feat.SetGeometry(out_line)
-                out_feat.SetField('uid', uid_str)
+                out_feat.SetField("uid", uid_str)
                 c_pt.SetPoint(0, sec_dist_pt_x, sec_dist_pt_y)
                 dist = start_pt.Distance(c_pt)
-                out_feat.SetField('len', dist)
-                out_feat.SetField('start_x', start_pt_x)
-                out_feat.SetField('start_y', start_pt_y)
-                out_feat.SetField('end_x', sec_dist_pt_x)
-                out_feat.SetField('end_y', sec_dist_pt_y)
+                out_feat.SetField("len", dist)
+                out_feat.SetField("start_x", start_pt_x)
+                out_feat.SetField("start_y", start_pt_y)
+                out_feat.SetField("end_x", sec_dist_pt_x)
+                out_feat.SetField("end_y", sec_dist_pt_y)
                 out_lyr_obj.CreateFeature(out_feat)
                 out_feat = None
 
@@ -881,7 +972,8 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file,
 
 def create_rtree_index(vec_file, vec_lyr):
     """
-    A function which creates a spatial index using the rtree package for the inputted vector file/layer.
+    A function which creates a spatial index using the rtree package for the
+    inputted vector file/layer.
 
     :param vec_file: Input vector file to be processed.
     :param vec_lyr: The layer within the vector file for which the index is to be built.
@@ -923,9 +1015,12 @@ def bbox_intersects_index(rt_idx, geom_lst, bbox):
     A function which tests for intersection between the geometries and the bounding box
     using a spatial index.
 
-    :param rt_idx: the rtree spatial index object (created using the create_rtree_index function)
-    :param geom_lst: the list of geometries as referenced in the index (created using the create_rtree_index function)
-    :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as geometries in the index.
+    :param rt_idx: the rtree spatial index object (created using the
+                   create_rtree_index function)
+    :param geom_lst: the list of geometries as referenced in the index (created
+                     using the create_rtree_index function)
+    :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as
+                  geometries in the index.
     :return: True there is an intersection. False there is not an intersection.
 
     """
@@ -956,7 +1051,7 @@ def calc_poly_centroids(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr
 
     :param vec_file: input vector file
     :param vec_lyr: input vector layer within the input file.
-    :param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+    :param out_format: the format driver for the output vector file (e.g., GPKG).
     :param out_vec_file: output file path for the vector.
     :param out_vec_lyr: output vector layer name.
 
@@ -975,7 +1070,9 @@ def calc_poly_centroids(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr
     if result_ds is None:
         raise Exception("Could not open '{}'".format(out_vec_file))
 
-    result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=ogr.wkbPoint)
+    result_lyr = result_ds.CreateLayer(
+        out_vec_lyr, lyr_spat_ref, geom_type=ogr.wkbPoint
+    )
     if result_lyr is None:
         raise Exception("Could not open layer '{}'".format(out_vec_lyr))
 
@@ -1017,9 +1114,19 @@ def calc_poly_centroids(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr
     result_ds = None
 
 
-def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
+def vec_lyr_intersection_gp(
+    vec_file,
+    vec_lyr,
+    vec_over_file,
+    vec_over_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    out_format="GPKG",
+    del_exist_vec=False,
+):
     """
-    A function which performs an intersection between the vector layer and the overlain vector using Geopandas.
+    A function which performs an intersection between the vector layer and the
+    overlain vector using Geopandas.
 
     :param vec_file: Input vector file path.
     :param vec_lyr: Input vector layer name.
@@ -1037,8 +1144,10 @@ def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, "
-                            "remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -1046,19 +1155,31 @@ def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
     # Perform Intersection
-    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='intersection')
+    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how="intersection")
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception("If output format is GPKG then an output layer is required.")
+            raise Exception(
+                "If output format is GPKG then an output layer is required."
+            )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
+def vec_lyr_difference_gp(
+    vec_file,
+    vec_lyr,
+    vec_over_file,
+    vec_over_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    out_format="GPKG",
+    del_exist_vec=False,
+):
     """
-    A function which performs a difference between the vector layer and the overlain vector using Geopandas.
+    A function which performs a difference between the vector layer and the
+    overlain vector using Geopandas.
 
     :param vec_file: Input vector file path.
     :param vec_lyr: Input vector layer name.
@@ -1076,8 +1197,10 @@ def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_ve
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, "
-                            "remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -1085,19 +1208,31 @@ def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_ve
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
     # Perform Difference
-    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='difference')
+    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how="difference")
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception("If output format is GPKG then an output layer is required.")
+            raise Exception(
+                "If output format is GPKG then an output layer is required."
+            )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
+def vec_lyr_sym_difference_gp(
+    vec_file,
+    vec_lyr,
+    vec_over_file,
+    vec_over_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    out_format="GPKG",
+    del_exist_vec=False,
+):
     """
-    A function which performs a symmetric difference between the vector layer and the overlain vector using Geopandas.
+    A function which performs a symmetric difference between the vector layer
+    and the overlain vector using Geopandas.
 
     :param vec_file: Input vector file path.
     :param vec_lyr: Input vector layer name.
@@ -1115,8 +1250,10 @@ def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, ou
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, "
-                            "remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -1124,21 +1261,36 @@ def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, ou
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
     # Perform symmetric difference
-    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='symmetric_difference')
+    data_inter_gdf = geopandas.overlay(
+        data_gdf, over_data_gdf, how="symmetric_difference"
+    )
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception("If output format is GPKG then an output layer is required.")
+            raise Exception(
+                "If output format is GPKG then an output layer is required."
+            )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
+def vec_lyr_identity_gp(
+    vec_file,
+    vec_lyr,
+    vec_over_file,
+    vec_over_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    out_format="GPKG",
+    del_exist_vec=False,
+):
     """
-    A function which performs a identity between the vector layer and the overlain vector using Geopandas.
+    A function which performs a identity between the vector layer and the
+    overlain vector using Geopandas.
 
-    The result consists of the surface of vec_file, but with the geometries obtained from overlaying vec_file with vec_over_file.
+    The result consists of the surface of vec_file, but with the geometries obtained
+    from overlaying vec_file with vec_over_file.
 
     :param vec_file: Input vector file path.
     :param vec_lyr: Input vector layer name.
@@ -1156,8 +1308,10 @@ def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, "
-                            "remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -1165,19 +1319,31 @@ def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
     # Perform identity
-    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='identity')
+    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how="identity")
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception("If output format is GPKG then an output layer is required.")
+            raise Exception(
+                "If output format is GPKG then an output layer is required."
+            )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
+def vec_lyr_union_gp(
+    vec_file,
+    vec_lyr,
+    vec_over_file,
+    vec_over_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    out_format="GPKG",
+    del_exist_vec=False,
+):
     """
-    A function which performs a union between the vector layer and the overlain vector using Geopandas.
+    A function which performs a union between the vector layer and the
+    overlain vector using Geopandas.
 
     :param vec_file: Input vector file path.
     :param vec_lyr: Input vector layer name.
@@ -1195,8 +1361,10 @@ def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_fil
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, "
-                            "remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -1204,11 +1372,13 @@ def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_fil
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
     # Perform union
-    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='union')
+    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how="union")
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception("If output format is GPKG then an output layer is required.")
+            raise Exception(
+                "If output format is GPKG then an output layer is required."
+            )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
@@ -1245,10 +1415,21 @@ def get_vec_lyr_as_pts(in_vec_file, in_vec_lyr):
     pbar.close()
     return pts_lst
 
-def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_format='GPKG', alpha_val=None,
-                       alpha_vals=None, max_iter=10000, del_exist_vec=False):
+
+def create_alpha_shape(
+    in_vec_file,
+    in_vec_lyr,
+    out_vec_file,
+    out_vec_lyr,
+    out_format="GPKG",
+    alpha_val=None,
+    alpha_vals=None,
+    max_iter=10000,
+    del_exist_vec=False,
+):
     """
-    Function which calculate an alpha shape for a set of vector features (which are converted to points).
+    Function which calculate an alpha shape for a set of vector features
+    (which are converted to points).
 
     For this function to work you need the alphashapes module installed:
     https://alphashape.readthedocs.io
@@ -1257,19 +1438,27 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
     :param in_vec_file: the input vector file.
     :param in_vec_lyr: the input vector layer name
     :param out_vec_file: the output vector file.
-    :param out_vec_lyr: the name of the output vector layer (if None then the same as the input).
-    :param out_format: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
-    :param alpha_val: The alpha value to create the the alpha shape polygon. If None then a value will be
-                      automatically calculate but warning this can a significant amount of time (i.e., hours!!)
-    :param alpha_vals: Alternatively, a list of alpha values can be provided (e.g., [75, 50, 25, 5, 2]) where
-                       first to produce a valid result will be outputted. i.e., the order you provide the alpha
-                       values will be the order they are tested. If None then the alpha_val parameter will be used.
-    :param max_iter: The maximum number of iterations for automatically selecting the alpha value. Note if the number
-                     iteration is not sufficient to find an optimum value then no value is returned.
+    :param out_vec_lyr: the name of the output vector layer (if None then
+                        the same as the input).
+    :param out_format: the output vector file format (e.g., GPKG)
+    :param alpha_val: The alpha value to create the the alpha shape
+                      polygon. If None then a value will be automatically
+                      calculate but warning this can a significant amount
+                      of time (i.e., hours!!)
+    :param alpha_vals: Alternatively, a list of alpha values can be provided
+                       (e.g., [75, 50, 25, 5, 2]) where first to produce a valid
+                       result will be outputted. i.e., the order you provide the alpha
+                       values will be the order they are tested. If None then the
+                       alpha_val parameter will be used.
+    :param max_iter: The maximum number of iterations for automatically selecting
+                     the alpha value. Note if the number iteration is not sufficient
+                     to find an optimum value then no value is returned.
     :param del_exist_vec: remove output file if it exists.
-    :return: (vec_output, alpha_val); vec_output is a boolean True an output produced; False no output,
-             alpha_val - the alpha value used for the analysis. If a single value was inputted then the
-             same value will be outputted.
+    :return: (vec_output, alpha_val); vec_output is a boolean True an output
+                                      produced; False no output, alpha_val - the
+                                      alpha value used for the analysis. If a single
+                                      value was inputted then the same value will
+                                      be outputted.
 
     """
     import alphashape
@@ -1283,7 +1472,10 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     def _rescale_polygon(in_poly, min_x, min_y, ran_x, ran_y):
         ext_ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -1295,7 +1487,9 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
         for int_ring in in_poly.interiors:
             n_int_ring = ogr.Geometry(ogr.wkbLinearRing)
             for pt in int_ring.coords:
-                n_int_ring.AddPoint(((pt[0] * ran_x) + min_x), ((pt[1] * ran_y) + min_y))
+                n_int_ring.AddPoint(
+                    ((pt[0] * ran_x) + min_x), ((pt[1] * ran_y) + min_y)
+                )
             n_poly.AddGeometry(n_int_ring)
         return n_poly
 
@@ -1339,7 +1533,10 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
         for alpha_test_val in alpha_vals:
             print("Trying Alpha: {}".format(alpha_test_val))
             alpha_shape = alphashape.alphashape(norm_pts, alpha=alpha_test_val)
-            if alpha_shape.geom_type == 'MultiPolygon' or alpha_shape.geom_type == 'Polygon':
+            if (
+                alpha_shape.geom_type == "MultiPolygon"
+                or alpha_shape.geom_type == "Polygon"
+            ):
                 alpha_val = alpha_test_val
                 break
         print("Final Alpha: {}".format(alpha_val))
@@ -1351,12 +1548,14 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
         alpha_shape = alphashape.alphashape(norm_pts, alpha=alpha_val)
 
     ogr_geom_type = ogr.wkbPolygon
-    if alpha_shape.geom_type == 'MultiPolygon':
+    if alpha_shape.geom_type == "MultiPolygon":
         ogr_geom_type = ogr.wkbMultiPolygon
         out_alpha_shape = ogr.Geometry(ogr.wkbMultiPolygon)
         for poly in alpha_shape:
-            out_alpha_shape.AddGeometry(_rescale_polygon(poly, min_x, min_y, ran_x, ran_y))
-    elif alpha_shape.geom_type == 'Polygon':
+            out_alpha_shape.AddGeometry(
+                _rescale_polygon(poly, min_x, min_y, ran_x, ran_y)
+            )
+    elif alpha_shape.geom_type == "Polygon":
         ogr_geom_type = ogr.wkbPolygon
         out_alpha_shape = _rescale_polygon(alpha_shape, min_x, min_y, ran_x, ran_y)
     else:
@@ -1379,7 +1578,9 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
         if result_ds is None:
             raise Exception("Could not open '{}'".format(out_vec_file))
 
-        result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=ogr_geom_type)
+        result_lyr = result_ds.CreateLayer(
+            out_vec_lyr, lyr_spat_ref, geom_type=ogr_geom_type
+        )
         if result_lyr is None:
             raise Exception("Could not open layer '{}'".format(out_vec_lyr))
 
@@ -1395,13 +1596,16 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_f
     return vec_output, alpha_val
 
 
-def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr, del_exist_vec=False):
+def convert_multi_geoms_to_single(
+    vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr, del_exist_vec=False
+):
     """
     A convert any multiple geometries into single geometries.
 
     :param vec_file: input vector file
     :param vec_lyr: input vector layer within the input file.
-    :param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+    :param out_format: the format driver for the output vector
+                       file (e.g., GPKG, ESRI Shapefile).
     :param out_vec_file: output file path for the vector.
     :param out_vec_lyr: output vector layer name.
     :param del_exist_vec: remove output file if it exists.
@@ -1411,13 +1615,17 @@ def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, out_vec_file, o
     from osgeo import gdal
     from osgeo import ogr
     import tqdm
+
     gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
@@ -1463,25 +1671,25 @@ def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, out_vec_file, o
 
         geom_ref = feat.GetGeometryRef()
 
-        if geom_ref.GetGeometryName().lower() == 'multipolygon':
+        if geom_ref.GetGeometryName().lower() == "multipolygon":
             for i in range(0, geom_ref.GetGeometryCount()):
                 g = geom_ref.GetGeometryRef(i)
                 outFeat = ogr.Feature(featDefn)
                 outFeat.SetGeometry(g)
                 result_lyr.CreateFeature(outFeat)
-        elif geom_ref.GetGeometryName().lower() == 'multilinestring':
+        elif geom_ref.GetGeometryName().lower() == "multilinestring":
             for i in range(0, geom_ref.GetGeometryCount()):
                 g = geom_ref.GetGeometryRef(i)
                 outFeat = ogr.Feature(featDefn)
                 outFeat.SetGeometry(g)
                 result_lyr.CreateFeature(outFeat)
-        elif geom_ref.GetGeometryName().lower() == 'multipoint':
+        elif geom_ref.GetGeometryName().lower() == "multipoint":
             for i in range(0, geom_ref.GetGeometryCount()):
                 g = geom_ref.GetGeometryRef(i)
                 outFeat = ogr.Feature(featDefn)
                 outFeat.SetGeometry(g)
                 result_lyr.CreateFeature(outFeat)
-        elif geom_ref.GetGeometryName().lower() == 'geometrycollection':
+        elif geom_ref.GetGeometryName().lower() == "geometrycollection":
             for i in range(0, geom_ref.GetGeometryCount()):
                 g = geom_ref.GetGeometryRef(i)
                 outFeat = ogr.Feature(featDefn)
@@ -1510,29 +1718,41 @@ def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, out_vec_file, o
     result_ds = None
 
 
-def simplify_geometries(vec_file, vec_lyr, tolerance, out_format, out_vec_file, out_vec_lyr, del_exist_vec=False):
+def simplify_geometries(
+    vec_file,
+    vec_lyr,
+    tolerance,
+    out_format,
+    out_vec_file,
+    out_vec_lyr,
+    del_exist_vec=False,
+):
     """
-Create a simplified version of the input
+    Create a simplified version of the input
 
-:param vec_file: input vector file
-:param vec_lyr: input vector layer within the input file.
-:param tolerance: simplification tolerance
-:param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
-:param out_vec_file: output file path for the vector.
-:param out_vec_lyr: output vector layer name.
-:param del_exist_vec: remove output file if it exists.
-
-"""
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer within the input file.
+    :param tolerance: simplification tolerance
+    :param out_format: the format driver for the output vector
+                       file (e.g., GPKG, ESRI Shapefile).
+    :param out_vec_file: output file path for the vector.
+    :param out_vec_lyr: output vector layer name.
+    :param del_exist_vec: remove output file if it exists.
+    """
     from osgeo import gdal
     from osgeo import ogr
     import tqdm
+
     gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
@@ -1590,32 +1810,45 @@ Create a simplified version of the input
     result_ds = None
 
 
-def delete_polygon_holes(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr, area_thres=None, del_exist_vec=False):
+def delete_polygon_holes(
+    vec_file,
+    vec_lyr,
+    out_format,
+    out_vec_file,
+    out_vec_lyr,
+    area_thres=None,
+    del_exist_vec=False,
+):
     """
-Delete holes from the input polygons in below the area threshold.
+    Delete holes from the input polygons in below the area threshold.
 
-:param vec_file: input vector file
-:param vec_lyr: input vector layer within the input file.
-:param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
-:param out_vec_file: output file path for the vector.
-:param out_vec_lyr: output vector layer name.
-:param area_thres: threshold below which holes are removed. If threshold is None then all holes are removed.
-:param del_exist_vec: remove output file if it exists.
-
-"""
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer within the input file.
+    :param out_format: the format driver for the output vector
+                       file (e.g., GPKG, ESRI Shapefile).
+    :param out_vec_file: output file path for the vector.
+    :param out_vec_lyr: output vector layer name.
+    :param area_thres: threshold below which holes are removed. If
+                       threshold is None then all holes are removed.
+    :param del_exist_vec: remove output file if it exists.
+    """
     from osgeo import gdal
     from osgeo import ogr
     import tqdm
+
     gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     def _remove_holes_polygon(polygon, area_thres=None):
-        if polygon.GetGeometryName().lower() != 'polygon':
+        if polygon.GetGeometryName().lower() != "polygon":
             raise Exception("Can only remove holes from polygon geometry.")
         if polygon.GetGeometryCount() == 1:
             return polygon
@@ -1672,12 +1905,12 @@ Delete holes from the input polygons in below the area threshold.
             openTransaction = True
 
         geom_ref = feat.GetGeometryRef()
-        if geom_ref.GetGeometryName().lower() == 'multipolygon':
+        if geom_ref.GetGeometryName().lower() == "multipolygon":
             out_geom = ogr.Geometry(ogr.wkbMultiPolygon)
             for i in range(0, geom_ref.GetGeometryCount()):
                 g = geom_ref.GetGeometryRef(i)
                 out_geom.AddGeometry(_remove_holes_polygon(g, area_thres))
-        elif geom_ref.GetGeometryName().lower() == 'polygon':
+        elif geom_ref.GetGeometryName().lower() == "polygon":
             out_geom = _remove_holes_polygon(geom_ref, area_thres)
 
         if out_geom is not None:
@@ -1705,20 +1938,20 @@ Delete holes from the input polygons in below the area threshold.
 
 def get_poly_hole_area(vec_file, vec_lyr):
     """
-Get an array of the areas of the polygon holes.
+    Get an array of the areas of the polygon holes.
 
-:param vec_file: input vector file
-:param vec_lyr: input vector layer within the input file.
-:returns: A list of areas.
-
-"""
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer within the input file.
+    :returns: A list of areas.
+    """
     from osgeo import gdal
     from osgeo import ogr
     import tqdm
+
     gdal.UseExceptions()
 
     def _calc_hole_area(polygon):
-        if polygon.GetGeometryName().lower() != 'polygon':
+        if polygon.GetGeometryName().lower() != "polygon":
             raise Exception("Can only remove holes from polygon geometry.")
         if polygon.GetGeometryCount() == 1:
             return []
@@ -1748,14 +1981,14 @@ Get an array of the areas of the polygon holes.
     hole_areas = []
     while feat is not None:
         geom_ref = feat.GetGeometryRef()
-        if geom_ref.GetGeometryName().lower() == 'multipolygon':
+        if geom_ref.GetGeometryName().lower() == "multipolygon":
             out_geom = ogr.Geometry(ogr.wkbMultiPolygon)
             for i in range(0, geom_ref.GetGeometryCount()):
                 g = geom_ref.GetGeometryRef(i)
                 areas = _calc_hole_area(g)
                 if len(areas) > 0:
                     hole_areas += areas
-        elif geom_ref.GetGeometryName().lower() == 'polygon':
+        elif geom_ref.GetGeometryName().lower() == "polygon":
             areas = _calc_hole_area(geom_ref)
             if len(areas) > 0:
                 hole_areas += areas
@@ -1768,29 +2001,41 @@ Get an array of the areas of the polygon holes.
     return hole_areas
 
 
-def remove_polygon_area(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr, area_thres, del_exist_vec=False):
+def remove_polygon_area(
+    vec_file,
+    vec_lyr,
+    out_format,
+    out_vec_file,
+    out_vec_lyr,
+    area_thres,
+    del_exist_vec=False,
+):
     """
-Delete polygons with an area below a defined threshold.
+    Delete polygons with an area below a defined threshold.
 
-:param vec_file: input vector file
-:param vec_lyr: input vector layer within the input file.
-:param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
-:param out_vec_file: output file path for the vector.
-:param out_vec_lyr: output vector layer name.
-:param area_thres: threshold below which polygons are removed.
-:param del_exist_vec: remove output file if it exists.
-
-"""
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer within the input file.
+    :param out_format: the format driver for the output vector
+                       file (e.g., GPKG, ESRI Shapefile).
+    :param out_vec_file: output file path for the vector.
+    :param out_vec_lyr: output vector layer name.
+    :param area_thres: threshold below which polygons are removed.
+    :param del_exist_vec: remove output file if it exists.
+    """
     from osgeo import gdal
     from osgeo import ogr
     import tqdm
+
     gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
@@ -1826,7 +2071,7 @@ Delete polygons with an area below a defined threshold.
             openTransaction = True
 
         geom_ref = feat.GetGeometryRef()
-        if geom_ref.GetGeometryName().lower() == 'multipolygon':
+        if geom_ref.GetGeometryName().lower() == "multipolygon":
             out_geom = ogr.Geometry(ogr.wkbMultiPolygon)
             n_geoms = 0
             for i in range(0, geom_ref.GetGeometryCount()):
@@ -1838,7 +2083,7 @@ Delete polygons with an area below a defined threshold.
                 outFeat = ogr.Feature(featDefn)
                 outFeat.SetGeometry(out_geom)
                 result_lyr.CreateFeature(outFeat)
-        elif geom_ref.GetGeometryName().lower() == 'polygon':
+        elif geom_ref.GetGeometryName().lower() == "polygon":
             if geom_ref.Area() > area_thres:
                 outFeat = ogr.Feature(featDefn)
                 outFeat.SetGeometry(geom_ref)
@@ -1862,10 +2107,19 @@ Delete polygons with an area below a defined threshold.
     result_ds = None
 
 
-def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None,
-                         out_format="GPKG", del_exist_vec=False):
+def vec_lyr_intersection(
+    vec_file,
+    vec_lyr,
+    vec_over_file,
+    vec_over_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    out_format="GPKG",
+    del_exist_vec=False,
+):
     """
-    A function which performs an intersection between the vector layer and the overlain vector.
+    A function which performs an intersection between the vector
+    layer and the overlain vector.
 
     :param vec_file: Input vector file path.
     :param vec_lyr: Input vector layer name.
@@ -1887,7 +2141,10 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -1951,23 +2208,34 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
                 for i in range(op_out_geom.GetGeometryCount()):
                     c_geom = op_out_geom.GetGeometryRef(i)
 
-                    if ((c_geom.GetGeometryName().upper() == "POLYGON") or (
-                            c_geom.GetGeometryName().upper() == "MULTIPOLYGON")) and (
-                            (geom_type == ogr.wkbMultiPolygon) or (geom_type == ogr.wkbPolygon)):
+                    if (
+                        (c_geom.GetGeometryName().upper() == "POLYGON")
+                        or (c_geom.GetGeometryName().upper() == "MULTIPOLYGON")
+                    ) and (
+                        (geom_type == ogr.wkbMultiPolygon)
+                        or (geom_type == ogr.wkbPolygon)
+                    ):
                         out_feat = ogr.Feature(feat_defn)
                         out_feat.SetGeometry(c_geom)
                         out_lyr_obj.CreateFeature(out_feat)
                         out_feat = None
-                    elif ((c_geom.GetGeometryName().upper() == "LINESTRING") or (
-                            c_geom.GetGeometryName().upper() == "MULTILINESTRING")) and (
-                            (geom_type == ogr.wkbMultiLineString) or (geom_type == ogr.wkbLineString)):
+                    elif (
+                        (c_geom.GetGeometryName().upper() == "LINESTRING")
+                        or (c_geom.GetGeometryName().upper() == "MULTILINESTRING")
+                    ) and (
+                        (geom_type == ogr.wkbMultiLineString)
+                        or (geom_type == ogr.wkbLineString)
+                    ):
                         out_feat = ogr.Feature(feat_defn)
                         out_feat.SetGeometry(c_geom)
                         out_lyr_obj.CreateFeature(out_feat)
                         out_feat = None
-                    elif ((c_geom.GetGeometryName().upper() == "POINT") or (
-                            c_geom.GetGeometryName().upper() == "MULTIPOINT")) and (
-                            (geom_type == ogr.wkbMultiPoint) or (geom_type == ogr.wkbPoint)):
+                    elif (
+                        (c_geom.GetGeometryName().upper() == "POINT")
+                        or (c_geom.GetGeometryName().upper() == "MULTIPOINT")
+                    ) and (
+                        (geom_type == ogr.wkbMultiPoint) or (geom_type == ogr.wkbPoint)
+                    ):
                         out_feat = ogr.Feature(feat_defn)
                         out_feat.SetGeometry(c_geom)
                         out_lyr_obj.CreateFeature(out_feat)
@@ -1990,8 +2258,17 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
     ds_over_vec = None
 
 
-def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None,
-                       out_format="GPKG", symmetric=False, del_exist_vec=False):
+def vec_lyr_difference(
+    vec_file,
+    vec_lyr,
+    vec_over_file,
+    vec_over_lyr,
+    out_vec_file,
+    out_vec_lyr=None,
+    out_format="GPKG",
+    symmetric=False,
+    del_exist_vec=False,
+):
     """
     A function which performs an difference between the vector layer and the overlain vector.
 
@@ -2016,7 +2293,10 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+            raise Exception(
+                "The output vector file ({}) already "
+                "exists, remove it and re-run.".format(out_vec_file)
+            )
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
@@ -2080,26 +2360,43 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
                         op_out_geom = in_geom.SymmetricDifference(over_geom)
                     else:
                         op_out_geom = in_geom.Difference(over_geom)
-                    if (op_out_geom is not None) and (op_out_geom.GetGeometryCount() > 0):
+                    if (op_out_geom is not None) and (
+                        op_out_geom.GetGeometryCount() > 0
+                    ):
                         for i in range(op_out_geom.GetGeometryCount()):
                             c_geom = op_out_geom.GetGeometryRef(i)
-                            if ((c_geom.GetGeometryName().upper() == "POLYGON") or (
-                                    c_geom.GetGeometryName().upper() == "MULTIPOLYGON")) and (
-                                    (geom_type == ogr.wkbMultiPolygon) or (geom_type == ogr.wkbPolygon)):
+                            if (
+                                (c_geom.GetGeometryName().upper() == "POLYGON")
+                                or (c_geom.GetGeometryName().upper() == "MULTIPOLYGON")
+                            ) and (
+                                (geom_type == ogr.wkbMultiPolygon)
+                                or (geom_type == ogr.wkbPolygon)
+                            ):
                                 out_feat = ogr.Feature(feat_defn)
                                 out_feat.SetGeometry(c_geom)
                                 out_lyr_obj.CreateFeature(out_feat)
                                 out_feat = None
-                            elif ((c_geom.GetGeometryName().upper() == "LINESTRING") or (
-                                    c_geom.GetGeometryName().upper() == "MULTILINESTRING")) and (
-                                    (geom_type == ogr.wkbMultiLineString) or (geom_type == ogr.wkbLineString)):
+                            elif (
+                                (c_geom.GetGeometryName().upper() == "LINESTRING")
+                                or (
+                                    c_geom.GetGeometryName().upper()
+                                    == "MULTILINESTRING"
+                                )
+                            ) and (
+                                (geom_type == ogr.wkbMultiLineString)
+                                or (geom_type == ogr.wkbLineString)
+                            ):
                                 out_feat = ogr.Feature(feat_defn)
                                 out_feat.SetGeometry(c_geom)
                                 out_lyr_obj.CreateFeature(out_feat)
                                 out_feat = None
-                            elif ((c_geom.GetGeometryName().upper() == "POINT") or (
-                                    c_geom.GetGeometryName().upper() == "MULTIPOINT")) and (
-                                    (geom_type == ogr.wkbMultiPoint) or (geom_type == ogr.wkbPoint)):
+                            elif (
+                                (c_geom.GetGeometryName().upper() == "POINT")
+                                or (c_geom.GetGeometryName().upper() == "MULTIPOINT")
+                            ) and (
+                                (geom_type == ogr.wkbMultiPoint)
+                                or (geom_type == ogr.wkbPoint)
+                            ):
                                 out_feat = ogr.Feature(feat_defn)
                                 out_feat.SetGeometry(c_geom)
                                 out_lyr_obj.CreateFeature(out_feat)
@@ -2122,9 +2419,6 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
     ds_over_vec = None
 
 
-
-
-
 def get_geom_pts(geom, pts_lst=None):
     """
     Recursive function which extracts all the points within the an OGR geometry.
@@ -2135,6 +2429,7 @@ def get_geom_pts(geom, pts_lst=None):
 
     """
     from osgeo import ogr
+
     if pts_lst is None:
         pts_lst = list()
 
@@ -2153,9 +2448,6 @@ def get_geom_pts(geom, pts_lst=None):
                         pt = c_geom.GetPoint(i)
                         pts_lst.append(pt)
     return pts_lst
-
-
-
 
 
 def vec_intersects_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
@@ -2554,14 +2846,13 @@ def vec_crosses_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
 
 def get_feat_envs(vec_file, vec_lyr):
     """
-A function which returns a list of bounding boxes for each feature
-within the vector layer.
+    A function which returns a list of bounding boxes for each feature
+    within the vector layer.
 
-:param vec_file: vector file.
-:param vec_lyr: layer within the vector file.
-:returns: list of BBOXs
-
-"""
+    :param vec_file: vector file.
+    :param vec_lyr: layer within the vector file.
+    :returns: list of BBOXs
+    """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if dsVecFile is None:
         raise Exception("Could not open '{}'".format(vec_file))
@@ -2576,13 +2867,13 @@ within the vector layer.
     feedback = 10
     feedback_next = step
     counter = 0
-    print("Started .0.", end='', flush=True)
+    print("Started .0.", end="", flush=True)
     outenvs = []
     # loop through the input features
     inFeature = vec_lyr_obj.GetNextFeature()
     while inFeature:
         if (nFeats > 10) and (counter == feedback_next):
-            print(".{}.".format(feedback), end='', flush=True)
+            print(".{}.".format(feedback), end="", flush=True)
             feedback_next = feedback_next + step
             feedback = feedback + 10
 
@@ -2596,5 +2887,3 @@ within the vector layer.
     print(" Completed")
     dsVecFile = None
     return outenvs
-
-

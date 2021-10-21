@@ -273,7 +273,6 @@ static PyMethodDef ZonalStatsMethods[] = {
 {"image_zone_to_hdf", (PyCFunction)ZonalStats_ImageZoneToHDF, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.zonalstats.image_zone_to_hdf(input_img, vec_file, vec_lyr, out_h5_file, no_prj_warn=False, pxl_in_poly_method=METHOD_POLYCONTAINSPIXELCENTER)\n"
 "Extract the all the pixel values for regions to a HDF5 file (1 column for each image band).\n\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string containing the name of the input image.\n"
 ":param vec_file: is a string containing the input vector file path.\n"
@@ -289,27 +288,23 @@ static PyMethodDef ZonalStatsMethods[] = {
 "    inputvector = './Vectors/injune_p142_crowns_utm.shp'\n"
 "    outputHDF = './TestOutputs/InjuneP142.hdf'\n"
 "    zonalstats.image_zone_to_hdf(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
-"\n"},
+"\n\n"},
 
 {"extract_zone_img_values_to_hdf", (PyCFunction)ZonalStats_ExtractZoneImageValues2HDF, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.zonalstats.extract_zone_img_values_to_hdf(input_img, in_msk_img, out_h5_file, mask_val, datatype)\n"
 "Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
-"\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string containing the name and path of the input file\n"
 ":param in_msk_img: is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
 ":param out_h5_file: is a string containing the name and path of the output HDF5 file\n"
 ":param mask_val: is a float containing the value of the pixel within the mask for which values are to be extracted\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
-"\n"},
+"\n\n"},
 
 {"extract_zone_img_band_values_to_hdf", (PyCFunction)ZonalStats_ExtractZoneImageBandValues2HDF, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.zonalstats.extract_zone_img_band_values_to_hdf(in_img_info, in_msk_img, out_h5_file, mask_val, datatype)\n"
 "Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
 "Multiple input rasters can be provided and the bands extracted selected.\n"
-"\n"
-"Where:\n"
 "\n"
 ":param in_img_info: is a list of rsgislib::zonalstats::ImageBandInfo objects with the file names and list of image bands within that file to be extracted.\n"
 ":param in_msk_img: is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
@@ -324,13 +319,11 @@ static PyMethodDef ZonalStatsMethods[] = {
 "   fileInfo.append(rsgislib.zonalstats.ImageBandInfo('InputImg1.kea', 'Image1', [1,3,4]))\n"
 "   fileInfo.append(rsgislib.zonalstats.ImageBandInfo('InputImg2.kea', 'Image2', [2]))\n"
 "   rsgislib.zonalstats.extract_zone_img_band_values_to_hdf(fileInfo, 'ClassMask.kea', 'ForestRefl.h5', 1.0)\n"
-"\n"},
+"\n\n"},
 
 {"random_sample_hdf5_file", (PyCFunction)ZonalStats_RandomSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.zonalstats.random_sample_hdf5_file(in_h5_file, out_h5_file, sample, rnd_seed, datatype)\n"
 "A function which randomly samples a HDF5 of extracted values.\n"
-"\n"
-"Where:\n"
 "\n"
 ":param in_h5_file: is a string with the path to the input file.\n"
 ":param out_h5_file: is a string with the path to the output file.\n"
@@ -343,8 +336,6 @@ static PyMethodDef ZonalStatsMethods[] = {
 {"split_sample_hdf5_file", (PyCFunction)ZonalStats_SplitSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.zonalstats.split_sample_hdf5_file(in_h5_file, out_h5_p1_file, out_h5_p2_file, sample, rnd_seed, datatype)\n"
 "A function which splits samples a HDF5 of extracted values.\n"
-"\n"
-"Where:\n"
 "\n"
 ":param in_h5_file: is a string with the path to the input file.\n"
 ":param out_h5_p1_file: is a string with the path to the output file.\n"
