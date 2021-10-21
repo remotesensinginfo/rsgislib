@@ -7,14 +7,19 @@ import os
 import math
 
 import osgeo.gdal as gdal
+import osgeo.ogr
 import osgeo.ogr as ogr
 
 
-def write_vec_column(out_vec_file, out_vec_lyr, att_column, att_col_datatype, att_col_data):
+def write_vec_column(
+    out_vec_file: str,
+    out_vec_lyr: str,
+    att_column: str,
+    att_col_datatype: int,
+    att_col_data: list,
+):
     """
     A function which will write a column to a vector file
-
-    Where:
 
     :param out_vec_file: The file / path to the vector data 'file'.
     :param out_vec_lyr: The layer to which the data is to be added.
@@ -96,11 +101,14 @@ def write_vec_column(out_vec_file, out_vec_lyr, att_column, att_col_datatype, at
         raise e
 
 
-def write_vec_column_to_layer(out_vec_lyr_obj, att_column, att_col_datatype, att_col_data):
+def write_vec_column_to_layer(
+    out_vec_lyr_obj: osgeo.ogr.Layer,
+    att_column: str,
+    att_col_datatype: int,
+    att_col_data: list,
+):
     """
     A function which will write a column to a vector layer.
-
-    Where:
 
     :param out_vec_lyr_obj: GDAL/OGR vector layer object
     :param att_column: Name of the output column
@@ -108,6 +116,7 @@ def write_vec_column_to_layer(out_vec_lyr_obj, att_column, att_col_datatype, att
                             (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
     :param att_col_data: A list of the same length as the number of features
                          in vector file.
+
     """
     gdal.UseExceptions()
 
@@ -165,15 +174,14 @@ def write_vec_column_to_layer(out_vec_lyr_obj, att_column, att_col_datatype, att
         openTransaction = False
 
 
-def read_vec_column(vec_file, vec_lyr, att_column):
+def read_vec_column(vec_file: str, vec_lyr: str, att_column: str):
     """
     A function which will reads a column from a vector file
-
-    Where:
 
     :param vec_file: The file / path to the vector data 'file'.
     :param vec_lyr: The layer to which the data is to be read from.
     :param att_column: Name of the input column
+
     """
     gdal.UseExceptions()
 
@@ -208,15 +216,14 @@ def read_vec_column(vec_file, vec_lyr, att_column):
     return outVal
 
 
-def read_vec_columns(vec_file, vec_lyr, att_columns):
+def read_vec_columns(vec_file: str, vec_lyr: str, att_columns: list):
     """
     A function which will reads a column from a vector file
-
-    Where:
 
     :param vec_file: The file / path to the vector data 'file'.
     :param vec_lyr: The layer to which the data is to be read from.
     :param att_columns: List of input attribute column names to be read in.
+
     """
     gdal.UseExceptions()
 
@@ -270,17 +277,23 @@ def read_vec_columns(vec_file, vec_lyr, att_columns):
     return outvals
 
 
-def pop_bbox_cols(vec_file, vec_lyr, x_min_col='xmin', x_max_col='xmax', y_min_col='ymin',
-                  y_max_col='ymax'):
+def pop_bbox_cols(
+    vec_file: str,
+    vec_lyr: str,
+    x_min_col: str = "xmin",
+    x_max_col: str = "xmax",
+    y_min_col: str = "ymin",
+    y_max_col: str = "ymax",
+):
     """
     A function which adds a polygons boundary bbox as attributes to each feature.
 
     :param vec_file: vector file.
     :param vec_lyr: layer within the vector file.
-    :param x_min_col: column name.
-    :param x_max_col: column name.
-    :param y_min_col: column name.
-    :param y_max_col: column name.
+    :param x_min_col: output column name.
+    :param x_max_col: output column name.
+    :param y_min_col: output column name.
+    :param y_max_col: output column name.
 
     """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_UPDATE)
@@ -338,13 +351,13 @@ def pop_bbox_cols(vec_file, vec_lyr, x_min_col='xmin', x_max_col='xmax', y_min_c
     feedback = 10
     feedback_next = step
     counter = 0
-    print("Started .0.", end='', flush=True)
+    print("Started .0.", end="", flush=True)
     vec_lyr_obj.ResetReading()
     for fid in fids:
         # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
         feat = vec_lyr_obj.GetFeature(fid)
         if (nFeats > 10) and (counter == feedback_next):
-            print(".{}.".format(feedback), end='', flush=True)
+            print(".{}.".format(feedback), end="", flush=True)
             feedback_next = feedback_next + step
             feedback = feedback + 10
 
@@ -379,13 +392,28 @@ def pop_bbox_cols(vec_file, vec_lyr, x_min_col='xmin', x_max_col='xmax', y_min_c
     print(" Completed")
 
 
-def create_name_col(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GPKG', out_col='names', x_col='MinX',
-                    y_col='MaxY', prefix='', postfix='', coords_lat_lon=True, int_coords=True, zero_x_pad=0, zero_y_pad=0,
-                    round_n_digts=0, non_neg=False):
+def create_name_col(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_col: str = "names",
+    x_col: str = "MinX",
+    y_col: str = "MaxY",
+    prefix: str = "",
+    postfix: str = "",
+    coords_lat_lon: bool = True,
+    int_coords: bool = True,
+    zero_x_pad: int = 0,
+    zero_y_pad: int = 0,
+    round_n_digts: int = 0,
+    non_neg: bool = False,
+):
     """
-    A function which creates a column in the vector layer which can define a name using coordinates associated
-    with the feature. Often this is useful if a tiling has been created and from this a set of images are to
-    generated for example.
+    A function which creates a column in the vector layer which can define a name
+    using coordinates associated with the feature. Often this is useful if a tiling
+    has been created and from this a set of images are to generated for example.
 
     :param vec_file: input vector file
     :param vec_lyr: input vector layer name
@@ -398,11 +426,13 @@ def create_name_col(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GP
     :param prefix: A prefix to the name
     :param postfix: A postfix to the name
     :param coords_lat_lon: A boolean specifying if the coordinates are lat / long
-    :param int_coords: A boolean specifying whether to integise the coordinates.
-    :param zero_x_pad: An integer, if larger than zero then the X coordinate will be zero padded.
-    :param zero_y_pad: An integer, if larger than zero then the Y coordinate will be zero padded.
-    :param round_n_digts: An integer, if larger than zero then the coordinates will be rounded to n significant digits
-    :param non_neg: boolean specifying whether an negative coordinates should be made positive. (Default: False)
+    :param int_coords: A boolean specifying whether to integerise the coordinates.
+    :param zero_x_pad: If larger than zero then the X coordinate will be zero padded.
+    :param zero_y_pad: If larger than zero then the Y coordinate will be zero padded.
+    :param round_n_digts: If larger than zero then the coordinates will be rounded
+                          to n significant digits
+    :param non_neg: boolean specifying whether an negative coordinates should be
+                    made positive. (Default: False)
 
     """
     import geopandas
@@ -428,45 +458,64 @@ def create_name_col(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format='GP
                 y_col_val = y_col_val * (-1)
 
         if zero_x_pad > 0:
-            x_col_val_str = rsgislib.tools.utils.zero_pad_num_str(x_col_val, str_len=zero_x_pad, round_num=False,
-                                                         round_n_digts=round_n_digts, integerise=int_coords)
+            x_col_val_str = rsgislib.tools.utils.zero_pad_num_str(
+                x_col_val,
+                str_len=zero_x_pad,
+                round_num=False,
+                round_n_digts=round_n_digts,
+                integerise=int_coords,
+            )
         else:
             x_col_val = int(x_col_val)
-            x_col_val_str = '{}'.format(x_col_val)
+            x_col_val_str = "{}".format(x_col_val)
 
         if zero_y_pad > 0:
-            y_col_val_str = rsgislib.tools.utils.zero_pad_num_str(y_col_val, str_len=zero_y_pad, round_num=False,
-                                                         round_n_digts=round_n_digts, integerise=int_coords)
+            y_col_val_str = rsgislib.tools.utils.zero_pad_num_str(
+                y_col_val,
+                str_len=zero_y_pad,
+                round_num=False,
+                round_n_digts=round_n_digts,
+                integerise=int_coords,
+            )
         else:
             y_col_val = int(y_col_val)
-            y_col_val_str = '{}'.format(y_col_val)
+            y_col_val_str = "{}".format(y_col_val)
 
         if coords_lat_lon:
-            hemi = 'N'
+            hemi = "N"
             if y_col_val_neg:
-                hemi = 'S'
-            east_west = 'E'
+                hemi = "S"
+            east_west = "E"
             if x_col_val_neg:
-                east_west = 'W'
-            name = '{}{}{}{}{}{}'.format(prefix, hemi, y_col_val_str, east_west, x_col_val_str, postfix)
+                east_west = "W"
+            name = "{}{}{}{}{}{}".format(
+                prefix, hemi, y_col_val_str, east_west, x_col_val_str, postfix
+            )
         else:
-            name = '{}E{}N{}{}'.format(prefix, x_col_val_str, y_col_val_str, postfix)
+            name = "{}E{}N{}{}".format(prefix, x_col_val_str, y_col_val_str, postfix)
 
         names.append(name)
 
     base_gpdf[out_col] = numpy.array(names)
 
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-
-
-def add_unq_numeric_col(vec_file, vec_lyr, unq_col, out_col, out_vec_file, out_vec_lyr, out_format='GPKG'):
+def add_unq_numeric_col(
+    vec_file: str,
+    vec_lyr: str,
+    unq_col: str,
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
     """
-    A function which adds a numeric column based off an existing column in the vector file.
+    A function which adds a numeric column based off an existing column in
+    the vector file.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer within the input file.
@@ -490,21 +539,31 @@ def add_unq_numeric_col(vec_file, vec_lyr, unq_col, out_col, out_vec_file, out_v
         base_gpdf.loc[sel_rows, out_col] = num_unq_val
         num_unq_val += 1
 
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, out_vec_file, out_vec_lyr, out_format='GPKG'):
+def add_numeric_col_lut(
+    vec_file: str,
+    vec_lyr: str,
+    ref_col: str,
+    val_lut: dict,
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
     """
-    A function which adds a numeric column based off an existing column in the vector file,
-    using an dict LUT to define the values.
+    A function which adds a numeric column based off an existing column in the
+    vector file, using an dict LUT to define the values.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer within the input file.
     :param ref_col: The column within which the unique values will be identified.
-    :param val_lut: A dict LUT (key should be value in ref_col and value be the value outputted to out_col).
+    :param val_lut: A dict LUT (key should be value in ref_col and value be the
+                    value outputted to out_col).
     :param out_col: The output numeric column
     :param out_vec_file: Output vector file
     :param out_vec_lyr: output vector layer name.
@@ -513,6 +572,7 @@ def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, out_vec_fi
     """
     import geopandas
     import numpy
+
     # Open vector file
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     # Add output column
@@ -522,13 +582,22 @@ def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, out_vec_fi
         sel_rows = base_gpdf[ref_col] == lut_key
         base_gpdf.loc[sel_rows, out_col] = val_lut[lut_key]
 
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def add_numeric_col(vec_file, vec_lyr, out_col, out_vec_file, out_vec_lyr, out_val=1, out_format='GPKG', out_col_int=False):
+def add_numeric_col(
+    vec_file: str,
+    vec_lyr: str,
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_val: float = 1,
+    out_format: str = "GPKG",
+    out_col_int: float = False,
+):
     """
     A function which adds a numeric column with the same value for all the features.
 
@@ -553,13 +622,21 @@ def add_numeric_col(vec_file, vec_lyr, out_col, out_vec_file, out_vec_lyr, out_v
     else:
         base_gpdf[out_col] = numpy.full((base_gpdf.shape[0]), out_val, dtype=float)
 
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def add_string_col(vec_file, vec_lyr, out_col, out_vec_file, out_vec_lyr, out_val='str_val', out_format='GPKG'):
+def add_string_col(
+    vec_file: str,
+    vec_lyr: str,
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_val: str = "str_val",
+    out_format: str = "GPKG",
+):
     """
     A function which adds a string column with the same value for all the features.
 
@@ -582,16 +659,16 @@ def add_string_col(vec_file, vec_lyr, out_col, out_vec_file, out_vec_lyr, out_va
 
     base_gpdf[out_col] = str_col
 
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def get_unq_col_values(vec_file, vec_lyr, col_name):
+def get_unq_col_values(vec_file: str, vec_lyr: str, col_name: str):
     """
-    A function which splits a vector layer by an attribute value into either different layers or different output
-    files.
+    A function which splits a vector layer by an attribute value into either
+    different layers or different output files.
 
     :param vec_file: Input vector file
     :param vec_lyr: Input vector layer
@@ -606,9 +683,14 @@ def get_unq_col_values(vec_file, vec_lyr, col_name):
     return unq_vals
 
 
-
-
-def add_fid_col(vec_file:str, vec_lyr:str, out_vec_file:str, out_vec_lyr:str, out_format:str ='GPKG', out_col:str = "fid"):
+def add_fid_col(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_col: str = "fid",
+):
     """
     A function which adds a numeric feature ID (FID) column with unique values per
     feature within the file.
@@ -625,15 +707,21 @@ def add_fid_col(vec_file:str, vec_lyr:str, out_vec_file:str, out_vec_lyr:str, ou
     import numpy
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
-    base_gpdf[out_col] = numpy.arange(1, (base_gpdf.shape[0])+1, 1, dtype=int)
+    base_gpdf[out_col] = numpy.arange(1, (base_gpdf.shape[0]) + 1, 1, dtype=int)
 
-    if out_format == 'GPKG':
+    if out_format == "GPKG":
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def get_vec_cols_as_array(vec_file:str, vec_lyr:str, cols: list, lower_limit:float =None, upper_limit:float =None):
+def get_vec_cols_as_array(
+    vec_file: str,
+    vec_lyr: str,
+    cols: list,
+    lower_limit: float = None,
+    upper_limit: float = None,
+):
     """
     A function returns an nxm numpy array with the values for the columns specified.
 
@@ -662,5 +750,3 @@ def get_vec_cols_as_array(vec_file:str, vec_lyr:str, cols: list, lower_limit:flo
     out_arr = rsgislib.tools.stats.mask_data_to_valid(out_arr, lower_limit, upper_limit)
 
     return out_arr
-
-
