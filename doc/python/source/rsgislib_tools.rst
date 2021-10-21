@@ -1,49 +1,23 @@
-RSGISLib Tools Module
-=================================
+RSGISLib Tools
+=================
 
-.. automodule:: rsgislib.tools
-   :members:
-   :undoc-members:
+.. toctree::
+   :maxdepth: 3
 
-Plotting
----------
-These functions make use of rsgislib functions and matplotlib to provide useful plotting functionality.
-
-.. autofunction:: rsgislib.tools.plotImageSpectra
-.. autofunction:: rsgislib.tools.plotImageComparison
-.. autofunction:: rsgislib.tools.plotImageHistogram
-
-Projection
------------
-
-.. autofunction:: rsgislib.tools.degrees_to_metres
-.. autofunction:: rsgislib.tools.metres_to_degrees
-
-UTM
-----
-
-.. autofunction:: rsgislib.tools.utm.check_valid_zone
-.. autofunction:: rsgislib.tools.utm.epsg_for_UTM
-.. autofunction:: rsgislib.tools.utm.from_latlon
-.. autofunction:: rsgislib.tools.utm.latitude_to_zone_letter
-.. autofunction:: rsgislib.tools.utm.latlon_to_zone_number
-.. autofunction:: rsgislib.tools.utm.min_max_eastings_for_lat
-.. autofunction:: rsgislib.tools.utm.split_wgs84_bbox_utm_zones
-.. autofunction:: rsgislib.tools.utm.to_latlon
-.. autofunction:: rsgislib.tools.utm.zone_number_to_central_longitude
-
-
-File Manipulation
-------------------
-
-.. autofunction:: rsgislib.tools.sortImgsUTM2DIRs
-
-
-Visualisation
---------------
-
-.. autofunction:: rsgislib.tools.visualisation.createKMZImg
-.. autofunction:: rsgislib.tools.visualisation.createWebTilesImg
+   rsgislib_tools_filetools
+   rsgislib_tools_geometrytools
+   rsgislib_tools_googlecloud
+   rsgislib_tools_plotting
+   rsgislib_tools_projection
+   rsgislib_tools_sensors
+   rsgislib_tools_stats
+   rsgislib_tools_sysprofile
+   rsgislib_tools_testimages
+   rsgislib_tools_tilecacheutils
+   rsgislib_tools_utils
+   rsgislib_tools_utm
+   rsgislib_tools_validatedatasets
+   rsgislib_tools_visualisation
 
 
 * :ref:`genindex`

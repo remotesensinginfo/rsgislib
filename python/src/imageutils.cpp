@@ -1138,7 +1138,7 @@ static PyObject *ImageUtils_CreateCopyImageVecExtent(PyObject *self, PyObject *a
                              RSGIS_PY_C_TEXT("n_bands"), RSGIS_PY_C_TEXT("pxl_val"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIfsi:create_copy_img_vef_extent", kwlist, &pszInputImage, &pszInputVectorFile, &pszInputVectorLyr,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIfsi:create_copy_img_vec_extent", kwlist, &pszInputImage, &pszInputVectorFile, &pszInputVectorLyr,
                                      &pszOutputImage, &numBands, &pxlVal, &pszGDALFormat, &nOutDataType))
     {
         return nullptr;
@@ -2599,8 +2599,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"},
 
-{"create_copy_img_vef_extent", (PyCFunction)ImageUtils_CreateCopyImageVecExtent, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.create_copy_img_vef_extent(input_img, vec_file, vec_lyr, output_img, n_bands, pxl_val, gdalformat, datatype)\n"
+{"create_copy_img_vec_extent", (PyCFunction)ImageUtils_CreateCopyImageVecExtent, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.create_copy_img_vec_extent(input_img, vec_file, vec_lyr, output_img, n_bands, pxl_val, gdalformat, datatype)\n"
 "Create a new blank image with the parameters specified but with the extent of the inputted shapefile.\n"
 "\n"
 "Where:\n"
@@ -2622,7 +2622,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_blank.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.create_copy_img_vef_extent(inputImage, vec_file, vec_lyr, outputImage, 3, 1, gdalformat, datatype)\n"
+"   imageutils.create_copy_img_vec_extent(inputImage, vec_file, vec_lyr, outputImage, 3, 1, gdalformat, datatype)\n"
 "\n"},
 
 {"stack_stats", (PyCFunction)ImageUtils_StackStats, METH_VARARGS | METH_KEYWORDS,

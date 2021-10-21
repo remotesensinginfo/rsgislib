@@ -71,27 +71,6 @@ METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within 
 """
 
 
-class ImageBandInfo(object):
-    """
-Create a list of these objects to pass to the extractZoneImageBandValues2HDF function
-
-:param file_name: is the input image file name and path.
-:param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
-:param bands: is a list of image bands within the file_name to be used for processing (band numbers start at 1).
-
-"""
-    def __init__(self, file_name=None, name=None, bands=None):
-        """
-        :param file_name: is the input image file name and path.
-        :param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
-        :param bands: is a list of image bands within the file_name to be used for processing (band numbers start at 1).
-        """
-        self.file_name = file_name
-        self.name = name
-        self.bands = bands
-
-
-
 def calc_zonal_band_stats_file(
     vec_file,
     vec_lyr,

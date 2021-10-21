@@ -6,7 +6,6 @@ The tools.visualisation module contains functions for aiding visualisation of da
 # Import modules
 import rsgislib
 import rsgislib.imageutils
-import os.path
 import os
 import shutil
 import subprocess
@@ -84,7 +83,7 @@ def create_kmz_img(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fa
     shutil.rmtree(tmpDIR)
 
 
-def create_web_tiles_img_no_stats_msk(input_img, out_dir, bands, zoom_levels='2-10', resample='average', finite_msk=False, tms=True):
+def create_webtiles_img_no_stats_msk(input_img, out_dir, bands, zoom_levels='2-10', resample='average', finite_msk=False, tms=True):
     """
     A function to convert an input image to a tile cache for web map servers, where the input image
     is stretched and bands sub-selected / ordered as required for visualisation.

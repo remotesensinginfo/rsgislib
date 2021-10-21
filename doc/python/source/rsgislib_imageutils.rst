@@ -37,8 +37,6 @@ Projection
 .. autofunction:: rsgislib.imageutils.get_wkt_proj_from_img
 .. autofunction:: rsgislib.imageutils.get_epsg_proj_from_img
 .. autofunction:: rsgislib.imageutils.get_utm_zone
-.. autofunction:: rsgislib.imageutils.do_gdal_layers_have_same_proj
-.. autofunction:: rsgislib.imageutils.has_gcps
 .. autofunction:: rsgislib.imageutils.copy_gcps
 .. autofunction:: rsgislib.imageutils.resample_img_to_match
 .. autofunction:: rsgislib.imageutils.reproject_image
@@ -60,11 +58,12 @@ Composite
 .. autofunction:: rsgislib.imageutils.create_ref_img_composite_img
 .. autofunction:: rsgislib.imageutils.combine_binary_masks
 .. autofunction:: rsgislib.imageutils.export_single_merged_img_band
-.. autofunction:: rsgislib.imagecomp.create_max_ndvi_composite
-.. autofunction:: rsgislib.imagecomp.create_max_ndvi_ndwi_composite_landsat
-.. autofunction:: rsgislib.imagecomp.create_max_ndvi_ndwi_composite
-.. autofunction:: rsgislib.imagecomp.create_max_scaled_ndvi_ndwi_composite
-.. autofunction:: rsgislib.imagecomp.check_build_ls8_vrts
+.. autofunction:: rsgislib.imageutils.imagecomp.create_max_ndvi_composite
+.. autofunction:: rsgislib.imageutils.imagecomp.create_max_ndvi_ndwi_composite_landsat
+.. autofunction:: rsgislib.imageutils.imagecomp.create_max_ndvi_ndwi_composite
+.. autofunction:: rsgislib.imageutils.imagecomp.create_max_scaled_ndvi_ndwi_composite
+.. autofunction:: rsgislib.imageutils.imagecomp.check_build_ls8_vrts
+.. autofunction:: rsgislib.imageutils.order_img_using_prop_valid_pxls
 .. autofunction:: rsgislib.imageutils.gen_timeseries_fill_composite_img
 .. autoclass:: rsgislib.imageutils.RSGISTimeseriesFillInfo
     :members:
@@ -83,9 +82,9 @@ Tile
 Visualisation / Normalisation
 ------------------------------
 
-.. autofunction:: rsgislib.imageutils.stretch_image
-.. autofunction:: rsgislib.imageutils.stretch_image_with_stats
-.. autofunction:: rsgislib.imageutils.normalise_image_pxl_vals
+.. autofunction:: rsgislib.imageutils.stretch_img
+.. autofunction:: rsgislib.imageutils.stretch_img_with_stats
+.. autofunction:: rsgislib.imageutils.normalise_img_pxl_vals
 .. autofunction:: rsgislib.imageutils.get_img_band_colour_interp
 .. autofunction:: rsgislib.imageutils.set_img_band_colour_interp
 .. autofunction:: rsgislib.imageutils.set_img_thematic
@@ -113,10 +112,8 @@ Subsetting
 .. autofunction:: rsgislib.imageutils.subset
 .. autofunction:: rsgislib.imageutils.subset_to_img
 .. autofunction:: rsgislib.imageutils.subset_to_polys
-.. autofunction:: rsgislib.imageutils.subset_imgs_to_common_extent
 .. autofunction:: rsgislib.imageutils.subset_bbox
 .. autofunction:: rsgislib.imageutils.subset_pxl_bbox
-.. autofunction:: rsgislib.imageutils.build_img_sub_dict
 .. autofunction:: rsgislib.imageutils.subset_to_vec
 
 
@@ -227,7 +224,7 @@ Other
 ------
 .. autofunction:: rsgislib.imageutils.stack_stats
 .. autofunction:: rsgislib.imageutils.gen_sampling_grid
-.. autofunction:: rsgislib.imageutils.order_img_using_valid_pxls
+
 
 
 Get Image Metadata

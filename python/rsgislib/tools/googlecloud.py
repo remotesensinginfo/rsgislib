@@ -3,7 +3,7 @@
 The tools.google_cloud module contains functions for manipulating
 """
 import os
-from google.cloud import storage
+
 
 def blob_exists(goog_cred, bucket_name, filename):
     """
@@ -16,6 +16,7 @@ def blob_exists(goog_cred, bucket_name, filename):
                      with a slash. i.e., directory/path rather than /directory/path.
     :return: boolean (True if the file exists / False if the file does not exist)
     """
+    from google.cloud import storage
     client = storage.Client.from_service_account_json(goog_cred)
     bucket = client.get_bucket(bucket_name)
     blob = bucket.blob(filename)
@@ -53,6 +54,7 @@ def upload_to_google_bucket(file_to_upload, goog_cred, bucket_name, bucket_dir):
                        should not start with a slash. i.e., directory/path rather than /directory/path.
 
     """
+    from google.cloud import storage
     # Explicitly use service account credentials by specifying the private key file.
     storage_client = storage.Client.from_service_account_json(goog_cred)
 

@@ -11,8 +11,6 @@ from rsgislib import imageutils
 from rsgislib import zonalstats
 # Import the RSGISLib Image Calc module
 from rsgislib import imagecalc
-# Import the os.path module
-import os.path
 # Import the os module
 import os
 
