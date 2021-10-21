@@ -197,6 +197,7 @@ def find_first_file(dir_path, file_search, rtn_except=True):
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
     name with '*' as wildcard(s).
+
     :param dir_path: The directory within which to search, note that the search will
                      be within sub-directories within the base directory until a file
                      meeting the search criteria are met.
@@ -385,13 +386,12 @@ def sort_imgs_to_dirs_utm(input_imgs_dir, file_search_str, out_base_dir):
     a projected using the UTM system into individual directories per
     UTM zone. Please note that the input files are moved on your system!!
 
-    Where:
-
     :param input_imgs_dir: directory where the input files are to be found.
     :param file_search_str: the wildcard search string to find files within
                             the input directory (e.g., "in_dir/*.kea").
     :param out_base_dir: the output directory where the UTM folders will be created
                          and the files copied.
+
     """
     import rsgislib.imageutils
 
@@ -465,6 +465,7 @@ def create_directory_archive(in_dir, out_arch, arch_format):
 def create_sha1_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA1 hash string of the input file.
+
     :param input_file: the input file for which the SHA1 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -484,6 +485,7 @@ def create_sha1_hash(input_file, block_size=4096):
 def create_sha224_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA224 hash string of the input file.
+
     :param input_file: the input file for which the SHA224 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -503,6 +505,7 @@ def create_sha224_hash(input_file, block_size=4096):
 def create_sha256_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA256 hash string of the input file.
+
     :param input_file: the input file for which the SHA256 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -522,6 +525,7 @@ def create_sha256_hash(input_file, block_size=4096):
 def create_sha384_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA384 hash string of the input file.
+
     :param input_file: the input file for which the SHA384 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -541,6 +545,7 @@ def create_sha384_hash(input_file, block_size=4096):
 def create_sha512_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA512 hash string of the input file.
+
     :param input_file: the input file for which the SHA512 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -560,6 +565,7 @@ def create_sha512_hash(input_file, block_size=4096):
 def create_md5_hash(input_file, block_size=4096):
     """
     A function which calculates finds the MD5 hash string of the input file.
+
     :param input_file: the input file for which the MD5 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -579,6 +585,7 @@ def create_md5_hash(input_file, block_size=4096):
 def create_blake2b_hash(input_file, block_size=4096):
     """
     A function which calculates finds the Blake2B hash string of the input file.
+
     :param input_file: the input file for which the Blake2B hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -598,6 +605,7 @@ def create_blake2b_hash(input_file, block_size=4096):
 def create_blake2s_hash(input_file, block_size=4096):
     """
     A function which calculates finds the Blake2S hash string of the input file.
+
     :param input_file: the input file for which the Blake2S hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -617,6 +625,7 @@ def create_blake2s_hash(input_file, block_size=4096):
 def create_sha3_224_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA3_224 hash string of the input file.
+
     :param input_file: the input file for which the SHA3_224 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -636,6 +645,7 @@ def create_sha3_224_hash(input_file, block_size=4096):
 def create_sha3_256_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA3_256 hash string of the input file.
+
     :param input_file: the input file for which the SHA3_256 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -655,6 +665,7 @@ def create_sha3_256_hash(input_file, block_size=4096):
 def create_sha3_384_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA3_384 hash string of the input file.
+
     :param input_file: the input file for which the SHA3_384 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
@@ -674,6 +685,7 @@ def create_sha3_384_hash(input_file, block_size=4096):
 def create_sha3_512_hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA3_512 hash string of the input file.
+
     :param input_file: the input file for which the SHA3_512 hash string with be found.
     :param block_size: the size of the blocks the file is read in in bytes
                        (default 4096; i.e., 4kb)
