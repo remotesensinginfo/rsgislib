@@ -606,7 +606,7 @@ def calc_yen_threshold(data):
 
     Yen J.C., Chang F.J., and Chang S. (1995) "A New Criterion
     for Automatic Multilevel Thresholding" IEEE Trans. on Image
-    Processing, 4(3): 370-378. :DOI:`10.1109/83.366472`
+    Processing, 4(3): 370-378. DOI:`10.1109/83.366472`
 
     :param data: 1d numeric numpy array
     :returns: float (threshold)
@@ -644,7 +644,7 @@ def calc_isodata_threshold(data):
     threshold = (data[data <= threshold].mean() + data[data > threshold].mean()) / 2.0
 
     Ridler, TW & Calvard, S (1978), "Picture thresholding using an iterative selection method"
-    IEEE Transactions on Systems, Man and Cybernetics 8: 630-632, :DOI:`10.1109/TSMC.1978.4310039`
+    IEEE Transactions on Systems, Man and Cybernetics 8: 630-632, DOI:`10.1109/TSMC.1978.4310039`
 
     :param data: 1d numeric numpy array
     :returns: float (threshold)
@@ -716,11 +716,11 @@ def calc_hist_cross_entropy(data, threshold):
     Li and Tam (1998).
 
     Li C.H. and Lee C.K. (1993) "Minimum Cross Entropy Thresholding"
-    Pattern Recognition, 26(4): 617-625 :DOI:`10.1016/0031-3203(93)90115-D`
+    Pattern Recognition, 26(4): 617-625 DOI:`10.1016/0031-3203(93)90115-D`
 
     Li C.H. and Tam P.K.S. (1998) "An Iterative Algorithm for Minimum
     Cross Entropy Thresholding" Pattern Recognition Letters, 18(8): 771-776
-    :DOI:`10.1016/S0167-8655(98)00057-9`
+    DOI: `10.1016/S0167-8655(98)00057-9`
 
     :param data: 1d numeric numpy array
     :param threshold: float spliting to the two parts of the histogram.
@@ -757,7 +757,7 @@ def calc_li_threshold(data, tolerance=None, initial_guess=None):
     Minimum Cross Entropy method.
 
     Li C.H. and Lee C.K. (1993) "Minimum Cross Entropy Thresholding"
-    Pattern Recognition, 26(4): 617-625 :DOI:`10.1016/0031-3203(93)90115-D`
+    Pattern Recognition, 26(4): 617-625 DOI:`10.1016/0031-3203(93)90115-D`
 
 
     :param data: 1d numeric numpy array
