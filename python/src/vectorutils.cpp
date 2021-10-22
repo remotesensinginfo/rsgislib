@@ -211,8 +211,9 @@ static PyMethodDef VectorUtilsMethods[] = {
 
 {"vector_maths", (PyCFunction)VectorUtils_VectorMaths, METH_VARARGS | METH_KEYWORDS,
 "vectorutils.vector_maths(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_col, exp, vars, del_exist_vec)\n"
-"A command to calculate a number column from data in existing columns.\n\n"
-"Where:\n"
+"A command to calculate a number column from data in existing columns.\n"
+"The syntax for the expression is from the `muparser library <http://muparser.beltoforion.de>`_ "
+"`see here for available operations and syntax <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`_\n."
 "\n"
 ":param vec_file: is a string containing the input vector file path\n"
 ":param vec_lyr: is a string containing the name of the input vector layer name\n"
@@ -227,8 +228,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 
 {"create_lines_of_points", (PyCFunction)VectorUtils_CreateLinesOfPoints, METH_VARARGS | METH_KEYWORDS,
 "vectorutils.create_lines_of_points(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, step, del_exist_vec)\n"
-"A function to create a regularly spaced set of points following a set of lines.\n\n"
-"Where:\n"
+"A function to create a regularly spaced set of points following a set of lines.\n"
 "\n"
 ":param vec_file: is a string containing the input vector file path (must be lines)\n"
 ":param vec_lyr: is a string containing the name of the input vector layer name\n"
@@ -241,8 +241,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 
 {"check_validate_geometries", (PyCFunction)VectorUtils_CheckValidateGeometries, METH_VARARGS | METH_KEYWORDS,
 "vectorutils.check_validate_geometries(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, print_err_geoms, del_exist_vec)\n"
-"A command fit a polygon to the points inputted.\n\n"
-"Where:\n"
+"A command fit a polygon to the points inputted.\n"
 "\n"
 ":param vec_file: is a string containing the input vector file path\n"
 ":param vec_lyr: is a string containing the name of the input vector layer name\n"

@@ -45,7 +45,7 @@ class StatsSummary:
         calc_min=False,
         calc_max=False,
         calc_sum=False,
-        calcMean=False,
+        calc_mean=False,
         calc_stdev=False,
         calc_median=False,
         calc_mode=False,
@@ -60,7 +60,7 @@ class StatsSummary:
         self.calc_min = calc_min
         self.calc_max = calc_max
         self.calc_sum = calc_sum
-        self.calcMean = calcMean
+        self.calc_mean = calc_mean
         self.calc_stdev = calc_stdev
         self.calc_median = calc_median
         self.calc_mode = calc_mode
