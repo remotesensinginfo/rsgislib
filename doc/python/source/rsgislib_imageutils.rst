@@ -5,6 +5,7 @@ RSGISLib Image Utilities Module
 Image Stats and Pyramids
 ------------------------
 .. autofunction:: rsgislib.imageutils.pop_img_stats
+.. autofunction:: rsgislib.imageutils.pop_thmt_img_stats
 .. autofunction:: rsgislib.imageutils.get_img_band_stats
 .. autofunction:: rsgislib.imageutils.get_img_no_data_value
 .. autofunction:: rsgislib.imageutils.set_img_no_data_value
@@ -26,6 +27,7 @@ Get Image Info
 .. autofunction:: rsgislib.imageutils.get_img_bbox_in_proj
 .. autofunction:: rsgislib.imageutils.get_img_files
 .. autofunction:: rsgislib.imageutils.has_gcps
+.. autofunction:: rsgislib.imageutils.get_gdal_format_name
 
 
 Projection
@@ -89,8 +91,7 @@ Visualisation / Normalisation
 .. autofunction:: rsgislib.imageutils.set_img_band_colour_interp
 .. autofunction:: rsgislib.imageutils.set_img_thematic
 .. autofunction:: rsgislib.imageutils.set_img_not_thematic
-.. autofunction:: rsgislib.imageutils.whiten_image
-.. autofunction:: rsgislib.imageutils.spectral_smoothing
+.. autofunction:: rsgislib.imageutils.define_colour_table
 
 
 Masking
@@ -224,7 +225,8 @@ Other
 ------
 .. autofunction:: rsgislib.imageutils.stack_stats
 .. autofunction:: rsgislib.imageutils.gen_sampling_grid
-
+.. autofunction:: rsgislib.imageutils.whiten_image
+.. autofunction:: rsgislib.imageutils.spectral_smoothing
 
 
 Get Image Metadata

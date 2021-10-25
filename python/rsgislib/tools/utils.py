@@ -396,6 +396,28 @@ def is_odd(number):
     return False
 
 
+def hex_to_rgb(hex_str:str):
+    """
+    A function which converts an hexadecimal colour representation to RGB values
+    between 0 and 255.
+
+    For example: #b432be is equal to: 180, 50, 190
+
+    :param hex_str: Input hex string which can be either 7 or 6 characters long.
+                    If 7 characters then the first character will be a #.
+    :return: R, G, B tuple
+    """
+    if hex_str[0] == '#':
+        hex_str = hex_str[1:]
+    if len(hex_str) != 6:
+        raise rsgislib.RSGISPyException("String must be of length "
+                                        "6 or 7 if starting with #")
+
+    r_hex = hex_str[0:2]
+    g_hex = hex_str[2:4]
+    b_hex = hex_str[4:6]
+    return int(r_hex, 16), int(g_hex, 16), int(b_hex, 16)
+
 def remove_repeated_chars(str_val, repeat_char):
     """
     A function which removes repeated characters within a string for the

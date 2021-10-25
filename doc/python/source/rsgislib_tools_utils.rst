@@ -49,6 +49,10 @@ Numeric
 .. autofunction:: rsgislib.tools.utils.negative
 .. autofunction:: rsgislib.tools.utils.is_odd
 
+Colours
+---------
+.. autofunction::rsgislib.tools.utils.hex_to_rgb
+
 Dates
 -------
 .. autofunction:: rsgislib.tools.utils.get_days_since
