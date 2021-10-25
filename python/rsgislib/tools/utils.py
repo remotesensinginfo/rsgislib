@@ -406,6 +406,11 @@ def hex_to_rgb(hex_str:str):
     :param hex_str: Input hex string which can be either 7 or 6 characters long.
                     If 7 characters then the first character will be a #.
     :return: R, G, B tuple
+
+    .. code:: python
+        import rsgislib.tools.utils
+        r, g, b = rsgislib.tools.utils.hex_to_rgb("#b432be")
+
     """
     if hex_str[0] == '#':
         hex_str = hex_str[1:]

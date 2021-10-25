@@ -51,7 +51,7 @@ Numeric
 
 Colours
 ---------
-.. autofunction::rsgislib.tools.utils.hex_to_rgb
+.. autofunction:: rsgislib.tools.utils.hex_to_rgb
 
 Dates
 -------
