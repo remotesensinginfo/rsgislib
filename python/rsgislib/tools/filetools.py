@@ -14,7 +14,9 @@ import time
 import rsgislib
 
 
-def get_file_basename(input_file:str, check_valid=False, n_comps=0, rm_n_exts=0):
+def get_file_basename(
+    input_file: str, check_valid: bool = False, n_comps: int = 0, rm_n_exts: int = 0
+):
     """
     Uses os.path module to return file basename (i.e., path and extension removed)
 
@@ -38,7 +40,7 @@ def get_file_basename(input_file:str, check_valid=False, n_comps=0, rm_n_exts=0)
     import string
 
     file_base_name = os.path.basename(input_file)
-    n_exts = file_base_name.count('.')
+    n_exts = file_base_name.count(".")
     if (rm_n_exts == 0) or (rm_n_exts > n_exts):
         rm_n_exts = n_exts
 
@@ -69,13 +71,14 @@ def get_file_basename(input_file:str, check_valid=False, n_comps=0, rm_n_exts=0)
     return basename
 
 
-def get_dir_name(input_file):
+def get_dir_name(input_file: str):
     """
     A function which returns just the name of the directory of the input file
     without the rest of the path.
 
     :param input_file: string for the input file name and path
     :return: directory name
+
     """
     input_file = os.path.abspath(input_file)
     dir_path = os.path.dirname(input_file)
@@ -83,10 +86,12 @@ def get_dir_name(input_file):
     return dir_name
 
 
-def delete_file_with_basename(input_file):
+def delete_file_with_basename(input_file: str):
     """
     Function to delete all the files which have a path
     and base name defined in the input_file attribute.
+
+    :param input_file: string for the input file name and path
 
     """
     baseName = os.path.splitext(input_file)[0]
@@ -96,11 +101,13 @@ def delete_file_with_basename(input_file):
         os.remove(file)
 
 
-def delete_dir(dir_path):
+def delete_dir(dir_path: str):
     """
     A function which will delete a directory, if files and other directories
     are within the path specified they will be recursively deleted as well.
     So be careful you don't delete things within meaning it.
+
+    :param dir_path: string for the input directory path
 
     """
     for root, dirs, files in os.walk(dir_path, topdown=False):
@@ -112,13 +119,22 @@ def delete_dir(dir_path):
     print("Deleted " + dir_path)
 
 
-def find_file(dir_path, file_search):
+def find_file(dir_path: str, file_search: str):
     """
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
     name with '*' as wildcard(s).
 
-    :return: string
+    :param dir_path: string for the input directory path
+    :param file_search: string with a * wildcard for the file being searched for.
+    :return: string with the path to the file
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.tools.filetools
+        file_path = rsgislib.tools.filetools.find_file("in/dir", "*N15W093*.tif")
 
     """
     files = glob.glob(os.path.join(dir_path, file_search))
@@ -133,13 +149,24 @@ def find_file(dir_path, file_search):
     return files[0]
 
 
-def find_file_none(dir_path, file_search):
+def find_file_none(dir_path: str, file_search: str):
     """
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
     name with '*' as wildcard(s). Returns None is not found.
 
-    :return: string
+    :param dir_path: string for the input directory path
+    :param file_search: string with a * wildcard for the file being searched for.
+    :return: string with the path to the file
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.tools.filetools
+        file_path = rsgislib.tools.filetools.find_file_none("in/dir", "*N15W093*.tif")
+        if file_path is not None:
+            print(file_path)
 
     """
     files = glob.glob(os.path.join(dir_path, file_search))
@@ -148,7 +175,7 @@ def find_file_none(dir_path, file_search):
     return files[0]
 
 
-def find_files_ext(dir_path, ending):
+def find_files_ext(dir_path: str, ending: str):
     """
     Find all the files within a directory structure with a specific file ending.
     The files are return as dictionary using the file name as the dictionary key.
@@ -157,6 +184,13 @@ def find_files_ext(dir_path, ending):
     :param dir_path: the base directory path within which to search.
     :param ending: the file ending (e.g., .txt, or txt or .kea, kea).
     :return: dict with file name as key
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.tools.filetools
+        file_paths = rsgislib.tools.filetools.find_files_ext("in/dir", ".tif")
 
     """
     out_file_dict = dict()
@@ -169,16 +203,25 @@ def find_files_ext(dir_path, ending):
     return out_file_dict
 
 
-def find_files_mpaths_ext(dir_paths, ending):
+def find_files_mpaths_ext(dir_paths: list, ending: str):
     """
     Find all the files within a list of input directories and the structure beneath
     with a specific file ending. The files are return as dictionary using the file
     name as the dictionary key. This means you cannot have files with the same name
     within the structure.
 
-    :param dir_path: the base directory path within which to search.
+    :param dir_paths: a list of base directory paths within which to search.
     :param ending: the file ending (e.g., .txt, or txt or .kea, kea).
     :return: dict with file name as key
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.tools.filetools
+        dir_paths = ["in/dir", "test/dir", "img/files"]
+        file_paths = rsgislib.tools.filetools.find_files_mpaths_ext(dir_paths, ".tif")
+
 
     """
     out_file_dict = dict()
@@ -192,7 +235,7 @@ def find_files_mpaths_ext(dir_paths, ending):
     return out_file_dict
 
 
-def find_first_file(dir_path, file_search, rtn_except=True):
+def find_first_file(dir_path: str, file_search: str, rtn_except: bool = True):
     """
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
@@ -207,6 +250,13 @@ def find_first_file(dir_path, file_search, rtn_except=True):
                        files are found (default). If False then None will be returned
                        rather than an exception raised.
     :return: The file found (or None if rtn_except=False)
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.tools.filetools
+        file_paths = rsgislib.tools.filetools.find_first_file("in/dir", "*N15W093*.tif")
 
     """
     files = None
@@ -225,7 +275,11 @@ def find_first_file(dir_path, file_search, rtn_except=True):
     return out_file
 
 
-def get_files_mod_time(file_lst, dt_before=None, dt_after=None):
+def get_files_mod_time(
+    file_lst: list,
+    dt_before: datetime.datetime = None,
+    dt_after: datetime.datetime = None,
+):
     """
     A function which subsets a list of files based on datetime of
     last modification. The function also does a check as to whether
@@ -236,6 +290,18 @@ def get_files_mod_time(file_lst, dt_before=None, dt_after=None):
                       before this will be returned
     :param dt_after: a datetime object with a date/time where files modified
                      after this will be returned
+
+    Example:
+
+    .. code:: python
+
+        import glob
+        import datetime
+        import rsgislib.tools.filetools
+
+        input_files = glob.glob("in/dir/*.tif")
+        dt_before = datetime.datetime(year=2020, month=12, day=25, hour=12, minute=30)
+        file_path = rsgislib.tools.filetools.get_files_mod_time(input_files, dt_before)
 
     """
     if (dt_before is None) and (dt_after is None):
@@ -252,13 +318,21 @@ def get_files_mod_time(file_lst, dt_before=None, dt_after=None):
     return out_file_lst
 
 
-def file_is_hidden(dir_path):
+def file_is_hidden(dir_path: str):
     """
     A function to test whether a file or folder is 'hidden' or not on the
     file system. Should be cross platform between Linux/UNIX and windows.
 
     :param dir_path: input file path to be tested
     :return: boolean (True = hidden)
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.tools.filetools
+        if rsgislib.tools.filetools.file_is_hidden("in/dir/img.kea"):
+            print("File is hidden")
 
     """
     dir_path = os.path.abspath(dir_path)
@@ -275,7 +349,7 @@ def file_is_hidden(dir_path):
         return file_name.startswith(".")
 
 
-def get_dir_list(dir_path, inc_hidden=False):
+def get_dir_list(dir_path: str, inc_hidden: bool = False):
     """
     Function which get the list of directories within the specified path.
 
@@ -283,6 +357,13 @@ def get_dir_list(dir_path, inc_hidden=False):
     :param inc_hidden: boolean specifying whether hidden files should be
                        included (default=False)
     :return: list of directory paths
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.tools.filetools
+        files = rsgislib.tools.filetools.get_dir_list("in/dir")
 
     """
     out_dir_lst = list()
@@ -298,7 +379,12 @@ def get_dir_list(dir_path, inc_hidden=False):
     return out_dir_lst
 
 
-def get_file_lock(input_file, sleep_period=1, wait_iters=120, use_except=False):
+def get_file_lock(
+    input_file: str,
+    sleep_period: int = 1,
+    wait_iters: int = 120,
+    use_except: bool = False,
+):
     """
     A function which gets a lock on a file.
 
@@ -344,7 +430,7 @@ def get_file_lock(input_file, sleep_period=1, wait_iters=120, use_except=False):
     return got_lock
 
 
-def release_file_lock(input_file):
+def release_file_lock(input_file: str):
     """
     A function which releases a lock file for the input file.
 
@@ -358,7 +444,7 @@ def release_file_lock(input_file):
         os.remove(lock_file_path)
 
 
-def clean_file_locks(dir_path, timeout=3600):
+def clean_file_locks(dir_path: str, timeout: int = 3600):
     """
     A function which cleans up any remaining lock file (i.e., if an application
     has crashed). The timeout time will be compared with the time written within
@@ -373,14 +459,16 @@ def clean_file_locks(dir_path, timeout=3600):
     c_dateime = datetime.datetime.now()
     lock_files = glob.glob(os.path.join(dir_path, ".*.lok"))
     for lock_file_path in lock_files:
-        create_date_str = rsgislib.tools.utils.read_text_file_no_new_lines(lock_file_path)
+        create_date_str = rsgislib.tools.utils.read_text_file_no_new_lines(
+            lock_file_path
+        )
         create_date = datetime.datetime.fromisoformat(create_date_str)
         time_since_create = (c_dateime - create_date).total_seconds()
         if time_since_create > timeout:
             os.remove(lock_file_path)
 
 
-def sort_imgs_to_dirs_utm(input_imgs_dir, file_search_str, out_base_dir):
+def sort_imgs_to_dirs_utm(input_imgs_dir: str, file_search_str: str, out_base_dir: str):
     """
     A function which will sort a series of input image files which
     a projected using the UTM system into individual directories per
@@ -409,7 +497,7 @@ def sort_imgs_to_dirs_utm(input_imgs_dir, file_search_str, out_base_dir):
                 shutil.move(tmpFile, outFile)
 
 
-def create_directory_archive(in_dir, out_arch, arch_format):
+def create_directory_archive(in_dir: str, out_arch: str, arch_format: str):
     """
     A function which creates an archive from an input directory. This function uses
     subprocess to call the appropriate command line function.
@@ -462,7 +550,7 @@ def create_directory_archive(in_dir, out_arch, arch_format):
     return out_arch_file
 
 
-def create_sha1_hash(input_file, block_size=4096):
+def create_sha1_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the SHA1 hash string of the input file.
 
@@ -482,7 +570,7 @@ def create_sha1_hash(input_file, block_size=4096):
     return sha1_hash.hexdigest()
 
 
-def create_sha224_hash(input_file, block_size=4096):
+def create_sha224_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the SHA224 hash string of the input file.
 
@@ -502,7 +590,7 @@ def create_sha224_hash(input_file, block_size=4096):
     return sha224_hash.hexdigest()
 
 
-def create_sha256_hash(input_file, block_size=4096):
+def create_sha256_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the SHA256 hash string of the input file.
 
@@ -522,7 +610,7 @@ def create_sha256_hash(input_file, block_size=4096):
     return sha256_hash.hexdigest()
 
 
-def create_sha384_hash(input_file, block_size=4096):
+def create_sha384_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the SHA384 hash string of the input file.
 
@@ -542,7 +630,7 @@ def create_sha384_hash(input_file, block_size=4096):
     return sha384_hash.hexdigest()
 
 
-def create_sha512_hash(input_file, block_size=4096):
+def create_sha512_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the SHA512 hash string of the input file.
 
@@ -562,7 +650,7 @@ def create_sha512_hash(input_file, block_size=4096):
     return sha512_hash.hexdigest()
 
 
-def create_md5_hash(input_file, block_size=4096):
+def create_md5_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the MD5 hash string of the input file.
 
@@ -582,7 +670,7 @@ def create_md5_hash(input_file, block_size=4096):
     return md5_hash.hexdigest()
 
 
-def create_blake2b_hash(input_file, block_size=4096):
+def create_blake2b_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the Blake2B hash string of the input file.
 
@@ -602,7 +690,7 @@ def create_blake2b_hash(input_file, block_size=4096):
     return blake2b_hash.hexdigest()
 
 
-def create_blake2s_hash(input_file, block_size=4096):
+def create_blake2s_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the Blake2S hash string of the input file.
 
@@ -622,7 +710,7 @@ def create_blake2s_hash(input_file, block_size=4096):
     return blake2s_hash.hexdigest()
 
 
-def create_sha3_224_hash(input_file, block_size=4096):
+def create_sha3_224_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the SHA3_224 hash string of the input file.
 
@@ -642,7 +730,7 @@ def create_sha3_224_hash(input_file, block_size=4096):
     return sha224_hash.hexdigest()
 
 
-def create_sha3_256_hash(input_file, block_size=4096):
+def create_sha3_256_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the SHA3_256 hash string of the input file.
 
@@ -662,7 +750,7 @@ def create_sha3_256_hash(input_file, block_size=4096):
     return sha256_hash.hexdigest()
 
 
-def create_sha3_384_hash(input_file, block_size=4096):
+def create_sha3_384_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the SHA3_384 hash string of the input file.
 
@@ -682,7 +770,7 @@ def create_sha3_384_hash(input_file, block_size=4096):
     return sha384_hash.hexdigest()
 
 
-def create_sha3_512_hash(input_file, block_size=4096):
+def create_sha3_512_hash(input_file: str, block_size: int = 4096):
     """
     A function which calculates finds the SHA3_512 hash string of the input file.
 
@@ -702,7 +790,9 @@ def create_sha3_512_hash(input_file, block_size=4096):
     return sha512_hash.hexdigest()
 
 
-def untar_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
+def untar_file(
+    in_file: str, out_dir: str, gen_arch_dir: bool = True, verbose: bool = False
+):
     """
     A function which extracts data from a tar file into the specified
     output directory. Optionally, an output directory of the same name
@@ -741,14 +831,18 @@ def untar_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
         cmd = 'tar -xf "{}"'.format(in_file)
     try:
         import subprocess
+
         subprocess.call(cmd, shell=True)
     except OSError as e:
         os.chdir(c_dir)
-        raise rsgislib.RSGISPyException('Could not extract data: {}'.format(cmd))
+        raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
     os.chdir(c_dir)
     return process_dir
 
-def untar_gz_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
+
+def untar_gz_file(
+    in_file: str, out_dir: str, gen_arch_dir: bool = True, verbose: bool = False
+):
     """
     A function which extracts data from a tar.gz file into the specified
     output directory. Optionally, an output directory of the same name
@@ -787,14 +881,18 @@ def untar_gz_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
         cmd = 'tar -xzf "{}"'.format(in_file)
     try:
         import subprocess
+
         subprocess.call(cmd, shell=True)
     except OSError as e:
         os.chdir(c_dir)
-        raise rsgislib.RSGISPyException('Could not extract data: {}'.format(cmd))
+        raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
     os.chdir(c_dir)
     return process_dir
 
-def unzip_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
+
+def unzip_file(
+    in_file: str, out_dir: str, gen_arch_dir: bool = True, verbose: bool = False
+):
     """
     A function which extracts data from a zip file into the specified
     output directory. Optionally, an output directory of the same name
@@ -831,15 +929,18 @@ def unzip_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
         print(cmd)
     try:
         import subprocess
+
         subprocess.call(cmd, shell=True)
     except OSError as e:
         os.chdir(c_dir)
-        raise rsgislib.RSGISPyException('Could not extract data: {}'.format(cmd))
+        raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
     os.chdir(c_dir)
     return process_dir
 
 
-def untar_bz_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
+def untar_bz_file(
+    in_file: str, out_dir: str, gen_arch_dir: bool = True, verbose: bool = False
+):
     """
     A function which extracts data from a tar.bz file into the specified
     output directory. Optionally, an output directory of the same name
@@ -878,11 +979,10 @@ def untar_bz_file(in_file: str, out_dir: str, gen_arch_dir=True, verbose=False):
         cmd = 'tar -xjf "{}"'.format(in_file)
     try:
         import subprocess
+
         subprocess.call(cmd, shell=True)
     except OSError as e:
         os.chdir(c_dir)
-        raise rsgislib.RSGISPyException('Could not extract data: {}'.format(cmd))
+        raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
     os.chdir(c_dir)
     return process_dir
-
-

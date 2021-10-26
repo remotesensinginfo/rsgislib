@@ -171,6 +171,7 @@ def calc_dist_to_img_vals(
         # Pixel value 1 == Clouds
         # Pixel value 2 == Cloud Shadows
         rsgislib.imagecalc.calc_dist_to_img_vals(cloudsImg, dist2Clouds, pxl_vals=[1,2])
+
     """
     # Check gdal is available
     import rsgislib.imageutils
@@ -492,6 +493,7 @@ def get_unique_values(input_img, img_band=1):
     :param img_band: image band to be processed (starts at 1)
 
     :return: array of unique values.
+
     """
     imgDS = gdal.Open(input_img)
     if imgDS is None:
@@ -587,7 +589,9 @@ def perform_image_pca(
                         processing. If None then ignored (Default: None)
     :param calc_stats: Boolean specifying whether pyramids and statistics should be
                        calculated for the output image. (Default: True)
-    :returns: an array with the ratio of the explained variance per band."""
+    :returns: an array with the ratio of the explained variance per band.
+
+    """
     import rsgislib.imageutils
 
     eigenVec, varExplain = get_pca_eigen_vector(
@@ -735,6 +739,7 @@ def rescale_img_pxl_vals(
     :param gdalformat: the GDAL image file format of the output image file.
     :param band_rescale_objs: list of ImageBandRescale objects
     :param trim_to_limits: whether to trim the output to the output min/max values.
+
     """
     from rios import applier
 
@@ -831,6 +836,7 @@ def calc_histograms_for_msk_vals(
                     If None (default) then calculated for all mask values.
 
     :return: returns a dict of mask values with an array for the histogram.
+
     """
     minVal = float(minVal)
     maxVal = float(maxVal)
@@ -945,6 +951,7 @@ def calc_img_basic_stats_for_ref_region(
                           be calculated.
     :param output_img: the output image path and file name
     :param gdalformat: the output image file format. Default KEA.
+
     """
     import rsgislib.imageutils
     from rios import applier

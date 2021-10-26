@@ -191,6 +191,13 @@ def pop_thmt_img_stats(
     :param ignore_zero: boolean specifying whether to ignore pixel with a value of zero
                         i.e., as a no data value (default: True)
 
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        rsgislib.imageutils.pop_thmt_img_stats("land_cover_cls_img.tif")
+
     """
     import tqdm
 

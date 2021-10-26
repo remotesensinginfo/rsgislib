@@ -11,7 +11,7 @@ import numpy
 import rsgislib
 
 
-def uid_generator(size=6):
+def uid_generator(size: int = 6):
     """
     A function which will generate a 'random' string of the specified length
     based on the UUID
@@ -22,9 +22,9 @@ def uid_generator(size=6):
     """
     import uuid
 
-    randomStr = str(uuid.uuid4())
-    randomStr = randomStr.replace("-", "")
-    return randomStr[0:size]
+    random_str = str(uuid.uuid4())
+    random_str = random_str.replace("-", "")
+    return random_str[0:size]
 
 
 def is_number(str_val: str):
@@ -44,7 +44,15 @@ def is_number(str_val: str):
     return True
 
 
-def zero_pad_num_str(num_val, str_len=3, round_num=False, round_n_digts=0, integerise=False, absolute=False, gain=1):
+def zero_pad_num_str(
+    num_val,
+    str_len=3,
+    round_num=False,
+    round_n_digts=0,
+    integerise=False,
+    absolute=False,
+    gain=1,
+):
     """
     A function which zero pads a number to make a string
 
@@ -64,7 +72,7 @@ def zero_pad_num_str(num_val, str_len=3, round_num=False, round_n_digts=0, integ
     if round_num:
         num_val = round(num_val, round_n_digts)
     if integerise:
-        num_val = int(num_val*gain)
+        num_val = int(num_val * gain)
 
     num_str = "{}".format(num_val)
     num_str = num_str.zfill(str_len)
@@ -249,7 +257,9 @@ def write_dict_to_json_gz(data_dict: dict, out_file: str, encoding="utf-8"):
     import json
     import gzip
 
-    json_str = json.dump(data_dict, sort_keys=True, indent=4, separators=(",", ": "), ensure_ascii=False)
+    json_str = json.dump(
+        data_dict, sort_keys=True, indent=4, separators=(",", ": "), ensure_ascii=False
+    )
     json_bytes = json_str.encode(encoding)
 
     with gzip.GzipFile(out_file, "w") as fout:
@@ -304,13 +314,16 @@ def create_var_list(in_vals_lsts, val_dict=None):
     :returns: list of dictionaries with the same keys are the input but only a
               single value will be associate with key rather than a list.
 
-    Example::
+    Example:
 
+    .. code:: python
+
+        import rsgislib.tools.utils
         seg_vars_ranges = dict()
         seg_vars_ranges['k'] = [5, 10, 20, 30, 40, 50, 60, 80, 100, 120]
         seg_vars_ranges['d'] = [10, 20, 50, 100, 200, 1000, 10000]
         seg_vars_ranges['minsize'] = [5, 10, 20, 50, 100, 200]
-        seg_vars = rsgis_utils.create_var_list(seg_vars_ranges)
+        seg_vars = rsgislib.tools.utils.create_var_list(seg_vars_ranges)
 
     """
     out_vars = []
@@ -396,7 +409,7 @@ def is_odd(number):
     return False
 
 
-def hex_to_rgb(hex_str:str):
+def hex_to_rgb(hex_str: str):
     """
     A function which converts an hexadecimal colour representation to RGB values
     between 0 and 255.
@@ -415,16 +428,18 @@ def hex_to_rgb(hex_str:str):
         r, g, b = rsgislib.tools.utils.hex_to_rgb("#b432be")
 
     """
-    if hex_str[0] == '#':
+    if hex_str[0] == "#":
         hex_str = hex_str[1:]
     if len(hex_str) != 6:
-        raise rsgislib.RSGISPyException("String must be of length "
-                                        "6 or 7 if starting with #")
+        raise rsgislib.RSGISPyException(
+            "String must be of length 6 or 7 if starting with #"
+        )
 
     r_hex = hex_str[0:2]
     g_hex = hex_str[2:4]
     b_hex = hex_str[4:6]
     return int(r_hex, 16), int(g_hex, 16), int(b_hex, 16)
+
 
 def remove_repeated_chars(str_val, repeat_char):
     """
@@ -544,13 +559,14 @@ def dict_struct_does_path_exist(dict_struct_obj, tree_sequence):
     steps_str = ""
     pathExists = True
     for tree_step in tree_sequence:
-        steps_str = steps_str+":"+tree_step
+        steps_str = steps_str + ":" + tree_step
         if tree_step in curr_dict_struct_obj:
             curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
         else:
             pathExists = False
             break
     return pathExists
+
 
 def dict_struct_get_str_value(dict_struct_obj, tree_sequence, valid_values=None):
     """
@@ -563,15 +579,20 @@ def dict_struct_get_str_value(dict_struct_obj, tree_sequence, valid_values=None)
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
     for tree_step in tree_sequence:
-        steps_str = steps_str+":"+tree_step
+        steps_str = steps_str + ":" + tree_step
         if tree_step in curr_dict_struct_obj:
             curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
         else:
             raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
     if valid_values is not None:
         if curr_dict_struct_obj not in valid_values:
-            raise rsgislib.RSGISPyException("'{}' is not within the list of valid values.".format(curr_dict_struct_obj))
+            raise rsgislib.RSGISPyException(
+                "'{}' is not within the list of valid values.".format(
+                    curr_dict_struct_obj
+                )
+            )
     return curr_dict_struct_obj
+
 
 def dict_struct_get_boolean_value(dict_struct_obj, tree_sequence):
     """
@@ -583,7 +604,7 @@ def dict_struct_get_boolean_value(dict_struct_obj, tree_sequence):
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
     for tree_step in tree_sequence:
-        steps_str = steps_str+":"+tree_step
+        steps_str = steps_str + ":" + tree_step
         if tree_step in curr_dict_struct_obj:
             curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
         else:
@@ -591,8 +612,11 @@ def dict_struct_get_boolean_value(dict_struct_obj, tree_sequence):
     if type(curr_dict_struct_obj).__name__ == "bool":
         rtn_bool = curr_dict_struct_obj
     else:
-        raise rsgislib.RSGISPyException("'{}' is not 'True' or 'False'.".format(curr_dict_struct_obj))
+        raise rsgislib.RSGISPyException(
+            "'{}' is not 'True' or 'False'.".format(curr_dict_struct_obj)
+        )
     return rtn_bool
+
 
 def dict_struct_get_date_value(dict_struct_obj, tree_sequence, date_format="%Y-%m-%d"):
     """
@@ -607,7 +631,7 @@ def dict_struct_get_date_value(dict_struct_obj, tree_sequence, date_format="%Y-%
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
     for tree_step in tree_sequence:
-        steps_str = steps_str+":"+tree_step
+        steps_str = steps_str + ":" + tree_step
         if tree_step in curr_dict_struct_obj:
             curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
         else:
@@ -615,7 +639,9 @@ def dict_struct_get_date_value(dict_struct_obj, tree_sequence, date_format="%Y-%
 
     if type(date_format) is str:
         try:
-            out_date_obj = datetime.datetime.strptime(curr_dict_struct_obj, date_format).date()
+            out_date_obj = datetime.datetime.strptime(
+                curr_dict_struct_obj, date_format
+            ).date()
         except Exception as e:
             raise rsgislib.RSGISPyException(e)
     elif type(date_format) is list:
@@ -623,7 +649,9 @@ def dict_struct_get_date_value(dict_struct_obj, tree_sequence, date_format="%Y-%
         except_obj = None
         for date_format_str in date_format:
             try:
-                out_date_obj = datetime.datetime.strptime(curr_dict_struct_obj, date_format_str).date()
+                out_date_obj = datetime.datetime.strptime(
+                    curr_dict_struct_obj, date_format_str
+                ).date()
                 found = True
                 break
             except Exception as e:
@@ -631,11 +659,16 @@ def dict_struct_get_date_value(dict_struct_obj, tree_sequence, date_format="%Y-%
         if not found:
             raise rsgislib.RSGISPyException(except_obj)
     else:
-        raise rsgislib.RSGISPyException("Do not know what the type is of date_format variable.")
+        raise rsgislib.RSGISPyException(
+            "Do not know what the type is of date_format variable."
+        )
 
     return out_date_obj
 
-def dict_struct_get_datetime_value(dict_struct_obj, tree_sequence, date_time_format="%Y-%m-%dT%H:%M:%S.%f"):
+
+def dict_struct_get_datetime_value(
+    dict_struct_obj, tree_sequence, date_time_format="%Y-%m-%dT%H:%M:%S.%f"
+):
     """
     A function which retrieves a single date value from a JSON structure.
 
@@ -654,10 +687,12 @@ def dict_struct_get_datetime_value(dict_struct_obj, tree_sequence, date_time_for
         else:
             raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
 
-    curr_dict_struct_obj = curr_dict_struct_obj.replace('Z', '')
+    curr_dict_struct_obj = curr_dict_struct_obj.replace("Z", "")
     if type(date_time_format) is str:
         try:
-            out_datetime_obj = datetime.datetime.strptime(curr_dict_struct_obj, date_time_format)
+            out_datetime_obj = datetime.datetime.strptime(
+                curr_dict_struct_obj, date_time_format
+            )
         except Exception as e:
             raise rsgislib.RSGISPyException(e)
     elif type(date_time_format) is list:
@@ -665,7 +700,9 @@ def dict_struct_get_datetime_value(dict_struct_obj, tree_sequence, date_time_for
         except_obj = None
         for date_time_format_str in date_time_format:
             try:
-                out_datetime_obj = datetime.datetime.strptime(curr_dict_struct_obj, date_time_format_str)
+                out_datetime_obj = datetime.datetime.strptime(
+                    curr_dict_struct_obj, date_time_format_str
+                )
                 found = True
                 break
             except Exception as e:
@@ -673,9 +710,12 @@ def dict_struct_get_datetime_value(dict_struct_obj, tree_sequence, date_time_for
         if not found:
             raise rsgislib.RSGISPyException(except_obj)
     else:
-        raise rsgislib.RSGISPyException("Do not know what the type is of date_time_format variable.")
+        raise rsgislib.RSGISPyException(
+            "Do not know what the type is of date_time_format variable."
+        )
 
     return out_datetime_obj
+
 
 def dict_struct_get_str_list_value(dict_struct_obj, tree_sequence, valid_values=None):
     """
@@ -689,7 +729,7 @@ def dict_struct_get_str_list_value(dict_struct_obj, tree_sequence, valid_values=
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
     for tree_step in tree_sequence:
-        steps_str = steps_str+":"+tree_step
+        steps_str = steps_str + ":" + tree_step
         if tree_step in curr_dict_struct_obj:
             curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
         else:
@@ -700,12 +740,19 @@ def dict_struct_get_str_list_value(dict_struct_obj, tree_sequence, valid_values=
     if valid_values is not None:
         for val in curr_dict_struct_obj:
             if type(val).__name__ != "str":
-                raise rsgislib.RSGISPyException("'{}' is not of type string.".format(val))
+                raise rsgislib.RSGISPyException(
+                    "'{}' is not of type string.".format(val)
+                )
             if val not in valid_values:
-                raise rsgislib.RSGISPyException("'{}' is not within the list of valid values.".format(val))
+                raise rsgislib.RSGISPyException(
+                    "'{}' is not within the list of valid values.".format(val)
+                )
     return curr_dict_struct_obj
 
-def dict_struct_get_numeric_value(dict_struct_obj, tree_sequence, valid_lower=None, valid_upper=None):
+
+def dict_struct_get_numeric_value(
+    dict_struct_obj, tree_sequence, valid_lower=None, valid_upper=None
+):
     """
     A function which retrieves a single numeric value from a JSON structure.
 
@@ -719,14 +766,16 @@ def dict_struct_get_numeric_value(dict_struct_obj, tree_sequence, valid_lower=No
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
     for tree_step in tree_sequence:
-        steps_str = steps_str+":"+tree_step
+        steps_str = steps_str + ":" + tree_step
         if tree_step in curr_dict_struct_obj:
             curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
         else:
             raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
 
     out_value = 0.0
-    if (type(curr_dict_struct_obj).__name__ == "int") or (type(curr_dict_struct_obj).__name__ == "float"):
+    if (type(curr_dict_struct_obj).__name__ == "int") or (
+        type(curr_dict_struct_obj).__name__ == "float"
+    ):
         out_value = curr_dict_struct_obj
     elif type(curr_dict_struct_obj).__name__ == "str":
         if curr_dict_struct_obj.isnumeric():
@@ -735,17 +784,26 @@ def dict_struct_get_numeric_value(dict_struct_obj, tree_sequence, valid_lower=No
             try:
                 out_value = float(curr_dict_struct_obj)
             except:
-                raise rsgislib.RSGISPyException("The identified value is not numeric '{}'".format(steps_str))
+                raise rsgislib.RSGISPyException(
+                    "The identified value is not numeric '{}'".format(steps_str)
+                )
     else:
-        raise rsgislib.RSGISPyException("The identified value is not numeric '{}'".format(steps_str))
+        raise rsgislib.RSGISPyException(
+            "The identified value is not numeric '{}'".format(steps_str)
+        )
 
     if valid_lower is not None:
         if out_value < valid_lower:
-            raise rsgislib.RSGISPyException("'"+str(out_value)+"' is less than the defined valid range.")
+            raise rsgislib.RSGISPyException(
+                "'{}' is less than the defined valid range.".format(out_value)
+            )
     if valid_upper is not None:
         if out_value > valid_upper:
-            raise rsgislib.RSGISPyException("'"+str(out_value)+"' is higher than the defined valid range.")
+            raise rsgislib.RSGISPyException(
+                "'{}' is higher than the defined valid range.".format(out_value)
+            )
     return out_value
+
 
 def dict_struct_get_list_value(dict_struct_obj, tree_sequence):
     """
@@ -759,7 +817,7 @@ def dict_struct_get_list_value(dict_struct_obj, tree_sequence):
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
     for tree_step in tree_sequence:
-        steps_str = steps_str+":"+tree_step
+        steps_str = steps_str + ":" + tree_step
         if tree_step in curr_dict_struct_obj:
             curr_dict_struct_obj = curr_dict_struct_obj[tree_step]
         else:
@@ -768,4 +826,3 @@ def dict_struct_get_list_value(dict_struct_obj, tree_sequence):
     if type(curr_dict_struct_obj).__name__ != "list":
         raise rsgislib.RSGISPyException("Retrieved value is not a list.")
     return curr_dict_struct_obj
-
