@@ -100,6 +100,7 @@ class ImageBandInfo(object):
                   processing (band numbers start at 1).
 
     """
+
     def __init__(self, file_name=None, name=None, bands=None):
         """
         :param file_name: is the input image file name and path.
@@ -153,6 +154,13 @@ def set_env_vars_lzw_gtiff_outs(bigtiff: bool = False):
     :param bigtiff: If True GTIFF files will be outputted
                     in big tiff format.
 
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        rsgislib.imageutils.set_env_vars_lzw_gtiff_outs()
+
     """
     if bigtiff:
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=LZW:BIGTIFF=YES"
@@ -160,30 +168,12 @@ def set_env_vars_lzw_gtiff_outs(bigtiff: bool = False):
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=LZW"
 
 
-def get_rsgislib_datatype_from_img(input_img: str):
-    """
-    Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT)
-    for the inputted raster file
-
-    :return: int
-
-    """
-    raster = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if raster == None:
-        raise rsgislib.RSGISPyException(
-            "Could not open raster image: '" + input_img + "'"
-        )
-    band = raster.GetRasterBand(1)
-    if band == None:
-        raise rsgislib.RSGISPyException(
-            "Could not open raster band 1 in image: '" + input_img + "'"
-        )
-    gdal_dtype = gdal.GetDataTypeName(band.DataType)
-    raster = None
-    return rsgislib.get_rsgislib_datatype(gdal_dtype)
-
-
-def pop_thmt_img_stats(input_img: str, add_clr_tab: bool=True, calc_pyramids: bool=True, ignore_zero: bool=True):
+def pop_thmt_img_stats(
+    input_img: str,
+    add_clr_tab: bool = True,
+    calc_pyramids: bool = True,
+    ignore_zero: bool = True,
+):
     """
     A function which populates a byte thematic input image (e.g., classification) with
     pyramids and header statistics (e.g., colour table).
@@ -230,10 +220,14 @@ def pop_thmt_img_stats(input_img: str, add_clr_tab: bool=True, calc_pyramids: bo
                 tmp_meta["STATISTICS_EXCLUDEDVALUES"] = "0"
 
             try:
-                (min_val, max_val, mean_val, stddev_val) = gdal_band.ComputeStatistics(False)
+                (min_val, max_val, mean_val, stddev_val) = gdal_band.ComputeStatistics(
+                    False
+                )
             except RuntimeError as e:
-                if str(e).endswith('Failed to compute statistics, no '
-                                   'valid pixels found in sampling.'):
+                if str(e).endswith(
+                    "Failed to compute statistics, no "
+                    "valid pixels found in sampling."
+                ):
                     min_val = 0
                     max_val = 0
                     mean_val = 0
@@ -255,13 +249,15 @@ def pop_thmt_img_stats(input_img: str, add_clr_tab: bool=True, calc_pyramids: bo
             hist_calc_min = -0.5
             hist_calc_max = 255.5
             hist_n_bins = 256
-            tmp_meta["STATISTICS_HISTOBINFUNCTION"] = 'direct'
+            tmp_meta["STATISTICS_HISTOBINFUNCTION"] = "direct"
 
-            hist = gdal_band.GetHistogram(hist_calc_min, hist_calc_max, hist_n_bins, False, False)
+            hist = gdal_band.GetHistogram(
+                hist_calc_min, hist_calc_max, hist_n_bins, False, False
+            )
 
             # Check if GDAL's histogram code overflowed. This is not a fool-proof test,
             # as some overflows will not result in negative counts.
-            histogram_overflow = (min(hist) < 0)
+            histogram_overflow = min(hist) < 0
 
             if not histogram_overflow:
                 # comes back as a list for some reason
@@ -277,7 +273,7 @@ def pop_thmt_img_stats(input_img: str, add_clr_tab: bool=True, calc_pyramids: bo
                 mode_bin = numpy.argmax(hist)
                 mode_val = mode_bin * hist_step + hist_min
                 tmp_meta["STATISTICS_MODE"] = "{}".format(int(round(mode_val)))
-                tmp_meta["STATISTICS_HISTOBINVALUES"] = '|'.join(map(repr, hist)) + '|'
+                tmp_meta["STATISTICS_HISTOBINVALUES"] = "|".join(map(repr, hist)) + "|"
                 tmp_meta["STATISTICS_HISTOMIN"] = "{}".format(hist_min)
                 tmp_meta["STATISTICS_HISTOMAX"] = "{}".format(hist_max)
                 tmp_meta["STATISTICS_HISTONUMBINS"] = "{}".format(hist_n_bins)
@@ -320,13 +316,13 @@ def pop_thmt_img_stats(input_img: str, add_clr_tab: bool=True, calc_pyramids: bo
                 n_overs = n_overs + 1
 
         gdal_ds = gdal.Open(input_img, gdal.GA_Update)
-        if img_format == 'GTIFF':
-            gdal.SetConfigOption('COMPRESS_OVERVIEW', 'LZW')
-        gdal_ds.BuildOverviews('NEAREST', pyd_lvls[:n_overs], callback)
+        if img_format == "GTIFF":
+            gdal.SetConfigOption("COMPRESS_OVERVIEW", "LZW")
+        gdal_ds.BuildOverviews("NEAREST", pyd_lvls[:n_overs], callback)
         gdal_ds = None
 
 
-def define_colour_table(input_img: str, clr_lut: dict, img_band:int =1):
+def define_colour_table(input_img: str, clr_lut: dict, img_band: int = 1):
     """
     A function which defines specific colours for image values for a colour
     table. Note, this function must be used to thematic images which use
@@ -355,6 +351,7 @@ def define_colour_table(input_img: str, clr_lut: dict, img_band:int =1):
 
     """
     import rsgislib.tools.utils
+
     gdal_ds = gdal.Open(input_img, gdal.GA_Update)
     gdal_band = gdal_ds.GetRasterBand(img_band)
     clr_tbl = gdal.ColorTable()
@@ -363,21 +360,74 @@ def define_colour_table(input_img: str, clr_lut: dict, img_band:int =1):
             r, g, b = rsgislib.tools.utils.hex_to_rgb(clr_lut[pxl_val])
             clr_tbl.SetColorEntry(pxl_val, (r, g, b, 255))
         elif isinstance(clr_lut[pxl_val], list) and len(clr_lut[pxl_val]) == 3:
-            clr_tbl.SetColorEntry(pxl_val, (clr_lut[pxl_val][0], clr_lut[pxl_val][1], clr_lut[pxl_val][2], 255))
+            clr_tbl.SetColorEntry(
+                pxl_val,
+                (clr_lut[pxl_val][0], clr_lut[pxl_val][1], clr_lut[pxl_val][2], 255),
+            )
         elif isinstance(clr_lut[pxl_val], list) and len(clr_lut[pxl_val]) == 4:
-            clr_tbl.SetColorEntry(pxl_val, (clr_lut[pxl_val][0], clr_lut[pxl_val][1], clr_lut[pxl_val][2], clr_lut[pxl_val][3]))
+            clr_tbl.SetColorEntry(
+                pxl_val,
+                (
+                    clr_lut[pxl_val][0],
+                    clr_lut[pxl_val][1],
+                    clr_lut[pxl_val][2],
+                    clr_lut[pxl_val][3],
+                ),
+            )
         else:
-            raise rsgislib.RSGISPyException("There should be single string or a list "
-                                            "with 3 or 4 values for the colour table.")
+            raise rsgislib.RSGISPyException(
+                "There should be single string or a list "
+                "with 3 or 4 values for the colour table."
+            )
     gdal_band.SetRasterColorTable(clr_tbl)
     gdal_band.SetRasterColorInterpretation(gdal.GCI_PaletteIndex)
     gdal_ds = None
+
+
+def get_rsgislib_datatype_from_img(input_img: str):
+    """
+    Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT)
+    for the inputted raster file
+
+    :param input_img: input image file.
+    :return: int
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img("img.kea")
+
+    """
+    raster = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if raster == None:
+        raise rsgislib.RSGISPyException(
+            "Could not open raster image: '" + input_img + "'"
+        )
+    band = raster.GetRasterBand(1)
+    if band == None:
+        raise rsgislib.RSGISPyException(
+            "Could not open raster band 1 in image: '" + input_img + "'"
+        )
+    gdal_dtype = gdal.GetDataTypeName(band.DataType)
+    raster = None
+    return rsgislib.get_rsgislib_datatype(gdal_dtype)
+
 
 def get_gdal_datatype_from_img(input_img: str):
     """
     Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
 
-    :return: ints
+    :param input_img: input image file.
+    :return: int
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        datatype = rsgislib.imageutils.get_gdal_datatype_from_img("img.kea")
 
     """
     raster = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -399,7 +449,15 @@ def get_gdal_datatype_name_from_img(input_img: str):
     """
     Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
 
+    :param input_img: input image file.
     :return: int
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        datatype = rsgislib.imageutils.get_gdal_datatype_name_from_img("img.kea")
 
     """
     raster = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -422,7 +480,15 @@ def get_file_img_extension(gdalformat: str):
     A function to get the extension for a given file format
     (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
 
+    :param gdalformat: GDAL string for the format.
     :return: string
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        img_ext = rsgislib.imageutils.get_file_img_extension("KEA")
 
     """
     ext = "NA"
@@ -447,7 +513,15 @@ def get_gdal_format_from_ext(input_img: str):
     """
     Get GDAL format, based on input_file
 
+    :param input_img: input image file.
     :return: string
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        img_ext = rsgislib.imageutils.get_gdal_format_from_ext("img.kea")
 
     """
     gdalStr = ""
@@ -466,6 +540,7 @@ def get_gdal_format_from_ext(input_img: str):
         raise rsgislib.RSGISPyException("Type not recognised")
     return gdalStr
 
+
 def get_gdal_format_name(input_img: str):
     """
     Gets the shorthand file format for the input image in uppercase.
@@ -473,11 +548,19 @@ def get_gdal_format_name(input_img: str):
     :param input_img: The current name of the GDAL layer.
     :return: string with the file format (e.g., KEA or GTIFF).
 
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        gdal_format = rsgislib.imageutils.get_gdal_format_name("img.kea")
+
     """
     layerDS = gdal.Open(input_img, gdal.GA_ReadOnly)
     gdalDriver = layerDS.GetDriver()
     layerDS = None
     return str(gdalDriver.ShortName).upper()
+
 
 def rename_gdal_layer(input_img: str, output_img: str):
     """
@@ -485,6 +568,13 @@ def rename_gdal_layer(input_img: str, output_img: str):
 
     :param input_img: The current name of the GDAL layer.
     :param output_img: The output name of the GDAL layer.
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        rsgislib.imageutils.rename_gdal_layer("img.kea", "output_img.kea")
 
     """
     layerDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -498,6 +588,13 @@ def delete_gdal_layer(input_img: str):
     Deletes all the files associated with a GDAL layer.
 
     :param input_img: The file name and path of the GDAL layer to be deleted.
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        rsgislib.imageutils.delete_gdal_layer("img.kea")
 
     """
     layerDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -514,6 +611,13 @@ def get_img_res(input_img: str, abs_vals: bool = False):
     :param abs_vals: if True then returned x/y values will be positive (default: False)
 
     :return: xRes, yRes
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        x_res, y_res = rsgislib.imageutils.get_img_res("img.kea")
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -537,7 +641,17 @@ def do_img_res_match(in_a_img: str, in_b_img: str):
     A function to test whether two images have the same
     image pixel resolution.
 
+    :param in_a_img: input image file.
+    :param in_b_img: input image file.
     :return: boolean
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        if rsgislib.imageutils.do_img_res_match("img1.kea", "img2.kea"):
+            print("Images match in terms of resolutions")
 
     """
     img1XRes, img1YRes = get_img_res(in_a_img)
@@ -550,7 +664,15 @@ def get_img_size(input_img: str):
     """
     A function to retrieve the image size in pixels.
 
+    :param input_img: input image file.
     :return: xSize, ySize
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        x_size, y_size = rsgislib.imageutils.get_img_size("img.kea")
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -570,7 +692,15 @@ def get_img_bbox(input_img: str):
     A function to retrieve the bounding box in the spatial
     coordinates of the image.
 
+    :param input_img: input image file.
     :return: (MinX, MaxX, MinY, MaxY)
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        bbox = rsgislib.imageutils.get_img_bbox("img.kea")
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -602,7 +732,16 @@ def get_img_bbox_in_proj(input_img: str, out_epsg: int):
     A function to retrieve the bounding box in the spatial
     coordinates of the image.
 
+    :param input_img: input image file.
+    :param out_epsg: an EPSG code for the output BBOX
     :return: (MinX, MaxX, MinY, MaxY)
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        bbox_osgb = rsgislib.imageutils.get_img_bbox("img.kea", out_epsg=27700)
 
     """
     import rsgislib.tools.geometrytools
@@ -623,14 +762,23 @@ def get_img_bbox_in_proj(input_img: str, out_epsg: int):
 
 def get_img_band_stats(input_img: str, img_band: int, compute: bool = True):
     """
-    A function which calls the GDAL function on the band selected to calculate the pixel stats
-    (min, max, mean, standard deviation).
+    A function which calls the GDAL function on the band selected to calculate
+    the pixel stats (min, max, mean, standard deviation).
 
     :param input_img: input image file path
-    :param img_band: specified image band for which stats are to be calculated (starts at 1).
-    :param compute: whether the stats should be calculated (True; Default) or an approximation or pre-calculated stats are OK (False).
+    :param img_band: specified image band for which stats are to be
+                     calculated (starts at 1).
+    :param compute: whether the stats should be calculated (True; Default) or an
+                    approximation or pre-calculated stats are OK (False).
 
     :return: stats (min, max, mean, stddev)
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        min, max, mean, std = rsgislib.imageutils.get_img_band_stats("img.kea", 1)
 
     """
     img_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -658,7 +806,15 @@ def get_img_band_count(input_img: str):
     """
     A function to retrieve the number of image bands in an image file.
 
+    :param input_img: input image file.
     :return: nBands
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        n_bands = rsgislib.imageutils.get_img_band_count("img.kea")
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -677,7 +833,16 @@ def get_img_no_data_value(input_img: str, img_band: int = 1):
     A function to retrieve the no data value for the image
     (from band; default 1).
 
+    :param input_img: input image file.
+    :param img_band: the band for which the no data value should be returned.
     :return: number
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        no_data_val = rsgislib.imageutils.get_img_no_data_value("img.kea")
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -695,6 +860,17 @@ def set_img_no_data_value(input_img: str, no_data_val: float, img_band: int = No
     """
     A function to set the no data value for an image.
     If band is not specified sets value for all bands.
+
+    :param input_img: input image file.
+    :param no_data_val: No data value to be defined to the image band
+    :param img_band: the band for which the no data value should be returned.
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        rsgislib.imageutils.set_img_no_data_value("img.kea", 0.0, 1)
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_Update)
@@ -716,8 +892,6 @@ def get_img_band_colour_interp(input_img: str, img_band: int):
     """
     A function to get the colour interpretation for a specific band.
 
-    :return: is a GDALColorInterp value:
-
     * GCI_Undefined=0,
     * GCI_GrayIndex=1,
     * GCI_PaletteIndex=2,
@@ -736,6 +910,10 @@ def get_img_band_colour_interp(input_img: str, img_band: int):
     * GCI_YCbCr_CbBand=15,
     * GCI_YCbCr_CrBand=16,
     * GCI_Max=16
+
+    :param input_img: input image file.
+    :param img_band: the band for which the no data value should be returned.
+    :return: is a GDALColorInterp value
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -772,6 +950,10 @@ def set_img_band_colour_interp(input_img: str, img_band: int, clr_itrp_val: int)
     * GCI_YCbCr_CrBand=16,
     * GCI_Max=16
 
+    :param input_img: input image file.
+    :param img_band: the band for which the no data value should be returned.
+    :param clr_itrp_val: the clr_itrp_val value to be set.
+
     """
     rasterDS = gdal.Open(input_img, gdal.GA_Update)
     if rasterDS is None:
@@ -787,7 +969,8 @@ def get_wkt_proj_from_img(input_img: str):
     A function which returns the WKT string representing the projection
     of the input image.
 
-    :return: string
+    :param input_img: input image file.
+    :return: WTK string
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -803,7 +986,10 @@ def get_wkt_proj_from_img(input_img: str):
 def get_epsg_proj_from_img(input_img: str):
     """
     Using GDAL to return the EPSG code for the input layer.
+
+    :param input_img: input image file.
     :return: EPSG code
+
     """
     epsgCode = None
     try:
@@ -831,6 +1017,7 @@ def get_img_files(input_img: str):
     A function which returns a list of the files associated (e.g., header etc.)
     with the input image file.
 
+    :param input_img: input image file.
     :return: lists
 
     """
@@ -845,6 +1032,7 @@ def get_utm_zone(input_img: str):
     A function which returns a string with the UTM (XXN | XXS) zone of the input image
     but only if it is projected within the UTM projection/coordinate system.
 
+    :param input_img: input image file.
     :return: string
 
     """
@@ -878,11 +1066,13 @@ def get_utm_zone(input_img: str):
 
 def do_gdal_layers_have_same_proj(in_a_img: str, in_b_img: str):
     """
-    A function which tests whether two gdal compatiable layers are in the same
+    A function which tests whether two gdal compatible layers are in the same
     projection/coordinate system. This is done using the GDAL SpatialReference
     function AutoIdentifyEPSG. If the identified EPSG codes are different then
     False is returned otherwise True.
 
+    :param in_a_img: input image file.
+    :param in_b_img: input image file.
     :return: boolean
 
     """
@@ -900,18 +1090,21 @@ def set_band_names(input_img: str, band_names: list, feedback: bool = False):
     """A utility function to set band names.
     Where:
 
-    :param inImage: is the input image
+    :param input_img: input image file.
     :param band_names: is a list of band names
-    :param feedback: is a boolean specifying whether feedback will be printed to the console (True= Printed / False (default) Not Printed)
+    :param feedback: is a boolean specifying whether feedback will be printed to the
+                     console (True= Printed / False (default) Not Printed)
 
     Example::
 
         from rsgislib import imageutils
 
         input_img = 'injune_p142_casi_sub_utm.kea'
-        band_names = ['446nm','530nm','549nm','569nm','598nm','633nm','680nm','696nm','714nm','732nm','741nm','752nm','800nm','838nm']
+        band_names = ['446nm','530nm','549nm','569nm','598nm','633nm','680nm','696nm',
+                      '714nm','732nm','741nm','752nm','800nm','838nm']
 
         imageutils.set_band_names(input_img, band_names)
+
     """
     dataset = gdal.Open(input_img, gdal.GA_Update)
 
@@ -933,10 +1126,7 @@ def get_band_names(input_img: str):
     """
     A utility function to get band names.
 
-    Where:
-
-    :param inImage: is the input image
-
+    :param input_img: input image file.
     :return: list of band names
 
     Example::
@@ -945,6 +1135,7 @@ def get_band_names(input_img: str):
 
         input_img = 'injune_p142_casi_sub_utm.kea'
         bandNames = imageutils.get_band_names(input_img)
+
     """
     dataset = gdal.Open(input_img, gdal.GA_Update)
     bandNames = list()
@@ -964,6 +1155,7 @@ def set_img_thematic(input_img: str):
     Set all image bands to be thematic.
 
     :param input_img: The file for which the bands are to be set as thematic
+
     """
     ds = gdal.Open(input_img, gdal.GA_Update)
     if ds == None:
@@ -978,7 +1170,9 @@ def set_img_not_thematic(input_img: str):
     """
     Set all image bands to be not thematic (athematic).
 
-    :param input_img: The file for which the bands are to be set as not thematic (athematic)
+    :param input_img: The file for which the bands are to be set
+                      as not thematic (athematic)
+
     """
     ds = gdal.Open(input_img, gdal.GA_Update)
     if ds == None:
@@ -994,8 +1188,8 @@ def has_gcps(input_img: str):
     Test whether the input image has GCPs - returns boolean
 
     :param input_img: input image file
-
     :return: boolean True - has GCPs; False - does not have GCPs
+
     """
     raster = gdal.Open(input_img, gdal.GA_ReadOnly)
     if raster == None:
@@ -1014,6 +1208,7 @@ def copy_gcps(input_img: str, output_img: str):
 
     :param input_img: Raster layer with GCPs
     :param output_img: Raster layer to which GCPs will be added
+
     """
     srcDS = gdal.Open(input_img, gdal.GA_ReadOnly)
     if srcDS == None:
@@ -1297,21 +1492,23 @@ def create_blank_buf_img_from_ref_img(
     no_data_val: float = None,
 ):
     """
-    A function to create a new image file based on the input image but buffered by the specified amount
-    (e.g., 100 pixels bigger on all sides. The buffer amount can ba specified in pixels or spatial units.
-    If non-None value is given for both inputs then an error will be produced. By default the no data value
-    will be taken from the input image header but if not available or specified within the function call
-    then that value will be used.
+    A function to create a new image file based on the input image but buffered by
+    the specified amount (e.g., 100 pixels bigger on all sides. The buffer amount
+    can be specified in pixels or spatial units. If non-None value is given for both
+    inputs then an error will be produced. By default the no data value will be taken
+    from the input image header but if not available or specified within the function
+    call then that value will be used.
 
     :param input_img: input reference image
     :param output_img: output image file.
     :param gdalformat: output image file format.
-    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the
+                     output image.
     :param buf_pxl_ext: the amount the input image will be buffered in pixels.
     :param buf_spt_ext: the amount the input image will be buffered in spatial distance,
-                    units are defined from the projection of the input image.
+                        units are defined from the projection of the input image.
     :param no_data_val: Optional no data value. If None then the no data value will be
-                    taken from the input image.
+                        taken from the input image.
 
     """
     if (buf_pxl_ext is None) and (buf_spt_ext is None):
@@ -1377,17 +1574,19 @@ def create_blank_img_from_ref_vector(
     datatype: int,
 ):
     """
-    A function to create a new image file based on a vector layer to define the extent and projection
-    of the output image.
+    A function to create a new image file based on a vector layer to define the
+    extent and projection of the output image.
 
     :param vec_file: input vector file.
-    :param vec_lyr: name of the vector layer, if None then assume the layer name will be the same as the file
-                     name of the input vector file.
+    :param vec_lyr: name of the vector layer, if None then assume the layer name will
+                    be the same as the file name of the input vector file.
     :param output_img: output image file.
     :param out_img_res: output image resolution, square pixels so a single value.
     :param out_img_n_bands: the number of image bands in the output image
     :param gdalformat: output image file format.
-    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the
+                     output image
+
     """
 
     import rsgislib.vectorutils
@@ -1437,18 +1636,22 @@ def create_copy_img_vec_extent_snap_to_grid(
     buf_n_pxl: int = 0,
 ):
     """
-    A function to create a new image file based on a vector layer to define the extent and projection
-    of the output image. The image file extent is snapped on to the grid defined by the vector layer.
+    A function to create a new image file based on a vector layer to define the
+    extent and projection of the output image. The image file extent is snapped
+    on to the grid defined by the vector layer.
 
     :param vec_file: input vector file.
-    :param vec_lyr: name of the vector layer, if None then assume the layer name will be the same as the file
-                     name of the input vector file.
+    :param vec_lyr: name of the vector layer, if None then assume the layer name
+                    will be the same as the file name of the input vector file.
     :param output_img: output image file.
     :param out_img_res: output image resolution, square pixels so a single value.
     :param out_img_n_bands: the number of image bands in the output image
     :param gdalformat: output image file format.
-    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image
-    :param buf_n_pxl: is an integer specifying the number of pixels to buffer the vector file extent by.
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the
+                     output image
+    :param buf_n_pxl: is an integer specifying the number of pixels to buffer the
+                      vector file extent by.
+
     """
     import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
@@ -1506,15 +1709,19 @@ def create_blank_img_from_bbox(
     """
     A function to create a new image file based on a bbox to define the extent.
 
-    :param bbox: bounding box defining the extent of the output image (xMin, xMax, yMin, yMax)
+    :param bbox: bounding box defining the extent of the output image
+                 (xMin, xMax, yMin, yMax)
     :param wkt_str: the WKT string defining the bbox and output image projection.
     :param output_img: output image file.
     :param out_img_res: output image resolution, square pixels so a single value.
     :param out_img_pxl_val: output image pixel value.
     :param out_img_n_bands: the number of image bands in the output image
     :param gdalformat: output image file format.
-    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
-    :param snap_to_grid: optional variable to snap the image to a grid of whole numbers with respect to the image pixel resolution.
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the
+                     output image.
+    :param snap_to_grid: optional variable to snap the image to a grid of whole
+                         numbers with respect to the image pixel resolution.
+
     """
     if snap_to_grid:
         import rsgislib.tools.geometrytools
@@ -1568,20 +1775,23 @@ def create_img_for_each_vec_feat(
     snap_to_grid: int = False,
 ):
     """
-    A function to create a set of image files representing the extent of each feature in the
-    inputted vector file.
+    A function to create a set of image files representing the extent of each
+    feature in the inputted vector file.
 
     :param vec_file: the input vector file.
     :param vec_lyr: the input vector layer
-    :param file_name_col: the name of the column in the vector layer which will be used as the file names.
+    :param file_name_col: the name of the column in the vector layer which will be
+                          used as the file names.
     :param out_img_path: output file path (directory) where the images will be saved.
     :param out_img_ext: the file extension to be added on to the output file names.
     :param out_img_pxl_val: output image pixel value
     :param out_img_n_bands: the number of image bands in the output image
     :param out_img_res: output image resolution, square pixels so a single value
     :param gdalformat: output image file format.
-    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
-    :param snap_to_grid: optional variable to snap the image to a grid of whole numbers with respect to the image pixel resolution.
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the
+                     output image.
+    :param snap_to_grid: optional variable to snap the image to a grid of whole
+                         numbers with respect to the image pixel resolution.
     """
 
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
@@ -1610,7 +1820,8 @@ def create_img_for_each_vec_feat(
     if not colExists:
         dsVecFile = None
         raise Exception(
-            "The specified column does not exist in the input layer; check case as some drivers are case sensitive."
+            "The specified column does not exist in the input layer; "
+            "check case as some drivers are case sensitive."
         )
 
     lyrVecObj.ResetReading()
@@ -1647,16 +1858,19 @@ def resample_img_to_match(
     multicore: bool = False,
 ):
     """
-    A utility function to resample an existing image to the projection and/or pixel size of another image.
+    A utility function to resample an existing image to the projection
+    and/or pixel size of another image.
 
-    Where:
-
-    :param in_ref_img: is the input reference image to which the processing image is to resampled to.
+    :param in_ref_img: is the input reference image to which the processing
+                       image is to resampled to.
     :param in_process_img: is the image which is to be resampled.
     :param output_img: is the output image file.
     :param gdalformat: is the gdal format for the output image.
-    :param interp_method: is the interpolation method used to resample the image rsgislib.INTERP_XXXX (Default: rsgislib.INTERP_NEAREST_NEIGHBOUR)
-    :param datatype: is the rsgislib datatype of the output image (if none then it will be the same as the input file).
+    :param interp_method: is the interpolation method used to resample the image
+                          rsgislib.INTERP_XXXX (Default:
+                          rsgislib.INTERP_NEAREST_NEIGHBOUR)
+    :param datatype: is the rsgislib datatype of the output image (if none then
+                     it will be the same as the input file).
     :param multicore: use multiple processing cores (Default = False)
     """
     numBands = get_img_band_count(in_process_img)
@@ -1742,7 +1956,7 @@ def reproject_image(
     output_img: str,
     out_wkt: str,
     gdalformat: str = "KEA",
-    interp_method: int = rsgislib.INTERP_CUBIC,
+    interp_method: int = rsgislib.INTERP_NEAREST_NEIGHBOUR,
     in_wkt: str = None,
     no_data_val: float = 0.0,
     out_pxl_res: float = "image",
@@ -1751,29 +1965,32 @@ def reproject_image(
     gdal_options: list = [],
 ):
     """
-    This function provides a tool which uses the gdalwarp function to reproject an input image. When you want an simpler
-    interface use the rsgislib.imageutils.gdal_warp function. This handles more automatically.
-
-    Where:
+    This function provides a tool which uses the gdalwarp function to reproject an
+    input image. When you want an simpler interface use the
+    rsgislib.imageutils.gdal_warp function. This handles more automatically.
 
     :param input_img: the input image name and path
     :param output_img: the output image name and path
     :param out_wkt: a WKT file representing the output projection
     :param gdalformat: the output image file format (Default is KEA)
-    :param interp_method: interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average,
-                   mode. (Default is cubic)
-    :param in_wkt: if input image is not well defined this is the input image projection as a WKT file (Default
-                  is None, i.e., ignored)
+    :param interp_method: is the interpolation method used to resample the image
+                          rsgislib.INTERP_XXXX (Default:
+                          rsgislib.INTERP_NEAREST_NEIGHBOUR)
+    :param in_wkt: if input image is not well defined this is the input image
+                   projection as a WKT file (Default is None, i.e., ignored)
     :param no_data_val: float representing the not data value (Default is 0.0)
-    :param out_pxl_res: three inputs can be provided. 1) 'image' where the output resolution will match the input
-                      (Default is image). 2) 'auto' where an output resolution maintaining the image size of the
-                      input image will be used. You may consider using rsgislib.imageutils.gdal_warp instead of
-                      this option. 3) provide a floating point value for the image resolution (note. pixels will
-                      be sqaure)
-    :param snap_to_grid: is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel
-                      resolution (Default is True).
-    :param nCores: the number of processing cores available for processing (-1 is all cores: Default=-1)
-    :param gdal_options: GDAL file creation options e.g., ["TILED=YES", "COMPRESS=LZW", "BIGTIFF=YES"]
+    :param out_pxl_res: three inputs can be provided. 1) 'image' where the output
+                        resolution will match the input (Default is image). 2) 'auto'
+                        where an output resolution maintaining the image size of the
+                        input image will be used. You may consider using
+                        rsgislib.imageutils.gdal_warp instead of this option.
+                        3) provide a floating point value for the image resolution
+                        (note. pixels will be sqaure)
+    :param snap_to_grid: is a boolean specifying whether the TL pixel should be
+                         snapped to a multiple of the pixel resolution (Default: True)
+    :param multicore: use multiple cores for warpping (Default=False)
+    :param gdal_options: GDAL file creation options e.g., ["TILED=YES",
+                         "COMPRESS=LZW", "BIGTIFF=YES"]
 
     """
     import rsgislib.tools.utils
@@ -1975,17 +2192,21 @@ def gdal_warp(
     options: list = [],
 ):
     """
-    A function which runs GDAL Warp function to tranform an image from one projection to another. Use this function
-    when you want GDAL to do procesing of pixel size and image size automatically. rsgislib.imageutils.reproject_image
+    A function which runs GDAL Warp function to tranform an image from one projection
+    to another. Use this function when you want GDAL to do processing of pixel size
+    and image size automatically. rsgislib.imageutils.reproject_image
     should be used when you want to put the output image on a particular grid etc.
 
     :param input_img: input image file
     :param output_img: output image file
     :param out_epsg: the EPSG for the output image file.
-    :param interp_method: interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is near)
+    :param interp_method: is the interpolation method used to resample the image
+                          rsgislib.INTERP_XXXX (Default:
+                          rsgislib.INTERP_NEAREST_NEIGHBOUR)
     :param gdalformat: output image file format
     :param use_multi_threaded: Use multiple cores for processing (Default: True).
-    :param options: GDAL file creation options e.g., ["TILED=YES", "COMPRESS=LZW", "BIGTIFF=YES"]
+    :param options: GDAL file creation options e.g., ["TILED=YES", "COMPRESS=LZW",
+                    "BIGTIFF=YES"]
 
     """
     from osgeo import gdal
@@ -2052,11 +2273,13 @@ def subset_pxl_bbox(
     :param input_img: input image to be subset.
     :param output_img: output image file.
     :param gdalformat: output image file format
-    :param datatype: datatype is a rsgislib.TYPE_* value providing the data type of the output image.
+    :param datatype: datatype is a rsgislib.TYPE_* value providing the data
+                     type of the output image.
     :param x_min_pxl: min x in pixels
     :param x_max_pxl: max x in pixels
     :param y_min_pxl: min y in pixels
     :param y_max_pxl: max y in pixels
+
     """
     bbox = get_img_bbox(input_img)
     xRes, yRes = get_img_res(input_img, abs_vals=True)
@@ -2081,7 +2304,7 @@ def create_tiles_multi_core(
     gdalformat: str,
     datatype: int,
     out_img_ext: str,
-    ncores: int = 1,
+    n_cores: int = 1,
 ):
     """
     Function to generate a set of tiles for the input image.
@@ -2091,9 +2314,12 @@ def create_tiles_multi_core(
     :param width: width in pixels of the tiles.
     :param height: height in pixels of the tiles.
     :param gdalformat: output image file format
-    :param datatype: datatype is a rsgislib.TYPE_* value providing the data type of the output image.
-    :param out_img_ext: output file extension to be added to the baseimage path (e.g., kea)
-    :param ncores: number of cores to be used; uses python multiprocessing module.
+    :param datatype: datatype is a rsgislib.TYPE_* value providing the data type
+                     of the output image.
+    :param out_img_ext: output file extension to be added to the base image
+                        path (e.g., kea)
+    :param n_cores: number of cores to be used; uses python multiprocessing module.
+
     """
     import multiprocessing
 
@@ -2173,19 +2399,20 @@ def create_tiles_multi_core(
             tileinfo["bbox"][3],
         )
 
-    poolobj = multiprocessing.Pool(ncores)
+    poolobj = multiprocessing.Pool(n_cores)
     poolobj.map(_runSubset, tiles)
 
 
 def calc_pixel_locations(input_img: str, output_img: str, gdalformat: str):
     """
-    Function which produces a 2 band output image with the X and Y locations of the image pixels.
-
-    Where:
+    Function which produces a 2 band output image with the X and Y locations
+    of the image pixels.
 
     :param input_img: the input reference image
-    :param output_img: the output image file name and path (will be same dimensions as the input)
+    :param output_img: the output image file name and path (will be same
+                       dimensions as the input)
     :param gdalformat: the GDAL image file format of the output image file.
+
     """
     try:
         import tqdm
@@ -2280,18 +2507,17 @@ def do_images_overlap(in_a_img: str, in_b_img: str, over_thres: int = 0.0):
 
     :param in_a_img: path to first image
     :param in_b_img: path to second image
-    :param over_thres: the amount of overlap required to return true (e.g., at least 1 pixel)
+    :param over_thres: the amount of overlap required to return true
+                       (e.g., at least 1 pixel)
 
     :return: Boolean specifying whether they overlap or not.
 
     Example::
 
         import rsgislib.imageutils
-        img = "/Users/pete/Temp/LandsatStatsImgs/MSS/ClearSkyMsks/LS1MSS_19720823_lat52lon114_r24p218_osgb_clearsky.tif"
-        tile = "/Users/pete/Temp/LandsatStatsImgs/MSS/RefImages/LandsatWalesRegion_60m_tile8.kea"
+        overlap = rsgislib.imageutils.do_images_overlap("tile_8.kea", "input.tif")
+        print("Images Overlap: {}".format(overlap))
 
-        overlap = rsgislib.imageutils.do_images_overlap(tile, img)
-        print("Images Overlap: " + str(overlap))
     """
     import rsgislib.tools.geometrytools
 
@@ -2402,12 +2628,14 @@ def generate_random_pxl_vals_img(
     input_img: str, output_img: str, gdalformat: str, low_val: int, up_val: int
 ):
     """
-    Function which produces a 1 band image with random integer values between lowVal and upVal.
+    Function which produces a 1 band image with random integer values between
+    lowVal and upVal.
 
     Where:
 
     :param input_img: the input reference image
-    :param output_img: the output image file name and path (will be same dimensions as the input)
+    :param output_img: the output image file name and path (will be same dimensions
+                       as the input)
     :param gdalformat: the GDAL image file format of the output image file.
     :param low_val: lower value
     :param up_val: upper value
@@ -2455,10 +2683,10 @@ def extract_img_pxl_sample(
     input image file to a number array.
 
     :param input_img: the image from which the random sample will be taken.
-    :param pxl_n_sample: the sample to be taken (e.g., a value of 100 will sample every 100th,
-                       valid (if noData specified), pixel)
-    :param no_data_val: provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
-
+    :param pxl_n_sample: the sample to be taken (e.g., a value of 100 will
+                         sample every 100th, valid (if noData specified), pixel)
+    :param no_data_val: provide a no data value which is to be ignored during
+                        processing. If None then ignored (Default: None)
     :return: outputs a numpy array (n sampled values, n bands)
 
     """
@@ -2498,14 +2726,16 @@ def extract_img_pxl_vals_in_msk(
     no_data_val: float = None,
 ):
     """
-    A function which extracts the image values within a mask for the specified image bands.
+    A function which extracts the image values within a mask for the specified
+    image bands.
 
     :param input_img: the image from which the random sample will be taken.
     :param img_bands: the image bands the values are to be read from.
     :param in_msk_img: the image mask specifying the regions of interest.
-    :param img_mask_val: the pixel value within the mask defining the region of interest.
-
+    :param img_mask_val: the pixel value within the mask defining the region
+                         of interest.
     :return: outputs a numpy array (n values, n bands)
+
     """
     # Import the RIOS image reader
     from rios.imagereader import ImageReader
@@ -2645,16 +2875,23 @@ def gdal_translate(
     input_img: str, output_img: str, gdalformat: str = "KEA", options: str = ""
 ):
     """
-    Using GDAL translate to convert input image to a different format, if GTIFF selected
-    and no options are provided then a cloud optimised GeoTIFF will be outputted.
+    Using GDAL translate to convert input image to a different format, if GTIFF
+    selected and no options are provided then a cloud optimised GeoTIFF will be
+    outputted.
 
     :param input_img: Input image which is GDAL readable.
     :param output_img: The output image file.
     :param gdalformat: The output image file format
-    :param options: options for the output driver (e.g., "-co TILED=YES -co COMPRESS=LZW -co BIGTIFF=YES")
+    :param options: options for the output driver (e.g., "-co TILED=YES
+                    -co COMPRESS=LZW -co BIGTIFF=YES")
+
     """
     if (gdalformat == "GTIFF") and (options == ""):
-        options = "-co TILED=YES -co INTERLEAVE=PIXEL -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COMPRESS=LZW -co BIGTIFF=YES -co COPY_SRC_OVERVIEWS=YES"
+        options = (
+            "-co TILED=YES -co INTERLEAVE=PIXEL -co BLOCKXSIZE=256 "
+            "-co BLOCKYSIZE=256 -co COMPRESS=LZW -co BIGTIFF=YES "
+            "-co COPY_SRC_OVERVIEWS=YES"
+        )
 
     try:
         import tqdm
@@ -2672,11 +2909,12 @@ def gdal_translate(
 
 def create_stack_images_vrt(input_imgs: str, out_vrt_file: str):
     """
-    A function which creates a GDAL VRT file from a set of input images by stacking the input images
-    in a multi-band output file.
+    A function which creates a GDAL VRT file from a set of input images by stacking
+    the input images in a multi-band output file.
 
     :param input_imgs: A list of input images
     :param out_vrt_file: The output file location for the VRT.
+
     """
     try:
         import tqdm
@@ -2699,8 +2937,8 @@ def create_mosaic_images_vrt(
 
     :param input_imgs: A list of input images
     :param out_vrt_file: The output file location for the VRT.
-    :param vrt_extent: An optional (If None then ignored) extent (minX, minY, maxX, maxY)
-                       for the VRT image.
+    :param vrt_extent: An optional (If None then ignored) extent
+                       (minX, minY, maxX, maxY) for the VRT image.
     """
     try:
         import tqdm
@@ -2722,8 +2960,8 @@ def create_vrt_band_subset(input_img: str, img_bands: list, out_vrt_img: str):
     the input list.
 
     :param input_img: the input GDAL image
-    :param img_bands: a list of bands (in the order they will be in the VRT). Note, band
-                  numbering starts at 1.
+    :param img_bands: a list of bands (in the order they will be in the VRT). Note,
+                      band numbering starts at 1.
     :param out_vrt_img: the output VRT file.
 
     """
@@ -2743,16 +2981,19 @@ def subset_to_vec(
     vec_epsg: int = None,
 ):
     """
-    A function which subsets an input image using the extent of a vector layer where the
-    input vector can be a different projection to the input image. Reprojection will be handled.
+    A function which subsets an input image using the extent of a vector layer where
+    the input vector can be a different projection to the input image. Reprojection
+    will be handled.
 
     :param input_img: Input Image file.
     :param output_img: Output Image file.
     :param gdalformat: Output image file format.
     :param roi_vec_file: The input vector file.
     :param roi_vec_lyr: The name of the input layer.
-    :param datatype: Output image data type. If None then the datatype of the input image will be used.
-    :param vec_epsg: If projection is poorly defined by the vector layer then it can be specified.
+    :param datatype: Output image data type. If None then the datatype of the input
+                     image will be used.
+    :param vec_epsg: If projection is poorly defined by the vector layer then it can
+                     be specified.
     """
     import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
@@ -2791,7 +3032,8 @@ def subset_to_vec(
         )
     else:
         raise Exception(
-            "The image and vector do not intersect and therefore the image cannot be subset."
+            "The image and vector do not intersect and "
+            "therefore the image cannot be subset."
         )
 
 
@@ -2816,8 +3058,10 @@ def mask_img_with_vec(
     :param roi_vec_lyr: The name of the input layer.
     :param tmp_dir: a temporary directory for files generated during processing.
     :param outvalue: The output value in the regions masked.
-    :param datatype: Output image data type. If None then the datatype of the input image will be used.
-    :param vec_epsg: If projection is poorly defined by the vector layer then it can be specified.
+    :param datatype: Output image data type. If None then the datatype of the
+                     input image will be used.
+    :param vec_epsg: If projection is poorly defined by the vector layer then it
+                     can be specified.
 
     """
     import rsgislib
@@ -2893,10 +3137,11 @@ def create_valid_mask(
     img_band_info: list, out_msk_file: str, gdalformat: str, tmp_dir: str
 ):
     """
-    A function to create a single valid mask from the intersection of the valid masks for all the input
-    images.
+    A function to create a single valid mask from the intersection of the valid masks
+    for all the input images.
 
-    :param img_band_info: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and and bands of interest.
+    :param img_band_info: A list of rsgislib.imageutils.ImageBandInfo objects to
+                          define the images and and bands of interest.
     :param out_msk_file: A output image file and path
     :param gdalformat: The output file format.
     :param tmp_dir: A directory for temporary outputs created during the processing.
@@ -2938,8 +3183,10 @@ def get_img_pxl_values(input_img: str, img_band: int, x_coords: float, y_coords:
 
     :param input_img: The input image name and path
     :param img_band: The band within the input image.
-    :param x_coords: A numpy array of image X coordinates (in the image pixel coordinates)
-    :param y_coords: A numpy array of image Y coordinates (in the image pixel coordinates)
+    :param x_coords: A numpy array of image X coordinates (in the image pixel
+                     coordinates)
+    :param y_coords: A numpy array of image Y coordinates (in the image pixel
+                     coordinates)
     :return: An array of image pixel values.
 
     """
@@ -2980,9 +3227,12 @@ def set_img_pxl_values(
 
     :param input_img: The input image name and path
     :param img_band: The band within the input image.
-    :param x_coords: A numpy array of image X coordinates (in the image pixel coordinates)
-    :param y_coords: A numpy array of image Y coordinates (in the image pixel coordinates)
-    :param pxl_value: The value to set the image pixel to (specified by the x/y coordinates)
+    :param x_coords: A numpy array of image X coordinates (in the image pixel
+                     coordinates)
+    :param y_coords: A numpy array of image Y coordinates (in the image pixel
+                     coordinates)
+    :param pxl_value: The value to set the image pixel to (specified by the x/y
+                      coordinates)
 
     """
     from osgeo import gdal
@@ -3016,19 +3266,21 @@ def assign_random_pxls(
     seed: int = None,
 ):
     """
-    A function which can generate a set of random pixels. Can honor the image no data value
-    and use an edge buffer so pixels are not identified near the image edge.
+    A function which can generate a set of random pixels. Can honor the image no
+    data value and use an edge buffer so pixels are not identified near the image edge.
 
     :param input_img: The input image providing the reference area and no data value.
     :param output_img: The output image with the random pixels.
     :param n_pts: The number of pixels to be sampled.
     :param img_band: The image band from the input image used for the no data value.
     :param gdalformat: The file format of the output image.
-    :param edge_pxl: The edge pixel buffer, in pixels. This is a buffer around the edge of
-                     the image within which pixels will not be identified. (Default: 0)
-    :param use_no_data: A boolean specifying whether the image no data value should be used. (Default: True)
-    :param seed: A random seed for generating the pixel locations. If None then a different
-                 seed is used each time the system is executed. (Default None)
+    :param edge_pxl: The edge pixel buffer, in pixels. This is a buffer around the
+                     edge of the image within which pixels will not be identified.
+                     (Default: 0)
+    :param use_no_data: A boolean specifying whether the image no data value should
+                        be used. (Default: True)
+    :param seed: A random seed for generating the pixel locations. If None then a
+                 different seed is used each time the system is executed (Default None).
 
     Example::
 
@@ -3109,9 +3361,12 @@ def check_img_lst(
     :param input_imgs: a list of input images
     :param exp_x_res: the expected image resolution in the x-axis
     :param exp_y_res: the expected image resolution in the y-axis
-    :param bbox: a bbox (MinX, MaxX, MinY, MaxY) where intersection will be tested. Default None and ignored.
-    :param print_errors: if True then images with errors will be printed to the console. Default: True
-    :return: a list of images which have passed resolution and optional bbox intersection test.
+    :param bbox: a bbox (MinX, MaxX, MinY, MaxY) where intersection will be tested.
+                 Default None and ignored.
+    :param print_errors: if True then images with errors will be printed to the
+                         console. Default: True
+    :return: a list of images which have passed resolution and optional bbox
+             intersection test.
 
     """
     import rsgislib.tools.geometrytools
@@ -3153,9 +3408,12 @@ def check_img_file_comparison(
 
     :param in_base_img: base input image which will be compared to
     :param in_comp_img: the input image which will be compared to the base.
-    :param test_n_bands: if true the number of image bands will be checked (i.e., the same)
-    :parma test_eql_bbox: if true then the bboxes will need to be identical between the images.
-    :param print_errors: if True then images with errors will be printed to the console. Default: True
+    :param test_n_bands: if true the number of image bands will be checked
+                         (i.e., the same)
+    :parma test_eql_bbox: if true then the bboxes will need to be identical
+                          between the images.
+    :param print_errors: if True then images with errors will be printed to the
+                         console. Default: True
     :return: Boolean (True; images are compariable)
 
     """
@@ -3200,9 +3458,9 @@ def check_img_file_comparison(
 
 def test_img_lst_intersects(input_imgs: list, stop_err: bool = False):
     """
-    A function which will test a list of image to check if they intersect, have matching image
-    resolution and projection. The first image in the list is used as the reference to which all
-    others are compared to.
+    A function which will test a list of image to check if they intersect,
+    have matching image resolution and projection. The first image in the list is
+    used as the reference to which all others are compared to.
 
     :param input_imgs: list of images file paths
     :param stop_err: boolean. Default: False.
@@ -3250,7 +3508,8 @@ def test_img_lst_intersects(input_imgs: list, stop_err: bool = False):
                     )
             elif (img_res[0] != ref_res[0]) or (img_res[1] != ref_res[1]):
                 print(
-                    "\tImage resolution does not match the reference (i.e., first image)"
+                    "\tImage resolution does not match the reference "
+                    "(i.e., first image)"
                 )
                 print("\tRef (first) Image: {}".format(ref_img))
                 print("\tRef (first) Res: ", ref_res)
@@ -3258,7 +3517,8 @@ def test_img_lst_intersects(input_imgs: list, stop_err: bool = False):
                 print("\tImage Res: ", img_res)
                 if stop_err:
                     raise Exception(
-                        "Image resolution does not match the reference (i.e., first image)"
+                        "Image resolution does not match the reference "
+                        "(i.e., first image)"
                     )
             else:
                 print("\tOK")
@@ -3283,8 +3543,10 @@ def whiten_image(
 
     :param input_img: the input image
     :param valid_msk_img: a valid input image mask
-    :param valid_msk_val: the pixel value in the mask image specifying valid image pixels.
-    :param output_img: the output image file name and path (will be same dimensions as the input)
+    :param valid_msk_val: the pixel value in the mask image specifying valid
+                          image pixels.
+    :param output_img: the output image file name and path (will be same dimensions
+                       as the input)
     :param gdalformat: the GDAL image file format of the output image file.
 
     """
@@ -3432,10 +3694,12 @@ def spectral_smoothing(
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
     :param win_len: the window length for the Savitzky-Golay filter (Default: 5)
-    :param polyorder: the order of the polynomial for the Savitzky-Golay filter (Default: 3)
+    :param polyorder: the order of the polynomial for the Savitzky-Golay filter
+                      (Default: 3)
     :param gdalformat: the output file format. (Default: KEA)
     :param datatype: the output image datatype (Default: Float 32)
-    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
+    :param calc_stats: Boolean specifying whether to calculate pyramids and
+                       metadata stats (Default: True)
 
     """
     from rios import applier
@@ -3512,7 +3776,8 @@ def spectral_smoothing(
 
 def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KEA"):
     """
-    A function which calculates the x and y pixel resolution (in metres) of each pixel projected in WGS84.
+    A function which calculates the x and y pixel resolution (in metres) of each
+    pixel projected in WGS84.
 
     :param input_img: input image, for which the per-pixel area will be calculated.
     :param output_img: output image file.
@@ -3583,6 +3848,7 @@ def mask_all_band_zero_vals(
     :param output_img: the output image file name and path
     :param gdalformat: the GDAL image file format of the output image file.
     :param out_val: Output pixel band value (default: 1)
+
     """
     from rios import applier
     import numpy
