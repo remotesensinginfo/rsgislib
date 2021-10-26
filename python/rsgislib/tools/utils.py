@@ -410,7 +410,7 @@ def hex_to_rgb(hex_str:str):
     Example:
 
     .. code:: python
-    
+
         import rsgislib.tools.utils
         r, g, b = rsgislib.tools.utils.hex_to_rgb("#b432be")
 

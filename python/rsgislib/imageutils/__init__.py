@@ -330,7 +330,7 @@ def define_colour_table(input_img: str, clr_lut: dict, img_band:int =1):
     """
     A function which defines specific colours for image values for a colour
     table. Note, this function must be used to thematic images which use
-    int pixel values.
+    int pixel values and replaces the existing colour table.
 
     :param input_img: input image path
     :param clr_lut: a dict with the pixel value as the key with a single value or
@@ -341,11 +341,23 @@ def define_colour_table(input_img: str, clr_lut: dict, img_band:int =1):
                     hexadecimal value for RGB (e.g., #b432be).
     :param img_band: int specifying the band for the colour table (default = 1)
 
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+
+        clr_lut = dict()
+        clr_lut[1] = '#009600'
+        clr_lut[2] = '#FFE5CC'
+        clr_lut[3] = '#CCFFE5'
+        rsgislib.imageutils.define_colour_table("cls_img.tif", clr_lut)
+
     """
     import rsgislib.tools.utils
     gdal_ds = gdal.Open(input_img, gdal.GA_Update)
     gdal_band = gdal_ds.GetRasterBand(img_band)
-    clr_tbl = gdal_band.GetColorTable()
+    clr_tbl = gdal.ColorTable()
     for pxl_val in clr_lut:
         if isinstance(clr_lut[pxl_val], str):
             r, g, b = rsgislib.tools.utils.hex_to_rgb(clr_lut[pxl_val])
