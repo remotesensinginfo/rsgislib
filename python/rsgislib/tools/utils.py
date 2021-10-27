@@ -45,13 +45,13 @@ def is_number(str_val: str):
 
 
 def zero_pad_num_str(
-    num_val,
-    str_len=3,
-    round_num=False,
-    round_n_digts=0,
-    integerise=False,
-    absolute=False,
-    gain=1,
+    num_val: float,
+    str_len: int = 3,
+    round_num: bool = False,
+    round_n_digts: int = 0,
+    integerise: bool = False,
+    absolute: bool = False,
+    gain: float = 1,
 ):
     """
     A function which zero pads a number to make a string
@@ -79,7 +79,7 @@ def zero_pad_num_str(
     return num_str
 
 
-def powerset_iter(in_set):
+def powerset_iter(in_set: list):
     """
     A function which returns an iterator (generator) for all the subsets
     of the inputted set (i.e., the powerset)
@@ -96,7 +96,7 @@ def powerset_iter(in_set):
             yield item
 
 
-def powerset_lst(in_set, min_items=0):
+def powerset_lst(in_set: list, min_items: int = 0):
     """
     A function which returns a list for all the subsets
     of the inputted set (i.e., the powerset)
@@ -244,7 +244,7 @@ def write_dict_to_json(data_dict: dict, out_file: str):
         )
 
 
-def write_dict_to_json_gz(data_dict: dict, out_file: str, encoding="utf-8"):
+def write_dict_to_json_gz(data_dict: dict, out_file: str, encoding: str = "utf-8"):
     """
     Write some data to a JSON file compressed with gzip. The data would commonly be
     structured as a dict but could also be a list.
@@ -280,7 +280,7 @@ def read_json_to_dict(input_file: str):
     return data
 
 
-def read_gz_json_to_dict(input_file: str, encoding="utf-8"):
+def read_gz_json_to_dict(input_file: str, encoding: str = "utf-8"):
     """
     Read a JSON file. Will return a list or dict.
 
@@ -299,7 +299,7 @@ def read_gz_json_to_dict(input_file: str, encoding="utf-8"):
     return data
 
 
-def create_var_list(in_vals_lsts, val_dict=None):
+def create_var_list(in_vals_lsts: dict, val_dict: dict = None):
     """
     A function which will produce a list of dictionaries with all the combinations
     of the input variables listed (i.e., the powerset).
@@ -357,7 +357,7 @@ def create_var_list(in_vals_lsts, val_dict=None):
     return out_vars
 
 
-def in_bounds(x, lower, upper, upper_strict=False):
+def in_bounds(x: numpy.array, lower: float, upper: float, upper_strict: bool = False):
     """
     Checks whether a value or array of values is within specified bounds.
 
@@ -374,7 +374,7 @@ def in_bounds(x, lower, upper, upper_strict=False):
         return lower <= numpy.min(x) and numpy.max(x) <= upper
 
 
-def mixed_signs(x):
+def mixed_signs(x: numpy.array):
     """
     Check whether an array of numbers has a mix of positive and negative values.
 
@@ -385,7 +385,7 @@ def mixed_signs(x):
     return numpy.min(x) < 0 and numpy.max(x) >= 0
 
 
-def negative(x):
+def negative(x: numpy.array):
     """
     Is the maximum number in the list negative.
     :param x: list of values
@@ -396,7 +396,7 @@ def negative(x):
     return numpy.max(x) < 0
 
 
-def is_odd(number):
+def is_odd(number: float):
     """
     A function which tests whether a number is odd
 
@@ -441,7 +441,7 @@ def hex_to_rgb(hex_str: str):
     return int(r_hex, 16), int(g_hex, 16), int(b_hex, 16)
 
 
-def remove_repeated_chars(str_val, repeat_char):
+def remove_repeated_chars(str_val: str, repeat_char: str):
     """
     A function which removes repeated characters within a string for the
     specified character
@@ -466,7 +466,11 @@ def remove_repeated_chars(str_val, repeat_char):
 
 
 def check_str(
-    str_val, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_punc=False
+    str_val: str,
+    rm_non_ascii: bool = False,
+    rm_dashs: bool = False,
+    rm_spaces: bool = False,
+    rm_punc: bool = False,
 ):
     """
     A function which can check a string removing spaces (replaced with underscores),
@@ -514,7 +518,7 @@ def check_str(
     return str_val_tmp
 
 
-def get_days_since(year, day_of_year, base_date):
+def get_days_since(year: int, day_of_year: int, base_date: datetime.date):
     """
     Calculate the number of days from a base data to a defined year/day.
 
@@ -531,7 +535,7 @@ def get_days_since(year, day_of_year, base_date):
     return (date_val - base_date).days
 
 
-def get_days_since_date(year, month, day, base_date):
+def get_days_since_date(year: int, month: int, day, base_date: datetime.date):
     """
     Calculate the number of days from a base data to a defined year/day.
 
@@ -548,12 +552,14 @@ def get_days_since_date(year, month, day, base_date):
     return (date_val - base_date).days
 
 
-def dict_struct_does_path_exist(dict_struct_obj, tree_sequence):
+def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: list):
     """
     A function which tests whether a path exists within JSON file.
+
     :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
     :param tree_sequence: list of strings specifying the path within the structure
     :return: boolean
+
     """
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
@@ -568,13 +574,19 @@ def dict_struct_does_path_exist(dict_struct_obj, tree_sequence):
     return pathExists
 
 
-def dict_struct_get_str_value(dict_struct_obj, tree_sequence, valid_values=None):
+def dict_struct_get_str_value(
+    dict_struct_obj: dict, tree_sequence: list, valid_values: list = None
+):
     """
     A function which retrieves a single string value from a JSON structure.
+
     :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
     :param tree_sequence: list of strings specifying the path within the structure
-    :param valid_values:
-    :return:
+    :param valid_values: An optional list of valid values. An exception will be
+                         thrown if a list is provided and the string value found
+                         is not within the list.
+    :return: the string value at the path provided.
+
     """
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
@@ -594,12 +606,14 @@ def dict_struct_get_str_value(dict_struct_obj, tree_sequence, valid_values=None)
     return curr_dict_struct_obj
 
 
-def dict_struct_get_boolean_value(dict_struct_obj, tree_sequence):
+def dict_struct_get_boolean_value(dict_struct_obj: dict, tree_sequence: list):
     """
     A function which retrieves a single boolean value from a JSON structure.
+
     :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
     :param tree_sequence: list of strings specifying the path within the structure
-    :return:
+    :return: boolean value.
+
     """
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
@@ -618,15 +632,18 @@ def dict_struct_get_boolean_value(dict_struct_obj, tree_sequence):
     return rtn_bool
 
 
-def dict_struct_get_date_value(dict_struct_obj, tree_sequence, date_format="%Y-%m-%d"):
+def dict_struct_get_date_value(
+    dict_struct_obj: dict, tree_sequence: list, date_format: str = "%Y-%m-%d"
+):
     """
     A function which retrieves a single date value from a JSON structure.
-    :param date_format:
+
     :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
     :param tree_sequence: list of strings specifying the path within the structure
     :param date_format: a string or list of strings for the date/time format
                              to be parsed by datetime.datetime.strptime.
-    :return:
+    :return: a date object with the value at the path specified.
+
     """
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
@@ -667,7 +684,9 @@ def dict_struct_get_date_value(dict_struct_obj, tree_sequence, date_format="%Y-%
 
 
 def dict_struct_get_datetime_value(
-    dict_struct_obj, tree_sequence, date_time_format="%Y-%m-%dT%H:%M:%S.%f"
+    dict_struct_obj: dict,
+    tree_sequence: list,
+    date_time_format: str = "%Y-%m-%dT%H:%M:%S.%f",
 ):
     """
     A function which retrieves a single date value from a JSON structure.
@@ -676,7 +695,7 @@ def dict_struct_get_datetime_value(
     :param tree_sequence: list of strings specifying the path within the structure
     :param date_time_format: a string or list of strings for the date/time format
                              to be parsed by datetime.datetime.strptime.
-    :return:
+    :return: datetime object with the value at the path provided.
     """
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
@@ -717,14 +736,19 @@ def dict_struct_get_datetime_value(
     return out_datetime_obj
 
 
-def dict_struct_get_str_list_value(dict_struct_obj, tree_sequence, valid_values=None):
+def dict_struct_get_str_list_value(
+    dict_struct_obj: dict, tree_sequence: list, valid_values: list = None
+):
     """
     A function which retrieves a list of string values from a JSON structure.
 
     :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
     :param tree_sequence: list of strings specifying the path within the structure
-    :param valid_values: optional list of valid values.
-    :return:
+    :param valid_values: An optional list of valid values. An exception will be
+                         thrown if a list is provided and a string value found
+                         is not within the list.
+    :return: list of strings
+
     """
     curr_dict_struct_obj = dict_struct_obj
     steps_str = ""
@@ -751,7 +775,10 @@ def dict_struct_get_str_list_value(dict_struct_obj, tree_sequence, valid_values=
 
 
 def dict_struct_get_numeric_value(
-    dict_struct_obj, tree_sequence, valid_lower=None, valid_upper=None
+    dict_struct_obj: dict,
+    tree_sequence: list,
+    valid_lower: float = None,
+    valid_upper: float = None,
 ):
     """
     A function which retrieves a single numeric value from a JSON structure.
@@ -805,13 +832,13 @@ def dict_struct_get_numeric_value(
     return out_value
 
 
-def dict_struct_get_list_value(dict_struct_obj, tree_sequence):
+def dict_struct_get_list_value(dict_struct_obj: dict, tree_sequence: list):
     """
     A function which retrieves a list of values from a JSON structure.
 
     :param dict_struct_obj: the structure of dicts (i.e., JSON) to be searched
     :param tree_sequence: list of strings  specifying the path within the structure
-    :return:
+    :return: list of values
 
     """
     curr_dict_struct_obj = dict_struct_obj
