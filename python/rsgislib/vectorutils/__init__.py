@@ -671,7 +671,7 @@ def reproj_vector_layer(
 
 
 def reproj_vec_lyr_obj(
-    vec_lyr_obj:ogr.Layer,
+    vec_lyr_obj: ogr.Layer,
     out_vec_file: str,
     out_epsg: int,
     out_format: str = "MEMORY",
@@ -820,6 +820,7 @@ def get_att_lst_select_feats(vec_file, vec_lyr, att_names, vec_sel_file, vec_sel
     :param vec_sel_file: the vector file which will be intersected within the vector file.
     :param vec_sel_lyr: the layer name which will be intersected within the vector file.
     :return: list of dictionaries with the output values.
+
     """
     gdal.UseExceptions()
     att_vals = []
@@ -915,8 +916,8 @@ def get_att_lst_select_feats_lyr_objs(vec_lyr_obj, att_names, vec_sel_lyr_obj):
     :param vec_lyr_obj: the OGR layer object from which the attribute data comes from.
     :param att_names: a list of attribute names to be outputted.
     :param vec_sel_lyr_obj: the OGR layer object which will be intersected within the vector file.
-
     :return: list of dictionaries with the output values.
+
     """
     gdal.UseExceptions()
     att_vals = []
@@ -998,8 +999,8 @@ def get_att_lst_select_bbox_feats(vec_file, vec_lyr, att_names, bbox, bbox_epsg=
     :param att_names: a list of attribute names to be outputted.
     :param bbox: the bounding box for the region of interest (xMin, xMax, yMin, yMax).
     :param bbox_epsg: the projection of the BBOX (if None then ignore).
-
     :return: list of dictionaries with the output values.
+
     """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
@@ -1028,8 +1029,8 @@ def get_att_lst_select_bbox_feats_lyr_objs(
     :param att_names: a list of attribute names to be outputted.
     :param bbox: the bounding box for the region of interest (xMin, xMax, yMin, yMax).
     :param bbox_epsg: the projection of the BBOX (if None then ignore).
-
     :return: list of dictionaries with the output values.
+
     """
     gdal.UseExceptions()
     outvals = []
@@ -1150,6 +1151,7 @@ def select_intersect_feats(
     :param out_vec_file: the vector file which will be outputted.
     :param out_vec_lyr: the layer name which will be outputted.
     :param out_format: output vector format (default GPKG)
+
     """
     gdal.UseExceptions()
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
@@ -1204,6 +1206,7 @@ def export_spatial_select_feats(
     :param out_vec_file: output vector file/path
     :param out_vec_lyr: output vector layer
     :param out_format: the output vector layer type.
+
     """
     gdal.UseExceptions()
     att_vals = []
@@ -1293,6 +1296,7 @@ def bbox_intersects_vec_lyr(vec_file, vec_lyr, bbox):
     :param vec_lyr: vector layer name
     :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
     :returns: boolean (True = Intersection)
+
     """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
@@ -1330,6 +1334,7 @@ def get_vec_lyr_cols(vec_file, vec_lyr):
     :param vec_file: input vector file.
     :param vec_lyr: input vector layer
     :returns: list of column names
+
     """
     gdal.UseExceptions()
     atts = []
@@ -1355,9 +1360,10 @@ def subset_envs_vec_lyr_obj(vec_lyr_obj, bbox, epsg=None):
 
     :param vec_lyr_obj: OGR Layer Object.
     :param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
-    :param epsg: provide an EPSG code for the layer if not well defined by the input layer.
-
+    :param epsg: provide an EPSG code for the layer if not well defined by
+                 the input layer.
     :return: OGR Layer and Dataset objects.
+
     """
     gdal.UseExceptions()
     if vec_lyr_obj is None:
@@ -1462,18 +1468,14 @@ def subset_veclyr_to_featboxs(
     :param out_format: The output file driver (e.g., GPKG).
 
     """
-    bboxes = rsgislib.vectorutils.get_feat_envs(vec_file_bbox, vec_lyr_bbox)
+    bboxes = get_feat_envs(vec_file_bbox, vec_lyr_bbox)
     print("There are {} bboxes to subset to.".format(len(bboxes)))
     for i in range(len(bboxes)):
         print(bboxes[i])
-        grid_02d_ds, grid_02d_lyr = rsgislib.vectorutils.read_vec_lyr_to_mem(
-            vec_file_tosub, vec_lyr_tosub
-        )
-        mem_result_ds, mem_result_lyr = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
-            grid_02d_lyr, bboxes[i]
-        )
+        grid_02d_ds, grid_02d_lyr = read_vec_lyr_to_mem(vec_file_tosub, vec_lyr_tosub)
+        mem_result_ds, mem_result_lyr = subset_envs_vec_lyr_obj(grid_02d_lyr, bboxes[i])
         out_vec_file = "{0}{1}{2}".format(out_file_base, i, out_file_end)
-        rsgislib.vectorutils.write_vec_lyr_to_file(
+        write_vec_lyr_to_file(
             mem_result_lyr,
             out_vec_file,
             out_lyr_name,
@@ -1491,8 +1493,8 @@ def read_vec_lyr_to_mem(vec_file, vec_lyr):
 
     :param vec_file: input vector file
     :param vec_lyr: input vector layer within the input file.
+    :returns: ogr_dataset, ogr_layer
 
-    :return: ogr_dataset, ogr_layer
     """
     gdal.UseExceptions()
     try:
@@ -1524,7 +1526,8 @@ def open_gdal_vec_lyr(vec_file, vec_lyr=None):
 
     :param vec_file: the file path to the vector file.
     :param vec_lyr: the name of the vector layer. If None then first layer is returned.
-    :return: GDAL dataset, GDAL Layer
+    :returns: GDAL dataset, GDAL Layer
+
     """
     vec_obj_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vec_obj_ds is None:
@@ -1550,8 +1553,8 @@ def get_mem_vec_lyr_subset(vec_file, vec_lyr, bbox):
     :param vec_file: vector layer from which the attribute data comes from.
     :param vec_lyr: the layer name from which the attribute data comes from.
     :param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+    :returns: OGR Layer and Dataset objects.
 
-    :return: OGR Layer and Dataset objects.
     """
     gdal.UseExceptions()
     try:
@@ -1652,8 +1655,10 @@ def get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(rat_datatype):
     Returns the data type to create a column in a OGR vector layer for equalivant to
     rat_datatype.
 
-    :param rat_datatype: the datatype (GFT_Integer, GFT_Real, GFT_String) for the RAT column.
-    :return: OGR datatype (OFTInteger, OFTReal, OFTString)
+    :param rat_datatype: the datatype (GFT_Integer, GFT_Real, GFT_String) for
+                         the RAT column.
+    :returns: OGR datatype (OFTInteger, OFTReal, OFTString)
+
     """
     if rat_datatype == gdal.GFT_Integer:
         rtn_type = ogr.OFTInteger
@@ -1676,19 +1681,23 @@ def copy_rat_cols_to_vector_lyr(
     out_col_types=None,
 ):
     """
-    A function to copy columns from RAT to a vector layer. Note, the vector layer needs a column, which already exists,
-    that specifies the row from the RAT the feature is related to. If you created the vector using the polygonise
+    A function to copy columns from RAT to a vector layer. Note, the vector layer
+    needs a column, which already exists, that specifies the row from the RAT the
+    feature is related to. If you created the vector using the polygonise
     function then that column will have been created and called 'PXLVAL'.
 
     :param vec_file: The vector file to be used.
     :param vec_lyr: The name of the layer within the vector file.
-    :param rat_row_col: The column in the layer which specifies the RAT row the feature corresponds with.
-    :param clumps_img: The clumps image with the RAT from which information should be taken.
+    :param rat_row_col: The column in the layer which specifies the RAT row the
+                        feature corresponds with.
+    :param clumps_img: The clumps image with the RAT from which information
+                       should be taken.
     :param ratcols: The names of the columns in the RAT to be copied.
-    :param out_col_names: If you do not want the same column names as the RAT then you can specify alternatives. If None
-                        then the names will be the same as the RAT. (Default = None)
-    :param out_col_types: The data types used for the columns in vector layer. If None then matched to RAT.
-                        Default is None
+    :param out_col_names: If you do not want the same column names as the RAT then
+                          you can specify alternatives. If None then the names will
+                          be the same as the RAT. (Default = None)
+    :param out_col_types: The data types used for the columns in vector layer. If None
+                          then matched to RAT. Default is None
 
     """
     gdal.UseExceptions()
@@ -1699,17 +1708,16 @@ def copy_rat_cols_to_vector_lyr(
     else:
         if len(out_col_names) != len(ratcols):
             raise Exception(
-                "The output columns names list is not the same length ({}) as the length of "
-                "the RAT columns list ({}) - they must be the same.".format(
-                    len(out_col_names), len(ratcols)
-                )
+                "The output columns names list is not the same length ({}) as "
+                "the length of the RAT columns list ({}) - they must be "
+                "the same.".format(len(out_col_names), len(ratcols))
             )
 
     if out_col_types is not None:
         if len(out_col_names) == len(out_col_types):
             raise Exception(
-                "Either specify the column types as None or the length of the list needs to be "
-                "the same as the number output columns."
+                "Either specify the column types as None or the length of the "
+                "list needs to be the same as the number output columns."
             )
 
     if not os.path.exists(vec_file):
@@ -1774,7 +1782,8 @@ def copy_rat_cols_to_vector_lyr(
             field_defn = ogr.FieldDefn(att_column, out_col_types[col_n])
             if vec_lyr_obj.CreateField(field_defn) != 0:
                 raise Exception(
-                    "Creating '{}' field failed; becareful with case, some drivers are case insensitive but column might not be found.".format(
+                    "Creating '{}' field failed; becareful with case, some drivers "
+                    "are case insensitive but column might not be found.".format(
                         att_column
                     )
                 )
@@ -1855,25 +1864,38 @@ def perform_spatial_join(
 
     For more information see: http://geopandas.org/mergingdata.html#spatial-joins
 
-    :param vec_base_file: the base vector file with the geometries which will be outputted.
-    :param vec_join_file: the vector with the attributes which will be joined to the base vector geometries.
+    :param vec_base_file: the base vector file with the geometries which will
+                          be outputted.
+    :param vec_join_file: the vector with the attributes which will be joined to
+                          the base vector geometries.
     :param out_vec_file: the output vector file.
-    :param vec_base_lyr: the layer name for the base vector, not needed if input file is a shapefile (Default None).
-    :param vec_join_lyr: the layer name for the join vector, not needed if input file is a shapefile (Default None).
-    :param out_vec_lyr: the layer name for the output vector, not needed if input file is a shapefile (Default None).
-    :param out_format: The output vector file format, if none then shapefile outputted (Default None)
-    :param join_how: Specifies the type of join that will occur and which geometry is retained. The options are
-                    [left, right, inner]. The default is 'inner'
-    :param join_op: Defines whether or not to join the attributes of one object to another.
-                   The options are [intersects, within, contains] and default is 'within'
+    :param vec_base_lyr: the layer name for the base vector, not needed if input file
+                         is a shapefile (Default None).
+    :param vec_join_lyr: the layer name for the join vector, not needed if input file
+                         is a shapefile (Default None).
+    :param out_vec_lyr: the layer name for the output vector, not needed if input file
+                        is a shapefile (Default None).
+    :param out_format: The output vector file format, if none then shapefile
+                       outputted (Default None)
+    :param join_how: Specifies the type of join that will occur and which geometry
+                     is retained. The options are [left, right, inner]. The default
+                     is 'inner'
+    :param join_op: Defines whether or not to join the attributes of one object
+                    to another. The options are [intersects, within, contains]
+                    and default is 'within'
+
     """
     if join_how not in ["left", "right", "inner"]:
         raise Exception("The join_how specifed is not valid.")
     if join_op not in ["intersects", "within", "contains"]:
         raise Exception("The join_op specifed is not valid.")
 
-    import geopandas  # Import geopandas module.
-    import rtree  # this is imported to provide useful error message as will be used in sjoin but if not present
+    # Import geopandas module.
+    import geopandas
+
+    # this is imported to provide useful error message as
+    # will be used in sjoin but if not present
+    import rtree
 
     # the error message is not very user friendly:
     # AttributeError: 'NoneType' object has no attribute 'intersection'
@@ -1903,16 +1925,19 @@ def does_vmsk_img_intersect(
     input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir, vec_epsg=None
 ):
     """
-    This function checks whether the input binary raster mask intesects with the input vector
-    layer. A check is first done as to whether the bounding boxes intersect, if they do then
-    the intersection between the images is then calculated. The input image and vector can be
-    in different projections but the projection needs to be well defined.
+    This function checks whether the input binary raster mask intesects with the
+    input vector layer. A check is first done as to whether the bounding boxes
+    intersect, if they do then the intersection between the images is then calculated.
+    The input image and vector can be in different projections but the projection
+    needs to be well defined.
 
     :param input_vmsk_img: Input binary mask image file.
     :param vec_roi_file: The input vector file.
     :param vec_roi_lyr: The name of the input layer.
     :param tmp_dir: a temporary directory for files generated during processing.
-    :param vec_epsg: If projection is poorly defined by the vector layer then it can be specified.
+    :param vec_epsg: If projection is poorly defined by the vector layer then
+                     it can be specified.
+
     """
     import rsgislib.imagecalc
     import rsgislib.tools.utils
@@ -2000,8 +2025,8 @@ def merge_to_multi_layer_vec(
     input_file_lyrs, out_vec_file, format="GPKG", overwrite=True
 ):
     """
-    A function which takes a list of vector files and layers (as VecLayersInfoObj objects)
-    and merged them into a multi-layer vector file.
+    A function which takes a list of vector files and layers (as VecLayersInfoObj
+    objects) and merged them into a multi-layer vector file.
 
     :param input_file_lyrs: list of VecLayersInfoObj objects.
     :param out_vec_file: output vector file.
@@ -2014,7 +2039,7 @@ def merge_to_multi_layer_vec(
     for vec in input_file_lyrs:
         vec_lyr_obj = open_gdal_vec_lyr(vec.vec_file, vec.vec_lyr)
         if first and overwrite:
-            rsgislib.vectorutils.write_vec_lyr_to_file(
+            write_vec_lyr_to_file(
                 vec_lyr_obj,
                 out_vec_file,
                 vec.vec_out_lyr,
@@ -2023,9 +2048,7 @@ def merge_to_multi_layer_vec(
                 replace=True,
             )
         else:
-            rsgislib.vectorutils.write_vec_lyr_to_file(
-                vec_lyr_obj, out_vec_file, vec.vec_out_lyr, format
-            )
+            write_vec_lyr_to_file(vec_lyr_obj, out_vec_file, vec.vec_out_lyr, format)
         vec_lyr_obj = None
         first = False
 
@@ -2044,24 +2067,27 @@ def vector_translate(
     del_exist_vec=False,
 ):
     """
-    A function which translates a vector file to another format, similar to ogr2ogr. If you wish
-    to reproject the input file then provide a destination srs (e.g., "EPSG:27700", or wkt string,
-    or proj4 string).
+    A function which translates a vector file to another format, similar to ogr2ogr.
+    If you wish to reproject the input file then provide a destination srs
+    (e.g., "EPSG:27700", or wkt string, or proj4 string).
 
     :param vec_file: the input vector file.
     :param vec_lyr: the input vector layer name
     :param out_vec_file: the output vector file.
-    :param out_vec_lyr: the name of the output vector layer (if None then the same as the input).
-    :param out_format: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
+    :param out_vec_lyr: the name of the output vector layer (if None then the same
+                        as the input).
+    :param out_format: the output vector file format (e.g., GPKG, GEOJSON, etc.)
     :param drv_create_opts: a list of options for the creation of the output file.
     :param lyr_create_opts: a list of options for the creation of the output layer.
     :param access_mode: default is None for creatoion but other but other options are:
                         [None (creation), 'update', 'append', 'overwrite']
-    :param src_srs: provide a source spatial reference for the input vector file. Default=None.
-                    can be used to provide a projection where none has been specified or the
-                    information has gone missing. Can be used without performing a reprojection.
-    :param dst_srs: provide a spatial reference for the output vector file to be reprojected to. (Default=None)
-                    If specified then the file will be reprojected.
+    :param src_srs: provide a source spatial reference for the input vector file.
+                    Default=None. can be used to provide a projection where none has
+                    been specified or the information has gone missing. Can be used
+                    without performing a reprojection.
+    :param dst_srs: provide a spatial reference for the output vector file to be
+                    reprojected to. (Default=None) If specified then the file will
+                    be reprojected.
     :param del_exist_vec: remove output file if it exists.
 
     """
@@ -2081,9 +2107,8 @@ def vector_translate(
             delete_vector_file(out_vec_file)
         else:
             raise Exception(
-                "The output vector file ({}) already exists, remove it and re-run.".format(
-                    out_vec_file
-                )
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
             )
 
     try:
@@ -2134,15 +2159,17 @@ def reproj_wgs84_vec_to_utm(
     del_exist_vec=False,
 ):
     """
-    A function which reprojects an input file projected in WGS84 (EPSG:4326) to UTM, where the UTM zone is
-    automatically identified using the mean x and y.
+    A function which reprojects an input file projected in WGS84 (EPSG:4326) to UTM,
+    where the UTM zone is automatically identified using the mean x and y.
 
     :param vec_file: the input vector file.
     :param vec_lyr: the input vector layer name
     :param out_vec_file: the output vector file.
-    :param out_vec_lyr: the name of the output vector layer (if None then the same as the input).
-    :param use_hemi: True differentiate between Southern and Northern hemisphere. False use Northern hemisphere.
-    :param out_format: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
+    :param out_vec_lyr: the name of the output vector layer (if None then the same
+                        as the input).
+    :param use_hemi: True differentiate between Southern and Northern hemisphere.
+                     False use Northern hemisphere.
+    :param out_format: the output vector file format (e.g., GPKG, GEOJSON, etc.)
     :param drv_create_opts: a list of options for the creation of the output file.
     :param lyr_create_opts: a list of options for the creation of the output layer.
     :param access_mode: by default the function overwrites the output file but other
@@ -2161,9 +2188,8 @@ def reproj_wgs84_vec_to_utm(
             delete_vector_file(out_vec_file)
         else:
             raise Exception(
-                "The output vector file ({}) already exists, remove it and re-run.".format(
-                    out_vec_file
-                )
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
             )
 
     if out_vec_lyr is None:
@@ -2233,13 +2259,15 @@ def spatial_select(
     out_format="GPKG",
 ):
     """
-    A function to perform a spatial selection within the input vector using a ROI vector layer.
-    This function uses geopandas so ensure that is installed.
+    A function to perform a spatial selection within the input vector using a
+    ROI vector layer. This function uses geopandas so ensure that is installed.
 
     :param vec_file: Input vector file from which features are selected.
     :param vec_lyr: Input vector file layer from which features are selected.
-    :param vec_roi_file: The ROI vector file used to select features within the input file.
-    :param vec_roi_lyr: The ROI vector layer used to select features within the input file.
+    :param vec_roi_file: The ROI vector file used to select features within
+                         the input file.
+    :param vec_roi_lyr: The ROI vector layer used to select features within
+                        the input file.
     :param out_vec_file: The output vector file with the selected features.
     :param out_vec_lyr: The output layer file with the selected features.
     :param out_format: the output vector format
@@ -2280,22 +2308,24 @@ def split_by_attribute(
     chk_lyr_names=True,
 ):
     """
-    A function which splits a vector layer by an attribute value into either different layers or different output
-    files.
+    A function which splits a vector layer by an attribute value into either
+    different layers or different output files.
 
     :param vec_file: Input vector file
     :param vec_lyr: Input vector layer
     :param split_col_name: The column name by which the vector layer will be split.
-    :param multi_layers: Boolean (default True). If True then a mulitple layer output file will be created (e.g., GPKG).
-                         If False then individual files will be outputted.
+    :param multi_layers: Boolean (default True). If True then a mulitple layer output
+                         file will be created (e.g., GPKG). If False then individual
+                         files will be outputted.
     :param out_vec_file: Output vector file - only used if multi_layers = True
     :param out_file_path: Output file path (directory) if multi_layers = False.
     :param out_file_ext: Output file extension is multi_layers = False
     :param out_format: The output format (e.g., GPKG, ESRI Shapefile).
-    :param dissolve: Boolean (Default=False) if True then a dissolve on the specified variable will be run
-                     as layers are separated.
-    :param chk_lyr_names: If True (default) layer names (from split_col_name) will be checked, which means
-                          punctuation removed and all characters being ascii characters.
+    :param dissolve: Boolean (Default=False) if True then a dissolve on the specified
+                     variable will be run as layers are separated.
+    :param chk_lyr_names: If True (default) layer names (from split_col_name) will be
+                          checked, which means punctuation removed and all characters
+                          being ascii characters.
 
     """
     import geopandas
@@ -2306,8 +2336,8 @@ def split_by_attribute(
     if multi_layers:
         if out_vec_file is None:
             raise Exception(
-                "If a multiple layer output is specified then an output file needs to be specified "
-                "to which the layer need to be added."
+                "If a multiple layer output is specified then an output "
+                "file needs to be specified to which the layer need to be added."
             )
     if not multi_layers:
         if (out_file_path is None) or (out_file_ext is None):
@@ -2328,8 +2358,9 @@ def split_by_attribute(
         c_gpdf = c_gpdf[~c_gpdf.isna()]
         # Dissolve if requested.
         if dissolve:
-            # Test resolve if an error thrown then it it probably a topological error which
-            # can sometimes be solved using a 0 buffer, so try that to see if it works.
+            # Test resolve if an error thrown then it it probably a topological
+            # error which can sometimes be solved using a 0 buffer, so try that
+            # to see if it works.
             try:
                 c_gpdf.dissolve(by=split_col_name)
             except:
@@ -2373,14 +2404,15 @@ def subset_by_attribute(
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer
     :param sub_col: The column used to subset the layer.
-    :param sub_vals: A list of values used to subset the layer. If using contains or start then regular expressions
-                     supported by the re library can be provided.
+    :param sub_vals: A list of values used to subset the layer. If using contains or
+                     start then regular expressions supported by the re library can
+                     be provided.
     :param out_vec_file: The output vector file
     :param out_vec_lyr: The output vector layer
     :param out_format: The output vector format.
-    :param match_type: The type of match for the subset. Options: equals (default) - the same value.
-                       contains - string is anywhere within attribute value.
-                       start - string matches the start of the attribute value.
+    :param match_type: The type of match for the subset. Options: equals (default) -
+                       the same value. contains - string is anywhere within attribute
+                       value. start - string matches the start of the attribute value.
 
     """
     import geopandas
@@ -2425,15 +2457,15 @@ def merge_vector_files(
     in_vec_files, out_vec_file, out_vec_lyr=None, out_format="GPKG", out_epsg=None
 ):
     """
-    A function which merges the input files into a single output file using geopandas. If the input files
-    have multiple layers they are all merged into the output file.
+    A function which merges the input files into a single output file using geopandas.
+    If the input files have multiple layers they are all merged into the output file.
 
     :param in_vec_files: list of input files
     :param out_vec_file: output vector file.
     :param out_vec_lyr: output vector layer.
     :param out_format: output file format.
-    :param out_epsg: if input layers are different projections then option can be used to define the output
-                     projection.
+    :param out_epsg: if input layers are different projections then option can be
+                     used to define the output projection.
 
     """
     import tqdm
@@ -2441,7 +2473,7 @@ def merge_vector_files(
 
     first = True
     for vec_file in tqdm.tqdm(in_vec_files):
-        lyrs = rsgislib.vectorutils.get_vec_lyrs_lst(vec_file)
+        lyrs = get_vec_lyrs_lst(vec_file)
         for lyr in lyrs:
             if first:
                 data_gdf = geopandas.read_file(vec_file, layer=lyr)
@@ -2470,15 +2502,17 @@ def merge_vector_layers(
     in_vecs_dict, out_vec_file, out_vec_lyr=None, out_format="GPKG", out_epsg=None
 ):
     """
-    A function which merges the input vector layers into a single output file using geopandas.
+    A function which merges the input vector layers into a single output
+    file using geopandas.
 
-    :param in_vecs_dict: list of dicts with keys [{'file': '/file/path/to/file.gpkg', 'layer': 'layer_name'}]
-                        providing the file paths and layer names.
+    :param in_vecs_dict: list of dicts with keys [{'file': '/file/path/to/file.gpkg',
+                         'layer': 'layer_name'}] providing the file paths and
+                         layer names.
     :param out_vec_file: output vector file.
     :param out_vec_lyr: output vector layer.
     :param out_format: output file format.
-    :param out_epsg: if input layers are different projections then option can be used to define the output
-                     projection.
+    :param out_epsg: if input layers are different projections then option can be
+                     used to define the output projection.
 
     """
     import tqdm
@@ -2520,15 +2554,17 @@ def merge_vector_layers(
 
 def explode_vec_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format="GPKG"):
     """
-    A function to explode a vector layer separating any multiple geometries (e.g., multipolygons)
-    to single geometries.
+    A function to explode a vector layer separating any multiple geometries
+    (e.g., multipolygons) to single geometries.
 
-    Note. this function uses geopandas and therefore the vector layer is loaded into memory.
+    Note. this function uses geopandas and therefore the vector layer is loaded
+    into memory.
 
     :param vec_file: vector layer file
     :param vec_lyr: vector layer name
     :param out_vec_file: output vector layer file
-    :param out_vec_lyr: output vector layer name (Can be None if output format is not GPKG).
+    :param out_vec_lyr: output vector layer name (Can be None if output
+                        format is not GPKG).
     :param out_format: The output format for the vector file.
 
     """
@@ -2550,14 +2586,14 @@ def explode_vec_files(in_vec_files, output_dir, out_format="GPKG", out_vec_ext="
     The output directory must be different to the directory the input files as the
     output file name will be the same as the input name.
 
-    Note. this function uses the explode_vec_lyr function which uses geopandas and therefore
-    the vector layer is loaded into memory.
+    Note. this function uses the explode_vec_lyr function which uses geopandas and
+    therefore the vector layer is loaded into memory.
 
     :param in_vec_files: A list of input files.
     :param output_dir: The directory where the output files will be placed.
     :param out_format: The vector format for the outputs.
-    :param out_vec_ext: the file extension for the output files. There should not be a dot within the extension.
-                         e.g., gpkg, shp, geojson.
+    :param out_vec_ext: the file extension for the output files. There should not
+                        be a dot within the extension. e.g., gpkg, shp, geojson.
 
     """
     import tqdm
@@ -2574,16 +2610,17 @@ def explode_vec_files(in_vec_files, output_dir, out_format="GPKG", out_vec_ext="
 def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
     """
     A function which checks a polygons within the geometry of a geopanadas dataframe
-    for specific case where they on the east/west edge (i.e., 180 / -180) and are therefore
-    being wrapped around the world. For example, this function would change a longitude
-    -179.91 to 180.01. The geopandas dataframe will be edit in place.
+    for specific case where they on the east/west edge (i.e., 180 / -180) and are
+    therefore being wrapped around the world. For example, this function would change
+    a longitude -179.91 to 180.01. The geopandas dataframe will be edit in place.
 
     This function will import the shapely library.
 
     :param data_gdf: geopandas dataframe.
-    :param width_thres: The threshold (default 350 degrees) for the width of a polygon for which
-                        the polygons will be checked, looping through all the coordinates
-    :return: geopandas dataframe
+    :param width_thres: The threshold (default 350 degrees) for the width of a
+                        polygon for which the polygons will be checked, looping
+                        through all the coordinates
+    :returns: geopandas dataframe
 
     """
     from shapely.geometry import Polygon, LinearRing
@@ -2699,19 +2736,23 @@ def merge_utm_vecs_wgs84(
     width_thres=350,
 ):
     """
-    A function which merges input files in UTM projections to the WGS84 projection cutting
-    polygons which wrap from one side of the world to other (i.e., 180/-180 boundary).
+    A function which merges input files in UTM projections to the WGS84 projection
+    cutting polygons which wrap from one side of the world to other
+    (i.e., 180/-180 boundary).
 
     :param in_vec_files: list of input files
     :param out_vec_file: output vector file.
     :param out_vec_lyr: output vector layer - only used if output format is GPKG
     :param out_format: output file format.
-    :param n_utm_zones_vec: GPKG file with layer per zone (layer names: 01, 02, ... 59, 60) each projected in
-                            the northern hemisphere UTM projections.
-    :param s_utm_zone_vec: GPKG file with layer per zone (layer names: 01, 02, ... 59, 60) each projected in
-                            the southern hemisphere UTM projections.
-    :param width_thres: The threshold (default 350 degrees) for the width of a polygon for which
-                        the polygons will be checked, looping through all the coordinates
+    :param n_utm_zones_vec: GPKG file with layer per zone (layer names: 01, 02, ...
+                            59, 60) each projected in the northern hemisphere UTM
+                            projections.
+    :param s_utm_zone_vec: GPKG file with layer per zone (layer names: 01, 02, ...
+                           59, 60) each projected in the southern hemisphere
+                           UTM projections.
+    :param width_thres: The threshold (default 350 degrees) for the width of a polygon
+                        for which the polygons will be checked, looping through all
+                        the coordinates
 
     """
     import geopandas
@@ -2728,7 +2769,8 @@ def merge_utm_vecs_wgs84(
         )
         if n_hemi_utm_file is None:
             raise Exception(
-                "An input is needed for n_hemi_utm_file. The RSGISLib installed version was not be found."
+                "An input is needed for n_hemi_utm_file. The RSGISLib "
+                "installed version was not be found."
             )
     if s_hemi_utm_file is None:
         install_prefix = __file__[: __file__.find("lib")]
@@ -2737,7 +2779,8 @@ def merge_utm_vecs_wgs84(
         )
         if s_hemi_utm_file is None:
             raise Exception(
-                "An input is needed for s_hemi_utm_file. The RSGISLib installed version was not be found."
+                "An input is needed for s_hemi_utm_file. The RSGISLib "
+                "installed version was not be found."
             )
 
     first = True
@@ -2817,7 +2860,8 @@ def clip_vec_lyr(
     out_format="GPKG",
 ):
     """
-    A function which clips a vector layer using an input region of interest (ROI) polygon layer.
+    A function which clips a vector layer using an input region of interest
+    (ROI) polygon layer.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer within the input file.
@@ -2849,8 +2893,10 @@ def shiftxy_vec_lyr(
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer within the input file.
-    :param x_shift: The shift in the x axis. In the units of the coordinate system the file is projected in.
-    :param y_shift: The shift in the y axis. In the units of the coordinate system the file is projected in.
+    :param x_shift: The shift in the x axis. In the units of the coordinate system
+                    the file is projected in.
+    :param y_shift: The shift in the y axis. In the units of the coordinate system
+                    the file is projected in.
     :param out_vec_file: Output vector file
     :param out_vec_lyr: Output vector layer name.
     :param out_format: Output file format (default GPKG).
@@ -2957,13 +3003,16 @@ def split_vec_lyr_random_subset(
     rand_seed: int = None,
 ):
     """
-    A function to split a vector layer into two subsets by randomly sampling the input file.
-    This function uses geopandas so that library must therefore be installed.
+    A function to split a vector layer into two subsets by randomly sampling the
+    input file. This function uses geopandas so that library must therefore
+    be installed.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer.
-    :param out_main_vec_file: Output vector file with the 'main' outputs (i.e., the remainder once the sample if taken)
-    :param out_main_vec_lyr: Output vector layer with the 'main' outputs (i.e., the remainder once the sample if taken)
+    :param out_main_vec_file: Output vector file with the 'main' outputs
+                              (i.e., the remainder once the sample if taken)
+    :param out_main_vec_lyr: Output vector layer with the 'main' outputs
+                             (i.e., the remainder once the sample if taken)
     :param out_smpl_vec_file: Output vector file with the sampled outputs
     :param out_smpl_vec_lyr: Output vector layer with the sampled outputs
     :param n_smpl: the number of samples to be randomly selected

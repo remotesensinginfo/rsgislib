@@ -181,6 +181,7 @@ def read_vec_column(vec_file: str, vec_lyr: str, att_column: str):
     :param vec_file: The file / path to the vector data 'file'.
     :param vec_lyr: The layer to which the data is to be read from.
     :param att_column: Name of the input column
+    :returns: a list with the column values.
 
     """
     gdal.UseExceptions()
@@ -218,11 +219,12 @@ def read_vec_column(vec_file: str, vec_lyr: str, att_column: str):
 
 def read_vec_columns(vec_file: str, vec_lyr: str, att_columns: list):
     """
-    A function which will reads a column from a vector file
+    A function which will reads a number of column from a vector file
 
     :param vec_file: The file / path to the vector data 'file'.
     :param vec_lyr: The layer to which the data is to be read from.
     :param att_columns: List of input attribute column names to be read in.
+    :returns: dict with the column names as keys and a list of values for each column
 
     """
     gdal.UseExceptions()
@@ -673,6 +675,7 @@ def get_unq_col_values(vec_file: str, vec_lyr: str, col_name: str):
     :param vec_file: Input vector file
     :param vec_lyr: Input vector layer
     :param col_name: The column name for which a list of unique values will be returned.
+    :returns: a numpy array as a list of the unique within the column.
 
     """
     import geopandas
@@ -723,7 +726,7 @@ def get_vec_cols_as_array(
     upper_limit: float = None,
 ):
     """
-    A function returns an nxm numpy array with the values for the columns specified.
+    A function returns an n x m numpy array with the values for the columns specified.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer within the input file.
@@ -737,6 +740,7 @@ def get_vec_cols_as_array(
     :param upper_limit: Optional upper limit to define valid values. Note the same
                         value is used for all the columns listed. If a value is found
                         to be outside of the threshold the whole row is removed.
+    :returns: a numpy array with the column values.
 
     """
     import geopandas
