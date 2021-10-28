@@ -1776,7 +1776,7 @@ def identify_small_units(
     :param tileHeight: is the height of the image tile (in pixels) if tiled clumping
                        is used.
 
-      Example:
+    Example:
 
     .. code:: python
         from rsgislib.rastergis import ratutils
@@ -1786,7 +1786,8 @@ def identify_small_units(
         classCol = "OutClass"
         outColName = ["SmallUnits25", "SmallUnits50", "SmallUnits100"]
         smallClumpsThres = [25, 50, 100]
-        rastergis.identify_small_units(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres)
+        rastergis.identify_small_units(clumpsImg, classCol, tmpPath,
+                                       outColName, smallClumpsThres)
 
     """
     # Check numpy is available
