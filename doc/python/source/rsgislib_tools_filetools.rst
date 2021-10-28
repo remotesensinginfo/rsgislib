@@ -15,6 +15,7 @@ Searching
 .. autofunction:: rsgislib.tools.filetools.find_files_mpaths_ext
 .. autofunction:: rsgislib.tools.filetools.find_first_file
 .. autofunction:: rsgislib.tools.filetools.get_files_mod_time
+.. autofunction:: rsgislib.tools.filetools.find_files_size_limits
 .. autofunction:: rsgislib.tools.filetools.get_dir_list
 
 Archives
@@ -60,6 +61,9 @@ File Hash
 .. autofunction:: rsgislib.tools.filetools.create_sha3_384_hash
 .. autofunction:: rsgislib.tools.filetools.create_sha3_512_hash
 
+Other
+--------
+.. autofunction:: rsgislib.tools.filetools.convert_file_size_units
 
 * :ref:`genindex`
 * :ref:`modindex`

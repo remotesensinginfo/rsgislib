@@ -318,6 +318,41 @@ def get_files_mod_time(
     return out_file_lst
 
 
+def find_files_size_limits(
+    dir_path: str, file_search: str, min_size: int = 0, max_size: int = None
+):
+    """
+    Search for files with a path using glob. Therefore, the file
+    paths returned is a true path. Within the file_search provide the file
+    names with '*' as wildcard(s).
+
+    :param dir_path: string for the input directory path
+    :param file_search: string with a * wildcard for the file being searched for.
+    :param min_size: the minimum file size in bytes (default is 0)
+    :param max_size: the maximum file size in bytes, if None (default) then ignored.
+    :return: string with the path to the file
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.tools.filetools
+        file_paths = rsgislib.tools.filetools.find_files_size_limits("in/dir",
+                                                                     "*N15W093*.tif",
+                                                                     0, 100000)
+
+    """
+    files = glob.glob(os.path.join(dir_path, file_search))
+    out_files = list()
+    for c_file in files:
+        file_size = get_file_size(c_file)
+        if (max_size is None) and (file_size > min_size):
+            out_files.append(c_file)
+        elif (file_size > min_size) and (file_size < max_size):
+            out_files.append(c_file)
+    return out_files
+
+
 def file_is_hidden(dir_path: str):
     """
     A function to test whether a file or folder is 'hidden' or not on the
@@ -379,7 +414,54 @@ def get_dir_list(dir_path: str, inc_hidden: bool = False):
     return out_dir_lst
 
 
-def get_file_size(file_path: str, unit: str='bytes'):
+def convert_file_size_units(in_size: int, in_unit: str, out_unit: str):
+    """
+    A function which converts between file size units
+
+    :param in_size: input file size
+    :param in_unit: the input unit for the file size. Options: bytes, kb, mb, gb, tb
+    :param out_unit: the output unit for the file size. Options: bytes, kb, mb, gb, tb
+    :return: float for the output file size
+
+    """
+    in_unit = in_unit.lower()
+    if in_unit not in ["bytes", "kb", "mb", "gb", "tb"]:
+        raise Exception("Input unit must be one of: bytes, kb, mb, gb, tb")
+
+    out_unit = out_unit.lower()
+    if out_unit not in ["bytes", "kb", "mb", "gb", "tb"]:
+        raise Exception("Output unit must be one of: bytes, kb, mb, gb, tb")
+
+    if in_unit == "bytes":
+        file_size_bytes = in_size
+    elif in_unit == "kb":
+        file_size_bytes = in_size * 1024.0
+    elif in_unit == "mb":
+        file_size_bytes = in_size * (1024.0 ** 2)
+    elif in_unit == "gb":
+        file_size_bytes = in_size * (1024.0 ** 3)
+    elif in_unit == "tb":
+        file_size_bytes = in_size * (1024.0 ** 4)
+    else:
+        raise Exception("Input unit it not recognised.")
+
+    if out_unit == "bytes":
+        out_file_size = file_size_bytes
+    elif out_unit == "kb":
+        out_file_size = file_size_bytes / 1024.0
+    elif out_unit == "mb":
+        out_file_size = file_size_bytes / (1024.0 ** 2)
+    elif out_unit == "gb":
+        out_file_size = file_size_bytes / (1024.0 ** 3)
+    elif out_unit == "tb":
+        out_file_size = file_size_bytes / (1024.0 ** 4)
+    else:
+        raise Exception("Output unit it not recognised.")
+
+    return out_file_size
+
+
+def get_file_size(file_path: str, unit: str = "bytes"):
     """
     A function which returns the file size of a file in the specified unit.
 
@@ -396,21 +478,22 @@ def get_file_size(file_path: str, unit: str='bytes'):
 
     """
     import pathlib
+
     unit = unit.lower()
-    if unit not in ['bytes', 'kb', 'mb', 'gb', 'tb']:
-        raise Exception('Unit must be one of: bytes, kb, mb, gb, tb')
+    if unit not in ["bytes", "kb", "mb", "gb", "tb"]:
+        raise Exception("Unit must be one of: bytes, kb, mb, gb, tb")
 
     p = pathlib.Path(file_path)
     if p.exists() and p.is_file():
         file_size_bytes = p.stat().st_size
 
-        if unit == 'kb':
+        if unit == "kb":
             out_file_size = file_size_bytes / 1024.0
-        elif unit == 'mb':
+        elif unit == "mb":
             out_file_size = file_size_bytes / 1024.0 ** 2
-        elif unit == 'gb':
+        elif unit == "gb":
             out_file_size = file_size_bytes / 1024.0 ** 3
-        elif unit == 'tb':
+        elif unit == "tb":
             out_file_size = file_size_bytes / 1024.0 ** 4
         else:
             out_file_size = file_size_bytes

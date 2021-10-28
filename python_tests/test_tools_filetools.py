@@ -101,6 +101,78 @@ def test_get_file_size_tb():
     )
 
 
+def test_convert_file_size_units_bytes_kb():
+    import rsgislib.tools.filetools
+
+    out_size = rsgislib.tools.filetools.convert_file_size_units(
+        1000000, in_unit="bytes", out_unit="kb"
+    )
+    assert abs(out_size - 976.56) < 0.1
+
+
+def test_convert_file_size_units_bytes_mb():
+    import rsgislib.tools.filetools
+
+    out_size = rsgislib.tools.filetools.convert_file_size_units(
+        1000000, in_unit="bytes", out_unit="mb"
+    )
+    assert abs(out_size - 0.954) < 0.1
+
+
+def test_convert_file_size_units_bytes_gb():
+    import rsgislib.tools.filetools
+
+    out_size = rsgislib.tools.filetools.convert_file_size_units(
+        1000000, in_unit="bytes", out_unit="gb"
+    )
+    assert abs(out_size - 0.000931) < 0.0001
+
+
+def test_convert_file_size_units_bytes_tb():
+    import rsgislib.tools.filetools
+
+    out_size = rsgislib.tools.filetools.convert_file_size_units(
+        1000000, in_unit="bytes", out_unit="tb"
+    )
+    assert abs(out_size - 9.095e-07) < 0.0000001
+
+
+def test_convert_file_size_units_kb_bytes():
+    import rsgislib.tools.filetools
+
+    out_size = rsgislib.tools.filetools.convert_file_size_units(
+        1000, in_unit="kb", out_unit="bytes"
+    )
+    assert abs(out_size - 1024000.0) < 1
+
+
+def test_convert_file_size_units_kb_mb():
+    import rsgislib.tools.filetools
+
+    out_size = rsgislib.tools.filetools.convert_file_size_units(
+        1000, in_unit="kb", out_unit="mb"
+    )
+    assert abs(out_size - 0.977) < 0.1
+
+
+def test_convert_file_size_units_kb_gb():
+    import rsgislib.tools.filetools
+
+    out_size = rsgislib.tools.filetools.convert_file_size_units(
+        1000, in_unit="kb", out_unit="gb"
+    )
+    assert abs(out_size - 0.000954) < 0.0001
+
+
+def test_convert_file_size_units_kb_tb():
+    import rsgislib.tools.filetools
+
+    out_size = rsgislib.tools.filetools.convert_file_size_units(
+        1000, in_unit="kb", out_unit="tb"
+    )
+    assert abs(out_size - 9.313e-07) < 0.0000001
+
+
 def test_untar_file_gen_arch_dir_true(tmp_path):
     import rsgislib.tools.filetools
 
