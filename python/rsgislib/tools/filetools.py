@@ -379,6 +379,46 @@ def get_dir_list(dir_path: str, inc_hidden: bool = False):
     return out_dir_lst
 
 
+def get_file_size(file_path: str, unit: str='bytes'):
+    """
+    A function which returns the file size of a file in the specified unit.
+
+    Units:
+    * bytes
+    * kb - kilobytes  (bytes / 1024)
+    * mb - megabytes  (bytes / 1024^2)
+    * gb - gigabytes  (bytes / 1024^3)
+    * tb - terabytes  (bytes / 1024^4)
+
+    :param file_path: the path to the file for which the size is to be calculated.
+    :param unit: the unit for the file size. Options: bytes, kb, mb, gb, tb
+    :return: float for the file size.
+
+    """
+    import pathlib
+    unit = unit.lower()
+    if unit not in ['bytes', 'kb', 'mb', 'gb', 'tb']:
+        raise Exception('Unit must be one of: bytes, kb, mb, gb, tb')
+
+    p = pathlib.Path(file_path)
+    if p.exists() and p.is_file():
+        file_size_bytes = p.stat().st_size
+
+        if unit == 'kb':
+            out_file_size = file_size_bytes / 1024.0
+        elif unit == 'mb':
+            out_file_size = file_size_bytes / 1024.0 ** 2
+        elif unit == 'gb':
+            out_file_size = file_size_bytes / 1024.0 ** 3
+        elif unit == 'tb':
+            out_file_size = file_size_bytes / 1024.0 ** 4
+        else:
+            out_file_size = file_size_bytes
+    else:
+        raise rsgislib.RSGISPyException("Input file path does not exist")
+    return out_file_size
+
+
 def get_file_lock(
     input_file: str,
     sleep_period: int = 1,

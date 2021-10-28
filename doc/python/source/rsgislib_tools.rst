@@ -16,7 +16,7 @@ RSGISLib Tools
    rsgislib_tools_tilecacheutils
    rsgislib_tools_utils
    rsgislib_tools_utm
-   rsgislib_tools_validatedatasets
+   rsgislib_tools_checkdatasets
    rsgislib_tools_visualisation
 
 
