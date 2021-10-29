@@ -86,18 +86,20 @@ def get_dir_name(input_file: str):
     return dir_name
 
 
-def delete_file_with_basename(input_file: str):
+def delete_file_with_basename(input_file: str, print_rms=True):
     """
     Function to delete all the files which have a path
     and base name defined in the input_file attribute.
 
     :param input_file: string for the input file name and path
+    :param print_rms: print the files being deleted (Default: True)
 
     """
     baseName = os.path.splitext(input_file)[0]
     fileList = glob.glob(baseName + str(".*"))
     for file in fileList:
-        print("Deleting file: " + str(file))
+        if print_rms:
+            print("Deleting file: " + str(file))
         os.remove(file)
 
 
