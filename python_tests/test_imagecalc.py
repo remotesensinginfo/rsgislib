@@ -21,7 +21,7 @@ def test_count_pxls_of_val_band1():
     )
 
 
-def test_count_pxls_of_val_band1_selVals():
+def test_count_pxls_of_val_band1_sel_vals():
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
@@ -82,7 +82,7 @@ def test_are_img_bands_equal_true():
     assert img_eq
 
 
-def test_are_img_bands_equal_difbands_false():
+def test_are_img_bands_equal_dif_bands_false():
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
@@ -443,7 +443,7 @@ def test_calc_dist_to_img_vals_tiled_multi_val_pxl(tmp_path):
     assert prop_match > 0.99
 
 
-def test_calc_prop_true_exp_NoVldMsk():
+def test_calc_prop_true_exp_no_vld_msk():
     import rsgislib.imagecalc
 
     ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
@@ -454,7 +454,7 @@ def test_calc_prop_true_exp_NoVldMsk():
     assert abs(prop - 0.855) < 0.001
 
 
-def test_calc_prop_true_exp_VldMsk():
+def test_calc_prop_true_exp_vld_msk():
     import rsgislib.imagecalc
 
     ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
@@ -464,3 +464,133 @@ def test_calc_prop_true_exp_VldMsk():
     prop = rsgislib.imagecalc.calc_prop_true_exp("ndvi>0.5?1:0", band_defns, vld_img)
 
     assert abs(prop - 0.655) < 0.001
+
+
+def test_calc_band_percentile():
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+
+    percent_val = rsgislib.imagecalc.calc_band_percentile(input_img, 0.5, 0)
+
+    assert ((percent_val[0] - 43) < 1) and ((percent_val[5] - 458) < 1)
+
+
+def test_calc_img_rescale_sgl_img(tmp_path):
+    import rsgislib.imagecalc
+
+    rescale_ndvi_ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_g100_o100_int.kea"
+    )
+    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    print(ndvi_img)
+
+    output_img = os.path.join(tmp_path, "rescaled_ndvi_img.kea")
+
+    rsgislib.imagecalc.calc_img_rescale(
+        ndvi_img, output_img, "KEA", rsgislib.TYPE_16INT, -999, 0, 1, 999, 100, 100
+    )
+
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(
+        output_img, rescale_ndvi_ref_img
+    )
+    assert img_eq
+
+
+def test_calc_img_rescale_multi_imgs(tmp_path):
+    import rsgislib.imagecalc
+
+    rescale_ndvi_ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_bs2_g100_o100_int.kea"
+    )
+    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    print(ndvi_img)
+
+    output_img = os.path.join(tmp_path, "rescaled_ndvi_imgs.kea")
+
+    rsgislib.imagecalc.calc_img_rescale(
+        [ndvi_img, ndvi_img],
+        output_img,
+        "KEA",
+        rsgislib.TYPE_16INT,
+        -999,
+        0,
+        1,
+        999,
+        100,
+        100,
+    )
+
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(
+        output_img, rescale_ndvi_ref_img
+    )
+    assert img_eq
+
+
+def test_perform_image_pca(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+
+    output_img = os.path.join(tmp_path, "pca_result_img.kea")
+    out_eigen_vec_file = os.path.join(tmp_path, "pca_eign_vec.mtxt")
+
+    rsgislib.imagecalc.perform_image_pca(
+        input_img,
+        output_img,
+        out_eigen_vec_file,
+        n_comps=None,
+        pxl_n_sample=100,
+        gdalformat="KEA",
+        datatype=rsgislib.TYPE_32FLOAT,
+        no_data_val=None,
+        calc_stats=True,
+    )
+
+    assert os.path.exists(output_img) and os.path.exists(out_eigen_vec_file)
+
+
+def test_perform_image_mnf(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+
+    output_img = os.path.join(tmp_path, "pca_result_img.kea")
+    tmp_dir = os.path.join(tmp_path, "tmp")
+
+    rsgislib.imagecalc.perform_image_mnf(
+        input_img,
+        output_img,
+        n_comps=None,
+        pxl_n_sample=100,
+        in_img_no_data=0,
+        tmp_dir=tmp_dir,
+        gdalformat="KEA",
+        datatype=rsgislib.TYPE_32FLOAT,
+        calc_stats=True,
+    )
+
+    assert os.path.exists(output_img)
+
+
+def test_recode_int_raster(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+
+    output_img = os.path.join(tmp_path, "recoded_ndvi_cats.kea")
+
+    recode_dict = dict()
+    recode_dict[1] = 100
+    recode_dict[2] = 200
+    recode_dict[3] = 300
+
+    rsgislib.imagecalc.recode_int_raster(
+        input_img,
+        output_img,
+        recode_dict,
+        keep_vals_not_in_dict=True,
+        gdalformat="KEA",
+        datatype=rsgislib.TYPE_16UINT,
+    )
+    assert os.path.exists(output_img)

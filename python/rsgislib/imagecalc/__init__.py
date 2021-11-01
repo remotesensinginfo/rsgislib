@@ -679,15 +679,15 @@ def perform_image_mnf(
     )
     print("{} values were extracted from the input image.".format(X.shape[0]))
 
-    pca = PCA()
-    pca.fit(X)
+    pca_obj = PCA()
+    pca_obj.fit(X)
 
     eigenVecFile = os.path.join(tmp_dir, "{}_eigen_vec.txt".format(img_basename))
     f = open(eigenVecFile, "w")
-    f.write("m=" + str(pca.components_.shape[0]) + "\n")
-    f.write("n=" + str(pca.components_.shape[1]) + "\n")
+    f.write("m=" + str(pca_obj.components_.shape[0]) + "\n")
+    f.write("n=" + str(pca_obj.components_.shape[1]) + "\n")
     first = True
-    for val in pca.components_.flatten():
+    for val in pca_obj.components_.flatten():
         if first:
             f.write(str(val))
             first = False
@@ -699,10 +699,10 @@ def perform_image_mnf(
 
     pcaComp = 1
     print("Prop. of variance explained:")
-    for val in pca.explained_variance_ratio_:
+    for val in pca_obj.explained_variance_ratio_:
         print("\t PCA Component " + str(pcaComp) + " = " + str(round(val, 4)))
         pcaComp = pcaComp + 1
-    varExplain = pca.explained_variance_ratio_
+    varExplain = pca_obj.explained_variance_ratio_
 
     outNComp = varExplain.shape[0]
     if n_comps is not None:

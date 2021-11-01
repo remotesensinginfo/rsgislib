@@ -1378,7 +1378,7 @@ static PyObject *ImageCalc_GetImageBandMinMax(PyObject *self, PyObject *args, Py
     PyObject *outList = PyTuple_New(2);
     try
     {
-        std::pair<double,double> outVals = rsgis::cmds::getImageBandMinMax(std::string(inputImage), imgBand, (bool)useNoDataVal, noDataVal);
+        std::pair<double, double> outVals = rsgis::cmds::getImageBandMinMax(std::string(inputImage), imgBand, (bool)useNoDataVal, noDataVal);
         
         if(PyTuple_SetItem(outList, 0, Py_BuildValue("d", outVals.first)) == -1)
         {
@@ -1416,8 +1416,12 @@ static PyObject *ImageCalc_CalcImageRescale(PyObject *self, PyObject *args, PyOb
         return nullptr;
     }
     
-    std::vector<std::string> inputImgs;
-    if(PySequence_Check(pInputImgsObj))
+    std::vector<std::string> input_imgs;
+    if(RSGISPY_CHECK_STRING(pInputImgsObj))
+    {
+        input_imgs.push_back(RSGISPY_STRING_EXTRACT(pInputImgsObj));
+    }
+    else if(PySequence_Check(pInputImgsObj))
     {
         Py_ssize_t nInputImgs = PySequence_Size(pInputImgsObj);
         for( Py_ssize_t n = 0; n < nInputImgs; n++ )
@@ -1425,7 +1429,7 @@ static PyObject *ImageCalc_CalcImageRescale(PyObject *self, PyObject *args, PyOb
             PyObject *strObj = PySequence_GetItem(pInputImgsObj, n);
             if(RSGISPY_CHECK_STRING(strObj))
             {
-                inputImgs.push_back(RSGISPY_STRING_EXTRACT(strObj));
+                input_imgs.push_back(RSGISPY_STRING_EXTRACT(strObj));
             }
             else
             {
@@ -1436,21 +1440,14 @@ static PyObject *ImageCalc_CalcImageRescale(PyObject *self, PyObject *args, PyOb
     }
     else
     {
-        if(RSGISPY_CHECK_STRING(pInputImgsObj))
-        {
-            inputImgs.push_back(RSGISPY_STRING_EXTRACT(pInputImgsObj));
-        }
-        else
-        {
-            PyErr_SetString(GETSTATE(self)->error, "Input images parameter must be either a single string or a sequence of strings");
-            return nullptr;
-        }
+        PyErr_SetString(GETSTATE(self)->error, "Input images parameter must be either a single string or a sequence of strings");
+        return nullptr;
     }
     
     try
     {
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
-        rsgis::cmds::executeRescaleImages(inputImgs, std::string(outputImage), std::string(gdalFormat), type, cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain);
+        rsgis::cmds::executeRescaleImages(input_imgs, std::string(outputImage), std::string(gdalFormat), type, cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
