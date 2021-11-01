@@ -15,7 +15,7 @@ def test_calc_ndvi(tmp_path):
 
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calcindices.calc_ndvi(
-        input_img, 3, 8, output_img, calc_stats=False, gdalformat="KEA"
+        input_img, 3, 8, output_img, calc_stats=True, gdalformat="KEA"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -35,7 +35,7 @@ def test_calc_wbi(tmp_path):
 
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calcindices.calc_wbi(
-        input_img, 1, 8, output_img, calc_stats=False, gdalformat="KEA"
+        input_img, 1, 8, output_img, calc_stats=True, gdalformat="KEA"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -55,7 +55,7 @@ def test_calc_ndwi(tmp_path):
 
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calcindices.calc_ndwi(
-        input_img, 8, 9, output_img, calc_stats=False, gdalformat="KEA"
+        input_img, 8, 9, output_img, calc_stats=True, gdalformat="KEA"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -75,7 +75,7 @@ def test_calc_gndwi(tmp_path):
 
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calcindices.calc_gndwi(
-        input_img, 2, 8, output_img, calc_stats=False, gdalformat="KEA"
+        input_img, 2, 8, output_img, calc_stats=True, gdalformat="KEA"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -95,7 +95,7 @@ def test_calc_gmndwi(tmp_path):
 
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calcindices.calc_gmndwi(
-        input_img, 2, 9, output_img, calc_stats=False, gdalformat="KEA"
+        input_img, 2, 9, output_img, calc_stats=True, gdalformat="KEA"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -115,7 +115,7 @@ def test_calc_whiteness(tmp_path):
 
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calcindices.calc_whiteness(
-        input_img, 1, 2, 3, output_img, calc_stats=False, gdalformat="KEA"
+        input_img, 1, 2, 3, output_img, calc_stats=True, gdalformat="KEA"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -140,7 +140,7 @@ def test_calc_brightness(tmp_path):
         2,
         3,
         output_img,
-        calc_stats=False,
+        calc_stats=True,
         gdalformat="KEA",
         scale_factor=1000,
     )
@@ -167,7 +167,7 @@ def test_calc_brightness_scaled(tmp_path):
         2,
         3,
         output_img,
-        calc_stats=False,
+        calc_stats=True,
         gdalformat="KEA",
         scale_factor=1000,
     )
@@ -189,7 +189,7 @@ def test_calc_ctvi(tmp_path):
 
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calcindices.calc_ctvi(
-        input_img, 1, 8, output_img, calc_stats=False, gdalformat="KEA"
+        input_img, 1, 8, output_img, calc_stats=True, gdalformat="KEA"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -209,7 +209,7 @@ def test_calc_ndsi(tmp_path):
 
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calcindices.calc_ndsi(
-        input_img, 2, 9, output_img, calc_stats=False, gdalformat="KEA"
+        input_img, 2, 9, output_img, calc_stats=True, gdalformat="KEA"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -229,7 +229,7 @@ def test_calc_nbr(tmp_path):
 
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calcindices.calc_nbr(
-        input_img, 8, 10, output_img, calc_stats=False, gdalformat="KEA"
+        input_img, 8, 10, output_img, calc_stats=True, gdalformat="KEA"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -253,7 +253,7 @@ def test_calc_bai(tmp_path):
         8,
         3,
         output_img,
-        calc_stats=False,
+        calc_stats=True,
         gdalformat="KEA",
         scale_factor=1000,
     )
