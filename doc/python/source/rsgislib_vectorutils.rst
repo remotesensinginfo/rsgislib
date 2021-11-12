@@ -16,11 +16,12 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.createvectors.polygonise_raster_to_vec_lyr
 .. autofunction:: rsgislib.vectorutils.createvectors.vectorise_pxls_to_pts
 .. autofunction:: rsgislib.vectorutils.createvectors.extract_image_footprint
-.. autofunction:: rsgislib.vectorutils.createvectors.create_poly_shp_for_lst_bboxs
+.. autofunction:: rsgislib.vectorutils.createvectors.create_poly_vec_for_lst_bboxs
 .. autofunction:: rsgislib.vectorutils.createvectors.define_grid
 .. autofunction:: rsgislib.vectorutils.createvectors.create_poly_vec_bboxs
 .. autofunction:: rsgislib.vectorutils.createvectors.create_vector_grid
 .. autofunction:: rsgislib.vectorutils.createvectors.write_pts_to_vec
+.. autofunction:: rsgislib.vectorutils.createvectors.create_bboxs_for_pts
 .. autofunction:: rsgislib.vectorutils.create_lines_of_points
 .. autofunction:: rsgislib.vectorutils.split_vec_lyr
 .. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
