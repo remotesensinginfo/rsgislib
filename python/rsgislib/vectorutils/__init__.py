@@ -1930,7 +1930,7 @@ def does_vmsk_img_intersect(
     input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir, vec_epsg=None
 ):
     """
-    This function checks whether the input binary raster mask intesects with the
+    This function checks whether the input binary raster mask intersects with the
     input vector layer. A check is first done as to whether the bounding boxes
     intersect, if they do then the intersection between the images is then calculated.
     The input image and vector can be in different projections but the projection
@@ -3109,3 +3109,91 @@ def create_train_test_smpls(
         import shutil
 
         shutil.rmtree(tmp_dir)
+
+
+def create_acc_pt_sets(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file_base: str,
+    out_vec_lyr: str,
+    cls_col: str,
+    n_sets: int,
+    sets_col: str = "set_id",
+    out_format: str = "GPKG",
+    out_ext: str = "gpkg",
+    shuffle_rows: bool = True,
+    rnd_seed: int = None,
+):
+    """
+    A function which splits a vector layer into n_sets where a 'class' column is used
+    to ensure that there are the same number of samples per 'class' within each set.
+    An example of where this function might be used is to split a set of accuracy
+    assessment point for assessing the classification accuracy into multiple sets.
+    Note, the output vector layers
+
+    :param vec_file: Input vector file/path
+    :param vec_lyr: Input vector layer name
+    :param out_vec_file_base: The output vector file base name and path. Note,
+                              the output file name will be: base{n_set}.out_ext.
+                              If you want a character (e.g., underscore) between the
+                              basename and the set number then include in the basename.
+                              Example, out/path/vec_file_name_
+    :param out_vec_lyr: the output vector layer name. The same layer name is used for
+                        all the output files.
+    :param cls_col: The column in the vector file which has values for the classes
+    :param n_sets: The number of sets you want the input vector sorted into.
+    :param sets_col: A column added to the output files with an integer representing
+                     the set the row belongs to so if vector files are merged again
+                     then the set information is not lost. (Default: 'set_id')
+    :param out_format: The output vector file format (Default: GPKG)
+    :param out_ext: the output vector file format extension (Default: gpkg)
+    :param shuffle_rows: Boolean specifying whether the vector layer rows should be
+                         shuffled before splitting into sets (Default: True)
+    :param rnd_seed: If shuffling the rows then this random seed can be used to ensure
+                     the shuffling is the same between runs.
+
+    """
+    import geopandas
+    import math
+    import numpy
+    import tqdm
+
+    # Read input vector file.
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    if cls_col not in base_gpdf.columns:
+        raise Exception(
+            "The specified class column is not within the input vector layer"
+        )
+
+    if shuffle_rows:
+        base_gpdf = base_gpdf.sample(frac=1, random_state=rnd_seed).reset_index(
+            drop=True
+        )
+    base_gpdf[sets_col] = numpy.zeros((base_gpdf.shape[0]), dtype=numpy.uint16)
+
+    unq_cls_info = base_gpdf[cls_col].value_counts()
+
+    sets = numpy.arange(1, n_sets + 1)
+
+    for cls, n_vals in tqdm.tqdm(zip(unq_cls_info.index, unq_cls_info)):
+        n_vals_per_set = math.floor(n_vals / n_sets)
+        sets_arr = numpy.zeros(n_vals, dtype=numpy.uint8)
+        s_idx = 0
+        e_idx = n_vals_per_set
+        for set in sets:
+            sets_arr[s_idx:e_idx] = set
+            s_idx = e_idx
+            e_idx = e_idx + n_vals_per_set
+        cls_msk = base_gpdf[cls_col] == cls
+        base_gpdf.loc[cls_msk, sets_col] = sets_arr
+
+    for set in tqdm.tqdm(sets):
+        out_vec_file = "{}{}.{}".format(out_vec_file_base, set, out_ext)
+        set_msk = base_gpdf[sets_col] == set
+        tmp_gpdf = base_gpdf[set_msk]
+
+        if out_format == "GPKG":
+            tmp_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            tmp_gpdf.to_file(out_vec_file, driver=out_format)

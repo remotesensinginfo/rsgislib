@@ -63,8 +63,8 @@ Merge Vectors
     :members:
 
 
-Vector Select / Subset / Split
--------------------------------
+Vector Select / Subset
+-----------------------
 
 .. autofunction:: rsgislib.vectorutils.get_att_lst_select_feats
 .. autofunction:: rsgislib.vectorutils.get_att_lst_select_feats_lyr_objs
@@ -75,21 +75,32 @@ Vector Select / Subset / Split
 .. autofunction:: rsgislib.vectorutils.bbox_intersects_vec_lyr
 .. autofunction:: rsgislib.vectorutils.subset_envs_vec_lyr_obj
 .. autofunction:: rsgislib.vectorutils.subset_veclyr_to_featboxs
-.. autofunction:: rsgislib.vectorutils.does_vmsk_img_intersect
 .. autofunction:: rsgislib.vectorutils.spatial_select
-.. autofunction:: rsgislib.vectorutils.split_by_attribute
 .. autofunction:: rsgislib.vectorutils.subset_by_attribute
+
+Vector Split
+---------------
+
+.. autofunction:: rsgislib.vectorutils.split_by_attribute
 .. autofunction:: rsgislib.vectorutils.split_feats_to_mlyrs
 .. autofunction:: rsgislib.vectorutils.split_vec_lyr_random_subset
 .. autofunction:: rsgislib.vectorutils.create_train_test_smpls
+.. autofunction:: rsgislib.vectorutils.create_acc_pt_sets
 
 
 Vector Geometry
 ----------------
+
 .. autofunction:: rsgislib.vectorutils.explode_vec_lyr
 .. autofunction:: rsgislib.vectorutils.explode_vec_files
 .. autofunction:: rsgislib.vectorutils.geopd_check_polys_wgs84_bounds_geometry
 .. autofunction:: rsgislib.vectorutils.clip_vec_lyr
+
+
+Vector / Raster Tests
+----------------------
+
+.. autofunction:: rsgislib.vectorutils.does_vmsk_img_intersect
 
 
 Vector Info
