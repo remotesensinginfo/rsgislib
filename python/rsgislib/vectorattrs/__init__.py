@@ -174,7 +174,7 @@ def write_vec_column_to_layer(
         openTransaction = False
 
 
-def read_vec_column(vec_file: str, vec_lyr: str, att_column: str):
+def read_vec_column(vec_file: str, vec_lyr: str, att_column: str) -> list:
     """
     A function which will reads a column from a vector file
 
@@ -217,14 +217,14 @@ def read_vec_column(vec_file: str, vec_lyr: str, att_column: str):
     return outVal
 
 
-def read_vec_columns(vec_file: str, vec_lyr: str, att_columns: list):
+def read_vec_columns(vec_file: str, vec_lyr: str, att_columns: list) -> list:
     """
     A function which will reads a number of column from a vector file
 
     :param vec_file: The file / path to the vector data 'file'.
     :param vec_lyr: The layer to which the data is to be read from.
     :param att_columns: List of input attribute column names to be read in.
-    :returns: dict with the column names as keys and a list of values for each column
+    :returns: list of dicts with the column names as keys
 
     """
     gdal.UseExceptions()

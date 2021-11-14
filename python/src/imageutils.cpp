@@ -869,47 +869,6 @@ static PyObject *ImageUtils_SubsetBBox(PyObject *self, PyObject *args, PyObject 
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_Subset2Polys(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),
-                             RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("filename_att"),
-                             RSGIS_PY_C_TEXT("out_img_base"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("out_img_ext"), nullptr};
-    const char *pszInputImage, *pszInputVectorFile, *pszInputVectorLyr, *pszOutputImageBase, *pszAttribute, *pszGDALFormat, *pszOutputExt;
-    int nOutDataType;
-
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssis:subset_to_polys", kwlist, &pszInputImage, &pszInputVectorFile, &pszInputVectorLyr,
-                                     &pszAttribute, &pszOutputImageBase, &pszGDALFormat, &nOutDataType, &pszOutputExt))
-        return nullptr;
-    
-    PyObject *pOutList;
-    try
-    {
-        std::vector<std::string> outFileNames;
-        
-        rsgis::cmds::executeSubset2Polys(std::string(pszInputImage), std::string(pszInputVectorFile),
-                                         std::string(pszInputVectorLyr), std::string(pszAttribute),
-                                         std::string(pszOutputImageBase), std::string(pszGDALFormat),
-                                         (rsgis::RSGISLibDataType)nOutDataType, std::string(pszOutputExt), &outFileNames);
-     
-        pOutList = PyList_New(outFileNames.size());
-        Py_ssize_t nIndex = 0;
-        for(auto itr = outFileNames.begin(); itr != outFileNames.end(); itr++)
-        {
-            PyObject *pVal = RSGISPY_CREATE_STRING((*itr).c_str());
-            PyList_SetItem(pOutList, nIndex, pVal ); // steals a reference
-            nIndex++;
-        }
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    return pOutList;
-}
-
 static PyObject *ImageUtils_Subset2Img(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("in_roi_img"),
@@ -2451,38 +2410,6 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   yMin = 359470.8\n"
 "   yMax = 359500.8\n"
 "   imageutils.subset_bbox(inputImage, outputImage, gdalformat, datatype, xMin, xMax, yMin, yMax)\n"
-"\n"},
-
-    {"subset_to_polys", (PyCFunction)ImageUtils_Subset2Polys, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.subset(input_img, vec_file, vec_lyr, filename_att, out_img_base, gdalformat, datatype, out_img_ext)\n"
-"Subset an image to the bounding box of a each polygon in an input vector.\n"
-"Useful for splitting an image into tiles of unequal sizes.\n"
-"\n"
-"Where:\n"
-"\n"
-":param input_img: is a string providing the name of the input file.\n"
-":param vec_file: is a string providing the vector which the image is to be clipped to. \n"
-":param vec_lyr: is a string with the vector layer name to be used.\n"
-":param filename_att: is a string providing the attribute in the vector to use for the ouput name\n"
-":param out_img_base: is a string providing the base name of the output file. The specified attribute of each polygon and extension will be appended.\n"
-":param gdalformat: is a string providing the output gdalformat of the subsets (e.g., KEA).\n"
-":param datatype: is a rsgislib.TYPE_* value providing the output data type of the subsets.\n"
-":param out_img_ext: is a string providing the extension for the tiles (as required by the specified data gdalformat).\n"
-"\n"
-":return: A list of strings containing the filenames.\n"
-"\n"
-"Example::\n"
-"\n"
-"   import rsgislib\n"
-"   from rsgislib import imageutils\n"
-"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"   inputVector = './Vectors/injune_p142_plot_location_utm.shp'\n"
-"   attribute = 'PLOTNO'\n"
-"   outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_subset_polys_'\n"
-"   gdalformat = 'KEA'\n"
-"   gdaltype = rsgislib.TYPE_32FLOAT\n"
-"   ext = 'kea'\n"
-"   imageutils.subset_to_polys(inputImage, inputVector, attribute, outputImageBase, gdalformat, gdaltype, ext)\n"
 "\n"},
 
     {"subset_to_img", (PyCFunction)ImageUtils_Subset2Img, METH_VARARGS | METH_KEYWORDS,

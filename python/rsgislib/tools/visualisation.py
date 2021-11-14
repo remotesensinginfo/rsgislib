@@ -1033,7 +1033,7 @@ def create_visual_overview_imgs_vec_extent(input_imgs, bands, tmp_dir, vec_exten
     if vec_extent_file is None:
         rsgislib.imageutils.gdal_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img)
     else:
-        vec_extent_bbox = rsgislib.vectorutils.getVecLayerExtent(vec_extent_file, vec_extent_lyr, computeIfExp=True)
+        vec_extent_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_extent_file, vec_extent_lyr, computeIfExp=True)
         vrt_extent = [vec_extent_bbox[0], vec_extent_bbox[2], vec_extent_bbox[1], vec_extent_bbox[3]]
         rsgislib.imageutils.gdal_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img, vrt_extent)
 

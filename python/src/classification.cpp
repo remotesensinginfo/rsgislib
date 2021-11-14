@@ -161,7 +161,7 @@ static PyObject *Classification_GenStratifiedRandomAccuracyPts(PyObject *self, P
     int seed = 10;
     int usePxlLst = false;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssssi|iii:generate_stratified_random_accuracy_pts", kwlist, &pszInputImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssssi|iii:generate_stratified_random_accuracy_pts", kwlist, &pszInputImage,
                                      &pszOutputVecFile, &pszOutputVecLyr, &pszFormat, &pszClassImgCol, &pszClassImgVecCol,
                                      &pszClassRefVecCol, &numPts, &seed, &del_exist_vec, &usePxlLst))
     {

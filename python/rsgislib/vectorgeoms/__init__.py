@@ -2844,7 +2844,7 @@ def vec_crosses_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
     return does_cross
 
 
-def get_feat_envs(vec_file, vec_lyr):
+def get_geoms_as_bboxs(vec_file: str, vec_lyr: str) -> list:
     """
     A function which returns a list of bounding boxes for each feature
     within the vector layer.
@@ -2853,37 +2853,20 @@ def get_feat_envs(vec_file, vec_lyr):
     :param vec_lyr: layer within the vector file.
     :returns: list of BBOXs
     """
-    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
-    if dsVecFile is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+    import geopandas
 
-    vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
-    if vec_lyr_obj is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+    # Read input vector file.
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
-    openTransaction = False
-    nFeats = vec_lyr_obj.GetFeatureCount(True)
-    step = math.floor(nFeats / 10)
-    feedback = 10
-    feedback_next = step
-    counter = 0
-    print("Started .0.", end="", flush=True)
-    outenvs = []
-    # loop through the input features
-    inFeature = vec_lyr_obj.GetNextFeature()
-    while inFeature:
-        if (nFeats > 10) and (counter == feedback_next):
-            print(".{}.".format(feedback), end="", flush=True)
-            feedback_next = feedback_next + step
-            feedback = feedback + 10
-
-        # get the input geometry
-        geom = inFeature.GetGeometryRef()
-        if geom is not None:
-            outenvs.append(geom.GetEnvelope())
-
-        inFeature = vec_lyr_obj.GetNextFeature()
-        counter = counter + 1
-    print(" Completed")
-    dsVecFile = None
-    return outenvs
+    # Get Geometry bounds
+    geom_bounds = base_gpdf["geometry"].bounds
+    # Create list of bboxs
+    bboxs = list(
+        zip(
+            geom_bounds["minx"],
+            geom_bounds["maxx"],
+            geom_bounds["miny"],
+            geom_bounds["maxy"],
+        )
+    )
+    return bboxs

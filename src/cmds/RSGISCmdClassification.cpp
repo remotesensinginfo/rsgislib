@@ -249,13 +249,16 @@ namespace rsgis{ namespace cmds {
             }
             else
             {
-                if(fileUtils.checkFilePresent(outputVecFile) & del_exist_vec)
+                if(fileUtils.checkFilePresent(outputVecFile))
                 {
-                    fileUtils.removeFileIfPresent(outputVecFile);
-                }
-                else
-                {
-                    throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
+                    if(del_exist_vec)
+                    {
+                        fileUtils.removeFileIfPresent(outputVecFile);
+                    }
+                    else
+                    {
+                        throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
+                    }
                 }
             }
             ogrSpatialRef = new OGRSpatialReference(imgDataset->GetProjectionRef());

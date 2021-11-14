@@ -112,7 +112,7 @@ Subsetting
 
 .. autofunction:: rsgislib.imageutils.subset
 .. autofunction:: rsgislib.imageutils.subset_to_img
-.. autofunction:: rsgislib.imageutils.subset_to_polys
+.. autofunction:: rsgislib.imageutils.subset_to_geoms_bbox
 .. autofunction:: rsgislib.imageutils.subset_bbox
 .. autofunction:: rsgislib.imageutils.subset_pxl_bbox
 .. autofunction:: rsgislib.imageutils.subset_to_vec

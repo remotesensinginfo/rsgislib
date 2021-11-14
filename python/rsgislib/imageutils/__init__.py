@@ -1599,7 +1599,7 @@ def create_blank_img_from_ref_vector(
     import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
 
-    baseExtent = rsgislib.vectorutils.getVecLayerExtent(vec_file, vec_lyr)
+    baseExtent = rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
     xMin, xMax, yMin, yMax = rsgislib.tools.geometrytools.findExtentOnGrid(
         baseExtent, out_img_res, full_contain=True
     )
@@ -1663,7 +1663,7 @@ def create_copy_img_vec_extent_snap_to_grid(
     import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
 
-    vec_bbox = rsgislib.vectorutils.getVecLayerExtent(
+    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
         vec_file, layerName=vec_lyr, computeIfExp=True
     )
     xMin = vec_bbox[0] - (out_img_res * buf_n_pxl)
@@ -2300,7 +2300,7 @@ def subset_pxl_bbox(
     yMin = bbox[2] + (y_min_pxl * yRes)
     yMax = bbox[2] + (y_max_pxl * yRes)
 
-    subsetbbox(input_img, output_img, gdalformat, datatype, xMin, xMax, yMin, yMax)
+    subset_bbox(input_img, output_img, gdalformat, datatype, xMin, xMax, yMin, yMax)
 
 
 def create_tiles_multi_core(
@@ -2914,7 +2914,7 @@ def gdal_translate(
     gdal.Translate(output_img, input_img, options=trans_opt)
 
 
-def create_stack_images_vrt(input_imgs: str, out_vrt_file: str):
+def create_stack_images_vrt(input_imgs: list, out_vrt_file: str):
     """
     A function which creates a GDAL VRT file from a set of input images by stacking
     the input images in a multi-band output file.
@@ -2936,7 +2936,7 @@ def create_stack_images_vrt(input_imgs: str, out_vrt_file: str):
 
 
 def create_mosaic_images_vrt(
-    input_imgs: str, out_vrt_file: str, vrt_extent: list = None
+    input_imgs: list, out_vrt_file: str, vrt_extent: list = None
 ):
     """
     A function which creates a GDAL VRT file from a set of input images by mosaicking
@@ -3006,20 +3006,21 @@ def subset_to_vec(
     import rsgislib.tools.geometrytools
 
     if vec_epsg is None:
-        vec_epsg = rsgislib.vectorutils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
+        vec_epsg = rsgislib.vectorutils.get_proj_epsg_from_vec(
+            roi_vec_file, roi_vec_lyr
+        )
     img_epsg = get_epsg_proj_from_img(input_img)
     if img_epsg == vec_epsg:
-
         projs_match = True
     else:
         img_bbox = get_img_bbox_in_proj(input_img, vec_epsg)
         projs_match = False
     img_bbox = get_img_bbox(input_img)
-    vec_bbox = rsgislib.vectorutils.getVecLayerExtent(
+    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
         roi_vec_file, roi_vec_lyr, computeIfExp=True
     )
     if img_epsg != vec_epsg:
-        vec_bbox = rsgislib.tools.geometrytools.reprojBBOX_epsg(
+        vec_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(
             vec_bbox, vec_epsg, img_epsg
         )
 
@@ -3027,7 +3028,7 @@ def subset_to_vec(
         common_bbox = rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox)
         if datatype == None:
             datatype = get_gdal_datatype_from_img(input_img)
-        subsetbbox(
+        subset_bbox(
             input_img,
             output_img,
             gdalformat,
@@ -3041,6 +3042,67 @@ def subset_to_vec(
         raise Exception(
             "The image and vector do not intersect and "
             "therefore the image cannot be subset."
+        )
+
+
+def subset_to_geoms_bbox(
+    input_img: str,
+    vec_file: str,
+    vec_lyr: str,
+    att_unq_val_col: str,
+    out_img_base: str,
+    gdalformat: str = "KEA",
+    datatype: int = None,
+    out_img_ext: str = "kea",
+):
+    """
+    Subset an image to the bounding box of a each geometry in the input vector
+    producing multiple output files. Useful for splitting an image into tiles
+    of unequal sizes or extracting sampling plots from a larger image.
+
+    :param input_img: The input image from which the subsets will be extracted.
+    :param vec_file: input vector file/path
+    :param vec_lyr: input vector layer name
+    :param att_unq_val_col: column within the attribute table which has a value
+                            to be included within the output file name so the
+                            output files can be identified and have unique file
+                            names.
+    :param out_img_base: the output images base path and file name
+    :param gdalformat: output image file format (default: KEA)
+    :param datatype: output image data type. If None (default) then taken from
+                     the input image.
+    :param out_img_ext: output image file extension (e.g., kea)
+
+    """
+    import rsgislib.vectorgeoms
+    import rsgislib.vectorattrs
+
+    if datatype is None:
+        datatype = get_rsgislib_datatype_from_img(input_img)
+
+    bboxs = rsgislib.vectorgeoms.get_geoms_as_bboxs(vec_file, vec_lyr)
+    print(bboxs)
+    print(
+        "There are {} geometries for "
+        "which subsets will be created".format(len(bboxs))
+    )
+
+    unq_bbox_ids = rsgislib.vectorattrs.read_vec_column(
+        vec_file, vec_lyr, att_unq_val_col
+    )
+
+    for bbox_id, bbox in zip(unq_bbox_ids, bboxs):
+        output_img = "{}{}.{}".format(out_img_base, bbox_id, out_img_ext)
+        print(output_img)
+        subset_bbox(
+            input_img,
+            output_img,
+            gdalformat,
+            datatype,
+            bbox[0],
+            bbox[1],
+            bbox[2],
+            bbox[3],
         )
 
 
@@ -3079,7 +3141,9 @@ def mask_img_with_vec(
 
     # Does the input image BBOX intersect the BBOX of the ROI vector?
     if vec_epsg is None:
-        vec_epsg = rsgislib.vectorutils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
+        vec_epsg = rsgislib.vectorutils.get_proj_epsg_from_vec(
+            roi_vec_file, roi_vec_lyr
+        )
     img_epsg = get_epsg_proj_from_img(input_img)
     if img_epsg == vec_epsg:
         img_bbox = get_img_bbox(input_img)
@@ -3087,7 +3151,7 @@ def mask_img_with_vec(
     else:
         img_bbox = get_img_bbox_in_proj(input_img, vec_epsg)
         projs_match = False
-    vec_bbox = rsgislib.vectorutils.getVecLayerExtent(
+    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
         roi_vec_file, roi_vec_lyr, computeIfExp=True
     )
 

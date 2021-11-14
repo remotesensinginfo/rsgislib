@@ -72,7 +72,7 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
         os.remove(cfile)
 
 
-def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None):
+def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None) -> str:
     """
     A function which gets the WKT projection from the inputted vector file.
 
@@ -95,7 +95,7 @@ def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None):
     return spatialRef.ExportToWkt()
 
 
-def get_proj_epsg_from_vec(vec_file: str, vec_lyr: str = None):
+def get_proj_epsg_from_vec(vec_file: str, vec_lyr: str = None) -> int:
     """
     A function which gets the EPSG projection from the inputted vector file.
 
@@ -257,14 +257,17 @@ def merge_vector_lyrs_to_gpkg(
     vec_file: str, out_vec_file: str, out_vec_lyr: str, exists: bool = False
 ):
     """
-    Function which will merge all the layers in the input vector file into an single output GeoPackage (GPKG)
-    file using ogr2ogr.
+    Function which will merge all the layers in the input vector file into an
+    single output GeoPackage (GPKG) file using ogr2ogr.
 
     Where:
 
-    :param vec_file: is a vector file which contains multiple layers which are to be merged
+    :param vec_file: is a vector file which contains multiple layers which
+                     are to be merged
     :param out_vec_file: is the output GPKG database (\*.gpkg)
-    :param out_vec_lyr: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+    :param out_vec_lyr: is the layer name in the output database (i.e., you can
+                        merge layers into single layer or write a number of layers
+                        to the same database).
     :param exists: boolean which specifies whether the database file exists or not.
     """
     lyrs = get_vec_lyrs_lst(vec_file)
@@ -404,7 +407,7 @@ def get_vec_lyrs_lst(vec_file: str):
 
 def get_vec_layer_extent(
     vec_file: str, vec_lyr: str = None, compute_if_exp: bool = True
-):
+) -> list:
     """
     Get the extent of the vector layer.
 
@@ -1468,7 +1471,9 @@ def subset_veclyr_to_featboxs(
     :param out_format: The output file driver (e.g., GPKG).
 
     """
-    bboxes = get_feat_envs(vec_file_bbox, vec_lyr_bbox)
+    import rsgislib.vectorgeoms
+
+    bboxes = rsgislib.vectorgeoms.get_geoms_as_bboxs(vec_file_bbox, vec_lyr_bbox)
     print("There are {} bboxes to subset to.".format(len(bboxes)))
     for i in range(len(bboxes)):
         print(bboxes[i])
