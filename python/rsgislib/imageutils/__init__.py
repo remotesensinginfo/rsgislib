@@ -3060,6 +3060,9 @@ def subset_to_geoms_bbox(
     producing multiple output files. Useful for splitting an image into tiles
     of unequal sizes or extracting sampling plots from a larger image.
 
+    Note, if a vector feature does not intersect with the input image then
+    it will silently ignore the feature (i.e., not output image will be produced).
+
     :param input_img: The input image from which the subsets will be extracted.
     :param vec_file: input vector file/path
     :param vec_lyr: input vector layer name
@@ -3076,6 +3079,7 @@ def subset_to_geoms_bbox(
     """
     import rsgislib.vectorgeoms
     import rsgislib.vectorattrs
+    import rsgislib.tools.geometrytools
 
     if datatype is None:
         datatype = get_rsgislib_datatype_from_img(input_img)
@@ -3091,19 +3095,36 @@ def subset_to_geoms_bbox(
         vec_file, vec_lyr, att_unq_val_col
     )
 
+    in_img_bbox = get_img_bbox(input_img)
+
     for bbox_id, bbox in zip(unq_bbox_ids, bboxs):
         output_img = "{}{}.{}".format(out_img_base, bbox_id, out_img_ext)
         print(output_img)
-        subset_bbox(
-            input_img,
-            output_img,
-            gdalformat,
-            datatype,
-            bbox[0],
-            bbox[1],
-            bbox[2],
-            bbox[3],
-        )
+        if rsgislib.tools.geometrytools.does_bbox_contain(in_img_bbox, bbox):
+            subset_bbox(
+                input_img,
+                output_img,
+                gdalformat,
+                datatype,
+                bbox[0],
+                bbox[1],
+                bbox[2],
+                bbox[3],
+            )
+        elif rsgislib.tools.geometrytools.do_bboxes_intersect(in_img_bbox, bbox):
+            inter_bbox = rsgislib.tools.geometrytools.bbox_intersection(
+                in_img_bbox, bbox
+            )
+            subset_bbox(
+                input_img,
+                output_img,
+                gdalformat,
+                datatype,
+                inter_bbox[0],
+                inter_bbox[1],
+                inter_bbox[2],
+                inter_bbox[3],
+            )
 
 
 def mask_img_with_vec(
