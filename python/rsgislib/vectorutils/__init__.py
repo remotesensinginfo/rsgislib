@@ -119,7 +119,9 @@ def get_proj_epsg_from_vec(vec_file: str, vec_lyr: str = None) -> int:
     return spatialRef.GetAuthorityCode(None)
 
 
-def get_vec_feat_count(vec_file: str, vec_lyr: str = None, compute_count: bool = True):
+def get_vec_feat_count(
+    vec_file: str, vec_lyr: str = None, compute_count: bool = True
+) -> int:
     """
     Get a count of the number of features in the vector layers.
 
@@ -335,16 +337,20 @@ def merge_vectors_to_gpkg_ind_lyrs(
     geom_type: str = None,
 ):
     """
-    Function which will merge a list of vector files into an single output GPKG file where each input
-    file forms a new layer using the existing layer name. This function wraps the ogr2ogr command.
+    Function which will merge a list of vector files into an single output GPKG file
+    where each input file forms a new layer using the existing layer name. This
+    function wraps the ogr2ogr command.
 
     Where:
 
     :param in_vec_files: is a list of input files.
     :param out_vec_file: is the output GPKG database (\*.gpkg)
-    :param rename_dup_lyrs: If False an exception will be throw if any input layers has the same name.
-                            If True a layer will be renamed - with a random set of letters/numbers on the end.
-    :param geom_type: Force the output vector to have a particular geometry type (e.g., 'POLYGON'). Same options as ogr2ogr.
+    :param rename_dup_lyrs: If False an exception will be throw if any input layers
+                            has the same name. If True a layer will be renamed - with
+                            a random set of letters/numbers on the end.
+    :param geom_type: Force the output vector to have a particular geometry type
+                      (e.g., 'POLYGON'). Same options as ogr2ogr.
+
     """
     import rsgislib.tools.utils
 
@@ -367,16 +373,19 @@ def merge_vectors_to_gpkg_ind_lyrs(
                     out_lyr = "{}_{}".format(lyr, rsgislib.tools.utils.uid_generator())
                 else:
                     raise Exception(
-                        "Input files have layers with the same name, these will be over written."
+                        "Input files have layers with the "
+                        "same name, these will be over written."
                     )
             print(
-                "Processing Layer: {0} has {1} features to copy - output layer name: {2}".format(
-                    lyr, nFeat, out_lyr
-                )
+                "Processing Layer: {0} has {1} features to "
+                "copy - output layer name: {2}".format(lyr, nFeat, out_lyr)
             )
             if nFeat > 0:
-                cmd = 'ogr2ogr -overwrite -f "GPKG" {4} -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {3}'.format(
-                    out_lyr, out_vec_file, inFile, lyr, out_geom_type
+                cmd = (
+                    'ogr2ogr -overwrite -f "GPKG" {4} -lco '
+                    'SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {3}'.format(
+                        out_lyr, out_vec_file, inFile, lyr, out_geom_type
+                    )
                 )
                 try:
                     subprocess.check_call(cmd, shell=True)
@@ -385,7 +394,7 @@ def merge_vectors_to_gpkg_ind_lyrs(
                 out_lyr_names.append(out_lyr)
 
 
-def get_vec_lyrs_lst(vec_file: str):
+def get_vec_lyrs_lst(vec_file: str) -> list:
     """
     A function which returns a list of available layers within the inputted vector file.
 
@@ -683,8 +692,9 @@ def reproj_vec_lyr_obj(
     print_feedback: bool = True,
 ):
     """
-    A function which reprojects a vector layer. You might also consider using rsgislib.vectorutils.vector_translate,
-    particularly if you are reprojecting the data and changing between coordinate units (e.g., degrees to meters)
+    A function which reprojects a vector layer. You might also consider using
+    rsgislib.vectorutils.vector_translate, particularly if you are reprojecting
+    the data and changing between coordinate units (e.g., degrees to meters)
 
     :param vec_lyr_obj: is a GDAL vector layer object.
     :param out_vec_file: is a string with name and path to output vector file - is created.
@@ -812,7 +822,9 @@ def reproj_vec_lyr_obj(
     return result_ds, result_lyr
 
 
-def get_att_lst_select_feats(vec_file, vec_lyr, att_names, vec_sel_file, vec_sel_lyr):
+def get_att_lst_select_feats(
+    vec_file: str, vec_lyr: str, att_names: list, vec_sel_file: str, vec_sel_lyr: str
+):
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -911,7 +923,9 @@ def get_att_lst_select_feats(vec_file, vec_lyr, att_names, vec_sel_file, vec_sel
     return outvals
 
 
-def get_att_lst_select_feats_lyr_objs(vec_lyr_obj, att_names, vec_sel_lyr_obj):
+def get_att_lst_select_feats_lyr_objs(
+    vec_lyr_obj: ogr.Layer, att_names: list, vec_sel_lyr_obj: ogr.Layer
+) -> list:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -992,7 +1006,9 @@ def get_att_lst_select_feats_lyr_objs(vec_lyr_obj, att_names, vec_sel_lyr_obj):
     return outvals
 
 
-def get_att_lst_select_bbox_feats(vec_file, vec_lyr, att_names, bbox, bbox_epsg=None):
+def get_att_lst_select_bbox_feats(
+    vec_file: str, vec_lyr: str, att_names: list, bbox: list, bbox_epsg: int = None
+) -> list:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1022,8 +1038,8 @@ def get_att_lst_select_bbox_feats(vec_file, vec_lyr, att_names, bbox, bbox_epsg=
 
 
 def get_att_lst_select_bbox_feats_lyr_objs(
-    vec_lyr_obj, att_names, bbox, bbox_epsg=None
-):
+    vec_lyr_obj: ogr.Layer, att_names: list, bbox: list, bbox_epsg: int = None
+) -> list:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1135,13 +1151,13 @@ def get_att_lst_select_bbox_feats_lyr_objs(
 
 
 def select_intersect_feats(
-    vec_file,
-    vec_lyr,
-    vec_roi_file,
-    vec_roi_lyr,
-    out_vec_file,
-    out_vec_lyr,
-    out_format="GPKG",
+    vec_file: str,
+    vec_lyr: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
 ):
     """
     Function to select the features which intersect with region of interest (ROI) features which will be outputted
@@ -1196,7 +1212,13 @@ def select_intersect_feats(
 
 
 def export_spatial_select_feats(
-    vec_file, vec_lyr, vec_sel_file, vec_sel_lyr, out_vec_file, out_vec_lyr, out_format
+    vec_file: str,
+    vec_lyr: str,
+    vec_sel_file: str,
+    vec_sel_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str,
 ):
     """
     Function to get a list of attribute values from features which intersect
@@ -1290,14 +1312,15 @@ def export_spatial_select_feats(
         raise e
 
 
-def bbox_intersects_vec_lyr(vec_file, vec_lyr, bbox):
+def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: list) -> bool:
     """
     A function which tests whether a feature within an inputted vector layer intersects
     with a bounding box.
 
     :param vec_file: vector file/path
     :param vec_lyr: vector layer name
-    :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
+    :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as
+                 vector layer.
     :returns: boolean (True = Intersection)
 
     """
@@ -1330,7 +1353,7 @@ def bbox_intersects_vec_lyr(vec_file, vec_lyr, bbox):
     return intersect
 
 
-def get_vec_lyr_cols(vec_file, vec_lyr):
+def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> list:
     """
     A function which returns a list of columns from the input vector layer.
 
@@ -1356,7 +1379,9 @@ def get_vec_lyr_cols(vec_file, vec_lyr):
     return atts
 
 
-def subset_envs_vec_lyr_obj(vec_lyr_obj, bbox, epsg=None):
+def subset_envs_vec_lyr_obj(
+    vec_lyr_obj: ogr.Layer, bbox: list, epsg: int = None
+) -> (ogr.DataSource, ogr.Layer):
     """
     Function to get an ogr vector layer for the defined bounding box. The returned
     layer is returned as an in memory ogr Layer object.
@@ -1446,14 +1471,14 @@ def subset_envs_vec_lyr_obj(vec_lyr_obj, bbox, epsg=None):
 
 
 def subset_veclyr_to_featboxs(
-    vec_file_bbox,
-    vec_lyr_bbox,
-    vec_file_tosub,
-    vec_lyr_tosub,
-    out_lyr_name,
-    out_file_base,
-    out_file_end=".gpkg",
-    out_format="GPKG",
+    vec_file_bbox: str,
+    vec_lyr_bbox: str,
+    vec_file_tosub: str,
+    vec_lyr_tosub: str,
+    out_lyr_name: str,
+    out_file_base: str,
+    out_file_end: str = ".gpkg",
+    out_format: str = "GPKG",
 ):
     """
     A function which subsets an input vector layer using the BBOXs of the features
@@ -1492,7 +1517,7 @@ def subset_veclyr_to_featboxs(
         grid_02d_ds = None
 
 
-def read_vec_lyr_to_mem(vec_file, vec_lyr):
+def read_vec_lyr_to_mem(vec_file: str, vec_lyr: str) -> (ogr.DataSource, ogr.Layer):
     """
     A function which reads a vector layer to an OGR in memory layer.
 
@@ -1523,7 +1548,9 @@ def read_vec_lyr_to_mem(vec_file, vec_lyr):
     return mem_ds, mem_lyr
 
 
-def open_gdal_vec_lyr(vec_file, vec_lyr=None):
+def open_gdal_vec_lyr(
+    vec_file: str, vec_lyr: str = None
+) -> (ogr.DataSource, ogr.Layer):
     """
     A function which opens a GDAL/OGR vector layer and returns
     the Dataset and Layer objects. Note, the file must be closed
@@ -1550,7 +1577,9 @@ def open_gdal_vec_lyr(vec_file, vec_lyr=None):
     return vec_obj_ds, lyr_obj
 
 
-def get_mem_vec_lyr_subset(vec_file, vec_lyr, bbox):
+def get_mem_vec_lyr_subset(
+    vec_file: str, vec_lyr: str, bbox: list
+) -> (ogr.DataSource, ogr.Layer):
     """
     Function to get an ogr vector layer for the defined bounding box. The returned
     layer is returned as an in memory ogr Layer object.
@@ -1580,7 +1609,12 @@ def get_mem_vec_lyr_subset(vec_file, vec_lyr, bbox):
 
 
 def write_vec_lyr_to_file(
-    vec_lyr_obj, out_vec_file, out_vec_lyr, out_format, options=[], replace=False
+    vec_lyr_obj: ogr.Layer,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str,
+    options: list = [],
+    replace: bool = False,
 ):
     """
     A function which reads a vector layer to an OGR in memory layer.
@@ -1619,14 +1653,14 @@ def write_vec_lyr_to_file(
 
 
 def create_copy_vector_lyr(
-    vec_file,
-    vec_lyr,
-    out_vec_file,
-    out_vec_lyr,
-    out_format,
-    options=[],
-    replace=False,
-    in_memory=False,
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str,
+    options: list = [],
+    replace: bool = False,
+    in_memory: bool = False,
 ):
     """
     A function which creates a copy of the input vector layer.
@@ -1655,7 +1689,7 @@ def create_copy_vector_lyr(
     vec_obj_ds = None
 
 
-def get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(rat_datatype):
+def get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(rat_datatype: int) -> int:
     """
     Returns the data type to create a column in a OGR vector layer for equalivant to
     rat_datatype.
@@ -1677,13 +1711,13 @@ def get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(rat_datatype):
 
 
 def copy_rat_cols_to_vector_lyr(
-    vec_file,
-    vec_lyr,
-    rat_row_col,
-    clumps_img,
-    ratcols,
-    out_col_names=None,
-    out_col_types=None,
+    vec_file: str,
+    vec_lyr: str,
+    rat_row_col: str,
+    clumps_img: str,
+    ratcols: list,
+    out_col_names: list = None,
+    out_col_types: list = None,
 ):
     """
     A function to copy columns from RAT to a vector layer. Note, the vector layer
@@ -1852,15 +1886,15 @@ def copy_rat_cols_to_vector_lyr(
 
 
 def perform_spatial_join(
-    vec_base_file,
-    vec_join_file,
-    out_vec_file,
-    vec_base_lyr=None,
-    vec_join_lyr=None,
-    out_vec_lyr=None,
-    out_format=None,
-    join_how="inner",
-    join_op="within",
+    vec_base_file: str,
+    vec_join_file: str,
+    out_vec_file: str,
+    vec_base_lyr: str = None,
+    vec_join_lyr: str = None,
+    out_vec_lyr: str = None,
+    out_format: str = None,
+    join_how: str = "inner",
+    join_op: str = "within",
 ):
     """
     A function to perform a spatial join between two vector layers. This function
@@ -1927,7 +1961,11 @@ def perform_spatial_join(
 
 
 def does_vmsk_img_intersect(
-    input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir, vec_epsg=None
+    input_vmsk_img: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    tmp_dir: str,
+    vec_epsg: int = None,
 ):
     """
     This function checks whether the input binary raster mask intersects with the
@@ -2027,7 +2065,10 @@ def does_vmsk_img_intersect(
 
 
 def merge_to_multi_layer_vec(
-    input_file_lyrs, out_vec_file, format="GPKG", overwrite=True
+    input_file_lyrs: VecLayersInfoObj,
+    out_vec_file: str,
+    out_format: str = "GPKG",
+    overwrite: bool = True,
 ):
     """
     A function which takes a list of vector files and layers (as VecLayersInfoObj
@@ -2035,7 +2076,7 @@ def merge_to_multi_layer_vec(
 
     :param input_file_lyrs: list of VecLayersInfoObj objects.
     :param out_vec_file: output vector file.
-    :param format: output format Default='GPKG'.
+    :param out_format: output format Default='GPKG'.
     :param overwrite: bool (default = True) specifying whether the input file should be
                       overwritten if it already exists.
 
@@ -2048,28 +2089,30 @@ def merge_to_multi_layer_vec(
                 vec_lyr_obj,
                 out_vec_file,
                 vec.vec_out_lyr,
-                format,
+                out_format,
                 options=["OVERWRITE=YES"],
                 replace=True,
             )
         else:
-            write_vec_lyr_to_file(vec_lyr_obj, out_vec_file, vec.vec_out_lyr, format)
+            write_vec_lyr_to_file(
+                vec_lyr_obj, out_vec_file, vec.vec_out_lyr, out_format
+            )
         vec_lyr_obj = None
         first = False
 
 
 def vector_translate(
-    vec_file,
-    vec_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    drv_create_opts=[],
-    lyr_create_opts=[],
-    access_mode=None,
-    src_srs=None,
-    dst_srs=None,
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    drv_create_opts: list = [],
+    lyr_create_opts: list = [],
+    access_mode: str = None,
+    src_srs: osr.SpatialReference = None,
+    dst_srs: osr.SpatialReference = None,
+    del_exist_vec: bool = False,
 ):
     """
     A function which translates a vector file to another format, similar to ogr2ogr.
@@ -2084,7 +2127,7 @@ def vector_translate(
     :param out_format: the output vector file format (e.g., GPKG, GEOJSON, etc.)
     :param drv_create_opts: a list of options for the creation of the output file.
     :param lyr_create_opts: a list of options for the creation of the output layer.
-    :param access_mode: default is None for creatoion but other but other options are:
+    :param access_mode: default is None for creation but other but other options are:
                         [None (creation), 'update', 'append', 'overwrite']
     :param src_srs: provide a source spatial reference for the input vector file.
                     Default=None. can be used to provide a projection where none has
@@ -2152,16 +2195,16 @@ def vector_translate(
 
 
 def reproj_wgs84_vec_to_utm(
-    vec_file,
-    vec_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    use_hemi=True,
-    out_format="GPKG",
-    drv_create_opts=[],
-    lyr_create_opts=[],
-    access_mode="overwrite",
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    use_hemi: bool = True,
+    out_format: str = "GPKG",
+    drv_create_opts: list = [],
+    lyr_create_opts: list = [],
+    access_mode: str = "overwrite",
+    del_exist_vec: bool = False,
 ):
     """
     A function which reprojects an input file projected in WGS84 (EPSG:4326) to UTM,
@@ -2255,13 +2298,13 @@ def reproj_wgs84_vec_to_utm(
 
 
 def spatial_select(
-    vec_file,
-    vec_lyr,
-    vec_roi_file,
-    vec_roi_lyr,
-    out_vec_file,
-    out_vec_lyr,
-    out_format="GPKG",
+    vec_file: str,
+    vec_lyr: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
 ):
     """
     A function to perform a spatial selection within the input vector using a
@@ -2301,16 +2344,16 @@ def spatial_select(
 
 
 def split_by_attribute(
-    vec_file,
-    vec_lyr,
-    split_col_name,
-    multi_layers=True,
-    out_vec_file=None,
-    out_file_path=None,
-    out_file_ext=None,
-    out_format="GPKG",
-    dissolve=False,
-    chk_lyr_names=True,
+    vec_file: str,
+    vec_lyr: str,
+    split_col_name: str,
+    multi_layers: bool = True,
+    out_vec_file: str = None,
+    out_file_path: str = None,
+    out_file_ext: str = None,
+    out_format: str = "GPKG",
+    dissolve: bool = False,
+    chk_lyr_names: bool = True,
 ):
     """
     A function which splits a vector layer by an attribute value into either
@@ -2394,14 +2437,14 @@ def split_by_attribute(
 
 
 def subset_by_attribute(
-    vec_file,
-    vec_lyr,
-    sub_col,
-    sub_vals,
-    out_vec_file,
-    out_vec_lyr,
-    out_format="GPKG",
-    match_type="equals",
+    vec_file: str,
+    vec_lyr: str,
+    sub_col: str,
+    sub_vals: list,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    match_type: str = "equals",
 ):
     """
     A function which subsets an input vector layer based on a list of values.
@@ -2459,13 +2502,17 @@ def subset_by_attribute(
 
 
 def merge_vector_files(
-    in_vec_files, out_vec_file, out_vec_lyr=None, out_format="GPKG", out_epsg=None
+    vec_files: list,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    out_epsg: int = None,
 ):
     """
     A function which merges the input files into a single output file using geopandas.
     If the input files have multiple layers they are all merged into the output file.
 
-    :param in_vec_files: list of input files
+    :param vec_files: list of input files
     :param out_vec_file: output vector file.
     :param out_vec_lyr: output vector layer.
     :param out_format: output file format.
@@ -2477,7 +2524,7 @@ def merge_vector_files(
     import geopandas
 
     first = True
-    for vec_file in tqdm.tqdm(in_vec_files):
+    for vec_file in tqdm.tqdm(vec_files):
         lyrs = get_vec_lyrs_lst(vec_file)
         for lyr in lyrs:
             if first:
@@ -2504,13 +2551,17 @@ def merge_vector_files(
 
 
 def merge_vector_layers(
-    in_vecs_dict, out_vec_file, out_vec_lyr=None, out_format="GPKG", out_epsg=None
+    vecs_dict: dict,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    out_epsg: int = None,
 ):
     """
     A function which merges the input vector layers into a single output
     file using geopandas.
 
-    :param in_vecs_dict: list of dicts with keys [{'file': '/file/path/to/file.gpkg',
+    :param vecs_dict: list of dicts with keys [{'file': '/file/path/to/file.gpkg',
                          'layer': 'layer_name'}] providing the file paths and
                          layer names.
     :param out_vec_file: output vector file.
@@ -2524,7 +2575,7 @@ def merge_vector_layers(
     import geopandas
 
     first = True
-    for vec_info in tqdm.tqdm(in_vecs_dict):
+    for vec_info in tqdm.tqdm(vecs_dict):
         if ("file" in vec_info) and ("layer" in vec_info):
             if first:
                 data_gdf = geopandas.read_file(
@@ -2557,7 +2608,13 @@ def merge_vector_layers(
             data_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def explode_vec_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format="GPKG"):
+def explode_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
     """
     A function to explode a vector layer separating any multiple geometries
     (e.g., multipolygons) to single geometries.
@@ -2585,7 +2642,12 @@ def explode_vec_lyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format="GP
             data_explode_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def explode_vec_files(in_vec_files, output_dir, out_format="GPKG", out_vec_ext="gpkg"):
+def explode_vec_files(
+    in_vec_files: list,
+    output_dir: str,
+    out_format: str = "GPKG",
+    out_vec_ext: str = "gpkg",
+):
     """
     A function which explodes the multiple geometries within a list of input layers.
     The output directory must be different to the directory the input files as the
@@ -2612,7 +2674,7 @@ def explode_vec_files(in_vec_files, output_dir, out_format="GPKG", out_vec_ext="
             explode_vec_lyr(vec_file, lyr, out_vec_file, lyr, out_format)
 
 
-def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
+def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres: float = 350):
     """
     A function which checks a polygons within the geometry of a geopanadas dataframe
     for specific case where they on the east/west edge (i.e., 180 / -180) and are
@@ -2732,13 +2794,13 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres=350):
 
 
 def merge_utm_vecs_wgs84(
-    in_vec_files,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    n_hemi_utm_file=None,
-    s_hemi_utm_file=None,
-    width_thres=350,
+    in_vec_files: list,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    n_hemi_utm_file: str = None,
+    s_hemi_utm_file: str = None,
+    width_thres: float = 350,
 ):
     """
     A function which merges input files in UTM projections to the WGS84 projection
@@ -2856,13 +2918,13 @@ def merge_utm_vecs_wgs84(
 
 
 def clip_vec_lyr(
-    vec_file,
-    vec_lyr,
-    vec_roi_file,
-    vec_roi_lyr,
-    out_vec_file,
-    out_vec_lyr,
-    out_format="GPKG",
+    vec_file: str,
+    vec_lyr: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
 ):
     """
     A function which clips a vector layer using an input region of interest
@@ -2891,7 +2953,13 @@ def clip_vec_lyr(
 
 
 def shiftxy_vec_lyr(
-    vec_file, vec_lyr, x_shift, y_shift, out_vec_file, out_vec_lyr, out_format="GPKG"
+    vec_file: str,
+    vec_lyr: str,
+    x_shift: float,
+    y_shift: float,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
 ):
     """
     A function which shifts (translates) a vector layer in the x and y axis'.
@@ -2925,7 +2993,9 @@ def shiftxy_vec_lyr(
         shifted_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format="GPKG"):
+def split_feats_to_mlyrs(
+    vec_file: str, vec_lyr: str, out_vec_file: str, out_format: str = "GPKG"
+):
     """
     A function which splits an existing vector layer into multiple layers
 
@@ -2951,15 +3021,15 @@ def split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format="GPKG"):
 
 
 def add_geom_bbox_cols(
-    vec_file,
-    vec_lyr,
-    out_vec_file,
-    out_vec_lyr,
-    out_format="GPKG",
-    min_x_col="MinX",
-    max_x_col="MaxX",
-    min_y_col="MinY",
-    max_y_col="MaxY",
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    min_x_col: str = "MinX",
+    max_x_col: str = "MaxX",
+    min_y_col: str = "MinY",
+    max_y_col: str = "MaxY",
 ):
     """
     A function which adds columns to the vector layer with the bbox of each geometry.
