@@ -36,8 +36,12 @@
 import numpy
 import math
 
+import tqdm
 
-def cls_quantity_accuracy(y_true, y_pred, cls_area):
+
+def cls_quantity_accuracy(
+    y_true: numpy.array, y_pred: numpy.array, cls_area: numpy.array
+) -> dict:
     """
     A function to calculate quantity allocation & disagreement for a
     land cover classification. The labels must be integers from 1 - N,
@@ -112,7 +116,12 @@ def cls_quantity_accuracy(y_true, y_pred, cls_area):
     return out_dict
 
 
-def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area, cls_names):
+def calc_class_accuracy_metrics(
+    ref_samples: numpy.array,
+    pred_samples: numpy.array,
+    cls_area: numpy.array,
+    cls_names: numpy.array,
+) -> dict:
     """
     A function which calculates a set of classification accuracy metrics for a set
     of reference and predicted samples. the area classified for each
@@ -126,6 +135,7 @@ def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area, cls_names):
                     (i.e., pixel count)
     :param cls_names: a 1d list of the class names (labels) in the order of
                       the class ids.
+    :return: dict with classification accuracy metrics
 
     """
     import sklearn.metrics
@@ -227,7 +237,9 @@ def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area, cls_names):
     return acc_metrics
 
 
-def calc_class_pt_accuracy_metrics(ref_samples, pred_samples, cls_names):
+def calc_class_pt_accuracy_metrics(
+    ref_samples: numpy.array, pred_samples: numpy.array, cls_names: numpy.array
+) -> dict:
     """
     A function which calculates a set of classification accuracy metrics for a set
     of reference and predicted samples.
@@ -238,6 +250,7 @@ def calc_class_pt_accuracy_metrics(ref_samples, pred_samples, cls_names):
                          numeric class id
     :param cls_names: a 1d list of the class names (labels) in the order of
                       the class ids.
+    :return: dict with classification accuracy metrics
 
     """
     import sklearn.metrics
@@ -283,15 +296,15 @@ def calc_class_pt_accuracy_metrics(ref_samples, pred_samples, cls_names):
 
 
 def calc_acc_metrics_vecsamples(
-    vec_file,
-    vec_lyr,
-    ref_col,
-    cls_col,
-    cls_img,
-    img_cls_name_col="ClassName",
-    img_hist_col="Histogram",
-    out_json_file=None,
-    out_csv_file=None,
+    vec_file: str,
+    vec_lyr: str,
+    ref_col: str,
+    cls_col: str,
+    cls_img: str,
+    img_cls_name_col: str = "ClassName",
+    img_hist_col: str = "Histogram",
+    out_json_file: str = None,
+    out_csv_file: str = None,
 ):
     """
     A function which calculates classification accuracy metrics using a set of
@@ -424,17 +437,9 @@ def calc_acc_metrics_vecsamples(
     acc_metrics["pixel_area"] = cls_area_dict
 
     if out_json_file is not None:
-        import json
+        import rsgislib.tools.utils
 
-        with open(out_json_file, "w") as out_json_file_obj:
-            json.dump(
-                acc_metrics,
-                out_json_file_obj,
-                sort_keys=True,
-                indent=4,
-                separators=(",", ": "),
-                ensure_ascii=False,
-            )
+        rsgislib.tools.utils.write_dict_to_json(acc_metrics, out_json_file)
 
     if out_csv_file is not None:
         import csv
@@ -624,7 +629,12 @@ def calc_acc_metrics_vecsamples(
 
 
 def calc_acc_ptonly_metrics_vecsamples(
-    vec_file, vec_lyr, ref_col, cls_col, out_json_file=None, out_csv_file=None
+    vec_file: str,
+    vec_lyr: str,
+    ref_col: str,
+    cls_col: str,
+    out_json_file: str = None,
+    out_csv_file: str = None,
 ):
     """
     A function which calculates classification accuracy metrics using a set of
@@ -643,20 +653,19 @@ def calc_acc_ptonly_metrics_vecsamples(
 
     Example::
 
-    vec_file = "Sonoma_county_classification_refPoints.gpkg"
-    vec_lyr = "ref_points"
-    ref_col = "reference_classes"
-    cls_col = "classes"
-    out_json_file = "Sonoma_county_class_acc_metrics.json"
+        vec_file = "Sonoma_county_classification_refPoints.gpkg"
+        vec_lyr = "ref_points"
+        ref_col = "reference_classes"
+        cls_col = "classes"
+        out_json_file = "Sonoma_county_class_acc_metrics.json"
 
-    import rsgislib
-    from rsgislib.classification import classaccuracymetrics
+        import rsgislib
+        from rsgislib.classification import classaccuracymetrics
 
-    classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples(vec_file, vec_lyr,
-                                                            ref_col, cls_col,
-                                                            out_json_file=None,
-                                                            out_csv_file=None)
-
+        classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples(vec_file, vec_lyr,
+                                                                ref_col, cls_col,
+                                                                out_json_file=None,
+                                                                out_csv_file=None)
 
     """
     import rsgislib.vectorattrs
@@ -693,17 +702,9 @@ def calc_acc_ptonly_metrics_vecsamples(
     )
 
     if out_json_file is not None:
-        import json
+        import rsgislib.tools.utils
 
-        with open(out_json_file, "w") as out_json_file_obj:
-            json.dump(
-                acc_metrics,
-                out_json_file_obj,
-                sort_keys=True,
-                indent=4,
-                separators=(",", ": "),
-                ensure_ascii=False,
-            )
+        rsgislib.tools.utils.write_dict_to_json(acc_metrics, out_json_file)
 
     if out_csv_file is not None:
         import csv
@@ -804,3 +805,462 @@ def calc_acc_ptonly_metrics_vecsamples(
         import pprint
 
         pprint.pprint(acc_metrics)
+
+
+def calc_acc_ptonly_metrics_vecsamples_bootstrap_uncertainty(
+    vec_file: str,
+    vec_lyr: str,
+    ref_col: str,
+    cls_col: str,
+    out_json_file: str = None,
+    sample_frac: float = 0.2,
+    bootstrap_n: int = 1000,
+) -> dict:
+    """
+    A function which calculates classification accuracy metrics using a set of
+    reference samples in a vector file.
+    This would be often be used alongside the ClassAccuracy QGIS plugin.
+
+    :param vec_file: the input vector file with the reference points
+    :param vec_lyr: the input vector layer name with the reference points.
+    :param ref_col: the name of the reference classification column in the input
+                    vector file.
+    :param cls_col: the name of the classification column in the input vector file.
+    :param out_json_file: if specified the generated metrics and confusion matrix
+                          are written to a JSON file (Default=None).
+    :param sample_frac: The fraction of the whole dataset selected for each
+                        bootstrap iteration.
+    :param bootstrap_n: The number of bootstrap iterations.
+    :return: dict with mean/median and bootstrap intervals.
+
+    """
+    import tqdm
+    import numpy.random
+    import rsgislib.vectorattrs
+
+    # Read columns from vector file.
+    ref_vals = numpy.array(
+        rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, ref_col)
+    )
+    cls_vals = numpy.array(
+        rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, cls_col)
+    )
+
+    # Find unique class values
+    unq_cls_names = numpy.unique(
+        numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
+    )
+
+    # Create LUTs assigning each class a unique int ID.
+    cls_name_lut = dict()
+    cls_id_lut = dict()
+    for cls_id, cls_name in enumerate(unq_cls_names):
+        cls_name_lut[cls_name] = cls_id
+        cls_id_lut[cls_id] = cls_name
+
+    # Create cls_id arrays
+    ref_int_vals = numpy.zeros_like(ref_vals, dtype=int)
+    cls_int_vals = numpy.zeros_like(cls_vals, dtype=int)
+    for cls_name in unq_cls_names:
+        ref_int_vals[ref_vals == cls_name] = cls_name_lut[cls_name]
+        cls_int_vals[cls_vals == cls_name] = cls_name_lut[cls_name]
+
+    n_samples = int(ref_int_vals.shape[0] * sample_frac)
+    smp_idx = numpy.arange(0, ref_int_vals.shape[0], dtype=int)
+
+    acc_metrics_runs = list()
+
+    for i in tqdm.tqdm(range(bootstrap_n)):
+        bs_sel_idx = numpy.random.choice(smp_idx, n_samples, replace=True)
+        ref_int_vals_smpls = ref_int_vals[bs_sel_idx]
+        cls_int_vals_smpls = cls_int_vals[bs_sel_idx]
+        acc_metrics_runs.append(
+            calc_class_pt_accuracy_metrics(
+                ref_int_vals_smpls, cls_int_vals_smpls, unq_cls_names
+            )
+        )
+
+    accuracy_scores = list()
+    cohen_kappa_scores = list()
+    macro_avg_f1_scores = list()
+    macro_avg_precision = list()
+    macro_avg_recall = list()
+    weighted_avg_f1_scores = list()
+    weighted_avg_precision = list()
+    weighted_avg_recall = list()
+    cls_stats = dict()
+    for cls in unq_cls_names:
+        cls_stats[cls] = dict()
+        cls_stats[cls]["f1-score"] = list()
+        cls_stats[cls]["precision"] = list()
+        cls_stats[cls]["recall"] = list()
+        cls_stats[cls]["support"] = list()
+        cls_stats[cls]["producer_accuracy"] = list()
+        cls_stats[cls]["user_accuracy"] = list()
+
+    for acc_metrics in acc_metrics_runs:
+        accuracy_scores.append(acc_metrics["accuracy"])
+        cohen_kappa_scores.append(acc_metrics["cohen_kappa"])
+        macro_avg_f1_scores.append(acc_metrics["macro avg"]["f1-score"])
+        macro_avg_precision.append(acc_metrics["macro avg"]["precision"])
+        macro_avg_recall.append(acc_metrics["macro avg"]["recall"])
+        weighted_avg_f1_scores.append(acc_metrics["weighted avg"]["f1-score"])
+        weighted_avg_precision.append(acc_metrics["weighted avg"]["precision"])
+        weighted_avg_recall.append(acc_metrics["weighted avg"]["recall"])
+
+        for i, cls in enumerate(unq_cls_names):
+            cls_stats[cls]["f1-score"].append(acc_metrics[cls]["f1-score"])
+            cls_stats[cls]["precision"].append(acc_metrics[cls]["precision"])
+            cls_stats[cls]["recall"].append(acc_metrics[cls]["recall"])
+            cls_stats[cls]["support"].append(acc_metrics[cls]["support"])
+            cls_stats[cls]["producer_accuracy"].append(
+                acc_metrics["producer_accuracy"][i]
+            )
+            cls_stats[cls]["user_accuracy"].append(acc_metrics["user_accuracy"][i])
+
+    conf_inters = [0.5, 2.5, 5, 50, 95, 97.5, 99.5]
+
+    accuracy_scores_inters = numpy.percentile(accuracy_scores, conf_inters)
+    accuracy_scores_mean = numpy.mean(accuracy_scores)
+
+    cohen_kappa_scores_inters = numpy.percentile(cohen_kappa_scores, conf_inters)
+    cohen_kappa_scores_mean = numpy.mean(cohen_kappa_scores)
+
+    macro_avg_f1_scores_inters = numpy.percentile(macro_avg_f1_scores, conf_inters)
+    macro_avg_f1_scores_mean = numpy.mean(macro_avg_f1_scores)
+
+    macro_avg_precision_inters = numpy.percentile(macro_avg_precision, conf_inters)
+    macro_avg_precision_mean = numpy.mean(macro_avg_precision)
+
+    macro_avg_recall_inters = numpy.percentile(macro_avg_recall, conf_inters)
+    macro_avg_recall_mean = numpy.mean(macro_avg_recall)
+
+    weighted_avg_f1_scores_inters = numpy.percentile(
+        weighted_avg_f1_scores, conf_inters
+    )
+    weighted_avg_f1_scores_mean = numpy.mean(weighted_avg_f1_scores)
+
+    weighted_avg_precision_inters = numpy.percentile(
+        weighted_avg_precision, conf_inters
+    )
+    weighted_avg_precision_mean = numpy.mean(weighted_avg_precision)
+
+    weighted_avg_recall_inters = numpy.percentile(weighted_avg_recall, conf_inters)
+    weighted_avg_recall_mean = numpy.mean(weighted_avg_recall)
+
+    cls_inter_stats = dict()
+    for cls in unq_cls_names:
+        cls_inter_stats[cls] = dict()
+        cls_inter_stats[cls]["f1-score inters"] = numpy.percentile(
+            cls_stats[cls]["f1-score"], conf_inters
+        )
+        cls_inter_stats[cls]["f1-score mean"] = numpy.mean(cls_stats[cls]["f1-score"])
+
+        cls_inter_stats[cls]["precision inters"] = numpy.percentile(
+            cls_stats[cls]["precision"], conf_inters
+        )
+        cls_inter_stats[cls]["precision mean"] = numpy.mean(cls_stats[cls]["precision"])
+
+        cls_inter_stats[cls]["recall inters"] = numpy.percentile(
+            cls_stats[cls]["recall"], conf_inters
+        )
+        cls_inter_stats[cls]["recall mean"] = numpy.mean(cls_stats[cls]["recall"])
+
+        cls_inter_stats[cls]["support inters"] = numpy.percentile(
+            cls_stats[cls]["support"], conf_inters
+        )
+        cls_inter_stats[cls]["support mean"] = numpy.mean(cls_stats[cls]["support"])
+
+        cls_inter_stats[cls]["producer_accuracy inters"] = numpy.percentile(
+            cls_stats[cls]["producer_accuracy"], conf_inters
+        )
+        cls_inter_stats[cls]["producer_accuracy mean"] = numpy.mean(
+            cls_stats[cls]["producer_accuracy"]
+        )
+
+        cls_inter_stats[cls]["user_accuracy inters"] = numpy.percentile(
+            cls_stats[cls]["user_accuracy"], conf_inters
+        )
+        cls_inter_stats[cls]["user_accuracy mean"] = numpy.mean(
+            cls_stats[cls]["user_accuracy"]
+        )
+
+    out_interv_stats = dict()
+    out_interv_stats["accuracy"] = dict()
+    out_interv_stats["accuracy"]["mean"] = float(accuracy_scores_mean)
+    out_interv_stats["accuracy"]["median"] = float(accuracy_scores_inters[3])
+    out_interv_stats["accuracy"]["90th"] = [
+        float(accuracy_scores_inters[2]),
+        float(accuracy_scores_inters[4]),
+    ]
+    out_interv_stats["accuracy"]["95th"] = [
+        float(accuracy_scores_inters[1]),
+        float(accuracy_scores_inters[5]),
+    ]
+    out_interv_stats["accuracy"]["99th"] = [
+        float(accuracy_scores_inters[0]),
+        float(accuracy_scores_inters[6]),
+    ]
+
+    out_interv_stats["cohen_kappa"] = dict()
+    out_interv_stats["cohen_kappa"]["mean"] = float(cohen_kappa_scores_mean)
+    out_interv_stats["cohen_kappa"]["median"] = float(cohen_kappa_scores_inters[3])
+    out_interv_stats["cohen_kappa"]["90th"] = [
+        float(cohen_kappa_scores_inters[2]),
+        float(cohen_kappa_scores_inters[4]),
+    ]
+    out_interv_stats["cohen_kappa"]["95th"] = [
+        float(cohen_kappa_scores_inters[1]),
+        float(cohen_kappa_scores_inters[5]),
+    ]
+    out_interv_stats["cohen_kappa"]["99th"] = [
+        float(cohen_kappa_scores_inters[0]),
+        float(cohen_kappa_scores_inters[6]),
+    ]
+
+    out_interv_stats["macro avg"] = dict()
+    out_interv_stats["macro avg"]["f1-score"] = dict()
+    out_interv_stats["macro avg"]["f1-score"]["mean"] = float(macro_avg_f1_scores_mean)
+    out_interv_stats["macro avg"]["f1-score"]["median"] = float(
+        macro_avg_f1_scores_inters[3]
+    )
+    out_interv_stats["macro avg"]["f1-score"]["90th"] = [
+        float(macro_avg_f1_scores_inters[2]),
+        float(macro_avg_f1_scores_inters[4]),
+    ]
+    out_interv_stats["macro avg"]["f1-score"]["95th"] = [
+        float(macro_avg_f1_scores_inters[1]),
+        float(macro_avg_f1_scores_inters[5]),
+    ]
+    out_interv_stats["macro avg"]["f1-score"]["99th"] = [
+        float(macro_avg_f1_scores_inters[0]),
+        float(macro_avg_f1_scores_inters[6]),
+    ]
+
+    out_interv_stats["macro avg"] = dict()
+    out_interv_stats["macro avg"]["precision"] = dict()
+    out_interv_stats["macro avg"]["precision"]["mean"] = float(macro_avg_precision_mean)
+    out_interv_stats["macro avg"]["precision"]["median"] = float(
+        macro_avg_precision_inters[3]
+    )
+    out_interv_stats["macro avg"]["precision"]["90th"] = [
+        float(macro_avg_precision_inters[2]),
+        float(macro_avg_precision_inters[4]),
+    ]
+    out_interv_stats["macro avg"]["precision"]["95th"] = [
+        float(macro_avg_precision_inters[1]),
+        float(macro_avg_precision_inters[5]),
+    ]
+    out_interv_stats["macro avg"]["precision"]["99th"] = [
+        float(macro_avg_precision_inters[0]),
+        float(macro_avg_precision_inters[6]),
+    ]
+
+    out_interv_stats["macro avg"] = dict()
+    out_interv_stats["macro avg"]["recall"] = dict()
+    out_interv_stats["macro avg"]["recall"]["mean"] = float(macro_avg_recall_mean)
+    out_interv_stats["macro avg"]["recall"]["median"] = float(
+        macro_avg_recall_inters[3]
+    )
+    out_interv_stats["macro avg"]["recall"]["90th"] = [
+        float(macro_avg_recall_inters[2]),
+        float(macro_avg_recall_inters[4]),
+    ]
+    out_interv_stats["macro avg"]["recall"]["95th"] = [
+        float(macro_avg_recall_inters[1]),
+        float(macro_avg_recall_inters[5]),
+    ]
+    out_interv_stats["macro avg"]["recall"]["99th"] = [
+        float(macro_avg_recall_inters[0]),
+        float(macro_avg_recall_inters[6]),
+    ]
+
+    out_interv_stats["weighted avg"] = dict()
+    out_interv_stats["weighted avg"]["f1-score"] = dict()
+    out_interv_stats["weighted avg"]["f1-score"]["mean"] = float(
+        weighted_avg_f1_scores_mean
+    )
+    out_interv_stats["weighted avg"]["f1-score"]["median"] = float(
+        weighted_avg_f1_scores_inters[3]
+    )
+    out_interv_stats["weighted avg"]["f1-score"]["90th"] = [
+        float(weighted_avg_f1_scores_inters[2]),
+        float(weighted_avg_f1_scores_inters[4]),
+    ]
+    out_interv_stats["weighted avg"]["f1-score"]["95th"] = [
+        float(weighted_avg_f1_scores_inters[1]),
+        float(weighted_avg_f1_scores_inters[5]),
+    ]
+    out_interv_stats["weighted avg"]["f1-score"]["99th"] = [
+        float(weighted_avg_f1_scores_inters[0]),
+        float(weighted_avg_f1_scores_inters[6]),
+    ]
+
+    out_interv_stats["weighted avg"] = dict()
+    out_interv_stats["weighted avg"]["precision"] = dict()
+    out_interv_stats["weighted avg"]["precision"]["mean"] = float(
+        weighted_avg_precision_mean
+    )
+    out_interv_stats["weighted avg"]["precision"]["median"] = float(
+        weighted_avg_precision_inters[3]
+    )
+    out_interv_stats["weighted avg"]["precision"]["90th"] = [
+        float(weighted_avg_precision_inters[2]),
+        float(weighted_avg_precision_inters[4]),
+    ]
+    out_interv_stats["weighted avg"]["precision"]["95th"] = [
+        float(weighted_avg_precision_inters[1]),
+        float(weighted_avg_precision_inters[5]),
+    ]
+    out_interv_stats["weighted avg"]["precision"]["99th"] = [
+        float(weighted_avg_precision_inters[0]),
+        float(weighted_avg_precision_inters[6]),
+    ]
+
+    out_interv_stats["weighted avg"] = dict()
+    out_interv_stats["weighted avg"]["recall"] = dict()
+    out_interv_stats["weighted avg"]["recall"]["mean"] = float(weighted_avg_recall_mean)
+    out_interv_stats["weighted avg"]["recall"]["median"] = float(
+        weighted_avg_recall_inters[3]
+    )
+    out_interv_stats["weighted avg"]["recall"]["90th"] = [
+        float(weighted_avg_recall_inters[2]),
+        float(weighted_avg_recall_inters[4]),
+    ]
+    out_interv_stats["weighted avg"]["recall"]["95th"] = [
+        float(weighted_avg_recall_inters[1]),
+        float(weighted_avg_recall_inters[5]),
+    ]
+    out_interv_stats["weighted avg"]["recall"]["99th"] = [
+        float(weighted_avg_recall_inters[0]),
+        float(weighted_avg_recall_inters[6]),
+    ]
+
+    for cls in unq_cls_names:
+        out_interv_stats[cls] = dict()
+        out_interv_stats[cls]["f1-score"] = dict()
+        out_interv_stats[cls]["f1-score"]["mean"] = float(
+            cls_inter_stats[cls]["f1-score mean"]
+        )
+        out_interv_stats[cls]["f1-score"]["median"] = float(
+            cls_inter_stats[cls]["f1-score inters"][3]
+        )
+        out_interv_stats[cls]["f1-score"]["90th"] = [
+            float(cls_inter_stats[cls]["f1-score inters"][2]),
+            float(cls_inter_stats[cls]["f1-score inters"][4]),
+        ]
+        out_interv_stats[cls]["f1-score"]["95th"] = [
+            float(cls_inter_stats[cls]["f1-score inters"][1]),
+            float(cls_inter_stats[cls]["f1-score inters"][5]),
+        ]
+        out_interv_stats[cls]["f1-score"]["99th"] = [
+            float(cls_inter_stats[cls]["f1-score inters"][0]),
+            float(cls_inter_stats[cls]["f1-score inters"][6]),
+        ]
+
+        out_interv_stats[cls]["precision"] = dict()
+        out_interv_stats[cls]["precision"]["mean"] = float(
+            cls_inter_stats[cls]["precision mean"]
+        )
+        out_interv_stats[cls]["precision"]["median"] = float(
+            cls_inter_stats[cls]["precision inters"][3]
+        )
+        out_interv_stats[cls]["precision"]["90th"] = [
+            float(cls_inter_stats[cls]["precision inters"][2]),
+            float(cls_inter_stats[cls]["precision inters"][4]),
+        ]
+        out_interv_stats[cls]["precision"]["95th"] = [
+            float(cls_inter_stats[cls]["precision inters"][1]),
+            float(cls_inter_stats[cls]["precision inters"][5]),
+        ]
+        out_interv_stats[cls]["precision"]["99th"] = [
+            float(cls_inter_stats[cls]["precision inters"][0]),
+            float(cls_inter_stats[cls]["precision inters"][6]),
+        ]
+
+        out_interv_stats[cls]["recall"] = dict()
+        out_interv_stats[cls]["recall"]["mean"] = float(
+            cls_inter_stats[cls]["recall mean"]
+        )
+        out_interv_stats[cls]["recall"]["median"] = float(
+            cls_inter_stats[cls]["recall inters"][3]
+        )
+        out_interv_stats[cls]["recall"]["90th"] = [
+            float(cls_inter_stats[cls]["recall inters"][2]),
+            float(cls_inter_stats[cls]["recall inters"][4]),
+        ]
+        out_interv_stats[cls]["recall"]["95th"] = [
+            float(cls_inter_stats[cls]["recall inters"][1]),
+            float(cls_inter_stats[cls]["recall inters"][5]),
+        ]
+        out_interv_stats[cls]["recall"]["99th"] = [
+            float(cls_inter_stats[cls]["recall inters"][0]),
+            float(cls_inter_stats[cls]["recall inters"][6]),
+        ]
+
+        out_interv_stats[cls]["support"] = dict()
+        out_interv_stats[cls]["support"]["mean"] = float(
+            cls_inter_stats[cls]["support mean"]
+        )
+        out_interv_stats[cls]["support"]["median"] = float(
+            cls_inter_stats[cls]["support inters"][3]
+        )
+        out_interv_stats[cls]["support"]["90th"] = [
+            float(cls_inter_stats[cls]["support inters"][2]),
+            float(cls_inter_stats[cls]["support inters"][4]),
+        ]
+        out_interv_stats[cls]["support"]["95th"] = [
+            float(cls_inter_stats[cls]["support inters"][1]),
+            float(cls_inter_stats[cls]["support inters"][5]),
+        ]
+        out_interv_stats[cls]["support"]["99th"] = [
+            float(cls_inter_stats[cls]["support inters"][0]),
+            float(cls_inter_stats[cls]["support inters"][6]),
+        ]
+
+        out_interv_stats[cls]["producer_accuracy"] = dict()
+        out_interv_stats[cls]["producer_accuracy"]["mean"] = float(
+            cls_inter_stats[cls]["producer_accuracy mean"]
+        )
+        out_interv_stats[cls]["producer_accuracy"]["median"] = float(
+            cls_inter_stats[cls]["producer_accuracy inters"][3]
+        )
+        out_interv_stats[cls]["producer_accuracy"]["90th"] = [
+            float(cls_inter_stats[cls]["producer_accuracy inters"][2]),
+            float(cls_inter_stats[cls]["producer_accuracy inters"][4]),
+        ]
+        out_interv_stats[cls]["producer_accuracy"]["95th"] = [
+            float(cls_inter_stats[cls]["producer_accuracy inters"][1]),
+            float(cls_inter_stats[cls]["producer_accuracy inters"][5]),
+        ]
+        out_interv_stats[cls]["producer_accuracy"]["99th"] = [
+            float(cls_inter_stats[cls]["producer_accuracy inters"][0]),
+            float(cls_inter_stats[cls]["producer_accuracy inters"][6]),
+        ]
+
+        out_interv_stats[cls]["user_accuracy"] = dict()
+        out_interv_stats[cls]["user_accuracy"]["mean"] = float(
+            cls_inter_stats[cls]["user_accuracy mean"]
+        )
+        out_interv_stats[cls]["user_accuracy"]["median"] = float(
+            cls_inter_stats[cls]["user_accuracy inters"][3]
+        )
+        out_interv_stats[cls]["user_accuracy"]["90th"] = [
+            float(cls_inter_stats[cls]["user_accuracy inters"][2]),
+            float(cls_inter_stats[cls]["user_accuracy inters"][4]),
+        ]
+        out_interv_stats[cls]["user_accuracy"]["95th"] = [
+            float(cls_inter_stats[cls]["user_accuracy inters"][1]),
+            float(cls_inter_stats[cls]["user_accuracy inters"][5]),
+        ]
+        out_interv_stats[cls]["user_accuracy"]["99th"] = [
+            float(cls_inter_stats[cls]["user_accuracy inters"][0]),
+            float(cls_inter_stats[cls]["user_accuracy inters"][6]),
+        ]
+
+    if out_json_file is not None:
+        import rsgislib.tools.utils
+
+        rsgislib.tools.utils.write_dict_to_json(out_interv_stats, out_json_file)
+
+    return out_interv_stats
