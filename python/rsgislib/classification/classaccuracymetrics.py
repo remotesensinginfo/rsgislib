@@ -1379,7 +1379,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
         f1_scr_intervals_max.append(intervals[1])
         n_pts.append(rsgislib.vectorutils.get_vec_feat_count(c_vec_file, c_vec_lyr))
 
-        if inter_rng < conf_thres:
+        if (inter_rng < conf_thres) and (not conf_thres_met):
             conf_thres_met = True
             conf_thres_met_idx = i
 
