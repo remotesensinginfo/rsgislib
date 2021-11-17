@@ -2551,7 +2551,7 @@ def merge_vector_files(
 
 
 def merge_vector_layers(
-    vecs_dict: dict,
+    vecs_dict: list,
     out_vec_file: str,
     out_vec_lyr: str = None,
     out_format: str = "GPKG",

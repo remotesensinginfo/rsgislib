@@ -33,10 +33,10 @@
 #
 ###########################################################################
 
-import numpy
 import math
+import os
 
-import tqdm
+import numpy
 
 
 def cls_quantity_accuracy(
@@ -807,7 +807,7 @@ def calc_acc_ptonly_metrics_vecsamples(
         pprint.pprint(acc_metrics)
 
 
-def calc_acc_ptonly_metrics_vecsamples_bootstrap_uncertainty(
+def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     vec_file: str,
     vec_lyr: str,
     ref_col: str,
@@ -817,9 +817,9 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_uncertainty(
     bootstrap_n: int = 1000,
 ) -> dict:
     """
-    A function which calculates classification accuracy metrics using a set of
-    reference samples in a vector file.
-    This would be often be used alongside the ClassAccuracy QGIS plugin.
+    A function which calculates classification accuracy metric confidence intervals
+    using a bootstrapping approach. This function uses a set of reference samples in
+    a vector file and would be often be used alongside the ClassAccuracy QGIS plugin.
 
     :param vec_file: the input vector file with the reference points
     :param vec_lyr: the input vector layer name with the reference points.
@@ -1037,7 +1037,6 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_uncertainty(
         float(macro_avg_f1_scores_inters[6]),
     ]
 
-    out_interv_stats["macro avg"] = dict()
     out_interv_stats["macro avg"]["precision"] = dict()
     out_interv_stats["macro avg"]["precision"]["mean"] = float(macro_avg_precision_mean)
     out_interv_stats["macro avg"]["precision"]["median"] = float(
@@ -1056,7 +1055,6 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_uncertainty(
         float(macro_avg_precision_inters[6]),
     ]
 
-    out_interv_stats["macro avg"] = dict()
     out_interv_stats["macro avg"]["recall"] = dict()
     out_interv_stats["macro avg"]["recall"]["mean"] = float(macro_avg_recall_mean)
     out_interv_stats["macro avg"]["recall"]["median"] = float(
@@ -1096,7 +1094,6 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_uncertainty(
         float(weighted_avg_f1_scores_inters[6]),
     ]
 
-    out_interv_stats["weighted avg"] = dict()
     out_interv_stats["weighted avg"]["precision"] = dict()
     out_interv_stats["weighted avg"]["precision"]["mean"] = float(
         weighted_avg_precision_mean
@@ -1117,7 +1114,6 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_uncertainty(
         float(weighted_avg_precision_inters[6]),
     ]
 
-    out_interv_stats["weighted avg"] = dict()
     out_interv_stats["weighted avg"]["recall"] = dict()
     out_interv_stats["weighted avg"]["recall"]["mean"] = float(weighted_avg_recall_mean)
     out_interv_stats["weighted avg"]["recall"]["median"] = float(
@@ -1264,3 +1260,146 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_uncertainty(
         rsgislib.tools.utils.write_dict_to_json(out_interv_stats, out_json_file)
 
     return out_interv_stats
+
+
+def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
+    vec_files: list,
+    vec_lyrs: list,
+    ref_col: str,
+    cls_col: str,
+    tmp_dir: str,
+    conf_inter: int = 95,
+    conf_thres: float = 0.05,
+    out_plot_file: str = None,
+    sample_frac: float = 0.2,
+    bootstrap_n: int = 1000,
+) -> (bool, int, list, list):
+    """
+    A function which calculates the f1-score and the confidence interval for each
+    the point sets provided. Where the points a cumulatively combined
+    increasing the number of points used for the analysis. Therefore, if there
+    were 3 files in the input list vec_files, 3 f1-score and uncertainies would
+    be calculated using the following point sets:
+
+    1. vec_files[0]
+    2. vec_files[0] + vec_files[1]
+    3. vec_files[0] + vec_files[1] + vec_files[2]
+
+    :param vec_files: list of input files which must be the same length as vec_lyrs
+    :param vec_lyrs: list of input layer names which must be the same length
+                     as vec_files
+    :param ref_col: the name of the reference classification column in the input
+                    vector file.
+    :param cls_col: the name of the classification column in the input vector file.
+    :param tmp_dir: A temporary directory where intermediate files can be written.
+    :param conf_inter: The confidence interval to be used. Options are 90, 95 or 99.
+                       The default is 95.
+    :param conf_thres: the threshold used to defined whether the confidence interval
+                         is below a user threshold. Value should be between 0-1. The
+                         default is 0.05 (i.e., 5%).
+    :param out_plot_file: Optionally an output plot of the f1-scores and upper and
+                          lower confidence intervals can be outputted. If None
+                          (default) then no plot will be produced. Otherwise, a file
+                          path and name. File format can be PNG or PDF. Use file
+                          extension of the output file to specify.
+    :param sample_frac: The fraction of the whole dataset selected for each
+                        bootstrap iteration.
+    :param bootstrap_n: The number of bootstrap iterations.
+    :return: (bool, int, list, list). 1. Did the confidence interval fall below the
+             the confidence threshold. 2. the index of the point it first fell below
+             the threshold. 3. list of f1-scores and 4. list of f1-score confidence
+             intervals.
+
+    """
+    import rsgislib.tools.utils
+    import rsgislib.vectorutils
+
+    uid_str = rsgislib.tools.utils.uid_generator()
+
+    if conf_inter not in [90, 95, 99]:
+        raise Exception("conf_inter must have a value of 90, 95 or 99.")
+
+    if not os.path.exists(tmp_dir):
+        raise Exception("tmp_dir does not exist")
+
+    if len(vec_files) != len(vec_lyrs):
+        raise Exception(
+            "vec_files and vec_lyrs have different " "lengths and must be the same."
+        )
+
+    f1_scores = list()
+    f1_scr_intervals_rgn = list()
+    f1_scr_intervals_min = list()
+    f1_scr_intervals_max = list()
+    n_pts = list()
+    conf_thres_met = False
+    conf_thres_met_idx = -1
+    first = True
+    i = 0
+    tmp_vec_files = list()
+    vecs_dict = list()
+    for vec_file, vec_lyr in zip(vec_files, vec_lyrs):
+        vecs_dict.append({"file": vec_file, "layer": vec_lyr})
+        if first:
+            c_vec_file = vec_file
+            c_vec_lyr = vec_lyr
+            first = False
+        else:
+            tmp_vec_file = os.path.join(tmp_dir, "tmp_vec_file_{}.gpkg".format(uid_str))
+            tmp_vec_lyr = "lyr_{}_{}".format(uid_str, i)
+            tmp_vec_files.append(tmp_vec_file)
+            rsgislib.vectorutils.merge_vector_layers(
+                vecs_dict,
+                out_vec_file=tmp_vec_file,
+                out_vec_lyr=tmp_vec_lyr,
+                out_format="GPKG",
+            )
+            c_vec_file = tmp_vec_file
+            c_vec_lyr = tmp_vec_lyr
+
+        calc_metrics = calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
+            c_vec_file,
+            c_vec_lyr,
+            ref_col,
+            cls_col,
+            out_json_file=None,
+            sample_frac=sample_frac,
+            bootstrap_n=bootstrap_n,
+        )
+
+        f1_scores.append(calc_metrics["macro avg"]["f1-score"]["median"])
+        intervals = calc_metrics["macro avg"]["f1-score"]["95th"]
+        if conf_inter == 90:
+            intervals = calc_metrics["macro avg"]["f1-score"]["90th"]
+        elif conf_inter == 99:
+            intervals = calc_metrics["macro avg"]["f1-score"]["99th"]
+        inter_rng = intervals[1] - intervals[0]
+        f1_scr_intervals_rgn.append(inter_rng)
+        f1_scr_intervals_min.append(intervals[0])
+        f1_scr_intervals_max.append(intervals[1])
+        n_pts.append(rsgislib.vectorutils.get_vec_feat_count(c_vec_file, c_vec_lyr))
+
+        if inter_rng < conf_thres:
+            conf_thres_met = True
+            conf_thres_met_idx = i
+
+        i = i + 1
+
+    for tmp_vec_file in tmp_vec_files:
+        if os.path.exists(tmp_vec_file):
+            rsgislib.vectorutils.delete_vector_file(tmp_vec_file)
+
+    if out_plot_file is not None:
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        ax.plot(n_pts, f1_scores, "-", color="black")
+        ax.fill_between(
+            n_pts, f1_scr_intervals_min, f1_scr_intervals_max, alpha=0.2, color="gray"
+        )
+        ax.set_xlabel("N Reference Plots")
+        ax.set_ylabel("F1 Score (macro avg)")
+        ax.set_title("F1 Score Confidence Intervals")
+        fig.savefig(out_plot_file)
+
+    return conf_thres_met, conf_thres_met_idx, f1_scores, f1_scr_intervals_rgn

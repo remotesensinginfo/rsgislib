@@ -50,7 +50,8 @@ Accuracy Assessment
 .. autofunction:: rsgislib.classification.pop_class_info_accuracy_pts
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples
-.. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples_bootstrap_uncertainty
+.. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval
+.. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_class_pt_accuracy_metrics
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_class_accuracy_metrics
 .. autofunction:: rsgislib.classification.classaccuracymetrics.cls_quantity_accuracy
