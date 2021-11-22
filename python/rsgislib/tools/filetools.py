@@ -1111,3 +1111,35 @@ def untar_bz_file(
         raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
     os.chdir(c_dir)
     return process_dir
+
+
+def create_targz_arch(out_arch_file:str, file_list:list, base_path:str=None):
+    """
+    A function which can be used to create a tar.gz file containing the
+    list of input files. If you wish to remove some of the directory
+    structure from the file paths in provided then a single base_path
+    can be provided and will be removed from the file paths in the archive.
+
+    :param out_arch_file: the output tar.gz file path
+    :param file_list: the list of files to be added to the archive.
+    :param base_path: the base path which will be removed from all the input files.
+                      Note, this means all the input files must have the same base
+                      path. Optional: Default is None (i.e., ignored).
+
+    """
+    import tarfile
+
+    out_arch_file = os.path.abspath(out_arch_file)
+
+    if base_path is not None:
+        cwd = os.getcwd()
+        os.chdir(base_path)
+
+    with tarfile.open(out_arch_file, "w:gz") as tar_out_file:
+        for c_file in file_list:
+            if base_path is not None:
+                c_file = os.path.relpath(c_file, base_path)
+            tar_out_file.add(c_file)
+
+    if base_path is not None:
+        os.chdir(cwd)
