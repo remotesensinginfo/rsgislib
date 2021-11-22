@@ -1113,7 +1113,7 @@ def untar_bz_file(
     return process_dir
 
 
-def create_targz_arch(out_arch_file:str, file_list:list, base_path:str=None):
+def create_targz_arch(out_arch_file: str, file_list: list, base_path: str = None):
     """
     A function which can be used to create a tar.gz file containing the
     list of input files. If you wish to remove some of the directory
