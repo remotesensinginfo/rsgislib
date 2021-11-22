@@ -814,6 +814,7 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     cls_col: str,
     out_json_file: str = None,
     sample_frac: float = 0.2,
+    sample_n_smps: int = None,
     bootstrap_n: int = 1000,
 ) -> dict:
     """
@@ -865,7 +866,12 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
         ref_int_vals[ref_vals == cls_name] = cls_name_lut[cls_name]
         cls_int_vals[cls_vals == cls_name] = cls_name_lut[cls_name]
 
-    n_samples = int(ref_int_vals.shape[0] * sample_frac)
+    if sample_n_smps is None:
+        n_samples = int(ref_int_vals.shape[0] * sample_frac)
+    elif sample_n_smps < ref_int_vals.shape[0]:
+        n_samples = sample_n_smps
+    else:
+        n_samples = ref_int_vals.shape[0]
     smp_idx = numpy.arange(0, ref_int_vals.shape[0], dtype=int)
 
     acc_metrics_runs = list()
@@ -1272,6 +1278,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
     conf_thres: float = 0.05,
     out_plot_file: str = None,
     sample_frac: float = 0.2,
+    sample_n_smps: int = None,
     bootstrap_n: int = 1000,
 ) -> (bool, int, list, list):
     """
@@ -1364,6 +1371,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
             cls_col,
             out_json_file=None,
             sample_frac=sample_frac,
+            sample_n_smps=sample_n_smps,
             bootstrap_n=bootstrap_n,
         )
 
