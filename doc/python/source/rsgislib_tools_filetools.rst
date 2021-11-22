@@ -21,6 +21,7 @@ Searching
 Archives
 ---------
 .. autofunction:: rsgislib.tools.filetools.create_directory_archive
+.. autofunction:: rsgislib.tools.filetools.create_targz_arch
 .. autofunction:: rsgislib.tools.filetools.untar_file
 .. autofunction:: rsgislib.tools.filetools.untar_gz_file
 .. autofunction:: rsgislib.tools.filetools.unzip_file
