@@ -284,10 +284,11 @@ static PyMethodDef ZonalStatsMethods[] = {
 "Example::\n"
 "\n"
 "    from rsgislib import zonalstats\n"
-"    inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"    inputvector = './Vectors/injune_p142_crowns_utm.shp'\n"
-"    outputHDF = './TestOutputs/InjuneP142.hdf'\n"
-"    zonalstats.image_zone_to_hdf(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
+"    input_img = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+"    vec_file = './Vectors/injune_p142_crowns_utm.shp'\n"
+"    vec_lyr = 'injune_p142_crowns_utm'\n"
+"    out_h5_file = './TestOutputs/InjuneP142.hdf'\n"
+"    zonalstats.image_zone_to_hdf(input_img, vec_file, vec_lyr, out_h5_file, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
 "\n\n"},
 
 {"extract_zone_img_values_to_hdf", (PyCFunction)ZonalStats_ExtractZoneImageValues2HDF, METH_VARARGS | METH_KEYWORDS,
@@ -315,6 +316,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "Example::\n"
 "\n"
 "   import rsgislib.zonalstats\n"
+"   import rsgislib.imageutils\n"
 "   fileInfo = []\n"
 "   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg1.kea', 'Image1', [1,3,4]))\n"
 "   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg2.kea', 'Image2', [2]))\n"
@@ -328,7 +330,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 ":param in_h5_file: is a string with the path to the input file.\n"
 ":param out_h5_file: is a string with the path to the output file.\n"
 ":param sample: is an integer with the number values to be sampled from the input file.\n"
-":param rnd_seed: is an integer which seeds the random number generator\n."
+":param rnd_seed: is an integer which seeds the random number generator.\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n\n"
 },
@@ -341,7 +343,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 ":param out_h5_p1_file: is a string with the path to the output file.\n"
 ":param out_h5_p2_file: is a string with the path to the output file.\n"
 ":param sample: is an integer with the number values to be sampled from the input file.\n"
-":param rnd_seed: is an integer which seeds the random number generator\n."
+":param rnd_seed: is an integer which seeds the random number generator.\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n\n"
 },

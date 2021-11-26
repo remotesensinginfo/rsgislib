@@ -1,4 +1,11 @@
 import os
+import pytest
+
+H5PY_NOT_AVAIL = False
+try:
+    import h5py
+except ImportError:
+    H5PY_NOT_AVAIL = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 ZONALSTATS_DATA_DIR = os.path.join(DATA_DIR, "zonalstats")
@@ -1045,3 +1052,212 @@ def test_calc_zonal_band_stats_file_Median(tmp_path):
             vals_eq = False
             break
     assert vals_eq
+
+
+def test_image_zone_to_hdf(tmp_path):
+    import rsgislib.zonalstats
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
+    vec_lyr = "sen2_20210527_aber_polygons"
+
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.image_zone_to_hdf(input_img, vec_file, vec_lyr, out_h5_file, no_prj_warn=False, pxl_in_poly_method=rsgislib.zonalstats.METHOD_POLYCONTAINSPIXELCENTER)
+
+    assert os.path.exists(out_h5_file)
+
+
+def test_extract_zone_img_values_to_hdf(tmp_path):
+    import rsgislib.zonalstats
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polys.kea")
+
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.extract_zone_img_values_to_hdf(input_img, in_msk_img, out_h5_file, 1, rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+def test_extract_zone_img_band_values_to_hdf(tmp_path):
+    import rsgislib.zonalstats
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polys.kea")
+
+    in_img_info = []
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image1', [1, 3, 4]))
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image2', [2]))
+
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.extract_zone_img_band_values_to_hdf(in_img_info, in_msk_img, out_h5_file, 1, rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+def test_random_sample_hdf5_file(tmp_path):
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_vals.h5")
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.random_sample_hdf5_file(in_h5_file, out_h5_file, 250, 42, rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+
+def test_split_sample_hdf5_file(tmp_path):
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_vals.h5")
+    out_h5_p1_file = os.path.join(tmp_path, "out_h5_p1_file.h5")
+    out_h5_p2_file = os.path.join(tmp_path, "out_h5_p2_file.h5")
+
+    rsgislib.zonalstats.split_sample_hdf5_file(in_h5_file, out_h5_p1_file, out_h5_p2_file, 250, 42, rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_p1_file) and os.path.exists(out_h5_p2_file)
+
+def test_merge_extracted_hdf5_data(tmp_path):
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_vals.h5")
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.merge_extracted_hdf5_data([in_h5_file, in_h5_file], out_h5_file, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_msk_h5_smpls_to_finite_values(tmp_path):
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_vals.h5")
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.msk_h5_smpls_to_finite_values(in_h5_file, out_h5_file, datatype=rsgislib.TYPE_16INT, lower_limit=0, upper_limit=1000)
+
+    assert os.path.exists(out_h5_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_extract_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
+    import rsgislib.zonalstats
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.kea")
+
+    in_img_info = []
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image1', [1, 3, 4]))
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image2', [2]))
+
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.extract_chip_zone_image_band_values_to_hdf(in_img_info, in_msk_img, 1, 20, out_h5_file, rotate_chips=None, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_extract_chip_zone_image_band_values_to_hdf_with_rot(tmp_path):
+    import rsgislib.zonalstats
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.kea")
+
+    in_img_info = []
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image1', [1, 3, 4]))
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image2', [2]))
+
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.extract_chip_zone_image_band_values_to_hdf(in_img_info, in_msk_img, 1, 20, out_h5_file, rotate_chips=[30, 60], datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_extract_ref_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
+    import rsgislib.zonalstats
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.kea")
+
+    in_img_info = []
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image1', [1, 3, 4]))
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image2', [2]))
+
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.extract_ref_chip_zone_image_band_values_to_hdf(in_img_info, in_ref_img, 1, in_msk_img, 1, 20, out_h5_file, rotate_chips=None, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_extract_ref_chip_zone_image_band_values_to_hdf_with_rot(tmp_path):
+    import rsgislib.zonalstats
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.kea")
+
+    in_img_info = []
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image1', [1, 3, 4]))
+    in_img_info.append(rsgislib.imageutils.ImageBandInfo(input_img, 'Image2', [2]))
+
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.extract_ref_chip_zone_image_band_values_to_hdf(in_img_info, in_ref_img, 1, in_msk_img, 1, 20, out_h5_file, rotate_chips=[30, 60], datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_split_sample_chip_hdf5_file(tmp_path):
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_chip_vals.h5")
+    out_h5_p1_file = os.path.join(tmp_path, "out_h5_p1_file.h5")
+    out_h5_p2_file = os.path.join(tmp_path, "out_h5_p2_file.h5")
+
+    rsgislib.zonalstats.split_sample_chip_hdf5_file(in_h5_file, out_h5_p1_file, out_h5_p2_file, 3, 42, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_p1_file) and os.path.exists(out_h5_p2_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_merge_extracted_hdf5_chip_data(tmp_path):
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_chip_vals.h5")
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.merge_extracted_hdf5_chip_data([in_h5_file, in_h5_file], out_h5_file, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_split_sample_ref_chip_hdf5_file(tmp_path):
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_refchip_vals.h5")
+    out_h5_p1_file = os.path.join(tmp_path, "out_h5_p1_file.h5")
+    out_h5_p2_file = os.path.join(tmp_path, "out_h5_p2_file.h5")
+
+    rsgislib.zonalstats.split_sample_ref_chip_hdf5_file(in_h5_file, out_h5_p1_file, out_h5_p2_file, 3, 42, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_p1_file) and os.path.exists(out_h5_p2_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_merge_extracted_hdf5_chip_ref_data(tmp_path):
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_refchip_vals.h5")
+    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
+
+    rsgislib.zonalstats.merge_extracted_hdf5_chip_ref_data([in_h5_file, in_h5_file], out_h5_file, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+

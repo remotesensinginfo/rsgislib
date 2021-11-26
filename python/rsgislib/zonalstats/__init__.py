@@ -49,12 +49,12 @@ respect to the method of intersection. The options for intersection are:
 * METHOD_PIXELCONTAINSPOLY = 4           # Pixel contains the polygon
 * METHOD_PIXELCONTAINSPOLYCENTER = 5     # Polygon center is within pixel
 * METHOD_ADAPTIVE = 6                    # The method is chosen based on relative areas
-                                           of pixel and polygon.
+                                         # of pixel and polygon.
 * METHOD_ENVELOPE = 7                    # All pixels in polygon envelope chosen
 * METHOD_PIXELAREAINPOLY = 8             # Percent of pixel area that is within
-                                           the polygon
+                                         # the polygon
 * METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within pixel
-
+"""
 
 METHOD_POLYCONTAINSPIXEL = 0           # Polygon completely contains pixel
 METHOD_POLYCONTAINSPIXELCENTER = 1     # Pixel center is within the polygon
@@ -63,12 +63,12 @@ METHOD_POLYOVERLAPSORCONTAINSPIXEL = 3 # Polygon overlaps or contains the pixel
 METHOD_PIXELCONTAINSPOLY = 4           # Pixel contains the polygon
 METHOD_PIXELCONTAINSPOLYCENTER = 5     # Polygon center is within pixel
 METHOD_ADAPTIVE = 6                    # The method is chosen based on relative areas
-                                         of pixel and polygon.
+                                       # of pixel and polygon.
 METHOD_ENVELOPE = 7                    # All pixels in polygon envelope chosen
 METHOD_PIXELAREAINPOLY = 8             # Percent of pixel area that is within
-                                         the polygon
+                                       # the polygon
 METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within pixel
-"""
+
 
 
 def calc_zonal_band_stats_file(
@@ -2220,7 +2220,7 @@ def split_sample_ref_chip_hdf5_file(input_h5_file, sample_h5_file, remain_h5_fil
     f = h5py.File(input_h5_file, 'r')
     n_rows = f['DATA/REF'].shape[0]
     chip_size = f['DATA/REF'].shape[1]
-    n_bands = f['DATA/REF'].shape[3]
+    n_bands = f['DATA/DATA'].shape[3]
     f.close()
 
     if sample_size > n_rows:
@@ -2256,6 +2256,7 @@ def split_sample_ref_chip_hdf5_file(input_h5_file, sample_h5_file, remain_h5_fil
     in_ref_samples = f['DATA/REF']
     out_ref_samples = in_ref_samples[smp_idxs]
     remain_ref_samples = in_ref_samples[remain_idxs]
+    reman_smpl_size = remain_ref_samples.shape[0]
     f.close()
 
     h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
@@ -2264,9 +2265,12 @@ def split_sample_ref_chip_hdf5_file(input_h5_file, sample_h5_file, remain_h5_fil
     fSampleH5Out = h5py.File(sample_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=out_data_samples, chunks=(250, chip_size, chip_size, n_bands),
+    smpl_chk_size = 250
+    if sample_size < smpl_chk_size:
+        smpl_chk_size = sample_size
+    dataSampleGrp.create_dataset('DATA', data=out_data_samples, chunks=(smpl_chk_size, chip_size, chip_size, n_bands),
                                  compression="gzip", shuffle=True, dtype=h5_dtype)
-    dataSampleGrp.create_dataset('REF', data=out_ref_samples, chunks=(250, chip_size, chip_size),
+    dataSampleGrp.create_dataset('REF', data=out_ref_samples, chunks=(smpl_chk_size, chip_size, chip_size),
                                  compression="gzip", shuffle=True, dtype='H')
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE REF TILES'.encode()
@@ -2276,9 +2280,12 @@ def split_sample_ref_chip_hdf5_file(input_h5_file, sample_h5_file, remain_h5_fil
     fSampleH5Out = h5py.File(remain_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=remain_data_samples, chunks=(250, chip_size, chip_size, n_bands),
+    rman_chk_size = 250
+    if reman_smpl_size < rman_chk_size:
+        rman_chk_size = reman_smpl_size
+    dataSampleGrp.create_dataset('DATA', data=remain_data_samples, chunks=(rman_chk_size, chip_size, chip_size, n_bands),
                                  compression="gzip", shuffle=True, dtype=h5_dtype)
-    dataSampleGrp.create_dataset('REF', data=remain_ref_samples, chunks=(250, chip_size, chip_size),
+    dataSampleGrp.create_dataset('REF', data=remain_ref_samples, chunks=(rman_chk_size, chip_size, chip_size),
                                  compression="gzip", shuffle=True, dtype='H')
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE REF TILES'.encode()
