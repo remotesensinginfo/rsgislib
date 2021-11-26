@@ -48,43 +48,43 @@ import osgeo.gdal
 import rios.rat
 
 
-def create_max_ndvi_composite(inImgsPattern, rBand, nBand, outRefImg, outCompImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True):
+def create_max_ndvi_composite(in_imgs_pattern, r_band, n_band, out_ref_img, out_comp_img, tmp_dir='./tmp', gdalformat='KEA', datatype=None, calc_stats=True):
     """
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI.
 
-:param inImgsPattern: is a pattern (ready for glob.glob(inImgsPattern)) so needs an '*' within the pattern to find the input image files.
-:param rBand: is the image band within the input images (same for all) for the red band - note band indexing starts at 1.
-:param nBand: is the image band within the input images (same for all) for the nir band - note band indexing starts at 1.
-:param outRefImg: is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
-:param outCompImg: is the output composite image for which gdalformat and dataType define the format and data type.
-:param tmpPath: is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
+:param in_imgs_pattern: is a pattern (ready for glob.glob(inImgsPattern)) so needs an '*' within the pattern to find the input image files.
+:param r_band: is the image band within the input images (same for all) for the red band - note band indexing starts at 1.
+:param n_band: is the image band within the input images (same for all) for the nir band - note band indexing starts at 1.
+:param out_ref_img: is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
+:param out_comp_img: is the output composite image for which gdalformat and dataType define the format and data type.
+:param tmp_dir: is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
 :param gdalformat: is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
-:param dataType: is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None).
-:param calcStats: calculate image statics and pyramids (Default=True)
+:param datatype: is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None).
+:param calc_stats: calculate image statics and pyramids (Default=True)
 
     """
     import rsgislib.tools.utils
     uidStr = rsgislib.tools.utils.uid_generator()
     
     # Get List of input images:
-    inImages = glob.glob(inImgsPattern)
+    inImages = glob.glob(in_imgs_pattern)
     
     if len(inImages) > 1:
         tmpPresent = True
-        if not os.path.exists(tmpPath):
-            os.makedirs(tmpPath)
+        if not os.path.exists(tmp_dir):
+            os.makedirs(tmp_dir)
             tmpPresent = False 
         
-        refLayersPath = os.path.join(tmpPath, 'RefLyrs_'+uidStr)
+        refLayersPath = os.path.join(tmp_dir, 'RefLyrs_'+uidStr)
         
         refImgTmpPresent = True
         if not os.path.exists(refLayersPath):
             os.makedirs(refLayersPath)
             refImgTmpPresent = False
         
-        if dataType is None:
-            dataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages[0])
+        if datatype is None:
+            datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(inImages[0])
         
         numInLyrs = len(inImages)
         
@@ -109,19 +109,19 @@ the maximum NDVI.
             imgLyrs[idx] = os.path.basename(img)
             baseImgName = os.path.splitext(os.path.basename(img))[0]
             refLyrImg = os.path.join(refLayersPath, baseImgName+'_ndvi.kea')
-            rsgislib.imagecalc.calcindices.calcNDVI(img, rBand, nBand, refLyrImg, False)
+            rsgislib.imagecalc.calcindices.calc_ndvi(img, r_band, n_band, refLyrImg, False)
             refLyrsLst.append(refLyrImg)
             idx = idx + 1
         imgLyrs[0] = ""
     
         # Create REF Image
-        rsgislib.imagecalc.get_img_idx_for_stat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
-        if calcStats:
+        rsgislib.imagecalc.get_img_idx_for_stat(refLyrsLst, out_ref_img, 'KEA', -999, rsgislib.SUMTYPE_MAX)
+        if calc_stats:
             # Pop Ref Image with stats
-            rsgislib.rastergis.pop_rat_img_stats(outRefImg, True, True, True)
+            rsgislib.rastergis.pop_rat_img_stats(out_ref_img, True, True, True)
             
             # Open the clumps dataset as a gdal dataset
-            ratDataset = osgeo.gdal.Open(outRefImg, osgeo.gdal.GA_Update)
+            ratDataset = osgeo.gdal.Open(out_ref_img, osgeo.gdal.GA_Update)
             
             # Write colours to RAT
             rios.rat.writeColumn(ratDataset, "Red", red)
@@ -133,22 +133,22 @@ the maximum NDVI.
             ratDataset = None
         
         # Create Composite Image
-        rsgislib.imageutils.create_ref_img_composite_img(inImages, outCompImg, outRefImg, gdalformat, dataType, 0.0)
+        rsgislib.imageutils.create_ref_img_composite_img(inImages, out_comp_img, out_ref_img, gdalformat, datatype, 0.0)
         
-        if calcStats:
+        if calc_stats:
             # Calc Stats
-            rsgislib.imageutils.pop_img_stats(outCompImg, use_no_data=True, no_data_val=0, calc_pyramids=True)
+            rsgislib.imageutils.pop_img_stats(out_comp_img, use_no_data=True, no_data_val=0, calc_pyramids=True)
     
         if not refImgTmpPresent:
             shutil.rmtree(refLayersPath, ignore_errors=True)
     
         if not tmpPresent:
-            shutil.rmtree(tmpPath, ignore_errors=True)
+            shutil.rmtree(tmp_dir, ignore_errors=True)
     elif len(inImages) == 1:
         print("Only 1 Input Image, Just Copying File to output")
-        shutil.copy(inImages[0], outCompImg)
+        shutil.copy(inImages[0], out_comp_img)
     else:
-        raise rsgislib.RSGISPyException("There were no input images for " + inImgsPattern)
+        raise rsgislib.RSGISPyException("There were no input images for " + in_imgs_pattern)
 
 
 def create_max_ndvi_ndwi_composite_landsat(inImgsPattern, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, use_mode=True):
@@ -229,8 +229,8 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
                 sBand = 5
                 onlyLS8 = False
             
-            rsgislib.imagecalc.calcindices.calcNDVI(img, rBand, nBand, refLyrNDVIImg, False)
-            rsgislib.imagecalc.calcindices.calcNDWI(img, nBand, sBand, refLyrNDWIImg, False)
+            rsgislib.imagecalc.calcindices.calc_ndvi(img, rBand, nBand, refLyrNDVIImg, False)
+            rsgislib.imagecalc.calcindices.calc_ndwi(img, nBand, sBand, refLyrNDWIImg, False)
             
             refLyrMskImg = os.path.join(refLayersPath, baseImgName+'_waterLandMsk.kea')
             bandDefns = []
@@ -471,8 +471,8 @@ used to define the spatial extent of the output images and spatial projection.
                 baseImgName = os.path.splitext(os.path.basename(img))[0]
                 refLyrNDVIImg = os.path.join(refLayersPath, baseImgName+'_ndvi.kea')
                 refLyrNDWIImg = os.path.join(refLayersPath, baseImgName+'_ndwi.kea')
-                rsgislib.imagecalc.calcindices.calcNDVI(img, rBand, nBand, refLyrNDVIImg, False)
-                rsgislib.imagecalc.calcindices.calcNDWI(img, nBand, sBand, refLyrNDWIImg, False)
+                rsgislib.imagecalc.calcindices.calc_ndvi(img, rBand, nBand, refLyrNDVIImg, False)
+                rsgislib.imagecalc.calcindices.calc_ndwi(img, nBand, sBand, refLyrNDWIImg, False)
                 
                 refLyrMskImg = os.path.join(refLayersPath, baseImgName+'_waterLandMsk.kea')
                 bandDefns = []
@@ -693,8 +693,8 @@ used to define the spatial extent of the output images and spatial projection.
                 refLyrNDWIImg = os.path.join(refLayersPath, baseImgName + '_ndwi.kea')
                 ###refLyrGNDWIImg = os.path.join(refLayersPath, baseImgName+'_gndwi.kea')
                 ###refLyrGMNDWIImg = os.path.join(refLayersPath, baseImgName+'_gmndwi.kea')
-                rsgislib.imagecalc.calcindices.calcNDVI(img, rBand, nBand, refLyrNDVIImg, False)
-                rsgislib.imagecalc.calcindices.calcNDWI(img, nBand, sBand, refLyrNDWIImg, False)
+                rsgislib.imagecalc.calcindices.calc_ndvi(img, rBand, nBand, refLyrNDVIImg, False)
+                rsgislib.imagecalc.calcindices.calc_ndwi(img, nBand, sBand, refLyrNDWIImg, False)
                 ###rsgislib.imagecalc.calcindices.calc_gndwi(img, gBand, nBand, refLyrGNDWIImg, False)
                 ###rsgislib.imagecalc.calcindices.calc_gmndwi(img, gBand, sBand, refLyrGMNDWIImg, False)
 

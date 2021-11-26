@@ -2410,7 +2410,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "        print('In Image ('+str(idx) + '):\t' + img)\n"
 "        baseImgName = os.path.splitext(os.path.basename(img))[0]\n"
 "        refLyrImg = os.path.join(refLayerPath, baseImgName+'_ndvi.kea')\n"
-"        rsgislib.imagecalc.calcNDVI(img, 3, 4, refLyrImg)\n"
+"        rsgislib.imagecalc.calc_ndvi(img, 3, 4, refLyrImg)\n"
 "        refLyrsLst.append(refLyrImg)\n"
 "        idx = idx + 1\n"
 "\n"
