@@ -1411,3 +1411,127 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
         fig.savefig(out_plot_file)
 
     return conf_thres_met, conf_thres_met_idx, f1_scores, f1_scr_intervals_rgn
+
+
+def summarise_multi_acc_ptonly_metrics(
+    acc_json_files: list, out_acc_json_sum_file: str
+):
+    """
+    A function which takes a list of JSON files outputted from the
+    calc_acc_ptonly_metrics_vecsamples function and creates a JSON with
+    summary statistics the individual accuracy metrics. This is useful
+    if you have calculated your accuracy using a number of individual
+    plots and you want to compare the accuracies from the individual
+    plots rather than just produce an overall summary.
+
+    :param acc_json_files: list of input JSON files.
+    :param out_acc_json_sum_file: file path the output JSON file.
+
+    """
+    import rsgislib.tools.utils
+
+    out_dict = dict()
+    out_dict["accuracy"] = {"values": []}
+    out_dict["cohen_kappa"] = {"values": []}
+    out_dict["macro avg"] = {
+        "f1-score": {"values": []},
+        "precision": {"values": []},
+        "recall": {"values": []},
+    }
+    out_dict["weighted avg"] = {
+        "f1-score": {"values": []},
+        "precision": {"values": []},
+        "recall": {"values": []},
+    }
+
+    first = True
+    for acc_json_file in acc_json_files:
+        acc_pt_dict = rsgislib.tools.utils.read_json_to_dict(acc_json_file)
+        if first:
+            cls_names = acc_pt_dict["cls_confidence_intervals"]
+            for cls_name in cls_names:
+                out_dict[cls_name] = {
+                    "f1-score": {"values": []},
+                    "precision": {"values": []},
+                    "recall": {"values": []},
+                }
+
+            first = False
+
+        out_dict["accuracy"]["values"].append(acc_pt_dict["accuracy"])
+        out_dict["cohen_kappa"]["values"].append(acc_pt_dict["cohen_kappa"])
+        out_dict["macro avg"]["f1-score"]["values"].append(
+            acc_pt_dict["macro avg"]["f1-score"]
+        )
+        out_dict["macro avg"]["precision"]["values"].append(
+            acc_pt_dict["macro avg"]["precision"]
+        )
+        out_dict["macro avg"]["recall"]["values"].append(
+            acc_pt_dict["macro avg"]["recall"]
+        )
+        out_dict["weighted avg"]["f1-score"]["values"].append(
+            acc_pt_dict["weighted avg"]["f1-score"]
+        )
+        out_dict["weighted avg"]["precision"]["values"].append(
+            acc_pt_dict["weighted avg"]["precision"]
+        )
+        out_dict["weighted avg"]["recall"]["values"].append(
+            acc_pt_dict["weighted avg"]["recall"]
+        )
+        for cls_name in cls_names:
+            out_dict[cls_name]["f1-score"]["values"].append(
+                acc_pt_dict[cls_name]["f1-score"]
+            )
+            out_dict[cls_name]["precision"]["values"].append(
+                acc_pt_dict[cls_name]["precision"]
+            )
+            out_dict[cls_name]["recall"]["values"].append(
+                acc_pt_dict[cls_name]["recall"]
+            )
+
+    def _calc_sum_stats(vals):
+        arr_vals = numpy.array(vals)
+        sum_stats_dict = dict()
+        sum_stats_dict["mean"] = float(numpy.mean(arr_vals))
+        sum_stats_dict["median"] = float(numpy.median(arr_vals))
+        sum_stats_dict["min"] = float(numpy.min(arr_vals))
+        sum_stats_dict["max"] = float(numpy.max(arr_vals))
+        for percentile in [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99]:
+            sum_stats_dict["percentile_{}".format(percentile)] = float(
+                numpy.percentile(arr_vals, percentile)
+            )
+
+        return sum_stats_dict
+
+    out_dict["accuracy"].update(_calc_sum_stats(out_dict["accuracy"]["values"]))
+    out_dict["cohen_kappa"].update(_calc_sum_stats(out_dict["cohen_kappa"]["values"]))
+    out_dict["macro avg"]["f1-score"].update(
+        _calc_sum_stats(out_dict["macro avg"]["f1-score"]["values"])
+    )
+    out_dict["macro avg"]["precision"].update(
+        _calc_sum_stats(out_dict["macro avg"]["precision"]["values"])
+    )
+    out_dict["macro avg"]["recall"].update(
+        _calc_sum_stats(out_dict["macro avg"]["recall"]["values"])
+    )
+    out_dict["weighted avg"]["f1-score"].update(
+        _calc_sum_stats(out_dict["weighted avg"]["f1-score"]["values"])
+    )
+    out_dict["weighted avg"]["precision"].update(
+        _calc_sum_stats(out_dict["weighted avg"]["precision"]["values"])
+    )
+    out_dict["weighted avg"]["recall"].update(
+        _calc_sum_stats(out_dict["weighted avg"]["recall"]["values"])
+    )
+    for cls_name in cls_names:
+        out_dict[cls_name]["f1-score"].update(
+            _calc_sum_stats(out_dict[cls_name]["f1-score"]["values"])
+        )
+        out_dict[cls_name]["precision"].update(
+            _calc_sum_stats(out_dict[cls_name]["precision"]["values"])
+        )
+        out_dict[cls_name]["recall"].update(
+            _calc_sum_stats(out_dict[cls_name]["recall"]["values"])
+        )
+
+    rsgislib.tools.utils.write_dict_to_json(out_dict, out_acc_json_sum_file)
