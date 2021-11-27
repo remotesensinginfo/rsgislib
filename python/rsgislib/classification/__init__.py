@@ -11,7 +11,7 @@ class ClassSimpleInfoObj(object):
     This is a class to store the information associated within the classification.
 
     :param id: Output pixel value for this class
-    :param file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
+    :param file_h5: hdf5 file (from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) with the training
                    data for the class
     :param red: Red colour for visualisation (0-255)
     :param green: Green colour for visualisation (0-255)
@@ -23,7 +23,7 @@ class ClassSimpleInfoObj(object):
         """
 
         :param id: Output pixel value for this class
-        :param file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
+        :param file_h5: hdf5 file (from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) with the training
                data for the class
         :param red: Red colour for visualisation (0-255)
         :param green: Green colour for visualisation (0-255)
@@ -36,6 +36,12 @@ class ClassSimpleInfoObj(object):
         self.green = green
         self.blue = blue
 
+    def __str__(self):
+        return "{}: {}, ({}, {}, {})".format(self.id, self.file_h5, self.red, self.green, self.blue)
+
+    def __repr__(self):
+        return "{}: {}, ({}, {}, {})".format(self.id, self.file_h5, self.red, self.green, self.blue)
+
 
 class ClassInfoObj(object):
     """
@@ -44,11 +50,11 @@ class ClassInfoObj(object):
     :param id: Internal unique ID value for this class (must start 0 and be consecutive between the classes)
     :param out_id: External unique ID for ther class which will be used as the output image pixel value, can
                    be any integer.
-    :param train_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
+    :param train_file_h5: hdf5 file (from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) with the training
                         data for the class
-    :param test_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the testing
+    :param test_file_h5: hdf5 file (from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) with the testing
                        data for the class
-    :param valid_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the validation
+    :param valid_file_h5: hdf5 file (from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) with the validation
                         data for the class
     :param red: Red colour for visualisation (0-255)
     :param green: Green colour for visualisation (0-255)
@@ -63,11 +69,11 @@ class ClassInfoObj(object):
         :param id: Internal unique ID value for this class (must start 0 and be consecutive between the classes)
         :param out_id: External unique ID for ther class which will be used as the output image pixel value,
                        can be any integer.
-        :param train_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training
+        :param train_file_h5: hdf5 file (from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) with the training
                             data for the class
-        :param test_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the testing
+        :param test_file_h5: hdf5 file (from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) with the testing
                            data for the class
-        :param valid_file_h5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the validation
+        :param valid_file_h5: hdf5 file (from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) with the validation
                             data for the class
         :param red: Red colour for visualisation (0-255)
         :param green: Green colour for visualisation (0-255)
@@ -82,6 +88,12 @@ class ClassInfoObj(object):
         self.red = red
         self.green = green
         self.blue = blue
+
+    def __str__(self):
+        return "{}={}: (Train:{}, Test:{}, Valid:{}), ({}, {}, {})".format(self.id, self.out_id, self.train_file_h5, self.test_file_h5, self.valid_file_h5, self.red, self.green, self.blue)
+
+    def __repr__(self):
+        return "{}={}: (Train:{}, Test:{}, Valid:{}), ({}, {}, {})".format(self.id, self.out_id, self.train_file_h5, self.test_file_h5, self.valid_file_h5, self.red, self.green, self.blue)
 
 class ClassVecSamplesInfoObj(object):
     """
@@ -156,52 +168,30 @@ class SamplesInfoObj(object):
         self.blue = blue
 
 
-def generate_transect_accuracy_pts(input_img, in_lines_vec_file, out_pts_vec_file,
-                                   class_img_col, class_img_vec_col, class_ref_vec_col,
-                                   line_step, del_exist_vec=False):
-    """ A tool for converting a set of lines in to point transects and 
-populating with the information for undertaking an accuracy assessment.
-
-Where:
-
-:param input_img: is a string specifying the input image file with classification.
-:param in_lines_vec_file: is a string specifying the input lines shapefile path.
-:param out_pts_vec_file: is a string specifying the output points shapefile path.
-:param class_img_col: is a string speciyfing the name of the column in the image file containing the class names.
-:param class_img_vec_col: is a string specifiying the output column in the shapefile for the classified class names.
-:param class_ref_vec_col: is an optional string specifiying an output column in the shapefile which can be used in the
-                       accuracy assessment for the reference data.
-:param line_step: is a double specifying the step along the lines between the points
-:param del_exist_vec: is an optional boolean specifying whether the output shapefile should be deleted if is already exists
-              (True and it will be deleted; Default is False)
-
-    """
-    # Import the RSGISLib Image Utils module
-    import rsgislib.vectorutils
-    rsgislib.vectorutils.createLinesOfPoints(in_lines_vec_file, out_pts_vec_file, line_step, del_exist_vec)
-    pop_class_info_accuracy_pts(input_img, out_pts_vec_file, class_img_col, class_img_vec_col, class_ref_vec_col)
-
-
 def get_class_training_data(img_band_info, class_vec_sample_info, tmp_dir,
                             sub_sample=None, ref_img=None):
     """
     A function to extract training for vector regions for a given input image set.
 
-    :param img_band_info: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and bands of interest.
-    :param class_vec_sample_info: A list of rsgislib.classification.ClassVecSamplesInfoObj objects to define the
-                               training regions.
+    :param img_band_info: A list of rsgislib.imageutils.ImageBandInfo objects to
+                          define the images and bands of interest.
+    :param class_vec_sample_info: List of rsgislib.classification.ClassVecSamplesInfoObj
+                                  objects to define the training regions.
     :param tmp_dir: A directory for temporary outputs created during the processing.
-    :param sub_sample: If not None then an integer needs to be provided which takes a random selection from the
-                       available samples to balance the number of samples used for the classification.
-    :param ref_img: A reference image which defines the area of interest, pixel size etc. for the processing.
-                   If None then an image will be generated using the input images but the tmpdir needs to be defined.
+    :param sub_sample: If not None then an integer needs to be provided which takes
+                       a random selection from the available samples to balance the
+                       number of samples used for the classification.
+    :param ref_img: A reference image which defines the area of interest, pixel size
+                    etc. for the processing. If None then an image will be generated
+                    using the input images but the tmp_dir needs to be defined.
     :return: dictionary of ClassSimpleInfoObj objects.
 
     """
     import rsgislib.tools.filetools
     import rsgislib.tools.utils
     import rsgislib.imageutils
-    import rsgislib.vectorutils
+    import rsgislib.vectorutils.createrasters
+    import rsgislib.zonalstats
     import os
     import random
     import shutil
@@ -221,7 +211,7 @@ def get_class_training_data(img_band_info, class_vec_sample_info, tmp_dir,
     for class_sample_info in class_vec_sample_info:
         cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.file_h5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
-        rsgislib.vectorutils.convertvector.rasterise_vec_lyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
+        rsgislib.vectorutils.createrasters.rasterise_vec_lyr(class_sample_info.vec_file, class_sample_info.vec_lyr, rasterise_ref_img,
                                                              out_vec_img, gdalformat="KEA", burn_val=class_sample_info.id,
                                                              datatype=rsgislib.TYPE_16UINT, att_column=None, use_vec_extent=False, thematic=True,
                                                              no_data_val=0)
@@ -233,12 +223,12 @@ def get_class_training_data(img_band_info, class_vec_sample_info, tmp_dir,
                                                                         numSamples=sub_sample)
             out_vec_img = out_vec_img_subsample
 
-        rsgislib.imageutils.extractZoneImageBandValues2HDF(img_band_info, out_vec_img, class_sample_info.file_h5,
+        rsgislib.zonalstats.extract_zone_img_band_values_to_hdf(img_band_info, out_vec_img, class_sample_info.file_h5,
                                                            class_sample_info.id)
         rand_red_val = random.randint(1, 255)
         rand_grn_val = random.randint(1, 255)
         rand_blu_val = random.randint(1, 255)
-        classInfo[class_sample_info.classname] = ClassSimpleInfoObj(id=class_sample_info.id,
+        classInfo[class_sample_info.class_name] = ClassSimpleInfoObj(id=class_sample_info.id,
                                                                     file_h5=class_sample_info.file_h5,
                                                                     red=rand_red_val,
                                                                     green=rand_grn_val,
@@ -287,7 +277,7 @@ def get_class_training_chips_data(img_band_info, class_vec_sample_info, chip_h_s
     for class_sample_info in class_vec_sample_info:
         cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.file_h5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
-        rsgislib.vectorutils.convertvector.rasterise_vec_lyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
+        rsgislib.vectorutils.createrasters.rasterise_vec_lyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
                                                              out_vec_img, gdalformat="KEA", burn_val=class_sample_info.id,
                                                              datatype=rsgislib.TYPE_16UINT, att_column=None, use_vec_extent=False, thematic=True,
                                                              no_data_val=0)
@@ -307,7 +297,7 @@ def get_num_samples(in_h5_file):
     """
     A function to return the number of samples within the input HDF5 file.
 
-    :param in_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
+    :param in_h5_file: Input HDF file, probably from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf.
     :return: the number of samples in the hdf5 file.
     """
     import h5py

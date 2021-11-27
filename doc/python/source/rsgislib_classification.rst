@@ -46,7 +46,6 @@ Accuracy Assessment
 ---------------------
 .. autofunction:: rsgislib.classification.generate_random_accuracy_pts
 .. autofunction:: rsgislib.classification.generate_stratified_random_accuracy_pts
-.. autofunction:: rsgislib.classification.generate_transect_accuracy_pts
 .. autofunction:: rsgislib.classification.pop_class_info_accuracy_pts
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples

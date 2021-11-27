@@ -7,8 +7,21 @@ try:
 except ImportError:
     H5PY_NOT_AVAIL = True
 
+PLOTLY_NOT_AVAIL = False
+try:
+    import plotly
+except ImportError:
+    PLOTLY_NOT_AVAIL = True
+
+KALEIDO_NOT_AVAIL = False
+try:
+    import kaleido
+except ImportError:
+    KALEIDO_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 ZONALSTATS_DATA_DIR = os.path.join(DATA_DIR, "zonalstats")
+CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
 
 
 @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
@@ -46,3 +59,121 @@ def test_get_num_samples_refchips():
     n_smpls = rsgislib.classification.get_num_samples(in_h5_file)
 
     assert n_smpls == 6
+
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_split_sample_train_valid_test(tmp_path):
+    import rsgislib.classification
+
+    in_h5_file = os.path.join(
+        ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_vals.h5"
+    )
+
+    train_h5_file = os.path.join(tmp_path, "out_train_data.h5")
+    valid_h5_file = os.path.join(tmp_path, "out_valid_data.h5")
+    test_h5_file = os.path.join(tmp_path, "out_test_data.h5")
+
+    rsgislib.classification.split_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file, 100, 100, train_sample=500, rand_seed=42, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(train_h5_file) and os.path.exists(valid_h5_file) and os.path.exists(test_h5_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_split_chip_sample_train_valid_test(tmp_path):
+    import rsgislib.classification
+
+    in_h5_file = os.path.join(
+        ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_chip_vals.h5"
+    )
+
+    train_h5_file = os.path.join(tmp_path, "out_train_data.h5")
+    valid_h5_file = os.path.join(tmp_path, "out_valid_data.h5")
+    test_h5_file = os.path.join(tmp_path, "out_test_data.h5")
+
+    rsgislib.classification.split_chip_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file, 2, 2, train_sample=None, rand_seed=42, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(train_h5_file) and os.path.exists(valid_h5_file) and os.path.exists(test_h5_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_split_chip_sample_ref_train_valid_test(tmp_path):
+    import rsgislib.classification
+
+    in_h5_file = os.path.join(
+        ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_refchip_vals.h5"
+    )
+
+    train_h5_file = os.path.join(tmp_path, "out_train_data.h5")
+    valid_h5_file = os.path.join(tmp_path, "out_valid_data.h5")
+    test_h5_file = os.path.join(tmp_path, "out_test_data.h5")
+
+    rsgislib.classification.split_chip_sample_ref_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file, 2, 2, train_sample=None, rand_seed=42, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(train_h5_file) and os.path.exists(valid_h5_file) and os.path.exists(test_h5_file)
+
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_flip_chip_hdf5_file(tmp_path):
+    import rsgislib.classification
+
+    in_h5_file = os.path.join(
+        ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_chip_vals.h5"
+    )
+
+    out_h5_file = os.path.join(tmp_path, "out_data.h5")
+
+    rsgislib.classification.flip_chip_hdf5_file(in_h5_file, out_h5_file, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_flip_ref_chip_hdf5_file(tmp_path):
+    import rsgislib.classification
+
+    in_h5_file = os.path.join(
+        ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_refchip_vals.h5"
+    )
+
+    out_h5_file = os.path.join(tmp_path, "out_data.h5")
+
+    rsgislib.classification.flip_ref_chip_hdf5_file(in_h5_file, out_h5_file, datatype=rsgislib.TYPE_16INT)
+
+    assert os.path.exists(out_h5_file)
+
+
+def test_get_class_training_data(tmp_path):
+    import rsgislib.imageutils
+    import rsgislib.classification
+
+    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    cls_vec_smpls = os.path.join(CLASSIFICATION_DATA_DIR, "cls_poly_smpls.gpkg")
+
+    img_band_info = []
+    img_band_info.append(rsgislib.imageutils.ImageBandInfo(s2_img, "s2", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+
+    class_vec_sample_info = []
+    class_vec_sample_info.append(rsgislib.classification.ClassVecSamplesInfoObj(id=1, class_name="Forest", vec_file=cls_vec_smpls, vec_lyr="cls_forest_smpls", file_h5=os.path.join(tmp_path, "cls_forest_smpls.h5")))
+    class_vec_sample_info.append(rsgislib.classification.ClassVecSamplesInfoObj(id=2, class_name="Grass", vec_file=cls_vec_smpls, vec_lyr="cls_grass_smpls", file_h5=os.path.join(tmp_path, "cls_grass_smpls.h5")))
+    class_vec_sample_info.append(rsgislib.classification.ClassVecSamplesInfoObj(id=3, class_name="Urban", vec_file=cls_vec_smpls, vec_lyr="cls_urban_smpls", file_h5=os.path.join(tmp_path, "cls_urban_smpls.h5")))
+    class_vec_sample_info.append(rsgislib.classification.ClassVecSamplesInfoObj(id=4, class_name="Water", vec_file=cls_vec_smpls, vec_lyr="cls_water_smpls", file_h5=os.path.join(tmp_path, "cls_water_smpls.h5")))
+
+    cls_info = rsgislib.classification.get_class_training_data(img_band_info, class_vec_sample_info, tmp_dir=tmp_path, sub_sample=None, ref_img=s2_img)
+
+    all_files_present = True
+    for cls in cls_info:
+        if not os.path.exists(cls_info[cls].file_h5):
+            all_files_present = False
+
+    assert all_files_present
+
+@pytest.mark.skipif((PLOTLY_NOT_AVAIL or KALEIDO_NOT_AVAIL), reason="plotly or kaleido dependencies not available")
+def test_plot_train_data(tmp_path):
+    import glob
+    import rsgislib.classification
+
+    forest_h5 = os.path.join(CLASSIFICATION_DATA_DIR, "cls_forest_smpls.h5")
+    urban_h5 = os.path.join(CLASSIFICATION_DATA_DIR, "cls_urban_smpls.h5")
+
+    rsgislib.classification.plot_train_data(forest_h5, urban_h5, tmp_path, cls1_name="Forest", cls2_name="Urban", var_names=None)
+
+    plot_files = glob.glob(os.path.join(tmp_path, "*.png"))
+
+    assert len(plot_files) == 100

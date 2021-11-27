@@ -894,7 +894,7 @@ def create_quicklook_overview_imgs_vec_overlay(input_imgs, bands, tmp_dir, vec_o
             raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
         # Rasterise the overlay vector to the output raster grid.
         tmp_vec_overlay_img = os.path.join(usr_tmp_dir, '{}_vec_overlay.kea'.format(lcl_img_basename))
-        rsgislib.vectorutils.convertvector.rasterise_vec_lyr(vec_overlay_file, vec_overlay_lyr, tmp_resized_img, tmp_vec_overlay_img,
+        rsgislib.vectorutils.createrasters.rasterise_vec_lyr(vec_overlay_file, vec_overlay_lyr, tmp_resized_img, tmp_vec_overlay_img,
                                                              gdalformat="KEA", burn_val=1, datatype=rsgislib.TYPE_8UINT, att_column=None,
                                                              thematic=True, no_data_val=0)
         # Merge the overlay and base image
@@ -922,7 +922,7 @@ def create_quicklook_overview_imgs_vec_overlay(input_imgs, bands, tmp_dir, vec_o
                 raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
             # Rasterise the overlay vector to the output raster grid.
             tmp_vec_overlay_img = os.path.join(usr_tmp_dir, '{}_vec_overlay.kea'.format(lcl_img_basename))
-            rsgislib.vectorutils.convertvector.rasterise_vec_lyr(vec_overlay_file, vec_overlay_lyr, tmp_resized_img,
+            rsgislib.vectorutils.createrasters.rasterise_vec_lyr(vec_overlay_file, vec_overlay_lyr, tmp_resized_img,
                                                                  tmp_vec_overlay_img, gdalformat="KEA", burn_val=1,
                                                                  datatype=rsgislib.TYPE_8UINT, att_column=None, thematic=True, no_data_val=0)
             # Merge the overlay and base image
@@ -1125,7 +1125,7 @@ def overlay_vec_on_img(input_img, output_img, vec_overlay_file, vec_overlay_lyr,
 
     # Create raster of the vector to be overlain.
     tmp_vec_overlay_img = os.path.join(usr_tmp_dir, '{}_vec_overlay.kea'.format(img_basename))
-    rsgislib.vectorutils.convertvector.rasterise_vec_lyr(vec_overlay_file, vec_overlay_lyr, input_img, tmp_vec_overlay_img,
+    rsgislib.vectorutils.createrasters.rasterise_vec_lyr(vec_overlay_file, vec_overlay_lyr, input_img, tmp_vec_overlay_img,
                                                          gdalformat="KEA", burn_val=1, datatype=rsgislib.TYPE_8UINT, att_column=None,
                                                          thematic=True, no_data_val=0)
 

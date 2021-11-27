@@ -163,7 +163,7 @@ can be used to train such as model. The output image will contain the hard membe
 :param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
 :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                    rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
+                    rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
 :param out_class_img: Output image which will contain the hard classification.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.

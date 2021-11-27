@@ -691,7 +691,7 @@ image and threshold can be applied to this image. Note. the softmax score is not
 :param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
 :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                    rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
+                    rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
 :param out_score_img: output image file with the classification softmax score - this image is scaled by
                    multiplying by 10000.
@@ -1022,7 +1022,7 @@ the maximum softmax score.
 :param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
                    Can be used to create a heirachical classification.
 :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                    rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
+                    rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
 :param out_class_img: Output image which will contain the hard classification defined as the maximum probability.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.

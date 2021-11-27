@@ -26,6 +26,7 @@ import rsgislib.imageutils
 # Import the RSGISLib RasterGIS module
 import rsgislib.rastergis
 
+gdal.UseExceptions()
 
 class VecLayersInfoObj(object):
     """
@@ -134,7 +135,7 @@ def get_vec_feat_count(
     :return: nfeats
 
     """
-    gdal.UseExceptions()
+
     inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vec_lyr is not None:
         inLayer = inDataSource.GetLayer(vec_lyr)
@@ -429,7 +430,7 @@ def get_vec_layer_extent(
 
     :return: boundary box is returned (MinX, MaxX, MinY, MaxY)
     """
-    gdal.UseExceptions()
+
     # Get a Layer's Extent
     inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vec_lyr is not None:
@@ -461,7 +462,7 @@ def split_vec_lyr(
     :param out_vec_ext: file ending (e.g., .shp).
 
     """
-    gdal.UseExceptions()
+
     datasrc = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     srcLyr = datasrc.GetLayer(vec_lyr)
     nInFeats = srcLyr.GetFeatureCount(True)
@@ -572,7 +573,7 @@ def reproj_vector_layer(
     """
     ## This code has been editted and updated for GDAL > version 2.0
     ## https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
-    gdal.UseExceptions()
+
 
     # get the input layer
     inDataSet = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
@@ -713,7 +714,7 @@ def reproj_vec_lyr_obj(
     """
     ## This code has been editted from https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
     ## Updated for GDAL 2.0
-    gdal.UseExceptions()
+
 
     vec_lyr_obj.ResetReading()
 
@@ -837,7 +838,7 @@ def get_att_lst_select_feats(
     :return: list of dictionaries with the output values.
 
     """
-    gdal.UseExceptions()
+
     att_vals = []
     try:
         dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
@@ -936,7 +937,7 @@ def get_att_lst_select_feats_lyr_objs(
     :return: list of dictionaries with the output values.
 
     """
-    gdal.UseExceptions()
+
     att_vals = []
     try:
         if vec_lyr_obj is None:
@@ -1051,7 +1052,7 @@ def get_att_lst_select_bbox_feats_lyr_objs(
     :return: list of dictionaries with the output values.
 
     """
-    gdal.UseExceptions()
+
     outvals = []
     try:
         if vec_lyr_obj is None:
@@ -1172,7 +1173,7 @@ def select_intersect_feats(
     :param out_format: output vector format (default GPKG)
 
     """
-    gdal.UseExceptions()
+
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
         raise Exception("Could not open '{}'".format(vec_file))
@@ -1233,7 +1234,7 @@ def export_spatial_select_feats(
     :param out_format: the output vector layer type.
 
     """
-    gdal.UseExceptions()
+
     att_vals = []
     try:
         dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
@@ -1362,7 +1363,7 @@ def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> list:
     :returns: list of column names
 
     """
-    gdal.UseExceptions()
+
     atts = []
 
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
@@ -1393,7 +1394,7 @@ def subset_envs_vec_lyr_obj(
     :return: OGR Layer and Dataset objects.
 
     """
-    gdal.UseExceptions()
+
     if vec_lyr_obj is None:
         raise Exception("Vector layer object which was provided was None.")
 
@@ -1526,7 +1527,7 @@ def read_vec_lyr_to_mem(vec_file: str, vec_lyr: str) -> (ogr.DataSource, ogr.Lay
     :returns: ogr_dataset, ogr_layer
 
     """
-    gdal.UseExceptions()
+
     try:
         vecDS = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if vecDS is None:
@@ -1590,7 +1591,7 @@ def get_mem_vec_lyr_subset(
     :returns: OGR Layer and Dataset objects.
 
     """
-    gdal.UseExceptions()
+
     try:
         dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if dsVecFile is None:
@@ -1629,7 +1630,7 @@ def write_vec_lyr_to_file(
                     in an existing file will be lost).
 
     """
-    gdal.UseExceptions()
+
     try:
         if os.path.exists(out_vec_file) and replace:
             delete_vector_file(out_vec_file)
@@ -1739,7 +1740,7 @@ def copy_rat_cols_to_vector_lyr(
                           then matched to RAT. Default is None
 
     """
-    gdal.UseExceptions()
+
     from rios import rat
 
     if out_col_names is None:
@@ -2065,7 +2066,7 @@ def does_vmsk_img_intersect(
 
 
 def merge_to_multi_layer_vec(
-    input_file_lyrs: VecLayersInfoObj,
+    input_file_lyrs: list,
     out_vec_file: str,
     out_format: str = "GPKG",
     overwrite: bool = True,
@@ -2079,11 +2080,10 @@ def merge_to_multi_layer_vec(
     :param out_format: output format Default='GPKG'.
     :param overwrite: bool (default = True) specifying whether the input file should be
                       overwritten if it already exists.
-
     """
     first = True
     for vec in input_file_lyrs:
-        vec_lyr_obj = open_gdal_vec_lyr(vec.vec_file, vec.vec_lyr)
+        vec_ds_obj, vec_lyr_obj = open_gdal_vec_lyr(vec.vec_file, vec.vec_lyr)
         if first and overwrite:
             write_vec_lyr_to_file(
                 vec_lyr_obj,
@@ -2097,7 +2097,7 @@ def merge_to_multi_layer_vec(
             write_vec_lyr_to_file(
                 vec_lyr_obj, out_vec_file, vec.vec_out_lyr, out_format
             )
-        vec_lyr_obj = None
+        vec_ds_obj = None
         first = False
 
 
@@ -2141,7 +2141,7 @@ def vector_translate(
     """
     from osgeo import gdal
 
-    gdal.UseExceptions()
+
 
     if access_mode is not None:
         if access_mode not in ["update", "append", "overwrite"]:
@@ -2150,19 +2150,14 @@ def vector_translate(
                 "'update', 'append', 'overwrite']"
             )
 
-    if os.path.exists(out_vec_file):
-        if del_exist_vec:
-            delete_vector_file(out_vec_file)
-        else:
-            raise Exception(
-                "The output vector file ({}) already exists, "
-                "remove it and re-run.".format(out_vec_file)
-            )
+    if os.path.exists(out_vec_file) and del_exist_vec:
+        delete_vector_file(out_vec_file)
 
+    n_feats = get_vec_feat_count(vec_file, vec_lyr)
     try:
         import tqdm
 
-        pbar = tqdm.tqdm(total=100)
+        pbar = tqdm.tqdm(total=n_feats)
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress
@@ -2190,8 +2185,16 @@ def vector_translate(
         layerName=out_vec_lyr,
         callback=callback,
     )
+    in_vec_ds = gdal.OpenEx(vec_file)
 
-    gdal.VectorTranslate(out_vec_file, vec_file, options=opts)
+    if os.path.exists(out_vec_file):
+        out_vec_ds = gdal.OpenEx(out_vec_file, gdal.GA_Update)
+        gdal.VectorTranslate(out_vec_ds, in_vec_ds, options=opts)
+        out_vec_ds = None
+    else:
+        gdal.VectorTranslate(out_vec_file, in_vec_ds, options=opts)
+    in_vec_ds = None
+
 
 
 def reproj_wgs84_vec_to_utm(
@@ -2243,7 +2246,6 @@ def reproj_wgs84_vec_to_utm(
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
-    gdal.UseExceptions()
     vec_ds_obj = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     vec_lyr_obj = vec_ds_obj.GetLayer(vec_lyr)
 
