@@ -221,20 +221,20 @@ This function uses a trained classifier and applies it to the provided input ima
                     example, sklearn.svm.SVC.
 
     """
-    out_score_img = False
+    create_out_score_img = False
     if out_score_img is not None:
-        out_score_img = True
+        create_out_score_img = True
 
     infiles = applier.FilenameAssociations()
     infiles.imageMask = in_img_mask
     numClassVars = 0
     for imgFile in img_file_info:
-        infiles.__dict__[imgFile.name] = imgFile.fileName
+        infiles.__dict__[imgFile.name] = imgFile.file_name
         numClassVars = numClassVars + len(imgFile.bands)
 
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = output_img
-    if out_score_img:
+    if create_out_score_img:
         outfiles.out_score_img = out_score_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = sk_classifier
@@ -301,7 +301,7 @@ This function uses a trained classifier and applies it to the provided input ima
     applier.apply(_applySKClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
     rsgislib.rastergis.pop_rat_img_stats(clumps_img=output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
-    if out_score_img:
+    if create_out_score_img:
         rsgislib.imageutils.pop_img_stats(out_score_img, use_no_data=True, no_data_val=0, calc_pyramids=True)
 
     if class_clr_names:
