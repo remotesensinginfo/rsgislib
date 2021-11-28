@@ -207,7 +207,7 @@ Where:
     for shpFile in shpFiles:
         imgTileFile = os.path.join(tilesMaskDIR, tilesNameBase + str(idx) + '.kea')
         shpFileLyr = os.path.splitext(os.path.basename(shpFile))[0]
-        vectorutils.convertvector.rasterise_vec_lyr(shpFile, shpFileLyr, inputImage, imgTileFile, gdalformat=imgFormat, burn_val=1,
+        rsgislib.vectorutils.createrasters.rasterise_vec_lyr(shpFile, shpFileLyr, inputImage, imgTileFile, gdalformat=imgFormat, burn_val=1,
                                                     datatype=rsgislib.TYPE_8UINT, att_column=None, use_vec_extent=False, thematic=True, no_data_val=0)
         drv.DeleteDataSource(shpFile)
         idx = idx + 1

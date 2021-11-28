@@ -46,7 +46,6 @@ Classification
 --------------
 
 .. autofunction:: rsgislib.rastergis.ratutils.identify_small_units
-.. autofunction:: rsgislib.rastergis.ratutils.populate_clumps_with_class_training
 .. autofunction:: rsgislib.rastergis.class_split_fit_hist_gausian_mixture_model
 
 Extrapolation

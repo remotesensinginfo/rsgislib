@@ -112,7 +112,7 @@ class ClassVecSamplesInfoObj(object):
         :param id: Unique ID for the class (will probably be the pixel value for this class)
         :param class_name: Unique name for the class.
         :param vec_file: A vector file path with the training samples
-        :param vec_lyr: The vector layer name within the vecfile for the training samples.
+        :param vec_lyr: The vector layer name within the vec_file for the training samples.
         :param file_h5: A file path for a HDF5 file where the pixel values for these samples will be stored.
 
         """

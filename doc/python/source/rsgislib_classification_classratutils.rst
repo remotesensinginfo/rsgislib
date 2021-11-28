@@ -62,6 +62,7 @@ To train the classifier you need to create a column within the clump raster attr
 Extract Data for Training
 --------------------------
 
+.. autofunction:: rsgislib.classification.classratutils.populate_clumps_with_class_training
 .. autofunction:: rsgislib.classification.classratutils.extract_rat_col_data
 
 

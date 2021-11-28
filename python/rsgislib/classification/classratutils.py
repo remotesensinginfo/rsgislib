@@ -38,12 +38,88 @@ import os
 import osgeo.gdal as gdal
 import numpy
 from rios import rat
-from rios import ratapplier
 
 import rsgislib
 
-def extract_rat_col_data(clumps_img, cols, sel_col, sel_col_val, out_h5_file,
-                         datatype=None, rat_band=1):
+def populate_clumps_with_class_training(
+    clumps_img:str, classes_info:list, tmp_dir:str, classes_int_col:str, classes_name_col:str, rat_band:int=1
+):
+    """
+    A function to populate a clumps file with training from a series of
+    vector layers (1 per class)
+
+    :param clumps_img: input clumps file.
+    :param classes_info: A list of rsgislb.classification.ClassVecSamplesInfoObj
+                         objects. Note, the file_h5 variable is not needed in
+                         this function.
+    :param tmp_dir: File path (which needs to exist) where files can
+                    temporally be written.
+    :param classes_int_col: Output column name for integer values representing
+                            each class.
+    :param classes_name_col: Output column name for string class names.
+    :param rat_band: The band within the input image the RAT is associated with.
+
+    """
+    import rsgislib.imageutils
+    import rsgislib.rastergis
+    import rsgislib.rastergis.ratutils
+    import rsgislib.vectorutils.createrasters
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
+    import shutil
+
+    createdDIR = False
+    if not os.path.isdir(tmp_dir):
+        os.makedirs(tmp_dir)
+        createdDIR = True
+
+    uid = rsgislib.tools.utils.uid_generator(10)
+
+    classLayerSeq = list()
+    tmpClassImgLayers = list()
+    classNamesDict = dict()
+
+    for cls_info in classes_info:
+
+        tmp_cls_img = os.path.join(tmp_dir, "{}_{}.kea".format(cls_info.class_name, uid))
+        rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
+            cls_info.vec_file,
+            cls_info.vec_lyr,
+            clumps_img,
+            tmp_cls_img,
+            gdalformat="KEA",
+            burn_val=cls_info.id,
+            datatype=rsgislib.TYPE_16UINT,
+        )
+        tmpClassImgLayers.append(tmp_cls_img)
+        classNamesDict[cls_info.id] = cls_info.class_name
+
+    combinedClassesImage = os.path.join(tmp_dir, "CombinedClasses_{}.kea".format(uid))
+    rsgislib.imageutils.combine_imgs_to_band(tmpClassImgLayers, combinedClassesImage, "KEA", rsgislib.TYPE_8UINT, 0.0)
+
+    rsgislib.rastergis.populate_rat_with_mode(
+        input_img=combinedClassesImage,
+        clumps_img=clumps_img,
+        out_cols_name=classes_int_col,
+        use_no_data=False,
+        no_data_val=0,
+        out_no_data=False,
+        mode_band=1,
+        rat_band=rat_band,
+    )
+    rsgislib.rastergis.ratutils.define_class_names(clumps_img, classes_int_col, classes_name_col, classNamesDict)
+
+    for file in tmpClassImgLayers:
+        rsgislib.tools.filetools.delete_file_with_basename(file)
+    rsgislib.tools.filetools.delete_file_with_basename(combinedClassesImage)
+
+    if createdDIR:
+        shutil.rmtree(tmp_dir)
+
+
+
+def extract_rat_col_data(clumps_img:str, cols:list, sel_col:str, sel_col_val:str, out_h5_file:str,
+                         datatype:int=None, rat_band:int=1):
     """
     A function which extracts column values to be used as training, testing, validation
     sets for building a classifier. The data will be saved within a HDF5 file. Note,
@@ -72,19 +148,19 @@ def extract_rat_col_data(clumps_img, cols, sel_col, sel_col_val, out_h5_file,
     h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     rat_dataset = gdal.Open(clumps_img, gdal.GA_ReadOnly)
-    sel_col_vals = rat.readColumn(rat_dataset, sel_col)
+    sel_col_vals = rat.readColumn(rat_dataset, sel_col, bandNumber=rat_band)
     sel_col_sub_vals = sel_col_vals[sel_col_vals == sel_col_val]
 
     n_feats = sel_col_sub_vals.shape[0]
-    print("n Feats: {}".format(n_feats))
+    print("n feats: {}".format(n_feats))
 
     n_cols = len(cols)
-    print("N Cols: {}".format(n_cols))
+    print("n cols: {}".format(n_cols))
 
     out_vars_arr = numpy.zeros((n_feats, n_cols), dtype=h5_dtype)
 
     for i, col in enumerate(cols):
-        col_data = rat.readColumn(rat_dataset, col)
+        col_data = rat.readColumn(rat_dataset, col, bandNumber=rat_band)
         col_data = col_data[sel_col_vals == sel_col_val]
         out_vars_arr[..., i] = col_data
 

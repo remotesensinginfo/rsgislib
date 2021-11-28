@@ -91,4 +91,4 @@ def test_summarise_multi_acc_ptonly_metrics(tmp_path):
     rsgislib.classification.classaccuracymetrics.summarise_multi_acc_ptonly_metrics(acc_json_files, out_acc_json_sum_file)
 
     assert os.path.exists(out_json_file)
-    
+
