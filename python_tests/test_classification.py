@@ -65,17 +65,29 @@ def test_get_num_samples_refchips():
 def test_split_sample_train_valid_test(tmp_path):
     import rsgislib.classification
 
-    in_h5_file = os.path.join(
-        ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_vals.h5"
-    )
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_vals.h5")
 
     train_h5_file = os.path.join(tmp_path, "out_train_data.h5")
     valid_h5_file = os.path.join(tmp_path, "out_valid_data.h5")
     test_h5_file = os.path.join(tmp_path, "out_test_data.h5")
 
-    rsgislib.classification.split_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file, 100, 100, train_sample=500, rnd_seed=42, datatype=rsgislib.TYPE_16INT)
+    rsgislib.classification.split_sample_train_valid_test(
+        in_h5_file,
+        train_h5_file,
+        valid_h5_file,
+        test_h5_file,
+        100,
+        100,
+        train_sample=500,
+        rnd_seed=42,
+        datatype=rsgislib.TYPE_16INT,
+    )
 
-    assert os.path.exists(train_h5_file) and os.path.exists(valid_h5_file) and os.path.exists(test_h5_file)
+    assert (
+        os.path.exists(train_h5_file)
+        and os.path.exists(valid_h5_file)
+        and os.path.exists(test_h5_file)
+    )
 
 
 @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
@@ -83,20 +95,88 @@ def test_create_train_valid_test_sets(tmp_path):
     import rsgislib.classification
 
     cls_in_info = dict()
-    cls_in_info['Forest'] = rsgislib.classification.ClassSimpleInfoObj(id=1, file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal.h5"), red=120, green=120, blue=120)
-    cls_in_info['Grass'] = rsgislib.classification.ClassSimpleInfoObj(id=2, file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal.h5"), red=120, green=120, blue=120)
-    cls_in_info['Urban'] = rsgislib.classification.ClassSimpleInfoObj(id=3, file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal.h5"), red=120, green=120, blue=120)
-    cls_in_info['Water'] = rsgislib.classification.ClassSimpleInfoObj(id=4, file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal.h5"), red=120, green=120, blue=120)
+    cls_in_info["Forest"] = rsgislib.classification.ClassSimpleInfoObj(
+        id=1,
+        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_in_info["Grass"] = rsgislib.classification.ClassSimpleInfoObj(
+        id=2,
+        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_in_info["Urban"] = rsgislib.classification.ClassSimpleInfoObj(
+        id=3,
+        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_in_info["Water"] = rsgislib.classification.ClassSimpleInfoObj(
+        id=4,
+        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
 
     cls_out_info = dict()
-    cls_out_info['Forest'] = rsgislib.classification.ClassInfoObj(id=0, out_id=1, train_file_h5=os.path.join(tmp_path, "cls_forest_smpls_bal_train.h5"), test_file_h5=os.path.join(tmp_path, "cls_forest_smpls_bal_test.h5"), valid_file_h5=os.path.join(tmp_path, "cls_forest_smpls_bal_valid.h5"), red=120, green=120, blue=120)
-    cls_out_info['Grass'] = rsgislib.classification.ClassInfoObj(id=1, out_id=2, train_file_h5=os.path.join(tmp_path, "cls_grass_smpls_bal_train.h5"), test_file_h5=os.path.join(tmp_path, "cls_grass_smpls_bal_test.h5"), valid_file_h5=os.path.join(tmp_path, "cls_grass_smpls_bal_valid.h5"), red=120, green=120, blue=120)
-    cls_out_info['Urban'] = rsgislib.classification.ClassInfoObj(id=2, out_id=3, train_file_h5=os.path.join(tmp_path, "cls_urban_smpls_bal_train.h5"), test_file_h5=os.path.join(tmp_path, "cls_urban_smpls_bal_test.h5"), valid_file_h5=os.path.join(tmp_path, "cls_urban_smpls_bal_valid.h5"), red=120, green=120, blue=120)
-    cls_out_info['Water'] = rsgislib.classification.ClassInfoObj(id=3, out_id=4, train_file_h5=os.path.join(tmp_path, "cls_water_smpls_bal_train.h5"), test_file_h5=os.path.join(tmp_path, "cls_water_smpls_bal_test.h5"), valid_file_h5=os.path.join(tmp_path, "cls_water_smpls_bal_valid.h5"), red=120, green=120, blue=120)
+    cls_out_info["Forest"] = rsgislib.classification.ClassInfoObj(
+        id=0,
+        out_id=1,
+        train_file_h5=os.path.join(tmp_path, "cls_forest_smpls_bal_train.h5"),
+        test_file_h5=os.path.join(tmp_path, "cls_forest_smpls_bal_test.h5"),
+        valid_file_h5=os.path.join(tmp_path, "cls_forest_smpls_bal_valid.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_out_info["Grass"] = rsgislib.classification.ClassInfoObj(
+        id=1,
+        out_id=2,
+        train_file_h5=os.path.join(tmp_path, "cls_grass_smpls_bal_train.h5"),
+        test_file_h5=os.path.join(tmp_path, "cls_grass_smpls_bal_test.h5"),
+        valid_file_h5=os.path.join(tmp_path, "cls_grass_smpls_bal_valid.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_out_info["Urban"] = rsgislib.classification.ClassInfoObj(
+        id=2,
+        out_id=3,
+        train_file_h5=os.path.join(tmp_path, "cls_urban_smpls_bal_train.h5"),
+        test_file_h5=os.path.join(tmp_path, "cls_urban_smpls_bal_test.h5"),
+        valid_file_h5=os.path.join(tmp_path, "cls_urban_smpls_bal_valid.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_out_info["Water"] = rsgislib.classification.ClassInfoObj(
+        id=3,
+        out_id=4,
+        train_file_h5=os.path.join(tmp_path, "cls_water_smpls_bal_train.h5"),
+        test_file_h5=os.path.join(tmp_path, "cls_water_smpls_bal_test.h5"),
+        valid_file_h5=os.path.join(tmp_path, "cls_water_smpls_bal_valid.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
 
-    rsgislib.classification.create_train_valid_test_sets(cls_in_info, cls_out_info, 500, 500, train_sample=None)
+    rsgislib.classification.create_train_valid_test_sets(
+        cls_in_info, cls_out_info, 500, 500, train_sample=None
+    )
 
-    assert os.path.exists(os.path.join(tmp_path, "cls_forest_smpls_bal_train.h5")) and os.path.exists(os.path.join(tmp_path, "cls_grass_smpls_bal_test.h5")) and os.path.exists(os.path.join(tmp_path, "cls_urban_smpls_bal_valid.h5")) and os.path.exists(os.path.join(tmp_path, "cls_water_smpls_bal_train.h5"))
+    assert (
+        os.path.exists(os.path.join(tmp_path, "cls_forest_smpls_bal_train.h5"))
+        and os.path.exists(os.path.join(tmp_path, "cls_grass_smpls_bal_test.h5"))
+        and os.path.exists(os.path.join(tmp_path, "cls_urban_smpls_bal_valid.h5"))
+        and os.path.exists(os.path.join(tmp_path, "cls_water_smpls_bal_train.h5"))
+    )
+
 
 @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_split_chip_sample_train_valid_test(tmp_path):
@@ -110,9 +190,24 @@ def test_split_chip_sample_train_valid_test(tmp_path):
     valid_h5_file = os.path.join(tmp_path, "out_valid_data.h5")
     test_h5_file = os.path.join(tmp_path, "out_test_data.h5")
 
-    rsgislib.classification.split_chip_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file, 2, 2, train_sample=None, rnd_seed=42, datatype=rsgislib.TYPE_16INT)
+    rsgislib.classification.split_chip_sample_train_valid_test(
+        in_h5_file,
+        train_h5_file,
+        valid_h5_file,
+        test_h5_file,
+        2,
+        2,
+        train_sample=None,
+        rnd_seed=42,
+        datatype=rsgislib.TYPE_16INT,
+    )
 
-    assert os.path.exists(train_h5_file) and os.path.exists(valid_h5_file) and os.path.exists(test_h5_file)
+    assert (
+        os.path.exists(train_h5_file)
+        and os.path.exists(valid_h5_file)
+        and os.path.exists(test_h5_file)
+    )
+
 
 @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_split_chip_sample_ref_train_valid_test(tmp_path):
@@ -126,9 +221,23 @@ def test_split_chip_sample_ref_train_valid_test(tmp_path):
     valid_h5_file = os.path.join(tmp_path, "out_valid_data.h5")
     test_h5_file = os.path.join(tmp_path, "out_test_data.h5")
 
-    rsgislib.classification.split_chip_sample_ref_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file, 2, 2, train_sample=None, rnd_seed=42, datatype=rsgislib.TYPE_16INT)
+    rsgislib.classification.split_chip_sample_ref_train_valid_test(
+        in_h5_file,
+        train_h5_file,
+        valid_h5_file,
+        test_h5_file,
+        2,
+        2,
+        train_sample=None,
+        rnd_seed=42,
+        datatype=rsgislib.TYPE_16INT,
+    )
 
-    assert os.path.exists(train_h5_file) and os.path.exists(valid_h5_file) and os.path.exists(test_h5_file)
+    assert (
+        os.path.exists(train_h5_file)
+        and os.path.exists(valid_h5_file)
+        and os.path.exists(test_h5_file)
+    )
 
 
 @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
@@ -141,9 +250,12 @@ def test_flip_chip_hdf5_file(tmp_path):
 
     out_h5_file = os.path.join(tmp_path, "out_data.h5")
 
-    rsgislib.classification.flip_chip_hdf5_file(in_h5_file, out_h5_file, datatype=rsgislib.TYPE_16INT)
+    rsgislib.classification.flip_chip_hdf5_file(
+        in_h5_file, out_h5_file, datatype=rsgislib.TYPE_16INT
+    )
 
     assert os.path.exists(out_h5_file)
+
 
 @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_flip_ref_chip_hdf5_file(tmp_path):
@@ -155,7 +267,9 @@ def test_flip_ref_chip_hdf5_file(tmp_path):
 
     out_h5_file = os.path.join(tmp_path, "out_data.h5")
 
-    rsgislib.classification.flip_ref_chip_hdf5_file(in_h5_file, out_h5_file, datatype=rsgislib.TYPE_16INT)
+    rsgislib.classification.flip_ref_chip_hdf5_file(
+        in_h5_file, out_h5_file, datatype=rsgislib.TYPE_16INT
+    )
 
     assert os.path.exists(out_h5_file)
 
@@ -168,15 +282,55 @@ def test_get_class_training_data(tmp_path):
     cls_vec_smpls = os.path.join(CLASSIFICATION_DATA_DIR, "cls_poly_smpls.gpkg")
 
     img_band_info = []
-    img_band_info.append(rsgislib.imageutils.ImageBandInfo(s2_img, "s2", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+    img_band_info.append(
+        rsgislib.imageutils.ImageBandInfo(s2_img, "s2", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    )
 
     class_vec_sample_info = []
-    class_vec_sample_info.append(rsgislib.classification.ClassVecSamplesInfoObj(id=1, class_name="Forest", vec_file=cls_vec_smpls, vec_lyr="cls_forest_smpls", file_h5=os.path.join(tmp_path, "cls_forest_smpls.h5")))
-    class_vec_sample_info.append(rsgislib.classification.ClassVecSamplesInfoObj(id=2, class_name="Grass", vec_file=cls_vec_smpls, vec_lyr="cls_grass_smpls", file_h5=os.path.join(tmp_path, "cls_grass_smpls.h5")))
-    class_vec_sample_info.append(rsgislib.classification.ClassVecSamplesInfoObj(id=3, class_name="Urban", vec_file=cls_vec_smpls, vec_lyr="cls_urban_smpls", file_h5=os.path.join(tmp_path, "cls_urban_smpls.h5")))
-    class_vec_sample_info.append(rsgislib.classification.ClassVecSamplesInfoObj(id=4, class_name="Water", vec_file=cls_vec_smpls, vec_lyr="cls_water_smpls", file_h5=os.path.join(tmp_path, "cls_water_smpls.h5")))
+    class_vec_sample_info.append(
+        rsgislib.classification.ClassVecSamplesInfoObj(
+            id=1,
+            class_name="Forest",
+            vec_file=cls_vec_smpls,
+            vec_lyr="cls_forest_smpls",
+            file_h5=os.path.join(tmp_path, "cls_forest_smpls.h5"),
+        )
+    )
+    class_vec_sample_info.append(
+        rsgislib.classification.ClassVecSamplesInfoObj(
+            id=2,
+            class_name="Grass",
+            vec_file=cls_vec_smpls,
+            vec_lyr="cls_grass_smpls",
+            file_h5=os.path.join(tmp_path, "cls_grass_smpls.h5"),
+        )
+    )
+    class_vec_sample_info.append(
+        rsgislib.classification.ClassVecSamplesInfoObj(
+            id=3,
+            class_name="Urban",
+            vec_file=cls_vec_smpls,
+            vec_lyr="cls_urban_smpls",
+            file_h5=os.path.join(tmp_path, "cls_urban_smpls.h5"),
+        )
+    )
+    class_vec_sample_info.append(
+        rsgislib.classification.ClassVecSamplesInfoObj(
+            id=4,
+            class_name="Water",
+            vec_file=cls_vec_smpls,
+            vec_lyr="cls_water_smpls",
+            file_h5=os.path.join(tmp_path, "cls_water_smpls.h5"),
+        )
+    )
 
-    cls_info = rsgislib.classification.get_class_training_data(img_band_info, class_vec_sample_info, tmp_dir=tmp_path, sub_sample=None, ref_img=s2_img)
+    cls_info = rsgislib.classification.get_class_training_data(
+        img_band_info,
+        class_vec_sample_info,
+        tmp_dir=tmp_path,
+        sub_sample=None,
+        ref_img=s2_img,
+    )
 
     all_files_present = True
     for cls in cls_info:
@@ -185,7 +339,11 @@ def test_get_class_training_data(tmp_path):
 
     assert all_files_present
 
-@pytest.mark.skipif((PLOTLY_NOT_AVAIL or KALEIDO_NOT_AVAIL), reason="plotly or kaleido dependencies not available")
+
+@pytest.mark.skipif(
+    (PLOTLY_NOT_AVAIL or KALEIDO_NOT_AVAIL),
+    reason="plotly or kaleido dependencies not available",
+)
 def test_plot_train_data(tmp_path):
     import glob
     import rsgislib.classification
@@ -193,7 +351,14 @@ def test_plot_train_data(tmp_path):
     forest_h5 = os.path.join(CLASSIFICATION_DATA_DIR, "cls_forest_smpls.h5")
     urban_h5 = os.path.join(CLASSIFICATION_DATA_DIR, "cls_urban_smpls.h5")
 
-    rsgislib.classification.plot_train_data(forest_h5, urban_h5, tmp_path, cls1_name="Forest", cls2_name="Urban", var_names=None)
+    rsgislib.classification.plot_train_data(
+        forest_h5,
+        urban_h5,
+        tmp_path,
+        cls1_name="Forest",
+        cls2_name="Urban",
+        var_names=None,
+    )
 
     plot_files = glob.glob(os.path.join(tmp_path, "*.png"))
 
