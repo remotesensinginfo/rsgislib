@@ -422,7 +422,7 @@ def get_rsgislib_datatype_from_img(input_img: str):
     return rsgislib.get_rsgislib_datatype(gdal_dtype)
 
 
-def get_gdal_datatype_from_img(input_img: str):
+def get_gdal_datatype_from_img(input_img: str)->int:
     """
     Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
 
@@ -452,12 +452,12 @@ def get_gdal_datatype_from_img(input_img: str):
     return gdal_dtype
 
 
-def get_gdal_datatype_name_from_img(input_img: str):
+def get_gdal_datatype_name_from_img(input_img: str)->str:
     """
     Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
 
     :param input_img: input image file.
-    :return: int
+    :return: str
 
     Example:
 
@@ -2077,16 +2077,16 @@ def reproject_image(
     gdalDataType = gdal.GetDataTypeName(inImgBand.DataType)
     rsgisDataType = rsgislib.get_rsgislib_datatype(gdalDataType)
 
-    tlXOut, tlYOut = rsgislib.tools.geometrytools.reprojPoint(
+    tlXOut, tlYOut = rsgislib.tools.geometrytools.reproj_point(
         inImgProj, outImgProj, tlXIn, tlYIn
     )
-    brXOut, brYOut = rsgislib.tools.geometrytools.reprojPoint(
+    brXOut, brYOut = rsgislib.tools.geometrytools.reproj_point(
         inImgProj, outImgProj, brXIn, brYIn
     )
-    trXOut, trYOut = rsgislib.tools.geometrytools.reprojPoint(
+    trXOut, trYOut = rsgislib.tools.geometrytools.reproj_point(
         inImgProj, outImgProj, trXIn, trYIn
     )
-    blXOut, blYOut = rsgislib.tools.geometrytools.reprojPoint(
+    blXOut, blYOut = rsgislib.tools.geometrytools.reproj_point(
         inImgProj, outImgProj, blXIn, blYIn
     )
 
@@ -2101,7 +2101,7 @@ def reproject_image(
 
     out_pxl_res = str(out_pxl_res).strip()
     outRes = 0.0
-    if rsgislib.tools.utils.isNumber(out_pxl_res):
+    if rsgislib.tools.utils.is_number(out_pxl_res):
         outRes = math.fabs(float(out_pxl_res))
     elif out_pxl_res == "image":
         outRes = inRes
@@ -2221,7 +2221,7 @@ def gdal_warp(
     gdal.UseExceptions()
     in_no_data_val = get_img_no_data_value(input_img)
     in_epsg = get_epsg_proj_from_img(input_img)
-    img_data_type = get_gdal_datatype_name_from_img(input_img)
+    img_data_type = get_gdal_datatype_from_img(input_img)
 
     eResampleAlg = gdal.GRA_NearestNeighbour
     if interp_method == rsgislib.INTERP_BILINEAR:
@@ -2602,10 +2602,10 @@ def do_images_overlap(in_a_img: str, in_b_img: str, over_thres: int = 0.0):
         if img1EPSG is None:
             img1EPSG = 0
 
-        img2TLX, img2TLY = rsgislib.tools.geometrytools.reprojPoint(
+        img2TLX, img2TLY = rsgislib.tools.geometrytools.reproj_point(
             inProj, outProj, img2TLX_orig, img2TLY_orig
         )
-        img2BRX, img2BRY = rsgislib.tools.geometrytools.reprojPoint(
+        img2BRX, img2BRY = rsgislib.tools.geometrytools.reproj_point(
             inProj, outProj, img2BRX_orig, img2BRY_orig
         )
 

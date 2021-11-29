@@ -359,22 +359,22 @@ def convert_between_tms_xyz(tiles_dir):
     for lcl_file in lcl_files:
         lcl_name = lcl_file
         lcl_file = os.path.join(tiles_dir, lcl_file)
-        if os.path.isdir(lcl_file) and rsgislib.tools.utils.isNumber(lcl_name):
+        if os.path.isdir(lcl_file) and rsgislib.tools.utils.is_number(lcl_name):
             in_zoom_dirs.append(os.path.abspath(lcl_file))
     for zoom_dir in tqdm.tqdm(in_zoom_dirs, desc='overall'):
         zoom = int(os.path.basename(zoom_dir))
         x_dirs = os.listdir(zoom_dir)
         for x_dir in tqdm.tqdm(x_dirs, desc='zoom {}'.format(zoom), leave=False):
-            if rsgislib.tools.utils.isNumber(x_dir):
+            if rsgislib.tools.utils.is_number(x_dir):
                 x = int(x_dir)
                 x_dir = os.path.join(zoom_dir, x_dir)
-                if os.path.isdir(x_dir) and rsgislib.tools.utils.isNumber(x):
+                if os.path.isdir(x_dir) and rsgislib.tools.utils.is_number(x):
                     y_files = os.listdir(x_dir)
                     os.chdir(x_dir)
                     for y_file in tqdm.tqdm(y_files, desc='y', leave=False):
                         y_cur_file = os.path.join(x_dir, y_file)
                         y_in_str = os.path.splitext(y_file)[0]
-                        if rsgislib.tools.utils.isNumber(y_in_str):
+                        if rsgislib.tools.utils.is_number(y_in_str):
                             y_in = int(y_in_str)
                             img_ext = os.path.splitext(y_file)[1]
                             n_tile_x, n_tile_y, n_zoom = flip_xyz_tms_tiles(x, y_in, zoom)
