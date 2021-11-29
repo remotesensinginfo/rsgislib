@@ -25,6 +25,7 @@ Pixel Training Data
 -------------------
 .. autofunction:: rsgislib.classification.get_class_training_data
 .. autofunction:: rsgislib.classification.split_sample_train_valid_test
+.. autofunction:: rsgislib.classification.create_train_valid_test_sets
 .. autofunction:: rsgislib.classification.get_class_training_chips_data
 .. autofunction:: rsgislib.classification.get_num_samples
 .. autofunction:: rsgislib.classification.plot_train_data

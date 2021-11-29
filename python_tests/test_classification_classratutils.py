@@ -46,6 +46,7 @@ def test_populate_clumps_with_class_training(tmp_path):
 
     assert vars_eq_vals
 
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_extract_rat_col_data(tmp_path):
     import rsgislib.classification.classratutils
     clumps_img = os.path.join(CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means_cls.kea")

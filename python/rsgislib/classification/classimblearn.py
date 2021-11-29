@@ -3,7 +3,7 @@
 import numpy
 import rsgislib
 
-def imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=None):
+def imblearn_h5_io_smplr(cls_in_info: dict, cls_out_info: dict, imblearn_obj, datatype:int=None):
     """
     A function which uses imblearn sampling (over or under) instance from the
     imbalanced-learn module to balance samples between all the classes. This
@@ -93,7 +93,7 @@ def imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=None)
         f_h5_out.close()
 
 
-def rand_oversample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datatype=None):
+def rand_oversample_smpls(cls_in_info: dict, cls_out_info: dict, rnd_seed:int=42, datatype:int=None):
     """
     A function which uses random oversampling from the imbalanced-learn module
     to balance samples between all the classes.
@@ -115,7 +115,7 @@ def rand_oversample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datatype=None)
     imblearn_obj = RandomOverSampler(random_state=rnd_seed)
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
-def smote_oversample_smpls(cls_in_info, cls_out_info, datatype=None):
+def smote_oversample_smpls(cls_in_info: dict, cls_out_info: dict, datatype:int=None):
     """
     A function which uses SMOTE oversampling from the imbalanced-learn module
     to balance samples between all the classes. Note this function only works
@@ -137,7 +137,7 @@ def smote_oversample_smpls(cls_in_info, cls_out_info, datatype=None):
     imblearn_obj = SMOTE()
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
-def adasyn_oversample_smpls(cls_in_info, cls_out_info, datatype=None):
+def adasyn_oversample_smpls(cls_in_info: dict, cls_out_info: dict, datatype:int=None):
     """
     A function which uses ADASYN oversampling from the imbalanced-learn module
     to balance samples between all the classes. Note this function only works
@@ -159,7 +159,7 @@ def adasyn_oversample_smpls(cls_in_info, cls_out_info, datatype=None):
     imblearn_obj = ADASYN()
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
-def borderline_smote_oversample_smpls(cls_in_info, cls_out_info, datatype=None):
+def borderline_smote_oversample_smpls(cls_in_info: dict, cls_out_info: dict, datatype:int=None):
     """
     A function which uses BorderlineSMOTE oversampling from the imbalanced-learn module
     to balance samples between all the classes. Note this function only works
@@ -182,7 +182,7 @@ def borderline_smote_oversample_smpls(cls_in_info, cls_out_info, datatype=None):
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
 
-def cluster_centroid_undersample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datatype=None):
+def cluster_centroid_undersample_smpls(cls_in_info: dict, cls_out_info: dict, rnd_seed:int=42, datatype:int=None):
     """
     A function which uses ClusterCentroids undersampling from the imbalanced-learn
     module to balance samples between all the classes.
@@ -205,7 +205,7 @@ def cluster_centroid_undersample_smpls(cls_in_info, cls_out_info, rnd_seed=42, d
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
 
-def random_undersample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datatype=None):
+def random_undersample_smpls(cls_in_info: dict, cls_out_info: dict, rnd_seed:int=42, datatype:int=None):
     """
     A function which uses random undersampling from the imbalanced-learn
     module to balance samples between all the classes.
@@ -227,7 +227,7 @@ def random_undersample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datatype=No
     imblearn_obj = RandomUnderSampler(random_state=rnd_seed)
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
-def near_miss_undersample_smpls(cls_in_info, cls_out_info, version=1, datatype=None):
+def near_miss_undersample_smpls(cls_in_info: dict, cls_out_info: dict, version=1, datatype:int=None):
     """
     A function which uses NearMiss undersampling from the imbalanced-learn
     module to balance samples between all the classes. Note this function only works
@@ -250,7 +250,7 @@ def near_miss_undersample_smpls(cls_in_info, cls_out_info, version=1, datatype=N
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
 
-def edited_near_neigh_undersample_smpls(cls_in_info, cls_out_info, datatype=None):
+def edited_near_neigh_undersample_smpls(cls_in_info: dict, cls_out_info: dict, datatype:int=None):
     """
     A function which uses EditedNearestNeighbours undersampling from the
     imbalanced-learn module to balance samples between all the classes.
@@ -271,7 +271,7 @@ def edited_near_neigh_undersample_smpls(cls_in_info, cls_out_info, datatype=None
     imblearn_obj = EditedNearestNeighbours()
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
-def repeat_edited_near_neigh_undersample_smpls(cls_in_info, cls_out_info, datatype=None):
+def repeat_edited_near_neigh_undersample_smpls(cls_in_info: dict, cls_out_info: dict, datatype:int=None):
     """
     A function which uses RepeatedEditedNearestNeighbours undersampling from the
     imbalanced-learn module to balance samples between all the classes.
@@ -292,7 +292,7 @@ def repeat_edited_near_neigh_undersample_smpls(cls_in_info, cls_out_info, dataty
     imblearn_obj = RepeatedEditedNearestNeighbours()
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
-def all_knn_undersample_smpls(cls_in_info, cls_out_info, datatype=None):
+def all_knn_undersample_smpls(cls_in_info: dict, cls_out_info: dict, datatype:int=None):
     """
     A function which uses AllKNN undersampling from the imbalanced-learn
     module to balance samples between all the classes.
@@ -314,7 +314,7 @@ def all_knn_undersample_smpls(cls_in_info, cls_out_info, datatype=None):
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
 
-def condensed_near_neigh_undersample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datatype=None):
+def condensed_near_neigh_undersample_smpls(cls_in_info: dict, cls_out_info: dict, rnd_seed:int=42, datatype:int=None):
     """
     A function which uses CondensedNearestNeighbour undersampling from the
     imbalanced-learn module to balance samples between all the classes.
@@ -336,7 +336,7 @@ def condensed_near_neigh_undersample_smpls(cls_in_info, cls_out_info, rnd_seed=4
     imblearn_obj = CondensedNearestNeighbour(random_state=rnd_seed)
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
-def one_sided_sel_undersample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datatype=None):
+def one_sided_sel_undersample_smpls(cls_in_info: dict, cls_out_info: dict, rnd_seed:int=42, datatype:int=None):
     """
     A function which uses OneSidedSelection undersampling from the
     imbalanced-learn module to balance samples between all the classes.
@@ -358,7 +358,7 @@ def one_sided_sel_undersample_smpls(cls_in_info, cls_out_info, rnd_seed=42, data
     imblearn_obj = OneSidedSelection(random_state=rnd_seed)
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
-def neighbourhood_clean_undersample_smpls(cls_in_info, cls_out_info, datatype=None):
+def neighbourhood_clean_undersample_smpls(cls_in_info: dict, cls_out_info: dict, datatype:int=None):
     """
     A function which uses NeighbourhoodCleaningRule undersampling from the
     imbalanced-learn module to balance samples between all the classes.
@@ -380,7 +380,7 @@ def neighbourhood_clean_undersample_smpls(cls_in_info, cls_out_info, datatype=No
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
 
-def smoteenn_combined_sample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datatype=None):
+def smoteenn_combined_sample_smpls(cls_in_info: dict, cls_out_info: dict, rnd_seed:int=42, datatype:int=None):
     """
     A function which uses SMOTEENN combined under and over sampling from the
     imbalanced-learn module to balance samples between all the classes.
@@ -402,7 +402,7 @@ def smoteenn_combined_sample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datat
     imblearn_obj = SMOTEENN(random_state=rnd_seed)
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
-def smotetomek_combined_sample_smpls(cls_in_info, cls_out_info, rnd_seed=42, datatype=None):
+def smotetomek_combined_sample_smpls(cls_in_info: dict, cls_out_info: dict, rnd_seed:int=42, datatype:int=None):
     """
     A function which uses SMOTETomek combined under and over sampling from the
     imbalanced-learn module to balance samples between all the classes.

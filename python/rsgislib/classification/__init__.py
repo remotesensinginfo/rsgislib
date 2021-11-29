@@ -168,8 +168,8 @@ class SamplesInfoObj(object):
         self.blue = blue
 
 
-def get_class_training_data(img_band_info, class_vec_sample_info, tmp_dir,
-                            sub_sample=None, ref_img=None):
+def get_class_training_data(img_band_info:list, class_vec_sample_info:list, tmp_dir:str,
+                            sub_sample:int=None, ref_img:str=None)->dict:
     """
     A function to extract training for vector regions for a given input image set.
 
@@ -238,8 +238,8 @@ def get_class_training_data(img_band_info, class_vec_sample_info, tmp_dir,
     return classInfo
 
 
-def get_class_training_chips_data(img_band_info, class_vec_sample_info, chip_h_size,
-                                  tmp_dir, ref_img=None):
+def get_class_training_chips_data(img_band_info:list, class_vec_sample_info:list, chip_h_size:int,
+                                  tmp_dir:str, ref_img:str=None)->dict:
     """
     A function to extract training chips (windows/regions) for vector regions for a given input image set.
 
@@ -293,7 +293,36 @@ def get_class_training_chips_data(img_band_info, class_vec_sample_info, chip_h_s
     return classInfo
 
 
-def get_num_samples(in_h5_file):
+def create_train_valid_test_sets(cls_in_info: dict, cls_out_info: dict, test_sample: int, valid_sample: int, train_sample: int = None, rnd_seed: int = 42, datatype: int = None):
+    """
+    A function which takes a dict of rsgislib.classification.ClassSimpleInfoObj
+    such as those retrieved from get_class_training_data and a dict of
+    rsgislib.classification.ClassInfoObj and creates the train, test, valid
+    data samples from a single input file for all the classes. This is a simple
+    wrapper function around the split_sample_train_valid_test function making it
+    easier to process multiple classes.
+
+    :param cls_in_info: a dict of rsgislib.classification.ClassSimpleInfoObj objects
+                        with the input HDF5 file paths which will be split.
+    :param cls_out_info: a dict of rsgislib.classification.ClassInfoObj objects
+                         which specifies the output paths for the output HDF5 files.
+    :param test_sample: The size of the testing sample to be taken.
+    :param valid_sample: The size of the validation sample to be taken.
+    :param train_sample: The size of the training sample to be taken. If None then the
+                         remaining samples are returned.
+    :param rnd_seed: The random seed to be used to randomly select the sub-samples.
+    :param datatype: is the data type used for the output HDF5 file
+                     (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
+
+    """
+    if cls_in_info.keys() != cls_out_info.keys():
+        raise Exception("The dict keys for the input and output info do not match.")
+
+    for cls_name in cls_in_info:
+        split_sample_train_valid_test(cls_in_info[cls_name].file_h5, cls_out_info[cls_name].train_file_h5, cls_out_info[cls_name].valid_file_h5, cls_out_info[cls_name].test_file_h5, test_sample, valid_sample, train_sample, rnd_seed, datatype)
+
+def get_num_samples(in_h5_file:str)->int:
     """
     A function to return the number of samples within the input HDF5 file.
 
@@ -308,7 +337,7 @@ def get_num_samples(in_h5_file):
 
 
 def split_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file, test_sample,
-                                  valid_sample, train_sample=None, rand_seed=42, datatype=None):
+                                  valid_sample, train_sample=None, rnd_seed=42, datatype=None):
     """
     A function to split a HDF5 samples file (from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf)
     into three (i.e., Training, Validation and Testing).
@@ -321,7 +350,7 @@ def split_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test
     :param test_sample: The size of the testing sample to be taken.
     :param valid_sample: The size of the validation sample to be taken.
     :param train_sample: The size of the training sample to be taken. If None then the remaining samples are returned.
-    :param rand_seed: The random seed to be used to randomly select the sub-samples.
+    :param rnd_seed: The random seed to be used to randomly select the sub-samples.
     :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
                      then the output data type will be float32.
 
@@ -335,21 +364,21 @@ def split_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
-    rsgislib.zonalstats.split_sample_hdf5_file(in_h5_file, test_h5_file, tmp_train_valid_sample_file, test_sample, rand_seed, datatype)
+    rsgislib.zonalstats.split_sample_hdf5_file(in_h5_file, test_h5_file, tmp_train_valid_sample_file, test_sample, rnd_seed, datatype)
     if train_sample is not None:
         tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
-        rsgislib.zonalstats.split_sample_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file, valid_sample, rand_seed, datatype)
+        rsgislib.zonalstats.split_sample_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file, valid_sample, rnd_seed, datatype)
         tmp_remain_sample_file = os.path.join(out_dir, "remain_tmp_sample_{}.h5".format(uid_str))
-        rsgislib.zonalstats.split_sample_hdf5_file(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file, train_sample, rand_seed, datatype)
+        rsgislib.zonalstats.split_sample_hdf5_file(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file, train_sample, rnd_seed, datatype)
         os.remove(tmp_train_sample_file)
         os.remove(tmp_remain_sample_file)
     else:
-        rsgislib.zonalstats.split_sample_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, train_h5_file, valid_sample, rand_seed, datatype)
+        rsgislib.zonalstats.split_sample_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, train_h5_file, valid_sample, rnd_seed, datatype)
     os.remove(tmp_train_valid_sample_file)
 
 
 def split_chip_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file,
-                                       test_sample, valid_sample, train_sample=None, rand_seed=42, datatype=None):
+                                       test_sample, valid_sample, train_sample=None, rnd_seed=42, datatype=None):
     """
     A function to split a chip HDF5 samples file (from rsgislib.zonalstats.extract_chip_zone_image_band_values_to_hdf)
     into three (i.e., Training, Validation and Testing).
@@ -362,7 +391,7 @@ def split_chip_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file,
     :param test_sample: The size of the testing sample to be taken.
     :param valid_sample: The size of the validation sample to be taken.
     :param train_sample: The size of the training sample to be taken. If None then the remaining samples are returned.
-    :param rand_seed: The random seed to be used to randomly select the sub-samples.
+    :param rnd_seed: The random seed to be used to randomly select the sub-samples.
     :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
                      then the output data type will be float32.
 
@@ -377,21 +406,21 @@ def split_chip_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file,
         datatype = rsgislib.TYPE_32FLOAT
 
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
-    rsgislib.zonalstats.split_sample_chip_hdf5_file(in_h5_file, test_h5_file, tmp_train_valid_sample_file, test_sample, rand_seed, datatype)
+    rsgislib.zonalstats.split_sample_chip_hdf5_file(in_h5_file, test_h5_file, tmp_train_valid_sample_file, test_sample, rnd_seed, datatype)
     if train_sample is not None:
         tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
-        rsgislib.zonalstats.split_sample_chip_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file, valid_sample, rand_seed, datatype)
+        rsgislib.zonalstats.split_sample_chip_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file, valid_sample, rnd_seed, datatype)
         tmp_remain_sample_file = os.path.join(out_dir, "remain_tmp_sample_{}.h5".format(uid_str))
-        rsgislib.zonalstats.split_sample_chip_hdf5_file(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file, train_sample, rand_seed, datatype)
+        rsgislib.zonalstats.split_sample_chip_hdf5_file(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file, train_sample, rnd_seed, datatype)
         os.remove(tmp_train_sample_file)
         os.remove(tmp_remain_sample_file)
     else:
-        rsgislib.zonalstats.split_sample_chip_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, train_h5_file, valid_sample, rand_seed, datatype)
+        rsgislib.zonalstats.split_sample_chip_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, train_h5_file, valid_sample, rnd_seed, datatype)
     os.remove(tmp_train_valid_sample_file)
 
 
 def split_chip_sample_ref_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file,
-                                           test_sample, valid_sample, train_sample=None, rand_seed=42, datatype=None):
+                                           test_sample, valid_sample, train_sample=None, rnd_seed=42, datatype=None):
     """
     A function to split a chip HDF5 samples file (from rsgislib.zonalstats.extract_chip_zone_image_band_values_to_hdf)
     into three (i.e., Training, Validation and Testing).
@@ -404,7 +433,7 @@ def split_chip_sample_ref_train_valid_test(in_h5_file, train_h5_file, valid_h5_f
     :param test_sample: The size of the testing sample to be taken.
     :param valid_sample: The size of the validation sample to be taken.
     :param train_sample: The size of the training sample to be taken. If None then the remaining samples are returned.
-    :param rand_seed: The random seed to be used to randomly select the sub-samples.
+    :param rnd_seed: The random seed to be used to randomly select the sub-samples.
     :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
                      then the output data type will be float32.
 
@@ -420,16 +449,16 @@ def split_chip_sample_ref_train_valid_test(in_h5_file, train_h5_file, valid_h5_f
         datatype = rsgislib.TYPE_32FLOAT
 
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
-    split_sample_ref_chip_hdf5_file(in_h5_file, test_h5_file, tmp_train_valid_sample_file, test_sample, rand_seed, datatype)
+    split_sample_ref_chip_hdf5_file(in_h5_file, test_h5_file, tmp_train_valid_sample_file, test_sample, rnd_seed, datatype)
     if train_sample is not None:
         tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
-        split_sample_ref_chip_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file, valid_sample, rand_seed, datatype)
+        split_sample_ref_chip_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file, valid_sample, rnd_seed, datatype)
         tmp_remain_sample_file = os.path.join(out_dir, "remain_tmp_sample_{}.h5".format(uid_str))
-        split_sample_ref_chip_hdf5_file(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file, train_sample, rand_seed, datatype)
+        split_sample_ref_chip_hdf5_file(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file, train_sample, rnd_seed, datatype)
         os.remove(tmp_train_sample_file)
         os.remove(tmp_remain_sample_file)
     else:
-        split_sample_ref_chip_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, train_h5_file, valid_sample, rand_seed, datatype)
+        split_sample_ref_chip_hdf5_file(tmp_train_valid_sample_file, valid_h5_file, train_h5_file, valid_sample, rnd_seed, datatype)
     os.remove(tmp_train_valid_sample_file)
 
 

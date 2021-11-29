@@ -1,0 +1,13 @@
+{
+    "eta": 0.14321063179347807,
+    "eval_metric": "merror",
+    "gamma": 22,
+    "max_delta_step": 4,
+    "max_depth": 9,
+    "min_child_weight": 9,
+    "nthread": 1,
+    "num_boost_round": 90,
+    "num_class": 4,
+    "objective": "multi:softmax",
+    "subsample": 0.8065317289420663
+}
