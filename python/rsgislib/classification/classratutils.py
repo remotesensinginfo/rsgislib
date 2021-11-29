@@ -41,8 +41,14 @@ from rios import rat
 
 import rsgislib
 
+
 def populate_clumps_with_class_training(
-    clumps_img:str, classes_info:list, tmp_dir:str, classes_int_col:str, classes_name_col:str, rat_band:int=1
+    clumps_img: str,
+    classes_info: list,
+    tmp_dir: str,
+    classes_int_col: str,
+    classes_name_col: str,
+    rat_band: int = 1,
 ):
     """
     A function to populate a clumps file with training from a series of
@@ -81,7 +87,9 @@ def populate_clumps_with_class_training(
 
     for cls_info in classes_info:
 
-        tmp_cls_img = os.path.join(tmp_dir, "{}_{}.kea".format(cls_info.class_name, uid))
+        tmp_cls_img = os.path.join(
+            tmp_dir, "{}_{}.kea".format(cls_info.class_name, uid)
+        )
         rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
             cls_info.vec_file,
             cls_info.vec_lyr,
@@ -95,7 +103,9 @@ def populate_clumps_with_class_training(
         classNamesDict[cls_info.id] = cls_info.class_name
 
     combinedClassesImage = os.path.join(tmp_dir, "CombinedClasses_{}.kea".format(uid))
-    rsgislib.imageutils.combine_imgs_to_band(tmpClassImgLayers, combinedClassesImage, "KEA", rsgislib.TYPE_8UINT, 0.0)
+    rsgislib.imageutils.combine_imgs_to_band(
+        tmpClassImgLayers, combinedClassesImage, "KEA", rsgislib.TYPE_8UINT, 0.0
+    )
 
     rsgislib.rastergis.populate_rat_with_mode(
         input_img=combinedClassesImage,
@@ -107,7 +117,9 @@ def populate_clumps_with_class_training(
         mode_band=1,
         rat_band=rat_band,
     )
-    rsgislib.rastergis.ratutils.define_class_names(clumps_img, classes_int_col, classes_name_col, classNamesDict)
+    rsgislib.rastergis.ratutils.define_class_names(
+        clumps_img, classes_int_col, classes_name_col, classNamesDict
+    )
 
     for file in tmpClassImgLayers:
         rsgislib.tools.filetools.delete_file_with_basename(file)
@@ -117,9 +129,15 @@ def populate_clumps_with_class_training(
         shutil.rmtree(tmp_dir)
 
 
-
-def extract_rat_col_data(clumps_img:str, cols:list, sel_col:str, sel_col_val:str, out_h5_file:str,
-                         datatype:int=None, rat_band:int=1):
+def extract_rat_col_data(
+    clumps_img: str,
+    cols: list,
+    sel_col: str,
+    sel_col_val: str,
+    out_h5_file: str,
+    datatype: int = None,
+    rat_band: int = 1,
+):
     """
     A function which extracts column values to be used as training, testing, validation
     sets for building a classifier. The data will be saved within a HDF5 file. Note,
@@ -170,15 +188,17 @@ def extract_rat_col_data(clumps_img:str, cols:list, sel_col:str, sel_col_val:str
     if n_feats < chunk_len:
         chunk_len = n_feats
 
-    fH5Out = h5py.File(out_h5_file, 'w')
+    fH5Out = h5py.File(out_h5_file, "w")
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=out_vars_arr, chunks=(chunk_len, n_cols), compression="gzip", shuffle=True, dtype=h5_dtype)
+    dataGrp.create_dataset(
+        "DATA",
+        data=out_vars_arr,
+        chunks=(chunk_len, n_cols),
+        compression="gzip",
+        shuffle=True,
+        dtype=h5_dtype,
+    )
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S255")
-    describDS[0] = 'Extracted from: '.format(os.path.basename(clumps_img)).encode()
+    describDS[0] = "Extracted from: ".format(os.path.basename(clumps_img)).encode()
     fH5Out.close()
-
-
-
-
-
