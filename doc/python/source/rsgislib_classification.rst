@@ -15,6 +15,7 @@ The classification functions are available within a number of sub-modules for in
    rsgislib_classification_classkeraschips
    rsgislib_classification_classratutils
    rsgislib_classification_clustersklearn
+   rsgislib_classification_classimblearn
 
 
 This rsgislib.classification module provides functions for dealing with training data, undertaking an accuracy assessment and other useful utilities, see below.

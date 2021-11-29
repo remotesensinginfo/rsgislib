@@ -1,4 +1,4 @@
-RSGISLib Scikit-Learn Clumps Classification
+RSGISLib Clumps Classification Utilities
 ==============================================
 
 The steps to undertaking a classification using clumps are:
@@ -59,10 +59,14 @@ To train the classifier you need to create a column within the clump raster attr
     rsgislib.rastergis.ratutils.populateClumpsWithClassTraining(clumps_img, classes_dict, tmp_path, classes_int_col_in, classes_name_col)
 
 
-Extract Data for Training
---------------------------
 
+Populate RAT Training
+------------------------
 .. autofunction:: rsgislib.classification.classratutils.populate_clumps_with_class_training
+
+
+Extract Data for Training
+----------------------------
 .. autofunction:: rsgislib.classification.classratutils.extract_rat_col_data
 
 

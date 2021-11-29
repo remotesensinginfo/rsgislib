@@ -497,8 +497,9 @@ def flip_ref_chip_hdf5_file(input_h5_file, output_h5_file, datatype=None):
 
     :param input_h5_file: The input HDF5 file for chips extracted from images.
     :param output_h5_file: The output HDF5 file for chips extracted from images.
-    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
-                     then the output data type will be float32.
+    :param datatype: is the data type used for the output HDF5 file (e.g.,
+                     rsgislib.TYPE_32FLOAT). If None (default) then the output
+                     data type will be float32.
 
     """
     import tqdm
