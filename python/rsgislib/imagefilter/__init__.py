@@ -23,14 +23,14 @@ class FilterParameters:
         stddev_y=None,
         angle=None,
     ):
-        self.filterType = filter_type
-        self.fileEnding = file_ending
+        self.filter_type = filter_type
+        self.file_ending = file_ending
         self.size = size
         self.option = option
-        self.nLooks = n_looks
+        self.n_looks = n_looks
         self.stddev = stddev
-        self.stddevX = stddev_x
-        self.stddevY = stddev_y
+        self.stddev_x = stddev_x
+        self.stddev_y = stddev_y
         self.angle = angle
 
 

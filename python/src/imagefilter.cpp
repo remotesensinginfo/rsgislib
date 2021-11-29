@@ -81,11 +81,11 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args, PyObject *ke
         
         // Get required fields
         // Filter type
-        pFilterType = PyObject_GetAttrString(o, "filterType");
+        pFilterType = PyObject_GetAttrString(o, "filter_type");
         extractedAttributes.push_back(pFilterType);
         if( ( pFilterType == nullptr ) || ( pFilterType == Py_None ) || !RSGISPY_CHECK_STRING(pFilterType) ) 
         {
-            PyErr_SetString(GETSTATE(self)->error, "Need to provide filter 'type'" );
+            PyErr_SetString(GETSTATE(self)->error, "Need to provide filter 'filter_type'" );
             FreePythonObjects(extractedAttributes);
             for(auto iter = filterParameters->begin(); iter != filterParameters->end(); ++iter)
             {
@@ -98,11 +98,11 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args, PyObject *ke
         std::cout << " " << i+1 << ") " << cmdObj->type << ": ";
 
         // File Ending
-        pFileEnding = PyObject_GetAttrString(o, "fileEnding");
+        pFileEnding = PyObject_GetAttrString(o, "file_ending");
         extractedAttributes.push_back(pFileEnding);
         if( ( pFileEnding == nullptr ) || ( pFileEnding == Py_None ) || !RSGISPY_CHECK_STRING(pFileEnding) ) 
         {
-            PyErr_SetString(GETSTATE(self)->error, "Need to provide 'fileEnding'" );
+            PyErr_SetString(GETSTATE(self)->error, "Need to provide 'file_ending'" );
             FreePythonObjects(extractedAttributes);
             for(auto iter = filterParameters->begin(); iter != filterParameters->end(); ++iter)
             {
@@ -143,7 +143,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args, PyObject *ke
             std::cout << "option = " << cmdObj->option << " ";
         }
 
-        pNLooks = PyObject_GetAttrString(o, "nLooks");
+        pNLooks = PyObject_GetAttrString(o, "n_looks");
         extractedAttributes.push_back(pNLooks);
         if( !(pNLooks == nullptr) & RSGISPY_CHECK_INT(pNLooks) )
         {
@@ -159,7 +159,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args, PyObject *ke
             std::cout << "StdDev = " << cmdObj->stddev << " ";
         }
         
-        pStdDevX = PyObject_GetAttrString(o, "stddevX");
+        pStdDevX = PyObject_GetAttrString(o, "stddev_x");
         extractedAttributes.push_back(pStdDevX);
         if( !(pStdDevX == nullptr) & (RSGISPY_CHECK_FLOAT(pStdDevX) | RSGISPY_CHECK_INT(pStdDevX)) )
         {
@@ -167,7 +167,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args, PyObject *ke
             std::cout << "StdDevX = " << cmdObj->stddevX << " ";
         }
 
-        pStdDevY = PyObject_GetAttrString(o, "stddevY");
+        pStdDevY = PyObject_GetAttrString(o, "stddev_y");
         extractedAttributes.push_back(pStdDevY);
         if( !(pStdDevY == nullptr) & (RSGISPY_CHECK_FLOAT(pStdDevY) | RSGISPY_CHECK_INT(pStdDevY)) )
         {

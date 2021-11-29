@@ -1057,7 +1057,7 @@ def perform_tiled_img_filter(
         input_img, output_img, numOutBands, 0, gdalformat, datatype
     )
 
-    imageutils.includeImagesWithOverlap(output_img, imgFilterTiles, int(tileOverlap))
+    imageutils.include_imgs_with_overlap(output_img, imgFilterTiles, int(tileOverlap))
 
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesFilterDIR)
@@ -1195,7 +1195,7 @@ def perform_tiled_img_multi_filter(
             input_img, output_img, numOutBands, 0, gdalformat, datatype
         )
 
-        imageutils.includeImagesWithOverlap(
+        imageutils.include_imgs_with_overlap(
             output_img, imgFilterTiles, int(filter_inst.getFilterHSize())
         )
 
