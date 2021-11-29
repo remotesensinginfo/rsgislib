@@ -732,7 +732,7 @@ image and threshold can be applied to this image. Note. the softmax score is not
     infiles.imageMask = in_img_msk
     numClassVars = 0
     for imgFile in img_file_info:
-        infiles.__dict__[imgFile.name] = imgFile.fileName
+        infiles.__dict__[imgFile.name] = imgFile.file_name
         numClassVars = numClassVars + len(imgFile.bands)
 
     outfiles = applier.FilenameAssociations()
@@ -1075,7 +1075,7 @@ the maximum softmax score.
     infiles.imageMask = in_img_mask
     numClassVars = 0
     for imgFile in img_file_info:
-        infiles.__dict__[imgFile.name] = imgFile.fileName
+        infiles.__dict__[imgFile.name] = imgFile.file_name
         numClassVars = numClassVars + len(imgFile.bands)
 
     n_classes = len(cls_train_info)

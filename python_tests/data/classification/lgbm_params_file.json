@@ -1,0 +1,20 @@
+{
+    "bagging_fraction": 0.8595069213088945,
+    "boost_from_average": true,
+    "boosting_type": "gbdt",
+    "feature_fraction": 0.40750536583415997,
+    "feature_pre_filter": false,
+    "is_unbalance": false,
+    "lambda_l1": 4.236258693920628,
+    "lambda_l2": 1.8706910903579175,
+    "max_depth": 7,
+    "metric": "auc,binary_error",
+    "min_child_weight": 14.36015843442555,
+    "min_data_in_leaf": 43,
+    "min_split_gain": 0.006614584754426877,
+    "num_leaves": 43,
+    "objective": "binary",
+    "reg_alpha": 1.09553302346427,
+    "reg_lambda": 1.3248674915101972,
+    "scale_pos_weight": 1.0004775549188156
+}
