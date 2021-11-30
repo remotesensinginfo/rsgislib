@@ -926,3 +926,103 @@ def test_create_vrt_band_subset(tmp_path):
     output_img = os.path.join(tmp_path, "out_img.vrt")
     rsgislib.imageutils.create_vrt_band_subset(input_img, [1,2,3], output_img)
     assert os.path.exists(output_img)
+
+def test_select_img_bands(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.select_img_bands(input_img, output_img, "KEA", rsgislib.TYPE_16UINT, [1,2,3])
+    assert os.path.exists(output_img)
+
+
+def test_stack_img_bands(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.stack_img_bands([input_img, input_img], None, output_img, 0, 0, "KEA", rsgislib.TYPE_16UINT)
+    assert os.path.exists(output_img)
+
+# TODO rsgislib.imageutils.pan_sharpen_hcs
+# TODO rsgislib.imageutils.sharpen_low_res_bands
+
+def test_get_band_names():
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    band_names = rsgislib.imageutils.get_band_names(input_img)
+    assert len(band_names) == 3
+
+def test_set_band_names(tmp_path):
+    import rsgislib.imageutils
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_subset_b123.kea")
+    copy2(input_ref_img, input_img)
+    rsgislib.imageutils.set_band_names(input_img, band_names=["b1", "b2", "b3"])
+
+    band_names = rsgislib.imageutils.get_band_names(input_img)
+    assert band_names[0] == "b1" and band_names[1] == "b2" and band_names[2] == "b3"
+
+
+def test_do_img_res_match():
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    assert rsgislib.imageutils.do_img_res_match(input_img, input_img)
+
+def test_check_img_lst():
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_imgs = [input_img, input_img, input_img]
+    bbox = rsgislib.imageutils.get_img_bbox(input_img)
+    rsgislib.imageutils.check_img_lst(input_imgs, 10, -10, bbox, print_errors=True, abs_res=True)
+
+
+def test_check_img_file_comparison():
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    rsgislib.imageutils.check_img_file_comparison(input_img, input_img, test_n_bands=True, test_eql_bbox=True, print_errors=True)
+
+
+def test_do_images_overlap():
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_sub_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+
+    assert rsgislib.imageutils.do_images_overlap(input_img, input_sub_img)
+
+
+def test_do_gdal_layers_have_same_proj_true():
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_sub_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+
+    assert rsgislib.imageutils.do_gdal_layers_have_same_proj(input_img, input_sub_img)
+
+def test_do_gdal_layers_have_same_proj_false():
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_utm_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
+
+    assert not rsgislib.imageutils.do_gdal_layers_have_same_proj(input_img, input_utm_img)
+
+def test_test_img_lst_intersects():
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_sub_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    rsgislib.imageutils.test_img_lst_intersects([input_img, input_sub_img])
+
+def test_calc_wgs84_pixel_area(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_wgs84.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+
+    rsgislib.imageutils.calc_wgs84_pixel_area(input_img, output_img, gdalformat="KEA")
+
+    assert os.path.exists(output_img)
+
+def test_calc_pixel_locations(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+
+    rsgislib.imageutils.calc_pixel_locations(input_img, output_img, gdalformat="KEA")
+
+    assert os.path.exists(output_img)

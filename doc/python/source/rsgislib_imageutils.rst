@@ -199,7 +199,6 @@ Check Images
 Pixel Size / Area
 -------------------
 .. autofunction:: rsgislib.imageutils.calc_wgs84_pixel_area
-.. autofunction:: rsgislib.imageutils.calc_wsg84_pixel_size
 .. autofunction:: rsgislib.imageutils.calc_pixel_locations
 
 
