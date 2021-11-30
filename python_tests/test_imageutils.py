@@ -688,3 +688,241 @@ def test_create_valid_mask(tmp_path):
 
     assert os.path.exists(output_img)
 
+
+def test_subset(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
+    vec_lyr = "aber_osgb_single_poly"
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.subset(input_img, vec_file, vec_lyr, output_img, "KEA", rsgislib.TYPE_16UINT)
+
+    assert os.path.exists(output_img)
+
+def test_subset_to_img(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_roi_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.subset_to_img(input_img, in_roi_img, output_img, "KEA", rsgislib.TYPE_16UINT)
+
+    assert os.path.exists(output_img)
+
+
+def test_subset_to_geoms_bbox(tmp_path):
+    import rsgislib.imageutils
+    import glob
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_lyr = "aber_osgb_multi_polys"
+    out_img_base = os.path.join(tmp_path, "out_img")
+    rsgislib.imageutils.subset_to_geoms_bbox(input_img, vec_file, vec_lyr, "val", out_img_base, gdalformat='KEA', datatype=None, out_img_ext='kea')
+
+    assert len(glob.glob("{}*.kea".format(out_img_base)))== 4
+
+
+def test_subset_bbox(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_roi_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    bbox = rsgislib.imageutils.get_img_bbox(in_roi_img)
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.subset_bbox(input_img, output_img, "KEA", rsgislib.TYPE_16UINT, bbox[0], bbox[1], bbox[2], bbox[3])
+
+    assert os.path.exists(output_img)
+
+
+def test_subset_pxl_bbox(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.subset_pxl_bbox(input_img, output_img, "KEA", rsgislib.TYPE_16UINT, 200, 300, 200, 300)
+
+    assert os.path.exists(output_img)
+
+
+def test_subset_to_vec(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
+    roi_vec_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
+    roi_vec_lyr = "aber_osgb_single_poly"
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.subset_to_vec(input_img, output_img, "KEA", roi_vec_file, roi_vec_lyr, datatype=rsgislib.TYPE_16UINT, vec_epsg=27700)
+
+    assert os.path.exists(output_img)
+
+
+def test_perform_random_pxl_sample_in_mask(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.perform_random_pxl_sample_in_mask(input_img, output_img, gdalformat="KEA", mask_vals=1, n_samples=10)
+    assert os.path.exists(output_img)
+
+def test_perform_random_pxl_sample_in_mask_low_pxl_count(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.perform_random_pxl_sample_in_mask_low_pxl_count(input_img, output_img, gdalformat="KEA", mask_vals=1, n_samples=10)
+    assert os.path.exists(output_img)
+
+def test_extract_img_pxl_sample():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.kea")
+    vals = rsgislib.imageutils.extract_img_pxl_sample(input_img, pxl_n_sample=10)
+    assert vals.shape[0] == 88165
+
+def test_extract_img_pxl_vals_in_msk():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_msk_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.kea")
+    vals = rsgislib.imageutils.extract_img_pxl_vals_in_msk(input_img, img_bands=[1,2,3], in_msk_img=in_msk_img, img_mask_val=4)
+    assert vals.shape[0] == 21957
+
+def test_create_blank_img(tmp_path):
+    import rsgislib.imageutils
+    wkt_file = os.path.join(IMGUTILS_DATA_DIR, "utm30n.wkt")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_blank_img(output_img, 1, 200, 200, 20000, 500000, 50, -100, 0, wkt_file, "", "KEA", rsgislib.TYPE_32INT)
+    assert os.path.exists(output_img)
+
+def test_create_blank_img_py(tmp_path):
+    import rsgislib.imageutils
+    import rsgislib.tools.utils
+    wkt_file = os.path.join(IMGUTILS_DATA_DIR, "utm30n.wkt")
+    wkt_str = rsgislib.tools.utils.read_text_file_no_new_lines(wkt_file)
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_blank_img_py(output_img, 3, 500, 500, 20000, 500000, 50, -10, wkt_str, "KEA", rsgislib.TYPE_32UINT)
+    assert os.path.exists(output_img)
+
+def test_create_copy_img(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_copy_img(input_img, output_img, 3, 5, "KEA", rsgislib.TYPE_32FLOAT)
+    assert os.path.exists(output_img)
+
+def test_create_copy_img_def_extent(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
+    bbox = rsgislib.imageutils.get_img_bbox(input_img)
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_copy_img_def_extent(input_img, output_img, 2, 1, bbox[0], bbox[1], bbox[2], bbox[3], 20, -20, "KEA", rsgislib.TYPE_32FLOAT)
+    assert os.path.exists(output_img)
+
+def test_create_blank_buf_img_from_ref_img(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_blank_buf_img_from_ref_img(input_img, output_img, "KEA", rsgislib.TYPE_32FLOAT, 50, no_data_val=0)
+    assert os.path.exists(output_img)
+
+
+def test_create_blank_img_from_ref_vector(tmp_path):
+    import rsgislib.imageutils
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
+    vec_lyr = "aber_osgb_single_poly"
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_blank_img_from_ref_vector(vec_file, vec_lyr, output_img, 20, 4, "KEA", rsgislib.TYPE_32FLOAT)
+    assert os.path.exists(output_img)
+
+def test_create_copy_img_vec_extent_snap_to_grid(tmp_path):
+    import rsgislib.imageutils
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
+    vec_lyr = "aber_osgb_single_poly"
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_copy_img_vec_extent_snap_to_grid(vec_file, vec_lyr, output_img, 20, 4, "KEA", rsgislib.TYPE_32FLOAT)
+    assert os.path.exists(output_img)
+
+
+def test_create_blank_img_from_bbox(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
+    bbox = rsgislib.imageutils.get_img_bbox(input_img)
+    wkt_file = os.path.join(IMGUTILS_DATA_DIR, "utm30n.wkt")
+    wkt_str = rsgislib.tools.utils.read_text_file_no_new_lines(wkt_file)
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_blank_img_from_bbox(bbox, wkt_str, output_img, 5, 10, 5, "KEA", rsgislib.TYPE_32FLOAT, True)
+    assert os.path.exists(output_img)
+
+def test_create_img_for_each_vec_feat(tmp_path):
+    import rsgislib.imageutils
+    import glob
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_lyr = "aber_osgb_multi_polys"
+    rsgislib.imageutils.create_img_for_each_vec_feat(vec_file, vec_lyr, file_name_col="tile_name", out_img_path=tmp_path, out_img_ext='kea', out_img_pxl_val=0, out_img_n_bands=1, out_img_res=25, gdalformat="KEA", datatype=rsgislib.TYPE_16INT, snap_to_grid=True)
+    assert len(glob.glob(os.path.join(tmp_path, "*.kea")))== 4
+
+def test_create_copy_img_vec_extent(tmp_path):
+    import rsgislib.imageutils
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
+    vec_lyr = "aber_osgb_single_poly"
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_copy_img_vec_extent(input_img, vec_file, vec_lyr, output_img, 1, 10, "KEA", rsgislib.TYPE_32FLOAT)
+    assert os.path.exists(output_img)
+
+def test_gdal_translate(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
+    rsgislib.imageutils.gdal_translate(input_img, output_img, gdalformat='GTIFF')
+    assert os.path.exists(output_img)
+
+def test_create_stack_images_vrt(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.vrt")
+    rsgislib.imageutils.create_stack_images_vrt([input_img, input_img], output_img)
+    assert os.path.exists(output_img)
+
+def test_create_mosaic_images_vrt(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+    import glob
+
+    imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, 's2_tiles', '*.kea'))
+    output_img = os.path.join(tmp_path, "out_img.vrt")
+    rsgislib.imageutils.create_mosaic_images_vrt(imgs, output_img)
+
+    assert os.path.exists(output_img)
+
+def test_create_mosaic_images_vrt_extent(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+    import glob
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    bbox = rsgislib.imageutils.get_img_bbox(input_img)
+
+    imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, 's2_tiles', '*.kea'))
+    output_img = os.path.join(tmp_path, "out_img.vrt")
+    rsgislib.imageutils.create_mosaic_images_vrt(imgs, output_img, vrt_extent=bbox)
+
+    assert os.path.exists(output_img)
+
+
+def test_create_vrt_band_subset(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.vrt")
+    rsgislib.imageutils.create_vrt_band_subset(input_img, [1,2,3], output_img)
+    assert os.path.exists(output_img)

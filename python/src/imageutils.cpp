@@ -1063,7 +1063,7 @@ static PyObject *ImageUtils_CreateCopyImageDefExtent(PyObject *self, PyObject *a
                              RSGIS_PY_C_TEXT("res_x"), RSGIS_PY_C_TEXT("res_y"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssIddddddfsi:create_copy_img_def_extent", kwlist, &pszInputImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssIfddddddsi:create_copy_img_def_extent", kwlist, &pszInputImage,
                                      &pszOutputImage, &numBands, &pxlVal, &xMin, &xMax, &yMin, &yMax, &xRes, &yRes,
                                      &pszGDALFormat, &nOutDataType))
     {
@@ -1072,7 +1072,7 @@ static PyObject *ImageUtils_CreateCopyImageDefExtent(PyObject *self, PyObject *a
     
     try
     {
-        rsgis::cmds::executeCreateCopyBlankImage(std::string(pszInputImage), std::string(pszOutputImage),
+        rsgis::cmds::executeCreateCopyBlankDefExtImage(std::string(pszInputImage), std::string(pszOutputImage),
                                                  numBands, xMin, xMax, yMin, yMax, xRes, yRes, pxlVal,
                                                  std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
     }
@@ -1097,7 +1097,7 @@ static PyObject *ImageUtils_CreateCopyImageVecExtent(PyObject *self, PyObject *a
                              RSGIS_PY_C_TEXT("n_bands"), RSGIS_PY_C_TEXT("pxl_val"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIfsi:create_copy_img_vec_extent", kwlist, &pszInputImage, &pszInputVectorFile, &pszInputVectorLyr,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssIfsi:create_copy_img_vec_extent", kwlist, &pszInputImage, &pszInputVectorFile, &pszInputVectorLyr,
                                      &pszOutputImage, &numBands, &pxlVal, &pszGDALFormat, &nOutDataType))
     {
         return nullptr;
@@ -2413,7 +2413,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"subset_to_img", (PyCFunction)ImageUtils_Subset2Img, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.subset_to_img(input_img, in_roi_img, output_img, gdalformat, type)\n"
+"rsgislib.imageutils.subset_to_img(input_img:str, in_roi_img:str, output_img:str, gdalformat:str, datatype:int)\n"
 "Subset an image to the bounding box of an image.\n"
 "\n"
 "Where:\n"

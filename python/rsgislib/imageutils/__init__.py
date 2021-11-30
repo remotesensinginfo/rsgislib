@@ -1463,8 +1463,8 @@ def create_blank_img_py(
     n_bands: int,
     width: int,
     height: int,
-    tlX: float,
-    tlY: float,
+    tl_x: float,
+    tl_y: float,
     out_img_res_x: float,
     out_img_res_y: float,
     wkt_string: str,
@@ -1481,8 +1481,8 @@ def create_blank_img_py(
     :param n_bands: the number of output image bands.
     :param width: the number of x pixels.
     :param height: the number of Y pixels.
-    :param tlX: the top-left corner x coordinate
-    :param tlY: the top-left corner y coordinate
+    :param tl_x: the top-left corner x coordinate
+    :param tl_y: the top-left corner y coordinate
     :param out_img_res_x: the output image resolution in the x axis
     :param out_img_res_y: the output image resolution in the y axis
     :param wkt_string: a WKT string with the output image projection
@@ -1499,7 +1499,7 @@ def create_blank_img_py(
     out_img_ds_obj = gdal_driver.Create(
         output_img, width, height, n_bands, gdal_data_type, options=options
     )
-    out_img_ds_obj.SetGeoTransform((tlX, out_img_res_x, 0, tlY, 0, out_img_res_y))
+    out_img_ds_obj.SetGeoTransform((tl_x, out_img_res_x, 0, tl_y, 0, out_img_res_y))
     out_img_ds_obj.SetProjection(wkt_string)
 
     raster = numpy.zeros((height, width), dtype=rsgislib.get_numpy_datatype(datatype))
@@ -1622,7 +1622,7 @@ def create_blank_img_from_ref_vector(
     import rsgislib.tools.geometrytools
 
     baseExtent = rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
-    xMin, xMax, yMin, yMax = rsgislib.tools.geometrytools.findExtentOnGrid(
+    xMin, xMax, yMin, yMax = rsgislib.tools.geometrytools.find_extent_on_grid(
         baseExtent, out_img_res, full_contain=True
     )
 
@@ -1635,7 +1635,7 @@ def create_blank_img_from_ref_vector(
     width = int(math.ceil(widthCoord / out_img_res))
     height = int(math.ceil(heightCoord / out_img_res))
 
-    wktString = rsgislib.vectorutils.getProjWKTFromVec(vec_file)
+    wktString = rsgislib.vectorutils.get_proj_wkt_from_vec(vec_file)
 
     create_blank_img(
         output_img,
@@ -1686,13 +1686,13 @@ def create_copy_img_vec_extent_snap_to_grid(
     import rsgislib.tools.geometrytools
 
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
-        vec_file, layerName=vec_lyr, compute_if_exp=True
+        vec_file, vec_lyr=vec_lyr, compute_if_exp=True
     )
     xMin = vec_bbox[0] - (out_img_res * buf_n_pxl)
     xMax = vec_bbox[1] + (out_img_res * buf_n_pxl)
     yMin = vec_bbox[2] - (out_img_res * buf_n_pxl)
     yMax = vec_bbox[3] + (out_img_res * buf_n_pxl)
-    xMin, xMax, yMin, yMax = rsgislib.tools.geometrytools.findExtentOnWholeNumGrid(
+    xMin, xMax, yMin, yMax = rsgislib.tools.geometrytools.find_extent_on_whole_num_grid(
         [xMin, xMax, yMin, yMax], out_img_res, True
     )
 
@@ -1705,7 +1705,7 @@ def create_copy_img_vec_extent_snap_to_grid(
     width = int(math.ceil(widthCoord / out_img_res))
     height = int(math.ceil(heightCoord / out_img_res))
 
-    wktString = rsgislib.vectorutils.getProjWKTFromVec(vec_file)
+    wktString = rsgislib.vectorutils.get_proj_wkt_from_vec(vec_file)
 
     create_blank_img(
         output_img,
@@ -1755,7 +1755,7 @@ def create_blank_img_from_bbox(
     if snap_to_grid:
         import rsgislib.tools.geometrytools
 
-        bbox = rsgislib.tools.geometrytools.findExtentOnGrid(
+        bbox = rsgislib.tools.geometrytools.find_extent_on_grid(
             bbox, out_img_res, full_contain=True
         )
 
@@ -1860,7 +1860,7 @@ def create_img_for_each_vec_feat(
             env = geom.GetEnvelope()
             tilebasename = feat.GetFieldAsString(feat_idx)
             outputImg = os.path.join(
-                out_img_path, "{0}{1}".format(tilebasename, out_img_ext)
+                out_img_path, "{0}.{1}".format(tilebasename, out_img_ext)
             )
             print(outputImg)
             create_blank_img_from_bbox(

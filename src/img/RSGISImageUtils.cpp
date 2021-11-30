@@ -5268,7 +5268,7 @@ namespace rsgis{namespace img{
                 throw RSGISImageException(message.c_str());
             }
             char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
-            
+
             dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, papszOptions);
             if(dataset == NULL)
             {
