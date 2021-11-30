@@ -122,10 +122,10 @@ def test_get_img_bbox_in_proj_utm30n():
     bbox = rsgislib.imageutils.get_img_bbox_in_proj(input_img, out_epsg=32630)
     print(bbox)
     assert (
-            (abs(bbox[0] - 424918.88) < 1.0)
-            and (abs(bbox[1] - 434357.09) < 1.0)
-            and (abs(bbox[2] - 5802283.59) < 1.0)
-            and (abs(bbox[3] - 5811879.561707063) < 1.0)
+            (abs(bbox[0] - 424918.88) < 3.0)
+            and (abs(bbox[1] - 434357.09) < 3.0)
+            and (abs(bbox[2] - 5802283.59) < 3.0)
+            and (abs(bbox[3] - 5811879.561707063) < 3.0)
     )
 
 
