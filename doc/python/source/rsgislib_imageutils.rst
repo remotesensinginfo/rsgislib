@@ -28,7 +28,7 @@ Get Image Info
 .. autofunction:: rsgislib.imageutils.get_img_files
 .. autofunction:: rsgislib.imageutils.has_gcps
 .. autofunction:: rsgislib.imageutils.get_gdal_format_name
-
+.. autofunction:: rsgislib.imageutils.is_img_thematic
 
 Projection
 -----------

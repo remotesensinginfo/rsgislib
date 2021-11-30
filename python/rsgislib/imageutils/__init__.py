@@ -1190,6 +1190,29 @@ def set_img_not_thematic(input_img: str):
     ds = None
 
 
+def is_img_thematic(input_img: str, img_band: int = 1):
+    """
+    Set all image bands to be thematic.
+
+    :param input_img: The file for which the bands are to be set as thematic
+    :param img_band: The image band to be tested.
+
+    """
+    ds = gdal.Open(input_img)
+    if ds == None:
+        raise Exception("Could not open the input_img.")
+    band_obj = ds.GetRasterBand(img_band)
+    meta_data_dict = band_obj.GetMetadata_Dict()
+
+    thematic_img = False
+    if "LAYER_TYPE" in meta_data_dict:
+        if meta_data_dict["LAYER_TYPE"] == "thematic":
+            thematic_img = True
+    ds = None
+
+    return thematic_img
+
+
 def has_gcps(input_img: str):
     """
     Test whether the input image has GCPs - returns boolean
@@ -1297,7 +1320,6 @@ def get_img_band_metadata(input_img: str, img_band: int, meta_field_name: str):
 
     band_obj = ds.GetRasterBand(img_band)
     meta_field_value = band_obj.GetMetadataItem(meta_field_name)
-    print(band_obj.GetMetadata_Dict())
     ds = None
 
     return meta_field_value
@@ -1664,7 +1686,7 @@ def create_copy_img_vec_extent_snap_to_grid(
     import rsgislib.tools.geometrytools
 
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
-        vec_file, layerName=vec_lyr, computeIfExp=True
+        vec_file, layerName=vec_lyr, compute_if_exp=True
     )
     xMin = vec_bbox[0] - (out_img_res * buf_n_pxl)
     xMax = vec_bbox[1] + (out_img_res * buf_n_pxl)
@@ -2303,6 +2325,19 @@ def subset_pxl_bbox(
     subset_bbox(input_img, output_img, gdalformat, datatype, xMin, xMax, yMin, yMax)
 
 
+def _run_subset(tileinfo):
+    """Internal function for create_tiles_multi_core for multiprocessing Pool."""
+    subset_pxl_bbox(
+        tileinfo["input_img"],
+        tileinfo["outfile"],
+        tileinfo["gdalformat"],
+        tileinfo["datatype"],
+        tileinfo["bbox"][0],
+        tileinfo["bbox"][1],
+        tileinfo["bbox"][2],
+        tileinfo["bbox"][3],
+    )
+
 def create_tiles_multi_core(
     input_img: str,
     out_img_base: str,
@@ -2393,21 +2428,8 @@ def create_tiles_multi_core(
         tile["gdalformat"] = gdalformat
         tile["datatype"] = datatype
 
-    def _runSubset(tileinfo):
-        """Internal function for create_tiles_multi_core for multiprocessing Pool."""
-        subset_pxl_bbox(
-            tileinfo["input_img"],
-            tileinfo["outfile"],
-            tileinfo["gdalformat"],
-            tileinfo["datatype"],
-            tileinfo["bbox"][0],
-            tileinfo["bbox"][1],
-            tileinfo["bbox"][2],
-            tileinfo["bbox"][3],
-        )
-
     poolobj = multiprocessing.Pool(n_cores)
-    poolobj.map(_runSubset, tiles)
+    poolobj.map(_run_subset, tiles)
 
 
 def calc_pixel_locations(input_img: str, output_img: str, gdalformat: str):
@@ -2850,10 +2872,10 @@ def combine_binary_masks(
     applier.apply(_combineMsks, infiles, outfiles, otherargs, controls=aControls)
 
     # find the unique output image files.
-    uniq_vals = rsgislib.imagecalc.get_uniqu_values(output_img, img_band=1)
+    uniq_vals = rsgislib.imagecalc.get_unique_values(output_img, img_band=1)
 
     # find the powerset of the inputs
-    possible_outputs = rsgislib.tools.utils.createVarList(in_vals_dict, val_dict=None)
+    possible_outputs = rsgislib.tools.utils.create_var_list(in_vals_dict, val_dict=None)
 
     out_poss_lut = dict()
     for poss in possible_outputs:
@@ -3017,7 +3039,7 @@ def subset_to_vec(
         projs_match = False
     img_bbox = get_img_bbox(input_img)
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
-        roi_vec_file, roi_vec_lyr, computeIfExp=True
+        roi_vec_file, roi_vec_lyr, compute_if_exp=True
     )
     if img_epsg != vec_epsg:
         vec_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(
@@ -3156,6 +3178,7 @@ def mask_img_with_vec(
     """
     import rsgislib
     import rsgislib.vectorutils
+    import rsgislib.vectorutils.createrasters
     import rsgislib.tools.geometrytools
     import rsgislib.tools.utils
     import rsgislib.tools.filetools
@@ -3173,7 +3196,7 @@ def mask_img_with_vec(
         img_bbox = get_img_bbox_in_proj(input_img, vec_epsg)
         projs_match = False
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
-        roi_vec_file, roi_vec_lyr, computeIfExp=True
+        roi_vec_file, roi_vec_lyr, compute_if_exp=True
     )
 
     if rsgislib.tools.geometrytools.do_bboxes_intersect(img_bbox, vec_bbox):
@@ -3185,7 +3208,7 @@ def mask_img_with_vec(
             os.mkdir(tmp_file_dir)
 
         # Rasterise the vector layer to the input image extent.
-        mem_ds, mem_lyr = rsgislib.vectorutils.getMemVecLyrSubset(
+        mem_ds, mem_lyr = rsgislib.vectorutils.get_mem_vec_lyr_subset(
             roi_vec_file, roi_vec_lyr, img_bbox
         )
 
@@ -3194,8 +3217,8 @@ def mask_img_with_vec(
                 mem_lyr,
                 "mem_vec",
                 img_epsg,
-                out_vec_drv="MEMORY",
-                out_lyr_name=None,
+                out_format="MEMORY",
+                out_vec_lyr=None,
                 in_epsg=None,
                 print_feedback=True,
             )
@@ -3206,12 +3229,12 @@ def mask_img_with_vec(
 
         roi_img = os.path.join(tmp_file_dir, "{}_roiimg.kea".format(base_vmsk_img))
         create_copy_img(input_img, roi_img, 1, 0, "KEA", rsgislib.TYPE_8UINT)
-        rsgislib.vectorutils.rasteriseVecLyrObj(
+        rsgislib.vectorutils.createrasters.rasterise_vec_lyr_obj(
             mem_result_lyr,
             roi_img,
-            burnVal=1,
-            vecAtt=None,
-            calcstats=True,
+            burn_val=1,
+            att_column=None,
+            calc_stats=True,
             thematic=True,
             nodata=0,
         )
@@ -3259,11 +3282,11 @@ def create_valid_mask(
             vdmskFile = os.path.join(tmp_lcl_dir, "{}_vmsk.kea".format(tmpBaseName))
             no_data_val = get_img_no_data_value(imgInfo.file_name)
             gen_valid_mask(
-                imgInfo.file_name, vdmskFile, gdalformat="KEA", nodata=no_data_val
+                imgInfo.file_name, vdmskFile, gdalformat="KEA", no_data_val=no_data_val
             )
             validMasks.append(vdmskFile)
 
-        gen_valid_mask(validMasks, out_msk_file, gdalformat, nodata=0.0)
+        gen_valid_mask(validMasks, out_msk_file, gdalformat, no_data_val=0.0)
         shutil.rmtree(tmp_lcl_dir)
 
 

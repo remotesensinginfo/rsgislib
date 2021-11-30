@@ -263,6 +263,18 @@ def test_has_gcps_false():
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
     assert not rsgislib.imageutils.has_gcps(input_img)
 
+def test_is_img_thematic_False():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    assert not rsgislib.imageutils.is_img_thematic(input_img)
+
+def test_is_img_thematic_True():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    assert rsgislib.imageutils.is_img_thematic(input_img)
+
 def test_get_gdal_format_name():
     import rsgislib.imageutils
 
@@ -364,9 +376,7 @@ def test_get_utm_zone():
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
     assert "30N" == rsgislib.imageutils.get_utm_zone(input_img)
 
-# TODO: Test for copy_gcps
-#def test_copy_gcps(tmp_path):
-
+# TODO rsgislib.imageutils.copy_gcps
 
 def test_resample_img_to_match(tmp_path):
     import rsgislib.imageutils
@@ -402,13 +412,279 @@ def test_gdal_warp(tmp_path):
     assert os.path.exists(output_img)
 
 
+def test_create_img_mosaic(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+    import glob
+
+    imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, 's2_tiles', '*.kea'))
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_img_mosaic(imgs, output_img, 0, 0, 1, 0, "KEA", rsgislib.TYPE_16UINT)
+
+    assert os.path.exists(output_img)
+
+def test_include_imgs(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+    import glob
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_copy_img(input_ref_img, output_img, 10, 0, "KEA", rsgislib.TYPE_16UINT)
+
+    imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, 's2_tiles', '*.kea'))
+    rsgislib.imageutils.include_imgs(output_img, imgs)
+
+    assert os.path.exists(output_img)
+
+def test_include_imgs_with_overlap(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+    import glob
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_copy_img(input_ref_img, output_img, 10, 0, "KEA", rsgislib.TYPE_16UINT)
+
+    imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, 's2_over_tiles', '*.kea'))
+    rsgislib.imageutils.include_imgs_with_overlap(output_img, imgs, overlap=20)
+
+    assert os.path.exists(output_img)
+
+def test_include_imgs_ind_img_intersect(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+    import glob
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_copy_img(input_ref_img, output_img, 10, 0, "KEA", rsgislib.TYPE_16UINT)
+
+    imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, 's2_tiles', '*.kea'))
+    rsgislib.imageutils.include_imgs_ind_img_intersect(output_img, imgs)
+
+    assert os.path.exists(output_img)
+
+
+def test_combine_imgs_to_band(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+    import glob
+
+    imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, 'cls_imgs', '*.kea'))
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.combine_imgs_to_band(imgs, output_img, gdalformat="KEA", datatype=rsgislib.TYPE_8UINT, no_data_val=0)
+
+    assert os.path.exists(output_img)
+
+
+# TODO rsgislib.imageutils.create_ref_img_composite_img
+
+def test_combine_binary_masks(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+
+    msk_imgs_dict = dict()
+    msk_imgs_dict["forest"] = os.path.join(IMGUTILS_DATA_DIR, 'cls_imgs', 'Forest_1226565d33.kea')
+    msk_imgs_dict["grass"] = os.path.join(IMGUTILS_DATA_DIR, 'cls_imgs', 'Grass_1226565d33.kea')
+    msk_imgs_dict["urban"] = os.path.join(IMGUTILS_DATA_DIR, 'cls_imgs', 'Urban_1226565d33.kea')
+    msk_imgs_dict["water"] = os.path.join(IMGUTILS_DATA_DIR, 'cls_imgs', 'Water_1226565d33.kea')
+
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    out_lut_file  = os.path.join(tmp_path, "out_lut.json")
+    rsgislib.imageutils.combine_binary_masks(msk_imgs_dict, output_img, out_lut_file, gdalformat="KEA")
+
+    assert os.path.exists(output_img) and os.path.exists(out_lut_file)
+
+# TODO rsgislib.imageutils.export_single_merged_img_band
+# TODO rsgislib.imageutils.order_img_using_prop_valid_pxls
+# TODO rsgislib.imageutils.gen_timeseries_fill_composite_img
+
+def test_create_tiles(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+    import glob
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    out_img_base = os.path.join(tmp_path, "out_img")
+    rsgislib.imageutils.create_tiles(input_img, out_img_base, 200, 200, 0, False, "KEA", rsgislib.TYPE_16UINT, "kea")
+
+    assert len(glob.glob("{}*.kea".format(out_img_base))) == 25
+
+
+def test_create_tiles_multi_core(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+    import glob
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    out_img_base = os.path.join(tmp_path, "out_img")
+    rsgislib.imageutils.create_tiles_multi_core(input_img, out_img_base, 200, 200, "KEA", rsgislib.TYPE_16UINT, "kea", 1)
+
+    assert len(glob.glob("{}*.kea".format(out_img_base))) == 25
+
+def test_stretch_img(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.stretch_img(input_img, output_img, False, "", 0, False, "KEA", rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARPERCENT, 2)
+
+    assert os.path.exists(output_img)
+
+def test_stretch_img_with_stats(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_stats_file = os.path.join(IMGUTILS_DATA_DIR, "s2_stch_stats.txt")
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.stretch_img_with_stats(input_img, output_img, in_stats_file, "KEA", rsgislib.TYPE_8UINT, 0, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+
+    assert os.path.exists(output_img)
+
+def test_normalise_img_pxl_vals(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.normalise_img_pxl_vals(input_img, output_img, "KEA", rsgislib.TYPE_32FLOAT, in_no_data_val=0, out_no_data_val=0, out_min=0, out_max=1, stretch_type=rsgislib.imageutils.STRETCH_LINEARPERCENT, stretch_param=2)
+
+    assert os.path.exists(output_img)
+
+def test_get_img_band_colour_interp():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+
+    assert rsgislib.imageutils.get_img_band_colour_interp(input_img, 1) == 1
+
+def test_set_img_band_colour_interp(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_subset.kea")
+    copy2(input_ref_img, input_img)
+
+    rsgislib.imageutils.set_img_band_colour_interp(input_img, img_band=1, clr_itrp_val=3)
+
+    assert rsgislib.imageutils.get_img_band_colour_interp(input_img, 1) == 3
 
 
 
+def test_set_img_thematic(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_subset.kea")
+    copy2(input_ref_img, input_img)
+
+    rsgislib.imageutils.set_img_thematic(input_img)
+
+    assert rsgislib.imageutils.is_img_thematic(input_img)
+
+def test_set_img_not_thematic(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, input_img)
+
+    rsgislib.imageutils.set_img_not_thematic(input_img)
+
+    assert not rsgislib.imageutils.is_img_thematic(input_img)
+
+def test_define_colour_table(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, input_img)
+
+    clr_lut = dict()
+    clr_lut[1] = '#009600'
+    clr_lut[2] = '#FFE5CC'
+    clr_lut[3] = '#CCFFE5'
+    rsgislib.imageutils.define_colour_table(input_img, clr_lut)
+
+def test_mask_img(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
+
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.mask_img(input_img, in_msk_img, output_img, "KEA", rsgislib.TYPE_16UINT, 0, 0)
+
+    assert os.path.exists(output_img)
+
+def test_gen_finite_mask(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.gen_finite_mask(input_img, output_img, gdalformat="KEA")
+
+    assert os.path.exists(output_img)
+
+def test_gen_valid_mask(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.gen_valid_mask(input_img, output_img, gdalformat="KEA", no_data_val=0.0)
+
+    assert os.path.exists(output_img)
+
+def test_gen_img_edge_mask(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.gen_img_edge_mask(input_img, output_img, gdalformat="KEA", n_edge_pxls=10)
+
+    assert os.path.exists(output_img)
 
 
+def test_mask_img_with_vec(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    roi_vec_file =  os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
+    roi_vec_lyr = "aber_osgb_single_poly"
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.mask_img_with_vec(input_img, output_img, "KEA", roi_vec_file, roi_vec_lyr, tmp_path, outvalue=0, datatype=rsgislib.TYPE_16UINT, vec_epsg = None)
+
+    assert os.path.exists(output_img)
 
 
+def test_mask_all_band_zero_vals(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.mask_all_band_zero_vals(input_img, output_img, gdalformat="KEA", out_val=1)
+
+    assert os.path.exists(output_img)
 
 
+def test_create_valid_mask(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber.kea")
+    copy2(input_ref_img, input_img)
+    rsgislib.imageutils.set_img_no_data_value(input_img, 0.0)
+
+    img_band_info = list()
+    img_band_info.append(rsgislib.imageutils.ImageBandInfo(file_name=input_img, name="s2_1", bands=[1,2]))
+    img_band_info.append(rsgislib.imageutils.ImageBandInfo(file_name=input_img, name="s2_2", bands=[3,4]))
+
+
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imageutils.create_valid_mask(img_band_info, output_img, gdalformat="KEA", tmp_dir=tmp_path)
+
+    assert os.path.exists(output_img)
 
