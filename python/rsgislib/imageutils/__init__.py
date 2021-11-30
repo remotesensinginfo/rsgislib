@@ -3290,7 +3290,7 @@ def create_valid_mask(
         shutil.rmtree(tmp_lcl_dir)
 
 
-def get_img_pxl_values(input_img: str, img_band: int, x_coords: float, y_coords: float):
+def get_img_pxl_values(input_img: str, img_band: int, x_coords: numpy.array, y_coords: numpy.array):
     """
     Function which gets pixel values from a image for specified
     image pixels. The coordinate space is image pixels, i.e.,
@@ -3331,8 +3331,8 @@ def get_img_pxl_values(input_img: str, img_band: int, x_coords: float, y_coords:
 def set_img_pxl_values(
     input_img: str,
     img_band: int,
-    x_coords: float,
-    y_coords: float,
+    x_coords: numpy.array,
+    y_coords: numpy.array,
     pxl_value: float = 1,
 ):
     """
@@ -3378,7 +3378,7 @@ def assign_random_pxls(
     gdalformat: str = "KEA",
     edge_pxl: int = 0,
     use_no_data: bool = True,
-    seed: int = None,
+    rnd_seed: int = None,
 ):
     """
     A function which can generate a set of random pixels. Can honor the image no
@@ -3394,7 +3394,7 @@ def assign_random_pxls(
                      (Default: 0)
     :param use_no_data: A boolean specifying whether the image no data value should
                         be used. (Default: True)
-    :param seed: A random seed for generating the pixel locations. If None then a
+    :param rnd_seed: A random seed for generating the pixel locations. If None then a
                  different seed is used each time the system is executed (Default None).
 
     Example::
@@ -3412,8 +3412,8 @@ def assign_random_pxls(
     import numpy
     import numpy.random
 
-    if seed is not None:
-        numpy.random.seed(seed)
+    if rnd_seed is not None:
+        numpy.random.seed(rnd_seed)
 
     if edge_pxl < 0:
         raise Exception("edge_pxl value must be greater than 0.")
@@ -3832,7 +3832,7 @@ def spectral_smoothing(
         progress_bar = cuiprogress.GDALProgressBar()
 
     np_dtype = rsgislib.get_numpy_datatype(datatype)
-    in_no_date = rsgislib.get_img_no_data_value(input_img)
+    in_no_date = get_img_no_data_value(input_img)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -3884,8 +3884,12 @@ def spectral_smoothing(
     applier.apply(_applySmoothing, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
+        use_no_data = True
+        if in_no_date is None:
+            use_no_data = False
+            in_no_date = 0.0
         pop_img_stats(
-            output_img, use_no_data=True, no_data_val=in_no_date, calc_pyramids=True
+            output_img, use_no_data=use_no_data, no_data_val=in_no_date, calc_pyramids=True
         )
 
 

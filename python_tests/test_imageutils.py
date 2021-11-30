@@ -1026,3 +1026,182 @@ def test_calc_pixel_locations(tmp_path):
     rsgislib.imageutils.calc_pixel_locations(input_img, output_img, gdalformat="KEA")
 
     assert os.path.exists(output_img)
+
+def test_get_file_img_extension_kea():
+    import rsgislib.imageutils
+    assert rsgislib.imageutils.get_file_img_extension("KEA") == "kea"
+
+def test_get_file_img_extension_tif():
+    import rsgislib.imageutils
+    assert rsgislib.imageutils.get_file_img_extension("GTIFF") == "tif"
+
+def test_get_file_img_extension_hfa():
+    import rsgislib.imageutils
+    assert rsgislib.imageutils.get_file_img_extension("HFA") == "img"
+
+def test_get_file_img_extension_envi():
+    import rsgislib.imageutils
+    assert rsgislib.imageutils.get_file_img_extension("ENVI") == "env"
+
+def test_get_file_img_extension_pcidsk():
+    import rsgislib.imageutils
+    assert rsgislib.imageutils.get_file_img_extension("PCIDSK") == "pix"
+
+def test_rename_gdal_layer(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_subset.kea")
+    copy2(input_ref_img, input_img)
+
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.rename_gdal_layer(input_img, output_img)
+
+    assert os.path.exists(output_img)
+
+def test_delete_gdal_layer(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_subset.kea")
+    copy2(input_ref_img, input_img)
+
+    rsgislib.imageutils.delete_gdal_layer(input_img)
+
+    assert not os.path.exists(input_img)
+
+def test_get_img_pxl_values():
+    import rsgislib.imageutils
+    import numpy
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    pxl_vals = rsgislib.imageutils.get_img_pxl_values(input_img, 1, numpy.array([20, 40]), numpy.array([10, 20]))
+
+    assert pxl_vals[0] == 79.0 and pxl_vals[1] == 80.0
+
+def test_set_img_pxl_values(tmp_path):
+    import rsgislib.imageutils
+    import numpy
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_subset.kea")
+    copy2(input_ref_img, input_img)
+
+    rsgislib.imageutils.set_img_pxl_values(input_img, 1, numpy.array([20, 40]), numpy.array([10, 20]), 1)
+    pxl_vals = rsgislib.imageutils.get_img_pxl_values(input_img, 1, numpy.array([20,40]), numpy.array([10, 20]))
+    assert pxl_vals[0] == 1 and pxl_vals[1] == 1
+
+def test_assign_random_pxls(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.assign_random_pxls(input_img, output_img, n_pts=100, img_band=1, gdalformat= 'KEA', edge_pxl = 0, use_no_data= True, rnd_seed=42)
+
+    assert os.path.exists(output_img)
+
+
+def test_generate_random_pxl_vals_img(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.generate_random_pxl_vals_img(input_img, output_img, gdalformat="KEA", low_val=100, up_val=200)
+
+    assert os.path.exists(output_img)
+
+
+def test_stack_stats(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.stack_stats(input_img, output_img, [1,2,3,4,5,6,7,8], "mean", "KEA", rsgislib.TYPE_16INT)
+
+    assert os.path.exists(output_img)
+
+def test_gen_sampling_grid(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.gen_sampling_grid(input_img, output_img, "KEA", 10, 10, 100, True)
+
+    assert os.path.exists(output_img)
+
+def test_whiten_image(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    valid_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.whiten_image(input_img, valid_msk_img, 1, output_img, "KEA")
+
+    assert os.path.exists(output_img)
+
+def test_spectral_smoothing(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    valid_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+    output_img = os.path.join(tmp_path, "output_img.kea")
+    rsgislib.imageutils.spectral_smoothing(input_img, valid_msk_img, 1, output_img)
+
+    assert os.path.exists(output_img)
+
+def test_set_img_band_metadata(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_subset.kea")
+    copy2(input_ref_img, input_img)
+
+    rsgislib.imageutils.set_img_band_metadata(input_img, 1, "Hello", "World")
+
+def test_get_img_band_metadata():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    rsgislib.imageutils.get_img_band_metadata(input_img, 1, "LAYER_TYPE")
+
+def test_get_img_band_metadata_fields():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    rsgislib.imageutils.get_img_band_metadata_fields(input_img, 1)
+
+def test_get_img_band_metadata_fields_dict():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    rsgislib.imageutils.get_img_band_metadata_fields_dict(input_img, 1)
+
+def test_set_img_metadata(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_subset.kea")
+    copy2(input_ref_img, input_img)
+
+    rsgislib.imageutils.set_img_metadata(input_img, "Hello", "World")
+
+def test_get_img_metadata(tmp_path):
+    import rsgislib.imageutils
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(tmp_path, "sen2_20210527_aber_subset.kea")
+    copy2(input_ref_img, input_img)
+
+    rsgislib.imageutils.set_img_metadata(input_img, "Hello", "World")
+    rsgislib.imageutils.get_img_metadata(input_img, "Hello")
+
+
+def test_get_img_metadata_fields():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    rsgislib.imageutils.get_img_metadata_fields(input_img)
+
+
+def test_get_img_metadata_fields_dict():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    rsgislib.imageutils.get_img_metadata_fields_dict(input_img)
+
