@@ -144,7 +144,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     def mergeStage1TilesToOutput(self, inputImage, tilesSegsDIR, tilesSegsBordersDIR, tilesBase, clumpsImage, bordersImage):
         segTiles = glob.glob(os.path.join(tilesSegsDIR, tilesBase+"*_segs.kea"))
         imageutils.create_copy_img(inputImage, clumpsImage, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
-        segmentation.mergeClumpImages(segTiles, clumpsImage)
+        segmentation.merge_clump_images(segTiles, clumpsImage)
         rastergis.pop_rat_img_stats(clumpsImage, True, True)
         
         tileBorders = glob.glob(os.path.join(tilesSegsBordersDIR, tilesBase+"*_segsborder.kea"))
@@ -184,7 +184,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     
     def mergeStage2TilesToOutput(self, clumpsImage, tilesSegsDIR, tilesSegBordersDIR, tilesBase, s2BordersImage):
         segTiles = glob.glob(os.path.join(tilesSegsDIR, tilesBase+"*_segs.kea"))
-        segmentation.mergeClumpImages(segTiles, clumpsImage)
+        segmentation.merge_clump_images(segTiles, clumpsImage)
         rastergis.pop_rat_img_stats(clumpsImage, True, True)
         
         tileBorders = glob.glob(os.path.join(tilesSegBordersDIR, tilesBase+"*_segsborder.kea"))
@@ -230,10 +230,10 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     def mergeStage3TilesToOutput(self, clumpsImage, subsetSegsDIR, subsetImgsMaskedDIR, subImgBaseName):
         burnTiles = glob.glob(os.path.join(subsetImgsMaskedDIR, subImgBaseName+"*_burn.kea"))
         if len(burnTiles) > 0:
-            segmentation.mergeClumpImages(burnTiles, clumpsImage)
+            segmentation.merge_clump_images(burnTiles, clumpsImage)
         
         segTiles = glob.glob(os.path.join(subsetSegsDIR, subImgBaseName+"*_segs.kea"))
-        segmentation.mergeClumpImages(segTiles, clumpsImage)
+        segmentation.merge_clump_images(segTiles, clumpsImage)
         rastergis.pop_rat_img_stats(clumpsImage, True, True)
 
 

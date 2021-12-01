@@ -8,8 +8,6 @@ Utilities
 .. autofunction:: rsgislib.segmentation.segutils.run_shepherd_segmentation
 .. autofunction:: rsgislib.segmentation.tiledsegsingle.perform_tiled_segmentation
 .. autofunction:: rsgislib.segmentation.segutils.run_shepherd_segmentation_pre_calcd_stats
-.. autofunction:: rsgislib.segmentation.segutils.run_shepherd_segmentation_test_min_obj_size
-.. autofunction:: rsgislib.segmentation.segutils.run_shepherd_segmentation_test_num_clumps
 
 
 Clump
@@ -17,8 +15,7 @@ Clump
 .. autofunction:: rsgislib.segmentation.clump
 .. autofunction:: rsgislib.segmentation.tiledclump.perform_clumping_single_thread
 .. autofunction:: rsgislib.segmentation.tiledclump.perform_clumping_multi_process
-.. autofunction:: rsgislib.segmentation.tiledclump.perform_union_clumping_single_thread
-.. autofunction:: rsgislib.segmentation.tiledclump.perform_union_clumping_multi_process
+
 
 Label
 ------
@@ -34,7 +31,8 @@ Elimination
 Join / Union
 -------------
 .. autofunction:: rsgislib.segmentation.union_of_clumps
-
+.. autofunction:: rsgislib.segmentation.tiledclump.perform_union_clumping_single_thread
+.. autofunction:: rsgislib.segmentation.tiledclump.perform_union_clumping_multi_process
 
 Visualisation
 --------------
@@ -44,7 +42,6 @@ Visualisation
 Tiles
 -------
 .. autofunction:: rsgislib.segmentation.merge_segmentation_tiles
-.. autofunction:: rsgislib.segmentation.tiledsegsingle.perform_tiled_segmentation
 
 
 scikit-image
