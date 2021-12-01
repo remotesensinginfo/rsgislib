@@ -3129,7 +3129,7 @@ def create_train_test_smpls(
     out_format: str = "GPKG",
     prop_test: float = 0.2,
     tmp_dir: str = "./tmp",
-    rand_seed: int = None,
+    rnd_seed: int = None,
 ):
     """
     A function for splitting a vector dataset into training and testing datasets.
@@ -3143,7 +3143,7 @@ def create_train_test_smpls(
     :param out_format: The output format of the output file. (Default: GPKG)
     :param prop_test: Proportion of the dataset to be defined as a the test data
     :param tmp_dir: a temporary directory for intimediate outputs.
-    :param rand_seed: A seed for the random number generator.
+    :param rnd_seed: A seed for the random number generator.
 
     """
     import rsgislib.vectorattrs
@@ -3174,7 +3174,7 @@ def create_train_test_smpls(
         out_test_vec_lyr,
         n_test_feats,
         out_format=out_format,
-        rand_seed=rand_seed,
+        rand_seed=rnd_seed,
     )
 
     if created_tmp_dir:

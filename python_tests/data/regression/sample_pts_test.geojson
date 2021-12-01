@@ -1,0 +1,16 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::27700" } },
+"features": [
+{ "type": "Feature", "properties": { "value": 90.0, "re_b4": 96.0, "re_b5": 443.0, "re_b6": 582.0, "nir_b7": 622.0, "nir_b8": 625.0 }, "geometry": { "type": "Point", "coordinates": [ 263289.880550846690312, 281414.281423937936779 ] } },
+{ "type": "Feature", "properties": { "value": 15.0, "re_b4": 153.0, "re_b5": 454.0, "re_b6": 518.0, "nir_b7": 559.0, "nir_b8": 570.0 }, "geometry": { "type": "Point", "coordinates": [ 265240.169404798187315, 285000.484212099399883 ] } },
+{ "type": "Feature", "properties": { "value": 65.0, "re_b4": 102.0, "re_b5": 462.0, "re_b6": 587.0, "nir_b7": 631.0, "nir_b8": 632.0 }, "geometry": { "type": "Point", "coordinates": [ 265967.889126421883702, 282922.11668714217376 ] } },
+{ "type": "Feature", "properties": { "value": 10.0, "re_b4": 167.0, "re_b5": 476.0, "re_b6": 545.0, "nir_b7": 601.0, "nir_b8": 611.0 }, "geometry": { "type": "Point", "coordinates": [ 263181.408895559899975, 277877.205511787324212 ] } },
+{ "type": "Feature", "properties": { "value": 30.0, "re_b4": 142.0, "re_b5": 476.0, "re_b6": 561.0, "nir_b7": 599.0, "nir_b8": 604.0 }, "geometry": { "type": "Point", "coordinates": [ 264099.104881292267237, 285064.523547602293547 ] } },
+{ "type": "Feature", "properties": { "value": 5.0, "re_b4": 147.0, "re_b5": 469.0, "re_b6": 545.0, "nir_b7": 588.0, "nir_b8": 588.0 }, "geometry": { "type": "Point", "coordinates": [ 263091.170828966540284, 278222.233413467823993 ] } },
+{ "type": "Feature", "properties": { "value": 90.0, "re_b4": 99.0, "re_b5": 463.0, "re_b6": 630.0, "nir_b7": 669.0, "nir_b8": 667.0 }, "geometry": { "type": "Point", "coordinates": [ 263260.771761981828604, 285256.641554110916331 ] } },
+{ "type": "Feature", "properties": { "value": 95.0, "re_b4": 94.0, "re_b5": 441.0, "re_b6": 591.0, "nir_b7": 625.0, "nir_b8": 623.0 }, "geometry": { "type": "Point", "coordinates": [ 263808.016992642835248, 285140.206398651120253 ] } },
+{ "type": "Feature", "properties": { "value": 30.0, "re_b4": 129.0, "re_b5": 469.0, "re_b6": 553.0, "nir_b7": 591.0, "nir_b8": 589.0 }, "geometry": { "type": "Point", "coordinates": [ 265927.136822010972537, 283294.709184613486286 ] } },
+{ "type": "Feature", "properties": { "value": 10.0, "re_b4": 154.0, "re_b5": 475.0, "re_b6": 550.0, "nir_b7": 589.0, "nir_b8": 595.0 }, "geometry": { "type": "Point", "coordinates": [ 264005.956756924453657, 284779.257416725798976 ] } }
+]
+}
