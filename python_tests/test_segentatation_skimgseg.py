@@ -55,7 +55,8 @@ def test_perform_watershed_segmentation(tmp_path):
     rsgislib.segmentation.skimgseg.perform_watershed_segmentation(input_img, in_markers_img, out_clumps_img, gdalformat='KEA', no_data_val=0, tmp_dir=tmp_dir, calc_stats=True, use_pca=True, n_pca_bands=1, pca_pxl_sample=100, compactness=0, watershed_line=False)
     assert os.path.exists(out_clumps_img)
 
-
+# TODO need to look at further as takes too long to run.
+""" 
 @pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
 def test_perform_random_walker_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
@@ -67,5 +68,5 @@ def test_perform_random_walker_segmentation(tmp_path):
     in_markers_img = os.path.join(SEGMENT_DATA_DIR, "sen2_20210527_aber_subset_lcl_min.kea")
     rsgislib.segmentation.skimgseg.perform_random_walker_segmentation(input_img, in_markers_img, out_clumps_img, gdalformat='KEA', no_data_val=0, tmp_dir=tmp_dir, calc_stats=True, use_pca=True, n_pca_bands=1, pca_pxl_sample=100, beta=130, mode='bf', tol=0.001, spacing=None)
     assert os.path.exists(out_clumps_img)
-
+"""
 
