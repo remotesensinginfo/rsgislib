@@ -11,6 +11,7 @@ import numpy
 import osgeo.gdal as gdal
 
 import rsgislib
+
 # import the C++ extension into this level
 from ._imagecalc import *
 
@@ -232,6 +233,7 @@ def _computeProximityArrArgsFunc(argVals):
     for the multiprocessing Pool
     """
     import rsgislib.imageutils
+
     # 0: tileFile
     # 1: distTileFile
     # 2: proxOptions
@@ -257,6 +259,7 @@ def _computeProximityArrArgsFunc(argVals):
     distImgDS = None
     classImgBand = None
     classImgDS = None
+
 
 def calc_dist_to_img_vals_tiled(
     input_img,
@@ -406,8 +409,6 @@ def calc_dist_to_img_vals_tiled(
         distTiles.append(distTileFile)
         distTileArgs.append(tileArgs)
 
-
-
     with Pool(n_cores) as p:
         p.map(_computeProximityArrArgsFunc, distTileArgs)
 
@@ -508,7 +509,9 @@ def get_unique_values(input_img, img_band=1):
     return uniq_vals
 
 
-def get_pca_eigen_vector(input_img, pxl_n_sample, no_data_val=None, out_matrix_file=None):
+def get_pca_eigen_vector(
+    input_img, pxl_n_sample, no_data_val=None, out_matrix_file=None
+):
     """
     A function which takes a sample from an input image and uses it to
     generate eigenvector for a PCA. Note. this can be used as input
@@ -613,7 +616,9 @@ def perform_image_pca(
         if no_data_val is not None:
             use_no_data = True
             lcl_no_data_val = no_data_val
-        rsgislib.imageutils.pop_img_stats(output_img, use_no_data, lcl_no_data_val, True)
+        rsgislib.imageutils.pop_img_stats(
+            output_img, use_no_data, lcl_no_data_val, True
+        )
 
     return varExplain
 
@@ -874,7 +879,6 @@ def calc_histograms_for_msk_vals(
     return hist_dict
 
 
-
 def calc_imgs_pxl_mode(input_imgs, output_img, gdalformat, no_data_val=0):
     """
     Function which calculates the mode of a group of images.
@@ -1068,7 +1072,9 @@ def normalise_image_band(input_img, band, output_img, gdal_format="KEA"):
         use_no_data_val = False
         no_data_val = 0.0
 
-    band_min, band_max = get_img_band_min_max(input_img, band, use_no_data_val, no_data_val)
+    band_min, band_max = get_img_band_min_max(
+        input_img, band, use_no_data_val, no_data_val
+    )
 
     band_defns = [BandDefn("b1", input_img, band)]
     band_range = band_max - band_min
