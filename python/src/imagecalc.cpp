@@ -335,33 +335,33 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
     }
 
     // get the kw attrs from the object
-    PyObject *pCalcMin = PyObject_GetAttrString(summaryStats, "calcMin");
+    PyObject *pCalcMin = PyObject_GetAttrString(summaryStats, "calc_min");
     if( ( pCalcMin == nullptr ) || ( pCalcMin == Py_None ) || !RSGISPY_CHECK_INT(pCalcMin) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMin\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calc_min\'" );
         Py_XDECREF(pCalcMin);
         return nullptr;
     }
 
-    PyObject *pCalcMax = PyObject_GetAttrString(summaryStats, "calcMax");
+    PyObject *pCalcMax = PyObject_GetAttrString(summaryStats, "calc_max");
     if( ( pCalcMax == nullptr ) || ( pCalcMax == Py_None ) || !RSGISPY_CHECK_INT(pCalcMax) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMax\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calc_max\'" );
         Py_XDECREF(pCalcMax);
         Py_DECREF(pCalcMin);
         return nullptr;
     }
 
-    PyObject *pCalcMean = PyObject_GetAttrString(summaryStats, "calcMean");
+    PyObject *pCalcMean = PyObject_GetAttrString(summaryStats, "calc_mean");
     if( ( pCalcMean == nullptr ) || ( pCalcMean == Py_None ) || !RSGISPY_CHECK_INT(pCalcMean) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMean\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calc_mean\'" );
         Py_XDECREF(pCalcMean);
         Py_DECREF(pCalcMax);
         Py_DECREF(pCalcMin);
         return nullptr;
     }
 
-    PyObject *pCalcSum = PyObject_GetAttrString(summaryStats, "calcSum");
+    PyObject *pCalcSum = PyObject_GetAttrString(summaryStats, "calc_sum");
     if( ( pCalcSum == nullptr ) || ( pCalcSum == Py_None ) || !RSGISPY_CHECK_INT(pCalcSum) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcSum\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calc_sum\'" );
         Py_XDECREF(pCalcSum);
         Py_DECREF(pCalcMean);
         Py_DECREF(pCalcMax);
@@ -369,9 +369,9 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
         return nullptr;
     }
 
-    PyObject *pCalcStdDev = PyObject_GetAttrString(summaryStats, "calcStdDev");
+    PyObject *pCalcStdDev = PyObject_GetAttrString(summaryStats, "calc_stdev");
     if( ( pCalcStdDev == nullptr ) || ( pCalcStdDev == Py_None ) || !RSGISPY_CHECK_INT(pCalcStdDev) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcStdDev\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calc_stdev\'" );
         Py_XDECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
         Py_DECREF(pCalcMean);
@@ -380,9 +380,9 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
         return nullptr;
     }
 
-    PyObject *pCalcMedian = PyObject_GetAttrString(summaryStats, "calcMedian");
+    PyObject *pCalcMedian = PyObject_GetAttrString(summaryStats, "calc_median");
     if( ( pCalcMedian == nullptr ) || ( pCalcMedian == Py_None ) || !RSGISPY_CHECK_INT(pCalcMedian) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMedian\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calc_median\'" );
         Py_XDECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
@@ -392,9 +392,9 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
         return nullptr;
     }
     
-    PyObject *pCalcMode = PyObject_GetAttrString(summaryStats, "calcMode");
+    PyObject *pCalcMode = PyObject_GetAttrString(summaryStats, "calc_mode");
     if( ( pCalcMode == nullptr ) || ( pCalcMode == Py_None ) || !RSGISPY_CHECK_INT(pCalcMode) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMode\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calc_mode\'" );
         Py_XDECREF(pCalcMode);
         Py_DECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
@@ -467,9 +467,9 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
         return nullptr;
     }
 
-    PyObject *pStdDev = PyObject_GetAttrString(summaryStats, "stdDev");
+    PyObject *pStdDev = PyObject_GetAttrString(summaryStats, "stdev");
     if( ( pStdDev == nullptr ) || ( pStdDev == Py_None ) || !RSGISPY_CHECK_FLOAT(pStdDev) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'stdDev\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'stdev\'" );
         Py_XDECREF(pStdDev);
         Py_DECREF(pSum);
         Py_DECREF(pMean);
@@ -578,12 +578,38 @@ static PyObject *ImageCalc_ImagePixelLinearFit(PyObject *self, PyObject *args, P
                              RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("band_values"), RSGIS_PY_C_TEXT("no_data_val"),
                              RSGIS_PY_C_TEXT("use_no_data"), nullptr};
-    const char *inputImage, *outputImage, *gdalFormat, *bandValues;
+    const char *inputImage, *outputImage, *gdalFormat;
+    PyObject *bandValuesObj;
     double noDataValue;
     int useNoDataValue;
 
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssfi:image_pixel_linear_fit", kwlist, &inputImage, &outputImage, &gdalFormat, &bandValues, &noDataValue, &useNoDataValue))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssOfi:image_pixel_linear_fit", kwlist, &inputImage, &outputImage, &gdalFormat, &bandValuesObj, &noDataValue, &useNoDataValue))
     {
+        return nullptr;
+    }
+
+    std::vector<float> bandValues;
+
+    if(PySequence_Check(bandValuesObj))
+    {
+        Py_ssize_t nMaskVals = PySequence_Size(bandValuesObj);
+        for (Py_ssize_t n = 0; n < nMaskVals; n++)
+        {
+            PyObject *o = PySequence_GetItem(bandValuesObj, n);
+            if (RSGISPY_CHECK_FLOAT(o) || RSGISPY_CHECK_INT(o))
+            {
+                bandValues.push_back(RSGISPY_FLOAT_EXTRACT(o));
+            } else
+            {
+                Py_DECREF(o);
+                PyErr_SetString(GETSTATE(self)->error, "A Band value was not a float.");
+                return nullptr;
+            }
+        }
+    }
+    else
+    {
+        PyErr_SetString(GETSTATE(self)->error, "band_values must be a list.");
         return nullptr;
     }
 
@@ -1987,7 +2013,7 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
 {"image_pixel_linear_fit", (PyCFunction)ImageCalc_ImagePixelLinearFit, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.image_pixel_linear_fit(input_img, output_img, gdalformat, band_values, no_data_val, use_no_data)\n"
+"rsgislib.imagecalc.image_pixel_linear_fit(input_img:str, output_img:str, gdalformat:str, band_values:list, no_data_val:float, use_no_data:bool)\n"
 "Performs a linear regression on each column of pixels.\n"
 "\n"
 "Where:\n"
@@ -1995,7 +2021,7 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param input_img: is a string containing the name of the input file\n"
 ":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
-":param band_values: is text file containing the value of each band (e.g. wavelength, day of year) with a separate line for each band\n"
+":param band_values: is a list of values, one for each band (e.g. wavelength, day of year)\n"
 ":param no_data_val: is a float specifying what value is used to signify no data\n"
 ":param use_no_data: is a boolean specifying whether the noDataValue should be used\n"
 "\n"
@@ -2005,14 +2031,8 @@ static PyMethodDef ImageCalcMethods[] = {
 "   output = 'injune_p142_casi_sub_utm_linear_fit.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   bandValues = [446,530,549,569,598,633,680,696,714,732,741,752,800,838]\n"
-"   \n"   
-"   bandValuesFile =  'injune_p142_casi_wavelengths.txt'\n"
-"   \n"  
-"   with open(bandValuesFile,'w') as f:\n"
-"       for bandVal in bandValues:\n"
-"           f.write(str(bandVal) + '\\n')\n"
 "   \n"
-"   imagecalc.image_pixel_linear_fit(image, output, gdalformat, bandValuesFile, 0, True)\n"
+"   imagecalc.image_pixel_linear_fit(image, output, gdalformat, bandValues, 0, True)\n"
 "\n"
 },
 

@@ -5,6 +5,11 @@ import pytest
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 IMGCALC_DATA_DIR = os.path.join(DATA_DIR, "imagecalc")
 
+RTREE_NOT_AVAIL = False
+try:
+    import rtree
+except ImportError:
+    RTREE_NOT_AVAIL = True
 
 def test_count_pxls_of_val_band1():
     import rsgislib.imagecalc
@@ -593,4 +598,162 @@ def test_recode_int_raster(tmp_path):
         gdalformat="KEA",
         datatype=rsgislib.TYPE_16UINT,
     )
+    assert os.path.exists(output_img)
+
+
+def test_all_bands_equal_to(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.all_bands_equal_to(input_img, output_img, 0, 1, 2, "KEA", rsgislib.TYPE_8UINT)
+    assert os.path.exists(output_img)
+
+def test_kmeans_clustering(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    out_file = os.path.join(tmp_path, "out_file")
+    rsgislib.imagecalc.kmeans_clustering(input_img, out_file, 10, 20, 100, True, 0.0025, rsgislib.INITCLUSTER_DIAGONAL_FULL_ATTACH)
+
+    out_ext_file = os.path.join(tmp_path, "out_file.gmtxt")
+    assert os.path.exists(out_ext_file)
+
+def test_isodata_clustering(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    out_file = os.path.join(tmp_path, "out_file")
+    rsgislib.imagecalc.isodata_clustering(input_img, out_file, 10, 20, 100, True, 0.0025, rsgislib.INITCLUSTER_DIAGONAL_FULL_ATTACH, 2, 5, 5, 5, 8, 18)
+    out_ext_file = os.path.join(tmp_path, "out_file.gmtxt")
+    assert os.path.exists(out_ext_file)
+
+
+def test_image_pixel_column_summary(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    stats_to_calc = rsgislib.imagecalc.StatsSummary()
+    stats_to_calc.calc_min = True
+    stats_to_calc.calc_max = True
+    stats_to_calc.calc_sum = True
+    stats_to_calc.calc_mean = True
+    stats_to_calc.calc_stdev = True
+    stats_to_calc.calc_median = True
+    stats_to_calc.calc_mode = True
+    rsgislib.imagecalc.image_pixel_column_summary(input_img, output_img, stats_to_calc, "KEA", rsgislib.TYPE_32FLOAT, 0.0, True)
+    assert os.path.exists(output_img)
+
+def test_get_img_band_stats_in_env():
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_wgs84.kea")
+    stats = rsgislib.imagecalc.get_img_band_stats_in_env(input_img, 1, 0, -4.0932, -4.0774, 52.4033, 52.4229)
+
+    print(stats)
+    assert ((stats[0] - 30) < 1) and ((stats[1] - 1066) < 1) and ((stats[2] - 74.6039) < 1) and ((stats[3] - 34.9773) < 1) and ((stats[4] - 1904637.0) < 2)
+
+def test_get_img_band_mode_in_env_0():
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_wgs84.kea")
+    mode = rsgislib.imagecalc.get_img_band_mode_in_env(input_img, 1, 1, -999, -4.0932, -4.0774, 52.4033, 52.4229)
+
+    assert mode[0] == 0
+
+def test_get_img_band_mode_in_env_2():
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_wgs84.kea")
+    mode = rsgislib.imagecalc.get_img_band_mode_in_env(input_img, 1, 1, -999, -4.0154, -3.9880, 52.4004, 52.4257)
+
+    print(mode)
+    assert mode[0] == 2
+
+def test_calc_multi_img_band_stats(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.calc_multi_img_band_stats([input_img, input_img], output_img, rsgislib.SUMTYPE_MEAN, "KEA", rsgislib.TYPE_32FLOAT, 0, True)
+
+    assert os.path.exists(output_img)
+
+def test_get_img_band_min_max():
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    min, max = rsgislib.imagecalc.get_img_band_min_max(input_img, 1, True, 0)
+    assert min == 1 and max == 1066
+
+# TODO rsgislib.imagecalc.get_img_sum_stats_in_pxl
+# TODO rsgislib.imagecalc.get_img_idx_for_stat
+# TODO rsgislib.imagecalc.identify_min_pxl_value_in_win
+
+def test_calc_img_mean_in_mask():
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+    val = rsgislib.imagecalc.calc_img_mean_in_mask(input_img, in_msk_img, msk_val=1, img_bands=[1,2,3], no_data_val=0, use_no_data=True)
+    assert (val - 71.5) < 0.1
+
+def test_calc_img_basic_stats_for_ref_region(tmp_path):
+    import rsgislib.imagecalc
+
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_stats_imgs = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.calc_img_basic_stats_for_ref_region(in_ref_img, [in_stats_imgs], output_img, gdalformat='KEA')
+
+    assert os.path.exists(output_img)
+
+@pytest.mark.skipif(RTREE_NOT_AVAIL, reason="tree dependency not available")
+def test_calc_fill_regions_knn(tmp_path):
+    import rsgislib.imagecalc
+
+    in_ref_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_subset.kea")
+    in_fill_regions_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.calc_fill_regions_knn(in_ref_img, 0, in_fill_regions_img, 0, output_img, k=5, summary=rsgislib.SUMTYPE_MODE, gdalformat='KEA', datatype=rsgislib.TYPE_16INT)
+    assert os.path.exists(output_img)
+
+
+def test_image_pixel_linear_fit(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    band_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.image_pixel_linear_fit(input_img, output_img, "KEA", band_values, 0, True)
+    assert os.path.exists(output_img)
+
+def test_calculate_img_band_rmse():
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    rsgislib.imagecalc.calculate_img_band_rmse(input_img, 1, input_img, 2)
+
+
+def test_correlation_window(tmp_path):
+    import rsgislib.imagecalc
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.correlation_window(input_img, output_img, 5, 1, 2, "KEA", rsgislib.TYPE_32FLOAT)
+    assert os.path.exists(output_img)
+
+def test_calc_mask_img_pxl_val_prob(tmp_path):
+    import rsgislib.imagecalc
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.calc_mask_img_pxl_val_prob(input_img, [1,2,3], in_msk_img, 2, output_img, "KEA", [5,5,5], False, False)
+    assert os.path.exists(output_img)
+
+def test_calc_img_difference(tmp_path):
+    import rsgislib.imagecalc
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.calc_img_difference(input_img, input_img, output_img, "KEA", rsgislib.TYPE_32FLOAT)
     assert os.path.exists(output_img)

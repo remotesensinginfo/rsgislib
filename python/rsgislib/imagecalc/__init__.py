@@ -1039,8 +1039,13 @@ def calc_img_basic_stats_for_ref_region(
     applier.apply(_calcBasicStats, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
 
+    use_no_data = True
+    if no_data_val is None:
+        no_data_val = 0.0
+        use_no_data = False
+
     rsgislib.imageutils.pop_img_stats(
-        output_img, use_no_data=True, no_data_val=no_data_val, calc_pyramids=True
+        output_img, use_no_data=use_no_data, no_data_val=no_data_val, calc_pyramids=True
     )
 
 
@@ -1140,7 +1145,7 @@ def calc_fill_regions_knn(
     ref_no_data,
     in_fill_regions_img,
     fill_region_val,
-    out_img,
+    output_img,
     k=5,
     summary=rsgislib.SUMTYPE_MODE,
     gdalformat="KEA",
@@ -1161,7 +1166,7 @@ def calc_fill_regions_knn(
     :param fill_region_val: The pixel value specifying the pixels in the
                             in_fill_regions_img image for the KNN value will
                             be calculated.
-    :param out_img: The output image file name and path.
+    :param output_img: The output image file name and path.
     :param k: The k parameter of the KNN.
     :param summary: Summary method (rsgislib.SUMTYPE_*) to be used (Default is Mode).
                     Options: Mode, Median, Sum, Mean, Range, Min, Max.
@@ -1177,7 +1182,7 @@ def calc_fill_regions_knn(
     import scipy.stats
     import rtree
 
-    if not rsgislib.imageutils.doGDALLayersHaveSameProj(
+    if not rsgislib.imageutils.do_gdal_layers_have_same_proj(
         in_ref_img, in_fill_regions_img
     ):
         raise Exception(
@@ -1251,7 +1256,7 @@ def calc_fill_regions_knn(
     infiles = applier.FilenameAssociations()
     infiles.inimage = in_fill_regions_img
     outfiles = applier.FilenameAssociations()
-    outfiles.outimage = out_img
+    outfiles.outimage = output_img
     otherargs = applier.OtherInputs()
     otherargs.kd_idx = kd_idx
     otherargs.k = k
