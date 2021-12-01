@@ -11,6 +11,6 @@ def test_perform_least_cost_path_calc(tmp_path):
     start_coord = (257938, 280795)
     stop_coord = (260201, 280445)
     rsgislib.imagecalc.leastcostpath.perform_least_cost_path_calc(
-        input_img, output_img, start_coord, stop_coord, gdalformat="KEA", costImgBand=1
+        input_img, output_img, start_coord, stop_coord, gdalformat="KEA", cost_img_band=1
     )
     assert os.path.exists(output_img)

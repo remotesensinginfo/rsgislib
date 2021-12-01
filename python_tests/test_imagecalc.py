@@ -777,7 +777,7 @@ def test_calc_img_basic_stats_for_ref_region(tmp_path):
     assert os.path.exists(output_img)
 
 
-@pytest.mark.skipif(RTREE_NOT_AVAIL, reason="tree dependency not available")
+@pytest.mark.skipif(RTREE_NOT_AVAIL, reason="rtree dependency not available")
 def test_calc_fill_regions_knn(tmp_path):
     import rsgislib.imagecalc
 
@@ -908,7 +908,7 @@ def test_calc_histograms_for_msk_vals():
     in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
 
     rsgislib.imagecalc.calc_histograms_for_msk_vals(
-        input_img, 1, in_msk_img, 1, 1, 1000, 1, mskvals=None
+        input_img, 1, in_msk_img, 1, 1, 1000, 1, msk_vals=None
     )
 
 
