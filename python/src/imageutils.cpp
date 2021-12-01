@@ -1119,50 +1119,6 @@ static PyObject *ImageUtils_CreateCopyImageVecExtent(PyObject *self, PyObject *a
     Py_RETURN_NONE;
 }
 
-
-static PyObject *ImageUtils_StackStats(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    // TODO SHOULD BE CHANGE TO USE RSGIS_SUM STATS RATHER THAN STRING.
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("n_bands"), RSGIS_PY_C_TEXT("stat"),
-                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
-
-    const char *pszInputImage, *pszOutputImage, *pszGDALFormat, *pszCalcStat;
-    int nOutDataType;
-    PyObject *nBandsObj;
-    unsigned int numBands = 0;
-    bool allBands = true;
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssOssi:stack_stats", kwlist, &pszInputImage, &pszOutputImage,
-                                     &nBandsObj, &pszCalcStat, &pszGDALFormat, &nOutDataType))
-    {
-        return nullptr;
-    }
-
-    // If an integer has been passes in for bands, extract it, otherwise assume all bands are needed.
-    if(nBandsObj != Py_None)
-    {
-        if(RSGISPY_CHECK_INT(nBandsObj))
-        {
-            numBands = RSGISPY_INT_EXTRACT(nBandsObj);
-            allBands = false;
-        }
-    }
-    
-    try
-    {
-        rsgis::cmds::executeStackStats(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszCalcStat),
-                                       allBands, numBands, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
 static PyObject *ImageUtils_OrderImagesUsingPropValidData(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("no_data_val"), nullptr};
@@ -2550,32 +2506,6 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
 "   imageutils.create_copy_img_vec_extent(inputImage, vec_file, vec_lyr, outputImage, 3, 1, gdalformat, datatype)\n"
-"\n"},
-
-{"stack_stats", (PyCFunction)ImageUtils_StackStats, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.stack_stats(input_img, output_img, n_bands, stat, gdalformat, datatype)\n"
-"Calculate statistics for every pixel in a stack of image. If all bands are used a single band image is produced with the specified statistics.\n"
-"If a number of bands are specified statistics are taken over every n bands to provide an image with B / n bands (where B is the number of input bands. \
-For example, can be used to produce monthly composite images from a stack with images from every day.\n"
-"\n"
-"Where:\n"
-"\n"
-":param input_img: is a string containing the name and path for the input image.\n"
-":param output_img: is a string containing the name and path for the output image.\n"
-":param n_bands: is an integer specifying the number of image bands in the output image, pass 'None' to use all bands.\n"
-":param stat: is a string providing the statistics to calculate, options are 'mean', 'min', 'max', and 'range'.\n"
-":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
-":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
-"\n"
-"Example::\n"
-"\n"
-"   import rsgislib\n"
-"   from rsgislib import imageutils\n"
-"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"   outputImage = './TestOutputs/injune_p142_casi_sub_utm_stackStats.kea'\n"
-"   gdalformat = 'KEA'\n"
-"   datatype = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.stack_stats(inputImage, outputImage, None, 'mean', gdalformat, datatype)\n"
 "\n"},
 
 {"order_img_using_prop_valid_pxls", (PyCFunction)ImageUtils_OrderImagesUsingPropValidData, METH_VARARGS | METH_KEYWORDS,

@@ -2697,7 +2697,7 @@ def generate_random_pxl_vals_img(
         """
         This is an internal rios function for generate_random_pxl_vals_img()
         """
-        outputs.outimage = numpy.random.random_integers(
+        outputs.outimage = numpy.random.randint(
             otherargs.lowVal, high=otherargs.upVal, size=inputs.inImg.shape
         )
         outputs.outimage = outputs.outimage.astype(numpy.int32, copy=False)

@@ -107,7 +107,7 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate summary statistics for a column of pixels */
     DllExport void executeImagePixelColumnSummary(std::string inputImage, std::string outputImage, rsgis::cmds::RSGISCmdStatsSummary summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, float noDataValue, bool useNoDataValue);
     /** Function to perform a linear regression on each column of pixels */
-    DllExport void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue);
+    DllExport void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<float> bandValues, float noDataValue, bool useNoDataValue);
     /** Function to calculate the correlation between 2 images */
     DllExport double** executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrixFile = "", unsigned int *nrows = 0, unsigned int *ncols = 0);
     /** Function to calculate the covariance between 2 images */

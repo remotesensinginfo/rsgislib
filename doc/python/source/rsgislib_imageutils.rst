@@ -222,7 +222,6 @@ Image I/O
 
 Other
 ------
-.. autofunction:: rsgislib.imageutils.stack_stats
 .. autofunction:: rsgislib.imageutils.gen_sampling_grid
 .. autofunction:: rsgislib.imageutils.whiten_image
 .. autofunction:: rsgislib.imageutils.spectral_smoothing

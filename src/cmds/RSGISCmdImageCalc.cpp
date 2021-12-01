@@ -820,7 +820,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue)
+    void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<float> bandValues, float noDataValue, bool useNoDataValue)
     {
         try
         {
@@ -832,28 +832,9 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-            rsgis::utils::RSGISTextUtils textUtils;
-            std::vector<std::string> strValues = textUtils.readFileToStringVector(bandValues);
-            std::vector<float> bandXValues;
-            for(std::vector<std::string>::iterator iterStrVals = strValues.begin(); iterStrVals != strValues.end(); ++iterStrVals)
+            if(bandValues.size() != imgDataset->GetRasterCount())
             {
-                if((*iterStrVals) != "")
-                {
-                    try
-                    {
-                        bandXValues.push_back(textUtils.strtofloat(*iterStrVals));
-                    }
-                    catch (rsgis::RSGISException &e)
-                    {
-                        // ignore.
-                        std::cout << "Warning \'" << *iterStrVals << "\' could not be converted to an float.\n";
-                    }
-                }
-            }
-
-            if(bandXValues.size() != imgDataset->GetRasterCount())
-            {
-                std::cout << "bandXValues.size() = " << bandXValues.size() << std::endl;
+                std::cout << "bandXValues.size() = " << bandValues.size() << std::endl;
                 std::cout << "imgDataset->GetRasterCount() = " << imgDataset->GetRasterCount() << std::endl;
                 GDALClose(imgDataset);
                 throw RSGISException("The number of image bands and x values are not the same.");
@@ -864,7 +845,7 @@ namespace rsgis{ namespace cmds {
             bandNames[1] = "Slope";
             bandNames[2] = "SumSq";
 
-            rsgis::img::RSGISLinearFit2Column *linearFit = new rsgis::img::RSGISLinearFit2Column(bandXValues, noDataValue, useNoDataValue);
+            rsgis::img::RSGISLinearFit2Column *linearFit = new rsgis::img::RSGISLinearFit2Column(bandValues, noDataValue, useNoDataValue);
 
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(linearFit, "", true);
             calcImage.calcImage(&imgDataset, 1, outputImage, true, bandNames, gdalFormat, GDT_Float32);

@@ -1,9 +1,15 @@
 import os
+import pytest
 from shutil import copy2
+
+GEOPANDAS_NOT_AVAIL = False
+try:
+    import geopandas
+except ImportError:
+    GEOPANDAS_NOT_AVAIL = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 IMGUTILS_DATA_DIR = os.path.join(DATA_DIR, "imageutils")
-
 
 def test_set_env_vars_lzw_gtiff_outs():
     import rsgislib.imageutils
@@ -854,6 +860,7 @@ def test_subset_to_img(tmp_path):
     assert os.path.exists(output_img)
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_subset_to_geoms_bbox(tmp_path):
     import rsgislib.imageutils
     import glob
@@ -1430,23 +1437,6 @@ def test_generate_random_pxl_vals_img(tmp_path):
     output_img = os.path.join(tmp_path, "output_img.kea")
     rsgislib.imageutils.generate_random_pxl_vals_img(
         input_img, output_img, gdalformat="KEA", low_val=100, up_val=200
-    )
-
-    assert os.path.exists(output_img)
-
-
-def test_stack_stats(tmp_path):
-    import rsgislib.imageutils
-
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "output_img.kea")
-    rsgislib.imageutils.stack_stats(
-        input_img,
-        output_img,
-        [1, 2, 3, 4, 5, 6, 7, 8],
-        "mean",
-        "KEA",
-        rsgislib.TYPE_16INT,
     )
 
     assert os.path.exists(output_img)

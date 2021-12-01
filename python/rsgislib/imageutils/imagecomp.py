@@ -387,7 +387,7 @@ used to define the spatial extent of the output images and spatial projection.
                 if cBands != nBands:
                     raise rsgislib.RSGISPyException("The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
 
-            sameProj = rsgislib.imageutils.doGDALLayersHaveSameProj(refImg, img)
+            sameProj = rsgislib.imageutils.do_gdal_layers_have_same_proj(refImg, img)
             if rsgislib.imageutils.doImagesOverlap(refImg, img):
                 if sameProj:
                     if rsgislib.imageutils.doImageResMatch(refImg, img):
@@ -607,7 +607,7 @@ used to define the spatial extent of the output images and spatial projection.
                     raise rsgislib.RSGISPyException(
                         "The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
 
-            sameProj = rsgislib.imageutils.doGDALLayersHaveSameProj(refImg, img)
+            sameProj = rsgislib.imageutils.do_gdal_layers_have_same_proj(refImg, img)
             if rsgislib.imageutils.doImagesOverlap(refImg, img):
                 if sameProj:
                     if rsgislib.imageutils.doImageResMatch(refImg, img):
