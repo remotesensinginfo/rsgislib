@@ -227,7 +227,7 @@ def calc_dist_to_img_vals(
     valsImgDS = None
 
 
-def _computeProximityArrArgsFunc(argVals):
+def _computeProximityArrArgsFunc(arg_vals):
     """
     This function is used internally within calc_dist_to_classes
     for the multiprocessing Pool
@@ -247,14 +247,14 @@ def _computeProximityArrArgsFunc(argVals):
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress
-    classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
-    classImgBand = classImgDS.GetRasterBand(argVals[5])
+    classImgDS = gdal.Open(arg_vals[0], gdal.GA_ReadOnly)
+    classImgBand = classImgDS.GetRasterBand(arg_vals[5])
     rsgislib.imageutils.create_copy_img(
-        argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT
+        arg_vals[0], arg_vals[1], 1, arg_vals[3], arg_vals[4], rsgislib.TYPE_32FLOAT
     )
-    distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
-    distImgBand = distImgDS.GetRasterBand(argVals[5])
-    gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=callback)
+    distImgDS = gdal.Open(arg_vals[1], gdal.GA_Update)
+    distImgBand = distImgDS.GetRasterBand(arg_vals[5])
+    gdal.ComputeProximity(classImgBand, distImgBand, arg_vals[2], callback=callback)
     distImgBand = None
     distImgDS = None
     classImgBand = None
@@ -822,7 +822,7 @@ def rescale_img_pxl_vals(
 
 
 def calc_histograms_for_msk_vals(
-    input_img, imgBand, imgMsk, mskBand, minVal, maxVal, binWidth, mskvals=None
+    input_img, img_band, img_msk, msk_band, min_val, max_val, bin_width, msk_vals=None
 ):
     """
     A function which reads the image bands (values and mask) into memory and creates a
@@ -830,38 +830,38 @@ def calc_histograms_for_msk_vals(
     to be no data.
 
     :param input_img: image values image file path.
-    :param imgBand: values image band
-    :param imgMsk: file path for image mask.
-    :param mskBand: mask image band
-    :param minVal: minimum value for the histogram bins
-    :param maxVal: maximum value for the histogram bins
-    :param binWidth: the width of the histograms bins.
-    :param mskvals: a list of values within the mask can be provided to just consider
+    :param img_band: values image band
+    :param img_msk: file path for image mask.
+    :param msk_band: mask image band
+    :param min_val: minimum value for the histogram bins
+    :param max_val: maximum value for the histogram bins
+    :param bin_width: the width of the histograms bins.
+    :param msk_vals: a list of values within the mask can be provided to just consider
                     a limited number of mask values when calculating the histograms.
                     If None (default) then calculated for all mask values.
 
     :return: returns a dict of mask values with an array for the histogram.
 
     """
-    minVal = float(minVal)
-    maxVal = float(maxVal)
-    nBins = math.ceil((maxVal - minVal) / binWidth)
-    maxVal = float(minVal + (binWidth * nBins))
+    min_val = float(min_val)
+    max_val = float(max_val)
+    nBins = math.ceil((max_val - min_val) / bin_width)
+    max_val = float(min_val + (bin_width * nBins))
 
     imgValsDS = gdal.Open(input_img)
-    imgValsBand = imgValsDS.GetRasterBand(imgBand)
+    imgValsBand = imgValsDS.GetRasterBand(img_band)
     valsArr = imgValsBand.ReadAsArray()
     imgValsDS = None
 
-    imgMskDS = gdal.Open(imgMsk)
-    imgMskBand = imgMskDS.GetRasterBand(mskBand)
+    imgMskDS = gdal.Open(img_msk)
+    imgMskBand = imgMskDS.GetRasterBand(msk_band)
     mskArr = imgMskBand.ReadAsArray()
     imgMskDS = None
 
-    if mskvals is None:
+    if msk_vals is None:
         uniq_vals = numpy.unique(mskArr)
     else:
-        uniq_vals = mskvals
+        uniq_vals = msk_vals
 
     hist_dict = dict()
 
@@ -869,7 +869,7 @@ def calc_histograms_for_msk_vals(
         if msk_val != 0:
             mskd_vals = valsArr[mskArr == msk_val]
             hist_arr, bin_edges = numpy.histogram(
-                mskd_vals, bins=nBins, range=(minVal, maxVal)
+                mskd_vals, bins=nBins, range=(min_val, max_val)
             )
             hist_dict[msk_val] = hist_arr
 

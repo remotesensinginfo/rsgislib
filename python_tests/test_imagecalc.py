@@ -1,5 +1,4 @@
 import os
-
 import pytest
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -852,5 +851,144 @@ def test_calc_img_difference(tmp_path):
     output_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.imagecalc.calc_img_difference(
         input_img, input_img, output_img, "KEA", rsgislib.TYPE_32FLOAT
+    )
+    assert os.path.exists(output_img)
+
+
+def test_histogram(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+    output_file = os.path.join(tmp_path, "out_img.txt")
+    rsgislib.imagecalc.histogram(
+        input_img, in_msk_img, output_file, 1, 1, 10, True, 0, 0
+    )
+
+    assert os.path.exists(output_file)
+
+
+def test_get_histogram():
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    rsgislib.imagecalc.get_histogram(input_img, 1, 1, True, 0, 0)
+
+
+def test_get_2d_img_histogram(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.get_2d_img_histogram(
+        input_img,
+        input_img,
+        output_img,
+        "KEA",
+        1,
+        2,
+        100,
+        1,
+        1,
+        1000,
+        1000,
+        1,
+        1,
+        0,
+        0,
+        False,
+    )
+    assert os.path.exists(output_img)
+
+
+def test_calc_histograms_for_msk_vals():
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+
+    rsgislib.imagecalc.calc_histograms_for_msk_vals(
+        input_img, 1, in_msk_img, 1, 1, 1000, 1, mskvals=None
+    )
+
+
+def test_normalise_image_band(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.normalise_image_band(input_img, 1, output_img, gdal_format="KEA")
+    assert os.path.exists(output_img)
+
+
+def test_rescale_img_pxl_vals(tmp_path):
+    import rsgislib.imagecalc
+
+    band_rescale_objs = list()
+    band_rescale_objs.append(
+        rsgislib.imagecalc.ImageBandRescale(
+            band=1,
+            in_min=1.0,
+            in_max=1000.0,
+            no_data_val=0,
+            out_min=200.0,
+            out_max=500.0,
+            out_no_data=-999.0,
+        )
+    )
+    band_rescale_objs.append(
+        rsgislib.imagecalc.ImageBandRescale(
+            band=2,
+            in_min=1.0,
+            in_max=1000.0,
+            no_data_val=0,
+            out_min=200.0,
+            out_max=500.0,
+            out_no_data=-999.0,
+        )
+    )
+    band_rescale_objs.append(
+        rsgislib.imagecalc.ImageBandRescale(
+            band=3,
+            in_min=1.0,
+            in_max=1000.0,
+            no_data_val=0,
+            out_min=200.0,
+            out_max=500.0,
+            out_no_data=-999.0,
+        )
+    )
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.rescale_img_pxl_vals(
+        input_img,
+        output_img,
+        "KEA",
+        rsgislib.TYPE_32FLOAT,
+        band_rescale_objs,
+        trim_to_limits=True,
+    )
+    assert os.path.exists(output_img)
+
+
+def test_mahalanobis_dist_filter(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.mahalanobis_dist_filter(
+        input_img, output_img, 5, "KEA", rsgislib.TYPE_32FLOAT
+    )
+    assert os.path.exists(output_img)
+
+
+def test_mahalanobis_dist_to_img_filter(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.imagecalc.mahalanobis_dist_to_img_filter(
+        input_img, output_img, 5, "KEA", rsgislib.TYPE_32FLOAT
     )
     assert os.path.exists(output_img)
