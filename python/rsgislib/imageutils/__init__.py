@@ -422,7 +422,7 @@ def get_rsgislib_datatype_from_img(input_img: str):
     return rsgislib.get_rsgislib_datatype(gdal_dtype)
 
 
-def get_gdal_datatype_from_img(input_img: str)->int:
+def get_gdal_datatype_from_img(input_img: str) -> int:
     """
     Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
 
@@ -452,7 +452,7 @@ def get_gdal_datatype_from_img(input_img: str)->int:
     return gdal_dtype
 
 
-def get_gdal_datatype_name_from_img(input_img: str)->str:
+def get_gdal_datatype_name_from_img(input_img: str) -> str:
     """
     Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
 
@@ -2338,6 +2338,7 @@ def _run_subset(tileinfo):
         tileinfo["bbox"][3],
     )
 
+
 def create_tiles_multi_core(
     input_img: str,
     out_img_base: str,
@@ -3290,7 +3291,9 @@ def create_valid_mask(
         shutil.rmtree(tmp_lcl_dir)
 
 
-def get_img_pxl_values(input_img: str, img_band: int, x_coords: numpy.array, y_coords: numpy.array):
+def get_img_pxl_values(
+    input_img: str, img_band: int, x_coords: numpy.array, y_coords: numpy.array
+):
     """
     Function which gets pixel values from a image for specified
     image pixels. The coordinate space is image pixels, i.e.,
@@ -3889,7 +3892,10 @@ def spectral_smoothing(
             use_no_data = False
             in_no_date = 0.0
         pop_img_stats(
-            output_img, use_no_data=use_no_data, no_data_val=in_no_date, calc_pyramids=True
+            output_img,
+            use_no_data=use_no_data,
+            no_data_val=in_no_date,
+            calc_pyramids=True,
         )
 
 
