@@ -74,7 +74,7 @@ def perform_felsenszwalb_segmentation(
         pcaImg = os.path.join(tmp_dir, inImgBaseName + "_pca.kea")
         pcaEigenValsFile = os.path.join(tmp_dir, inImgBaseName + "_eigen.mtxt")
         inDType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
-        rsgislib.imagecalc.performImagePCA(
+        rsgislib.imagecalc.perform_image_pca(
             input_img,
             pcaImg,
             pcaEigenValsFile,
@@ -93,7 +93,7 @@ def perform_felsenszwalb_segmentation(
         pcaImg = os.path.join(tmp_dir, inImgBaseName + "_pca.kea")
         pcaEigenValsFile = os.path.join(tmp_dir, inImgBaseName + "_eigen.mtxt")
         inDType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
-        rsgislib.imagecalc.performImagePCA(
+        rsgislib.imagecalc.perform_image_pca(
             input_img,
             pcaImg,
             pcaEigenValsFile,
@@ -215,7 +215,7 @@ def perform_quickshift_segmentation(
         pcaImg = os.path.join(tmp_dir, inImgBaseName + "_pca.kea")
         pcaEigenValsFile = os.path.join(tmp_dir, inImgBaseName + "_eigen.mtxt")
         inDType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
-        rsgislib.imagecalc.performImagePCA(
+        rsgislib.imagecalc.perform_image_pca(
             input_img,
             pcaImg,
             pcaEigenValsFile,
@@ -367,7 +367,7 @@ def perform_slic_segmentation(
         pcaImg = os.path.join(tmp_dir, inImgBaseName + "_pca.kea")
         pcaEigenValsFile = os.path.join(tmp_dir, inImgBaseName + "_eigen.mtxt")
         inDType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
-        rsgislib.imagecalc.performImagePCA(
+        rsgislib.imagecalc.perform_image_pca(
             input_img,
             pcaImg,
             pcaEigenValsFile,
@@ -386,7 +386,7 @@ def perform_slic_segmentation(
         pcaImg = os.path.join(tmp_dir, inImgBaseName + "_pca.kea")
         pcaEigenValsFile = os.path.join(tmp_dir, inImgBaseName + "_eigen.mtxt")
         inDType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
-        rsgislib.imagecalc.performImagePCA(
+        rsgislib.imagecalc.perform_image_pca(
             input_img,
             pcaImg,
             pcaEigenValsFile,
@@ -520,7 +520,7 @@ def perform_watershed_segmentation(
         pcaImg = os.path.join(tmp_dir, inImgBaseName + "_pca.kea")
         pcaEigenValsFile = os.path.join(tmp_dir, inImgBaseName + "_eigen.mtxt")
         inDType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
-        rsgislib.imagecalc.performImagePCA(
+        rsgislib.imagecalc.perform_image_pca(
             input_img,
             pcaImg,
             pcaEigenValsFile,
@@ -539,7 +539,7 @@ def perform_watershed_segmentation(
         pcaImg = os.path.join(tmp_dir, inImgBaseName + "_pca.kea")
         pcaEigenValsFile = os.path.join(tmp_dir, inImgBaseName + "_eigen.mtxt")
         inDType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
-        rsgislib.imagecalc.performImagePCA(
+        rsgislib.imagecalc.perform_image_pca(
             input_img,
             pcaImg,
             pcaEigenValsFile,
@@ -676,7 +676,7 @@ def perform_random_walker_segmentation(
         pcaImg = os.path.join(tmp_dir, inImgBaseName + "_pca.kea")
         pcaEigenValsFile = os.path.join(tmp_dir, inImgBaseName + "_eigen.mtxt")
         inDType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
-        rsgislib.imagecalc.performImagePCA(
+        rsgislib.imagecalc.perform_image_pca(
             input_img,
             pcaImg,
             pcaEigenValsFile,
@@ -695,7 +695,7 @@ def perform_random_walker_segmentation(
         pcaImg = os.path.join(tmp_dir, inImgBaseName + "_pca.kea")
         pcaEigenValsFile = os.path.join(tmp_dir, inImgBaseName + "_eigen.mtxt")
         inDType = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
-        rsgislib.imagecalc.performImagePCA(
+        rsgislib.imagecalc.perform_image_pca(
             input_img,
             pcaImg,
             pcaEigenValsFile,
