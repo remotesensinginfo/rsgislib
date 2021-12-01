@@ -335,7 +335,7 @@ def create_quicklook_imgs(inputImg, bands, outputImgs='quicklook.jpg', output_im
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     if scale_axis == 'auto':
-        x_size, y_size = rsgislib.imageutils.getImageSize(stretchImg)
+        x_size, y_size = rsgislib.imageutils.get_img_size(stretchImg)
         if x_size > y_size:
             scale_axis = 'width'
         else:
@@ -670,7 +670,7 @@ def create_quicklook_overview_imgs(input_imgs, bands, tmp_dir, outputImgs='quick
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     if scale_axis == 'auto':
-        x_size, y_size = rsgislib.imageutils.getImageSize(stretchImg)
+        x_size, y_size = rsgislib.imageutils.get_img_size(stretchImg)
         if x_size > y_size:
             scale_axis = 'width'
         else:
@@ -871,7 +871,7 @@ def create_quicklook_overview_imgs_vec_overlay(input_imgs, bands, tmp_dir, vec_o
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     if scale_axis == 'auto':
-        x_size, y_size = rsgislib.imageutils.getImageSize(stretchImg)
+        x_size, y_size = rsgislib.imageutils.get_img_size(stretchImg)
         if x_size > y_size:
             scale_axis = 'width'
         else:
@@ -1047,7 +1047,7 @@ def create_visual_overview_imgs_vec_extent(input_imgs, bands, tmp_dir, vec_exten
                                                img_no_data_val, False, 'KEA', rsgislib.TYPE_8UINT,
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
     if scale_axis == 'auto':
-        x_size, y_size = rsgislib.imageutils.getImageSize(stretchImg)
+        x_size, y_size = rsgislib.imageutils.get_img_size(stretchImg)
         if x_size > y_size:
             scale_axis = 'width'
         else:
