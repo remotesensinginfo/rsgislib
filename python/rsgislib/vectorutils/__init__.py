@@ -28,6 +28,7 @@ import rsgislib.rastergis
 
 gdal.UseExceptions()
 
+
 class VecLayersInfoObj(object):
     """
     This is a class to store the information associated within the rsgislib.vectorutils.merge_to_multi_layer_vec function.
@@ -73,7 +74,7 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
         os.remove(cfile)
 
 
-def check_format_name(format: str)-> str:
+def check_format_name(format: str) -> str:
     """
     A function which checks the format string for vector formats
     as functions which use Geopandas rather than GDAL directly as
@@ -597,7 +598,6 @@ def reproj_vector_layer(
     ## This code has been editted and updated for GDAL > version 2.0
     ## https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
 
-
     # get the input layer
     inDataSet = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if inDataSet is None:
@@ -737,7 +737,6 @@ def reproj_vec_lyr_obj(
     """
     ## This code has been editted from https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
     ## Updated for GDAL 2.0
-
 
     vec_lyr_obj.ResetReading()
 
@@ -1573,7 +1572,7 @@ def read_vec_lyr_to_mem(vec_file: str, vec_lyr: str) -> (ogr.DataSource, ogr.Lay
 
 
 def open_gdal_vec_lyr(
-    vec_file: str, vec_lyr: str = None
+    vec_file: str, vec_lyr: str = None, readonly: bool = True
 ) -> (ogr.DataSource, ogr.Layer):
     """
     A function which opens a GDAL/OGR vector layer and returns
@@ -1582,10 +1581,15 @@ def open_gdal_vec_lyr(
 
     :param vec_file: the file path to the vector file.
     :param vec_lyr: the name of the vector layer. If None then first layer is returned.
+    :param readonly: if False then the layer will be opened and allow editing of the
+                   layer while if True (default) then it will be read only.
     :returns: GDAL dataset, GDAL Layer
 
     """
-    vec_obj_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    if readonly:
+        vec_obj_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_UPDATE)
+    else:
+        vec_obj_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_READONLY)
     if vec_obj_ds is None:
         raise Exception("Could not open '{}'".format(vec_file))
 
@@ -2164,8 +2168,6 @@ def vector_translate(
     """
     from osgeo import gdal
 
-
-
     if access_mode is not None:
         if access_mode not in ["update", "append", "overwrite"]:
             raise Exception(
@@ -2217,7 +2219,6 @@ def vector_translate(
     else:
         gdal.VectorTranslate(out_vec_file, in_vec_ds, options=opts)
     in_vec_ds = None
-
 
 
 def reproj_wgs84_vec_to_utm(

@@ -183,6 +183,123 @@ def test_write_vec_column_String(tmp_path):
     assert vals_eq
 
 
+def test_write_vec_column_to_layer_Int(tmp_path):
+    import rsgislib.vectorutils
+    import rsgislib.vectorattrs
+    import osgeo.ogr as ogr
+
+    vec_file = os.path.join(VECTORATTRS_DATA_DIR, "sen2_20210527_aber_att_vals.geojson")
+    vec_lyr = "sen2_20210527_aber_att_vals"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
+    out_vec_lyr = "out_vec"
+    rsgislib.vectorutils.create_copy_vector_lyr(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        "GEOJSON",
+        replace=True,
+        in_memory=True,
+    )
+
+    vec_obj_ds, vec_lyr_obj = rsgislib.vectorutils.open_gdal_vec_lyr(
+        out_vec_file, out_vec_lyr, readonly=True
+    )
+
+    ref_vals = [1, 2, 3, 4, 5, 6]
+    rsgislib.vectorattrs.write_vec_column_to_layer(
+        vec_lyr_obj, "TestCol", ogr.OFTInteger, ref_vals
+    )
+    vec_obj_ds = None
+
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "TestCol")
+    vals_eq = True
+    for val, ref_val in zip(vals, ref_vals):
+        if val != ref_val:
+            vals_eq = False
+            break
+    assert vals_eq
+
+
+def test_write_vec_column_to_layer_Float(tmp_path):
+    import rsgislib.vectorutils
+    import rsgislib.vectorattrs
+    import osgeo.ogr as ogr
+
+    vec_file = os.path.join(VECTORATTRS_DATA_DIR, "sen2_20210527_aber_att_vals.geojson")
+    vec_lyr = "sen2_20210527_aber_att_vals"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
+    out_vec_lyr = "out_vec"
+    rsgislib.vectorutils.create_copy_vector_lyr(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        "GEOJSON",
+        replace=True,
+        in_memory=True,
+    )
+
+    vec_obj_ds, vec_lyr_obj = rsgislib.vectorutils.open_gdal_vec_lyr(
+        out_vec_file, out_vec_lyr, readonly=True
+    )
+
+    ref_vals = [1.1, 2.2, 3.3, 4.4, 5.5, 6.6]
+    rsgislib.vectorattrs.write_vec_column_to_layer(
+        vec_lyr_obj, "TestCol", ogr.OFTReal, ref_vals
+    )
+    vec_obj_ds = None
+
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "TestCol")
+    vals_eq = True
+    for val, ref_val in zip(vals, ref_vals):
+        if val != ref_val:
+            vals_eq = False
+            break
+    assert vals_eq
+
+
+def test_write_vec_column_to_layer_String(tmp_path):
+    import rsgislib.vectorutils
+    import rsgislib.vectorattrs
+    import osgeo.ogr as ogr
+
+    vec_file = os.path.join(VECTORATTRS_DATA_DIR, "sen2_20210527_aber_att_vals.geojson")
+    vec_lyr = "sen2_20210527_aber_att_vals"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
+    out_vec_lyr = "out_vec"
+    rsgislib.vectorutils.create_copy_vector_lyr(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        "GEOJSON",
+        replace=True,
+        in_memory=True,
+    )
+
+    vec_obj_ds, vec_lyr_obj = rsgislib.vectorutils.open_gdal_vec_lyr(
+        out_vec_file, out_vec_lyr, readonly=True
+    )
+
+    ref_vals = ["One", "Two", "Three", "Four", "Five", "Six"]
+    rsgislib.vectorattrs.write_vec_column_to_layer(
+        vec_lyr_obj, "TestCol", ogr.OFTString, ref_vals
+    )
+    vec_obj_ds = None
+
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "TestCol")
+    vals_eq = True
+    for val, ref_val in zip(vals, ref_vals):
+        if val != ref_val:
+            vals_eq = False
+            break
+    assert vals_eq
+
+
 def test_pop_bbox_cols(tmp_path):
     import rsgislib.vectorattrs
 
