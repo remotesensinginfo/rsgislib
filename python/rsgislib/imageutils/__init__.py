@@ -3009,6 +3009,7 @@ def subset_to_vec(
     roi_vec_lyr: str,
     datatype: int = None,
     vec_epsg: int = None,
+    img_epsg: int = None,
 ):
     """
     A function which subsets an input image using the extent of a vector layer where
@@ -3024,7 +3025,10 @@ def subset_to_vec(
                      image will be used.
     :param vec_epsg: If projection is poorly defined by the vector layer then it can
                      be specified.
+    :param img_epsg: If projection is poorly defined by the image layer then it can
+                     be specified.
     """
+    import rsgislib
     import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
 
@@ -3032,20 +3036,24 @@ def subset_to_vec(
         vec_epsg = rsgislib.vectorutils.get_proj_epsg_from_vec(
             roi_vec_file, roi_vec_lyr
         )
-    img_epsg = get_epsg_proj_from_img(input_img)
-    if img_epsg == vec_epsg:
-        projs_match = True
-    else:
-        img_bbox = get_img_bbox_in_proj(input_img, vec_epsg)
-        projs_match = False
-    img_bbox = get_img_bbox(input_img)
+    if img_epsg is None:
+        img_epsg = get_epsg_proj_from_img(input_img)
+
+    if (img_epsg is None) or (vec_epsg is None):
+        print("img_epsg: {}".format(img_epsg))
+        print("vec_epsg: {}".format(vec_epsg))
+        raise Exception("Either the image or vector EPSG is None!")
+
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
         roi_vec_file, roi_vec_lyr, compute_if_exp=True
     )
+    img_bbox = get_img_bbox(input_img)
+    
     if img_epsg != vec_epsg:
         vec_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(
             vec_bbox, vec_epsg, img_epsg
         )
+
 
     if rsgislib.tools.geometrytools.do_bboxes_intersect(img_bbox, vec_bbox):
         common_bbox = rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox)
