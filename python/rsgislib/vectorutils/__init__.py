@@ -1587,9 +1587,9 @@ def open_gdal_vec_lyr(
 
     """
     if readonly:
-        vec_obj_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_UPDATE)
-    else:
         vec_obj_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_READONLY)
+    else:
+        vec_obj_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_UPDATE)
     if vec_obj_ds is None:
         raise Exception("Could not open '{}'".format(vec_file))
 
