@@ -456,7 +456,7 @@ def define_grid(
             in_proj_obj.ImportFromEPSG(in_epsg_code)
             out_proj_obj = osr.SpatialReference()
             out_proj_obj.ImportFromEPSG(4326)
-            wgs84_bbox = rsgislib.tools.geometrytools.reprojBBOX(
+            wgs84_bbox = rsgislib.tools.geometrytools.reproj_bbox(
                 bbox, in_proj_obj, out_proj_obj
             )
 
@@ -491,7 +491,7 @@ def define_grid(
         if (not multi_zones) and (utm_tl[2] == utm_tr[2] == utm_br[2] == utm_bl[2]):
             utm_zone = utm_tl[2]
 
-            utm_proj_epsg = rsgislib.tools.utm.epsg_for_UTM(utm_zone, utm_top_hemi)
+            utm_proj_epsg = rsgislib.tools.utm.epsg_for_utm(utm_zone, utm_top_hemi)
 
             define_grid(
                 bbox,
@@ -557,10 +557,10 @@ def define_grid(
                 out_proj_obj = osr.SpatialReference()
                 out_proj_obj.ImportFromEPSG(utm_proj_epsg)
 
-                utm_bbox = rsgislib.tools.geometrytools.reprojBBOX(
+                utm_bbox = rsgislib.tools.geometrytools.reproj_bbox(
                     zone_roi[1], in_proj_obj, out_proj_obj
                 )
-                bboxs = rsgislib.tools.geometrytools.getBBoxGrid(
+                bboxs = rsgislib.tools.geometrytools.get_bbox_grid(
                     utm_bbox, x_size, y_size
                 )
 
@@ -582,13 +582,13 @@ def define_grid(
             in_proj_obj.ImportFromEPSG(in_epsg_code)
             out_proj_obj = osr.SpatialReference()
             out_proj_obj.ImportFromEPSG(out_epsg_code)
-            proj_bbox = rsgislib.tools.geometrytools.reprojBBOX(
+            proj_bbox = rsgislib.tools.geometrytools.reproj_bbox(
                 bbox, in_proj_obj, out_proj_obj
             )
         else:
             proj_bbox = bbox
 
-        bboxs = rsgislib.tools.geometrytools.getBBoxGrid(proj_bbox, x_size, y_size)
+        bboxs = rsgislib.tools.geometrytools.get_bbox_grid(proj_bbox, x_size, y_size)
 
         if out_epsg_code is None:
             create_poly_vec_bboxs(out_vec, out_vec_lyr, vec_drv, in_epsg_code, bboxs)
@@ -723,64 +723,6 @@ def create_poly_vec_bboxs(
         raise e
 
 
-def create_vector_grid(
-    out_vec_file, out_format, out_vec_lyr, epsg_code, grid_x, grid_y, bbox
-):
-    """
-    A function which creates a regular grid across a defined area.
-
-    :param out_vec_file: outout file
-    :param epsg_code: EPSG code of the output projection
-    :param grid_x: the size in the x axis of the grid cells.
-    :param grid_y: the size in the y axis of the grid cells.
-    :param bbox: the area for which cells will be defined (MinX, MaxX, MinY, MaxY).
-    :param out_format: the output vector layer type.
-    :param out_vec_lyr: output vector layer
-    """
-    import math
-
-    minX = float(bbox[0])
-    maxX = float(bbox[1])
-    minY = float(bbox[2])
-    maxY = float(bbox[3])
-    grid_x = float(grid_x)
-    grid_y = float(grid_y)
-
-    nXCells = math.floor((maxX - minX) / grid_x)
-    x_remain = (maxX - minX) - (grid_x * nXCells)
-
-    nYCells = math.floor((maxY - minY) / grid_y)
-    y_remain = (maxY - minY) - (grid_y * nYCells)
-
-    print("Cells: [{0}, {1}]".format(nXCells, nYCells))
-
-    bboxs = []
-    for i in range(nYCells):
-        cMaxY = maxY - (i * grid_y)
-        cMinY = cMaxY - grid_y
-        for j in range(nXCells):
-            cMinX = minX + (j * grid_x)
-            cMaxX = cMinX + grid_x
-            bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
-        if x_remain > 0:
-            cMinX = minX + (nXCells * grid_x)
-            cMaxX = cMinX + x_remain
-            bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
-    if y_remain > 0:
-        cMaxY = maxY - (nYCells * grid_y)
-        cMinY = cMaxY - y_remain
-        for j in range(nXCells):
-            cMinX = minX + (j * grid_x)
-            cMaxX = cMinX + grid_x
-            bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
-        if x_remain > 0:
-            cMinX = minX + (nXCells * grid_x)
-            cMaxX = cMinX + x_remain
-            bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
-
-    create_poly_vec_bboxs(out_vec_file, out_vec_lyr, out_format, epsg_code, bboxs)
-
-
 def write_pts_to_vec(
     out_vec_file,
     out_vec_lyr,
@@ -863,7 +805,7 @@ def write_pts_to_vec(
                     )
                 if len(atts[att_types["names"][i]]) != len(pts_x):
                     raise Exception(
-                        '"{}" in atts does not have the same len as bboxs'.format(
+                        '"{}" in atts does not have the same len as pts_x'.format(
                             att_types["names"][i]
                         )
                     )
