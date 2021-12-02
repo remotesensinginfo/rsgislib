@@ -103,10 +103,10 @@ def test_write_vec_column_Int(tmp_path):
 
     ref_vals = [1, 2, 3, 4, 5, 6]
     rsgislib.vectorattrs.write_vec_column(
-        out_vec_file, out_vec_lyr, "TestCol", ogr.OFTInteger, ref_vals
+        out_vec_file, out_vec_lyr, "testcol", ogr.OFTInteger, ref_vals
     )
 
-    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "TestCol")
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcol")
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
         if val != ref_val:
@@ -137,10 +137,10 @@ def test_write_vec_column_Float(tmp_path):
 
     ref_vals = [1.1, 2.2, 3.3, 4.4, 5.5, 6.6]
     rsgislib.vectorattrs.write_vec_column(
-        out_vec_file, out_vec_lyr, "TestCol", ogr.OFTReal, ref_vals
+        out_vec_file, out_vec_lyr, "testcol", ogr.OFTReal, ref_vals
     )
 
-    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "TestCol")
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcol")
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
         if val != ref_val:
@@ -171,10 +171,10 @@ def test_write_vec_column_String(tmp_path):
 
     ref_vals = ["One", "Two", "Three", "Four", "Five", "Six"]
     rsgislib.vectorattrs.write_vec_column(
-        out_vec_file, out_vec_lyr, "TestCol", ogr.OFTString, ref_vals
+        out_vec_file, out_vec_lyr, "testcol", ogr.OFTString, ref_vals
     )
 
-    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "TestCol")
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcol")
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
         if val != ref_val:
@@ -209,11 +209,11 @@ def test_write_vec_column_to_layer_Int(tmp_path):
 
     ref_vals = [1, 2, 3, 4, 5, 6]
     rsgislib.vectorattrs.write_vec_column_to_layer(
-        vec_lyr_obj, "TestCol", ogr.OFTInteger, ref_vals
+        vec_lyr_obj, "testcol", ogr.OFTInteger, ref_vals
     )
     vec_obj_ds = None
 
-    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "TestCol")
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcol")
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
         if val != ref_val:
@@ -248,11 +248,11 @@ def test_write_vec_column_to_layer_Float(tmp_path):
 
     ref_vals = [1.1, 2.2, 3.3, 4.4, 5.5, 6.6]
     rsgislib.vectorattrs.write_vec_column_to_layer(
-        vec_lyr_obj, "TestCol", ogr.OFTReal, ref_vals
+        vec_lyr_obj, "testcol", ogr.OFTReal, ref_vals
     )
     vec_obj_ds = None
 
-    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "TestCol")
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcol")
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
         if val != ref_val:
@@ -287,11 +287,11 @@ def test_write_vec_column_to_layer_String(tmp_path):
 
     ref_vals = ["One", "Two", "Three", "Four", "Five", "Six"]
     rsgislib.vectorattrs.write_vec_column_to_layer(
-        vec_lyr_obj, "TestCol", ogr.OFTString, ref_vals
+        vec_lyr_obj, "testcol", ogr.OFTString, ref_vals
     )
     vec_obj_ds = None
 
-    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "TestCol")
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcol")
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
         if val != ref_val:
