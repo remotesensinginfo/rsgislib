@@ -72,6 +72,7 @@ namespace rsgis{namespace vec{
             OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ);
             std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute);
             std::vector<std::string>* getColumnNames(OGRLayer *layer);
+            std::vector<std::string> getColumnNamesLitVec(OGRLayer *layer);
             std::vector<OGRPoint*>* getRegularStepPoints(std::vector<OGRLineString*> *lines, double step);
             OGREnvelope* getEnvelope(OGRGeometry *geom);
             OGREnvelope* getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes);

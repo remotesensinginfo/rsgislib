@@ -430,6 +430,27 @@ namespace rsgis{namespace vec{
             return colNames;
         }
 
+        std::vector<std::string> RSGISVectorUtils::getColumnNamesLitVec(OGRLayer *layer)
+        {
+            std::vector<std::string> colNames = std::vector<std::string>();
+            try
+            {
+                OGRFeatureDefn *ogrFeatDef = layer->GetLayerDefn();
+                int numFields = ogrFeatDef->GetFieldCount();
+                for(int i = 0; i < numFields; ++i)
+                {
+                    OGRFieldDefn *fieldDef = ogrFeatDef->GetFieldDefn(i);
+                    colNames.push_back(std::string(fieldDef->GetNameRef()));
+                }
+
+            }
+            catch (RSGISVectorException &e)
+            {
+                throw e;
+            }
+            return colNames;
+        }
+
 
 
         std::vector<OGRPoint*>* RSGISVectorUtils::getRegularStepPoints(std::vector<OGRLineString*> *lines, double step)

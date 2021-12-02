@@ -1248,23 +1248,22 @@ static PyObject *RasterGIS_ImportVecAtts(PyObject *self, PyObject *args, PyObjec
     
     try
     {
-        std::vector<std::string> *colNames = nullptr;
+        std::vector<std::string> colNames;
         if(PySequence_Check(pColNamesList))
         {
             Py_ssize_t nCmds = PySequence_Size(pColNamesList);
-            colNames = new std::vector<std::string>();
-            colNames->reserve(nCmds);
+            colNames.reserve(nCmds);
             
             for(int i = 0; i < nCmds; ++i)
             {
                 PyObject *o = PySequence_GetItem(pColNamesList, i);     // get the python object
                 
                 std::string strVal = RSGISPY_STRING_EXTRACT(o); // Get string
-                colNames->push_back(strVal);
+                colNames.push_back(strVal);
             }
         }
         
-        rsgis::cmds::executeImportShpAtts(std::string(clumpsImage), ratBand, std::string(vectorFile), std::string(vectorLyrName), std::string(fidColName), colNames);
+        rsgis::cmds::executeImportVecAtts(std::string(clumpsImage), ratBand, std::string(vectorFile), std::string(vectorLyrName), std::string(fidColName), colNames);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {

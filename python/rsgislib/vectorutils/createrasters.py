@@ -4,6 +4,7 @@ The vector conversion tools for converting between raster and vector
 """
 
 import osgeo.gdal as gdal
+import osgeo.ogr as ogr
 
 import rsgislib
 
@@ -135,13 +136,13 @@ def rasterise_vec_lyr(
 
 
 def rasterise_vec_lyr_obj(
-    vec_lyr_obj,
-    output_img,
-    burn_val=1,
-    att_column=None,
-    calc_stats=True,
-    thematic=True,
-    nodata=0,
+    vec_lyr_obj:ogr.Layer,
+    output_img:str,
+    burn_val:int=1,
+    att_column:str=None,
+    calc_stats:bool=True,
+    thematic:bool=True,
+    nodata:float=0,
 ):
     """
     A utility to rasterise a vector layer to an image covering the same region.
@@ -207,7 +208,7 @@ def rasterise_vec_lyr_obj(
         raise e
 
 
-def copy_vec_to_rat(vec_file, vec_lyr, input_img, output_img):
+def copy_vec_to_rat(vec_file:str, vec_lyr:str, input_img:str, output_img:str, fid_col:str="FID"):
     """
     A utility to create raster copy of a polygon vector layer. The output image is
     a KEA file and the attribute table has the attributes from the vector layer.
@@ -232,7 +233,13 @@ def copy_vec_to_rat(vec_file, vec_lyr, input_img, output_img):
         vectorutils.copy_vec_to_rat(inputVector, 'crowns', inputImage, outputImage)
 
     """
+    import rsgislib
     import rsgislib.rastergis
+    import rsgislib.vectorutils
+
+    cols = rsgislib.vectorutils.get_vec_lyr_cols(vec_file, vec_lyr)
+    if fid_col not in cols:
+        raise rsgislib.RSGISPyException("FID Column not within the input layer")
 
     rasterise_vec_lyr(
         vec_file,
@@ -241,7 +248,7 @@ def copy_vec_to_rat(vec_file, vec_lyr, input_img, output_img):
         output_img,
         gdalformat="KEA",
         datatype=rsgislib.TYPE_32UINT,
-        att_column="FID",
+        att_column=fid_col,
         use_vec_extent=False,
         thematic=True,
         no_data_val=0,

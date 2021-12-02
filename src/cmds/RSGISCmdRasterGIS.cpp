@@ -1520,25 +1520,20 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> *colNames)
+    void executeImportVecAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> colNames)
     {
         try
         {
-            if((colNames != NULL) & (colNames->empty()))
-            {
-                throw RSGISCmdException("The list of column names is empty.");
-            }
-            
             GDALAllRegister();
             OGRRegisterAll();
-            
+
             GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(clumpsImage.c_str(), GA_Update);
             if(clumpsDataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-            
+
             rsgis::vec::RSGISVectorUtils vecUtils;
             /////////////////////////////////////
             //
@@ -1559,17 +1554,16 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open vector layer ") + inputVectorLyr;
                 throw RSGISFileException(message.c_str());
             }
-            
-            if(colNames == NULL)
+
+            if(colNames.empty())
             {
                 std::cout << "No column names were specified so copying them all.\n";
-                colNames = vecUtils.getColumnNames(inputVecLyr);
+                colNames = vecUtils.getColumnNamesLitVec(inputVecLyr);
             }
 
             rsgis::rastergis::RSGISInputShapefileAttributes2RAT copyShpAtts2RAT;
-            copyShpAtts2RAT.copyVectorAtt2Rat(clumpsDataset, ratBand, inputVecLyr, fidColStr, colNames);
-            
-            delete colNames;
+            copyShpAtts2RAT.copyVectorAtt2Rat(clumpsDataset, ratBand, inputVecLyr, fidColStr, &colNames);
+
             GDALClose(clumpsDataset);
             GDALClose(inputVecDS);
         }

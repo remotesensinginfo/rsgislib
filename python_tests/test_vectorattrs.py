@@ -204,7 +204,7 @@ def test_write_vec_column_to_layer_Int(tmp_path):
     )
 
     vec_obj_ds, vec_lyr_obj = rsgislib.vectorutils.open_gdal_vec_lyr(
-        out_vec_file, out_vec_lyr, readonly=True
+        out_vec_file, out_vec_lyr, readonly=False
     )
 
     ref_vals = [1, 2, 3, 4, 5, 6]
@@ -243,7 +243,7 @@ def test_write_vec_column_to_layer_Float(tmp_path):
     )
 
     vec_obj_ds, vec_lyr_obj = rsgislib.vectorutils.open_gdal_vec_lyr(
-        out_vec_file, out_vec_lyr, readonly=True
+        out_vec_file, out_vec_lyr, readonly=False
     )
 
     ref_vals = [1.1, 2.2, 3.3, 4.4, 5.5, 6.6]
@@ -282,7 +282,7 @@ def test_write_vec_column_to_layer_String(tmp_path):
     )
 
     vec_obj_ds, vec_lyr_obj = rsgislib.vectorutils.open_gdal_vec_lyr(
-        out_vec_file, out_vec_lyr, readonly=True
+        out_vec_file, out_vec_lyr, readonly=False
     )
 
     ref_vals = ["One", "Two", "Three", "Four", "Five", "Six"]
