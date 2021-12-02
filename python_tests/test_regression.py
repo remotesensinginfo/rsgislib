@@ -6,6 +6,7 @@ try:
 except ImportError:
     SKLEARN_NOT_AVAIL = True
 
+
 @pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_get_regression_stats():
     import rsgislib.regression

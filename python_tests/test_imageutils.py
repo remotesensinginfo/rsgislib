@@ -11,6 +11,7 @@ except ImportError:
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 IMGUTILS_DATA_DIR = os.path.join(DATA_DIR, "imageutils")
 
+
 def test_set_env_vars_lzw_gtiff_outs():
     import rsgislib.imageutils
 

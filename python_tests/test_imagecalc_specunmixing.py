@@ -674,15 +674,15 @@ def test_calc_ppi(tmp_path):
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
     output_img = os.path.join(tmp_path, "out_ppi_img.kea")
     specunmixing.calc_ppi(
-            input_img,
-            output_img,
-            "KEA",
-            niters=1000,
-            lthres=0,
-            uthres=0,
-            img_gain=1,
-            seed=None,
-            calc_stats=True,
-            )
+        input_img,
+        output_img,
+        "KEA",
+        niters=1000,
+        lthres=0,
+        uthres=0,
+        img_gain=1,
+        seed=None,
+        calc_stats=True,
+    )
 
     assert os.path.exists(output_img)

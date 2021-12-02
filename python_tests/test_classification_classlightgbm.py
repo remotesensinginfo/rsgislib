@@ -17,7 +17,6 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
 
 
-
 @pytest.mark.skipif(
     (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
     reason="h5py or lightgbm dependencies not available",
@@ -209,8 +208,6 @@ def test_apply_lightgbm_binary_classifier(tmp_path):
     assert os.path.exists(out_prob_img) and os.path.exists(out_class_img)
 
 
-
-
 @pytest.mark.skipif(
     (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
     reason="h5py or lightgbm dependencies not available",
@@ -369,7 +366,7 @@ def test_apply_lightgbm_multiclass_classifier(tmp_path):
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.txt")
     rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifer(
         out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
-        )
+    )
 
     in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
     s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
@@ -392,5 +389,3 @@ def test_apply_lightgbm_multiclass_classifier(tmp_path):
     )
 
     assert os.path.exists(out_class_img)
-
-
