@@ -113,14 +113,14 @@ def polygonise_raster_to_vec_lyr(
 
 
 def vectorise_pxls_to_pts(
-    input_img,
-    img_band,
-    img_msk_val,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    out_epsg_code=None,
-    del_exist_vec=False,
+    input_img: str,
+    img_band: int,
+    img_msk_val: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    out_epsg_code: int = None,
+    del_exist_vec: bool = False,
 ):
     """
     Function which creates a new output vector file for the pixels within the input
@@ -219,7 +219,13 @@ def vectorise_pxls_to_pts(
 
 
 def extract_image_footprint(
-    input_img, out_vec_file, out_vec_lyr, out_format, tmp_dir="./tmp", reproj_to=None
+    input_img: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    tmp_dir: str = "./tmp",
+    reproj_to: str = None,
+    no_data_val=None,
 ):
     """
     A function to extract an image footprint as a vector.
@@ -229,12 +235,15 @@ def extract_image_footprint(
     :param out_vec_lyr: output vector layer name.
     :param tmp_dir: temp directory which will be used during processing. It will be
                     created and deleted once processing complete.
-    :param reproj_to: optional command
+    :param reproj_to: optional if not None then an ogr2ogr command will be
+                      run and the input here is what is to go into the ogr2ogr
+                      command after -t_srs. E.g., -t_srs epsg:4326
     """
     gdal.UseExceptions()
     import rsgislib.tools.utils
     import rsgislib.imageutils
     import rsgislib.vectorutils
+    import rsgislib.vectorattrs
 
     uidStr = rsgislib.tools.utils.uid_generator()
 
@@ -246,9 +255,13 @@ def extract_image_footprint(
     inImgBase = os.path.splitext(os.path.basename(input_img))[0]
 
     validOutImg = os.path.join(tmp_dir, inImgBase + "_" + uidStr + "_validimg.kea")
-    inImgNoData = rsgislib.imageutils.get_img_no_data_value(input_img)
+    if no_data_val is None:
+        no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
+
+    if no_data_val is None:
+        raise rsgislib.RSGISPyException("A no data value has not been specified.")
     rsgislib.imageutils.gen_valid_mask(
-        inimages=input_img, outimage=validOutImg, gdalformat="KEA", nodata=inImgNoData
+        input_img, validOutImg, gdalformat="KEA", no_data_val=no_data_val
     )
 
     outVecTmpFile = out_vec_file
@@ -261,14 +274,13 @@ def extract_image_footprint(
         outVecTmpFile, out_vec_lyr, out_format, validOutImg, 1, validOutImg, 1
     )
 
-    vecLayerName = os.path.splitext(os.path.basename(outVecTmpFile))[0]
     ds = gdal.OpenEx(outVecTmpFile, gdal.OF_READONLY)
     if ds is None:
         raise Exception("Could not open '" + outVecTmpFile + "'")
 
-    lyr = ds.GetLayerByName(vecLayerName)
+    lyr = ds.GetLayerByName(out_vec_lyr)
     if lyr is None:
-        raise Exception("Could not find layer '" + vecLayerName + "'")
+        raise Exception("Could not find layer '" + out_vec_lyr + "'")
     numFeats = lyr.GetFeatureCount()
     lyr = None
     ds = None
@@ -276,8 +288,8 @@ def extract_image_footprint(
     fileName = []
     for i in range(numFeats):
         fileName.append(os.path.basename(input_img))
-    rsgislib.vectoratts.write_vec_column(
-        outVecTmpFile, vecLayerName, "FileName", ogr.OFTString, fileName
+    rsgislib.vectorattrs.write_vec_column(
+        outVecTmpFile, out_vec_lyr, "FileName", ogr.OFTString, fileName
     )
 
     if not (reproj_to is None):
@@ -903,7 +915,17 @@ def write_pts_to_vec(
         raise e
 
 
-def create_bboxs_for_pts(vec_file: str, vec_lyr: str, bbox_width: float, bbox_height: float, out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG", del_exist_vec: bool = False, epsg_code: int = None):
+def create_bboxs_for_pts(
+    vec_file: str,
+    vec_lyr: str,
+    bbox_width: float,
+    bbox_height: float,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
+    epsg_code: int = None,
+):
     """
     A function which takes a set of points (from the input vector layer) and creates
     a set of boxes with the same height and width, one for each point.
@@ -928,7 +950,7 @@ def create_bboxs_for_pts(vec_file: str, vec_lyr: str, bbox_width: float, bbox_he
             raise Exception(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
-                )
+            )
 
     h_width = bbox_width / 2.0
     h_height = bbox_height / 2.0
@@ -969,4 +991,13 @@ def create_bboxs_for_pts(vec_file: str, vec_lyr: str, bbox_width: float, bbox_he
     pbar.close()
     vec_ds_obj = None
 
-    create_poly_vec_bboxs(out_vec_file, out_vec_lyr, out_format, epsg_code, out_bboxs, atts=None, att_types=None, overwrite=False)
+    create_poly_vec_bboxs(
+        out_vec_file,
+        out_vec_lyr,
+        out_format,
+        epsg_code,
+        out_bboxs,
+        atts=None,
+        att_types=None,
+        overwrite=False,
+    )
