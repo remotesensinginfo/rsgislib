@@ -441,6 +441,9 @@ def create_name_col(
     import numpy
     import tqdm
     import rsgislib.tools.utils
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
@@ -530,6 +533,9 @@ def add_unq_numeric_col(
     """
     import geopandas
     import numpy
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     unq_vals = base_gpdf[unq_col].unique()
@@ -574,6 +580,9 @@ def add_numeric_col_lut(
     """
     import geopandas
     import numpy
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
 
     # Open vector file
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
@@ -598,7 +607,7 @@ def add_numeric_col(
     out_vec_lyr: str,
     out_val: float = 1,
     out_format: str = "GPKG",
-    out_col_int: float = False,
+    out_col_int: bool = False,
 ):
     """
     A function which adds a numeric column with the same value for all the features.
@@ -617,6 +626,9 @@ def add_numeric_col(
     """
     import geopandas
     import numpy
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     if out_col_int:
@@ -653,6 +665,9 @@ def add_string_col(
     """
     import geopandas
     import numpy
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
@@ -708,6 +723,9 @@ def add_fid_col(
     """
     import geopandas
     import numpy
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     base_gpdf[out_col] = numpy.arange(1, (base_gpdf.shape[0]) + 1, 1, dtype=int)

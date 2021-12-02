@@ -73,6 +73,29 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
         os.remove(cfile)
 
 
+def check_format_name(format: str)-> str:
+    """
+    A function which checks the format string for vector formats
+    as functions which use Geopandas rather than GDAL directly as
+    for analysis require the format string to be GeoJSON rather
+    than GEOJSON. This function just helps to catch user input
+    error and correct it.
+
+    At the moment this function just changes GeoJSON, but if the input
+    format isn't GEOJSON then the string is left unaltered and just
+    passed back. Edits for more formats can be included in the future
+    if they are found to be needed for Geopandas.
+
+    :param format: the input format string (e.g. GEOJSON, GPKG, ESRI Shapefile, etc.)
+    :return: the format string, if the format is GEOJSON then it will be changes to
+             GeoJSON.
+
+    """
+    if format.lower() == "geojson":
+        format = "GeoJSON"
+    return format
+
+
 def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None) -> str:
     """
     A function which gets the WKT projection from the inputted vector file.
