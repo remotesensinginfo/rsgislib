@@ -243,12 +243,10 @@ static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *a
 // Our list of functions in this module
 static PyMethodDef ImageRegistrationMethods[] = {
 {"find_image_offset", (PyCFunction)ImageRegistration_FindImageOffset, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.find_image_offset(in_ref_img, in_float_img, ref_img_bands, flt_img_bands, metric_type, x_search,  y_search, sub_pxl_res)\n"
+"imageregistration.find_image_offset(in_ref_img:str, in_float_img:str, ref_img_bands:list, flt_img_bands:list, metric_type:int, x_search:int,  y_search:int, sub_pxl_res:int)\n"
 "Calculate and X/Y offset between the input reference and float images.\n"
 "This function will calculate the similarity intersecting regions of the\n"
 "two images and identified an X/Y where the similarity is greatest.\n"
-"\n"
-"Where:\n"
 "\n"
 ":param in_ref_img: is a string providing reference image which to which the floating image is to be registered.n"
 ":param in_float_img: is a string providing the floating image to be registered to the reference image\n"
@@ -258,6 +256,7 @@ static PyMethodDef ImageRegistrationMethods[] = {
 ":param x_search: is the number of pixels in the x-axis the image can be moved either side of the centre.\n"
 ":param y_search: is the number of pixels in the y-axis the image can be moved either side of the centre.\n"
 ":param sub_pxl_res: is an optional (if not specified then no sub-pixel component will be estimated) int specifying the sub-pixel resolution to which the pixel shifts are estimated. Note that the values are positive integers such that a value of 2 will result in a sub pixel resolution of 0.5 of a pixel and a value 4 will be 0.25 of a pixel. \n"
+":return: (x_offset, y_offset)\n"
 "\n"
 "\n"
 },
@@ -265,8 +264,6 @@ static PyMethodDef ImageRegistrationMethods[] = {
 {"basic_registration", (PyCFunction)ImageRegistration_BasicRegistration, METH_VARARGS | METH_KEYWORDS,
 "imageregistration.basic_registration(in_ref_img, in_float_img, out_gcp_file, pixel_gap, threshold, win_size, search_area, sd_ref_thres, sd_flt_thres, sub_pxl_res, metric_type, output_type)\n"
 "Generate tie points between floating and reference image using basic algorithm.\n"
-"\n"
-"Where:\n"
 "\n"
 ":param in_ref_img: is a string providing reference image which to which the floating image is to be registered.n"
 ":param in_float_img: is a string providing the floating image to be registered to the reference image\n"

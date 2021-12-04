@@ -10,7 +10,7 @@ except ImportError:
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 IMGUTILS_DATA_DIR = os.path.join(DATA_DIR, "imageutils")
-
+IMGREG_DATA_DIR = os.path.join(DATA_DIR, "imageregistration")
 
 def test_set_env_vars_lzw_gtiff_outs():
     import rsgislib.imageutils
@@ -288,6 +288,11 @@ def test_has_gcps_false():
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
     assert not rsgislib.imageutils.has_gcps(input_img)
 
+def test_has_gcps_true():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset_gcps.kea")
+    assert rsgislib.imageutils.has_gcps(input_img)
 
 def test_is_img_thematic_False():
     import rsgislib.imageutils
@@ -415,7 +420,17 @@ def test_get_utm_zone():
     assert "30N" == rsgislib.imageutils.get_utm_zone(input_img)
 
 
-# TODO rsgislib.imageutils.copy_gcps
+def test_copy_gcps(tmp_path):
+    import rsgislib.imageutils
+    input_img = os.path.join(IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset_gcps.kea")
+
+    output_ref_img = os.path.join(IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset.kea")
+    output_img = os.path.join(tmp_path, "sen2_20210527_aber_subset_b123_offset.kea")
+    copy2(output_ref_img, output_img)
+
+    rsgislib.imageutils.copy_gcps(input_img, output_img)
+
+    assert rsgislib.imageutils.has_gcps(output_img)
 
 
 def test_resample_img_to_match(tmp_path):
