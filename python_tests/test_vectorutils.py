@@ -888,6 +888,7 @@ def test_geopd_check_polys_wgs84_bounds_geometry():
     gdf_out = rsgislib.vectorutils.geopd_check_polys_wgs84_bounds_geometry(data_gdf)
     assert len(gdf_out) > 0
 
+@pytest.mark.skipif((GEOPANDAS_NOT_AVAIL and SHAPELY_NOT_AVAIL), reason="geopandas or shapely dependencies not available")
 def test_merge_utm_vecs_wgs84(tmp_path):
     import rsgislib.vectorutils
 
@@ -901,4 +902,50 @@ def test_merge_utm_vecs_wgs84(tmp_path):
 
     rsgislib.vectorutils.merge_utm_vecs_wgs84(in_vec_files, out_vec_file, out_vec_lyr, out_format="GPKG")
     assert os.path.exists(out_vec_file)
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_split_feats_to_mlyrs(tmp_path):
+    import rsgislib.vectorutils
+    vec_file = os.path.join(DATA_DIR, "degree_grid_examples_uk.geojson")
+    vec_lyr = "degree_grid_examples_uk"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+
+    rsgislib.vectorutils.split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format="GPKG")
+
+    assert os.path.exists(out_vec_file)
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_split_vec_lyr_random_subset(tmp_path):
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
+    vec_lyr = "sample_pts"
+
+    out_rmain_vec_file = os.path.join(tmp_path, "remain_out_vec.gpkg")
+    out_rmain_vec_lyr = "remain_out_vec"
+
+    out_smpl_vec_file = os.path.join(tmp_path, "sample_out_vec.gpkg")
+    out_smpl_vec_lyr = "sample_out_vec"
+
+    rsgislib.vectorutils.split_vec_lyr_random_subset(vec_file, vec_lyr, out_rmain_vec_file, out_rmain_vec_lyr, out_smpl_vec_file, out_smpl_vec_lyr, n_smpl=10, out_format="GPKG", rnd_seed=42)
+
+    assert os.path.exists(out_rmain_vec_file) and os.path.exists(out_smpl_vec_file)
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_create_train_test_smpls(tmp_path):
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
+    vec_lyr = "sample_pts"
+
+    out_train_vec_file = os.path.join(tmp_path, "train_out_vec.gpkg")
+    out_train_vec_lyr = "train_out_vec"
+
+    out_test_vec_file = os.path.join(tmp_path, "test_out_vec.gpkg")
+    out_test_vec_lyr = "sample_out_vec"
+
+    rsgislib.vectorutils.create_train_test_smpls(vec_file, vec_lyr, out_train_vec_file, out_train_vec_lyr, out_test_vec_file, out_test_vec_lyr, out_format="GPKG", prop_test=0.2, tmp_dir=tmp_path, rnd_seed=42)
+    assert os.path.exists(out_train_vec_file) and os.path.exists(out_test_vec_file)
+
 

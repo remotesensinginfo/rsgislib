@@ -20,13 +20,14 @@ Calculate New Geometries
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_union_gp
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_intersection
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_difference
-
+.. autofunction:: rsgislib.vectorgeoms.clip_vec_lyr
 
 Edit Geometries
 -----------------
 .. autofunction:: rsgislib.vectorgeoms.simplify_geometries
 .. autofunction:: rsgislib.vectorgeoms.delete_polygon_holes
 .. autofunction:: rsgislib.vectorgeoms.remove_polygon_area
+.. autofunction:: rsgislib.vectorgeoms.shiftxy_vec_lyr
 
 Geometry Tests
 ----------------
@@ -37,6 +38,12 @@ Geometry Tests
 .. autofunction:: rsgislib.vectorgeoms.vec_touches_vec
 .. autofunction:: rsgislib.vectorgeoms.vec_crosses_vec
 
+Spatial Index
+------------------
+.. autofunction:: rsgislib.vectorgeoms.create_rtree_index
+.. autofunction:: rsgislib.vectorgeoms.bbox_intersects_index
+
+
 Internal Utilities
 --------------------
 .. autofunction:: rsgislib.vectorgeoms.get_pt_on_line
@@ -46,10 +53,6 @@ Internal Utilities
 .. autofunction:: rsgislib.vectorgeoms.line_intersection_range
 .. autofunction:: rsgislib.vectorgeoms.scnd_line_intersection_range
 
-Spatial Indexes
-------------------
-.. autofunction:: rsgislib.vectorgeoms.create_rtree_index
-.. autofunction:: rsgislib.vectorgeoms.bbox_intersects_index
 
 Calculate Geometry Info
 -------------------------

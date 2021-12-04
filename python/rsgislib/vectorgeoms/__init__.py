@@ -970,80 +970,6 @@ def scnd_line_intersection_range(
     ds_objs_sub_vec = None
 
 
-def create_rtree_index(vec_file, vec_lyr):
-    """
-    A function which creates a spatial index using the rtree package for the
-    inputted vector file/layer.
-
-    :param vec_file: Input vector file to be processed.
-    :param vec_lyr: The layer within the vector file for which the index is to be built.
-
-    """
-    import rtree
-
-    vec_file_obj = gdal.OpenEx(vec_file, gdal.OF_READONLY)
-    if vec_file_obj is None:
-        raise Exception("Could not open '{}'".format(vec_file))
-
-    vec_lyr_obj = vec_file_obj.GetLayerByName(vec_lyr)
-    if vec_lyr_obj is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
-
-    idx_obj = rtree.index.Index(interleaved=False)
-    geom_lst = list()
-
-    n_feats = vec_lyr_obj.GetFeatureCount(True)
-    n_geom = 0
-    pbar = tqdm.tqdm(total=n_feats)
-    vec_lyr_obj.ResetReading()
-    feat = vec_lyr_obj.GetNextFeature()
-    while feat is not None:
-        geom_obj = feat.GetGeometryRef()
-        if geom_obj is not None:
-            xmin, xmax, ymin, ymax = geom_obj.GetEnvelope()
-            geom_lst.append(geom_obj.Clone())
-            idx_obj.insert(n_geom, (xmin, xmax, ymin, ymax))
-            n_geom = n_geom + 1
-        pbar.update(1)
-        feat = vec_lyr_obj.GetNextFeature()
-    vec_file_obj = None
-    return idx_obj, geom_lst
-
-
-def bbox_intersects_index(rt_idx, geom_lst, bbox):
-    """
-    A function which tests for intersection between the geometries and the bounding box
-    using a spatial index.
-
-    :param rt_idx: the rtree spatial index object (created using the
-                   create_rtree_index function)
-    :param geom_lst: the list of geometries as referenced in the index (created
-                     using the create_rtree_index function)
-    :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as
-                  geometries in the index.
-    :return: True there is an intersection. False there is not an intersection.
-
-    """
-    ring = ogr.Geometry(ogr.wkbLinearRing)
-    ring.AddPoint(bbox[0], bbox[3])
-    ring.AddPoint(bbox[1], bbox[3])
-    ring.AddPoint(bbox[1], bbox[2])
-    ring.AddPoint(bbox[0], bbox[2])
-    ring.AddPoint(bbox[0], bbox[3])
-    # Create polygon.
-    poly_bbox = ogr.Geometry(ogr.wkbPolygon)
-    poly_bbox.AddGeometry(ring)
-
-    bbox_intersects = False
-
-    for geom_idx in list(rt_idx.intersection(bbox)):
-        print(geom_idx)
-        geom_obj = geom_lst[geom_idx]
-        if poly_bbox.Intersects(geom_obj):
-            bbox_intersects = True
-            break
-    return bbox_intersects
-
 
 def calc_poly_centroids(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr):
     """
@@ -2419,6 +2345,41 @@ def vec_lyr_difference(
     ds_over_vec = None
 
 
+def clip_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which clips a vector layer using an input region of interest
+    (ROI) polygon layer.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_roi_file: Input vector file defining the ROI polygon(s)
+    :param vec_roi_lyr: Input vector layer within the roi input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: Output file format (default GPKG).
+
+    """
+    import geopandas
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    roi_gpdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
+
+    cliped_gpdf = geopandas.clip(base_gpdf, roi_gpdf, keep_geom_type=True)
+
+    if out_format == "GPKG":
+        cliped_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        cliped_gpdf.to_file(out_vec_file, driver=out_format)
+
+
 def get_geom_pts(geom, pts_lst=None):
     """
     Recursive function which extracts all the points within the an OGR geometry.
@@ -2911,5 +2872,123 @@ def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: list) -> bool:
     # Do they intersect?
     intersect = poly.Intersects(geom_collect)
     return intersect
+
+def shiftxy_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    x_shift: float,
+    y_shift: float,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which shifts (translates) a vector layer in the x and y axis'.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param x_shift: The shift in the x axis. In the units of the coordinate system
+                    the file is projected in.
+    :param y_shift: The shift in the y axis. In the units of the coordinate system
+                    the file is projected in.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: Output file format (default GPKG).
+
+    """
+    import geopandas
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    shifted_gseries = base_gpdf.translate(xoff=x_shift, yoff=y_shift)
+    shifted_gpdf = geopandas.GeoDataFrame(geometry=shifted_gseries)
+
+    col_names = base_gpdf.columns
+    for col_name in col_names:
+        if col_name != "geometry":
+            shifted_gpdf[col_name] = base_gpdf[col_name]
+
+    if out_format == "GPKG":
+        shifted_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        shifted_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+
+
+def create_rtree_index(vec_file, vec_lyr):
+    """
+    A function which creates a spatial index using the rtree package for the
+    inputted vector file/layer.
+
+    :param vec_file: Input vector file to be processed.
+    :param vec_lyr: The layer within the vector file for which the index is to be built.
+
+    """
+    import rtree
+    import tqdm
+
+    vec_file_obj = gdal.OpenEx(vec_file, gdal.OF_READONLY)
+    if vec_file_obj is None:
+        raise Exception("Could not open '{}'".format(vec_file))
+
+    vec_lyr_obj = vec_file_obj.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not find layer '{}'".format(vec_lyr))
+
+    idx_obj = rtree.index.Index(interleaved=False)
+    geom_lst = list()
+
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
+    n_geom = 0
+    pbar = tqdm.tqdm(total=n_feats)
+    vec_lyr_obj.ResetReading()
+    feat = vec_lyr_obj.GetNextFeature()
+    while feat is not None:
+        geom_obj = feat.GetGeometryRef()
+        if geom_obj is not None:
+            xmin, xmax, ymin, ymax = geom_obj.GetEnvelope()
+            geom_lst.append(geom_obj.Clone())
+            idx_obj.insert(n_geom, (xmin, xmax, ymin, ymax))
+            n_geom = n_geom + 1
+        pbar.update(1)
+        feat = vec_lyr_obj.GetNextFeature()
+    vec_file_obj = None
+    return idx_obj, geom_lst
+
+
+def bbox_intersects_index(rt_idx, geom_lst, bbox):
+    """
+    A function which tests for intersection between the geometries and the bounding box
+    using a spatial index.
+
+    :param rt_idx: the rtree spatial index object (created using the
+                   create_rtree_index function)
+    :param geom_lst: the list of geometries as referenced in the index (created
+                     using the create_rtree_index function)
+    :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as
+                  geometries in the index.
+    :return: True there is an intersection. False there is not an intersection.
+
+    """
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    ring.AddPoint(bbox[0], bbox[3])
+    ring.AddPoint(bbox[1], bbox[3])
+    ring.AddPoint(bbox[1], bbox[2])
+    ring.AddPoint(bbox[0], bbox[2])
+    ring.AddPoint(bbox[0], bbox[3])
+    # Create polygon.
+    poly_bbox = ogr.Geometry(ogr.wkbPolygon)
+    poly_bbox.AddGeometry(ring)
+
+    bbox_intersects = False
+
+    for geom_idx in list(rt_idx.intersection(bbox)):
+        print(geom_idx)
+        geom_obj = geom_lst[geom_idx]
+        if poly_bbox.Intersects(geom_obj):
+            bbox_intersects = True
+            break
+    return bbox_intersects
 
 

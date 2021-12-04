@@ -25,7 +25,7 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.create_lines_of_points
 .. autofunction:: rsgislib.vectorutils.split_vec_lyr
 .. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
-.. autofunction:: rsgislib.vectorutils.add_geom_bbox_cols
+
 
 
 Vector I/O
@@ -78,6 +78,7 @@ Vector Select / Subset
 .. autofunction:: rsgislib.vectorutils.spatial_select
 .. autofunction:: rsgislib.vectorutils.subset_by_attribute
 
+
 Vector Split
 ---------------
 
@@ -85,7 +86,7 @@ Vector Split
 .. autofunction:: rsgislib.vectorutils.split_feats_to_mlyrs
 .. autofunction:: rsgislib.vectorutils.split_vec_lyr_random_subset
 .. autofunction:: rsgislib.vectorutils.create_train_test_smpls
-.. autofunction:: rsgislib.vectorutils.create_acc_pt_sets
+
 
 
 Vector Geometry
@@ -94,7 +95,8 @@ Vector Geometry
 .. autofunction:: rsgislib.vectorutils.explode_vec_lyr
 .. autofunction:: rsgislib.vectorutils.explode_vec_files
 .. autofunction:: rsgislib.vectorutils.geopd_check_polys_wgs84_bounds_geometry
-.. autofunction:: rsgislib.vectorutils.clip_vec_lyr
+
+
 
 
 Vector / Raster Tests
@@ -120,7 +122,7 @@ Vectors Utilities
 
 .. autofunction:: rsgislib.vectorutils.check_validate_geometries
 .. autofunction:: rsgislib.vectorutils.delete_vector_file
-.. autofunction:: rsgislib.vectorutils.shiftxy_vec_lyr
+
 
 
 * :ref:`genindex`

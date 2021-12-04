@@ -2888,80 +2888,6 @@ def merge_utm_vecs_wgs84(
             out_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def clip_vec_lyr(
-    vec_file: str,
-    vec_lyr: str,
-    vec_roi_file: str,
-    vec_roi_lyr: str,
-    out_vec_file: str,
-    out_vec_lyr: str,
-    out_format: str = "GPKG",
-):
-    """
-    A function which clips a vector layer using an input region of interest
-    (ROI) polygon layer.
-
-    :param vec_file: Input vector file.
-    :param vec_lyr: Input vector layer within the input file.
-    :param vec_roi_file: Input vector file defining the ROI polygon(s)
-    :param vec_roi_lyr: Input vector layer within the roi input file.
-    :param out_vec_file: Output vector file
-    :param out_vec_lyr: Output vector layer name.
-    :param out_format: Output file format (default GPKG).
-
-    """
-    import geopandas
-
-    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
-    roi_gpdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
-
-    cliped_gpdf = geopandas.clip(base_gpdf, roi_gpdf, keep_geom_type=True)
-
-    if out_format == "GPKG":
-        cliped_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        cliped_gpdf.to_file(out_vec_file, driver=out_format)
-
-
-def shiftxy_vec_lyr(
-    vec_file: str,
-    vec_lyr: str,
-    x_shift: float,
-    y_shift: float,
-    out_vec_file: str,
-    out_vec_lyr: str,
-    out_format: str = "GPKG",
-):
-    """
-    A function which shifts (translates) a vector layer in the x and y axis'.
-
-    :param vec_file: Input vector file.
-    :param vec_lyr: Input vector layer within the input file.
-    :param x_shift: The shift in the x axis. In the units of the coordinate system
-                    the file is projected in.
-    :param y_shift: The shift in the y axis. In the units of the coordinate system
-                    the file is projected in.
-    :param out_vec_file: Output vector file
-    :param out_vec_lyr: Output vector layer name.
-    :param out_format: Output file format (default GPKG).
-
-    """
-    import geopandas
-
-    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
-
-    shifted_gseries = base_gpdf.translate(xoff=x_shift, yoff=y_shift)
-    shifted_gpdf = geopandas.GeoDataFrame(geometry=shifted_gseries)
-
-    col_names = base_gpdf.columns
-    for col_name in col_names:
-        if col_name != "geometry":
-            shifted_gpdf[col_name] = base_gpdf[col_name]
-
-    if out_format == "GPKG":
-        shifted_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        shifted_gpdf.to_file(out_vec_file, driver=out_format)
 
 
 def split_feats_to_mlyrs(
@@ -2991,62 +2917,19 @@ def split_feats_to_mlyrs(
     base_gpdf = None
 
 
-def add_geom_bbox_cols(
-    vec_file: str,
-    vec_lyr: str,
-    out_vec_file: str,
-    out_vec_lyr: str,
-    out_format: str = "GPKG",
-    min_x_col: str = "MinX",
-    max_x_col: str = "MaxX",
-    min_y_col: str = "MinY",
-    max_y_col: str = "MaxY",
-):
-    """
-    A function which adds columns to the vector layer with the bbox of each geometry.
 
-    :param vec_file: input vector file
-    :param vec_lyr: input vector layer name
-    :param out_vec_file: output vector file
-    :param out_vec_lyr: output vector layer name
-    :param out_format: The output format of the output file. (Default: GPKG)
-    :param min_x_col: Name of the MinX column (Default: MinX)
-    :param max_x_col: Name of the MaxX column (Default: MaxX)
-    :param min_y_col: Name of the MinY column (Default: MinY)
-    :param max_y_col: Name of the MaxY column (Default: MaxY)
-
-    """
-    import geopandas
-
-    # Read input vector file.
-    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
-
-    # Get Geometry bounds
-    geom_bounds = base_gpdf["geometry"].bounds
-
-    # Add columns to the geodataframe
-    base_gpdf[min_x_col] = geom_bounds["minx"]
-    base_gpdf[max_x_col] = geom_bounds["maxx"]
-    base_gpdf[min_y_col] = geom_bounds["miny"]
-    base_gpdf[max_y_col] = geom_bounds["maxy"]
-
-    # Output the file.
-    if out_format == "GPKG":
-        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
 def split_vec_lyr_random_subset(
     vec_file: str,
     vec_lyr: str,
-    out_main_vec_file: str,
-    out_main_vec_lyr: str,
+    out_rmain_vec_file: str,
+    out_rmain_vec_lyr: str,
     out_smpl_vec_file: str,
     out_smpl_vec_lyr: str,
     n_smpl: int,
     out_format: str = "GPKG",
-    rand_seed: int = None,
+    rnd_seed: int = None,
 ):
     """
     A function to split a vector layer into two subsets by randomly sampling the
@@ -3055,15 +2938,15 @@ def split_vec_lyr_random_subset(
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer.
-    :param out_main_vec_file: Output vector file with the 'main' outputs
+    :param out_rmain_vec_file: Output vector file with the 'remain' outputs
                               (i.e., the remainder once the sample if taken)
-    :param out_main_vec_lyr: Output vector layer with the 'main' outputs
+    :param out_rmain_vec_lyr: Output vector layer with the 'remain' outputs
                              (i.e., the remainder once the sample if taken)
     :param out_smpl_vec_file: Output vector file with the sampled outputs
     :param out_smpl_vec_lyr: Output vector layer with the sampled outputs
     :param n_smpl: the number of samples to be randomly selected
     :param out_format: The output format of the output file. (Default: GPKG)
-    :param rand_seed: A seed for the random number generator.
+    :param rnd_seed: A seed for the random number generator.
 
     """
     import geopandas
@@ -3077,14 +2960,14 @@ def split_vec_lyr_random_subset(
     # Read input vector file.
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
-    smpl_gpdf = base_gpdf.sample(n=n_smpl, random_state=rand_seed)
+    smpl_gpdf = base_gpdf.sample(n=n_smpl, random_state=rnd_seed)
     base_gpdf = base_gpdf.drop(smpl_gpdf.index)
 
     if out_format == "GPKG":
-        base_gpdf.to_file(out_main_vec_file, layer=out_main_vec_lyr, driver=out_format)
+        base_gpdf.to_file(out_rmain_vec_file, layer=out_rmain_vec_lyr, driver=out_format)
         smpl_gpdf.to_file(out_smpl_vec_file, layer=out_smpl_vec_lyr, driver=out_format)
     else:
-        base_gpdf.to_file(out_main_vec_file, driver=out_format)
+        base_gpdf.to_file(out_rmain_vec_file, driver=out_format)
         smpl_gpdf.to_file(out_smpl_vec_file, driver=out_format)
 
 
@@ -3143,7 +3026,7 @@ def create_train_test_smpls(
         out_test_vec_lyr,
         n_test_feats,
         out_format=out_format,
-        rand_seed=rnd_seed,
+        rnd_seed=rnd_seed,
     )
 
     if created_tmp_dir:
@@ -3152,89 +3035,4 @@ def create_train_test_smpls(
         shutil.rmtree(tmp_dir)
 
 
-def create_acc_pt_sets(
-    vec_file: str,
-    vec_lyr: str,
-    out_vec_file_base: str,
-    out_vec_lyr: str,
-    cls_col: str,
-    n_sets: int,
-    sets_col: str = "set_id",
-    out_format: str = "GPKG",
-    out_ext: str = "gpkg",
-    shuffle_rows: bool = True,
-    rnd_seed: int = None,
-):
-    """
-    A function which splits a vector layer into n_sets where a 'class' column is used
-    to ensure that there are the same number of samples per 'class' within each set.
-    An example of where this function might be used is to split a set of accuracy
-    assessment point for assessing the classification accuracy into multiple sets.
-    Note, the output vector layers
 
-    :param vec_file: Input vector file/path
-    :param vec_lyr: Input vector layer name
-    :param out_vec_file_base: The output vector file base name and path. Note,
-                              the output file name will be: base{n_set}.out_ext.
-                              If you want a character (e.g., underscore) between the
-                              basename and the set number then include in the basename.
-                              Example, out/path/vec_file_name_
-    :param out_vec_lyr: the output vector layer name. The same layer name is used for
-                        all the output files.
-    :param cls_col: The column in the vector file which has values for the classes
-    :param n_sets: The number of sets you want the input vector sorted into.
-    :param sets_col: A column added to the output files with an integer representing
-                     the set the row belongs to so if vector files are merged again
-                     then the set information is not lost. (Default: 'set_id')
-    :param out_format: The output vector file format (Default: GPKG)
-    :param out_ext: the output vector file format extension (Default: gpkg)
-    :param shuffle_rows: Boolean specifying whether the vector layer rows should be
-                         shuffled before splitting into sets (Default: True)
-    :param rnd_seed: If shuffling the rows then this random seed can be used to ensure
-                     the shuffling is the same between runs.
-
-    """
-    import geopandas
-    import math
-    import numpy
-    import tqdm
-
-    # Read input vector file.
-    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
-
-    if cls_col not in base_gpdf.columns:
-        raise Exception(
-            "The specified class column is not within the input vector layer"
-        )
-
-    if shuffle_rows:
-        base_gpdf = base_gpdf.sample(frac=1, random_state=rnd_seed).reset_index(
-            drop=True
-        )
-    base_gpdf[sets_col] = numpy.zeros((base_gpdf.shape[0]), dtype=numpy.uint16)
-
-    unq_cls_info = base_gpdf[cls_col].value_counts()
-
-    sets = numpy.arange(1, n_sets + 1)
-
-    for cls, n_vals in tqdm.tqdm(zip(unq_cls_info.index, unq_cls_info)):
-        n_vals_per_set = math.floor(n_vals / n_sets)
-        sets_arr = numpy.zeros(n_vals, dtype=numpy.uint8)
-        s_idx = 0
-        e_idx = n_vals_per_set
-        for set in sets:
-            sets_arr[s_idx:e_idx] = set
-            s_idx = e_idx
-            e_idx = e_idx + n_vals_per_set
-        cls_msk = base_gpdf[cls_col] == cls
-        base_gpdf.loc[cls_msk, sets_col] = sets_arr
-
-    for set in tqdm.tqdm(sets):
-        out_vec_file = "{}{}.{}".format(out_vec_file_base, set, out_ext)
-        set_msk = base_gpdf[sets_col] == set
-        tmp_gpdf = base_gpdf[set_msk]
-
-        if out_format == "GPKG":
-            tmp_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-        else:
-            tmp_gpdf.to_file(out_vec_file, driver=out_format)

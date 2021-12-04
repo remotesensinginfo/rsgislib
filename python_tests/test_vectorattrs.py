@@ -310,6 +310,18 @@ def test_pop_bbox_cols(tmp_path):
     vec_lyr = "aber_osgb_multi_polys"
     rsgislib.vectorattrs.pop_bbox_cols(vec_file, vec_lyr)
 
+def test_add_geom_bbox_cols(tmp_path):
+    import rsgislib.vectorattrs
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_lyr = "aber_osgb_multi_polys"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorattrs.add_geom_bbox_cols(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format="GPKG", min_x_col="MinX", max_x_col="MaxX", min_y_col= "MinY", max_y_col= "MaxY")
+    assert os.path.exists(out_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_create_name_col(tmp_path):

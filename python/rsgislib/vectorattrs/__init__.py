@@ -393,6 +393,51 @@ def pop_bbox_cols(
     dsVecFile = None
     print(" Completed")
 
+def add_geom_bbox_cols(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    min_x_col: str = "MinX",
+    max_x_col: str = "MaxX",
+    min_y_col: str = "MinY",
+    max_y_col: str = "MaxY",
+):
+    """
+    A function which adds columns to the vector layer with the bbox of each geometry.
+
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer name
+    :param out_vec_file: output vector file
+    :param out_vec_lyr: output vector layer name
+    :param out_format: The output format of the output file. (Default: GPKG)
+    :param min_x_col: Name of the MinX column (Default: MinX)
+    :param max_x_col: Name of the MaxX column (Default: MaxX)
+    :param min_y_col: Name of the MinY column (Default: MinY)
+    :param max_y_col: Name of the MaxY column (Default: MaxY)
+
+    """
+    import geopandas
+
+    # Read input vector file.
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    # Get Geometry bounds
+    geom_bounds = base_gpdf["geometry"].bounds
+
+    # Add columns to the geodataframe
+    base_gpdf[min_x_col] = geom_bounds["minx"]
+    base_gpdf[max_x_col] = geom_bounds["maxx"]
+    base_gpdf[min_y_col] = geom_bounds["miny"]
+    base_gpdf[max_y_col] = geom_bounds["maxy"]
+
+    # Output the file.
+    if out_format == "GPKG":
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(out_vec_file, driver=out_format)
+
 
 def create_name_col(
     vec_file: str,

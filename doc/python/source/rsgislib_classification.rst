@@ -44,11 +44,15 @@ Utilities
 .. autofunction:: rsgislib.classification.collapse_classes
 .. autofunction:: rsgislib.classification.gen_rgb_img_from_clr_tbl
 
-Accuracy Assessment
----------------------
+Accuracy Assessment Samples
+----------------------------
 .. autofunction:: rsgislib.classification.generate_random_accuracy_pts
 .. autofunction:: rsgislib.classification.generate_stratified_random_accuracy_pts
 .. autofunction:: rsgislib.classification.pop_class_info_accuracy_pts
+.. autofunction:: rsgislib.classification.create_acc_pt_sets
+
+Accuracy Assessment Stats
+----------------------------
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval
