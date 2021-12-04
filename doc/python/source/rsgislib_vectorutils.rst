@@ -8,7 +8,8 @@ Vector Attributes
 .. autofunction:: rsgislib.vectorutils.vector_maths
 .. autofunction:: rsgislib.vectorutils.copy_rat_cols_to_vector_lyr
 .. autofunction:: rsgislib.vectorutils.perform_spatial_join
-
+.. autoclass:: rsgislib.vectorutils.VecColVar
+    :members:
 
 Create Vectors
 ----------------

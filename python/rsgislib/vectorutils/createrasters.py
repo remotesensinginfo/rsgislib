@@ -142,7 +142,7 @@ def rasterise_vec_lyr_obj(
     att_column: str = None,
     calc_stats: bool = True,
     thematic: bool = True,
-    nodata: float = 0,
+    no_data_val: float = 0,
 ):
     """
     A utility to rasterise a vector layer to an image covering the same region.
@@ -161,7 +161,7 @@ def rasterise_vec_lyr_obj(
                        should be calculated.
     :param thematic: is a boolean (default True) specifying that the output image is
                      an thematic dataset so a colour table will be populated.
-    :param nodata: is a float specifying the no data value associated with a
+    :param no_data_val: is a float specifying the no data value associated with a
                    continuous output image.
 
     """
@@ -202,7 +202,7 @@ def rasterise_vec_lyr_obj(
             else:
                 import rsgislib.imageutils
 
-                rsgislib.imageutils.pop_img_stats(output_img, True, nodata, True)
+                rsgislib.imageutils.pop_img_stats(output_img, True, no_data_val, True)
     except Exception as e:
         print("Failed rasterising: {}".format(output_img))
         raise e

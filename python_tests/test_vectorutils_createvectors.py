@@ -140,15 +140,28 @@ def test_extract_image_footprint_reproj(tmp_path):
 
     assert os.path.exists(out_vec_file)
 
+
 def test_define_grid(tmp_path):
     import rsgislib.vectorutils.createvectors
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorutils.createvectors.define_grid([0,5,10,15], 1, 1, 4326, out_vec_file, out_vec_lyr, vec_drv='GPKG', out_epsg_code=None, utm_grid=False, utm_hemi=False)
+    rsgislib.vectorutils.createvectors.define_grid(
+        [0, 5, 10, 15],
+        1,
+        1,
+        4326,
+        out_vec_file,
+        out_vec_lyr,
+        vec_drv="GPKG",
+        out_epsg_code=None,
+        utm_grid=False,
+        utm_hemi=False,
+    )
 
     assert os.path.exists(out_vec_file)
+
 
 def test_define_grid_utm(tmp_path):
     import rsgislib.vectorutils.createvectors
@@ -156,9 +169,21 @@ def test_define_grid_utm(tmp_path):
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorutils.createvectors.define_grid([0,5,10,15], 5000, 5000, 4326, out_vec_file, out_vec_lyr, vec_drv='GPKG', out_epsg_code=None, utm_grid=True, utm_hemi=False)
+    rsgislib.vectorutils.createvectors.define_grid(
+        [0, 5, 10, 15],
+        5000,
+        5000,
+        4326,
+        out_vec_file,
+        out_vec_lyr,
+        vec_drv="GPKG",
+        out_epsg_code=None,
+        utm_grid=True,
+        utm_hemi=False,
+    )
 
     assert os.path.exists(out_vec_file)
+
 
 def test_create_poly_vec_bboxs(tmp_path):
     import rsgislib.vectorutils.createvectors
@@ -167,7 +192,7 @@ def test_create_poly_vec_bboxs(tmp_path):
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    bboxs = [[1,2,1,2], [2,3,2,3], [3,4,3,4], [4,5,4,5]]
+    bboxs = [[1, 2, 1, 2], [2, 3, 2, 3], [3, 4, 3, 4], [4, 5, 4, 5]]
 
     atts = dict()
     atts["name"] = ["hello", "to", "the", "world"]
@@ -177,7 +202,16 @@ def test_create_poly_vec_bboxs(tmp_path):
     att_types["names"] = ["name", "id"]
     att_types["types"] = [ogr.OFTString, ogr.OFTInteger]
 
-    rsgislib.vectorutils.createvectors.create_poly_vec_bboxs(out_vec_file, out_vec_lyr, "GPKG", 4326, bboxs, atts=atts, att_types=att_types, overwrite=True)
+    rsgislib.vectorutils.createvectors.create_poly_vec_bboxs(
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        4326,
+        bboxs,
+        atts=atts,
+        att_types=att_types,
+        overwrite=True,
+    )
 
     assert os.path.exists(out_vec_file)
 
@@ -200,7 +234,19 @@ def test_write_pts_to_vec(tmp_path):
     att_types["names"] = ["name", "id"]
     att_types["types"] = [ogr.OFTString, ogr.OFTInteger]
 
-    rsgislib.vectorutils.createvectors.write_pts_to_vec(out_vec_file, out_vec_lyr, "GPKG", 4326, pts_x, pts_y, atts=atts, att_types=att_types, replace=True, file_opts=[], lyr_opts=[])
+    rsgislib.vectorutils.createvectors.write_pts_to_vec(
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        4326,
+        pts_x,
+        pts_y,
+        atts=atts,
+        att_types=att_types,
+        replace=True,
+        file_opts=[],
+        lyr_opts=[],
+    )
 
     assert os.path.exists(out_vec_file)
 
@@ -214,12 +260,31 @@ def test_create_bboxs_for_pts(tmp_path):
     pts_x = [1, 2, 3, 4]
     pts_y = [1, 2, 3, 4]
 
-
-    rsgislib.vectorutils.createvectors.write_pts_to_vec(pts_vec_file, pts_vec_lyr, "GPKG", 4326, pts_x, pts_y, atts=None, att_types=None, replace=True, file_opts=[], lyr_opts=[])
+    rsgislib.vectorutils.createvectors.write_pts_to_vec(
+        pts_vec_file,
+        pts_vec_lyr,
+        "GPKG",
+        4326,
+        pts_x,
+        pts_y,
+        atts=None,
+        att_types=None,
+        replace=True,
+        file_opts=[],
+        lyr_opts=[],
+    )
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorutils.createvectors.create_bboxs_for_pts(pts_vec_file, pts_vec_lyr, 0.25, 0.35, out_vec_file, out_vec_lyr, out_format = 'GPKG', del_exist_vec = False)
+    rsgislib.vectorutils.createvectors.create_bboxs_for_pts(
+        pts_vec_file,
+        pts_vec_lyr,
+        0.25,
+        0.35,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+        del_exist_vec=False,
+    )
     assert os.path.exists(out_vec_file)
-

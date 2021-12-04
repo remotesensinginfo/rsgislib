@@ -3245,7 +3245,7 @@ def mask_img_with_vec(
             att_column=None,
             calc_stats=True,
             thematic=True,
-            nodata=0,
+            no_data_val=0,
         )
         mem_result_ds = None
 

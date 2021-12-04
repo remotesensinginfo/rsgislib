@@ -29,6 +29,27 @@ import rsgislib.rastergis
 gdal.UseExceptions()
 
 
+class VecColVar(object):
+    """
+    A class for using the the vector_math function specifying the input
+    columns and the variable name to be used in the expression.
+
+    :param name: the name of the variable to be used within the expression
+    :param field_name: the name of the column in the attribute table.
+
+    """
+
+    def __init__(self, name: str, field_name: str):
+        """
+
+        :param name: the name of the variable to be used within the expression
+        :param field_name: the name of the column in the attribute table.
+
+        """
+        self.name = name
+        self.field_name = field_name
+
+
 class VecLayersInfoObj(object):
     """
     This is a class to store the information associated within the rsgislib.vectorutils.merge_to_multi_layer_vec function.
@@ -43,6 +64,7 @@ class VecLayersInfoObj(object):
         self, vec_file: str = None, vec_lyr: str = None, vec_out_lyr: str = None
     ):
         """
+
         :param vec_file: input vector file.
         :param vec_lyr: input vector layer name
         :param vec_out_lyr: output vector layer name
@@ -141,7 +163,11 @@ def get_proj_epsg_from_vec(vec_file: str, vec_lyr: str = None) -> int:
         raise Exception("Could not open layer within file: {}".format(vec_file))
     spatialRef = layer.GetSpatialRef()
     spatialRef.AutoIdentifyEPSG()
-    return spatialRef.GetAuthorityCode(None)
+    epsg_str = spatialRef.GetAuthorityCode(None)
+    espg_rtn = None
+    if epsg_str is not None:
+        espg_rtn = int(epsg_str)
+    return espg_rtn
 
 
 def get_vec_feat_count(
@@ -169,51 +195,6 @@ def get_vec_feat_count(
         raise Exception("Check layer name as did not open layer.")
     nFeats = inLayer.GetFeatureCount(compute_count)
     return nFeats
-
-
-def merge_shapefiles(in_vec_files: list, out_vec_file: str):
-    """
-    Function which will merge a list of shapefiles into an single shapefile using ogr2ogr.
-
-    Where:
-
-    :param in_vec_files: is a list of input files.
-    :param out_vec_file: is the output shapefile
-
-    """
-    if os.path.exists(out_vec_file):
-        driver = ogr.GetDriverByName("ESRI Shapefile")
-        driver.DeleteDataSource(out_vec_file)
-    first = True
-    for inFile in in_vec_files:
-        nFeat = get_vec_feat_count(inFile)
-        print("Processing: " + inFile + " has " + str(nFeat) + " features.")
-        if nFeat > 0:
-            if first:
-                cmd = (
-                    'ogr2ogr -f "ESRI Shapefile"  "'
-                    + out_vec_file
-                    + '" "'
-                    + inFile
-                    + '"'
-                )
-                try:
-                    subprocess.check_call(cmd, shell=True)
-                except OSError as e:
-                    raise Exception("Error running ogr2ogr: " + cmd)
-                first = False
-            else:
-                cmd = (
-                    'ogr2ogr -update -append -f "ESRI Shapefile" "'
-                    + out_vec_file
-                    + '" "'
-                    + inFile
-                    + '"'
-                )
-                try:
-                    subprocess.check_call(cmd, shell=True)
-                except OSError as e:
-                    raise Exception("Error running ogr2ogr: " + cmd)
 
 
 def merge_vectors_to_gpkg(
@@ -483,7 +464,8 @@ def split_vec_lyr(
     :param out_format: output file driver.
     :param out_dir: output directory for the created output files.
     :param out_vec_base: output layer name will be the same as the base file name.
-    :param out_vec_ext: file ending (e.g., .shp).
+    :param out_vec_ext: file ending (e.g., gpkg). Note don't include the dot,
+                        so input gpkg rather than .gpkg.
 
     """
 
@@ -505,7 +487,7 @@ def split_vec_lyr(
     eFeatN = n_feats
     for i in range(nOutFiles):
         outveclyr = "{0}{1}".format(out_vec_base, i + 1)
-        outvecfile = os.path.join(out_dir, "{0}{1}".format(outveclyr, out_vec_ext))
+        outvecfile = os.path.join(out_dir, "{0}.{1}".format(outveclyr, out_vec_ext))
         print("Creating: {}".format(outvecfile))
         result_ds = out_driver.CreateDataSource(outvecfile)
         result_lyr = result_ds.CreateLayer(
@@ -539,7 +521,7 @@ def split_vec_lyr(
 
     if remainFeats > 0:
         outveclyr = "{0}{1}".format(out_vec_base, nOutFiles + 1)
-        outvecfile = os.path.join(out_dir, "{0}{1}".format(outveclyr, out_vec_ext))
+        outvecfile = os.path.join(out_dir, "{0}.{1}".format(outveclyr, out_vec_ext))
         print("Creating: {}".format(outvecfile))
         result_ds = out_driver.CreateDataSource(outvecfile)
         result_lyr = result_ds.CreateLayer(
@@ -847,7 +829,7 @@ def reproj_vec_lyr_obj(
 
 def get_att_lst_select_feats(
     vec_file: str, vec_lyr: str, att_names: list, vec_sel_file: str, vec_sel_lyr: str
-):
+) -> list:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -855,7 +837,8 @@ def get_att_lst_select_feats(
     :param vec_file: vector layer from which the attribute data comes from.
     :param vec_lyr: the layer name from which the attribute data comes from.
     :param att_names: a list of attribute names to be outputted.
-    :param vec_sel_file: the vector file which will be intersected within the vector file.
+    :param vec_sel_file: the vector file which will be intersected within the
+                         vector file.
     :param vec_sel_lyr: the layer name which will be intersected within the vector file.
     :return: list of dictionaries with the output values.
 
@@ -898,9 +881,8 @@ def get_att_lst_select_feats(
                 dsSelVecFile = None
                 dsVecFile = None
                 raise Exception(
-                    "Could not find the attribute ({}) specified within the vector layer.".format(
-                        attName
-                    )
+                    "Could not find the attribute ({}) specified within "
+                    "the vector layer.".format(attName)
                 )
 
         mem_driver = ogr.GetDriverByName("MEMORY")
@@ -955,7 +937,8 @@ def get_att_lst_select_feats_lyr_objs(
 
     :param vec_lyr_obj: the OGR layer object from which the attribute data comes from.
     :param att_names: a list of attribute names to be outputted.
-    :param vec_sel_lyr_obj: the OGR layer object which will be intersected within the vector file.
+    :param vec_sel_lyr_obj: the OGR layer object which will be intersected within
+                            the vector file.
     :return: list of dictionaries with the output values.
 
     """
@@ -987,9 +970,8 @@ def get_att_lst_select_feats_lyr_objs(
         for attName in att_names:
             if not found_atts[attName]:
                 raise Exception(
-                    "Could not find the attribute ({}) specified within the vector layer.".format(
-                        attName
-                    )
+                    "Could not find the attribute ({}) specified within "
+                    "the vector layer.".format(attName)
                 )
 
         mem_driver = ogr.GetDriverByName("MEMORY")
@@ -1037,7 +1019,8 @@ def get_att_lst_select_bbox_feats(
     with the select layer.
 
     :param vec_file: the OGR file from which the attribute data comes from.
-    :param vec_lyr: the layer name within the file from which the attribute data comes from.
+    :param vec_lyr: the layer name within the file from which the attribute data
+                    comes from.
     :param att_names: a list of attribute names to be outputted.
     :param bbox: the bounding box for the region of interest (xMin, xMax, yMin, yMax).
     :param bbox_epsg: the projection of the BBOX (if None then ignore).
@@ -1089,7 +1072,8 @@ def get_att_lst_select_bbox_feats_lyr_objs(
                 int(in_vec_lyr_epsg) != int(bbox_epsg)
             ):
                 raise Exception(
-                    "The EPSG codes for the BBOX and input vector layer are not the same."
+                    "The EPSG codes for the BBOX and input vector "
+                    "layer are not the same."
                 )
 
         lyrDefn = vec_lyr_obj.GetLayerDefn()
@@ -1109,9 +1093,8 @@ def get_att_lst_select_bbox_feats_lyr_objs(
         for attName in att_names:
             if not found_atts[attName]:
                 raise Exception(
-                    "Could not find the attribute ({}) specified within the vector layer.".format(
-                        attName
-                    )
+                    "Could not find the attribute ({}) specified within "
+                    "the vector layer.".format(attName)
                 )
 
         # Create in-memory layer for the BBOX layer.
@@ -1183,13 +1166,15 @@ def select_intersect_feats(
     out_format: str = "GPKG",
 ):
     """
-    Function to select the features which intersect with region of interest (ROI) features which will be outputted
-    into a new vector layer.
+    Function to select the features which intersect with region of interest (ROI)
+    features which will be outputted into a new vector layer.
 
     :param vec_file: vector layer from which the attribute data comes from.
     :param vec_lyr: the layer name from which the attribute data comes from.
-    :param vec_roi_file: the vector file which will be intersected within the vector file.
-    :param vec_roi_lyr: the layer name which will be intersected within the vector file.
+    :param vec_roi_file: the vector file which will be intersected within the
+                         vector file.
+    :param vec_roi_lyr: the layer name which will be intersected within the
+                        vector file.
     :param out_vec_file: the vector file which will be outputted.
     :param out_vec_lyr: the layer name which will be outputted.
     :param out_format: output vector format (default GPKG)
@@ -1249,7 +1234,8 @@ def export_spatial_select_feats(
 
     :param vec_file: vector layer from which the attribute data comes from.
     :param vec_lyr: the layer name from which the attribute data comes from.
-    :param vec_sel_file: the vector file which will be intersected within the vector file.
+    :param vec_sel_file: the vector file which will be intersected within the
+                         vector file.
     :param vec_sel_lyr: the layer name which will be intersected within the vector file.
     :param out_vec_file: output vector file/path
     :param out_vec_lyr: output vector layer
@@ -1333,47 +1319,6 @@ def export_spatial_select_feats(
         result_ds = None
     except Exception as e:
         raise e
-
-
-def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: list) -> bool:
-    """
-    A function which tests whether a feature within an inputted vector layer intersects
-    with a bounding box.
-
-    :param vec_file: vector file/path
-    :param vec_lyr: vector layer name
-    :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as
-                 vector layer.
-    :returns: boolean (True = Intersection)
-
-    """
-    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
-    if dsVecFile is None:
-        raise Exception("Could not open '{}'".format(vec_file))
-
-    vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
-    if vec_lyr_obj is None:
-        raise Exception("Could not find layer '" + vec_lyr + "'")
-
-    # Get a geometry collection object for shapefile.
-    geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
-    for feat in vec_lyr_obj:
-        geom_collect.AddGeometry(feat.GetGeometryRef())
-
-    # Create polygon for bbox
-    ring = ogr.Geometry(ogr.wkbLinearRing)
-    ring.AddPoint(bbox[0], bbox[3])
-    ring.AddPoint(bbox[1], bbox[3])
-    ring.AddPoint(bbox[1], bbox[2])
-    ring.AddPoint(bbox[0], bbox[2])
-    ring.AddPoint(bbox[0], bbox[3])
-    # Create polygon.
-    poly = ogr.Geometry(ogr.wkbPolygon)
-    poly.AddGeometry(ring)
-
-    # Do they intersect?
-    intersect = poly.Intersects(geom_collect)
-    return intersect
 
 
 def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> list:
@@ -1500,7 +1445,7 @@ def subset_veclyr_to_featboxs(
     vec_lyr_tosub: str,
     out_lyr_name: str,
     out_file_base: str,
-    out_file_end: str = ".gpkg",
+    out_file_end: str = "gpkg",
     out_format: str = "GPKG",
 ):
     """
@@ -1515,7 +1460,7 @@ def subset_veclyr_to_featboxs(
                          have the same layer name.
     :param out_file_base: The base name for the output files. A numeric count 0-n will
                           be inserted between this and the ending.
-    :param out_file_end: The output file ending (e.g., .gpkg).
+    :param out_file_end: The output file ending (e.g., gpkg).
     :param out_format: The output file driver (e.g., GPKG).
 
     """
@@ -1527,7 +1472,7 @@ def subset_veclyr_to_featboxs(
         print(bboxes[i])
         grid_02d_ds, grid_02d_lyr = read_vec_lyr_to_mem(vec_file_tosub, vec_lyr_tosub)
         mem_result_ds, mem_result_lyr = subset_envs_vec_lyr_obj(grid_02d_lyr, bboxes[i])
-        out_vec_file = "{0}{1}{2}".format(out_file_base, i, out_file_end)
+        out_vec_file = "{0}{1}.{2}".format(out_file_base, i, out_file_end)
         write_vec_lyr_to_file(
             mem_result_lyr,
             out_vec_file,
@@ -1804,7 +1749,7 @@ def copy_rat_cols_to_vector_lyr(
     if vec_lyr_obj is None:
         raise Exception("Could not find layer '{}'".format(vec_file))
 
-    rat_cols_all = rsgislib.rastergis.getRATColumnsInfo(clumps_img)
+    rat_cols_all = rsgislib.rastergis.get_rat_columns_info(clumps_img)
 
     cols_exist = []
     for ratcol in ratcols:
@@ -1915,12 +1860,12 @@ def copy_rat_cols_to_vector_lyr(
 
 def perform_spatial_join(
     vec_base_file: str,
+    vec_base_lyr: str,
     vec_join_file: str,
+    vec_join_lyr: str,
     out_vec_file: str,
-    vec_base_lyr: str = None,
-    vec_join_lyr: str = None,
-    out_vec_lyr: str = None,
-    out_format: str = None,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
     join_how: str = "inner",
     join_op: str = "within",
 ):
@@ -1933,17 +1878,13 @@ def perform_spatial_join(
 
     :param vec_base_file: the base vector file with the geometries which will
                           be outputted.
+    :param vec_base_lyr: the layer name for the base vector.
     :param vec_join_file: the vector with the attributes which will be joined to
                           the base vector geometries.
+    :param vec_join_lyr: the layer name for the join vector.
     :param out_vec_file: the output vector file.
-    :param vec_base_lyr: the layer name for the base vector, not needed if input file
-                         is a shapefile (Default None).
-    :param vec_join_lyr: the layer name for the join vector, not needed if input file
-                         is a shapefile (Default None).
-    :param out_vec_lyr: the layer name for the output vector, not needed if input file
-                        is a shapefile (Default None).
-    :param out_format: The output vector file format, if none then shapefile
-                       outputted (Default None)
+    :param out_vec_lyr: the layer name for the output vector.
+    :param out_format: The output vector file format (Default GPKG)
     :param join_how: Specifies the type of join that will occur and which geometry
                      is retained. The options are [left, right, inner]. The default
                      is 'inner'
@@ -1952,40 +1893,36 @@ def perform_spatial_join(
                     and default is 'within'
 
     """
-    if join_how not in ["left", "right", "inner"]:
-        raise Exception("The join_how specifed is not valid.")
-    if join_op not in ["intersects", "within", "contains"]:
-        raise Exception("The join_op specifed is not valid.")
-
-    # Import geopandas module.
     import geopandas
 
-    # this is imported to provide useful error message as
-    # will be used in sjoin but if not present
-    import rtree
+    if join_how not in ["left", "right", "inner"]:
+        raise Exception("The join_how specified is not valid.")
+    if join_op not in ["intersects", "within", "contains"]:
+        raise Exception("The join_op specified is not valid.")
 
+    # Try importing rtree to provide useful error message as
+    # will be used in sjoin but if not present
     # the error message is not very user friendly:
     # AttributeError: 'NoneType' object has no attribute 'intersection'
+    try:
+        import rtree
+    except ImportError:
+        raise rsgislib.RSGISPyException(
+            "The rtree module was not available for "
+            "import this is required by geopandas to "
+            "perform a join."
+        )
 
-    if vec_base_lyr is None:
-        base_gpd_df = geopandas.read_file(vec_base_file)
-    else:
-        base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
-
-    if vec_join_lyr is None:
-        join_gpg_df = geopandas.read_file(vec_join_file)
-    else:
-        join_gpg_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
+    base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
+    join_gpg_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
 
     join_gpg_df = geopandas.sjoin(base_gpd_df, join_gpg_df, how=join_how, op=join_op)
 
-    if out_format is None:
-        join_gpg_df.to_file(out_vec_file)
-    else:
-        if out_vec_lyr is None:
-            join_gpg_df.to_file(out_vec_file, driver=out_format)
-        else:
+    if len(join_gpg_df) > 0:
+        if out_format == "GPKG":
             join_gpg_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            join_gpg_df.to_file(out_vec_file, driver=out_format)
 
 
 def does_vmsk_img_intersect(
@@ -2014,6 +1951,7 @@ def does_vmsk_img_intersect(
     import rsgislib.tools.utils
     import rsgislib.tools.filetools
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorutils.createrasters
 
     # Does the input image BBOX intersect the BBOX of the ROI vector?
     if vec_epsg is None:
@@ -2058,14 +1996,14 @@ def does_vmsk_img_intersect(
         rsgislib.imageutils.create_copy_img(
             input_vmsk_img, roi_img, 1, 0, "KEA", rsgislib.TYPE_8UINT
         )
-        rasteriseVecLyrObj(
+        rsgislib.vectorutils.createrasters.rasterise_vec_lyr_obj(
             mem_result_lyr,
             roi_img,
-            burnVal=1,
-            vecAtt=None,
-            calcstats=True,
+            burn_val=1,
+            att_column=None,
+            calc_stats=True,
             thematic=True,
-            nodata=0,
+            no_data_val=0,
         )
         mem_result_ds = None
 
@@ -2085,7 +2023,7 @@ def does_vmsk_img_intersect(
         rsgislib.rastergis.pop_rat_img_stats(
             intersect_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
-        n_vals = rsgislib.imagecalc.countPxlsOfVal(intersect_img, vals=[1])
+        n_vals = rsgislib.imagecalc.count_pxls_of_val(intersect_img, vals=[1])
         if n_vals[0] > 0:
             img_intersect = True
         shutil.rmtree(tmp_file_dir)
@@ -2253,7 +2191,8 @@ def reproj_wgs84_vec_to_utm(
 
     """
     import rsgislib.tools.utm
-    from rsgislib.vectorutils import vector_translate
+    import rsgislib.tools.projection
+    import rsgislib.vectorgeoms
     from osgeo import gdal
     import os
     import tqdm
@@ -2281,7 +2220,7 @@ def reproj_wgs84_vec_to_utm(
     while in_feature:
         geom = in_feature.GetGeometryRef()
         if geom is not None:
-            get_geom_pts(geom, pts_lst)
+            rsgislib.vectorgeoms.get_geom_pts(geom, pts_lst)
         in_feature = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
         pbar.update(1)
@@ -2305,10 +2244,13 @@ def reproj_wgs84_vec_to_utm(
         hemi = "S"
     print("UTM Zone: {}{}".format(utm_zone, hemi))
 
-    out_epsg = rsgislib.tools.utm.epsg_for_UTM(utm_zone, hemi)
+    out_epsg = rsgislib.tools.utm.epsg_for_utm(utm_zone, hemi)
     print("EPSG: {}".format(out_epsg))
 
-    dst_srs_str = "EPSG:{}".format(out_epsg)
+    src_srs_obj = rsgislib.tools.projection.get_osr_prj_obj(4326)
+    dst_srs_obj = rsgislib.tools.projection.get_osr_prj_obj(out_epsg)
+
+    #dst_srs_str = "EPSG:{}".format(out_epsg)
     vector_translate(
         vec_file,
         vec_lyr,
@@ -2318,8 +2260,8 @@ def reproj_wgs84_vec_to_utm(
         drv_create_opts,
         lyr_create_opts,
         access_mode,
-        src_srs="EPSG:4326",
-        dst_srs=dst_srs_str,
+        src_srs=src_srs_obj,
+        dst_srs=dst_srs_obj,
     )
 
 
@@ -2853,10 +2795,12 @@ def merge_utm_vecs_wgs84(
     import rsgislib.tools.utm
     import rsgislib.tools.utils
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorgeoms
     import tqdm
 
     if n_hemi_utm_file is None:
         install_prefix = __file__[: __file__.find("lib")]
+        print(install_prefix)
         n_hemi_utm_file = os.path.join(
             install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_north.gpkg"
         )
@@ -2867,6 +2811,7 @@ def merge_utm_vecs_wgs84(
             )
     if s_hemi_utm_file is None:
         install_prefix = __file__[: __file__.find("lib")]
+        print(install_prefix)
         s_hemi_utm_file = os.path.join(
             install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_south.gpkg"
         )
@@ -2894,7 +2839,7 @@ def merge_utm_vecs_wgs84(
                 else:
                     utm_zones_file = n_hemi_utm_file
 
-                contained = vec_within_vec(utm_zones_file, zone_str, file, lyr)
+                contained = rsgislib.vectorgeoms.vec_within_vec(utm_zones_file, zone_str, file, lyr)
                 if not contained:
                     data_gdf = geopandas.read_file(file, layer=lyr)
                     utm_gdf = geopandas.read_file(utm_zones_file, layer=zone_str)

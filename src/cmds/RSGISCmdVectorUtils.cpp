@@ -37,6 +37,8 @@ namespace rsgis{ namespace cmds {
             
     void executeVectorMaths(std::string inputVectorFile, std::string inputVectorLyr, std::string outputVectorFile, std::string outputVectorLyr, std::string outFormat, std::string outColumn, std::string expression, bool delExistVec, std::vector<RSGISVariableFieldCmds> vars)
     {
+        std::cout << "NOT IMPLEMENTED\n";
+        throw RSGISException("executeVectorMaths is not implemented!");
         /*
         try
         {
@@ -167,6 +169,8 @@ namespace rsgis{ namespace cmds {
             
     void executeCreateLinesOfPoints(std::string inputVectorFile, std::string inputVectorLyr, std::string outputVectorFile, std::string outputVectorLyr, std::string outFormat, double step, bool delExistVec)
     {
+        std::cout << "NOT IMPLEMENTED\n";
+        throw RSGISException("executeCreateLinesOfPoints is not implemented!");
         /*
         try
         {
@@ -236,6 +240,8 @@ namespace rsgis{ namespace cmds {
 
     void executeCheckValidateGeometries(std::string inputVectorFile, std::string inputVectorLyr, std::string outputVectorFile, std::string outputVectorLyr, std::string outFormat, bool printGeomErrs, bool delExistVec)
     {
+        std::cout << "NOT IMPLEMENTED\n";
+        throw RSGISException("executeCheckValidateGeometries is not implemented!");
         /*
         try
         {

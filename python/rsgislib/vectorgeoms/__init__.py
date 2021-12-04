@@ -2870,3 +2870,46 @@ def get_geoms_as_bboxs(vec_file: str, vec_lyr: str) -> list:
         )
     )
     return bboxs
+
+
+def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: list) -> bool:
+    """
+    A function which tests whether a feature within an inputted vector layer intersects
+    with a bounding box.
+
+    :param vec_file: vector file/path
+    :param vec_lyr: vector layer name
+    :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as
+                 vector layer.
+    :returns: boolean (True = Intersection)
+
+    """
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
+    if dsVecFile is None:
+        raise Exception("Could not open '{}'".format(vec_file))
+
+    vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not find layer '" + vec_lyr + "'")
+
+    # Get a geometry collection object for shapefile.
+    geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
+    for feat in vec_lyr_obj:
+        geom_collect.AddGeometry(feat.GetGeometryRef())
+
+    # Create polygon for bbox
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    ring.AddPoint(bbox[0], bbox[3])
+    ring.AddPoint(bbox[1], bbox[3])
+    ring.AddPoint(bbox[1], bbox[2])
+    ring.AddPoint(bbox[0], bbox[2])
+    ring.AddPoint(bbox[0], bbox[3])
+    # Create polygon.
+    poly = ogr.Geometry(ogr.wkbPolygon)
+    poly.AddGeometry(ring)
+
+    # Do they intersect?
+    intersect = poly.Intersects(geom_collect)
+    return intersect
+
+
