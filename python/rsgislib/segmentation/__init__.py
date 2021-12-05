@@ -31,5 +31,3 @@ Daniel Clewley, Peter Bunting, James Shepherd, Sam Gillingham, Neil Flood, John 
 
 # import the C++ extension into this level
 from ._segmentation import *
-
-

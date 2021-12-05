@@ -2250,7 +2250,7 @@ def reproj_wgs84_vec_to_utm(
     src_srs_obj = rsgislib.tools.projection.get_osr_prj_obj(4326)
     dst_srs_obj = rsgislib.tools.projection.get_osr_prj_obj(out_epsg)
 
-    #dst_srs_str = "EPSG:{}".format(out_epsg)
+    # dst_srs_str = "EPSG:{}".format(out_epsg)
     vector_translate(
         vec_file,
         vec_lyr,
@@ -2839,7 +2839,9 @@ def merge_utm_vecs_wgs84(
                 else:
                     utm_zones_file = n_hemi_utm_file
 
-                contained = rsgislib.vectorgeoms.vec_within_vec(utm_zones_file, zone_str, file, lyr)
+                contained = rsgislib.vectorgeoms.vec_within_vec(
+                    utm_zones_file, zone_str, file, lyr
+                )
                 if not contained:
                     data_gdf = geopandas.read_file(file, layer=lyr)
                     utm_gdf = geopandas.read_file(utm_zones_file, layer=zone_str)
@@ -2888,8 +2890,6 @@ def merge_utm_vecs_wgs84(
             out_gdf.to_file(out_vec_file, driver=out_format)
 
 
-
-
 def split_feats_to_mlyrs(
     vec_file: str, vec_lyr: str, out_vec_file: str, out_format: str = "GPKG"
 ):
@@ -2915,9 +2915,6 @@ def split_feats_to_mlyrs(
         tmp_gpdf.to_file(out_vec_file, layer=vec_out_lyr, driver=out_format)
         tmp_gpdf = None
     base_gpdf = None
-
-
-
 
 
 def split_vec_lyr_random_subset(
@@ -2964,7 +2961,9 @@ def split_vec_lyr_random_subset(
     base_gpdf = base_gpdf.drop(smpl_gpdf.index)
 
     if out_format == "GPKG":
-        base_gpdf.to_file(out_rmain_vec_file, layer=out_rmain_vec_lyr, driver=out_format)
+        base_gpdf.to_file(
+            out_rmain_vec_file, layer=out_rmain_vec_lyr, driver=out_format
+        )
         smpl_gpdf.to_file(out_smpl_vec_file, layer=out_smpl_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_rmain_vec_file, driver=out_format)
@@ -3033,6 +3032,3 @@ def create_train_test_smpls(
         import shutil
 
         shutil.rmtree(tmp_dir)
-
-
-

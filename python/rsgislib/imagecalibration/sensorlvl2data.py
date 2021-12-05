@@ -34,8 +34,14 @@
 ############################################################################
 
 
-def create_stacked_ls8_cl2_lv2_img(input_file, out_dir, tmp_dir, scale_factor=10000,
-                                   gdalformat="KEA", delete_inter_data=True):
+def create_stacked_ls8_cl2_lv2_img(
+    input_file,
+    out_dir,
+    tmp_dir,
+    scale_factor=10000,
+    gdalformat="KEA",
+    delete_inter_data=True,
+):
     """
     A function which extracts the USGS collection-2 level-2 data and creates a single
     multi-band image file in the output directory. Note the output data type is
@@ -81,57 +87,142 @@ def create_stacked_ls8_cl2_lv2_img(input_file, out_dir, tmp_dir, scale_factor=10
 
     ls8_head_info = rsgislib.tools.sensors.read_landsat_mtl_to_dict(mtl_header)
 
-    ls_prod_id = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "LANDSAT_PRODUCT_ID"]).lower()
+    ls_prod_id = rsgislib.tools.utils.dict_struct_get_str_value(
+        ls8_head_info, ["PRODUCT_CONTENTS", "LANDSAT_PRODUCT_ID"]
+    ).lower()
 
-    b1_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_1"])
-    b2_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_2"])
-    b3_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_3"])
-    b4_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_4"])
-    b5_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_5"])
-    b6_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_6"])
-    b7_img = rsgislib.tools.utils.dict_struct_get_str_value(ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_7"])
+    b1_img = rsgislib.tools.utils.dict_struct_get_str_value(
+        ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_1"]
+    )
+    b2_img = rsgislib.tools.utils.dict_struct_get_str_value(
+        ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_2"]
+    )
+    b3_img = rsgislib.tools.utils.dict_struct_get_str_value(
+        ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_3"]
+    )
+    b4_img = rsgislib.tools.utils.dict_struct_get_str_value(
+        ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_4"]
+    )
+    b5_img = rsgislib.tools.utils.dict_struct_get_str_value(
+        ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_5"]
+    )
+    b6_img = rsgislib.tools.utils.dict_struct_get_str_value(
+        ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_6"]
+    )
+    b7_img = rsgislib.tools.utils.dict_struct_get_str_value(
+        ls8_head_info, ["PRODUCT_CONTENTS", "FILE_NAME_BAND_7"]
+    )
 
-    b1_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_1"])
-    b2_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_2"])
-    b3_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_3"])
-    b4_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_4"])
-    b5_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_5"])
-    b6_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_6"])
-    b7_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_7"])
+    b1_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_1"],
+    )
+    b2_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_2"],
+    )
+    b3_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_3"],
+    )
+    b4_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_4"],
+    )
+    b5_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_5"],
+    )
+    b6_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_6"],
+    )
+    b7_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_MULT_BAND_7"],
+    )
 
-    b1_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_1"])
-    b2_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_2"])
-    b3_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_3"])
-    b4_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_4"])
-    b5_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_5"])
-    b6_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_6"])
-    b7_add = rsgislib.tools.utils.dict_struct_get_numeric_value(ls8_head_info, ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_7"])
+    b1_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_1"],
+    )
+    b2_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_2"],
+    )
+    b3_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_3"],
+    )
+    b4_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_4"],
+    )
+    b5_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_5"],
+    )
+    b6_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_6"],
+    )
+    b7_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
+        ls8_head_info,
+        ["LEVEL2_SURFACE_REFLECTANCE_PARAMETERS", "REFLECTANCE_ADD_BAND_7"],
+    )
 
     band_info = []
-    band_info.append({"img": os.path.join(raw_dir, b1_img), "multi": b1_multi, "add": b1_add})
-    band_info.append({"img": os.path.join(raw_dir, b2_img), "multi": b2_multi, "add": b2_add})
-    band_info.append({"img": os.path.join(raw_dir, b3_img), "multi": b3_multi, "add": b3_add})
-    band_info.append({"img": os.path.join(raw_dir, b4_img), "multi": b4_multi, "add": b4_add})
-    band_info.append({"img": os.path.join(raw_dir, b5_img), "multi": b5_multi, "add": b5_add})
-    band_info.append({"img": os.path.join(raw_dir, b6_img), "multi": b6_multi, "add": b6_add})
-    band_info.append({"img": os.path.join(raw_dir, b7_img), "multi": b7_multi, "add": b7_add})
+    band_info.append(
+        {"img": os.path.join(raw_dir, b1_img), "multi": b1_multi, "add": b1_add}
+    )
+    band_info.append(
+        {"img": os.path.join(raw_dir, b2_img), "multi": b2_multi, "add": b2_add}
+    )
+    band_info.append(
+        {"img": os.path.join(raw_dir, b3_img), "multi": b3_multi, "add": b3_add}
+    )
+    band_info.append(
+        {"img": os.path.join(raw_dir, b4_img), "multi": b4_multi, "add": b4_add}
+    )
+    band_info.append(
+        {"img": os.path.join(raw_dir, b5_img), "multi": b5_multi, "add": b5_add}
+    )
+    band_info.append(
+        {"img": os.path.join(raw_dir, b6_img), "multi": b6_multi, "add": b6_add}
+    )
+    band_info.append(
+        {"img": os.path.join(raw_dir, b7_img), "multi": b7_multi, "add": b7_add}
+    )
 
     sref_bands = []
     for i, band in enumerate(band_info):
-        out_img_band = os.path.join(tmp_dir, "{}_b{}_sref.kea".format(ls_prod_id, i + 1))
-        rsgislib.imagecalc.image_math(band["img"], out_img_band, "b1==0?-9999:((b1*{})+{})*{}".format(band["multi"], band["add"], scale_factor),'KEA', rsgislib.TYPE_32INT)
+        out_img_band = os.path.join(
+            tmp_dir, "{}_b{}_sref.kea".format(ls_prod_id, i + 1)
+        )
+        rsgislib.imagecalc.image_math(
+            band["img"],
+            out_img_band,
+            "b1==0?-9999:((b1*{})+{})*{}".format(
+                band["multi"], band["add"], scale_factor
+            ),
+            "KEA",
+            rsgislib.TYPE_32INT,
+        )
         sref_bands.append(out_img_band)
 
     band_names = ["coastal", "blue", "green", "red", "nir", "swir1", "swir2"]
     out_img_ext = rsgislib.imageutils.get_file_img_extension(gdalformat)
     output_img = os.path.join(out_dir, "{}_sref.{}".format(ls_prod_id, out_img_ext))
-    rsgislib.imageutils.stack_img_bands(sref_bands, band_names, output_img, None, -9999, gdalformat, rsgislib.TYPE_32INT)
-    rsgislib.imageutils.pop_img_stats(output_img, use_no_data=True, no_data_val=-9999, calc_pyramids=True)
+    rsgislib.imageutils.stack_img_bands(
+        sref_bands, band_names, output_img, None, -9999, gdalformat, rsgislib.TYPE_32INT
+    )
+    rsgislib.imageutils.pop_img_stats(
+        output_img, use_no_data=True, no_data_val=-9999, calc_pyramids=True
+    )
 
     if delete_inter_data:
         import shutil
+
         shutil.rmtree(raw_dir)
         for img_band in sref_bands:
             rsgislib.imageutils.delete_gdal_layer(img_band)
-
-

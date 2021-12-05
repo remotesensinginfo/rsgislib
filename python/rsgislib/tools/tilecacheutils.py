@@ -158,7 +158,11 @@ def get_xy_mercator_lonlat(meter_x, meter_y, truncate=False):
     """
     lon_deg = (meter_x / ORIGIN_SHIFT) * 180.0
     lat_deg = (meter_y / ORIGIN_SHIFT) * 180.0
-    lat_deg = 180.0 / math.pi * (2 * math.atan(math.exp(lat_deg * math.pi / 180.0)) - math.pi / 2.0)
+    lat_deg = (
+        180.0
+        / math.pi
+        * (2 * math.atan(math.exp(lat_deg * math.pi / 180.0)) - math.pi / 2.0)
+    )
 
     if truncate:
         lon_deg, lat_deg = truncate_lng_lat(lon_deg, lat_deg)
@@ -260,6 +264,7 @@ def get_tiles(bbox, zooms, tms=True, truncate=False):
     """
     import math
     from collections.abc import Sequence
+
     west = bbox[0]
     east = bbox[1]
     south = bbox[2]
@@ -353,6 +358,7 @@ def convert_between_tms_xyz(tiles_dir):
     import os
     import rsgislib.tools.utils
     import tqdm
+
     c_pwd = os.getcwd()
     in_zoom_dirs = []
     lcl_files = os.listdir(tiles_dir)
@@ -361,26 +367,25 @@ def convert_between_tms_xyz(tiles_dir):
         lcl_file = os.path.join(tiles_dir, lcl_file)
         if os.path.isdir(lcl_file) and rsgislib.tools.utils.is_number(lcl_name):
             in_zoom_dirs.append(os.path.abspath(lcl_file))
-    for zoom_dir in tqdm.tqdm(in_zoom_dirs, desc='overall'):
+    for zoom_dir in tqdm.tqdm(in_zoom_dirs, desc="overall"):
         zoom = int(os.path.basename(zoom_dir))
         x_dirs = os.listdir(zoom_dir)
-        for x_dir in tqdm.tqdm(x_dirs, desc='zoom {}'.format(zoom), leave=False):
+        for x_dir in tqdm.tqdm(x_dirs, desc="zoom {}".format(zoom), leave=False):
             if rsgislib.tools.utils.is_number(x_dir):
                 x = int(x_dir)
                 x_dir = os.path.join(zoom_dir, x_dir)
                 if os.path.isdir(x_dir) and rsgislib.tools.utils.is_number(x):
                     y_files = os.listdir(x_dir)
                     os.chdir(x_dir)
-                    for y_file in tqdm.tqdm(y_files, desc='y', leave=False):
+                    for y_file in tqdm.tqdm(y_files, desc="y", leave=False):
                         y_cur_file = os.path.join(x_dir, y_file)
                         y_in_str = os.path.splitext(y_file)[0]
                         if rsgislib.tools.utils.is_number(y_in_str):
                             y_in = int(y_in_str)
                             img_ext = os.path.splitext(y_file)[1]
-                            n_tile_x, n_tile_y, n_zoom = flip_xyz_tms_tiles(x, y_in, zoom)
+                            n_tile_x, n_tile_y, n_zoom = flip_xyz_tms_tiles(
+                                x, y_in, zoom
+                            )
                             out_img_file = "{}{}".format(n_tile_y, img_ext)
                             os.rename(y_cur_file, out_img_file)
     os.chdir(c_pwd)
-
-
-

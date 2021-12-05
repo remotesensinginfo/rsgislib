@@ -447,7 +447,10 @@ def perform_slic_segmentation(
 
     if calc_stats:
         rsgislib.rastergis.pop_rat_img_stats(
-            clumps_img=output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
         )
 
 
@@ -587,7 +590,10 @@ def perform_watershed_segmentation(
 
     if calc_stats:
         rsgislib.rastergis.pop_rat_img_stats(
-            clumps_img=output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
         )
 
 
@@ -751,5 +757,8 @@ def perform_random_walker_segmentation(
 
     if calc_stats:
         rsgislib.rastergis.pop_rat_img_stats(
-            clumps_img=output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
         )

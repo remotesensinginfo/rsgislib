@@ -5,12 +5,16 @@ The tools.plotting module contains functions for extracting and plotting remote 
 
 # Import the RSGISLib module
 import rsgislib
+
 # Import the RSGISLib Image Utils module
 from rsgislib import imageutils
+
 # Import the RSGISLib Zonal Stats module
 from rsgislib import zonalstats
+
 # Import the RSGISLib Image Calc module
 from rsgislib import imagecalc
+
 # Import the os module
 import os
 
@@ -26,111 +30,156 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.colors as mClrs
 except ImportError as pltErr:
-    haveMatPlotLib = False   
-    
+    haveMatPlotLib = False
+
 haveNumpy = True
 try:
     import numpy
 except ImportError as numErr:
-    haveNumpy = False    
-    
-    
-def plot_image_spectra(input_img, vec_file, vec_lyr, output_plot_file, wavelengths, plot_title, scale_factor=0.1, show_refl_std=True, refl_max=None):
+    haveNumpy = False
+
+
+def plot_image_spectra(
+    input_img,
+    vec_file,
+    vec_lyr,
+    output_plot_file,
+    wavelengths,
+    plot_title,
+    scale_factor=0.1,
+    show_refl_std=True,
+    refl_max=None,
+):
     """A utility function to extract and plot image spectra.
-Where:
+    Where:
 
-:param input_img: is the input image
-:param vec_file: is the region of interest file as a vector file - if multiple polygons are defined the spectra for each will be added to the plot.
-:param vec_lyr:
-:param output_plot_file: is the output PDF file for the plot which has been create
-:param wavelengths: is list of numbers with the wavelength of each band (must have the same number of wavelengths as image bands)
-:param plot_title: is a string with the title for the plot
-:param scale_factor: is a float specifying the scaling to percentage (0 - 100). (Default is 0.1, i.e., pixel values are scaled between 0-1000; ARCSI default).
-:param show_refl_std: is a boolean (default: True) to specify whether a shaded region showing 1 standard deviation from the mean on the plot alongside the mean spectra.
-:param refl_max: is a parameter for setting the maximum reflectance value on the Y axis (if None the maximum value in the dataset is used
+    :param input_img: is the input image
+    :param vec_file: is the region of interest file as a vector file - if multiple polygons are defined the spectra for each will be added to the plot.
+    :param vec_lyr:
+    :param output_plot_file: is the output PDF file for the plot which has been create
+    :param wavelengths: is list of numbers with the wavelength of each band (must have the same number of wavelengths as image bands)
+    :param plot_title: is a string with the title for the plot
+    :param scale_factor: is a float specifying the scaling to percentage (0 - 100). (Default is 0.1, i.e., pixel values are scaled between 0-1000; ARCSI default).
+    :param show_refl_std: is a boolean (default: True) to specify whether a shaded region showing 1 standard deviation from the mean on the plot alongside the mean spectra.
+    :param refl_max: is a parameter for setting the maximum reflectance value on the Y axis (if None the maximum value in the dataset is used
 
-Example::
+    Example::
 
-    from rsgislib import tools
-        
-    inputImage = 'injune_p142_casi_sub_utm.kea'
-    roiFile = 'spectraROI.shp'
-    outputPlotFile = 'SpectraPlot.pdf'
-    wavelengths = [446.0, 530.0, 549.0, 569.0, 598.0, 633.0, 680.0, 696.0, 714.0, 732.0, 741.0, 752.0, 800.0, 838.0]
-    plotTitle = "Image Spectral from CASI Image"
-    
-    tools.plotting.plot_image_spectra(inputImage, roiFile, outputPlotFile, wavelengths, plotTitle)
-    
-"""
+        from rsgislib import tools
+
+        inputImage = 'injune_p142_casi_sub_utm.kea'
+        roiFile = 'spectraROI.shp'
+        outputPlotFile = 'SpectraPlot.pdf'
+        wavelengths = [446.0, 530.0, 549.0, 569.0, 598.0, 633.0, 680.0, 696.0, 714.0, 732.0, 741.0, 752.0, 800.0, 838.0]
+        plotTitle = "Image Spectral from CASI Image"
+
+        tools.plotting.plot_image_spectra(inputImage, roiFile, outputPlotFile, wavelengths, plotTitle)
+    """
 
     try:
         # Check gdal is available
         if not haveGDALPy:
-            raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+            raise Exception(
+                "The GDAL python bindings required for this function could not be imported\n\t"
+                + gdalErr
+            )
         # Check matplotlib is available
         if not haveMatPlotLib:
-            raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
-        
+            raise Exception(
+                "The matplotlib module is required for this function could not be imported\n\t"
+                + pltErr
+            )
+
         dataset = gdal.Open(input_img, gdal.GA_ReadOnly)
         numBands = dataset.RasterCount
         dataset = None
-        
+
         if not len(wavelengths) == numBands:
             raise Exception("The number of wavelengths and image bands must be equal.")
-        
+
         tmpOutFile = os.path.splitext(output_plot_file)[0] + "_statstmp.txt"
-        zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=False, calcMin=False, calcMax=False, calcMean=True, calcStdDev=True, calcMode=False, calcSum=False)
-        zonalstats.pixelStats2TXT(input_img, vec_file, tmpOutFile, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER, False)
-        
+        zonalattributes = zonalstats.ZonalAttributes(
+            minThreshold=0,
+            maxThreshold=10000,
+            calcCount=False,
+            calcMin=False,
+            calcMax=False,
+            calcMean=True,
+            calcStdDev=True,
+            calcMode=False,
+            calcSum=False,
+        )
+        zonalstats.pixelStats2TXT(
+            input_img,
+            vec_file,
+            tmpOutFile,
+            zonalattributes,
+            True,
+            True,
+            zonalstats.METHOD_POLYCONTAINSPIXELCENTER,
+            False,
+        )
+
         meanVals = []
         stdDevVals = []
-        stats = open(tmpOutFile, 'r')
+        stats = open(tmpOutFile, "r")
         row = 0
         for statsRow in stats:
             statsRow = statsRow.strip()
             if row > 0:
                 meanVal = []
                 stdDevVal = []
-                data = statsRow.split(',')
-                
+                data = statsRow.split(",")
+
                 if not len(data) == (numBands * 2) + 2:
-                    raise Exception("The number of outputted stats values is incorrect!")
+                    raise Exception(
+                        "The number of outputted stats values is incorrect!"
+                    )
                 for band in range(numBands):
-                    meanVal.append(float(data[(band*2)+1]) * scale_factor)
-                    stdDevVal.append(float(data[(band*2)+2]) * scale_factor)
+                    meanVal.append(float(data[(band * 2) + 1]) * scale_factor)
+                    stdDevVal.append(float(data[(band * 2) + 2]) * scale_factor)
                 meanVals.append(meanVal)
                 stdDevVals.append(stdDevVal)
-            row+=1
+            row += 1
         stats.close()
-        
-        #print("Mean: ", meanVals)
-        #print("Std Dev: ", stdDevVals)
+
+        # print("Mean: ", meanVals)
+        # print("Std Dev: ", stdDevVals)
         print("Creating Plot")
         fig = plt.figure(figsize=(7, 5), dpi=80)
         ax1 = fig.add_subplot(111)
         for feat in range(len(meanVals)):
-            ax1.plot(wavelengths, meanVals[feat], 'k-', zorder=10)
+            ax1.plot(wavelengths, meanVals[feat], "k-", zorder=10)
             if show_refl_std:
                 lowerVals = []
                 upperVals = []
                 for band in range(numBands):
                     lowerVals.append(meanVals[feat][band] - stdDevVals[feat][band])
                     upperVals.append(meanVals[feat][band] + stdDevVals[feat][band])
-                ax1.fill_between(wavelengths, lowerVals, upperVals, alpha=0.2, linewidth=1.0, facecolor=[0.70,0.70,0.70], edgecolor=[0.70,0.70,0.70], zorder=-1)
-        
-        ax1Range = ax1.axis('tight')
-                
+                ax1.fill_between(
+                    wavelengths,
+                    lowerVals,
+                    upperVals,
+                    alpha=0.2,
+                    linewidth=1.0,
+                    facecolor=[0.70, 0.70, 0.70],
+                    edgecolor=[0.70, 0.70, 0.70],
+                    zorder=-1,
+                )
+
+        ax1Range = ax1.axis("tight")
+
         if refl_max is None:
             ax1.axis((ax1Range[0], ax1Range[1], 0, ax1Range[3]))
         else:
             ax1.axis((ax1Range[0], ax1Range[1], 0, refl_max))
-        
-        plt.grid(color='k', linestyle='--', linewidth=0.5)
+
+        plt.grid(color="k", linestyle="--", linewidth=0.5)
         plt.title(plot_title)
         plt.xlabel("Wavelength")
         plt.ylabel("Reflectance (%)")
-    
-        plt.savefig(output_plot_file, format='PDF')
+
+        plt.savefig(output_plot_file, format="PDF")
         os.remove(tmpOutFile)
         print("Completed.\n")
 
@@ -138,57 +187,87 @@ Example::
         raise e
 
 
-def plot_image_comparison(inputImage1, inputImage2, img1Band, img2Band, outputPlotFile, numBins=100, img1Min=None, img1Max=None, img2Min=None, img2Max=None, img1Scale=1, img2Scale=1, img1Off=0, img2Off=0, normOutput=False, plotTitle='2D Histogram', xLabel='X Axis', yLabel='Y Axis', ctable='jet', interp='nearest'):
-    """A function to plot two images against each other. 
-Where:
+def plot_image_comparison(
+    inputImage1,
+    inputImage2,
+    img1Band,
+    img2Band,
+    outputPlotFile,
+    numBins=100,
+    img1Min=None,
+    img1Max=None,
+    img2Min=None,
+    img2Max=None,
+    img1Scale=1,
+    img2Scale=1,
+    img1Off=0,
+    img2Off=0,
+    normOutput=False,
+    plotTitle="2D Histogram",
+    xLabel="X Axis",
+    yLabel="Y Axis",
+    ctable="jet",
+    interp="nearest",
+):
+    """A function to plot two images against each other.
+    Where:
 
-:param inputImage1: is a string with the path to the first image.
-:param inputImage2: is a string with the path to the second image.
-:param img1Band: is an int specifying the band in the first image to be plotted.
-:param img2Band: is an int specifying the band in the second image to be plotted.
-:param outputPlotFile: is a string specifying the output PDF for the plot.
-:param numBins: is an int specifying the number of bins within each axis of the histogram (default: 100)
-:param img1Min: is a double specifying the minimum value to be used in the histogram from image 1. If value is None then taken from the image.
-:param img1Max: is a double specifying the maximum value to be used in the histogram from image 1. If value is None then taken from the image.
-:param img2Min: is a double specifying the minimum value to be used in the histogram from image 2. If value is None then taken from the image.
-:param img2Max: is a double specifying the maximum value to be used in the histogram from image 2. If value is None then taken from the image.
-:param img1Scale: is a double specifying the scale for image 1 (Default 1).
-:param img2Scale: is a double specifying the scale for image 2 (Default 1).
-:param img1Off: is a double specifying the offset for image 1 (Default 0).
-:param img2Off: is a double specifying the offset for image 2 (Default 0).
-:param normOutput: is a boolean specifying whether the histogram should be normalised (Default: False).
-:param plotTitle: is a string specifying the title of the plot (Default: '2D Histogram').
-:param xLabel: is a string specifying the x axis label (Default: 'X Axis')
-:param yLabel: is a string specifying the y axis label (Default: 'Y Axis')
-:param ctable: is a string specifying the colour table to be used (Default: jet), list of available colour tables specified by matplotlib: http://matplotlib.org/examples/color/colormaps_reference.html
-:param interp: is a string specifying the interpolation algorithm to be used (Default: 'nearest'). Available values are ‘none’, ‘nearest’, ‘bilinear’, ‘bicubic’, ‘spline16’, ‘spline36’, ‘hanning’, ‘hamming’, ‘hermite’, ‘kaiser’, ‘quadric’, ‘catrom’, ‘gaussian’, ‘bessel’, ‘mitchell’, ‘sinc’, ‘lanczos’.
-    
-Example::
+    :param inputImage1: is a string with the path to the first image.
+    :param inputImage2: is a string with the path to the second image.
+    :param img1Band: is an int specifying the band in the first image to be plotted.
+    :param img2Band: is an int specifying the band in the second image to be plotted.
+    :param outputPlotFile: is a string specifying the output PDF for the plot.
+    :param numBins: is an int specifying the number of bins within each axis of the histogram (default: 100)
+    :param img1Min: is a double specifying the minimum value to be used in the histogram from image 1. If value is None then taken from the image.
+    :param img1Max: is a double specifying the maximum value to be used in the histogram from image 1. If value is None then taken from the image.
+    :param img2Min: is a double specifying the minimum value to be used in the histogram from image 2. If value is None then taken from the image.
+    :param img2Max: is a double specifying the maximum value to be used in the histogram from image 2. If value is None then taken from the image.
+    :param img1Scale: is a double specifying the scale for image 1 (Default 1).
+    :param img2Scale: is a double specifying the scale for image 2 (Default 1).
+    :param img1Off: is a double specifying the offset for image 1 (Default 0).
+    :param img2Off: is a double specifying the offset for image 2 (Default 0).
+    :param normOutput: is a boolean specifying whether the histogram should be normalised (Default: False).
+    :param plotTitle: is a string specifying the title of the plot (Default: '2D Histogram').
+    :param xLabel: is a string specifying the x axis label (Default: 'X Axis')
+    :param yLabel: is a string specifying the y axis label (Default: 'Y Axis')
+    :param ctable: is a string specifying the colour table to be used (Default: jet), list of available colour tables specified by matplotlib: http://matplotlib.org/examples/color/colormaps_reference.html
+    :param interp: is a string specifying the interpolation algorithm to be used (Default: 'nearest'). Available values are ‘none’, ‘nearest’, ‘bilinear’, ‘bicubic’, ‘spline16’, ‘spline36’, ‘hanning’, ‘hamming’, ‘hermite’, ‘kaiser’, ‘quadric’, ‘catrom’, ‘gaussian’, ‘bessel’, ‘mitchell’, ‘sinc’, ‘lanczos’.
 
-    from rsgislib.tools import plotting
-    
-    inputImage1 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_sref_ndvi.kea'
-    inputImage2 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_ndvi.kea'
-    outputPlotFile = 'ARCSI_RAD_SREF_NDVI.pdf'
-    
-    plotting.plot_image_comparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
-    
+    Example::
+
+        from rsgislib.tools import plotting
+
+        inputImage1 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_sref_ndvi.kea'
+        inputImage2 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_ndvi.kea'
+        outputPlotFile = 'ARCSI_RAD_SREF_NDVI.pdf'
+
+        plotting.plot_image_comparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
+
     """
     try:
         # Check gdal is available
         if not haveGDALPy:
-            raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+            raise Exception(
+                "The GDAL python bindings required for this function could not be imported\n\t"
+                + gdalErr
+            )
         # Check matplotlib is available
         if not haveMatPlotLib:
-            raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
+            raise Exception(
+                "The matplotlib module is required for this function could not be imported\n\t"
+                + pltErr
+            )
         # Check matplotlib is available
         if not haveNumpy:
-            raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
-        
-        gdalformat = "KEA"      
+            raise Exception(
+                "The numpy module is required for this function could not be imported\n\t"
+                + numErr
+            )
+
+        gdalformat = "KEA"
         tmpOutFile = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmp.kea"
-        #tmpOutFileStch = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmpStch.kea"
-        
+        # tmpOutFileStch = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmpStch.kea"
+
         if (img1Min is None) or (img1Max is None):
             # Calculate image 1 stats
             imgGDALDS = gdal.Open(inputImage1, gdal.GA_ReadOnly)
@@ -199,7 +278,7 @@ Example::
                 img1Min = min
             if img1Max is None:
                 img1Max = max
-            
+
         if (img2Min is None) or (img2Max is None):
             # Calculate image 2 stats
             imgGDALDS = gdal.Open(inputImage2, gdal.GA_ReadOnly)
@@ -210,97 +289,145 @@ Example::
                 img2Min = min
             if img2Max is None:
                 img2Max = max
-        
+
         # Images are flipped so axis' come out correctly.
-        outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(inputImage2, inputImage1, tmpOutFile, gdalformat, img2Band, img1Band, numBins, img2Min, img2Max, img1Min, img1Max, img2Scale, img1Scale, img2Off, img1Off, normOutput)
+        outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(
+            inputImage2,
+            inputImage1,
+            tmpOutFile,
+            gdalformat,
+            img2Band,
+            img1Band,
+            numBins,
+            img2Min,
+            img2Max,
+            img1Min,
+            img1Max,
+            img2Scale,
+            img1Scale,
+            img2Off,
+            img1Off,
+            normOutput,
+        )
         print("Image1 Bin Size: ", outBinSizeImg1)
         print("Image2 Bin Size: ", outBinSizeImg2)
         print("rSq: ", rSq)
-                
+
         print("Read Image Data")
         plotGDALImg = gdal.Open(tmpOutFile, gdal.GA_ReadOnly)
         plotImgBand = plotGDALImg.GetRasterBand(1)
         dataArr = plotImgBand.ReadAsArray().astype(float)
         plotGDALImg = None
-        
+
         fig = plt.figure(figsize=(7, 7), dpi=80)
         ax1 = fig.add_subplot(111)
-        
-        img1MinSc = img1Off + (img1Min*img1Scale)
-        img1MaxSc = img1Off + (img1Max*img1Scale)
-        img2MinSc = img2Off + (img2Min*img2Scale)
-        img2MaxSc = img2Off + (img2Max*img2Scale)
-        
-        minVal = numpy.min(dataArr[dataArr!=0])
+
+        img1MinSc = img1Off + (img1Min * img1Scale)
+        img1MaxSc = img1Off + (img1Max * img1Scale)
+        img2MinSc = img2Off + (img2Min * img2Scale)
+        img2MaxSc = img2Off + (img2Max * img2Scale)
+
+        minVal = numpy.min(dataArr[dataArr != 0])
         maxVal = numpy.max(dataArr)
-        
+
         print("Min Value: ", minVal)
         print("Max Value: ", maxVal)
-        
-        cmap=plt.get_cmap(ctable)
-        mClrs.Colormap.set_under(cmap,color='white')
-        mClrs.Colormap.set_over(cmap,color='white')
-        
-        imPlot = plt.imshow(dataArr, cmap=cmap, aspect='equal', interpolation=interp, norm=mClrs.Normalize(vmin=minVal, vmax=maxVal), vmin=minVal, vmax=maxVal, origin=[0,0], extent=[img1MinSc, img1MaxSc, img2MinSc, img2MaxSc])
-        plt.grid(color='k', linestyle='--', linewidth=0.5)
-        rSqStr = ''
+
+        cmap = plt.get_cmap(ctable)
+        mClrs.Colormap.set_under(cmap, color="white")
+        mClrs.Colormap.set_over(cmap, color="white")
+
+        imPlot = plt.imshow(
+            dataArr,
+            cmap=cmap,
+            aspect="equal",
+            interpolation=interp,
+            norm=mClrs.Normalize(vmin=minVal, vmax=maxVal),
+            vmin=minVal,
+            vmax=maxVal,
+            origin=[0, 0],
+            extent=[img1MinSc, img1MaxSc, img2MinSc, img2MaxSc],
+        )
+        plt.grid(color="k", linestyle="--", linewidth=0.5)
+        rSqStr = ""
         if rSq < 0:
             rSq = 0.00
         rSqStr = "$r^2 = " + str(round(rSq, 3)) + "$"
-        plt.text(0.05, 0.95, rSqStr, va='center', transform=ax1.transAxes)
+        plt.text(0.05, 0.95, rSqStr, va="center", transform=ax1.transAxes)
         fig.colorbar(imPlot)
         plt.title(plotTitle)
         plt.xlabel(xLabel)
         plt.ylabel(yLabel)
-    
-        plt.savefig(outputPlotFile, format='PDF')
-        
+
+        plt.savefig(outputPlotFile, format="PDF")
+
         # Tidy up temporary file.
         gdalDriver = gdal.GetDriverByName(gdalformat)
         gdalDriver.Delete(tmpOutFile)
-                
+
     except Exception as e:
         raise e
 
 
-def plot_image_histogram(input_img, imgBand, outputPlotFile, numBins=100, imgMin=None, imgMax=None, normOutput=False, plotTitle='Histogram', xLabel='X Axis', colour='blue', edgecolour='black', linewidth=None):
+def plot_image_histogram(
+    input_img,
+    imgBand,
+    outputPlotFile,
+    numBins=100,
+    imgMin=None,
+    imgMax=None,
+    normOutput=False,
+    plotTitle="Histogram",
+    xLabel="X Axis",
+    colour="blue",
+    edgecolour="black",
+    linewidth=None,
+):
     """
-A function to plot the histogram of an image.
+    A function to plot the histogram of an image.
 
-Where:
+    Where:
 
-:param input_img: is a string with the path to the image.
-:param imgBand: is an int specifying the band in the image to be plotted.
-:param outputPlotFile: is a string specifying the output PDF for the plot.
-:param numBins: is an int specifying the number of bins within each axis of the histogram (default: 100)
-:param imgMin: is a double specifying the minimum value to be used in the histogram from the image. If value is None then taken from the image.
-:param imgMax: is a double specifying the maximum value to be used in the histogram from the image. If value is None then taken from the image.
-:param normOutput: is a boolean specifying whether the histogram should be normalised (Default: False).
-:param plotTitle: is a string specifying the title of the plot (Default: '2D Histogram').
-:param xLabel: is a string specifying the x axis label (Default: 'X Axis')
-:param colour: is the colour of the bars in the plot (see matplotlib documentation for how to specify, either keyword or RGB values (e.g., [1.0,0,0])
-:param edgecolour: is the colour of the edges of the bars
-:param linewidth: is the thickness of the edges of the bars in the plot.
-    
-Example::
+    :param input_img: is a string with the path to the image.
+    :param imgBand: is an int specifying the band in the image to be plotted.
+    :param outputPlotFile: is a string specifying the output PDF for the plot.
+    :param numBins: is an int specifying the number of bins within each axis of the histogram (default: 100)
+    :param imgMin: is a double specifying the minimum value to be used in the histogram from the image. If value is None then taken from the image.
+    :param imgMax: is a double specifying the maximum value to be used in the histogram from the image. If value is None then taken from the image.
+    :param normOutput: is a boolean specifying whether the histogram should be normalised (Default: False).
+    :param plotTitle: is a string specifying the title of the plot (Default: '2D Histogram').
+    :param xLabel: is a string specifying the x axis label (Default: 'X Axis')
+    :param colour: is the colour of the bars in the plot (see matplotlib documentation for how to specify, either keyword or RGB values (e.g., [1.0,0,0])
+    :param edgecolour: is the colour of the edges of the bars
+    :param linewidth: is the thickness of the edges of the bars in the plot.
 
-    from rsgislib.tools import plotting
-    
-    plotting.plot_image_histogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
-    
+    Example::
+
+        from rsgislib.tools import plotting
+
+        plotting.plot_image_histogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
+
     """
     try:
         # Check gdal is available
         if not haveGDALPy:
-            raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+            raise Exception(
+                "The GDAL python bindings required for this function could not be imported\n\t"
+                + gdalErr
+            )
         # Check matplotlib is available
         if not haveMatPlotLib:
-            raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
+            raise Exception(
+                "The matplotlib module is required for this function could not be imported\n\t"
+                + pltErr
+            )
         # Check matplotlib is available
         if not haveNumpy:
-            raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
-        
-        
+            raise Exception(
+                "The numpy module is required for this function could not be imported\n\t"
+                + numErr
+            )
+
         if (imgMin is None) or (imgMax is None):
             # Calculate image 1 stats
             imgGDALDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -314,31 +441,40 @@ Example::
 
         binWidth = (imgMax - imgMin) / numBins
         print("Bin Size: ", binWidth)
-        
-        bins, hMin, hMax = imagecalc.getHistogram(input_img, imgBand, binWidth, False, imgMin, imgMax)
-                
+
+        bins, hMin, hMax = imagecalc.getHistogram(
+            input_img, imgBand, binWidth, False, imgMin, imgMax
+        )
+
         if normOutput:
             sumBins = numpy.sum(bins)
-            bins = bins/sumBins
-        
+            bins = bins / sumBins
+
         numBins = len(bins)
         xLocs = numpy.arange(numBins)
         xLocs = (xLocs * binWidth) - (binWidth / 2)
-        
+
         fig = plt.figure(figsize=(7, 7), dpi=80)
-        plt.bar(xLocs, bins, width=binWidth, color=colour, edgecolor=edgecolour, linewidth=linewidth)
+        plt.bar(
+            xLocs,
+            bins,
+            width=binWidth,
+            color=colour,
+            edgecolor=edgecolour,
+            linewidth=linewidth,
+        )
         plt.xlim(imgMin, imgMax)
-        
+
         plt.title(plotTitle)
         plt.xlabel(xLabel)
-        plt.ylabel('Freq.')
-        plt.savefig(outputPlotFile, format='PDF')
-                
+        plt.ylabel("Freq.")
+        plt.savefig(outputPlotFile, format="PDF")
+
     except Exception as e:
         raise e
 
 
-def residual_plot(y_true, residuals, out_file, out_format='PNG', title=None):
+def residual_plot(y_true, residuals, out_file, out_format="PNG", title=None):
     """
     A function to create a residual plot to investigate the
     normality and homoscedasticity of model residuals.
@@ -360,19 +496,19 @@ def residual_plot(y_true, residuals, out_file, out_format='PNG', title=None):
     if not isinstance(y_true, numpy.ndarray):
         y_true = numpy.array(y_true)
     if y_true.ndim != 1:
-        raise Exception('y_true has more than 1 dimension.')
+        raise Exception("y_true has more than 1 dimension.")
     if residuals.ndim != 1:
-        raise Exception('Residuals has more than 1 dimension.')
+        raise Exception("Residuals has more than 1 dimension.")
     if residuals.size != y_true.size:
-        raise Exception('y_true.size != residuals.size.')
+        raise Exception("y_true.size != residuals.size.")
 
     # setup plot:
     # rcParams.update({'font.family': 'cmr10'})  # use latex fonts.
     # rcParams['axes.unicode_minus'] = False
-    rcParams.update({'font.size': 8.5})
-    rcParams['axes.linewidth'] = 0.5
-    rcParams['xtick.major.pad'] = '2'
-    rcParams['ytick.major.pad'] = '2'
+    rcParams.update({"font.size": 8.5})
+    rcParams["axes.linewidth"] = 0.5
+    rcParams["xtick.major.pad"] = "2"
+    rcParams["ytick.major.pad"] = "2"
     fig = plt.figure(figsize=(5, 2.5))
     gs = gridspec.GridSpec(nrows=1, ncols=2, width_ratios=[3.5, 1])
     ax1 = plt.subplot(gs[0])
@@ -380,10 +516,10 @@ def residual_plot(y_true, residuals, out_file, out_format='PNG', title=None):
     plt.tight_layout(w_pad=-1, h_pad=0)
 
     # draw scatterplot:
-    ax1.axhline(y=0.0, c='k', ls=':', lw=0.5, zorder=2)
-    ax1.scatter(y_true, residuals, s=16, color='C0', marker='.', linewidth=0, zorder=1)
-    ax1.set_xlabel('Observed value', fontsize=9)
-    ax1.set_ylabel('Residuals', fontsize=9)
+    ax1.axhline(y=0.0, c="k", ls=":", lw=0.5, zorder=2)
+    ax1.scatter(y_true, residuals, s=16, color="C0", marker=".", linewidth=0, zorder=1)
+    ax1.set_xlabel("Observed value", fontsize=9)
+    ax1.set_ylabel("Residuals", fontsize=9)
     if title is not None:
         ax1.set_title(title)
 
@@ -391,14 +527,14 @@ def residual_plot(y_true, residuals, out_file, out_format='PNG', title=None):
     ax2.get_xaxis().tick_bottom()
     ax2.get_yaxis().tick_right()
     ax2.get_yaxis().set_visible(False)
-    ax2.hist(residuals, bins=50, orientation='horizontal', color='C0')
-    ax2.axhline(y=0.0, c='k', ls=':', lw=0.5, zorder=2)
-    ax2.set_xlabel('Frequency', fontsize=9)
-    plt.savefig(out_file, format=out_format, dpi=300, bbox_inches='tight')
+    ax2.hist(residuals, bins=50, orientation="horizontal", color="C0")
+    ax2.axhline(y=0.0, c="k", ls=":", lw=0.5, zorder=2)
+    ax2.set_xlabel("Frequency", fontsize=9)
+    plt.savefig(out_file, format=out_format, dpi=300, bbox_inches="tight")
     plt.close()
 
 
-def quantile_plot(residuals, ylabel, out_file, out_format='PNG', title=None):
+def quantile_plot(residuals, ylabel, out_file, out_format="PNG", title=None):
     """
     A function to create a Quantile-Quantile plot to investigate the
     normality of model residuals.
@@ -420,39 +556,35 @@ def quantile_plot(residuals, ylabel, out_file, out_format='PNG', title=None):
 
         # rcParams.update({'font.family': 'cmr10'})  # use latex fonts.
     # rcParams['axes.unicode_minus'] = False
-    rcParams.update({'font.size': 8.5})
-    rcParams['axes.linewidth'] = 0.5
-    rcParams['xtick.major.pad'] = '2'
-    rcParams['ytick.major.pad'] = '2'
+    rcParams.update({"font.size": 8.5})
+    rcParams["axes.linewidth"] = 0.5
+    rcParams["xtick.major.pad"] = "2"
+    rcParams["ytick.major.pad"] = "2"
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.5, 2.5))
-    ax.get_yaxis().set_tick_params(which='major', direction='out')
-    ax.get_xaxis().set_tick_params(which='major', direction='out')
-    ax.get_xaxis().set_tick_params(which='minor', direction='out', length=0, width=0)
-    ax.get_yaxis().set_tick_params(which='minor', direction='out', length=0, width=0)
+    ax.get_yaxis().set_tick_params(which="major", direction="out")
+    ax.get_xaxis().set_tick_params(which="major", direction="out")
+    ax.get_xaxis().set_tick_params(which="minor", direction="out", length=0, width=0)
+    ax.get_yaxis().set_tick_params(which="minor", direction="out", length=0, width=0)
     ax.get_xaxis().tick_bottom()
     ax.get_yaxis().tick_left()
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
     ax.xaxis.set_tick_params(width=0.5)
     ax.yaxis.set_tick_params(width=0.5)
 
-    probplot(residuals, dist='norm', plot=ax)
+    probplot(residuals, dist="norm", plot=ax)
 
     if title is not None:
         ax.set_title(title)
     else:
-        ax.set_title('')
+        ax.set_title("")
     ax.set_ylabel(ylabel)
-    ax.get_lines()[0].set_marker('.')
-    ax.get_lines()[0].set_markerfacecolor('k')
-    ax.get_lines()[0].set_markeredgecolor('k')
+    ax.get_lines()[0].set_marker(".")
+    ax.get_lines()[0].set_markerfacecolor("k")
+    ax.get_lines()[0].set_markeredgecolor("k")
     ax.get_lines()[0].set_markeredgewidth(0)
     ax.get_lines()[0].set_markersize(4.0)
     ax.get_lines()[1].set_linewidth(1.0)
-    ax.get_lines()[1].set_color('r')
-    plt.savefig(out_file, format=out_format, dpi=300, bbox_inches='tight')
+    ax.get_lines()[1].set_color("r")
+    plt.savefig(out_file, format=out_format, dpi=300, bbox_inches="tight")
     plt.close()
-
-
-
-

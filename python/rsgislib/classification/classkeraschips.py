@@ -52,8 +52,9 @@ from rios.imagewriter import ImageWriter
 from rios import rat
 
 
-def train_keras_chips_pixel_classifer(cls_mdl, cls_info_dict, out_mdl_file=None,
-                                      train_epochs=5, train_batch_size=32):
+def train_keras_chips_pixel_classifer(
+    cls_mdl, cls_info_dict, out_mdl_file=None, train_epochs=5, train_batch_size=32
+):
     """
     A function which trains a neural network defined using the keras API for the classification of remotely sensed data.
     A dict of class information, as ClassInfoObj objects, is defined with the training data.
@@ -65,7 +66,7 @@ def train_keras_chips_pixel_classifer(cls_mdl, cls_info_dict, out_mdl_file=None,
     :param out_mdl_file: A file path to save the trained model as a hdf5 file. If None then ignored.
     :param train_epochs: The number of epochs to use for training
     :param train_batch_size: The batch size to use for training.
-    
+
     """
     try:
         from keras.utils import to_categorical
@@ -75,8 +76,11 @@ def train_keras_chips_pixel_classifer(cls_mdl, cls_info_dict, out_mdl_file=None,
     n_classes = len(cls_info_dict)
     for clsname in cls_info_dict:
         if cls_info_dict[clsname].id >= n_classes:
-            raise ("ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(clsname,
-                                                                                          cls_info_dict[clsname].id))
+            raise (
+                "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
+                    clsname, cls_info_dict[clsname].id
+                )
+            )
 
     cls_data_dict = {}
     train_data_lst = []
@@ -89,34 +93,40 @@ def train_keras_chips_pixel_classifer(cls_mdl, cls_info_dict, out_mdl_file=None,
     for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].train_file_h5, 'r')
-        sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
-        sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
-        sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
-        sgl_cls_info['train_data_lbls'][...] = cls_info_dict[clsname].id
+        f = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        sgl_cls_info["train_n_rows"] = f["DATA/DATA"].shape[0]
+        sgl_cls_info["train_data"] = numpy.array(f["DATA/DATA"])
+        sgl_cls_info["train_data_lbls"] = numpy.zeros(
+            sgl_cls_info["train_n_rows"], dtype=int
+        )
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
         f.close()
-        train_data_lst.append(sgl_cls_info['train_data'])
-        train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
+        train_data_lst.append(sgl_cls_info["train_data"])
+        train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].valid_file_h5, 'r')
-        sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
-        sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
-        sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
-        sgl_cls_info['valid_data_lbls'][...] = cls_info_dict[clsname].id
+        f = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        sgl_cls_info["valid_n_rows"] = f["DATA/DATA"].shape[0]
+        sgl_cls_info["valid_data"] = numpy.array(f["DATA/DATA"])
+        sgl_cls_info["valid_data_lbls"] = numpy.zeros(
+            sgl_cls_info["valid_n_rows"], dtype=int
+        )
+        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
         f.close()
-        valid_data_lst.append(sgl_cls_info['valid_data'])
-        valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
+        valid_data_lst.append(sgl_cls_info["valid_data"])
+        valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
         print("Reading Class {} Testing".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].test_file_h5, 'r')
-        sgl_cls_info['test_n_rows'] = f['DATA/DATA'].shape[0]
-        sgl_cls_info['test_data'] = numpy.array(f['DATA/DATA'])
-        sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
-        sgl_cls_info['test_data_lbls'][...] = cls_info_dict[clsname].id
+        f = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
+        sgl_cls_info["test_n_rows"] = f["DATA/DATA"].shape[0]
+        sgl_cls_info["test_data"] = numpy.array(f["DATA/DATA"])
+        sgl_cls_info["test_data_lbls"] = numpy.zeros(
+            sgl_cls_info["valid_n_rows"], dtype=int
+        )
+        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[clsname].id
         f.close()
-        test_data_lst.append(sgl_cls_info['test_data'])
-        test_lbls_lst.append(sgl_cls_info['test_data_lbls'])
+        test_data_lst.append(sgl_cls_info["test_data"])
+        test_lbls_lst.append(sgl_cls_info["test_data_lbls"])
 
         cls_data_dict[clsname] = sgl_cls_info
         cls_ids.append(cls_info_dict[clsname].id)
@@ -136,12 +146,19 @@ def train_keras_chips_pixel_classifer(cls_mdl, cls_info_dict, out_mdl_file=None,
     test_lbls_keras = to_categorical(test_lbls_np, num_classes=n_classes)
 
     print("Start Training Model")
-    cls_mdl.fit(train_np, train_lbls_keras, epochs=train_epochs, batch_size=train_batch_size,
-                validation_data=(vaild_np, vaild_lbls_keras))
+    cls_mdl.fit(
+        train_np,
+        train_lbls_keras,
+        epochs=train_epochs,
+        batch_size=train_batch_size,
+        validation_data=(vaild_np, vaild_lbls_keras),
+    )
     print("Finished Training Model")
     cls_mdl.summary()
 
-    loss_and_metrics = cls_mdl.evaluate(test_np, test_lbls_keras, batch_size=train_batch_size)
+    loss_and_metrics = cls_mdl.evaluate(
+        test_np, test_lbls_keras, batch_size=train_batch_size
+    )
     eval_metric_names = cls_mdl.metrics_names
     for eval_name, eval_val in zip(eval_metric_names, loss_and_metrics):
         print("{} = {}".format(eval_name, eval_val))
@@ -150,10 +167,18 @@ def train_keras_chips_pixel_classifer(cls_mdl, cls_info_dict, out_mdl_file=None,
         cls_mdl.save(out_mdl_file)
 
 
-def apply_keras_chips_pixel_classifier(class_train_info, keras_cls_mdl, in_img_mask,
-                                       img_mask_val, img_file_info, chip_size,
-                                       out_class_img, norm_function=None, gdalformat="KEA",
-                                       class_clr_names=True):
+def apply_keras_chips_pixel_classifier(
+    class_train_info,
+    keras_cls_mdl,
+    in_img_mask,
+    img_mask_val,
+    img_file_info,
+    chip_size,
+    out_class_img,
+    norm_function=None,
+    gdalformat="KEA",
+    class_clr_names=True,
+):
     """
     This function applies a trained single pixel keras model to an image. The function train_keras_pixel_classifer
     can be used to train such as model. The output image will contain the hard membership of the predicted class.
@@ -184,8 +209,11 @@ def apply_keras_chips_pixel_classifier(class_train_info, keras_cls_mdl, in_img_m
     cls_id_lut = numpy.zeros(n_classes)
     for clsname in class_train_info:
         if class_train_info[clsname].id >= n_classes:
-            raise ("ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(clsname,
-                                                                                          class_train_info[clsname].id))
+            raise (
+                "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
+                    clsname, class_train_info[clsname].id
+                )
+            )
         cls_id_lut[class_train_info[clsname].id] = class_train_info[clsname].out_id
 
     inImgs = list()
@@ -203,7 +231,13 @@ def apply_keras_chips_pixel_classifier(class_train_info, keras_cls_mdl, in_img_m
     scn_overlap = chip_size // 2
 
     writer = None
-    reader = ImageReader(inImgs, windowxsize=chip_size, windowysize=chip_size, overlap=scn_overlap, layerselection=inImgBands)
+    reader = ImageReader(
+        inImgs,
+        windowxsize=chip_size,
+        windowysize=chip_size,
+        overlap=scn_overlap,
+        layerselection=inImgBands,
+    )
     feat2cls = None
 
     for (info, block) in tqdm.tqdm(reader):
@@ -212,11 +246,17 @@ def apply_keras_chips_pixel_classifier(class_train_info, keras_cls_mdl, in_img_m
         blk_shape = classMskArr.shape
 
         if feat2cls is None:
-            feat2cls = numpy.zeros([1, chip_size, chip_size, n_img_bands], dtype=numpy.float32)
+            feat2cls = numpy.zeros(
+                [1, chip_size, chip_size, n_img_bands], dtype=numpy.float32
+            )
         else:
             feat2cls[...] = 0
 
-        chip_mask = classMskArr[0, scn_overlap:scn_overlap+chip_size,scn_overlap:scn_overlap+chip_size]
+        chip_mask = classMskArr[
+            0,
+            scn_overlap : scn_overlap + chip_size,
+            scn_overlap : scn_overlap + chip_size,
+        ]
         # If there are no valid pixels in the block at all then no point running prediction
         # set all output valies to 0.
         if numpy.all(chip_mask != img_mask_val):
@@ -225,11 +265,15 @@ def apply_keras_chips_pixel_classifier(class_train_info, keras_cls_mdl, in_img_m
         else:
             # Go through bands and reorder for prediction
             for nImg in range(nImgs):
-                imgBlk = block[nImg + 1][:,:,:]
+                imgBlk = block[nImg + 1][:, :, :]
                 for iBand in range(imgBlk.shape[0]):
-                    feat2cls[0, :, :, iBand] = imgBlk[iBand,scn_overlap:scn_overlap+chip_size,scn_overlap:scn_overlap+chip_size]
+                    feat2cls[0, :, :, iBand] = imgBlk[
+                        iBand,
+                        scn_overlap : scn_overlap + chip_size,
+                        scn_overlap : scn_overlap + chip_size,
+                    ]
 
-            image_chip = feat2cls[0:1,:,:,:]
+            image_chip = feat2cls[0:1, :, :, :]
             # If a normalisation function has been specified then apply this
             if norm_function is not None:
                 image_chip = norm_function(image_chip)
@@ -249,13 +293,17 @@ def apply_keras_chips_pixel_classifier(class_train_info, keras_cls_mdl, in_img_m
             out_cls_arr[classMskArr != img_mask_val] = 0
 
         if writer is None:
-            writer = ImageWriter(out_class_img, info=info, firstblock=out_cls_arr, drivername=gdalformat)
+            writer = ImageWriter(
+                out_class_img, info=info, firstblock=out_cls_arr, drivername=gdalformat
+            )
         else:
             writer.write(out_cls_arr)
     writer.close(calcStats=False)
 
     if class_clr_names:
-        rsgislib.rastergis.pop_rat_img_stats(out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+        rsgislib.rastergis.pop_rat_img_stats(
+            out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+        )
         max_val = rsgislib.imagecalc.get_img_band_min_max(out_class_img, 1, False, 0)[1]
         ratDataset = gdal.Open(out_class_img, gdal.GA_Update)
 
@@ -269,15 +317,15 @@ def apply_keras_chips_pixel_classifier(class_train_info, keras_cls_mdl, in_img_m
             green = numpy.random.randint(0, 255, max_cls_val + 1)
             blue = numpy.random.randint(0, 255, max_cls_val + 1)
         else:
-            red = rat.readColumn(ratDataset, 'Red')
-            green = rat.readColumn(ratDataset, 'Green')
-            blue = rat.readColumn(ratDataset, 'Blue')
+            red = rat.readColumn(ratDataset, "Red")
+            green = rat.readColumn(ratDataset, "Green")
+            blue = rat.readColumn(ratDataset, "Blue")
 
-        ClassName = numpy.empty_like(red, dtype=numpy.dtype('a255'))
+        ClassName = numpy.empty_like(red, dtype=numpy.dtype("a255"))
         ClassName[...] = ""
 
         for classKey in class_train_info:
-            print("Apply Colour to class \'" + classKey + "\'")
+            print("Apply Colour to class '" + classKey + "'")
             red[class_train_info[classKey].out_id] = class_train_info[classKey].red
             green[class_train_info[classKey].out_id] = class_train_info[classKey].green
             blue[class_train_info[classKey].out_id] = class_train_info[classKey].blue
@@ -290,9 +338,16 @@ def apply_keras_chips_pixel_classifier(class_train_info, keras_cls_mdl, in_img_m
         ratDataset = None
 
 
-def train_keras_chips_ref_classifer(cls_mdl, train_data_file, valid_data_file,
-                                    test_data_file, n_classes, out_mdl_file=None,
-                                    train_epochs=5, train_batch_size=32):
+def train_keras_chips_ref_classifer(
+    cls_mdl,
+    train_data_file,
+    valid_data_file,
+    test_data_file,
+    n_classes,
+    out_mdl_file=None,
+    train_epochs=5,
+    train_batch_size=32,
+):
     """
     A function which trains a neural network defined using the keras API for the classification of remotely sensed data.
 
@@ -313,38 +368,42 @@ def train_keras_chips_ref_classifer(cls_mdl, train_data_file, valid_data_file,
     except:
         from tensorflow.keras.utils import to_categorical
 
-    f = h5py.File(train_data_file, 'r')
-    train_np = numpy.array(f['DATA/DATA'])
-    train_lbls_np = numpy.array(f['DATA/REF'])
+    f = h5py.File(train_data_file, "r")
+    train_np = numpy.array(f["DATA/DATA"])
+    train_lbls_np = numpy.array(f["DATA/REF"])
     f.close()
     train_lbls_keras = to_categorical(train_lbls_np, num_classes=n_classes)
 
-    f = h5py.File(valid_data_file, 'r')
-    vaild_np = numpy.array(f['DATA/DATA'])
-    vaild_lbls_np = numpy.array(f['DATA/REF'])
+    f = h5py.File(valid_data_file, "r")
+    vaild_np = numpy.array(f["DATA/DATA"])
+    vaild_lbls_np = numpy.array(f["DATA/REF"])
     f.close()
     vaild_lbls_keras = to_categorical(vaild_lbls_np, num_classes=n_classes)
 
-    f = h5py.File(test_data_file, 'r')
-    test_np = numpy.array(f['DATA/DATA'])
-    test_lbls_np = numpy.array(f['DATA/REF'])
+    f = h5py.File(test_data_file, "r")
+    test_np = numpy.array(f["DATA/DATA"])
+    test_lbls_np = numpy.array(f["DATA/REF"])
     f.close()
     test_lbls_keras = to_categorical(test_lbls_np, num_classes=n_classes)
     print("Finished Reading Data")
 
     print("Start Training Model")
-    cls_mdl.fit(train_np, train_lbls_keras, epochs=train_epochs, batch_size=train_batch_size,
-                validation_data=(vaild_np, vaild_lbls_keras))
+    cls_mdl.fit(
+        train_np,
+        train_lbls_keras,
+        epochs=train_epochs,
+        batch_size=train_batch_size,
+        validation_data=(vaild_np, vaild_lbls_keras),
+    )
     print("Finished Training Model")
     cls_mdl.summary()
 
     if out_mdl_file is not None:
         cls_mdl.save(out_mdl_file)
 
-    loss_and_metrics = cls_mdl.evaluate(test_np, test_lbls_keras, batch_size=train_batch_size)
+    loss_and_metrics = cls_mdl.evaluate(
+        test_np, test_lbls_keras, batch_size=train_batch_size
+    )
     eval_metric_names = cls_mdl.metrics_names
     for eval_name, eval_val in zip(eval_metric_names, loss_and_metrics):
         print("{} = {}".format(eval_name, eval_val))
-
-
-

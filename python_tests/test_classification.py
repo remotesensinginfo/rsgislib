@@ -375,13 +375,28 @@ def test_plot_train_data(tmp_path):
 def test_create_acc_pt_sets(tmp_path):
     import rsgislib.classification
     import glob
-    vec_file = os.path.join(CLASSIFICATION_DATA_DIR, "gmw_acc_roi_30_cls_acc_pts.geojson")
+
+    vec_file = os.path.join(
+        CLASSIFICATION_DATA_DIR, "gmw_acc_roi_30_cls_acc_pts.geojson"
+    )
     vec_lyr = "gmw_acc_roi_30_cls_acc_pts"
 
     out_vec_file_base = os.path.join(tmp_path, "gmw_acc_roi_30_cls_acc_pts_")
 
-    rsgislib.classification.create_acc_pt_sets(vec_file, vec_lyr, out_vec_file_base, "gmw_acc_roi_30_cls_acc_pts", "gmw_v25_cls", 10, sets_col="set_id", out_format="GeoJSON", out_ext="geojson", shuffle_rows=True, rnd_seed=42)
-    assert len(glob.glob(os.path.join(tmp_path, "gmw_acc_roi_30_cls_acc_pts_*.geojson"))) == 10
-
-
-
+    rsgislib.classification.create_acc_pt_sets(
+        vec_file,
+        vec_lyr,
+        out_vec_file_base,
+        "gmw_acc_roi_30_cls_acc_pts",
+        "gmw_v25_cls",
+        10,
+        sets_col="set_id",
+        out_format="GeoJSON",
+        out_ext="geojson",
+        shuffle_rows=True,
+        rnd_seed=42,
+    )
+    assert (
+        len(glob.glob(os.path.join(tmp_path, "gmw_acc_roi_30_cls_acc_pts_*.geojson")))
+        == 10
+    )

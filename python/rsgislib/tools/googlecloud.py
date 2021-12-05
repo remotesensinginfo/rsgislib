@@ -17,6 +17,7 @@ def blob_exists(goog_cred, bucket_name, filename):
     :return: boolean (True if the file exists / False if the file does not exist)
     """
     from google.cloud import storage
+
     client = storage.Client.from_service_account_json(goog_cred)
     bucket = client.get_bucket(bucket_name)
     blob = bucket.blob(filename)
@@ -35,10 +36,11 @@ def list_files(goog_cred, bucket_name, bucket_dir):
 
     """
     from google.cloud import storage
+
     client = storage.Client.from_service_account_json(goog_cred)
     bucket = client.get_bucket(bucket_name)
     files = bucket.list_blobs(prefix=bucket_dir)
-    fileList = [file.name for file in files if '.' in file.name]
+    fileList = [file.name for file in files if "." in file.name]
     return fileList
 
 
@@ -55,6 +57,7 @@ def upload_to_google_bucket(file_to_upload, goog_cred, bucket_name, bucket_dir):
 
     """
     from google.cloud import storage
+
     # Explicitly use service account credentials by specifying the private key file.
     storage_client = storage.Client.from_service_account_json(goog_cred)
 
@@ -64,6 +67,8 @@ def upload_to_google_bucket(file_to_upload, goog_cred, bucket_name, bucket_dir):
     blob_obj = bucket_obj.blob(bucket_file_path)
     blob_obj.upload_from_filename(file_to_upload)
     if not blob_exists(goog_cred, bucket_name, bucket_file_path):
-        raise Exception("File was not successfully uploaded to Google Cloud: '{}'".format(file_to_upload))
-
-
+        raise Exception(
+            "File was not successfully uploaded to Google Cloud: '{}'".format(
+                file_to_upload
+            )
+        )

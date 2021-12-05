@@ -3048,12 +3048,11 @@ def subset_to_vec(
         roi_vec_file, roi_vec_lyr, compute_if_exp=True
     )
     img_bbox = get_img_bbox(input_img)
-    
+
     if img_epsg != vec_epsg:
         vec_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(
             vec_bbox, vec_epsg, img_epsg
         )
-
 
     if rsgislib.tools.geometrytools.do_bboxes_intersect(img_bbox, vec_bbox):
         common_bbox = rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox)

@@ -282,7 +282,9 @@ def apply_mean_diff_filter(input_img, output_img, filter_size, gdalformat, datat
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def apply_mean_diff_abs_filter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_mean_diff_abs_filter(
+    input_img, output_img, filter_size, gdalformat, datatype
+):
     """
     Apply a mean absolute difference filter to the specified input image.
 
@@ -344,7 +346,9 @@ def apply_total_diff_filter(input_img, output_img, filter_size, gdalformat, data
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def apply_total_diff_abs_filter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_total_diff_abs_filter(
+    input_img, output_img, filter_size, gdalformat, datatype
+):
     """
     Apply a total absolute difference filter to the specified input image.
 
@@ -468,7 +472,9 @@ def apply_norm_var_filter(input_img, output_img, filter_size, gdalformat, dataty
     apply_filters(input_img, outputImageBase, filters, gdalformat, outExt, datatype)
 
 
-def apply_norm_var_sqrt_filter(input_img, output_img, filter_size, gdalformat, datatype):
+def apply_norm_var_sqrt_filter(
+    input_img, output_img, filter_size, gdalformat, datatype
+):
     """
     Apply a normalised variance square root filter to the specified input image.
 

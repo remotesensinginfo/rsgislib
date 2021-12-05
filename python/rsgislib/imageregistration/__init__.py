@@ -41,8 +41,17 @@ TYPE_RSGIS_IMG2MAP = 3
 TYPE_RSGIS_MAPOFFS = 4
 
 
-
-def warp_with_gcps_with_gdal(in_ref_img:str, in_process_img:str, output_img:str, gdalformat:str, interp_method: int = rsgislib.INTERP_NEAREST_NEIGHBOUR, use_tps:bool=False, use_poly:bool=True, poly_order:int=3, use_multi_thread:bool=False):
+def warp_with_gcps_with_gdal(
+    in_ref_img: str,
+    in_process_img: str,
+    output_img: str,
+    gdalformat: str,
+    interp_method: int = rsgislib.INTERP_NEAREST_NEIGHBOUR,
+    use_tps: bool = False,
+    use_poly: bool = True,
+    poly_order: int = 3,
+    use_multi_thread: bool = False,
+):
     """
     A utility function to warp an image file (in_process_img) using GCPs defined within
     the image header - this is the same as using the gdalwarp utility. However, the
@@ -69,10 +78,12 @@ def warp_with_gcps_with_gdal(in_ref_img:str, in_process_img:str, output_img:str,
     """
     import rsgislib.imageutils
     from osgeo import gdal
-     
+
     if not rsgislib.imageutils.has_gcps(in_process_img):
-        raise Exception("Input process image does not have GCPs "
-                        "within it's header - this is required.")
+        raise Exception(
+            "Input process image does not have GCPs "
+            "within it's header - this is required."
+        )
 
     numBands = rsgislib.imageutils.get_img_band_count(in_process_img)
     noDataVal = rsgislib.imageutils.get_img_no_data_value(in_process_img)
@@ -95,14 +106,17 @@ def warp_with_gcps_with_gdal(in_ref_img:str, in_process_img:str, output_img:str,
         interpolationMethod = gdal.GRA_Mode
     else:
         raise Exception("Interpolation method was not recognised or known.")
-    
-    rsgislib.imageutils.create_copy_img(in_ref_img, output_img, numBands, 0, gdalformat, datatype)
+
+    rsgislib.imageutils.create_copy_img(
+        in_ref_img, output_img, numBands, 0, gdalformat, datatype
+    )
 
     inFile = gdal.Open(in_process_img, gdal.GA_ReadOnly)
     outFile = gdal.Open(output_img, gdal.GA_Update)
 
     try:
         import tqdm
+
         pbar = tqdm.tqdm(total=100)
         callback = lambda *args, **kw: pbar.update()
     except:
@@ -110,16 +124,27 @@ def warp_with_gcps_with_gdal(in_ref_img:str, in_process_img:str, output_img:str,
 
     wrpOpts = None
     if use_tps:
-        wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=use_multi_thread, tps=use_tps, callback=callback)
+        wrpOpts = gdal.WarpOptions(
+            resampleAlg=interpolationMethod,
+            srcNodata=noDataVal,
+            dstNodata=noDataVal,
+            multithread=use_multi_thread,
+            tps=use_tps,
+            callback=callback,
+        )
     elif use_poly:
-        wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=use_multi_thread, polynomialOrder=poly_order, callback=callback)
+        wrpOpts = gdal.WarpOptions(
+            resampleAlg=interpolationMethod,
+            srcNodata=noDataVal,
+            dstNodata=noDataVal,
+            multithread=use_multi_thread,
+            polynomialOrder=poly_order,
+            callback=callback,
+        )
     else:
-        warpOptions = None    
-    
+        warpOptions = None
+
     gdal.Warp(outFile, inFile, options=wrpOpts)
-        
+
     inFile = None
     outFile = None
-
-
-

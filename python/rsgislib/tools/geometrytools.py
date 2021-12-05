@@ -62,6 +62,7 @@ def reproj_bbox_epsg(bbox, in_epsg, out_epsg):
 
     """
     import osgeo.osr as osr
+
     in_osr_proj_obj = osr.SpatialReference()
     in_osr_proj_obj.ImportFromEPSG(int(in_epsg))
 
@@ -70,6 +71,7 @@ def reproj_bbox_epsg(bbox, in_epsg, out_epsg):
 
     out_bbox = reproj_bbox(bbox, in_osr_proj_obj, out_osr_proj_obj)
     return out_bbox
+
 
 def do_bboxes_intersect(bbox1, bbox2):
     """
@@ -84,9 +86,14 @@ def do_bboxes_intersect(bbox1, bbox2):
     x_max = 1
     y_min = 2
     y_max = 3
-    intersect = ((bbox1[x_max] > bbox2[x_min]) and (bbox2[x_max] > bbox1[x_min]) and (
-            bbox1[y_max] > bbox2[y_min]) and (bbox2[y_max] > bbox1[y_min]))
+    intersect = (
+        (bbox1[x_max] > bbox2[x_min])
+        and (bbox2[x_max] > bbox1[x_min])
+        and (bbox1[y_max] > bbox2[y_min])
+        and (bbox2[y_max] > bbox1[y_min])
+    )
     return intersect
+
 
 def does_bbox_contain(bbox1, bbox2):
     """
@@ -101,9 +108,14 @@ def does_bbox_contain(bbox1, bbox2):
     x_max = 1
     y_min = 2
     y_max = 3
-    contains = ((bbox1[x_min] < bbox2[x_min]) and (bbox1[x_max] > bbox2[x_max]) and (
-            bbox1[y_min] < bbox2[y_min]) and (bbox1[y_max] > bbox2[y_max]))
+    contains = (
+        (bbox1[x_min] < bbox2[x_min])
+        and (bbox1[x_max] > bbox2[x_max])
+        and (bbox1[y_min] < bbox2[y_min])
+        and (bbox1[y_max] > bbox2[y_max])
+    )
     return contains
+
 
 def calc_bbox_area(bbox):
     """
@@ -116,6 +128,7 @@ def calc_bbox_area(bbox):
     # width x height
     return (bbox[1] - bbox[0]) * (bbox[3] - bbox[2])
 
+
 def bbox_equal(bbox1, bbox2):
     """
     A function which tests whether two bboxes (xMin, xMax, yMin, yMax) are equal.
@@ -126,9 +139,15 @@ def bbox_equal(bbox1, bbox2):
 
     """
     bbox_eql = False
-    if (bbox1[0] == bbox2[0]) and (bbox1[1] == bbox2[1]) and (bbox1[2] == bbox2[2]) and (bbox1[3] == bbox2[3]):
+    if (
+        (bbox1[0] == bbox2[0])
+        and (bbox1[1] == bbox2[1])
+        and (bbox1[2] == bbox2[2])
+        and (bbox1[3] == bbox2[3])
+    ):
         bbox_eql = True
     return bbox_eql
+
 
 def bbox_intersection(bbox1, bbox2):
     """
@@ -160,6 +179,7 @@ def bbox_intersection(bbox1, bbox2):
         yMaxOverlap = bbox2[3]
 
     return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
+
 
 def bboxes_intersection(bboxes):
     """
@@ -278,14 +298,18 @@ def find_common_extent_on_grid(base_extent, base_grid, other_extent, full_contai
 
     if other_extent[2] > yMinOverlap:
         if full_contain:
-            diff = math.floor(abs(other_extent[2] - yMinOverlap) / base_grid) * base_grid
+            diff = (
+                math.floor(abs(other_extent[2] - yMinOverlap) / base_grid) * base_grid
+            )
         else:
             diff = math.ceil(abs(other_extent[2] - yMinOverlap) / base_grid) * base_grid
         yMinOverlap = yMinOverlap + diff
 
     if other_extent[3] < yMaxOverlap:
         if full_contain:
-            diff = math.floor(abs(yMaxOverlap - other_extent[3]) / base_grid) * base_grid
+            diff = (
+                math.floor(abs(yMaxOverlap - other_extent[3]) / base_grid) * base_grid
+            )
         else:
             diff = math.ceil(abs(yMaxOverlap - other_extent[3]) / base_grid) * base_grid
         yMaxOverlap = yMaxOverlap - diff
@@ -329,7 +353,9 @@ def find_extent_on_grid(base_extent, base_grid, full_contain=True):
     return [xMin, xMaxOut, yMinOut, yMax]
 
 
-def find_extent_on_whole_num_grid(base_extent, base_grid, full_contain=True, round_vals=None):
+def find_extent_on_whole_num_grid(
+    base_extent, base_grid, full_contain=True, round_vals=None
+):
     """
     A function which calculates the extent but defined on a grid with defined resolution.
     Useful for finding extent on a particular image grid.
@@ -373,8 +399,12 @@ def find_extent_on_whole_num_grid(base_extent, base_grid, full_contain=True, rou
     if round_vals is None:
         out_bbox = [xMinOut, xMaxOut, yMinOut, yMaxOut]
     else:
-        out_bbox = [round(xMinOut, round_vals), round(xMaxOut, round_vals), round(yMinOut, round_vals),
-                    round(yMaxOut, round_vals)]
+        out_bbox = [
+            round(xMinOut, round_vals),
+            round(xMaxOut, round_vals),
+            round(yMinOut, round_vals),
+            round(yMaxOut, round_vals),
+        ]
     return out_bbox
 
 
@@ -396,8 +426,10 @@ def get_bbox_grid(bbox, x_size, y_size):
     n_tiles_y = math.floor(height / y_size)
 
     if (n_tiles_x > 10000) or (n_tiles_y > 10000):
-        print("WARNING: did you mean to product so many tiles (X: {}, Y: {}) "
-              "might want to check your units".format(n_tiles_x, n_tiles_y))
+        print(
+            "WARNING: did you mean to product so many tiles (X: {}, Y: {}) "
+            "might want to check your units".format(n_tiles_x, n_tiles_y)
+        )
 
     full_tile_width = n_tiles_x * x_size
     full_tile_height = n_tiles_y * y_size
@@ -449,9 +481,9 @@ def reproj_point(in_osr_proj_obj, out_osr_proj_obj, x, y):
 
     """
     if in_osr_proj_obj.EPSGTreatsAsLatLong():
-        wktPt = 'POINT(%s %s)' % (y, x)
+        wktPt = "POINT(%s %s)" % (y, x)
     else:
-        wktPt = 'POINT(%s %s)' % (x, y)
+        wktPt = "POINT(%s %s)" % (x, y)
     point = ogr.CreateGeometryFromWkt(wktPt)
     point.AssignSpatialReference(in_osr_proj_obj)
     point.TransformTo(out_osr_proj_obj)
@@ -462,6 +494,3 @@ def reproj_point(in_osr_proj_obj, out_osr_proj_obj, x, y):
         outX = point.GetX()
         outY = point.GetY()
     return outX, outY
-
-
-

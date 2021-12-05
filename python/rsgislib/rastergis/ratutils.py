@@ -1192,7 +1192,7 @@ class RSGISRATChangeVarInfo:
 
 
 def find_change_clumps_hist_skew_kurt_test_vote_multi_vars(
-    inputClumps, inClassCol, classOfInterest, outChangeFeatCol, vars=[]
+    clumps_img, in_class_col, class_of_interest, out_change_feat_col, vars=[]
 ):
     """
     A function to call one of the find_change_clumps_hist_skew_kurt_test functions
@@ -1200,12 +1200,12 @@ def find_change_clumps_hist_skew_kurt_test_vote_multi_vars(
 
     Where:
 
-    :param inputClumps: input clumps file.
-    :param inClassCol: The column specifiying the classes, one of which change
+    :param clumps_img: input clumps file.
+    :param in_class_col: The column specifiying the classes, one of which change
                        will be found.
-    :param classOfInterest: The class (as defined in inClassCol) on which changed
+    :param class_of_interest: The class (as defined in inClassCol) on which changed
                             is being found.
-    :param outChangeFeatCol: the output column with the vote scores.
+    :param out_change_feat_col: the output column with the vote scores.
     :param vars: a list of RSGISRATChangeVarInfo objects used to specify the
                  variables and function to be called.
 
@@ -1234,9 +1234,9 @@ def find_change_clumps_hist_skew_kurt_test_vote_multi_vars(
         print(var.changeVarCol)
         if var.thresDirection == RSGISRATThresDirection.lower:
             outThres = find_change_clumps_hist_skew_kurt_test_lower(
-                inputClumps,
-                inClassCol,
-                classOfInterest,
+                clumps_img,
+                in_class_col,
+                class_of_interest,
                 var.changeVarCol,
                 var.outChangeFeatCol,
                 var.noDataVals,
@@ -1248,9 +1248,9 @@ def find_change_clumps_hist_skew_kurt_test_vote_multi_vars(
             var.upperThreshold = outThres[1]
         elif var.thresDirection == RSGISRATThresDirection.upper:
             outThres = find_change_clumps_hist_skew_kurt_test_upper(
-                inputClumps,
-                inClassCol,
-                classOfInterest,
+                clumps_img,
+                in_class_col,
+                class_of_interest,
                 var.changeVarCol,
                 var.outChangeFeatCol,
                 var.noDataVals,
@@ -1262,9 +1262,9 @@ def find_change_clumps_hist_skew_kurt_test_vote_multi_vars(
             var.upperThreshold = outThres[1]
         elif var.thresDirection == RSGISRATThresDirection.lowerupper:
             outThres = find_change_clumps_hist_skew_kurt_test(
-                inputClumps,
-                inClassCol,
-                classOfInterest,
+                clumps_img,
+                in_class_col,
+                class_of_interest,
                 var.changeVarCol,
                 var.outChangeFeatCol,
                 var.noDataVals,
@@ -1280,8 +1280,8 @@ def find_change_clumps_hist_skew_kurt_test_vote_multi_vars(
                 "only lower, upper and lowerupper are supported"
             )
 
-    ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
-    classVals = rat.readColumn(ratDataset, inClassCol)
+    ratDataset = gdal.Open(clumps_img, gdal.GA_Update)
+    classVals = rat.readColumn(ratDataset, in_class_col)
     changeVote = numpy.zeros_like(classVals, dtype=numpy.int)
 
     for var in vars:
@@ -1290,12 +1290,12 @@ def find_change_clumps_hist_skew_kurt_test_vote_multi_vars(
             changeCol[changeCol == 2] = 1
         changeVote = changeVote + changeCol
 
-    rat.writeColumn(ratDataset, outChangeFeatCol, changeVote)
+    rat.writeColumn(ratDataset, out_change_feat_col, changeVote)
     ratDataset = None
 
 
 def find_clumps_within_existing_thresholds(
-    inputClumps, inClassCol, classOfInterest, outFeatsCol, vars=[]
+    clumps_img, in_class_col, class_of_interest, out_feats_col, vars=[]
 ):
     """
     A function to use the thresholds stored in the RSGISRATChangeVarInfo objects (var)
@@ -1306,12 +1306,12 @@ def find_clumps_within_existing_thresholds(
 
     Where:
 
-    :param inputClumps: input clumps file.
-    :param inClassCol: The column specifiying the classes, one of which change
+    :param clumps_img: input clumps file.
+    :param in_class_col: The column specifiying the classes, one of which change
                        will be found.
-    :param classOfInterest: The class (as defined in inClassCol) on which changed
+    :param class_of_interest: The class (as defined in inClassCol) on which changed
                             is being found.
-    :param outFeatsCol: the output binary column specifying whether a feature is
+    :param out_feats_col: the output binary column specifying whether a feature is
                         within the thresholds.
     :param vars: a list of RSGISRATChangeVarInfo objects used to specify the
                  variables and function to be called.
@@ -1339,10 +1339,10 @@ def find_clumps_within_existing_thresholds(
         raise Exception("Need to provide a list of variables with parameters...")
 
     ## Open the image file...
-    ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
+    ratDataset = gdal.Open(clumps_img, gdal.GA_Update)
 
     ## Read in columns
-    classVals = rat.readColumn(ratDataset, inClassCol)
+    classVals = rat.readColumn(ratDataset, in_class_col)
     outFeats = numpy.zeros_like(classVals)
 
     first = True
@@ -1353,7 +1353,7 @@ def find_clumps_within_existing_thresholds(
             outFeats = numpy.where(
                 (varVals > var.lowerThreshold)
                 & (varVals < var.upperThreshold)
-                & (classVals == classOfInterest),
+                & (classVals == class_of_interest),
                 1,
                 outFeats,
             )
@@ -1363,58 +1363,57 @@ def find_clumps_within_existing_thresholds(
             outFeats = numpy.where(
                 (varVals > var.lowerThreshold)
                 & (varVals < var.upperThreshold)
-                & (classVals == classOfInterest),
+                & (classVals == class_of_interest),
                 outFeats,
                 0,
             )
 
-    rat.writeColumn(ratDataset, outFeatsCol, outFeats)
+    rat.writeColumn(ratDataset, out_feats_col, outFeats)
     ratDataset = None
 
 
-def _ratapplier_defClassNames(info, inputs, outputs, otherargs):
-    classNum = getattr(inputs.inrat, otherargs.classNumCol)
-
-    classNames = numpy.empty_like(classNum, dtype=numpy.dtype("a255"))
-    classNames[...] = ""
-
-    for key in otherargs.classNamesDict:
-        classNames = numpy.where(
-            (classNum == key), otherargs.classNamesDict[key], classNames
-        )
-
-    setattr(outputs.outrat, otherargs.classNameCol, classNames)
-
-
-def define_class_names(clumps, classNumCol, classNameCol, classNamesDict):
+def define_class_names(clumps_img, class_num_col, class_name_col, class_names_dict):
     """
     A function to create a class names column in a RAT based on segmented clumps
      where a number of clumps have the same number class.
 
-    :param clumps: input clumps image.
-    :param classNumCol: column specifying the class number (e.g., where clumps
+    :param clumps_img: input clumps image.
+    :param class_num_col: column specifying the class number (e.g., where clumps
                         are segments in a segmentation)
-    :param classNameCol: the output column name where a string will be created if
+    :param class_name_col: the output column name where a string will be created if
                          it doesn't already exists.
-    :param classNamesDict: Dictionary to look up the class names. The key needs to
+    :param class_names_dict: Dictionary to look up the class names. The key needs to
                            the integer number for the class
 
     """
     in_rats = ratapplier.RatAssociations()
     out_rats = ratapplier.RatAssociations()
 
-    in_rats.inrat = ratapplier.RatHandle(clumps)
-    out_rats.outrat = ratapplier.RatHandle(clumps)
+    in_rats.inrat = ratapplier.RatHandle(clumps_img)
+    out_rats.outrat = ratapplier.RatHandle(clumps_img)
 
     otherargs = ratapplier.OtherArguments()
-    otherargs.classNumCol = classNumCol
-    otherargs.classNameCol = classNameCol
-    otherargs.classNamesDict = classNamesDict
+    otherargs.classNumCol = class_num_col
+    otherargs.classNameCol = class_name_col
+    otherargs.classNamesDict = class_names_dict
+
+    def _ratapplier_defClassNames(info, inputs, outputs, otherargs):
+        classNum = getattr(inputs.inrat, otherargs.classNumCol)
+
+        classNames = numpy.empty_like(classNum, dtype=numpy.dtype("a255"))
+        classNames[...] = ""
+
+        for key in otherargs.classNamesDict:
+            classNames = numpy.where(
+                (classNum == key), otherargs.classNamesDict[key], classNames
+            )
+
+        setattr(outputs.outrat, otherargs.classNameCol, classNames)
 
     ratapplier.apply(_ratapplier_defClassNames, in_rats, out_rats, otherargs)
 
 
-def set_class_names_colours(clumpsImg, classNamesCol, classInfoDict):
+def set_class_names_colours(clumps_img, class_names_col, class_info_dict):
     """
     A function to define a class names column and define the class colours.
 
@@ -1422,10 +1421,10 @@ def set_class_names_colours(clumpsImg, classNamesCol, classInfoDict):
     classInfoDict[1] = {'classname':'Forest', 'red':0, 'green':255, 'blue':0}
     classInfoDict[2] = {'classname':'Water', 'red':0, 'green':0, 'blue':255}
 
-    :param clumpsImg: Input clumps image - expecting a classification
+    :param clumps_img: Input clumps image - expecting a classification
                       (rather than segmentation) where the number is the pixel value.
-    :param classNamesCol: The output column for the class names.
-    :param classInfoDict: a dict where the key is the pixel value for the class.
+    :param class_names_col: The output column for the class names.
+    :param class_info_dict: a dict where the key is the pixel value for the class.
     """
     # Check numpy is available
     if not haveNumpy:
@@ -1446,8 +1445,8 @@ def set_class_names_colours(clumpsImg, classNamesCol, classInfoDict):
             "could not be imported\n\t" + riosRatErr
         )
 
-    n_rows = rsgislib.rastergis.get_rat_length(clumpsImg)
-    col_names = rsgislib.rastergis.get_rat_columns(clumpsImg)
+    n_rows = rsgislib.rastergis.get_rat_length(clumps_img)
+    col_names = rsgislib.rastergis.get_rat_columns(clumps_img)
 
     red_avail = False
     green_avail = False
@@ -1460,10 +1459,10 @@ def set_class_names_colours(clumpsImg, classNamesCol, classInfoDict):
         blue_avail = True
 
     class_names_col_avail = False
-    if classNamesCol in col_names:
+    if class_names_col in col_names:
         class_names_col_avail = True
 
-    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    ratDataset = gdal.Open(clumps_img, gdal.GA_Update)
 
     if red_avail:
         red_arr = rat.readColumn(ratDataset, "Red")
@@ -1481,16 +1480,16 @@ def set_class_names_colours(clumpsImg, classNamesCol, classInfoDict):
         blue_arr = numpy.zeros(n_rows, dtype=int)
 
     if class_names_col_avail:
-        class_names_arr = rat.readColumn(ratDataset, classNamesCol)
+        class_names_arr = rat.readColumn(ratDataset, class_names_col)
     else:
         class_names_arr = numpy.zeros(n_rows, dtype=numpy.dtype("a255"))
 
-    for class_key in classInfoDict:
+    for class_key in class_info_dict:
         if (class_key >= 0) and (class_key < n_rows):
-            class_names_arr[class_key] = classInfoDict[class_key]["classname"]
-            red_arr[class_key] = classInfoDict[class_key]["red"]
-            green_arr[class_key] = classInfoDict[class_key]["green"]
-            blue_arr[class_key] = classInfoDict[class_key]["blue"]
+            class_names_arr[class_key] = class_info_dict[class_key]["classname"]
+            red_arr[class_key] = class_info_dict[class_key]["red"]
+            green_arr[class_key] = class_info_dict[class_key]["green"]
+            blue_arr[class_key] = class_info_dict[class_key]["blue"]
         else:
             print(
                 "Class key ({}) was not within the number of rows in the RAT.".format(
@@ -1499,7 +1498,7 @@ def set_class_names_colours(clumpsImg, classNamesCol, classInfoDict):
                 file=sys.stderr,
             )
 
-    rat.writeColumn(ratDataset, classNamesCol, class_names_arr)
+    rat.writeColumn(ratDataset, class_names_col, class_names_arr)
     rat.writeColumn(ratDataset, "Red", red_arr)
     rat.writeColumn(ratDataset, "Green", green_arr)
     rat.writeColumn(ratDataset, "Blue", blue_arr)
@@ -1507,30 +1506,28 @@ def set_class_names_colours(clumpsImg, classNamesCol, classInfoDict):
     ratDataset = None
 
 
-
-
 def create_clumps_shp_bbox(
-    clumpsImg,
-    minXCol,
-    maxXCol,
-    minYCol,
-    maxYCol,
-    outShpLyrName,
-    roundInt=False,
-    ignoreFirstRow=False,
+    clumps_img,
+    min_x_col,
+    max_x_col,
+    min_y_col,
+    max_y_col,
+    out_shp_lyr_name,
+    round_int=False,
+    ignore_first_row=False,
 ):
     """
     A function to create a shapefile of polygons with the bboxs of the clumps
     defined using the minX, maxX, minY and maxY coordinates for the features.
 
-    :param clumpsImg: input clumps file.
-    :param minXCol: the minX column in RAT.
-    :param maxXCol: the maxX column in RAT.
-    :param minYCol: the minY column in RAT.
-    :param maxYCol: the maxY column in RAT.
-    :param outShpLyrName: The output shapefile name (layer name do not include
+    :param clumps_img: input clumps file.
+    :param min_x_col: the minX column in RAT.
+    :param max_x_col: the maxX column in RAT.
+    :param min_y_col: the minY column in RAT.
+    :param max_y_col: the maxY column in RAT.
+    :param out_shp_lyr_name: The output shapefile name (layer name do not include
                           the .shp it will be appended).
-    :param roundInt: Boolean specifying whether the coordinated should be rounded to
+    :param round_int: Boolean specifying whether the coordinated should be rounded to
                      integers (Default: False)
 
     """
@@ -1560,17 +1557,17 @@ def create_clumps_shp_bbox(
             "could not be imported\n\t" + gdalogrErr
         )
 
-    ratDataset = gdal.Open(clumpsImg)
+    ratDataset = gdal.Open(clumps_img)
 
-    minXVals = rat.readColumn(ratDataset, minXCol)
-    maxXVals = rat.readColumn(ratDataset, maxXCol)
-    minYVals = rat.readColumn(ratDataset, minYCol)
-    maxYVals = rat.readColumn(ratDataset, maxYCol)
+    minXVals = rat.readColumn(ratDataset, min_x_col)
+    maxXVals = rat.readColumn(ratDataset, max_x_col)
+    minYVals = rat.readColumn(ratDataset, min_y_col)
+    maxYVals = rat.readColumn(ratDataset, max_y_col)
 
     fidVals = numpy.arange(maxYVals.shape[0])
 
     ## Remove First Row which is no data...
-    if ignoreFirstRow:
+    if ignore_first_row:
         minXVals = numpy.delete(minXVals, (0), axis=0)
         maxXVals = numpy.delete(maxXVals, (0), axis=0)
         minYVals = numpy.delete(minYVals, (0), axis=0)
@@ -1604,7 +1601,7 @@ def create_clumps_shp_bbox(
         )
     ]
 
-    if roundInt:
+    if round_int:
         minXValsSub = numpy.rint(minXValsSub)
         maxXValsSub = numpy.rint(maxXValsSub)
         minYValsSub = numpy.rint(minYValsSub)
@@ -1614,12 +1611,12 @@ def create_clumps_shp_bbox(
     print("Num Feats: ", numFeats)
 
     driver = ogr.GetDriverByName("ESRI Shapefile")
-    if os.path.exists(outShpLyrName + ".shp"):
-        driver.DeleteDataSource(outShpLyrName + ".shp")
-    outDatasource = driver.CreateDataSource(outShpLyrName + ".shp")
+    if os.path.exists(out_shp_lyr_name + ".shp"):
+        driver.DeleteDataSource(out_shp_lyr_name + ".shp")
+    outDatasource = driver.CreateDataSource(out_shp_lyr_name + ".shp")
     raster_srs = osr.SpatialReference()
     raster_srs.ImportFromWkt(ratDataset.GetProjectionRef())
-    outLayer = outDatasource.CreateLayer(outShpLyrName, srs=raster_srs)
+    outLayer = outDatasource.CreateLayer(out_shp_lyr_name, srs=raster_srs)
 
     fieldFIDDefn = ogr.FieldDefn("ID", ogr.OFTInteger)
     fieldFIDDefn.SetWidth(6)
@@ -1667,15 +1664,15 @@ def create_clumps_shp_bbox(
 
 
 def identify_small_units(
-    clumpsImg,
-    classCol,
-    tmpPath,
-    outColName,
-    smallClumpsThres,
-    useTiledClump=False,
-    nCores=2,
-    tileWidth=4000,
-    tileHeight=4000,
+    clumps_img,
+    class_col,
+    tmp_dir,
+    out_col_name,
+    small_clumps_thres,
+    use_tiled_clump=False,
+    n_cores=1,
+    tile_width=2000,
+    tile_height=2000,
 ):
     """
     Identify small connected units within a classification. The threshold to define
@@ -1683,23 +1680,23 @@ def identify_small_units(
     variables can be provided as lists to identify a number of thresholds of
     small units.
 
-    :param clumpsImg: string for the clumps image file containing input classification
-    :param classCol: string for the column name representing the classification as
+    :param clumps_img: string for the clumps image file containing input classification
+    :param class_col: string for the column name representing the classification as
                      integer values
-    :param tmpPath: directory path where temporary layers are stored (if directory is
+    :param tmp_dir: directory path where temporary layers are stored (if directory is
                     created within the function it will be deleted once function
                     is complete).
-    :param outColName: a list of output column names (i.e., one for each threshold)
-    :param smallClumpsThres: a list of thresholds for identifying small clumps.
-    :param useTiledClump: a boolean to specify whether the tiled clumping algorithm
+    :param out_col_name: a list of output column names (i.e., one for each threshold)
+    :param small_clumps_thres: a list of thresholds for identifying small clumps.
+    :param use_tiled_clump: a boolean to specify whether the tiled clumping algorithm
                           should be used (Default is False; select True for large
                           datasets)
-    :param nCores: if the tiled version of the clumping algorithm is being used then
+    :param n_cores: if the tiled version of the clumping algorithm is being used then
                    there is an option to use multiple processing cores; specify the
                    number to be used (Default is 2).
-    :param tileWidth: is the width of the image tile (in pixels) if tiled clumping
+    :param tile_width: is the width of the image tile (in pixels) if tiled clumping
                       is used.
-    :param tileHeight: is the height of the image tile (in pixels) if tiled clumping
+    :param tile_height: is the height of the image tile (in pixels) if tiled clumping
                        is used.
 
     Example:
@@ -1737,46 +1734,49 @@ def identify_small_units(
 
     import rsgislib.tools.filetools
 
-    if len(outColName) is not len(smallClumpsThres):
+    if len(out_col_name) is not len(small_clumps_thres):
         print(
             "The number of threshold values and output "
             "column names should be the same."
         )
         sys.exit(-1)
 
-    numThresholds = len(smallClumpsThres)
+    numThresholds = len(small_clumps_thres)
 
     createdDIR = False
-    if not os.path.isdir(tmpPath):
-        os.makedirs(tmpPath)
+    if not os.path.isdir(tmp_dir):
+        os.makedirs(tmp_dir)
         createdDIR = True
 
-    baseName = os.path.splitext(os.path.basename(clumpsImg))[0]
-    classMaskImg = os.path.join(tmpPath, baseName + "_TmpClassMask.kea")
-    classMaskClumps = os.path.join(tmpPath, baseName + "_TmpClassMaskClumps.kea")
-    smallClumpsMask = os.path.join(tmpPath, baseName + "_SmallClassClumps.kea")
+    baseName = os.path.splitext(os.path.basename(clumps_img))[0]
+    classMaskImg = os.path.join(tmp_dir, baseName + "_TmpClassMask.kea")
+    classMaskClumps = os.path.join(tmp_dir, baseName + "_TmpClassMaskClumps.kea")
+    smallClumpsMask = os.path.join(tmp_dir, baseName + "_SmallClassClumps.kea")
 
     rastergis.export_col_to_gdal_img(
-        clumpsImg, classMaskImg, "KEA", rsgislib.TYPE_16UINT, classCol
+        clumps_img, classMaskImg, "KEA", rsgislib.TYPE_16UINT, class_col
     )
-    if useTiledClump:
+    if use_tiled_clump:
         from rsgislib.segmentation import tiledclump
 
-        if nCores > 1:
+        if n_cores > 1:
             tiledclump.perform_clumping_multi_process(
                 classMaskImg,
                 classMaskClumps,
-                tmpDIR=os.path.join(tmpPath, baseName + "_ClumpTmp"),
-                width=tileWidth,
-                height=tileHeight,
-                nCores=nCores,
+                tmpDIR=os.path.join(tmp_dir, baseName + "_ClumpTmp"),
+                width=tile_width,
+                height=tile_height,
+                nCores=n_cores,
             )
         else:
             tiledclump.perform_clumping_single_thread(
                 classMaskImg,
                 classMaskClumps,
                 tmpDIR=os.path.join(
-                    tmpPath, baseName + "_ClumpTmp", width=tileWidth, height=tileHeight
+                    tmp_dir,
+                    baseName + "_ClumpTmp",
+                    width=tile_width,
+                    height=tile_height,
                 ),
             )
     else:
@@ -1784,11 +1784,16 @@ def identify_small_units(
     rastergis.pop_rat_img_stats(classMaskClumps, False, False)
 
     for i in range(numThresholds):
-        print("Processing thresold " + str(smallClumpsThres[i]) + " - " + outColName[i])
+        print(
+            "Processing thresold "
+            + str(small_clumps_thres[i])
+            + " - "
+            + out_col_name[i]
+        )
         ratDataset = gdal.Open(classMaskClumps, gdal.GA_Update)
         Histogram = rat.readColumn(ratDataset, "Histogram")
         smallUnits = numpy.zeros_like(Histogram, dtype=numpy.int16)
-        smallUnits[Histogram < smallClumpsThres[i]] = 1
+        smallUnits[Histogram < small_clumps_thres[i]] = 1
         rat.writeColumn(ratDataset, "smallUnits", smallUnits)
         ratDataset = None
 
@@ -1797,27 +1802,27 @@ def identify_small_units(
         )
 
         bs = []
-        bs.append(rastergis.BandAttStats(band=1, maxField=outColName[i]))
-        rastergis.populate_rat_with_stats(smallClumpsMask, clumpsImg, bs)
+        bs.append(rastergis.BandAttStats(band=1, maxField=out_col_name[i]))
+        rastergis.populate_rat_with_stats(smallClumpsMask, clumps_img, bs)
 
     rsgislib.tools.filetools.delete_file_with_basename(classMaskImg)
     rsgislib.tools.filetools.delete_file_with_basename(classMaskClumps)
     rsgislib.tools.filetools.delete_file_with_basename(smallClumpsMask)
     if createdDIR:
-        shutil.rmtree(tmpPath)
+        shutil.rmtree(tmp_dir)
 
 
-def _computeProximityArrArgsFunc(argVals):
+def _computeProximityArrArgsFunc(arg_vals):
     """
     This function is used internally within calc_dist_to_classes for the multiprocessing Pool
 
     """
-    classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
+    classImgDS = gdal.Open(arg_vals[0], gdal.GA_ReadOnly)
     classImgBand = classImgDS.GetRasterBand(1)
     imageutils.create_copy_img(
-        argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT
+        arg_vals[0], arg_vals[1], 1, arg_vals[3], arg_vals[4], rsgislib.TYPE_32FLOAT
     )
-    distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
+    distImgDS = gdal.Open(arg_vals[1], gdal.GA_Update)
     distImgBand = distImgDS.GetRasterBand(1)
     try:
         import tqdm
@@ -1826,7 +1831,7 @@ def _computeProximityArrArgsFunc(argVals):
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress
-    gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=callback)
+    gdal.ComputeProximity(classImgBand, distImgBand, arg_vals[2], callback=callback)
     distImgBand = None
     distImgDS = None
     classImgBand = None
@@ -1834,33 +1839,33 @@ def _computeProximityArrArgsFunc(argVals):
 
 
 def calc_dist_to_classes(
-    clumpsImg,
-    classCol,
-    outImgBase,
-    tmpDIR="./tmp",
-    tileSize=2000,
-    maxDist=1000,
-    nodata=1000,
-    nCores=-1,
+    clumps_img,
+    class_col,
+    out_img_base,
+    tmp_dir="./tmp",
+    tile_size=2000,
+    max_dist=1000,
+    no_data_val=1000,
+    n_cores=-1,
 ):
     """
     A function which will calculate proximity rasters for a set of classes
     defined within the RAT.
 
-    :param clumpsImg: is a string specifying the input image with the associated RAT
-    :param classCol: is the column in the RAT which has the classification
-    :param outImgBase: is the base name of the output image - output files will
+    :param clumps_img: is a string specifying the input image with the associated RAT
+    :param class_col: is the column in the RAT which has the classification
+    :param out_img_base: is the base name of the output image - output files will
                        be KEA files.
-    :param tmpDIR: is a directory to be used for storing the image tiles and
+    :param tmp_dir: is a directory to be used for storing the image tiles and
                    other temporary files - if not directory does not exist it
                    will be created and deleted on completion (Default: ./tmp).
-    :param tileSize: is an int specifying in pixels the size of the image tiles
+    :param tile_size: is an int specifying in pixels the size of the image tiles
                      used for processing (Default: 2000)
-    :param maxDist: is the maximum distance in units of the geographic units of
+    :param max_dist: is the maximum distance in units of the geographic units of
                     the projection of the input image (Default: 1000).
-    :param nodata: is the value applied to the pixels outside of the maxDist
+    :param no_data_val: is the value applied to the pixels outside of the maxDist
                    threshold (Default: 1000; i.e., the same as maxDist).
-    :param nCores: is the number of processing cores which are available to be
+    :param n_cores: is the number of processing cores which are available to be
                    used for this processing. If -1 all available cores will be
                    used. (Default: -1)
 
@@ -1869,23 +1874,23 @@ def calc_dist_to_classes(
     import rsgislib.tools.filetools
 
     tmpPresent = True
-    if not os.path.exists(tmpDIR):
-        print("WARNING: '" + tmpDIR + "' directory does not exist so creating it...")
-        os.makedirs(tmpDIR)
+    if not os.path.exists(tmp_dir):
+        print("WARNING: '" + tmp_dir + "' directory does not exist so creating it...")
+        os.makedirs(tmp_dir)
         tmpPresent = False
 
-    if nCores <= 0:
-        nCores = multiprocessing.cpu_count()
+    if n_cores <= 0:
+        n_cores = multiprocessing.cpu_count()
 
     uid = rsgislib.tools.utils.uid_generator()
 
-    classesImg = os.path.join(tmpDIR, "ClassImg_" + uid + ".kea")
+    classesImg = os.path.join(tmp_dir, "ClassImg_" + uid + ".kea")
     rastergis.export_col_to_gdal_img(
-        clumpsImg, classesImg, "KEA", rsgislib.TYPE_32UINT, classCol
+        clumps_img, classesImg, "KEA", rsgislib.TYPE_32UINT, class_col
     )
 
-    ratDataset = gdal.Open(clumpsImg, gdal.GA_ReadOnly)
-    classColInt = rat.readColumn(ratDataset, classCol)
+    ratDataset = gdal.Open(clumps_img, gdal.GA_ReadOnly)
+    classColInt = rat.readColumn(ratDataset, class_col)
     ratDataset = None
 
     classIDs = numpy.unique(classColInt)
@@ -1894,8 +1899,8 @@ def calc_dist_to_classes(
 
     # print("Image Res {} x {}".format(xRes, yRes))
 
-    xMaxDistPxl = math.ceil(maxDist / xRes)
-    yMaxDistPxl = math.ceil(maxDist / yRes)
+    xMaxDistPxl = math.ceil(max_dist / xRes)
+    yMaxDistPxl = math.ceil(max_dist / yRes)
 
     print("Max Dist Pxls X = {}, Y = {}".format(xMaxDistPxl, yMaxDistPxl))
 
@@ -1903,7 +1908,7 @@ def calc_dist_to_classes(
     if yMaxDistPxl > xMaxDistPxl:
         tileOverlap = yMaxDistPxl
 
-    classTilesDIR = os.path.join(tmpDIR, "ClassTiles_" + uid)
+    classTilesDIR = os.path.join(tmp_dir, "ClassTiles_" + uid)
     classTilesDIRPresent = True
     if not os.path.exists(classTilesDIR):
         os.makedirs(classTilesDIR)
@@ -1913,8 +1918,8 @@ def calc_dist_to_classes(
     imageutils.create_tiles(
         classesImg,
         classesImgTileBase,
-        tileSize,
-        tileSize,
+        tile_size,
+        tile_size,
         tileOverlap,
         0,
         "KEA",
@@ -1923,16 +1928,16 @@ def calc_dist_to_classes(
     )
     imgTileFiles = glob.glob(classesImgTileBase + "*.kea")
 
-    distTilesDIR = os.path.join(tmpDIR, "DistTiles_" + uid)
+    distTilesDIR = os.path.join(tmp_dir, "DistTiles_" + uid)
     distTilesDIRPresent = True
     if not os.path.exists(distTilesDIR):
         os.makedirs(distTilesDIR)
         distTilesDIRPresent = False
 
     proxOptionsBase = [
-        "MAXDIST=" + str(maxDist),
+        "MAXDIST=" + str(max_dist),
         "DISTUNITS=GEO",
-        "NODATA=" + str(nodata),
+        "NODATA=" + str(no_data_val),
     ]
 
     for classID in classIDs:
@@ -1945,20 +1950,27 @@ def calc_dist_to_classes(
         for classTileFile in imgTileFiles:
             baseTileName = os.path.basename(classTileFile)
             distTileFile = os.path.join(distTilesDIR, baseTileName)
-            tileArgs = [classTileFile, distTileFile, proxOptions, nodata, "KEA"]
+            tileArgs = [classTileFile, distTileFile, proxOptions, no_data_val, "KEA"]
             distTiles.append(distTileFile)
             distTileArgs.append(tileArgs)
 
-        with Pool(nCores) as p:
+        with Pool(n_cores) as p:
             p.map(_computeProximityArrArgsFunc, distTileArgs)
 
-        distImage = outImgBase + "_" + str(classID) + ".kea"
+        distImage = out_img_base + "_" + str(classID) + ".kea"
         # Mosaic Tiles
         imageutils.create_img_mosaic(
-            distTiles, distImage, nodata, nodata, 1, 1, "KEA", rsgislib.TYPE_32FLOAT
+            distTiles,
+            distImage,
+            no_data_val,
+            no_data_val,
+            1,
+            1,
+            "KEA",
+            rsgislib.TYPE_32FLOAT,
         )
         imageutils.pop_img_stats(
-            distImage, use_no_data=True, no_data_val=nodata, calc_pyramids=True
+            distImage, use_no_data=True, no_data_val=no_data_val, calc_pyramids=True
         )
         for imgFile in distTiles:
             rsgislib.tools.filetools.delete_file_with_basename(imgFile)
@@ -1973,23 +1985,23 @@ def calc_dist_to_classes(
         shutil.rmtree(distTilesDIR, ignore_errors=True)
 
     if not tmpPresent:
-        shutil.rmtree(tmpDIR, ignore_errors=True)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
     else:
         os.remove(classesImg)
 
 
 def calc_dist_between_clumps(
-    clumpsImg, outColName, tmpDIR="./tmp", useIdx=False, maxDistThres=10
+    clumps_img, out_col_name, tmp_dir="./tmp", use_idx=False, max_dist_thres=10
 ):
     """
     Calculate the distance between all clumps
 
-    :param clumpsImg: image clumps for which the distance will be calculated.
-    :param outColName: output column within the clumps image.
-    :param tmpDIR: directory out tempory files will be outputted to.
-    :param useIdx: use a spatial index when calculating the distance between
+    :param clumps_img: image clumps for which the distance will be calculated.
+    :param out_col_name: output column within the clumps image.
+    :param tmp_dir: directory out tempory files will be outputted to.
+    :param use_idx: use a spatial index when calculating the distance between
                    clumps (needed for large number of clumps).
-    :param maxDistThres: if using an index than an upper limit on the distance
+    :param max_dist_thres: if using an index than an upper limit on the distance
                          between clumps can be defined.
 
     """
@@ -1997,18 +2009,18 @@ def calc_dist_between_clumps(
     import rsgislib.tools.filetools
 
     tmpPresent = True
-    if not os.path.exists(tmpDIR):
-        os.makedirs(tmpDIR)
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
         tmpPresent = False
 
     baseName = "{}_{}".format(
-        rsgislib.tools.filetools.get_file_basename(clumpsImg),
+        rsgislib.tools.filetools.get_file_basename(clumps_img),
         rsgislib.tools.utils.uid_generator(),
     )
 
-    polysShp = os.path.join(tmpDIR, baseName + "_shp.shp")
+    polysShp = os.path.join(tmp_dir, baseName + "_shp.shp")
     vectorutils.polygoniseRaster(
-        clumpsImg, polysShp, imgBandNo=1, maskImg=clumpsImg, imgMaskBandNo=1
+        clumps_img, polysShp, imgBandNo=1, maskImg=clumps_img, imgMaskBandNo=1
     )
 
     print(
@@ -2017,51 +2029,56 @@ def calc_dist_between_clumps(
     )
     t = rsgislib.RSGISTime()
     t.start(True)
-    polysShpGeomDist = os.path.join(tmpDIR, baseName + "_dist_shp.shp")
+    polysShpGeomDist = os.path.join(tmp_dir, baseName + "_dist_shp.shp")
     vectorutils.dist2NearestGeom(
-        polysShp, polysShpGeomDist, outColName, True, useIdx, maxDistThres
+        polysShp, polysShpGeomDist, out_col_name, True, use_idx, max_dist_thres
     )
     t.end()
 
-    rastergis.import_vec_atts(clumpsImg, polysShpGeomDist, [outColName])
+    rastergis.import_vec_atts(clumps_img, polysShpGeomDist, [out_col_name])
 
     if not tmpPresent:
-        shutil.rmtree(tmpDIR, ignore_errors=True)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
 def calc_dist_to_large_clumps(
-    clumpsImg, outColName, sizeThres, tmpDIR="./tmp", useIdx=False, maxDistThres=10
+    clumps_img,
+    out_col_name,
+    size_thres,
+    tmp_dir="./tmp",
+    use_idx=False,
+    max_dist_thres=10,
 ):
     """
     Calculate the distance from each small clump to a large clump. Split defined by
     the threshold provided.
 
-    :param clumpsImg: image clumps for which the distance will be calculated.
-    :param outColName: output column within the clumps image.
-    :param sizeThres: is a threshold to seperate the sets of large and small clumps.
-    :param tmpDIR: directory out tempory files will be outputted to.
-    :param useIdx: use a spatial index when calculating the distance between clumps
+    :param clumps_img: image clumps for which the distance will be calculated.
+    :param out_col_name: output column within the clumps image.
+    :param size_thres: is a threshold to seperate the sets of large and small clumps.
+    :param tmp_dir: directory out tempory files will be outputted to.
+    :param use_idx: use a spatial index when calculating the distance between clumps
                    (needed for large number of clumps).
-    :param maxDistThres: if using an index than an upper limit on the distance
+    :param max_dist_thres: if using an index than an upper limit on the distance
                          between clumps can be defined.
 
     """
     import rsgislib.tools.utils
 
     tmpPresent = True
-    if not os.path.exists(tmpDIR):
-        os.makedirs(tmpDIR)
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
         tmpPresent = False
 
     uidStr = rsgislib.tools.utils.uid_generator()
     baseName = "{}_{}".format(
-        rsgislib.tools.filetools.get_file_basename(clumpsImg), uidStr
+        rsgislib.tools.filetools.get_file_basename(clumps_img), uidStr
     )
 
-    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    ratDataset = gdal.Open(clumps_img, gdal.GA_Update)
     Histogram = rat.readColumn(ratDataset, "Histogram")
     smallUnits = numpy.zeros_like(Histogram, dtype=numpy.int16)
-    smallUnits[Histogram < sizeThres] = 1
+    smallUnits[Histogram < size_thres] = 1
     rat.writeColumn(ratDataset, "smallUnits", smallUnits)
 
     ID = numpy.arange(Histogram.shape[0])
@@ -2086,28 +2103,28 @@ def calc_dist_to_large_clumps(
     rat.writeColumn(ratDataset, "LrgUnits", lrgUnitClumpIDs)
     rat.writeColumn(ratDataset, "smallUnitsBin", smallUnits)
 
-    smClumpsImg = os.path.join(tmpDIR, baseName + "_smclumps.kea")
+    smClumpsImg = os.path.join(tmp_dir, baseName + "_smclumps.kea")
     rastergis.export_col_to_gdal_img(
-        clumpsImg, smClumpsImg, "KEA", rsgislib.TYPE_32UINT, "SmUnits"
+        clumps_img, smClumpsImg, "KEA", rsgislib.TYPE_32UINT, "SmUnits"
     )
     rastergis.pop_rat_img_stats(
         clumps_img=smClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
     )
 
-    lrgClumpsImg = os.path.join(tmpDIR, baseName + "_lrgclumps.kea")
+    lrgClumpsImg = os.path.join(tmp_dir, baseName + "_lrgclumps.kea")
     rastergis.export_col_to_gdal_img(
-        clumpsImg, lrgClumpsImg, "KEA", rsgislib.TYPE_32UINT, "LrgUnits"
+        clumps_img, lrgClumpsImg, "KEA", rsgislib.TYPE_32UINT, "LrgUnits"
     )
     rastergis.pop_rat_img_stats(
         clumps_img=lrgClumpsImg, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
     )
 
-    smPolysShp = os.path.join(tmpDIR, baseName + "_smClumps_shp.shp")
+    smPolysShp = os.path.join(tmp_dir, baseName + "_smClumps_shp.shp")
     rsgislib.vectorutils.polygoniseRaster(
         smClumpsImg, smPolysShp, imgBandNo=1, maskImg=smClumpsImg, imgMaskBandNo=1
     )
 
-    lgrPolysShp = os.path.join(tmpDIR, baseName + "_lgrClumps_shp.shp")
+    lgrPolysShp = os.path.join(tmp_dir, baseName + "_lgrClumps_shp.shp")
     rsgislib.vectorutils.polygoniseRaster(
         lrgClumpsImg, lgrPolysShp, imgBandNo=1, maskImg=lrgClumpsImg, imgMaskBandNo=1
     )
@@ -2118,60 +2135,69 @@ def calc_dist_to_large_clumps(
     )
     t = rsgislib.RSGISTime()
     t.start(True)
-    smPolysDistShp = os.path.join(tmpDIR, baseName + "_smClumps_dist_shp.shp")
+    smPolysDistShp = os.path.join(tmp_dir, baseName + "_smClumps_dist_shp.shp")
     rsgislib.vectorutils.dist2NearestSecGeomSet(
-        smPolysShp, lgrPolysShp, smPolysDistShp, outColName, True, useIdx, maxDistThres
+        smPolysShp,
+        lgrPolysShp,
+        smPolysDistShp,
+        out_col_name,
+        True,
+        use_idx,
+        max_dist_thres,
     )
     t.end()
-    rsgislib.rastergis.import_vec_atts(smClumpsImg, smPolysDistShp, [outColName])
+    rsgislib.rastergis.import_vec_atts(smClumpsImg, smPolysDistShp, [out_col_name])
 
     smClumpsRATDataset = gdal.Open(smClumpsImg, gdal.GA_Update)
-    minDistCol = rat.readColumn(smClumpsRATDataset, outColName)
+    minDistCol = rat.readColumn(smClumpsRATDataset, out_col_name)
 
     minDistSmlClumpsArr = numpy.zeros_like(Histogram, dtype=numpy.float32)
     minDistSmlClumpsArr[smUnitIDs] = minDistCol
 
-    rat.writeColumn(ratDataset, outColName, minDistSmlClumpsArr)
+    rat.writeColumn(ratDataset, out_col_name, minDistSmlClumpsArr)
 
     smClumpsRATDataset = None
     ratDataset = None
 
     if not tmpPresent:
-        shutil.rmtree(tmpDIR, ignore_errors=True)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
-def take_random_sample(clumpsImg, inColName, inColVal, outColName, sampleRatio, seed=0):
+def take_random_sample(
+    clumps_img, in_col_name, in_col_val, out_col_name, sample_ratio, rnd_seed=0
+):
     """
     A function to take a random sample of an input column.
 
-    :param clumpsImg: clumps image.
-    :param inColName: input column name.
-    :param inColVal: numeric value for which the random sample is to be taken for.
-    :param outColName: output column where value of 1 is selected within the random
+    :param clumps_img: clumps image.
+    :param in_col_name: input column name.
+    :param in_col_val: numeric value for which the random sample is to be taken for.
+    :param out_col_name: output column where value of 1 is selected within the random
                        sample and 0 is not selected.
-    :param sampleRatio: the size of the sample (0 - 1.0; i.e., 10% = 0.1) to be
+    :param sample_ratio: the size of the sample (0 - 1.0; i.e., 10% = 0.1) to be
                         taken of the number of rows within input value.
-    :param seed: is the seed for the random number generation (optional; default is 0).
+    :param rnd_seed: is the seed for the random number generation (optional;
+                     default is 0).
     """
-    if (sampleRatio <= 0) or (sampleRatio >= 1):
+    if (sample_ratio <= 0) or (sample_ratio >= 1):
         raise rsgislib.RSGISPyException("Input sample ratio must be between 0 and 1.")
 
     # Define the seed for the random number generation.
-    numpy.random.seed(seed)
+    numpy.random.seed(rnd_seed)
 
     # READ COL FROM RAT:
-    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
-    inColVals = rat.readColumn(ratDataset, inColName)
+    ratDataset = gdal.Open(clumps_img, gdal.GA_Update)
+    inColVals = rat.readColumn(ratDataset, in_col_name)
 
     # Create an array for the original array indexes.
     ID = numpy.arange(inColVals.shape[0])
 
     # Cut array and array indexes to be only bins with a value of 1
     # (i.e., there is lidar data here).
-    ID = ID[inColVals == inColVal]
+    ID = ID[inColVals == in_col_val]
 
     # Sample of the subsetted input array where it equals inColVal.
-    numOfSamples = int(ID.shape[0] * sampleRatio)
+    numOfSamples = int(ID.shape[0] * sample_ratio)
     IDSamples = numpy.arange(ID.shape[0])
     IDSampPerms = numpy.random.permutation(IDSamples)
     IDSampPermsSelect = IDSampPerms[0:numOfSamples]
@@ -2186,16 +2212,16 @@ def take_random_sample(clumpsImg, inColName, inColVal, outColName, sampleRatio, 
     outColVals[outArryIdxsSel] = 1
 
     # WRITE COL TO RAT:
-    rat.writeColumn(ratDataset, outColName, outColVals)
+    rat.writeColumn(ratDataset, out_col_name, outColVals)
     ratDataset = None
 
 
-def get_column_data(clumpsImg, columnName):
+def get_column_data(clumps_img, col_name):
     """
     A function to read a column of data from a RAT.
 
-    :param clumpsImg: Input clumps image
-    :param columnName: Name of the column to be read.
+    :param clumps_img: Input clumps image
+    :param col_name: Name of the column to be read.
 
     :return: numpy array with values from the clumpsImg
     """
@@ -2218,27 +2244,27 @@ def get_column_data(clumpsImg, columnName):
             "could not be imported\n\t" + riosRatErr
         )
 
-    col_names = rsgislib.rastergis.get_rat_columns(clumpsImg)
+    col_names = rsgislib.rastergis.get_rat_columns(clumps_img)
 
-    if columnName not in col_names:
+    if col_name not in col_names:
         raise Exception("Column specified is not within the RAT.")
 
-    ratDataset = gdal.Open(clumpsImg, gdal.GA_ReadOnly)
+    ratDataset = gdal.Open(clumps_img, gdal.GA_ReadOnly)
     if ratDataset is None:
         raise Exception("The input image could not be opened.")
 
-    col_data = rat.readColumn(ratDataset, columnName)
+    col_data = rat.readColumn(ratDataset, col_name)
     ratDataset = None
     return col_data
 
 
-def set_column_data(clumpsImg, columnName, columnData):
+def set_column_data(clumps_img, col_name, col_data):
     """
     A function to read a column of data from a RAT.
 
-    :param clumpsImg: Input clumps image
-    :param columnName: Name of the column to be written.
-    :param columnData: Data to be written to the column.
+    :param clumps_img: Input clumps image
+    :param col_name: Name of the column to be written.
+    :param col_data: Data to be written to the column.
     """
     # Check numpy is available
     if not haveNumpy:
@@ -2259,15 +2285,15 @@ def set_column_data(clumpsImg, columnName, columnData):
             "could not be imported\n\t" + riosRatErr
         )
 
-    rat_length = rsgislib.rastergis.get_rat_length(clumpsImg)
-    if rat_length != (columnData.shape[0]):
+    rat_length = rsgislib.rastergis.get_rat_length(clumps_img)
+    if rat_length != (col_data.shape[0]):
         raise Exception("The input data array is not the same length as the RAT.")
 
-    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    ratDataset = gdal.Open(clumps_img, gdal.GA_Update)
     if ratDataset is None:
         raise Exception("The input image could not be opened.")
 
-    rat.writeColumn(ratDataset, columnName, columnData)
+    rat.writeColumn(ratDataset, col_name, col_data)
     ratDataset = None
 
 

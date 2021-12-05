@@ -2,12 +2,6 @@ import os
 import pytest
 from shutil import copy2
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-VECTORUTILS_DATA_DIR = os.path.join(DATA_DIR, "vectorutils")
-CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
-IMGUTILS_DATA_DIR = os.path.join(DATA_DIR, "imageutils")
-REGRESS_DATA_DIR = os.path.join(DATA_DIR, "regression")
-
 GEOPANDAS_NOT_AVAIL = False
 try:
     import geopandas
@@ -25,6 +19,13 @@ try:
     import shapely
 except ImportError:
     SHAPELY_NOT_AVAIL = True
+
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+VECTORUTILS_DATA_DIR = os.path.join(DATA_DIR, "vectorutils")
+CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
+IMGUTILS_DATA_DIR = os.path.join(DATA_DIR, "imageutils")
+REGRESS_DATA_DIR = os.path.join(DATA_DIR, "regression")
+
 
 def test_delete_vector_file(tmp_path):
     import rsgislib.vectorutils
@@ -674,7 +675,11 @@ def test_vector_maths(tmp_path):
 # TODO rsgislib.vectorutils.create_lines_of_points
 # TODO rsgislib.vectorutils.check_validate_geometries
 
-@pytest.mark.skipif((GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL), reason="geopandas or rtree dependencies not available")
+
+@pytest.mark.skipif(
+    (GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL),
+    reason="geopandas or rtree dependencies not available",
+)
 def test_perform_spatial_join_empty(tmp_path):
     import rsgislib.vectorutils
 
@@ -686,12 +691,25 @@ def test_perform_spatial_join_empty(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.perform_spatial_join(vec_base_file, vec_base_lyr, vec_join_file, vec_join_lyr, out_vec_file, out_vec_lyr, out_format="GPKG", join_how="inner", join_op="within")
+    rsgislib.vectorutils.perform_spatial_join(
+        vec_base_file,
+        vec_base_lyr,
+        vec_join_file,
+        vec_join_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+        join_how="inner",
+        join_op="within",
+    )
 
     assert not os.path.exists(out_vec_file)
 
 
-@pytest.mark.skipif((GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL), reason="geopandas or rtree dependencies not available")
+@pytest.mark.skipif(
+    (GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL),
+    reason="geopandas or rtree dependencies not available",
+)
 def test_perform_spatial_join(tmp_path):
     import rsgislib.vectorutils
 
@@ -703,9 +721,20 @@ def test_perform_spatial_join(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.perform_spatial_join(vec_base_file, vec_base_lyr, vec_join_file, vec_join_lyr, out_vec_file, out_vec_lyr, out_format="GPKG", join_how="inner", join_op="within")
+    rsgislib.vectorutils.perform_spatial_join(
+        vec_base_file,
+        vec_base_lyr,
+        vec_join_file,
+        vec_join_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+        join_how="inner",
+        join_op="within",
+    )
 
     assert os.path.exists(out_vec_file)
+
 
 def test_does_vmsk_img_intersect(tmp_path):
     import rsgislib.vectorutils
@@ -714,8 +743,11 @@ def test_does_vmsk_img_intersect(tmp_path):
     vec_roi_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     vec_roi_lyr = "aber_osgb_multi_polys"
 
-    intersect = rsgislib.vectorutils.does_vmsk_img_intersect(input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir=tmp_path)
+    intersect = rsgislib.vectorutils.does_vmsk_img_intersect(
+        input_vmsk_img, vec_roi_file, vec_roi_lyr, tmp_dir=tmp_path
+    )
     assert intersect
+
 
 def test_vector_translate(tmp_path):
     import rsgislib.vectorutils
@@ -726,21 +758,28 @@ def test_vector_translate(tmp_path):
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorutils.vector_translate(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format="GPKG")
+    rsgislib.vectorutils.vector_translate(
+        vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format="GPKG"
+    )
 
     assert os.path.exists(out_vec_file)
 
+
 def test_reproj_wgs84_vec_to_utm(tmp_path):
     import rsgislib.vectorutils
+
     vec_file = os.path.join(DATA_DIR, "degree_grid_examples_uk.geojson")
     vec_lyr = "degree_grid_examples_uk"
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorutils.reproj_wgs84_vec_to_utm(vec_file, vec_lyr, out_vec_file, out_vec_lyr, use_hemi=True, out_format="GPKG")
+    rsgislib.vectorutils.reproj_wgs84_vec_to_utm(
+        vec_file, vec_lyr, out_vec_file, out_vec_lyr, use_hemi=True, out_format="GPKG"
+    )
 
     assert os.path.exists(out_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_spatial_select(tmp_path):
@@ -755,9 +794,18 @@ def test_spatial_select(tmp_path):
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorutils.spatial_select(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, out_vec_lyr, out_format="GPKG")
+    rsgislib.vectorutils.spatial_select(
+        vec_file,
+        vec_lyr,
+        vec_roi_file,
+        vec_roi_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+    )
 
     assert os.path.exists(out_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_split_by_attribute_sgl_file(tmp_path):
@@ -769,8 +817,18 @@ def test_split_by_attribute_sgl_file(tmp_path):
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     split_col_name = "names"
 
-    rsgislib.vectorutils.split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out_vec_file=out_vec_file, out_file_path=None, out_file_ext="gpkg", out_format="GPKG")
+    rsgislib.vectorutils.split_by_attribute(
+        vec_file,
+        vec_lyr,
+        split_col_name,
+        multi_layers=True,
+        out_vec_file=out_vec_file,
+        out_file_path=None,
+        out_file_ext="gpkg",
+        out_format="GPKG",
+    )
     assert os.path.exists(out_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_split_by_attribute_mul_files(tmp_path):
@@ -782,8 +840,18 @@ def test_split_by_attribute_mul_files(tmp_path):
 
     split_col_name = "names"
 
-    rsgislib.vectorutils.split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=False, out_vec_file=None, out_file_path=tmp_path, out_file_ext="gpkg", out_format="GPKG")
+    rsgislib.vectorutils.split_by_attribute(
+        vec_file,
+        vec_lyr,
+        split_col_name,
+        multi_layers=False,
+        out_vec_file=None,
+        out_file_path=tmp_path,
+        out_file_ext="gpkg",
+        out_format="GPKG",
+    )
     assert len(glob.glob(os.path.join(tmp_path, "*.gpkg"))) == 13
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_subset_by_attribute_equals(tmp_path):
@@ -798,8 +866,18 @@ def test_subset_by_attribute_equals(tmp_path):
 
     sub_col = "names"
     sub_vals = ["helloN63W125world", "helloN63W123world", "helloS52E053world"]
-    rsgislib.vectorutils.subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_vec_lyr, out_format="GPKG", match_type="equals")
+    rsgislib.vectorutils.subset_by_attribute(
+        vec_file,
+        vec_lyr,
+        sub_col,
+        sub_vals,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+        match_type="equals",
+    )
     assert os.path.exists(out_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_subset_by_attribute_contains(tmp_path):
@@ -814,8 +892,18 @@ def test_subset_by_attribute_contains(tmp_path):
 
     sub_col = "names"
     sub_vals = ["N63"]
-    rsgislib.vectorutils.subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_vec_lyr, out_format="GPKG", match_type="contains")
+    rsgislib.vectorutils.subset_by_attribute(
+        vec_file,
+        vec_lyr,
+        sub_col,
+        sub_vals,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+        match_type="contains",
+    )
     assert os.path.exists(out_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_subset_by_attribute_start(tmp_path):
@@ -830,8 +918,18 @@ def test_subset_by_attribute_start(tmp_path):
 
     sub_col = "names"
     sub_vals = ["hello"]
-    rsgislib.vectorutils.subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_vec_lyr, out_format="GPKG", match_type="start")
+    rsgislib.vectorutils.subset_by_attribute(
+        vec_file,
+        vec_lyr,
+        sub_col,
+        sub_vals,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+        match_type="start",
+    )
     assert os.path.exists(out_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_merge_vector_files(tmp_path):
@@ -846,7 +944,9 @@ def test_merge_vector_files(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.merge_vector_files(in_vec_files, out_vec_file, out_vec_lyr, out_format="GPKG")
+    rsgislib.vectorutils.merge_vector_files(
+        in_vec_files, out_vec_file, out_vec_lyr, out_format="GPKG"
+    )
     assert os.path.exists(out_vec_file)
 
 
@@ -867,15 +967,21 @@ def test_merge_vector_layers(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.merge_vector_layers(in_vec_files, out_vec_file, out_vec_lyr, out_format="GPKG")
+    rsgislib.vectorutils.merge_vector_layers(
+        in_vec_files, out_vec_file, out_vec_lyr, out_format="GPKG"
+    )
     assert os.path.exists(out_vec_file)
+
 
 # Need to create the input datasets
 # TODO rsgislib.vectorutils.explode_vec_lyr
 # TODO rsgislib.vectorutils.explode_vec_files
 
 
-@pytest.mark.skipif((GEOPANDAS_NOT_AVAIL and SHAPELY_NOT_AVAIL), reason="geopandas or shapely dependencies not available")
+@pytest.mark.skipif(
+    (GEOPANDAS_NOT_AVAIL and SHAPELY_NOT_AVAIL),
+    reason="geopandas or shapely dependencies not available",
+)
 def test_geopd_check_polys_wgs84_bounds_geometry():
     import rsgislib.vectorutils
     import geopandas
@@ -888,7 +994,11 @@ def test_geopd_check_polys_wgs84_bounds_geometry():
     gdf_out = rsgislib.vectorutils.geopd_check_polys_wgs84_bounds_geometry(data_gdf)
     assert len(gdf_out) > 0
 
-@pytest.mark.skipif((GEOPANDAS_NOT_AVAIL and SHAPELY_NOT_AVAIL), reason="geopandas or shapely dependencies not available")
+
+@pytest.mark.skipif(
+    (GEOPANDAS_NOT_AVAIL and SHAPELY_NOT_AVAIL),
+    reason="geopandas or shapely dependencies not available",
+)
 def test_merge_utm_vecs_wgs84(tmp_path):
     import rsgislib.vectorutils
 
@@ -900,20 +1010,27 @@ def test_merge_utm_vecs_wgs84(tmp_path):
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorutils.merge_utm_vecs_wgs84(in_vec_files, out_vec_file, out_vec_lyr, out_format="GPKG")
+    rsgislib.vectorutils.merge_utm_vecs_wgs84(
+        in_vec_files, out_vec_file, out_vec_lyr, out_format="GPKG"
+    )
     assert os.path.exists(out_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_split_feats_to_mlyrs(tmp_path):
     import rsgislib.vectorutils
+
     vec_file = os.path.join(DATA_DIR, "degree_grid_examples_uk.geojson")
     vec_lyr = "degree_grid_examples_uk"
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
 
-    rsgislib.vectorutils.split_feats_to_mlyrs(vec_file, vec_lyr, out_vec_file, out_format="GPKG")
+    rsgislib.vectorutils.split_feats_to_mlyrs(
+        vec_file, vec_lyr, out_vec_file, out_format="GPKG"
+    )
 
     assert os.path.exists(out_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_split_vec_lyr_random_subset(tmp_path):
@@ -928,9 +1045,20 @@ def test_split_vec_lyr_random_subset(tmp_path):
     out_smpl_vec_file = os.path.join(tmp_path, "sample_out_vec.gpkg")
     out_smpl_vec_lyr = "sample_out_vec"
 
-    rsgislib.vectorutils.split_vec_lyr_random_subset(vec_file, vec_lyr, out_rmain_vec_file, out_rmain_vec_lyr, out_smpl_vec_file, out_smpl_vec_lyr, n_smpl=10, out_format="GPKG", rnd_seed=42)
+    rsgislib.vectorutils.split_vec_lyr_random_subset(
+        vec_file,
+        vec_lyr,
+        out_rmain_vec_file,
+        out_rmain_vec_lyr,
+        out_smpl_vec_file,
+        out_smpl_vec_lyr,
+        n_smpl=10,
+        out_format="GPKG",
+        rnd_seed=42,
+    )
 
     assert os.path.exists(out_rmain_vec_file) and os.path.exists(out_smpl_vec_file)
+
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_create_train_test_smpls(tmp_path):
@@ -945,7 +1073,16 @@ def test_create_train_test_smpls(tmp_path):
     out_test_vec_file = os.path.join(tmp_path, "test_out_vec.gpkg")
     out_test_vec_lyr = "sample_out_vec"
 
-    rsgislib.vectorutils.create_train_test_smpls(vec_file, vec_lyr, out_train_vec_file, out_train_vec_lyr, out_test_vec_file, out_test_vec_lyr, out_format="GPKG", prop_test=0.2, tmp_dir=tmp_path, rnd_seed=42)
+    rsgislib.vectorutils.create_train_test_smpls(
+        vec_file,
+        vec_lyr,
+        out_train_vec_file,
+        out_train_vec_lyr,
+        out_test_vec_file,
+        out_test_vec_lyr,
+        out_format="GPKG",
+        prop_test=0.2,
+        tmp_dir=tmp_path,
+        rnd_seed=42,
+    )
     assert os.path.exists(out_train_vec_file) and os.path.exists(out_test_vec_file)
-
-

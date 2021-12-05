@@ -1121,7 +1121,6 @@ def plot_train_data(
             fig.write_image(out_plot_file)
 
 
-
 def create_acc_pt_sets(
     vec_file: str,
     vec_lyr: str,

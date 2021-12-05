@@ -393,6 +393,7 @@ def pop_bbox_cols(
     dsVecFile = None
     print(" Completed")
 
+
 def add_geom_bbox_cols(
     vec_file: str,
     vec_lyr: str,

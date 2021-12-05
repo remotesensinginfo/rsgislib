@@ -20,7 +20,7 @@
 #  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# Purpose:  Provides helper functions for calculating commmon image band 
+# Purpose:  Provides helper functions for calculating commmon image band
 #           indices.
 #
 # Author: Pete Bunting
@@ -37,8 +37,11 @@ import rsgislib
 import rsgislib.imageutils
 import rsgislib.imagecalc
 
-def calc_ndvi(input_img, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat='KEA'):
-    """ 
+
+def calc_ndvi(
+    input_img, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA"
+):
+    """
     Helper function to calculate Normalised difference Vegetation Index (NDVI)
     ((NIR-RED)/(NIR+RED)). Note the output no data value is -999.
 
@@ -68,19 +71,28 @@ def calc_ndvi(input_img, img_red_band, img_nir_band, output_img, calc_stats=True
     calc_ndvi(input_image, red_band, nir_band, out_image, calc_stats, gdalformat)
 
     """
-    expression = '(nir+red)!=0?(nir-red)/(nir+red):-999'
+    expression = "(nir+red)!=0?(nir-red)/(nir+red):-999"
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('red', input_img, img_red_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('nir', input_img, img_nir_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-def calc_wbi(input_img, img_blue_band, img_nir_band, output_img, calc_stats=True, gdalformat='KEA'):
-    """ 
+def calc_wbi(
+    input_img,
+    img_blue_band,
+    img_nir_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+):
+    """
     Helper function to calculate Water Band Index (WBI) (Blue/NIR.
     Note, the output no data value is -999.
 
@@ -96,19 +108,28 @@ def calc_wbi(input_img, img_blue_band, img_nir_band, output_img, calc_stats=True
                        (Default: KEA)
 
     """
-    expression = 'nir!=0?blue/nir:-999'
+    expression = "nir!=0?blue/nir:-999"
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('blue', input_img, img_blue_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('nir', input_img, img_nir_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999., True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-def calc_ndwi(input_img, img_nir_band, img_swir1_band, output_img, calc_stats=True, gdalformat='KEA'):
-    """ 
+def calc_ndwi(
+    input_img,
+    img_nir_band,
+    img_swir1_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+):
+    """
     Helper function to calculate Normalised Difference Water Index (NDWI)
      ((NIR-SWIR)/(NIR+SWIR)), note the output no data value is -999.
 
@@ -128,19 +149,28 @@ def calc_ndwi(input_img, img_nir_band, img_swir1_band, output_img, calc_stats=Tr
                        (Default: KEA)
 
     """
-    expression = '(nir+swir)!=0?(nir-swir)/(nir+swir):-999'
+    expression = "(nir+swir)!=0?(nir-swir)/(nir+swir):-999"
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('swir', input_img, img_swir1_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('nir', input_img, img_nir_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir1_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-def calc_gndwi(input_img, img_green_band, img_nir_band, output_img, calc_stats=True, gdalformat='KEA'):
-    """ 
+def calc_gndwi(
+    input_img,
+    img_green_band,
+    img_nir_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+):
+    """
     Helper function to calculate Green-Normalised Water Different Index (NDWI)
     ((GREEN-NIR)/(GREEN+NIR)), note the output no data value is -999.
 
@@ -160,19 +190,28 @@ def calc_gndwi(input_img, img_green_band, img_nir_band, output_img, calc_stats=T
                        (Default: KEA)
 
     """
-    expression = '(green+nir)!=0?(green-nir)/(green+nir):-999'
+    expression = "(green+nir)!=0?(green-nir)/(green+nir):-999"
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('green', input_img, img_green_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('nir', input_img, img_nir_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-def calc_gmndwi(input_img, img_green_band, img_swir1_band, output_img, calc_stats=True, gdalformat='KEA'):
-    """ 
+def calc_gmndwi(
+    input_img,
+    img_green_band,
+    img_swir1_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+):
+    """
     Helper function to calculate Green/SWIR-Normalised Difference Water Index (NDWI)
     ((GREEN-SWIR)/(GREEN+SWIR)). Note, the output no data value is -999.
 
@@ -192,19 +231,29 @@ def calc_gmndwi(input_img, img_green_band, img_swir1_band, output_img, calc_stat
                        (Default: KEA)
 
     """
-    expression = '(green+swir)!=0?(green-swir)/(green+swir):-999'
+    expression = "(green+swir)!=0?(green-swir)/(green+swir):-999"
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('green', input_img, img_green_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('swir', input_img, img_swir1_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir1_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
-       
-def calc_whiteness(input_img, img_blue_band, img_green_band, img_red_band, output_img, calc_stats=True, gdalformat='KEA'):
-    """ 
+
+def calc_whiteness(
+    input_img,
+    img_blue_band,
+    img_green_band,
+    img_red_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+):
+    """
     Helper function to calculate whiteness, note the output no data value is -999.
 
     :param input_img: is a string specifying the input image file.
@@ -221,20 +270,31 @@ def calc_whiteness(input_img, img_blue_band, img_green_band, img_red_band, outpu
                        (Default: KEA)
 
     """
-    expression = '(blue+green+red)!=0?(abs(blue-((blue+green+red)/3)) + abs(green-((blue+green+red)/3)) + abs(red-((blue+green+red)/3)))/((blue+green+red)/3):-999'
+    expression = "(blue+green+red)!=0?(abs(blue-((blue+green+red)/3)) + abs(green-((blue+green+red)/3)) + abs(red-((blue+green+red)/3)))/((blue+green+red)/3):-999"
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('blue', input_img, img_blue_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('green', input_img, img_green_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('red', input_img, img_red_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-def calc_brightness(input_img, img_blue_band, img_green_band, img_red_band, output_img, calc_stats=True, gdalformat='KEA', scale_factor=1000):
-    """ 
+def calc_brightness(
+    input_img,
+    img_blue_band,
+    img_green_band,
+    img_red_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+    scale_factor=1000,
+):
+    """
     Helper function to calculate visible brightness, note the output no data
     value is -999.
 
@@ -254,20 +314,33 @@ def calc_brightness(input_img, img_blue_band, img_green_band, img_red_band, outp
                          0-1 (Default: 1000 to match rsgislib/arcsi)
 
     """
-    expression = '(blue+green+red)!=0?((blue/{})+(green/{})+(red/{}))/3:-999'.format(scale_factor, scale_factor, scale_factor)
+    expression = "(blue+green+red)!=0?((blue/{})+(green/{})+(red/{}))/3:-999".format(
+        scale_factor, scale_factor, scale_factor
+    )
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('blue', input_img, img_blue_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('green', input_img, img_green_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('red', input_img, img_red_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img,False,-999.,True)
-        
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
-def calc_brightness_scaled(input_img, img_blue_band, img_green_band, img_red_band, output_img, calc_stats=True, gdalformat='KEA', scale_factor=1000):
-    """ 
+
+def calc_brightness_scaled(
+    input_img,
+    img_blue_band,
+    img_green_band,
+    img_red_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+    scale_factor=1000,
+):
+    """
     Helper function to calculate visible brightness, note the output no data
     value is -999. The difference between this function calc_brightness is
     that the output image is rescaled so the maximum value is 1.
@@ -290,30 +363,47 @@ def calc_brightness_scaled(input_img, img_blue_band, img_green_band, img_red_ban
     """
     import rsgislib.tools.utils
     import rsgislib.tools.filetools
+
     uid_str = rsgislib.tools.utils.uid_generator()
     basename = rsgislib.tools.filetools.get_file_basename(output_img)
     file_ext = rsgislib.imageutils.get_file_img_extension(gdalformat)
     tmp_img = "{}_tmp_{}.{}".format(basename, uid_str, file_ext)
-    expression = '(blue+green+red)!=0?((blue/{})+(green/{})+(red/{}))/3:-999'.format(scale_factor, scale_factor, scale_factor)
+    expression = "(blue+green+red)!=0?((blue/{})+(green/{})+(red/{}))/3:-999".format(
+        scale_factor, scale_factor, scale_factor
+    )
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('blue', input_img, img_blue_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('green', input_img, img_green_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('red', input_img, img_red_band))
-    rsgislib.imagecalc.band_math(tmp_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
-    rsgislib.imageutils.normalise_img_pxl_vals(input_img=tmp_img, output_img=output_img, gdalformat=gdalformat, datatype=rsgislib.TYPE_32FLOAT, in_no_data_val=-999, out_no_data_val=-999, out_min=0, out_max=1, stretch_type=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretch_param=2)
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    rsgislib.imagecalc.band_math(
+        tmp_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+    rsgislib.imageutils.normalise_img_pxl_vals(
+        input_img=tmp_img,
+        output_img=output_img,
+        gdalformat=gdalformat,
+        datatype=rsgislib.TYPE_32FLOAT,
+        in_no_data_val=-999,
+        out_no_data_val=-999,
+        out_min=0,
+        out_max=1,
+        stretch_type=rsgislib.imageutils.STRETCH_LINEARSTDDEV,
+        stretch_param=2,
+    )
     rsgislib.tools.filetools.delete_file_with_basename(tmp_img)
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-
-def calc_ctvi(input_img, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat='KEA'):
-    """ 
+def calc_ctvi(
+    input_img, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA"
+):
+    """
     Helper function to calculate Corrected Transformed Vegetation Index
     ((NDVI + 0.5)/sqrt(abs(NDVI + 0.5))), note the output no data value is -999.
-        
+
     :param input_img: is a string specifying the input image file.
     :param img_red_band: is an int specifying the blue band in the input image
                          (band indexing starts at 1)
@@ -326,19 +416,30 @@ def calc_ctvi(input_img, img_red_band, img_nir_band, output_img, calc_stats=True
                        (Default: KEA)
 
     """
-    expression = '(nir+red)!=0?(((nir-red)/(nir+red))+0.5)/' \
-                 'sqrt(abs(((nir-red)/(nir+red))+0.5)):-999'
+    expression = (
+        "(nir+red)!=0?(((nir-red)/(nir+red))+0.5)/"
+        "sqrt(abs(((nir-red)/(nir+red))+0.5)):-999"
+    )
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('red', input_img, img_red_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('nir', input_img, img_nir_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img,False,-999.,True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-def calc_ndsi(input_img, img_green_band, img_swir1_band, output_img, calc_stats=True, gdalformat='KEA'):
+def calc_ndsi(
+    input_img,
+    img_green_band,
+    img_swir1_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+):
     """
     Helper function to calculate Normalised Difference Snow Index (NDSI)
     ((Green-SWIR)/(Green+SWIR)), note the output no data value is -999.
@@ -355,18 +456,27 @@ def calc_ndsi(input_img, img_green_band, img_swir1_band, output_img, calc_stats=
                        (Default: KEA)
 
     """
-    expression = '(green+swir)!=0?(green-swir)/(green+swir):-999'
+    expression = "(green+swir)!=0?(green-swir)/(green+swir):-999"
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('swir', input_img, img_swir1_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('green', input_img, img_green_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir1_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999., True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-def calc_nbr(input_img, img_nir_band, img_swir2_band, output_img, calc_stats=True, gdalformat='KEA'):
+def calc_nbr(
+    input_img,
+    img_nir_band,
+    img_swir2_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+):
     """
     Helper function to calculate Normalised Burn Ratio (NBR)
     ((NIR-SWIR#2)/(NIR+SWIR#2)). Note, the output no data value is -999.
@@ -383,18 +493,28 @@ def calc_nbr(input_img, img_nir_band, img_swir2_band, output_img, calc_stats=Tru
                        (Default: KEA)
 
     """
-    expression = '(nir+swir)!=0?(nir-swir)/(nir+swir):-999'
+    expression = "(nir+swir)!=0?(nir-swir)/(nir+swir):-999"
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('swir', input_img, img_swir2_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('nir', input_img, img_nir_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir2_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999., True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-def calc_bai(input_img, img_nir_band, img_red_band, output_img, calc_stats=True, gdalformat='KEA', scale_factor=1000):
+def calc_bai(
+    input_img,
+    img_nir_band,
+    img_red_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+    scale_factor=1000,
+):
     """
     Helper function to calculate Burn Area Index (BAI)
     1/((0.1 - red)*(0.1 - red) + (0.06 - nir)*(0.06 - nir)).
@@ -418,19 +538,33 @@ def calc_bai(input_img, img_nir_band, img_red_band, output_img, calc_stats=True,
                          between 0-1 (Default: 1000 to match rsgislib/arcsi)
 
     """
-    expression = '(nir+red)!=0?(1/((0.1 - (red/{}))*(0.1 - (red/{})) + ' \
-                 '(0.06 - (nir/{}))*(0.06 - (nir/{})))):-999'.format(scale_factor, scale_factor, scale_factor, scale_factor)
+    expression = (
+        "(nir+red)!=0?(1/((0.1 - (red/{}))*(0.1 - (red/{})) + "
+        "(0.06 - (nir/{}))*(0.06 - (nir/{})))):-999".format(
+            scale_factor, scale_factor, scale_factor, scale_factor
+        )
+    )
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('red', input_img, img_red_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('nir', input_img, img_nir_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999., True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
-def calc_mvi(input_img, img_green_band, img_nir_band, img_swir1_band, output_img, calc_stats=True, gdalformat='KEA'):
+def calc_mvi(
+    input_img,
+    img_green_band,
+    img_nir_band,
+    img_swir1_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+):
     """
     Helper function to calculate Mangrove Vegetation Index (MFI)
     ((NIR-Green)/(SWIR-Green)). Note, the output no data value is -999.
@@ -454,16 +588,18 @@ def calc_mvi(input_img, img_green_band, img_nir_band, img_swir1_band, output_img
                        (Default: KEA)
 
     """
-    expression = 'abs(swir-green)!=0?abs(nir-green)/abs(swir-green):-999'
+    expression = "abs(swir-green)!=0?abs(nir-green)/abs(swir-green):-999"
     band_defns = []
-    band_defns.append(rsgislib.imagecalc.BandDefn('green', input_img, img_green_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('nir', input_img, img_nir_band))
-    band_defns.append(rsgislib.imagecalc.BandDefn('swir', input_img, img_swir1_band))
-    rsgislib.imagecalc.band_math(output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir1_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
     # Set no data value
     rsgislib.imageutils.set_img_no_data_value(output_img, -999)
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999., True)
+        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
 
 
 """
