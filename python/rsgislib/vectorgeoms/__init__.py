@@ -117,22 +117,37 @@ def get_pt_on_line(pt1: ogr.Geometry, pt2: ogr.Geometry, dist: float) -> (float,
     else:
         dx = pt2.GetX() - pt1.GetX()
         dy = pt2.GetY() - pt1.GetY()
-        theta = math.atan(dy / dx)
-        y1 = dist * math.sin(theta)
-        x1 = dist * math.cos(theta)
 
-        if (dx >= 0) and (dy > 0):
-            out_pt_x = pt1.GetX() + x1
-            out_pt_y = pt1.GetY() + y1
-        elif (dx >= 0) and (dy <= 0):
-            out_pt_x = pt1.GetX() + x1
-            out_pt_y = pt1.GetY() + y1
-        elif (dx < 0) & (dy > 0):
-            out_pt_x = pt1.GetX() - x1
-            out_pt_y = pt1.GetY() - y1
-        elif (dx < 0) & (dy <= 0):
-            out_pt_x = pt1.GetX() - x1
-            out_pt_y = pt1.GetY() - y1
+        if (abs(dx) > 0) and (abs(dy) > 0):
+            theta = math.atan(dy / dx)
+            y1 = dist * math.sin(theta)
+            x1 = dist * math.cos(theta)
+
+            if (dx >= 0) and (dy > 0):
+                out_pt_x = pt1.GetX() + x1
+                out_pt_y = pt1.GetY() + y1
+            elif (dx >= 0) and (dy <= 0):
+                out_pt_x = pt1.GetX() + x1
+                out_pt_y = pt1.GetY() + y1
+            elif (dx < 0) & (dy > 0):
+                out_pt_x = pt1.GetX() - x1
+                out_pt_y = pt1.GetY() - y1
+            elif (dx < 0) & (dy <= 0):
+                out_pt_x = pt1.GetX() - x1
+                out_pt_y = pt1.GetY() - y1
+        elif dx == 0:
+            out_pt_x = pt1.GetX()
+            if dy > 0:
+                out_pt_y = pt1.GetY() + dist
+            else:
+                out_pt_y = pt1.GetY() - dist
+        elif dy == 0:
+            out_pt_y = pt1.GetY()
+            if dx > 0:
+                out_pt_x = pt1.GetX() + dist
+            else:
+                out_pt_x = pt1.GetX() - dist
+
     return out_pt_x, out_pt_y
 
 
@@ -159,23 +174,31 @@ def find_pt_to_side(
     :return: The created point; returned as a set of floats: (x, y)
 
     """
+    import math
+
     if left_hand:
         tmp_pt = pt_end
         pt_end = pt_start
         pt_start = tmp_pt
-    import math
 
     dx = pt_end.GetX() - pt_start.GetX()
     dy = pt_end.GetY() - pt_start.GetY()
-    beta = math.atan(dy / dx)
 
-    distanceP1P2 = pt_start.Distance(pt)
-    distanceP1P3 = math.sqrt((line_len * line_len) + (distanceP1P2 * distanceP1P2))
-    theta = math.atan(line_len / distanceP1P2)
-    alpha = math.pi - (theta - beta)
+    if (abs(dx) > 0) and (abs(dy) > 0):
+        beta = math.atan(dy / dx)
+        distanceP1P2 = pt_start.Distance(pt)
+        distanceP1P3 = math.sqrt((line_len * line_len) + (distanceP1P2 * distanceP1P2))
+        theta = math.atan(line_len / distanceP1P2)
+        alpha = math.pi - (theta - beta)
 
-    localX = distanceP1P3 * math.cos(alpha)
-    localY = distanceP1P3 * math.sin(alpha)
+        localX = distanceP1P3 * math.cos(alpha)
+        localY = distanceP1P3 * math.sin(alpha)
+    elif dx == 0:
+        localX = line_len
+        localY = 0
+    elif dy == 0:
+        localX = 0
+        localY = line_len
 
     if (dx >= 0) and (dy > 0):
         out_pt_x = pt_start.GetX() - localX
@@ -440,7 +463,7 @@ def closest_line_intersection(
     if lyr_objs_vec is None:
         raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
 
-    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subsetEnvsVecLyrObj(
+    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
         lyr_objs_vec, vec_bbox
     )
 
@@ -631,7 +654,7 @@ def line_intersection_range(
     if lyr_objs_vec is None:
         raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
 
-    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subsetEnvsVecLyrObj(
+    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
         lyr_objs_vec, vec_bbox
     )
 
@@ -834,7 +857,7 @@ def scnd_line_intersection_range(
     if lyr_objs_vec is None:
         raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
 
-    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subsetEnvsVecLyrObj(
+    ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
         lyr_objs_vec, vec_bbox
     )
 
@@ -1317,12 +1340,12 @@ def vec_lyr_union_gp(
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def get_vec_lyr_as_pts(in_vec_file: str, in_vec_lyr: str):
+def get_vec_lyr_as_pts(vec_file: str, vec_lyr: str) -> list:
     """
     Get a list of points from the vectors within an input file.
 
-    :param in_vec_file: Input vector file
-    :param in_vec_lyr: Input vector layer name
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer name
     :return: returns a list of points.
 
     """
@@ -1330,8 +1353,8 @@ def get_vec_lyr_as_pts(in_vec_file: str, in_vec_lyr: str):
     import tqdm
 
     gdal.UseExceptions()
-    vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
-    vec_lyr_obj = vec_ds_obj.GetLayer(in_vec_lyr)
+    vec_ds_obj = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    vec_lyr_obj = vec_ds_obj.GetLayer(vec_lyr)
 
     pts_lst = list()
     n_feats = vec_lyr_obj.GetFeatureCount(True)
@@ -1350,8 +1373,8 @@ def get_vec_lyr_as_pts(in_vec_file: str, in_vec_lyr: str):
 
 
 def create_alpha_shape(
-    in_vec_file: str,
-    in_vec_lyr: str,
+    vec_file: str,
+    vec_lyr: str,
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
@@ -1368,8 +1391,8 @@ def create_alpha_shape(
     https://alphashape.readthedocs.io
     https://github.com/bellockk/alphashape
 
-    :param in_vec_file: the input vector file.
-    :param in_vec_lyr: the input vector layer name
+    :param vec_file: the input vector file.
+    :param vec_lyr: the input vector layer name
     :param out_vec_file: the output vector file.
     :param out_vec_lyr: the name of the output vector layer (if None then
                         the same as the input).
@@ -1426,7 +1449,7 @@ def create_alpha_shape(
             n_poly.AddGeometry(n_int_ring)
         return n_poly
 
-    pts = get_vec_lyr_as_pts(in_vec_file, in_vec_lyr)
+    pts = get_vec_lyr_as_pts(vec_file, vec_lyr)
     min_x = 0.0
     min_y = 0.0
     max_x = 0.0
@@ -1497,12 +1520,12 @@ def create_alpha_shape(
 
     vec_output = False
     if out_alpha_shape is not None:
-        vecDS = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
+        vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
         if vecDS is None:
-            raise Exception("Could not open '{}'".format(in_vec_file))
-        vec_lyr_obj = vecDS.GetLayerByName(in_vec_lyr)
+            raise Exception("Could not open '{}'".format(vec_file))
+        vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not open layer '{}'".format(in_vec_lyr))
+            raise Exception("Could not open layer '{}'".format(vec_lyr))
         lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
         vecDS = None
 
@@ -1527,6 +1550,73 @@ def create_alpha_shape(
         vec_output = True
 
     return vec_output, alpha_val
+
+
+def explode_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function to explode a vector layer separating any multiple geometries
+    (e.g., multipolygons) to single geometries.
+
+    Note. this function uses geopandas and therefore the vector layer is loaded
+    into memory.
+
+    :param vec_file: vector layer file
+    :param vec_lyr: vector layer name
+    :param out_vec_file: output vector layer file
+    :param out_vec_lyr: output vector layer name (Can be None if output
+                        format is not GPKG).
+    :param out_format: The output format for the vector file.
+
+    """
+    import geopandas
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_explode_gdf = data_gdf.explode()
+
+    if len(data_explode_gdf) > 0:
+        if out_format == "GPKG":
+            data_explode_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            data_explode_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def explode_vec_files(
+    in_vec_files: list,
+    output_dir: str,
+    out_format: str = "GPKG",
+    out_vec_ext: str = "gpkg",
+):
+    """
+    A function which explodes the multiple geometries within a list of input layers.
+    The output directory must be different to the directory the input files as the
+    output file name will be the same as the input name.
+
+    Note. this function uses the explode_vec_lyr function which uses geopandas and
+    therefore the vector layer is loaded into memory.
+
+    :param in_vec_files: A list of input files.
+    :param output_dir: The directory where the output files will be placed.
+    :param out_format: The vector format for the outputs.
+    :param out_vec_ext: the file extension for the output files. There should not
+                        be a dot within the extension. e.g., gpkg, shp, geojson.
+
+    """
+    import tqdm
+    import rsgislib.vectorutils
+    import rsgislib.tools.filetools
+
+    for vec_file in tqdm.tqdm(in_vec_files):
+        lyrs = rsgislib.vectorutils.get_vec_lyrs_lst(vec_file)
+        basename = rsgislib.tools.filetools.get_file_basename(vec_file)
+        out_vec_file = os.path.join(output_dir, "{}.{}".format(basename, out_vec_ext))
+        for lyr in lyrs:
+            explode_vec_lyr(vec_file, lyr, out_vec_file, lyr, out_format)
 
 
 def convert_multi_geoms_to_single(
@@ -2981,7 +3071,7 @@ def create_rtree_index(vec_file: str, vec_lyr: str):
     return idx_obj, geom_lst
 
 
-def bbox_intersects_index(rt_idx, geom_lst: list, bbox: list):
+def bbox_intersects_index(rt_idx, geom_lst: list, bbox: list) -> bool:
     """
     A function which tests for intersection between the geometries and the bounding box
     using a spatial index.

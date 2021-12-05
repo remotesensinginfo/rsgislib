@@ -973,11 +973,6 @@ def test_merge_vector_layers(tmp_path):
     assert os.path.exists(out_vec_file)
 
 
-# Need to create the input datasets
-# TODO rsgislib.vectorutils.explode_vec_lyr
-# TODO rsgislib.vectorutils.explode_vec_files
-
-
 @pytest.mark.skipif(
     (GEOPANDAS_NOT_AVAIL and SHAPELY_NOT_AVAIL),
     reason="geopandas or shapely dependencies not available",

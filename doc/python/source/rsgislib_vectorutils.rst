@@ -92,11 +92,7 @@ Vector Split
 Vector Geometry
 ----------------
 
-.. autofunction:: rsgislib.vectorutils.explode_vec_lyr
-.. autofunction:: rsgislib.vectorutils.explode_vec_files
 .. autofunction:: rsgislib.vectorutils.geopd_check_polys_wgs84_bounds_geometry
-
-
 
 
 Vector / Raster Tests

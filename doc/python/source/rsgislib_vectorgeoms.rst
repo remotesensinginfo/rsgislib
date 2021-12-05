@@ -5,6 +5,8 @@ Convert Geometries
 -------------------
 .. autofunction:: rsgislib.vectorgeoms.convert_polygon_to_polyline
 .. autofunction:: rsgislib.vectorgeoms.convert_multi_geoms_to_single
+.. autofunction:: rsgislib.vectorgeoms.explode_vec_lyr
+.. autofunction:: rsgislib.vectorgeoms.explode_vec_files
 .. autofunction:: rsgislib.vectorgeoms.get_vec_lyr_as_pts
 .. autofunction:: rsgislib.vectorgeoms.get_geom_pts
 .. autofunction:: rsgislib.vectorgeoms.get_geoms_as_bboxs
