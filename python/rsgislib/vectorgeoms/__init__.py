@@ -17,12 +17,12 @@ gdal.UseExceptions()
 
 
 def convert_polygon_to_polyline(
-    vec_poly_file,
-    vec_poly_lyr,
-    vec_line_file,
-    vec_line_lyr=None,
-    out_format="GPKG",
-    del_exist_vec=False,
+    vec_poly_file: str,
+    vec_poly_lyr: str,
+    vec_line_file: str,
+    vec_line_lyr: str = None,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function to convert a polygon vector file to a polyline file.
@@ -97,7 +97,7 @@ def convert_polygon_to_polyline(
     out_ds_obj = None
 
 
-def get_pt_on_line(pt1, pt2, dist):
+def get_pt_on_line(pt1: ogr.Geometry, pt2: ogr.Geometry, dist: float) -> (float, float):
     """
     A function that calculates a point on the vector defined by pt1 and pt2.
 
@@ -136,7 +136,13 @@ def get_pt_on_line(pt1, pt2, dist):
     return out_pt_x, out_pt_y
 
 
-def find_pt_to_side(pt_start, pt, pt_end, line_len, left_hand=False):
+def find_pt_to_side(
+    pt_start: ogr.Geometry,
+    pt: ogr.Geometry,
+    pt_end: ogr.Geometry,
+    line_len: float,
+    left_hand: bool = False,
+) -> (float, float):
     """
     A function to calculate a point location at a right-angle to the vector defined
     by the points pt_start and pt_end at the location pt.
@@ -968,7 +974,6 @@ def scnd_line_intersection_range(
     ds_line_vec = None
     ds_objs_vec = None
     ds_objs_sub_vec = None
-
 
 
 def calc_poly_centroids(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr):
@@ -2873,6 +2878,7 @@ def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: list) -> bool:
     intersect = poly.Intersects(geom_collect)
     return intersect
 
+
 def shiftxy_vec_lyr(
     vec_file: str,
     vec_lyr: str,
@@ -2912,8 +2918,6 @@ def shiftxy_vec_lyr(
         shifted_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         shifted_gpdf.to_file(out_vec_file, driver=out_format)
-
-
 
 
 def create_rtree_index(vec_file, vec_lyr):
@@ -2990,5 +2994,3 @@ def bbox_intersects_index(rt_idx, geom_lst, bbox):
             bbox_intersects = True
             break
     return bbox_intersects
-
-
