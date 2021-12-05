@@ -195,15 +195,15 @@ def find_pt_to_side(
 
 
 def create_orthg_lines(
-    in_vec_file,
-    in_vec_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    pt_step=1000,
-    line_len=10000,
-    left_hand=False,
-    out_format="GPKG",
-    del_exist_vec=False,
+    in_vec_file: str,
+    in_vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    pt_step: float = 1000,
+    line_len: float = 10000,
+    left_hand: bool = False,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function to create a set of lines which are orthogonal to the lines of the input
@@ -352,17 +352,17 @@ def create_orthg_lines(
 
 
 def closest_line_intersection(
-    vec_line_file,
-    vec_line_lyr,
-    vec_objs_file,
-    vec_objs_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    start_x_field="start_x",
-    start_y_field="start_y",
-    uid_field="uid",
-    out_format="GEOJSON",
-    del_exist_vec=False,
+    vec_line_file: str,
+    vec_line_lyr: str,
+    vec_objs_file: str,
+    vec_objs_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    start_x_field: str = "start_x",
+    start_y_field: str = "start_y",
+    uid_field: str = "uid",
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function which intersects each line within the input vector layer
@@ -543,17 +543,17 @@ def closest_line_intersection(
 
 
 def line_intersection_range(
-    vec_line_file,
-    vec_line_lyr,
-    vec_objs_file,
-    vec_objs_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    start_x_field="start_x",
-    start_y_field="start_y",
-    uid_field="uid",
-    out_format="GEOJSON",
-    del_exist_vec=False,
+    vec_line_file: str,
+    vec_line_lyr: str,
+    vec_objs_file: str,
+    vec_objs_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    start_x_field: str = "start_x",
+    start_y_field: str = "start_y",
+    uid_field: str = "uid",
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function which intersects each line within the input vector layer
@@ -747,17 +747,17 @@ def line_intersection_range(
 
 
 def scnd_line_intersection_range(
-    vec_line_file,
-    vec_line_lyr,
-    vec_objs_file,
-    vec_objs_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    start_x_field="start_x",
-    start_y_field="start_y",
-    uid_field="uid",
-    out_format="GPKG",
-    del_exist_vec=False,
+    vec_line_file: str,
+    vec_line_lyr: str,
+    vec_objs_file: str,
+    vec_objs_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    start_x_field: str = "start_x",
+    start_y_field: str = "start_y",
+    uid_field: str = "uid",
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function which intersects a line with a set of polygons outputting the
@@ -976,7 +976,9 @@ def scnd_line_intersection_range(
     ds_objs_sub_vec = None
 
 
-def calc_poly_centroids(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr):
+def calc_poly_centroids(
+    vec_file: str, vec_lyr: str, out_format: str, out_vec_file: str, out_vec_lyr: str
+):
     """
     Create a vector layer of the polygon centroids.
 
@@ -1046,14 +1048,14 @@ def calc_poly_centroids(vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr
 
 
 def vec_lyr_intersection_gp(
-    vec_file,
-    vec_lyr,
-    vec_over_file,
-    vec_over_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    vec_over_file: str,
+    vec_over_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function which performs an intersection between the vector layer and the
@@ -1099,14 +1101,14 @@ def vec_lyr_intersection_gp(
 
 
 def vec_lyr_difference_gp(
-    vec_file,
-    vec_lyr,
-    vec_over_file,
-    vec_over_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    vec_over_file: str,
+    vec_over_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function which performs a difference between the vector layer and the
@@ -1152,14 +1154,14 @@ def vec_lyr_difference_gp(
 
 
 def vec_lyr_sym_difference_gp(
-    vec_file,
-    vec_lyr,
-    vec_over_file,
-    vec_over_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    vec_over_file: str,
+    vec_over_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function which performs a symmetric difference between the vector layer
@@ -1207,14 +1209,14 @@ def vec_lyr_sym_difference_gp(
 
 
 def vec_lyr_identity_gp(
-    vec_file,
-    vec_lyr,
-    vec_over_file,
-    vec_over_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    vec_over_file: str,
+    vec_over_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function which performs a identity between the vector layer and the
@@ -1263,14 +1265,14 @@ def vec_lyr_identity_gp(
 
 
 def vec_lyr_union_gp(
-    vec_file,
-    vec_lyr,
-    vec_over_file,
-    vec_over_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    vec_over_file: str,
+    vec_over_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function which performs a union between the vector layer and the
@@ -1315,7 +1317,7 @@ def vec_lyr_union_gp(
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def get_vec_lyr_as_pts(in_vec_file, in_vec_lyr):
+def get_vec_lyr_as_pts(in_vec_file: str, in_vec_lyr: str):
     """
     Get a list of points from the vectors within an input file.
 
@@ -1348,15 +1350,15 @@ def get_vec_lyr_as_pts(in_vec_file, in_vec_lyr):
 
 
 def create_alpha_shape(
-    in_vec_file,
-    in_vec_lyr,
-    out_vec_file,
-    out_vec_lyr,
-    out_format="GPKG",
-    alpha_val=None,
-    alpha_vals=None,
-    max_iter=10000,
-    del_exist_vec=False,
+    in_vec_file: str,
+    in_vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    alpha_val: float = None,
+    alpha_vals: list = None,
+    max_iter: int = 10000,
+    del_exist_vec: bool = False,
 ):
     """
     Function which calculate an alpha shape for a set of vector features
@@ -1528,7 +1530,12 @@ def create_alpha_shape(
 
 
 def convert_multi_geoms_to_single(
-    vec_file, vec_lyr, out_format, out_vec_file, out_vec_lyr, del_exist_vec=False
+    vec_file: str,
+    vec_lyr: str,
+    out_format: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    del_exist_vec: bool = False,
 ):
     """
     A convert any multiple geometries into single geometries.
@@ -1650,13 +1657,13 @@ def convert_multi_geoms_to_single(
 
 
 def simplify_geometries(
-    vec_file,
-    vec_lyr,
-    tolerance,
-    out_format,
-    out_vec_file,
-    out_vec_lyr,
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    tolerance: float,
+    out_format: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    del_exist_vec: bool = False,
 ):
     """
     Create a simplified version of the input
@@ -1742,13 +1749,13 @@ def simplify_geometries(
 
 
 def delete_polygon_holes(
-    vec_file,
-    vec_lyr,
-    out_format,
-    out_vec_file,
-    out_vec_lyr,
-    area_thres=None,
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    out_format: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    area_thres: float = None,
+    del_exist_vec: bool = False,
 ):
     """
     Delete holes from the input polygons in below the area threshold.
@@ -1867,13 +1874,14 @@ def delete_polygon_holes(
     result_ds = None
 
 
-def get_poly_hole_area(vec_file, vec_lyr):
+def get_poly_hole_area(vec_file: str, vec_lyr: str):
     """
     Get an array of the areas of the polygon holes.
 
     :param vec_file: input vector file
     :param vec_lyr: input vector layer within the input file.
     :returns: A list of areas.
+
     """
     from osgeo import gdal
     from osgeo import ogr
@@ -1933,13 +1941,13 @@ def get_poly_hole_area(vec_file, vec_lyr):
 
 
 def remove_polygon_area(
-    vec_file,
-    vec_lyr,
-    out_format,
-    out_vec_file,
-    out_vec_lyr,
-    area_thres,
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    out_format: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    area_thres: float,
+    del_exist_vec: bool = False,
 ):
     """
     Delete polygons with an area below a defined threshold.
@@ -2039,14 +2047,14 @@ def remove_polygon_area(
 
 
 def vec_lyr_intersection(
-    vec_file,
-    vec_lyr,
-    vec_over_file,
-    vec_over_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    vec_over_file: str,
+    vec_over_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
 ):
     """
     A function which performs an intersection between the vector
@@ -2190,15 +2198,15 @@ def vec_lyr_intersection(
 
 
 def vec_lyr_difference(
-    vec_file,
-    vec_lyr,
-    vec_over_file,
-    vec_over_lyr,
-    out_vec_file,
-    out_vec_lyr=None,
-    out_format="GPKG",
-    symmetric=False,
-    del_exist_vec=False,
+    vec_file: str,
+    vec_lyr: str,
+    vec_over_file: str,
+    vec_over_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    symmetric: bool = False,
+    del_exist_vec: bool = False,
 ):
     """
     A function which performs an difference between the vector layer and the overlain vector.
@@ -2385,7 +2393,7 @@ def clip_vec_lyr(
         cliped_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def get_geom_pts(geom, pts_lst=None):
+def get_geom_pts(geom: ogr.Geometry, pts_lst: list = None) -> list:
     """
     Recursive function which extracts all the points within the an OGR geometry.
 
@@ -2416,7 +2424,9 @@ def get_geom_pts(geom, pts_lst=None):
     return pts_lst
 
 
-def vec_intersects_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+def vec_intersects_vec(
+    vec_base_file: str, vec_base_lyr: str, vec_comp_file: str, vec_comp_lyr: str
+) -> bool:
     """
     Function to test whether the comparison vector layer intersects with the
     base vector layer.
@@ -2480,7 +2490,9 @@ def vec_intersects_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr)
     return does_intersect
 
 
-def vec_overlaps_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+def vec_overlaps_vec(
+    vec_base_file: str, vec_base_lyr: str, vec_comp_file: str, vec_comp_lyr: str
+) -> bool:
     """
     Function to test whether the comparison vector layer overlaps with the
     base vector layer.
@@ -2544,7 +2556,9 @@ def vec_overlaps_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
     return does_overlap
 
 
-def vec_within_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+def vec_within_vec(
+    vec_base_file: str, vec_base_lyr: str, vec_comp_file: str, vec_comp_lyr: str
+) -> bool:
     """
     Function to test whether the comparison vector layer within with the
     base vector layer.
@@ -2612,7 +2626,9 @@ def vec_within_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
     return is_within
 
 
-def vec_contains_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+def vec_contains_vec(
+    vec_base_file: str, vec_base_lyr: str, vec_comp_file: str, vec_comp_lyr: str
+) -> bool:
     """
     Function to test whether the base vector layer contains with the
     comparison vector layer.
@@ -2680,7 +2696,9 @@ def vec_contains_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
     return does_contain
 
 
-def vec_touches_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+def vec_touches_vec(
+    vec_base_file: str, vec_base_lyr: str, vec_comp_file: str, vec_comp_lyr: str
+) -> bool:
     """
     Function to test whether the comparison vector layer touches the
     base vector layer.
@@ -2745,7 +2763,9 @@ def vec_touches_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
     return does_touch
 
 
-def vec_crosses_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+def vec_crosses_vec(
+    vec_base_file: str, vec_base_lyr: str, vec_comp_file: str, vec_comp_lyr: str
+) -> bool:
     """
     Function to test whether the comparison vector layer touches the
     base vector layer.
@@ -2920,7 +2940,7 @@ def shiftxy_vec_lyr(
         shifted_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def create_rtree_index(vec_file, vec_lyr):
+def create_rtree_index(vec_file: str, vec_lyr: str):
     """
     A function which creates a spatial index using the rtree package for the
     inputted vector file/layer.
@@ -2961,7 +2981,7 @@ def create_rtree_index(vec_file, vec_lyr):
     return idx_obj, geom_lst
 
 
-def bbox_intersects_index(rt_idx, geom_lst, bbox):
+def bbox_intersects_index(rt_idx, geom_lst: list, bbox: list):
     """
     A function which tests for intersection between the geometries and the bounding box
     using a spatial index.

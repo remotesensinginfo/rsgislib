@@ -87,5 +87,73 @@ def test_find_pt_to_side_left():
     assert (abs(new_pt_x - 200.0000) < 1) and (abs(new_pt_y - 853.5534) < 1)
 
 
+def test_create_orthg_lines_right(tmp_path):
+    import rsgislib.vectorgeoms
+
+    vec_poly_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_poly_lyr = "aber_osgb_multi_polys"
+
+    vec_line_file = os.path.join(tmp_path, "lines_vec.gpkg")
+    vec_line_lyr = "lines_vec"
+
+    rsgislib.vectorgeoms.convert_polygon_to_polyline(
+        vec_poly_file,
+        vec_poly_lyr,
+        vec_line_file,
+        vec_line_lyr,
+        out_format="GPKG",
+        del_exist_vec=False,
+    )
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorgeoms.create_orthg_lines(
+        vec_line_file,
+        vec_line_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        pt_step=1000,
+        line_len=10000,
+        left_hand=False,
+        out_format="GPKG",
+        del_exist_vec=False,
+    )
+
+    assert os.path.exists(out_vec_file)
 
 
+def test_create_orthg_lines_left(tmp_path):
+    import rsgislib.vectorgeoms
+
+    vec_poly_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_poly_lyr = "aber_osgb_multi_polys"
+
+    vec_line_file = os.path.join(tmp_path, "lines_vec.gpkg")
+    vec_line_lyr = "lines_vec"
+
+    rsgislib.vectorgeoms.convert_polygon_to_polyline(
+        vec_poly_file,
+        vec_poly_lyr,
+        vec_line_file,
+        vec_line_lyr,
+        out_format="GPKG",
+        del_exist_vec=False,
+    )
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorgeoms.create_orthg_lines(
+        vec_line_file,
+        vec_line_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        pt_step=1000,
+        line_len=10000,
+        left_hand=True,
+        out_format="GPKG",
+        del_exist_vec=False,
+    )
+
+    assert os.path.exists(out_vec_file)
