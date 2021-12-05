@@ -782,7 +782,7 @@ static PyObject *RasterGIS_CalcBorderLength(PyObject *self, PyObject *args, PyOb
 
     static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_col"), RSGIS_PY_C_TEXT("ignore_zero_edges"), nullptr};
 
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sis:calc_border_length", kwlist, &inputImage, &iIgnoreZeroEdges, &outColsName))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssi:calc_border_length", kwlist, &inputImage, &outColsName, &iIgnoreZeroEdges))
     {
         return nullptr;
     }

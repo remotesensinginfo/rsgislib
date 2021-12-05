@@ -74,7 +74,7 @@ class ShapeIndex:
         self.idx = idx
 
 
-def export_cols_to_gdal_image(
+def export_cols_to_gdal_img(
     clumps_img, output_img, gdalformat, datatype, fields, ratband=1, tmp_dir=None
 ):
     """

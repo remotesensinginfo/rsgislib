@@ -75,7 +75,7 @@ Copy & Export
 ----------------
 .. autofunction:: rsgislib.rastergis.export_rat_cols_to_ascii
 .. autofunction:: rsgislib.rastergis.export_col_to_gdal_img
-.. autofunction:: rsgislib.rastergis.export_cols_to_gdal_image
+.. autofunction:: rsgislib.rastergis.export_cols_to_gdal_img
 .. autofunction:: rsgislib.rastergis.export_clumps_to_images
 .. autofunction:: rsgislib.rastergis.copy_gdal_rat_columns
 .. autofunction:: rsgislib.rastergis.copy_rat

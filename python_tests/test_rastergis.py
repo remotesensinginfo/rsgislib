@@ -163,3 +163,108 @@ def test_populate_rat_with_stats(tmp_path):
             break
 
     assert vars_eq_vals
+
+
+def test_pop_rat_img_stats(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_nostats.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps_nostats.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.pop_rat_img_stats(clumps_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+
+
+# TODO rsgislib.rastergis.collapse_rat
+
+def test_calc_border_length(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.calc_border_length(clumps_img, "out_col", True)
+
+# TODO rsgislib.rastergis.calc_rel_border
+# TODO rsgislib.rastergis.calc_rel_diff_neigh_stats
+
+
+def test_define_border_clumps(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.define_border_clumps(clumps_img, "out_col")
+
+# TODO rsgislib.rastergis.define_clump_tile_positions
+
+def test_find_boundary_pixels(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    output_img = os.path.join(tmp_path, "out_img.kea")
+
+    rsgislib.rastergis.find_boundary_pixels(clumps_img, output_img, "KEA", 1)
+
+    assert os.path.exists(output_img)
+
+
+
+def test_find_neighbours(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.find_neighbours(clumps_img, 1)
+
+
+# TODO rsgislib.rastergis.populate_rat_with_cat_proportions
+# TODO rsgislib.rastergis.populate_rat_with_percentiles
+# TODO rsgislib.rastergis.populate_rat_with_meanlit_stats
+# TODO rsgislib.rastergis.select_clumps_on_grid
+
+def test_clumps_spatial_location(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.clumps_spatial_location(clumps_img, eastings="eastings", northings="northings")
+
+def test_clumps_spatial_extent(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.clumps_spatial_extent(clumps_img, min_xx="min_xx", min_xy="min_xy", max_xx="max_xx", max_xy="max_xy", min_yx="min_yx", min_yy="min_yy", max_yx="max_yx", max_yy="max_yy", rat_band=1)
+
+# TODO rsgislib.rastergis.str_class_majority
+# TODO rsgislib.rastergis.populate_rat_with_mode
+# TODO rsgislib.rastergis.populate_rat_with_prop_valid_pxls
+# TODO rsgislib.rastergis.histo_sampling
+# TODO rsgislib.rastergis.class_split_fit_hist_gausian_mixture_model
+# TODO rsgislib.rastergis.apply_rat_knn
+# TODO rsgislib.rastergis.get_global_class_stats
+# TODO rsgislib.rastergis.fit_hist_gausian_mixture_model
+# TODO rsgislib.rastergis.calc_1d_jm_distance
+# TODO rsgislib.rastergis.calc_2d_jm_distance
+# TODO rsgislib.rastergis.calc_bhattacharyya_distance
+# TODO rsgislib.rastergis.export_rat_cols_to_ascii
+# TODO rsgislib.rastergis.export_col_to_gdal_img
+# TODO rsgislib.rastergis.export_cols_to_gdal_img
+# TODO rsgislib.rastergis.export_clumps_to_images
+# TODO rsgislib.rastergis.copy_gdal_rat_columns
+# TODO rsgislib.rastergis.copy_rat
+# TODO rsgislib.rastergis.import_vec_atts
+# TODO rsgislib.rastergis.colour_rat_classes
