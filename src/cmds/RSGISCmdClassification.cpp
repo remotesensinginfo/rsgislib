@@ -157,13 +157,16 @@ namespace rsgis{ namespace cmds {
             }
             else
             {
-                if(fileUtils.checkFilePresent(outputVecFile) & del_exist_vec)
+                if(fileUtils.checkFilePresent(outputVecFile))
                 {
-                    fileUtils.removeFileIfPresent(outputVecFile);
-                }
-                else
-                {
-                    throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
+                    if(del_exist_vec)
+                    {
+                        fileUtils.removeFileIfPresent(outputVecFile);
+                    }
+                    else
+                    {
+                        throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
+                    }
                 }
             }
             ogrSpatialRef = new OGRSpatialReference(imgDataset->GetProjectionRef());
@@ -309,7 +312,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePopClassInfoAccuracyPts(std::string classImage, std::string vecFile, std::string vecLyr, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, bool addRefCol)
+    void executePopClassInfoAccuracyPts(std::string classImage, std::string vecFile, std::string vecLyr, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, bool addRefCol, std::string processVecCol, bool addProcessCol)
     {
         try
         {
@@ -347,7 +350,7 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::classifier::RSGISGenAccuracyPoints genAccPts;
-            genAccPts.popClassInfo2Vec(imgDataset, inVecLyrObj, classImgCol, classImgVecCol, classRefVecCol, addRefCol);
+            genAccPts.popClassInfo2Vec(imgDataset, inVecLyrObj, classImgCol, classImgVecCol, classRefVecCol, addRefCol, processVecCol, addProcessCol);
             
             GDALClose(imgDataset);
             GDALClose(inputVecDS);

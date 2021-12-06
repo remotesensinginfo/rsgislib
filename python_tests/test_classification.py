@@ -1,5 +1,6 @@
 import os
 import pytest
+from shutil import copy2
 
 H5PY_NOT_AVAIL = False
 try:
@@ -345,7 +346,7 @@ def test_get_class_training_data(tmp_path):
 
     assert all_files_present
 
-
+"""
 @pytest.mark.skipif(
     (PLOTLY_NOT_AVAIL or KALEIDO_NOT_AVAIL),
     reason="plotly or kaleido dependencies not available",
@@ -369,7 +370,7 @@ def test_plot_train_data(tmp_path):
     plot_files = glob.glob(os.path.join(tmp_path, "*.png"))
 
     assert len(plot_files) == 100
-
+"""
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_create_acc_pt_sets(tmp_path):
@@ -400,3 +401,62 @@ def test_create_acc_pt_sets(tmp_path):
         len(glob.glob(os.path.join(tmp_path, "gmw_acc_roi_30_cls_acc_pts_*.geojson")))
         == 10
     )
+
+
+def test_generate_random_accuracy_pts(tmp_path):
+    import rsgislib.classification
+
+    input_img = os.path.join(
+        CLASSIFICATION_DATA_DIR, "gmw_acc_roi_1_cls.kea"
+        )
+
+    out_vec_file = os.path.join(tmp_path, "out_vecs.gpkg")
+    out_vec_lyr = "out_vecs"
+
+    rsgislib.classification.generate_random_accuracy_pts(input_img, out_vec_file, out_vec_lyr, "GPKG", "cls_name", "gmw_v2_cls", "ref_cls", 1000, 42, del_exist_vec=False)
+
+    assert os.path.exists(out_vec_file)
+
+
+def test_generate_stratified_random_accuracy_pts(tmp_path):
+    import rsgislib.classification
+
+    input_img = os.path.join(
+        CLASSIFICATION_DATA_DIR, "gmw_acc_roi_1_cls.kea"
+        )
+
+    out_vec_file = os.path.join(tmp_path, "out_vecs.gpkg")
+    out_vec_lyr = "out_vecs"
+
+    rsgislib.classification.generate_stratified_random_accuracy_pts(input_img, out_vec_file, out_vec_lyr, "GPKG", "cls_name", "gmw_v2_cls", "ref_cls", 1000, 42, False, True)
+
+    assert os.path.exists(out_vec_file)
+
+
+def test_pop_class_info_accuracy_pts_only_cls_col(tmp_path):
+    import rsgislib.classification
+
+    input_img = os.path.join(
+        CLASSIFICATION_DATA_DIR, "gmw_acc_roi_1_cls.kea"
+        )
+
+    vec_ref_file = os.path.join(CLASSIFICATION_DATA_DIR, "gmw_acc_set_1_acc_pts.geojson")
+    vec_file = os.path.join(tmp_path, "gmw_acc_set_1_acc_pts.geojson")
+    copy2(vec_ref_file, vec_file)
+    vec_lyr = "gmw_acc_set_1_acc_pts"
+
+    rsgislib.classification.pop_class_info_accuracy_pts(input_img, vec_file, vec_lyr, "cls_name", "gmw_new_cls")
+
+def test_pop_class_info_accuracy_pts_all_col(tmp_path):
+    import rsgislib.classification
+
+    input_img = os.path.join(
+        CLASSIFICATION_DATA_DIR, "gmw_acc_roi_1_cls.kea"
+        )
+
+    vec_ref_file = os.path.join(CLASSIFICATION_DATA_DIR, "gmw_acc_set_1_acc_pts.geojson")
+    vec_file = os.path.join(tmp_path, "gmw_acc_set_1_acc_pts.geojson")
+    copy2(vec_ref_file, vec_file)
+    vec_lyr = "gmw_acc_set_1_acc_pts"
+
+    rsgislib.classification.pop_class_info_accuracy_pts(input_img, vec_file, vec_lyr, "cls_name", "gmw_new_cls", "ref_new_col", "new_process")

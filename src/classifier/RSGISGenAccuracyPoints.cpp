@@ -1001,7 +1001,7 @@ namespace rsgis{namespace classifier{
     }
     
     
-    void RSGISGenAccuracyPoints::popClassInfo2Vec(GDALDataset *inputImage, OGRLayer *inputVecLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, bool addRefCol)
+    void RSGISGenAccuracyPoints::popClassInfo2Vec(GDALDataset *inputImage, OGRLayer *inputVecLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, bool addRefCol, std::string vecProcessCol, bool addProcessCol)
     {
         try
         {
@@ -1046,7 +1046,7 @@ namespace rsgis{namespace classifier{
             imgClassField.SetWidth(254);
             if( inputVecLayer->CreateField( &imgClassField, false ) != OGRERR_NONE )
             {
-                std::string message = std::string("Creating shapefile field \'") + vecClassImgCol + std::string("\' has failed");
+                std::string message = std::string("Creating vector field \'") + vecClassImgCol + std::string("\' has failed");
                 throw rsgis::RSGISException(message);
             }
             std::string vecClassImgField = std::string(imgClassField.GetNameRef());
@@ -1058,17 +1058,20 @@ namespace rsgis{namespace classifier{
                 refClassField.SetWidth(254);
                 if( inputVecLayer->CreateField( &refClassField, false ) != OGRERR_NONE )
                 {
-                    std::string message = std::string("Creating shapefile field \'") + vecClassRefCol + std::string("\' has failed");
+                    std::string message = std::string("Creating vector field \'") + vecClassRefCol + std::string("\' has failed");
                     throw rsgis::RSGISException(message);
                 }
                 vecClassRefField = std::string(refClassField.GetNameRef());
             }
 
-            OGRFieldDefn processedField("Processed", OFTInteger);
-            if( inputVecLayer->CreateField( &processedField ) != OGRERR_NONE )
+            if(addProcessCol)
             {
-                std::string message = std::string("Creating shapefile field \'Processed\' has failed");
-                throw rsgis::RSGISException(message);
+                OGRFieldDefn processedField(vecProcessCol.c_str(), OFTInteger);
+                if (inputVecLayer->CreateField(&processedField) != OGRERR_NONE)
+                {
+                    std::string message = std::string("Creating vector field \'") + vecProcessCol + std::string("\' has failed");
+                    throw rsgis::RSGISException(message);
+                }
             }
             
             OGRFeatureDefn *featDefn = inputVecLayer->GetLayerDefn();
@@ -1078,7 +1081,11 @@ namespace rsgis{namespace classifier{
             {
                 refClassColIdx = featDefn->GetFieldIndex(vecClassRefField.c_str());
             }
-            int processedColIdx = featDefn->GetFieldIndex("Processed");
+            int processedColIdx = -1;
+            if(addProcessCol)
+            {
+                processedColIdx = featDefn->GetFieldIndex(vecProcessCol.c_str());
+            }
             
             int numFeatures = inputVecLayer->GetFeatureCount(TRUE);
             
@@ -1146,7 +1153,11 @@ namespace rsgis{namespace classifier{
                             featObj->SetField(refClassColIdx, emptyStr.c_str());
                         }
                     }
-                    featObj->SetField(processedColIdx, 0);
+
+                    if(addProcessCol)
+                    {
+                        featObj->SetField(processedColIdx, 0);
+                    }
                     
                     if( inputVecLayer->SetFeature(featObj) != OGRERR_NONE )
                     {

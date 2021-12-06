@@ -124,7 +124,7 @@ static PyObject *Classification_GenRandomAccuracyPts(PyObject *self, PyObject *a
     int del_exist_vec = false;
     int seed = 10;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssssi|ii:generate_random_accuracy_pts", kwlist, &pszInputImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssssi|ii:generate_random_accuracy_pts", kwlist, &pszInputImage,
                                      &pszOutputVecFile, &pszOutputVecLyr, &pszFormat, &pszClassImgCol, &pszClassImgVecCol,
                                      &pszClassRefVecCol, &numPts, &seed, &del_exist_vec))
     {
@@ -189,23 +189,33 @@ static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),
                              RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("rat_class_col"),
-                             RSGIS_PY_C_TEXT("vec_class_col"), RSGIS_PY_C_TEXT("vec_ref_col"), nullptr};
+                             RSGIS_PY_C_TEXT("vec_class_col"), RSGIS_PY_C_TEXT("vec_ref_col"),
+                             RSGIS_PY_C_TEXT("vec_process_col"), nullptr};
     const char *pszInputImage, *pszVecFile, *pszVecLyr, *pszClassImgCol, *pszClassImgVecCol;
-    PyObject *classRefVecColObj;
+    PyObject *classRefVecColObj = nullptr;
+    PyObject *processVecColObj = nullptr;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|O:pop_class_info_accuracy_pts", kwlist, &pszInputImage, &pszVecFile,
-                                     &pszVecLyr, &pszClassImgCol, &pszClassImgVecCol, &classRefVecColObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssss|OO:pop_class_info_accuracy_pts", kwlist, &pszInputImage, &pszVecFile,
+                                     &pszVecLyr, &pszClassImgCol, &pszClassImgVecCol, &classRefVecColObj, &processVecColObj))
     {
         return nullptr;
     }
     
     bool addRefCol = false;
+    bool addProcessCol = false;
     std::string pszClassRefVecCol = std::string();
+    std::string pszProcessVecCol = std::string();
     
     if(RSGISPY_CHECK_STRING(classRefVecColObj))
     {
         pszClassRefVecCol = RSGISPY_STRING_EXTRACT(classRefVecColObj);
         addRefCol = true;
+    }
+
+    if(RSGISPY_CHECK_STRING(processVecColObj))
+    {
+        pszProcessVecCol = RSGISPY_STRING_EXTRACT(processVecColObj);
+        addProcessCol = true;
     }
     
     try
@@ -213,7 +223,8 @@ static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject
         rsgis::cmds::executePopClassInfoAccuracyPts(std::string(pszInputImage), std::string(pszVecFile),
                                                     std::string(pszVecLyr), std::string(pszClassImgCol),
                                                     std::string(pszClassImgVecCol),
-                                                    pszClassRefVecCol, addRefCol);
+                                                    pszClassRefVecCol, addRefCol,
+                                                    pszProcessVecCol, addProcessCol);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -290,7 +301,7 @@ static PyMethodDef ClassificationMethods[] = {
 },
     
 {"pop_class_info_accuracy_pts", (PyCFunction)Classification_PopClassInfoAccuracyPts, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.classification.pop_class_info_accuracy_pts(input_img, vec_file, vec_lyr, rat_class_col, vec_class_col, vec_ref_col)\n"
+"rsgislib.classification.pop_class_info_accuracy_pts(input_img:str, vec_file:str, vec_lyr:str, rat_class_col:str, vec_class_col:str, vec_ref_col:str = None, vec_process_col:str = None)\n"
 "Generates a set of stratified random points for accuracy assessment.\n"
 "\n"
 "Where:\n"
@@ -298,9 +309,10 @@ static PyMethodDef ClassificationMethods[] = {
 ":param input_img: is a string containing the name and path of the input image with attribute table.\n"
 ":param vec_file: is a string containing the name and path of the input vector file.\n"
 ":param vec_lyr: is a string containing the vector file layer name.\n"
-":param rat_class_col: is a string speciyfing the name of the column in the image file containing the class names.\n"
-":param vec_class_col: is a string specifiying the output column in the vector file for the classified class names.\n"
-":param vec_ref_col: is an optional string specifiying an output column in the vector file which can be used in the accuracy assessment for the reference data.\n"
+":param rat_class_col: is a string specifying the name of the column in the image file containing the class names.\n"
+":param vec_class_col: is a string specifying the output column in the vector file for the classified class names.\n"
+":param vec_ref_col: is an optional string specifying an output column in the vector file which can be used in the accuracy assessment for the reference data.\n"
+":param vec_process_col: is an optional string specifying an output column in the vector file which is used allocate points as processed or otherwise."
 },
 
     {nullptr}        /* Sentinel */
