@@ -24,6 +24,7 @@
 #define RSGISCopyImage_H
 
 #include <iostream>
+#include <bitset>
 #include <string>
 
 #include "gdal_priv.h"
@@ -52,15 +53,6 @@ namespace rsgis{namespace img{
 		public: 
 			RSGISCopyImage(int numberOutBands);
 			void calcImageValue(float *bandValues, int numBands, double *output);
-			void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("No implemented");};
-            void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-			void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-			void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-			void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("No implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-			bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("No implemented");};
 			~RSGISCopyImage();
 		};
     
@@ -69,18 +61,21 @@ namespace rsgis{namespace img{
     public:
         RSGISCopyImageBandSelect(std::vector<unsigned int> bands);
         void calcImageValue(float *bandValues, int numBands, double *output);
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("No implemented");};
         ~RSGISCopyImageBandSelect();
     protected:
         std::vector<unsigned int> bands;
+    };
+
+
+    class DllExport RSGISCopyImageBandToBits : public RSGISCalcImageValue
+    {
+    public:
+        RSGISCopyImageBandToBits(int numberOutBands, unsigned int img_band, GDALDataType gdalDataType);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output);
+        ~RSGISCopyImageBandToBits();
+    protected:
+        unsigned int imgBandIdx;
+        GDALDataType gdalDataType;
     };
 	
 }}

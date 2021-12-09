@@ -23,13 +23,11 @@
 #ifndef RSGISCalcImageSingleValue_H
 #define RSGISCalcImageSingleValue_H
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <string>
 #include "img/RSGISImageCalcException.h"
-#include <geos/geom/Envelope.h>
-#include <geos/geom/Polygon.h>
-#include <geos/geom/Point.h>
+#include "gdal_priv.h"
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
@@ -52,8 +50,8 @@ namespace rsgis{namespace img{
 			RSGISCalcImageSingleValue(int numOutputValues);
 			virtual void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
 			virtual void calcImageValue(float *bandValuesImage, int numBands, int band) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
-			virtual void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
-			virtual void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
+			virtual void calcImageValue(float *bandValuesImage, int numBands, OGREnvelope *extent) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
+			virtual void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, OGRPolygon *poly, OGRPoint *pt) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
 			int getNumberOfOutValues();
 			virtual double* getOutputValues() {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
 			virtual void reset() {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};

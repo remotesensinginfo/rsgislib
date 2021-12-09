@@ -1,56 +1,48 @@
 RSGISLib Image Segmentation Module
 ===================================
 
-.. automodule:: rsgislib.segmentation
-   :members:
-   :undoc-members:
+Commands to perform a series of segmentations on input imagery
 
 Utilities
 ---------
-.. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentation
-.. autofunction:: rsgislib.segmentation.tiledsegsingle.performTiledSegmentation
-.. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentationPreCalcdStats
-.. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentationTestMinObjSize
-.. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentationTestNumClumps
+.. autofunction:: rsgislib.segmentation.segutils.run_shepherd_segmentation
+.. autofunction:: rsgislib.segmentation.tiledsegsingle.perform_tiled_segmentation
+.. autofunction:: rsgislib.segmentation.segutils.run_shepherd_segmentation_pre_calcd_stats
 
 
 Clump
 ------
 .. autofunction:: rsgislib.segmentation.clump
-.. autofunction:: rsgislib.segmentation.tiledclump.performClumpingSingleThread
-.. autofunction:: rsgislib.segmentation.tiledclump.performClumpingMultiProcess
-.. autofunction:: rsgislib.segmentation.tiledclump.performUnionClumpingSingleThread
-.. autofunction:: rsgislib.segmentation.tiledclump.performUnionClumpingMultiProcess
+.. autofunction:: rsgislib.segmentation.tiledclump.perform_clumping_single_thread
+.. autofunction:: rsgislib.segmentation.tiledclump.perform_clumping_multi_process
+
 
 Label
 ------
-.. autofunction:: rsgislib.segmentation.labelPixelsFromClusterCentres
-.. autofunction:: rsgislib.segmentation.relabelClumps
+.. autofunction:: rsgislib.segmentation.label_pixels_from_cluster_centres
+.. autofunction:: rsgislib.segmentation.relabel_clumps
 
 Elimination
 --------------
-.. autofunction:: rsgislib.segmentation.eliminateSinglePixels
-.. autofunction:: rsgislib.segmentation.rmSmallClumps
-.. autofunction:: rsgislib.segmentation.rmSmallClumpsStepwise
+.. autofunction:: rsgislib.segmentation.eliminate_single_pixels
+.. autofunction:: rsgislib.segmentation.rm_small_clumps
+.. autofunction:: rsgislib.segmentation.rm_small_clumps_stepwise
 
 Join / Union
 -------------
-.. autofunction:: rsgislib.segmentation.unionOfClumps
-
+.. autofunction:: rsgislib.segmentation.union_of_clumps
+.. autofunction:: rsgislib.segmentation.tiledclump.perform_union_clumping_single_thread
+.. autofunction:: rsgislib.segmentation.tiledclump.perform_union_clumping_multi_process
 
 Visualisation
 --------------
-.. autofunction:: rsgislib.segmentation.meanImage
+.. autofunction:: rsgislib.segmentation.mean_image
 
 
 Tiles
 -------
-.. autofunction:: rsgislib.segmentation.mergeSegmentationTiles
-.. autofunction:: rsgislib.segmentation.tiledsegsingle.performTiledSegmentation
+.. autofunction:: rsgislib.segmentation.merge_segmentation_tiles
 
-.. automodule:: rsgislib.segmentation.tiledclump
-   :members:
-   :undoc-members:
 
 scikit-image
 ------------
@@ -60,14 +52,13 @@ scikit-image
 
 Other
 -----
-.. autofunction:: rsgislib.segmentation.generateRegularGrid
-.. autofunction:: rsgislib.segmentation.dropSelectedClumps
-.. autofunction:: rsgislib.segmentation.findTileBordersMask
-.. autofunction:: rsgislib.segmentation.includeRegionsInClumps
-.. autofunction:: rsgislib.segmentation.mergeClumpImages
-.. autofunction:: rsgislib.segmentation.mergeEquivClumps
-.. autofunction:: rsgislib.segmentation.mergeSegments2Neighbours
-.. autofunction:: rsgislib.segmentation.pxlGrowRegions
+.. autofunction:: rsgislib.segmentation.generate_regular_grid
+.. autofunction:: rsgislib.segmentation.drop_selected_clumps
+.. autofunction:: rsgislib.segmentation.find_tile_borders_mask
+.. autofunction:: rsgislib.segmentation.include_regions_in_clumps
+.. autofunction:: rsgislib.segmentation.merge_clump_images
+.. autofunction:: rsgislib.segmentation.merge_equiv_clumps
+.. autofunction:: rsgislib.segmentation.merge_segments_to_neighbours
 
 
 * :ref:`genindex`

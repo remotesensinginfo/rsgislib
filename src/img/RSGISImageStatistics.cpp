@@ -201,7 +201,11 @@ namespace rsgis{namespace img{
 		RSGISCalcImage *calcImg = NULL;
 		try
 		{
-            geos::geom::Envelope *env = new geos::geom::Envelope(xMin, xMax, yMin, yMax);
+            OGREnvelope *env = new OGREnvelope();
+            env->MinX = xMin;
+            env->MaxX = xMax;
+            env->MinY = yMin;
+            env->MaxY = yMax;
             
 			calcImageStats = new RSGISCalcImageStatisticsNoData(numInputBands, false, NULL, noDataSpecified, noDataVal, onePassSD);
 			calcImg = new RSGISCalcImage(calcImageStats, "", true);
@@ -264,7 +268,11 @@ namespace rsgis{namespace img{
 		RSGISCalcImage *calcImg = NULL;
 		try
 		{
-            geos::geom::Envelope *env = new geos::geom::Envelope(xMin, xMax, yMin, yMax);
+            OGREnvelope *env = new OGREnvelope();
+            env->MinX = xMin;
+            env->MaxX = xMax;
+            env->MinY = yMin;
+            env->MaxY = yMax;
             
 			calcImageStats = new RSGISCalcImageHistogramNoData(imgBand, noDataSpecified, noDataVal, numBins, binRanges, binCounts);
 			calcImg = new RSGISCalcImage(calcImageStats, "", true);
@@ -1038,7 +1046,7 @@ namespace rsgis{namespace img{
         return percentileVal;
     }
     
-    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, geos::geom::Envelope *env, bool quiet)
+    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, OGREnvelope *env, bool quiet)
     {
         double percentileVal = 0.0;
         try

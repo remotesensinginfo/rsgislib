@@ -23,7 +23,7 @@
 #ifndef RSGISCumulativeArea_H
 #define RSGISCumulativeArea_H
 
-#include <math.h>
+#include <cmath>
 #include <limits>
 
 #include "img/RSGISCalcImage.h"
@@ -55,15 +55,6 @@ namespace rsgis { namespace img {
 	public:
 		RSGISCumulativeArea(int numOutBands, rsgis::math::Matrix *bandValuesWidths);
 		void calcImageValue(float *bandValues, int numBands, double *output);
-		void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};	
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};															
 		~RSGISCumulativeArea();
 	private:
 		rsgis::math::Matrix *bandValuesWidths;

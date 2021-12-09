@@ -1,5 +1,5 @@
-RSGISLib Module
-===============
+RSGISLib
+===========
 
 .. automodule:: rsgislib
    :members:

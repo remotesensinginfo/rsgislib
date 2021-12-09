@@ -24,7 +24,7 @@
 #ifndef RSGISFunctions_H
 #define RSGISFunctions_H
 
-#include <math.h>
+#include <cmath>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include "muParser.h"

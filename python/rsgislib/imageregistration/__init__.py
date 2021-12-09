@@ -41,79 +41,110 @@ TYPE_RSGIS_IMG2MAP = 3
 TYPE_RSGIS_MAPOFFS = 4
 
 
-
-def warpUseGCPsWithGDAL(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, useTPS=False, usePoly=True, polyOrder=3, useMutliThread=False):
+def warp_with_gcps_with_gdal(
+    in_ref_img: str,
+    in_process_img: str,
+    output_img: str,
+    gdalformat: str,
+    interp_method: int = rsgislib.INTERP_NEAREST_NEIGHBOUR,
+    use_tps: bool = False,
+    use_poly: bool = True,
+    poly_order: int = 3,
+    use_multi_thread: bool = False,
+):
     """
-A utility function to warp an image file (inProcessImg) using GCPs defined within the image header - this is the same as using the 
-gdalwarp utility. However, the output image will have the same pixel grid and dimensions as the input reference image (inRefImg).
+    A utility function to warp an image file (in_process_img) using GCPs defined within
+    the image header - this is the same as using the gdalwarp utility. However, the
+    output image will have the same pixel grid and dimensions as the input reference
+    image (in_ref_img).
 
-Where:
+    :param in_ref_img: is the input reference image to which the processing image
+                       is to resampled to.
+    :param in_process_img: is the image which is to be resampled.
+    :param output_img: is the output image file.
+    :param gdalformat: is the gdal format for the output image.
+    :param interp_method: is the interpolation method used to resample the image
+                          [bilinear, lanczos, cubicspline, nearestneighbour, cubic,
+                          average, mode]
+    :param use_tps: is a boolean specifying that the thin plated splines method of
+                    warping should be used (i.e., rubbersheet); Default False.
+    :param use_poly: is a boolean specifying that a polynomial method of warping
+                     is used; Default True
+    :param poly_order: is the order of the polynomial used to represent the
+                       transformation (1, 2 or 3). Only used if use_poly=True
+    :param use_multi_thread: is a boolean specifying whether multiple processing
+                             cores should be used for the warping.
 
-:param inRefImg: is the input reference image to which the processing image is to resampled to.
-:param inProcessImg: is the image which is to be resampled.
-:param outImg: is the output image file.
-:param gdalformat: is the gdal format for the output image.
-:param interpMethod: is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
-:param useTPS: is a boolean specifying that the thin plated splines method of warping should be used (i.e., rubbersheet); Default False.
-:param usePoly: is a boolean specifying that a polynomial method of warpping is used; Default True
-:param polyOrder: is the order of the polynomial used to represent the transformation (1, 2 or 3). Only used if usePoly=True
-:param useMutliThread: is a boolean specifying whether multiple processing cores should be used for the warping.
-
-"""
+    """
     import rsgislib.imageutils
     from osgeo import gdal
-     
-    if not rsgislib.imageutils.hasGCPs(inProcessImg):
-        raise Exception("Input process image does not have GCPs within it's header - this is required.")
 
-    rsgisUtils = rsgislib.RSGISPyUtils() 
-    
-    numBands = rsgisUtils.getImageBandCount(inProcessImg)
-    noDataVal = rsgisUtils.getImageNoDataValue(inProcessImg)
-    datatype = rsgisUtils.getRSGISLibDataTypeFromImg(inProcessImg)
-    
+    if not rsgislib.imageutils.has_gcps(in_process_img):
+        raise Exception(
+            "Input process image does not have GCPs "
+            "within it's header - this is required."
+        )
+
+    numBands = rsgislib.imageutils.get_img_band_count(in_process_img)
+    noDataVal = rsgislib.imageutils.get_img_no_data_value(in_process_img)
+    datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(in_process_img)
+
     interpolationMethod = gdal.GRA_NearestNeighbour
-    if interpMethod == 'bilinear':
-        interpolationMethod = gdal.GRA_Bilinear 
-    elif interpMethod == 'lanczos':
-        interpolationMethod = gdal.GRA_Lanczos 
-    elif interpMethod == 'cubicspline':
-        interpolationMethod = gdal.GRA_CubicSpline 
-    elif interpMethod == 'nearestneighbour':
-        interpolationMethod = gdal.GRA_NearestNeighbour 
-    elif interpMethod == 'cubic':
+    if interp_method == rsgislib.INTERP_BILINEAR:
+        interpolationMethod = gdal.GRA_Bilinear
+    elif interp_method == rsgislib.INTERP_LANCZOS:
+        interpolationMethod = gdal.GRA_Lanczos
+    elif interp_method == rsgislib.INTERP_CUBICSPLINE:
+        interpolationMethod = gdal.GRA_CubicSpline
+    elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
+        interpolationMethod = gdal.GRA_NearestNeighbour
+    elif interp_method == rsgislib.INTERP_CUBIC:
         interpolationMethod = gdal.GRA_Cubic
-    elif interpMethod == 'average':
+    elif interp_method == rsgislib.INTERP_AVERAGE:
         interpolationMethod = gdal.GRA_Average
-    elif interpMethod == 'mode':
+    elif interp_method == rsgislib.INTERP_MODE:
         interpolationMethod = gdal.GRA_Mode
     else:
         raise Exception("Interpolation method was not recognised or known.")
-    
-    rsgislib.imageutils.createCopyImage(inRefImg, outImg, numBands, 0, gdalformat, datatype)
 
-    inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
-    outFile = gdal.Open(outImg, gdal.GA_Update)
+    rsgislib.imageutils.create_copy_img(
+        in_ref_img, output_img, numBands, 0, gdalformat, datatype
+    )
+
+    inFile = gdal.Open(in_process_img, gdal.GA_ReadOnly)
+    outFile = gdal.Open(output_img, gdal.GA_Update)
 
     try:
         import tqdm
+
         pbar = tqdm.tqdm(total=100)
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress
 
     wrpOpts = None
-    if useTPS:
-        wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=useMutliThread, tps=useTPS, callback=callback)
-    elif usePoly:
-        wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=useMutliThread, polynomialOrder=polyOrder, callback=callback)
+    if use_tps:
+        wrpOpts = gdal.WarpOptions(
+            resampleAlg=interpolationMethod,
+            srcNodata=noDataVal,
+            dstNodata=noDataVal,
+            multithread=use_multi_thread,
+            tps=use_tps,
+            callback=callback,
+        )
+    elif use_poly:
+        wrpOpts = gdal.WarpOptions(
+            resampleAlg=interpolationMethod,
+            srcNodata=noDataVal,
+            dstNodata=noDataVal,
+            multithread=use_multi_thread,
+            polynomialOrder=poly_order,
+            callback=callback,
+        )
     else:
-        warpOptions = None    
-    
+        warpOptions = None
+
     gdal.Warp(outFile, inFile, options=wrpOpts)
-        
+
     inFile = None
     outFile = None
-
-
-

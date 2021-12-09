@@ -25,7 +25,7 @@ namespace rsgis { namespace cmds {
     
 	RSGISCmdException::RSGISCmdException() : std::exception()
 	{
-		msgs = "A RSGISCmdException has been created..";
+		msgs = std::string("A RSGISCmdException has been created..");
 	}
     
     RSGISCmdException::RSGISCmdException(const char* message) : std::exception()
@@ -37,8 +37,8 @@ namespace rsgis { namespace cmds {
 	{
 		msgs = message;
 	}
-    
-	const char* RSGISCmdException::what()
+
+	const char* RSGISCmdException::what() const noexcept
 	{
 		return msgs.c_str();
 	}

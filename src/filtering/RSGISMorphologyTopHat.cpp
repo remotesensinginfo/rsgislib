@@ -39,8 +39,8 @@ namespace rsgis{namespace filter{
             }
             
             rsgis::img::RSGISImageUtils imgUtils;
-            GDALDataset *outDataset = NULL;
-            GDALDataset *tmpDataset = NULL;
+            GDALDataset *outDataset = nullptr;
+            GDALDataset *tmpDataset = nullptr;
             GDALDataset **tmpGDALDataArray = new GDALDataset*[2];
             
             outDataset = imgUtils.createCopy(dataset, outputImage, format, outDataType);

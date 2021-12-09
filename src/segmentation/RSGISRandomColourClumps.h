@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 #include <queue>
-#include <math.h>
+#include <cmath>
 #include <stdlib.h>
 #include <time.h>
 

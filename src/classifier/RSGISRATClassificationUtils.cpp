@@ -40,7 +40,7 @@ namespace rsgis{ namespace classifier{
             // Get attribute table...
             GDALRasterAttributeTable *inRAT = segments->GetRasterBand(1)->GetDefaultRAT();
             
-            if(inRAT == NULL)
+            if(inRAT == nullptr)
             {
                 throw RSGISClassificationException("The image dataset does not have an attribute table.");
             }
@@ -128,11 +128,11 @@ namespace rsgis{ namespace classifier{
             // Create new image with new RAT and pixel IDs...
             RSGISRecodeRasterFromClasses *recodeRaster = new RSGISRecodeRasterFromClasses(inRAT, classColVals, classNameColLen, classes);
             rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(recodeRaster, "", true);
-            calcImg.calcImage(&segments, 1, 0, outputImage, false, NULL, imageFormat, GDT_Int32);
+            calcImg.calcImage(&segments, 1, 0, outputImage, false, nullptr, imageFormat, GDT_Int32);
             delete recodeRaster;
             
             GDALDataset *imageDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
-            if(imageDataset == NULL)
+            if(imageDataset == nullptr)
             {
                 std::string message = std::string("Could not open image ") + outputImage;
                 throw rsgis::RSGISImageException(message.c_str());
@@ -315,7 +315,7 @@ namespace rsgis{ namespace classifier{
             
             const GDALColorEntry *clr = clrTab->GetColorEntry(val);
             
-            if(clr != NULL)
+            if(clr != nullptr)
             {
                 output[0] = clr->c1;
                 output[1] = clr->c2;

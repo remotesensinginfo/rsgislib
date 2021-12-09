@@ -1,7 +1,5 @@
-RSGISLib Keras Image Chips Classification Module
-=================================================
-
-.. automodule:: rsgislib.classification.classkeraschips
+RSGISLib Keras Image Chips Classification
+============================================
 
 These functions are first attempts and connecting spatial image data with window based (convolutional) neural networks. These functions and other will be developed as our research and understanding of these methods move forward.
 
@@ -133,6 +131,8 @@ Classify Functions
 -------------------
 
 .. autofunction:: rsgislib.classification.classkeraschips.apply_keras_chips_pixel_classifier
+.. autofunction:: rsgislib.classification.classkeraschips.train_keras_chips_ref_classifer
+
 
 
 

@@ -25,7 +25,6 @@
 #define RSGISPixelInPoly_H
 
 #include "ogrsf_frmts.h"
-#include "geos/geom/GeometryFactory.h"
 
 #include "common/RSGISVectorException.h"
 #include "img/RSGISCalcImageValue.h"
@@ -160,16 +159,7 @@ namespace rsgis{namespace img {
     {
     public:
         RSGISGetPixelsInPoly(std::vector<float> **pxlVals, unsigned int nBands);
-        void calcImageValue(float *bandValues, int numBands, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent);
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, OGREnvelope extent);
         ~RSGISGetPixelsInPoly();
     protected:
         std::vector<float> **pxlVals;

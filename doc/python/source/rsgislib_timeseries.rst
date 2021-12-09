@@ -1,10 +1,6 @@
 RSGISLib Timeseries Analysis Module
 ======================================
 
-.. automodule:: rsgislib.timeseries
-   :members:
-   :undoc-members:
-
 Model Fitting
 --------------
 

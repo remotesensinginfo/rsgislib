@@ -55,8 +55,8 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISVectorMaths(VariableFields **variables, int numVariables, std::string mathsExpression, std::string outHeading);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
-		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid){throw RSGISVectorException("Not Implemented");};
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, OGREnvelope *env, long fid);
+		virtual void processFeature(OGRFeature *feature, OGREnvelope *env, long fid){throw RSGISVectorException("Not Implemented");};
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		~RSGISVectorMaths();
 	private:

@@ -124,15 +124,15 @@ namespace rsgis{namespace filter{
 	void RSGISPrewittFilter::exportAsImage(std::string filename)
 	{
 		GDALAllRegister();
-		GDALDataset *outputImageDS = NULL;
-		GDALRasterBand *outputRasterBand = NULL;
-		GDALDriver *gdalDriver = NULL;
-		float *outputData = NULL;
+		GDALDataset *outputImageDS = nullptr;
+		GDALRasterBand *outputRasterBand = nullptr;
+		GDALDriver *gdalDriver = nullptr;
+		float *outputData = nullptr;
 		
 		try
 		{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
-			if(gdalDriver == NULL)
+			if(gdalDriver == nullptr)
 			{
 				throw RSGISImageException("ENVI driver does not exists..");
 			}
@@ -155,22 +155,22 @@ namespace rsgis{namespace filter{
 		}
 		catch(rsgis::RSGISImageException &e)
 		{
-			if(outputData == NULL)
+			if(outputData == nullptr)
 			{
 				delete outputData;
 			}
-			if(gdalDriver == NULL)
+			if(gdalDriver == nullptr)
 			{
 				delete gdalDriver;
 			}
 			throw e;
 		}
 		
-		if(outputData != NULL)
+		if(outputData != nullptr)
 		{
 			delete outputData;
 		}
-		if(gdalDriver == NULL)
+		if(gdalDriver == nullptr)
 		{
 			delete gdalDriver;
 		}

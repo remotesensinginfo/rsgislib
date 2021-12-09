@@ -39,8 +39,6 @@
 #include "vec/RSGISProcessOGRFeature.h"
 #include "vec/RSGISVectorUtils.h"
 
-#include "geos/geom/Envelope.h"
-
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
 #undef DllExport

@@ -25,7 +25,7 @@
 
 #include <iostream>
 #include <string>
-#include <math.h>
+#include <cmath>
 
 #include "gdal_priv.h"
 
@@ -67,15 +67,6 @@ namespace rsgis{namespace img{
 	public: 
 		RSGISSavitzkyGolaySmoothingFilters(int numberOutBands, int order, int window, rsgis::math::Vector *imagebandValues);
 		void calcImageValue(float *bandValues, int numBands, double *output);
-		void calcImageValue(float *bandValues, int numBands);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent);
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent);
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
 		~RSGISSavitzkyGolaySmoothingFilters();
 	private:
 		int order;

@@ -81,14 +81,10 @@ namespace rsgis{ namespace cmds {
     };
     
     /** Function to run the stretch image command */
-    DllExport void executeStretchImage(std::string inputImage, std::string outputImage, bool saveOutStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam);
-
-DllExport void executeStretchImageNoData(std::string inputImage, std::string outputImage, double inNoData, bool saveOutStats, std::string outStatsFile, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam);
+    DllExport void executeStretchImageNoData(std::string inputImage, std::string outputImage, double inNoData, bool saveOutStats, std::string outStatsFile, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam);
     
     /** Function to run the stretch image command with predefined stretch parameters*/
-    DllExport void executeStretchImageWithStats(std::string inputImage, std::string outputImage, std::string inStatsFile, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam);
-
-DllExport void executeStretchImageWithStatsNoData(std::string inputImage, std::string outputImage, std::string inStatsFile, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam, double nodataval);
+    DllExport void executeStretchImageWithStatsNoData(std::string inputImage, std::string outputImage, std::string inStatsFile, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam, double nodataval);
     
     /** Function to run the stretch image command with predefined stretch parameters*/
     DllExport void executeNormaliseImgPxlVals(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, float inNoDataVal, float outNoDataVal, float outMinVal, float outMaxVal, RSGISStretches stretchType, float stretchParam);
@@ -145,26 +141,15 @@ DllExport void executeStretchImageWithStatsNoData(std::string inputImage, std::s
     /** A function to stack image bands into a single output image */
     DllExport void executeStackImageBands(std::string *imageFiles, std::string *imageBandNames, int numImages, std::string outputImage, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, RSGISLibDataType outDataType, bool replaceBandNames);
     
-    /** A function to extract image values to a HDF file */
-    DllExport void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal, RSGISLibDataType dataType);
-        
-    /** A function to extract image band values to a HDF file */
-    DllExport void executeImageBandRasterZone2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outputHDF, float maskVal, RSGISLibDataType dataType);
 
-    /** A function to sample a list of values saved in a HDF5 file */
-    DllExport void executeRandomSampleH5File(std::string inputH5, std::string outputH5, unsigned int nSample, int seed, RSGISLibDataType dataType);
-
-    /** A function to sample a list of values saved in a HDF5 file */
-    DllExport void executeSplitSampleH5File(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSample, int seed, RSGISLibDataType dataType);
-    
     /** A function to subset an image to the bounding box of a polygon */
-    DllExport void executeSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType);
+    DllExport void executeSubset(std::string inputImage, std::string inputVecFile, std::string inputVecLyr, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType);
     
     /** A function to subset an image to a bounding box */
     DllExport void executeSubsetBBox(std::string inputImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType, double xMin, double xMax, double yMin, double yMax);
     
     /** A function to subset an image to polygons within shapefile */
-    DllExport void executeSubset2Polys(std::string inputImage, std::string inputVector, std::string filenameAttribute, std::string outputImageBase, std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL);
+    DllExport void executeSubset2Polys(std::string inputImage, std::string inputVecFile, std::string inputVecLyr, std::string filenameAttribute, std::string outputImageBase, std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL);
     
     /** A function to subset an image to another image*/
     DllExport void executeSubset2Img(std::string inputImage, std::string inputROIImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType);
@@ -173,16 +158,16 @@ DllExport void executeStretchImageWithStatsNoData(std::string inputImage, std::s
     DllExport void executeSubsetImageBands(std::string inputImage, std::string outputImage, std::vector<unsigned int> bands, std::string gdalFormat, RSGISLibDataType outDataType);
     
     /** A function to create a new blank image */
-    DllExport void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double resolution, float pxlVal, std::string wktFile, std::string wktStr, std::string gdalFormat, RSGISLibDataType outDataType);
+    DllExport void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double res_x, double res_y, float pxlVal, std::string wktFile, std::string wktStr, std::string gdalFormat, RSGISLibDataType outDataType);
 
     /** A function to create a new blank image using an exising image as a base. */
     DllExport void executeCreateCopyBlankImage(std::string inputImage, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType);
     
     /** A function to create a new blank image using an exising image as a base. */
-    DllExport void executeCreateCopyBlankImage(std::string inputImage, std::string outputImage, unsigned int numBands, double xMin, double xMax, double yMin, double yMax, double resX, double resY, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType);
+    DllExport void executeCreateCopyBlankDefExtImage(std::string inputImage, std::string outputImage, unsigned int numBands, double xMin, double xMax, double yMin, double yMax, double resX, double resY, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType);
     
-    /** A function to create a new blank image using an exising image as a base but cutting to extent of shapefile. */
-    DllExport void executeCreateCopyBlankImageVecExtent(std::string inputImage, std::string inputVector, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType);
+    /** A function to create a new blank image using an exising image as a base but cutting to extent of vector layer. */
+    DllExport void executeCreateCopyBlankImageVecExtent(std::string inputImage, std::string inputVecFile, std::string inputVecLyr, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType);
     
     /** A function to calculate summary statistics for every band in a stack or every n bands */
     DllExport void executeStackStats(std::string inputImage, std::string outputImage, std::string calcStat, bool allBands, unsigned int numBands, std::string gdalFormat, RSGISLibDataType outDataType);
@@ -195,7 +180,10 @@ DllExport void executeStretchImageWithStatsNoData(std::string inputImage, std::s
         
     /** A function to produce a binary image for valid regions within all the input images (i.e., not the no data value) */
     DllExport void executeValidImageMask(std::vector<std::string> inputImages, std::string outputImage, std::string gdalFormat, float noDataVal=0.0);
-    
+
+    /** A function to produce a binary mask with the edge pixels of the input image identified */
+    DllExport void executeImageEdgeMask(std::string inputImage, std::string outputImage, std::string gdalFormat, unsigned int nEdgePxls);
+
     /** A function to combine images together into a single image band by excluding the no data value */
     DllExport void executeCombineImagesSingleBandIgnoreNoData(std::vector<std::string> inputImages, std::string outputImage, float noDataVal, std::string gdalFormat, RSGISLibDataType outDataType);
     
@@ -225,6 +213,9 @@ DllExport void executeStretchImageWithStatsNoData(std::string inputImage, std::s
 
     /** A function to get the GDAL image creation options for a given format via the defined environmental variable */
     DllExport std::map<std::string, std::string> executeGetGDALImageCreationOpts(std::string gdalFormat);
+
+    /** A function which unpacks the image pixel values to a multi band image */
+    DllExport void executeUnpackPxlValues(std::string inputImage, unsigned int inputImgBand, std::string outputImage, std::string gdalFormat);
     
 }}
 

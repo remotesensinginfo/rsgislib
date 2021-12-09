@@ -38,12 +38,10 @@
 #include "segmentation/RSGISGenMeanSegImage.h"
 #include "segmentation/RSGISRandomColourClumps.h"
 #include "segmentation/RSGISMergeSegmentationTiles.h"
-#include "segmentation/RSGISBottomUpShapeFeatureExtraction.h"
 #include "segmentation/RSGISMergeSegmentations.h"
 #include "segmentation/RSGISMergeSegments.h"
 #include "segmentation/RSGISCreateImageGrid.h"
 #include "segmentation/RSGISDropClumps.h"
-#include "segmentation/RSGISRegionGrowSegmentsPixels.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
@@ -663,68 +661,6 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript)
-    {
-        /*
-        try
-        {
-            rsgis::img::RSGISImageUtils imgUtils;
-            GDALAllRegister();
-            
-            GDALDataset *inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
-            if(inputDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            GDALDataset *maskDataset = (GDALDataset *) GDALOpen(maskImage.c_str(), GA_Update);
-            if(inputDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + maskImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            GDALDataset *outputDataset = imgUtils.createCopy(inputDataset, 1, outputImage, outputFormat, GDT_Int32);
-            
-            GDALDataset *temp1Dataset = imgUtils.createCopy(inputDataset, 1, temp1Image, outputFormat, GDT_Int32);
-            GDALDataset *temp2Dataset = imgUtils.createCopy(inputDataset, 1, temp2Image, outputFormat, GDT_Int32);
-            
-            std::vector<rsgis::segment::FeatureShapeDescription*> shapeFeatDescriptSegs;
-            shapeFeatDescriptSegs.reserve(shapeFeatDescript.size());
-            rsgis::segment::FeatureShapeDescription *feat = NULL;
-            for(std::vector<rsgis::cmds::FeatureShapeDescription*>::iterator iterFeats = shapeFeatDescript.begin(); iterFeats != shapeFeatDescript.end(); ++iterFeats)
-            {
-                feat = new rsgis::segment::FeatureShapeDescription();
-                feat->area = (*iterFeats)->area;
-                feat->areaLower = (*iterFeats)->areaLower;
-                feat->areaUpper = (*iterFeats)->areaUpper;
-                feat->lenWidth = (*iterFeats)->lenWidth;
-                feat->lenWidthLower = (*iterFeats)->lenWidthLower;
-                feat->lenWidthUpper = (*iterFeats)->lenWidthUpper;
-                shapeFeatDescriptSegs.push_back(feat);
-            }
-            
-            rsgis::segment::RSGISBottomUpShapeFeatureExtraction rsgisExtractFeats;
-            rsgisExtractFeats.extractBrightFeatures(inputDataset, maskDataset, outputDataset, temp1Dataset, temp2Dataset, initThres, thresIncrement, thresholdUpper, shapeFeatDescriptSegs);
-            
-            GDALClose(inputDataset);
-            GDALClose(outputDataset);
-            GDALClose(temp1Dataset);
-            GDALClose(temp2Dataset);
-            GDALClose(maskDataset);
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw rsgis::cmds::RSGISCmdException(e.what());
-        }
-        catch (std::exception &e)
-        {
-            throw rsgis::cmds::RSGISCmdException(e.what());
-        }
-         */
-    }
-    
     void executeRMSmallClumps(std::string clumpsImage, std::string outputImage, float threshold, std::string imgFormat)
     {
         GDALAllRegister();
@@ -1011,54 +947,7 @@ namespace rsgis{ namespace cmds {
             throw rsgis::cmds::RSGISCmdException(e.what());
         }
     }
-            
-            
-    DllExport void executePxlGrowRegions(std::string clumpsImage, std::string valsImage, std::string outputImage, std::string imageFormat, std::string muParseCriteria, std::vector<VarImgBandPairs> varNameBandPairs)
-    {
-        try
-        {
-            rsgis::img::RSGISImageUtils imgUtils;
-            GDALAllRegister();
-            GDALDataset *clumpDS = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
-            if(clumpDS == NULL)
-            {
-                std::string message = std::string("Could not open image ") + clumpsImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            GDALDataset *imgValsDS = (GDALDataset *) GDALOpen(valsImage.c_str(), GA_ReadOnly);
-            if(imgValsDS == NULL)
-            {
-                std::string message = std::string("Could not open image ") + valsImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            GDALDataset *outputClumpsDS = imgUtils.createCopy(clumpDS, 1, outputImage, imageFormat, GDT_UInt32);
-            outputClumpsDS->GetRasterBand(1)->Fill(0.0);
-            
-            
-            throw rsgis::RSGISException("executePxlGrowRegions is not implemented yet; see code in RSGISRegionGrowSegmentsPixels.h");
-            
-            
-            
-            outputClumpsDS->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
-            popImageStats.populateImageWithRasterGISStats(outputClumpsDS, true, true, true, 1);
-            
-            // Tidy up
-            GDALClose(clumpDS);
-            GDALClose(imgValsDS);
-            GDALClose(outputClumpsDS);
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw rsgis::cmds::RSGISCmdException(e.what());
-        }
-        catch (std::exception &e)
-        {
-            throw rsgis::cmds::RSGISCmdException(e.what());
-        }
-    }
+
     
 }}
 

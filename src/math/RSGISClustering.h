@@ -24,7 +24,7 @@
 #define RSGISClustering_h
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <vector>
 
 #include "math/RSGISProbabilityDistributions.h"

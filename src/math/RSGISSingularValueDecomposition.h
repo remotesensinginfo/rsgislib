@@ -24,7 +24,7 @@
 #ifndef RSGISSingularValueDecomposition_H
 #define RSGISSingularValueDecomposition_H
 
-#include <math.h>
+#include <cmath>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_linalg.h>

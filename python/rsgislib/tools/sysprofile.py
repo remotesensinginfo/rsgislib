@@ -31,21 +31,32 @@ def create_mem_cpu_profile(out_file, interval=3, duration=600):
     psutil.cpu_percent()
     time.sleep(1)
     print("Started logging...")
-    with open(out_file, 'w') as out_file_obj:
+    with open(out_file, "w") as out_file_obj:
         start_time = time.time()
-        out_file_obj.write('timestamp,interval,used_mem,cpu_percent\n')
+        out_file_obj.write("timestamp,interval,used_mem,cpu_percent\n")
         for i in tqdm.tqdm(range(n_steps)):
             current_time = time.time()
-            current_time_inter = str(round(current_time - start_time, 1))  # time in seconds
+            current_time_inter = str(
+                round(current_time - start_time, 1)
+            )  # time in seconds
             mem_info = dict(psutil.virtual_memory()._asdict())
-            used_mem = str(round(mem_info['used'] * 0.000000001, 2))  # mem usage in GB
+            used_mem = str(round(mem_info["used"] * 0.000000001, 2))  # mem usage in GB
             out_file_obj.write(
-                '{}, {}, {}, {}\n'.format(current_time, current_time_inter, used_mem, psutil.cpu_percent()))
+                "{}, {}, {}, {}\n".format(
+                    current_time, current_time_inter, used_mem, psutil.cpu_percent()
+                )
+            )
             out_file_obj.flush()
             time.sleep(interval)
 
 
-def plot_mem_cpu_profile(profile_file, out_plot_file='sys_profile.pdf', ref_period=30, interval=3, plot_format='PDF'):
+def plot_mem_cpu_profile(
+    profile_file,
+    out_plot_file="sys_profile.pdf",
+    ref_period=30,
+    interval=3,
+    plot_format="PDF",
+):
     """
     A function which creates a plot using the output of the rsgislib.tools.create_mem_cpu_profile function.
     A reference period can be used to estimate the background system usage which is removed from the whole
@@ -64,31 +75,44 @@ def plot_mem_cpu_profile(profile_file, out_plot_file='sys_profile.pdf', ref_peri
     import pandas
     import matplotlib.pyplot as plt
 
-    cols_dtypes = {'timestamp': float, 'interval': float, 'used_mem': float, 'cpu_percent': float}
-    profile_df = pandas.read_csv(profile_file, delimiter=',', header=0, dtype=cols_dtypes)
+    cols_dtypes = {
+        "timestamp": float,
+        "interval": float,
+        "used_mem": float,
+        "cpu_percent": float,
+    }
+    profile_df = pandas.read_csv(
+        profile_file, delimiter=",", header=0, dtype=cols_dtypes
+    )
 
     if (ref_period > 0) and (ref_period > (4 * interval)):
         ref_n_rows = int(ref_period / interval)
-        avg_bkg_used_mem = profile_df[0:ref_n_rows].mean()['used_mem']
-        avg_bkg_cpu_percent = profile_df[0:ref_n_rows].mean()['cpu_percent']
+        avg_bkg_used_mem = profile_df[0:ref_n_rows].mean()["used_mem"]
+        avg_bkg_cpu_percent = profile_df[0:ref_n_rows].mean()["cpu_percent"]
 
-        profile_df['used_mem'] = profile_df['used_mem'] - avg_bkg_used_mem
-        profile_df['cpu_percent'] = profile_df['cpu_percent'] - avg_bkg_cpu_percent
-        profile_df['used_mem'][profile_df['used_mem'] < 0] = 0.0
-        profile_df['cpu_percent'][profile_df['cpu_percent'] < 0] = 0.0
+        profile_df["used_mem"] = profile_df["used_mem"] - avg_bkg_used_mem
+        profile_df["cpu_percent"] = profile_df["cpu_percent"] - avg_bkg_cpu_percent
+        profile_df["used_mem"][profile_df["used_mem"] < 0] = 0.0
+        profile_df["cpu_percent"][profile_df["cpu_percent"] < 0] = 0.0
 
-    time_max = profile_df['interval'].max()
-    used_mem_max = profile_df['used_mem'].max()
-    cpu_percent_max = profile_df['cpu_percent'].max()
+    time_max = profile_df["interval"].max()
+    used_mem_max = profile_df["used_mem"].max()
+    cpu_percent_max = profile_df["cpu_percent"].max()
 
     ax = profile_df.plot(x="interval", y="used_mem", color="r", label="Used Memory")
-    profile_df.plot(x="interval", y="cpu_percent", color="b", label="Percent CPU", secondary_y=True, ax=ax)
+    profile_df.plot(
+        x="interval",
+        y="cpu_percent",
+        color="b",
+        label="Percent CPU",
+        secondary_y=True,
+        ax=ax,
+    )
 
     ax.set_xlabel("time (seconds)")
     ax.set_xlim(0, time_max)
     ax.set_ylabel("Memory (Gb)")
     ax.set_ylim(0, used_mem_max * 1.10)
-    ax.right_ax.set_ylabel('CPU Percent (%)')
+    ax.right_ax.set_ylabel("CPU Percent (%)")
     ax.right_ax.set_ylim(0, cpu_percent_max * 1.10)
     plt.savefig(out_plot_file, format=plot_format)
-

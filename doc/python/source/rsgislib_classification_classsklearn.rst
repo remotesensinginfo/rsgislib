@@ -1,7 +1,5 @@
-RSGISLib Scikit-Learn Pixel Classification Module
-==================================================
-
-.. automodule:: rsgislib.classification.classsklearn
+RSGISLib Scikit-Learn Pixel Classification
+=============================================
 
 These functions allow a classifier from the scikit-learn (https://scikit-learn.org) library to be trained and applied on an individual image pixel basis. This requires a number of processing steps to be undertaken:
 
@@ -106,6 +104,5 @@ Classify Functions
 -------------------
 
 .. autofunction:: rsgislib.classification.classsklearn.apply_sklearn_classifer
-.. autofunction:: rsgislib.classification.classsklearn.perform_voting_classification
 
 

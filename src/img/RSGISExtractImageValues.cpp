@@ -513,7 +513,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISExtractPxlsAsPts::exportPixelsAsPoints(GDALDataset *image, float maskVal, std::vector<std::pair<double,double> > *pxPts, geos::geom::Envelope *env)
+    void RSGISExtractPxlsAsPts::exportPixelsAsPoints(GDALDataset *image, float maskVal, std::vector<std::pair<double,double> > *pxPts, OGREnvelope *env)
     {
         try
         {
@@ -543,7 +543,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISExtractPxlsAsPts::exportPixelsAsPointsWithVal(GDALDataset *image, float maskVal, GDALDataset *valImg, int valImgBand, std::vector<std::pair<std::pair<double,double>,double> > *pxPts, bool quiet, geos::geom::Envelope *env)
+    void RSGISExtractPxlsAsPts::exportPixelsAsPointsWithVal(GDALDataset *image, float maskVal, GDALDataset *valImg, int valImgBand, std::vector<std::pair<std::pair<double,double>,double> > *pxPts, bool quiet, OGREnvelope *env)
     {
         try
         {
@@ -597,15 +597,15 @@ namespace rsgis{namespace img{
         this->featDefn = vecLayer->GetLayerDefn();
     }
     
-    void RSGISExtractPxlsAsPtsImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
+    void RSGISExtractPxlsAsPtsImgCalc::calcImageValue(float *bandValues, int numBands, OGREnvelope extent) 
     {
         if(bandValues[0] == maskValue)
         {
-            geos::geom::Coordinate centre;
-            extent.centre(centre);
+            double centre_x = extent.MinX + (extent.MaxX - extent.MinX)/2;
+            double centre_y = extent.MinY + (extent.MaxY - extent.MinY)/2;
             
             OGRFeature *poFeature = new OGRFeature(featDefn);
-            OGRPoint *pt = new OGRPoint(centre.x, centre.y, 0.0);
+            OGRPoint *pt = new OGRPoint(centre_x, centre_y, 0.0);
             poFeature->SetGeometryDirectly(pt);
             vecLayer->CreateFeature(poFeature);
         }
@@ -624,13 +624,13 @@ namespace rsgis{namespace img{
         this->maskValue = maskValue;
     }
     
-    void RSGISExtractPxlsAsPts2VecImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
+    void RSGISExtractPxlsAsPts2VecImgCalc::calcImageValue(float *bandValues, int numBands, OGREnvelope extent) 
     {
         if(bandValues[0] == maskValue)
         {
-            geos::geom::Coordinate centre;
-            extent.centre(centre);
-            pxPts->push_back(std::pair<double,double>(centre.x, centre.y));
+            double centre_x = extent.MinX + (extent.MaxX - extent.MinX)/2;
+            double centre_y = extent.MinY + (extent.MaxY - extent.MinY)/2;
+            pxPts->push_back(std::pair<double,double>(centre_x, centre_y));
         }
     }
     
@@ -646,13 +646,13 @@ namespace rsgis{namespace img{
         this->valIdx = valIdx;
     }
     
-    void RSGISExtractPxlsAsPts2VecWithValImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
+    void RSGISExtractPxlsAsPts2VecWithValImgCalc::calcImageValue(float *bandValues, int numBands, OGREnvelope extent) 
     {
         if(bandValues[0] == maskValue)
         {
-            geos::geom::Coordinate centre;
-            extent.centre(centre);
-            pxPts->push_back(std::pair<std::pair<double,double>, double>(std::pair<double,double>(centre.x, centre.y), bandValues[valIdx]));
+            double centre_x = extent.MinX + (extent.MaxX - extent.MinX)/2;
+            double centre_y = extent.MinY + (extent.MaxY - extent.MinY)/2;
+            pxPts->push_back(std::pair<std::pair<double,double>, double>(std::pair<double,double>(centre_x, centre_y), bandValues[valIdx]));
         }
     }
     

@@ -2916,7 +2916,7 @@ namespace rsgis{namespace img{
     
     
     
-    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env, bool quiet)
+    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, OGREnvelope *env, bool quiet)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -4446,7 +4446,7 @@ namespace rsgis{namespace img{
 	}
 
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, OGREnvelope *env, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -4867,7 +4867,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, bool quiet)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, OGREnvelope *env, bool quiet)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -5156,7 +5156,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env, bool quiet)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numIntDS, int numFloatDS, OGREnvelope *env, bool quiet)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -5666,7 +5666,7 @@ namespace rsgis{namespace img{
             
             unsigned int xPxl = 0;
             unsigned int yPxl = 0;
-            geos::geom::Envelope extent;
+            OGREnvelope extent;
 			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
@@ -5689,8 +5689,11 @@ namespace rsgis{namespace img{
                             inDataColumn[n] = inputData[n][(m*width)+j];
                         }
                         
-                        extent.init(xPxl, xPxl, yPxl, yPxl);
-                        
+                        extent.MinX = xPxl;
+                        extent.MaxX = xPxl;
+                        extent.MinY = yPxl;
+                        extent.MaxY = yPxl;
+
                         this->calc->calcImageValue(inDataColumn, numInBands, extent);
                         ++xPxl;
                     }
@@ -5717,8 +5720,11 @@ namespace rsgis{namespace img{
                         {
                             inDataColumn[n] = inputData[n][(m*width)+j];
                         }
-                        
-                        extent.init(xPxl, xPxl, yPxl, yPxl);
+
+                        extent.MinX = xPxl;
+                        extent.MaxX = xPxl;
+                        extent.MinY = yPxl;
+                        extent.MaxY = yPxl;
                         
                         this->calc->calcImageValue(inDataColumn, numInBands, extent);
                         ++xPxl;
@@ -5911,7 +5917,7 @@ namespace rsgis{namespace img{
         GDALRasterBand **inputRasterFloatBands = NULL;
         GDALRasterBand **inputRasterIntBands = NULL;
         
-        geos::geom::Envelope extent;
+        OGREnvelope extent;
         unsigned int xPxl = 0;
         unsigned int yPxl = 0;
         
@@ -6015,8 +6021,11 @@ namespace rsgis{namespace img{
                         {
                             inDataFloatColumn[n] = inputFloatData[n][(m*width)+j];
                         }
-                        
-                        extent.init(xPxl, xPxl, yPxl, yPxl);
+
+                        extent.MinX = xPxl;
+                        extent.MaxX = xPxl;
+                        extent.MinY = yPxl;
+                        extent.MaxY = yPxl;
                         
                         this->calc->calcImageValue(inDataIntColumn, numIntBands, inDataFloatColumn, numFloatBands, extent);
                         
@@ -6057,8 +6066,11 @@ namespace rsgis{namespace img{
                         {
                             inDataFloatColumn[n] = inputFloatData[n][(m*width)+j];
                         }
-                        
-                        extent.init(xPxl, xPxl, yPxl, yPxl);
+
+                        extent.MinX = xPxl;
+                        extent.MaxX = xPxl;
+                        extent.MinY = yPxl;
+                        extent.MaxY = yPxl;
                         
                         this->calc->calcImageValue(inDataIntColumn, numIntBands, inDataFloatColumn, numFloatBands, extent);
                         xPxl += 1;
@@ -6331,7 +6343,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, bool quiet)
+    void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, OGREnvelope *env, bool quiet)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -6351,7 +6363,7 @@ namespace rsgis{namespace img{
 		
 		GDALRasterBand **inputRasterBands = NULL;
         
-        geos::geom::Envelope extent;
+        OGREnvelope extent;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -6434,7 +6446,10 @@ namespace rsgis{namespace img{
 						inDataColumn[n] = inputData[n][j];
 					}
 					
-					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
+                    extent.MinX = pxlTLX;
+                    extent.MaxX = (pxlTLX+pxlWidth);
+                    extent.MinY = (pxlTLY-pxlHeight);
+                    extent.MaxY = pxlTLY;
 					
 					this->calc->calcImageValue(inDataColumn, numInBands, extent);
 					
@@ -6638,7 +6653,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand **inputRasterFloatBands = NULL;
         GDALRasterBand **inputRasterIntBands = NULL;
         
-        geos::geom::Envelope extent;
+        OGREnvelope extent;
         double imgTLX = 0;
         double imgTLY = 0;
         double pxlTLX = 0;
@@ -6759,7 +6774,10 @@ namespace rsgis{namespace img{
                             inDataFloatColumn[n] = inputFloatData[n][(m*width)+j];
                         }
                         
-                        extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
+                        extent.MinX = pxlTLX;
+                        extent.MaxX = (pxlTLX+pxlWidth);
+                        extent.MinY = (pxlTLY-pxlHeight);
+                        extent.MaxY = pxlTLY;
                         
                         this->calc->calcImageValue(inDataIntColumn, numIntBands, inDataFloatColumn, numFloatBands, extent);
                         
@@ -6801,7 +6819,10 @@ namespace rsgis{namespace img{
                             inDataFloatColumn[n] = inputFloatData[n][(m*width)+j];
                         }
                         
-                        extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
+                        extent.MinX = pxlTLX;
+                        extent.MaxX = (pxlTLX+pxlWidth);
+                        extent.MinY = (pxlTLY-pxlHeight);
+                        extent.MaxY = pxlTLY;
                         
                         this->calc->calcImageValue(inDataIntColumn, numIntBands, inDataFloatColumn, numFloatBands, extent);
                         pxlTLX += pxlWidth;
@@ -7098,7 +7119,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand **inputRasterBands = NULL;
 		GDALRasterBand **outputRasterBands = NULL;
 		GDALDriver *gdalDriver = NULL;
-		geos::geom::Envelope extent;
+		OGREnvelope extent;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -7205,7 +7226,10 @@ namespace rsgis{namespace img{
 						inDataColumn[n] = inputData[n][j];
 					}
 					
-					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
+                    extent.MinX = pxlTLX;
+                    extent.MaxX = (pxlTLX+pxlWidth);
+                    extent.MinY = (pxlTLY-pxlHeight);
+                    extent.MaxY = pxlTLY;
 					
 					this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn, extent);
 					
@@ -10435,7 +10459,7 @@ namespace rsgis{namespace img{
             int dWinY = 0;
             long xPxl = 0;
             long yPxl = 0;
-            geos::geom::Envelope pxlPos;
+            OGREnvelope pxlPos;
             
             rsgis_tqdm pbar;
             if(nYBlocks > 0)
@@ -10740,7 +10764,11 @@ namespace rsgis{namespace img{
                             
                             if(passPxlXY)
                             {
-                                pxlPos.init(xPxl, xPxl, yPxl, yPxl);
+                                pxlPos.MinX = xPxl;
+                                pxlPos.MaxX = xPxl;
+                                pxlPos.MinY = yPxl;
+                                pxlPos.MaxY = yPxl;
+
                                 this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn, pxlPos);
                             }
                             else
@@ -10975,7 +11003,10 @@ namespace rsgis{namespace img{
                             
                             if(passPxlXY)
                             {
-                                pxlPos.init(xPxl, xPxl, yPxl, yPxl);
+                                pxlPos.MinX = xPxl;
+                                pxlPos.MaxX = xPxl;
+                                pxlPos.MinY = yPxl;
+                                pxlPos.MaxY = yPxl;
                                 this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn, pxlPos);
                             }
                             else
@@ -11418,7 +11449,7 @@ namespace rsgis{namespace img{
             double pxlTLY = 0;
             double pxlWidth = 0;
             double pxlHeight = 0;
-            geos::geom::Envelope pxlExt;
+            OGREnvelope pxlExt;
             
             pxlTLX = gdalTranslation[0];
             pxlTLY = gdalTranslation[3];
@@ -11731,7 +11762,10 @@ namespace rsgis{namespace img{
                                 }
                             }
 
-                            pxlExt.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
+                            pxlExt.MinX = pxlTLX;
+                            pxlExt.MaxX = (pxlTLX+pxlWidth);
+                            pxlExt.MinY = (pxlTLY-pxlHeight);
+                            pxlExt.MaxY = pxlTLY;
                             this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn, pxlExt);
                             
                             for(int n = 0; n < this->numOutBands; n++)
@@ -11958,9 +11992,11 @@ namespace rsgis{namespace img{
                                     }
                                 }
                             }
-                            
 
-                            pxlExt.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
+                            pxlExt.MinX = pxlTLX;
+                            pxlExt.MaxX = (pxlTLX+pxlWidth);
+                            pxlExt.MinY = (pxlTLY-pxlHeight);
+                            pxlExt.MaxY = pxlTLY;
                             this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn, pxlExt);
                             
                             for(int n = 0; n < this->numOutBands; n++)
@@ -12224,7 +12260,7 @@ namespace rsgis{namespace img{
         GDALClose(outputImageDS);
     }
 	
-	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat,  GDALDataType gdalDataType)
+	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, OGREnvelope *env, OGRPolygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat,  GDALDataType gdalDataType)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -12248,9 +12284,6 @@ namespace rsgis{namespace img{
 		GDALRasterBand **inputRasterBands = NULL;
 		GDALRasterBand **outputRasterBands = NULL;
 		GDALDriver *gdalDriver = NULL;
-		geos::geom::Envelope extent;
-		geos::geom::Coordinate pxlCentre;
-		const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -12350,49 +12383,56 @@ namespace rsgis{namespace img{
 					{
 						inDataColumn[n] = inputData[n][j];
 					}
-					
-                    geos::geom::Coordinate pxlCentre;
-					geos::geom::Point *pt = NULL;
-					
-					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
-					extent.centre(pxlCentre);
-					pt = geomFactory->createPoint(pxlCentre);
-					
+
 					if (pixelPolyOption == polyContainsPixelCenter) 
-					{
-						
-						if(poly->contains(pt)) // If polygon contains pixel center
+                    {
+                        double x_pt = pxlTLX + (pxlWidth / 2);
+                        double y_pt = pxlTLY - (pxlHeight / 2);
+
+                        OGRPoint *pxlCentre = new OGRPoint(x_pt, y_pt);
+						if(poly->Contains(pxlCentre)) // If polygon contains pixel center
 						{
 							this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn);
 						}
 						else
-						{
-							for(int n = 0; n < this->numOutBands; n++)
-							{
-								outDataColumn[n] = nodata;
-							}
-						}
-						
+                        {
+                            for (int n = 0; n < this->numOutBands; n++)
+                            {
+                                outDataColumn[n] = nodata;
+                            }
+                        }
+						delete pxlCentre;
 					}
 					else if (pixelPolyOption == pixelAreaInPoly) 
 					{
-						geos::geom::CoordinateSequence *coords = NULL;
-						geos::geom::LinearRing *ring = NULL;
-						geos::geom::Polygon *pixelGeosPoly = NULL;
-						geos::geom::Geometry *intersectionGeom;
-						
-						coords = new geos::geom::CoordinateArraySequence();
-						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
-						ring = geomFactory->createLinearRing(coords);
-						pixelGeosPoly = geomFactory->createPolygon(ring, NULL);
-						
-						
-						intersectionGeom = pixelGeosPoly->intersection(poly);
-						double intersectionArea = intersectionGeom->getArea()  / pixelGeosPoly->getArea();
+                        OGRLinearRing *ring = new OGRLinearRing();
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+
+                        OGRPolygon *pixelPoly = new OGRPolygon();
+                        pixelPoly->addRingDirectly(ring);
+
+                        double intersectionArea = 0.0;
+                        OGRGeometry *intersectGeom = pixelPoly->Intersection(poly);
+                        if(intersectGeom->getGeometryType() == wkbPolygon)
+                        {
+                            intersectionArea = dynamic_cast<OGRPolygon*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbMultiPolygon)
+                        {
+                            intersectionArea = dynamic_cast<OGRMultiPolygon*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbSurface)
+                        {
+                            intersectionArea = dynamic_cast<OGRSurface*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbMultiSurface)
+                        {
+                            intersectionArea = dynamic_cast<OGRMultiSurface *>(intersectGeom)->get_Area() / pixelPoly->get_Area();
+                        }
 						
 						if(intersectionArea > 0)
 						{
@@ -12408,15 +12448,16 @@ namespace rsgis{namespace img{
 								outDataColumn[n] = nodata;
 							}
 						}
+
+						delete pixelPoly;
+						delete intersectGeom;
 					}
 					else 
 					{
 						RSGISPixelInPoly *pixelInPoly;
 						OGRLinearRing *ring;
 						OGRPolygon *pixelPoly;
-						OGRPolygon *ogrPoly;
-						OGRGeometry *ogrGeom;
-						
+
 						pixelInPoly = new RSGISPixelInPoly(pixelPolyOption);
 						
 						ring = new OGRLinearRing();
@@ -12429,42 +12470,24 @@ namespace rsgis{namespace img{
 						pixelPoly = new OGRPolygon();
 						pixelPoly->addRingDirectly(ring);
 						
-						ogrPoly = new OGRPolygon();
-						const geos::geom::LineString *line = poly->getExteriorRing();
-						OGRLinearRing *ogrRing = new OGRLinearRing();
-						const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
-						int numCoords = coords->getSize();
-						geos::geom::Coordinate coord;
-						for(int i = 0; i < numCoords; i++)
-						{
-							coord = coords->getAt(i);
-							ogrRing->addPoint(coord.x, coord.y, coord.z);
-						}
-						ogrPoly->addRing(ogrRing);
-						ogrGeom = (OGRGeometry *) ogrPoly;
-						
 						// Check if the pixel should be classed as part of the polygon using the specified method
-						if (pixelInPoly->findPixelInPoly(ogrGeom, pixelPoly)) 
+						if (pixelInPoly->findPixelInPoly(poly, pixelPoly))
 						{
 							this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn);
 						}
 						else
 						{
-							for(int n = 0; n < this->numOutBands; n++)
-							{
-								outDataColumn[n] = nodata;
-							}
-						}
-						
+                            for (int n = 0; n < this->numOutBands; n++)
+                            {
+                                outDataColumn[n] = nodata;
+                            }
+                        }
 						
 						// Tidy
 						delete pixelInPoly;
 						delete pixelPoly;
-						delete ogrPoly;
 					}
-					
-					delete pt;
-					
+
 					pxlTLX += pxlWidth;
 					
 					for(int n = 0; n < this->numOutBands; n++)
@@ -12713,7 +12736,7 @@ namespace rsgis{namespace img{
 	}
 	
 	/* calcImageWithinPolygon - takes existing output image */
-	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption)
+	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, OGREnvelope *env, OGRPolygon *poly, pixelInPolyOption pixelPolyOption)
 	{
 		/* Input and output images as gdal datasets
 		 * Stored as:
@@ -12734,8 +12757,7 @@ namespace rsgis{namespace img{
 		int height = 0;
 		int width = 0;
 		int numInBands = 0;
-		//int numOutBands = 0;
-		
+
 		float **inputData = NULL;
 		double **outputData = NULL;
 		float *inDataColumn = NULL;
@@ -12743,9 +12765,6 @@ namespace rsgis{namespace img{
 		
 		GDALRasterBand **inputRasterBands = NULL;
 		GDALRasterBand **outputRasterBands = NULL;
-		geos::geom::Envelope extent;
-		geos::geom::Coordinate pxlCentre;
-		const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -12841,127 +12860,118 @@ namespace rsgis{namespace img{
 				{
 					outputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], (bandOffsets[n][1]+i), width, 1, outputData[n], width, 1, GDT_Float64, 0, 0);
 				}
-				
-				
+
 				for(int j = 0; j < width; j++)
 				{
 					for(int n = 0; n < numInBands; n++)
 					{
 						inDataColumn[n] = inputData[n][j];
 					}
-					
-					geos::geom::Coordinate pxlCentre;
-					geos::geom::Point *pt = NULL;
-					
-					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
-					extent.centre(pxlCentre);
-					pt = geomFactory->createPoint(pxlCentre);
-					
-					if (pixelPolyOption == polyContainsPixelCenter) 
-					{
-						if(poly->contains(pt)) // If polygon contains pixel center
-						{
-							this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn);
-						}
-						else 
-						{
-							for (int n = 0; n < this->numOutBands; n++) 
-							{
-								outDataColumn[n] = outputData[n][j];
-							}
-						}
 
-					}
-					else if (pixelPolyOption == pixelAreaInPoly) 
-					{
-						geos::geom::CoordinateSequence *coords = NULL;
-						geos::geom::LinearRing *ring = NULL;
-						geos::geom::Polygon *pixelGeosPoly = NULL;
-						geos::geom::Geometry *intersectionGeom;
-						
-						coords = new geos::geom::CoordinateArraySequence();
-						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
-						ring = geomFactory->createLinearRing(coords);
-						pixelGeosPoly = geomFactory->createPolygon(ring, NULL);
-						
-						
-						intersectionGeom = pixelGeosPoly->intersection(poly);
-						double intersectionArea = intersectionGeom->getArea()  / pixelGeosPoly->getArea();
-						
-						if(intersectionArea > 0)
-						{
-							for(int n = 0; n < numInBands; n++)
-							{
-								this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn);
-							}
-						}
-						else 
-						{
-							for (int n = 0; n < this->numOutBands; n++) 
-							{
-								outDataColumn[n] = outputData[n][j];
-							}
-						}
-					}
-					else 
-					{
-						RSGISPixelInPoly *pixelInPoly;
-						OGRLinearRing *ring;
-						OGRPolygon *pixelPoly;
-						OGRPolygon *ogrPoly;
-						OGRGeometry *ogrGeom;
-						
-						pixelInPoly = new RSGISPixelInPoly(pixelPolyOption);
-						
-						ring = new OGRLinearRing();
-						ring->addPoint(pxlTLX, pxlTLY, 0);
-						ring->addPoint(pxlTLX + pxlWidth, pxlTLY, 0);
-						ring->addPoint(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0);
-						ring->addPoint(pxlTLX, pxlTLY - pxlHeight, 0);
-						ring->addPoint(pxlTLX, pxlTLY, 0);
-						
-						pixelPoly = new OGRPolygon();
-						pixelPoly->addRingDirectly(ring);
-						
-						ogrPoly = new OGRPolygon();
-						const geos::geom::LineString *line = poly->getExteriorRing();
-						OGRLinearRing *ogrRing = new OGRLinearRing();
-						const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
-						int numCoords = coords->getSize();
-						geos::geom::Coordinate coord;
-						for(int i = 0; i < numCoords; i++)
-						{
-							coord = coords->getAt(i);
-							ogrRing->addPoint(coord.x, coord.y, coord.z);
-						}
-						ogrPoly->addRing(ogrRing);
-						ogrGeom = (OGRGeometry *) ogrPoly;
-						
-						// Check if the pixel should be classed as part of the polygon using the specified method
-						if (pixelInPoly->findPixelInPoly(ogrGeom, pixelPoly)) 
-						{
-							this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn);
-						}
-						else 
-						{
-							for (int n = 0; n < this->numOutBands; n++) 
-							{
-								outDataColumn[n] = outputData[n][j];
-							}
-						}
-						
-						// Tidy
-						delete pixelInPoly;
-						delete pixelPoly;
-						delete ogrPoly;
-					}
-					
-					delete pt;
-					
+                    if (pixelPolyOption == polyContainsPixelCenter)
+                    {
+                        double x_pt = pxlTLX + (pxlWidth / 2);
+                        double y_pt = pxlTLY - (pxlHeight / 2);
+
+                        OGRPoint *pxlCentre = new OGRPoint(x_pt, y_pt);
+                        if(poly->Contains(pxlCentre)) // If polygon contains pixel center
+                        {
+                            this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn);
+                        }
+                        else
+                        {
+                            for (int n = 0; n < this->numOutBands; n++)
+                            {
+                                outDataColumn[n] = outputData[n][j];
+                            }
+                        }
+                        delete pxlCentre;
+                    }
+                    else if (pixelPolyOption == pixelAreaInPoly)
+                    {
+                        OGRLinearRing *ring = new OGRLinearRing();
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+
+                        OGRPolygon *pixelPoly = new OGRPolygon();
+                        pixelPoly->addRingDirectly(ring);
+
+                        double intersectionArea = 0.0;
+                        OGRGeometry *intersectGeom = pixelPoly->Intersection(poly);
+                        if(intersectGeom->getGeometryType() == wkbPolygon)
+                        {
+                            intersectionArea = dynamic_cast<OGRPolygon*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbMultiPolygon)
+                        {
+                            intersectionArea = dynamic_cast<OGRMultiPolygon*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbSurface)
+                        {
+                            intersectionArea = dynamic_cast<OGRSurface*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbMultiSurface)
+                        {
+                            intersectionArea = dynamic_cast<OGRMultiSurface *>(intersectGeom)->get_Area() / pixelPoly->get_Area();
+                        }
+
+                        if(intersectionArea > 0)
+                        {
+                            for(int n = 0; n < numInBands; n++)
+                            {
+                                this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn);
+                            }
+                        }
+                        else
+                        {
+                            for (int n = 0; n < this->numOutBands; n++)
+                            {
+                                outDataColumn[n] = outputData[n][j];
+                            }
+                        }
+
+                        delete pixelPoly;
+                        delete intersectGeom;
+                    }
+                    else
+                    {
+                        RSGISPixelInPoly *pixelInPoly;
+                        OGRLinearRing *ring;
+                        OGRPolygon *pixelPoly;
+
+                        pixelInPoly = new RSGISPixelInPoly(pixelPolyOption);
+
+                        ring = new OGRLinearRing();
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+
+                        pixelPoly = new OGRPolygon();
+                        pixelPoly->addRingDirectly(ring);
+
+                        // Check if the pixel should be classed as part of the polygon using the specified method
+                        if (pixelInPoly->findPixelInPoly(poly, pixelPoly))
+                        {
+                            this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn);
+                        }
+                        else
+                        {
+                            for (int n = 0; n < this->numOutBands; n++)
+                            {
+                                outDataColumn[n] = outputData[n][j];
+                            }
+                        }
+
+                        // Tidy
+                        delete pixelInPoly;
+                        delete pixelPoly;
+                    }
+
 					pxlTLX += pxlWidth;
 					
 					for(int n = 0; n < this->numOutBands; n++)
@@ -13213,7 +13223,7 @@ namespace rsgis{namespace img{
 	}
     
     /* calcImageWithinPolygon - Does not use an output image */
-	void RSGISCalcImage::calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption)
+	void RSGISCalcImage::calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, OGREnvelope *env, OGRPolygon *poly, pixelInPolyOption pixelPolyOption)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -13232,13 +13242,11 @@ namespace rsgis{namespace img{
 		float *inDataColumn = NULL;
 		
 		GDALRasterBand **inputRasterBands = NULL;
-		geos::geom::Envelope extent;
-		geos::geom::Coordinate pxlCentre;
-		const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
 		double pxlHeight = 0;
+		OGREnvelope extent = OGREnvelope();
         
 		try
 		{
@@ -13263,12 +13271,16 @@ namespace rsgis{namespace img{
 			
 			delete[] transformations;
 			
-			geos::geom::Envelope *bufferedEnvelope = NULL;
+			OGREnvelope *bufferedEnvelope = NULL;
 			
-			if ((env->getWidth() < pxlWidth) | (env->getHeight() < pxlHeight))
+			if (((env->MaxX - env->MinX) < pxlWidth) | ((env->MaxY - env->MinY) < pxlHeight))
 			{
 				buffer = true;
-				bufferedEnvelope = new geos::geom::Envelope(env->getMinX() - pxlWidth / 2, env->getMaxX() + pxlWidth / 2, env->getMinY() - pxlHeight / 2, env->getMaxY() + pxlHeight / 2);
+				bufferedEnvelope = new OGREnvelope();
+                bufferedEnvelope->MinX = env->MinX - pxlWidth / 2;
+                bufferedEnvelope->MinX = env->MaxX + pxlWidth / 2;
+                bufferedEnvelope->MinY = env->MinY - pxlHeight / 2;
+                bufferedEnvelope->MaxY = env->MaxY + pxlHeight / 2;
 			}
 			
 			// Find image overlap
@@ -13338,93 +13350,94 @@ namespace rsgis{namespace img{
 					{
 						inDataColumn[n] = inputData[n][j];
 					}
-					
-					geos::geom::Coordinate pxlCentre;
-					geos::geom::Point *pt = NULL;
-					
-					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
-					extent.centre(pxlCentre);
-					pt = geomFactory->createPoint(pxlCentre);
-					
-					if (pixelPolyOption == polyContainsPixelCenter) 
-					{
-						if(poly->contains(pt)) // If polygon contains pixel center
-						{
-							this->calc->calcImageValue(inDataColumn, numInBands, extent);
-						}
-					}
-					else if (pixelPolyOption == pixelAreaInPoly) 
-					{
-						geos::geom::CoordinateSequence *coords = NULL;
-						geos::geom::LinearRing *ring = NULL;
-						geos::geom::Polygon *pixelGeosPoly = NULL;
-						geos::geom::Geometry *intersectionGeom;
-						
-						coords = new geos::geom::CoordinateArraySequence();
-						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
-						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
-						ring = geomFactory->createLinearRing(coords);
-						pixelGeosPoly = geomFactory->createPolygon(ring, NULL);
-						
-						
-						intersectionGeom = pixelGeosPoly->intersection(poly);
-						double intersectionArea = intersectionGeom->getArea()  / pixelGeosPoly->getArea();
-						
-						if(intersectionArea > 0)
-						{
-							this->calc->calcImageValue(inDataColumn, numInBands, extent);
-						}
-					}
-					else 
-					{
-						RSGISPixelInPoly *pixelInPoly;
-						OGRLinearRing *ring;
-						OGRPolygon *pixelPoly;
-						OGRPolygon *ogrPoly;
-						OGRGeometry *ogrGeom;
-						
-						pixelInPoly = new RSGISPixelInPoly(pixelPolyOption);
-						
-						ring = new OGRLinearRing();
-						ring->addPoint(pxlTLX, pxlTLY, 0);
-						ring->addPoint(pxlTLX + pxlWidth, pxlTLY, 0);
-						ring->addPoint(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0);
-						ring->addPoint(pxlTLX, pxlTLY - pxlHeight, 0);
-						ring->addPoint(pxlTLX, pxlTLY, 0);
-						
-						pixelPoly = new OGRPolygon();
-						pixelPoly->addRingDirectly(ring);
-						
-						ogrPoly = new OGRPolygon();
-						const geos::geom::LineString *line = poly->getExteriorRing();
-						OGRLinearRing *ogrRing = new OGRLinearRing();
-						const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
-						int numCoords = coords->getSize();
-						geos::geom::Coordinate coord;
-						for(int i = 0; i < numCoords; i++)
-						{
-							coord = coords->getAt(i);
-							ogrRing->addPoint(coord.x, coord.y, coord.z);
-						}
-						ogrPoly->addRing(ogrRing);
-						ogrGeom = (OGRGeometry *) ogrPoly;
-						
-						// Check if the pixel should be classed as part of the polygon using the specified method
-						if (pixelInPoly->findPixelInPoly(ogrGeom, pixelPoly)) 
-						{
-							this->calc->calcImageValue(inDataColumn, numInBands, extent);
-						}
-						
-						// Tidy
-						delete pixelInPoly;
-						delete pixelPoly;
-						delete ogrPoly;
-					}
-					
-					delete pt;
+
+                    extent.MinX = pxlTLX;
+                    extent.MaxX = (pxlTLX+pxlWidth);
+                    extent.MinY = (pxlTLY-pxlHeight);
+                    extent.MaxY = pxlTLY;
+
+                    if (pixelPolyOption == polyContainsPixelCenter)
+                    {
+                        double x_pt = pxlTLX + (pxlWidth / 2);
+                        double y_pt = pxlTLY - (pxlHeight / 2);
+
+                        OGRPoint *pxlCentre = new OGRPoint(x_pt, y_pt);
+                        if(poly->Contains(pxlCentre)) // If polygon contains pixel center
+                        {
+                            this->calc->calcImageValue(inDataColumn, numInBands, extent);
+                        }
+                        delete pxlCentre;
+                    }
+                    else if (pixelPolyOption == pixelAreaInPoly)
+                    {
+                        OGRLinearRing *ring = new OGRLinearRing();
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+
+                        OGRPolygon *pixelPoly = new OGRPolygon();
+                        pixelPoly->addRingDirectly(ring);
+
+                        double intersectionArea = 0.0;
+                        OGRGeometry *intersectGeom = pixelPoly->Intersection(poly);
+                        if(intersectGeom->getGeometryType() == wkbPolygon)
+                        {
+                            intersectionArea = dynamic_cast<OGRPolygon*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbMultiPolygon)
+                        {
+                            intersectionArea = dynamic_cast<OGRMultiPolygon*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbSurface)
+                        {
+                            intersectionArea = dynamic_cast<OGRSurface*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbMultiSurface)
+                        {
+                            intersectionArea = dynamic_cast<OGRMultiSurface *>(intersectGeom)->get_Area() / pixelPoly->get_Area();
+                        }
+
+                        if(intersectionArea > 0)
+                        {
+                            for(int n = 0; n < numInBands; n++)
+                            {
+                                this->calc->calcImageValue(inDataColumn, numInBands, extent);
+                            }
+                        }
+
+                        delete pixelPoly;
+                        delete intersectGeom;
+                    }
+                    else
+                    {
+                        RSGISPixelInPoly *pixelInPoly;
+                        OGRLinearRing *ring;
+                        OGRPolygon *pixelPoly;
+
+                        pixelInPoly = new RSGISPixelInPoly(pixelPolyOption);
+
+                        ring = new OGRLinearRing();
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+
+                        pixelPoly = new OGRPolygon();
+                        pixelPoly->addRingDirectly(ring);
+
+                        // Check if the pixel should be classed as part of the polygon using the specified method
+                        if (pixelInPoly->findPixelInPoly(poly, pixelPoly))
+                        {
+                            this->calc->calcImageValue(inDataColumn, numInBands, extent);
+                        }
+
+                        // Tidy
+                        delete pixelInPoly;
+                        delete pixelPoly;
+                    }
 					
 					pxlTLX += pxlWidth;
 				}
@@ -13595,7 +13608,7 @@ namespace rsgis{namespace img{
 		}		
 	}
 
-    void RSGISCalcImage::calcImageWithinPolygonExtentInMem(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption)
+    void RSGISCalcImage::calcImageWithinPolygonExtentInMem(GDALDataset **datasets, int numDS, OGREnvelope *env, OGRPolygon *poly, pixelInPolyOption pixelPolyOption)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -13614,9 +13627,7 @@ namespace rsgis{namespace img{
         float *inDataColumn = NULL;
 
         GDALRasterBand **inputRasterBands = NULL;
-        geos::geom::Envelope extent;
-        geos::geom::Coordinate pxlCentre;
-        const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
+        OGREnvelope extent = OGREnvelope();
         double pxlTLX = 0;
         double pxlTLY = 0;
         double pxlWidth = 0;
@@ -13644,12 +13655,16 @@ namespace rsgis{namespace img{
             }
             delete[] transformations;
 
-            geos::geom::Envelope *bufferedEnvelope = NULL;
+            OGREnvelope *bufferedEnvelope = NULL;
 
-            if ((env->getWidth() < pxlWidth) | (env->getHeight() < pxlHeight))
+            if (((env->MaxX - env->MinX) < pxlWidth) | ((env->MaxY - env->MinY) < pxlHeight))
             {
                 buffer = true;
-                bufferedEnvelope = new geos::geom::Envelope(env->getMinX() - pxlWidth, env->getMaxX() + pxlWidth, env->getMinY() - pxlHeight, env->getMaxY() + pxlHeight);
+                bufferedEnvelope = new OGREnvelope();
+                bufferedEnvelope->MinX = env->MinX - pxlWidth / 2;
+                bufferedEnvelope->MinX = env->MaxX + pxlWidth / 2;
+                bufferedEnvelope->MinY = env->MinY - pxlHeight / 2;
+                bufferedEnvelope->MaxY = env->MaxY + pxlHeight / 2;
             }
 
             // Find image overlap
@@ -13726,52 +13741,70 @@ namespace rsgis{namespace img{
                         inDataColumn[n] = inputData[n][(i*width)+j];
                     }
 
-                    geos::geom::Coordinate pxlCentre;
-                    geos::geom::Point *pt = NULL;
-
-                    extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
-                    extent.centre(pxlCentre);
-                    pt = geomFactory->createPoint(pxlCentre);
+                    extent.MinX = pxlTLX;
+                    extent.MaxX = (pxlTLX+pxlWidth);
+                    extent.MinY = (pxlTLY-pxlHeight);
+                    extent.MaxY = pxlTLY;
 
                     if (pixelPolyOption == polyContainsPixelCenter)
                     {
-                        if(poly->contains(pt)) // If polygon contains pixel center
+                        double x_pt = pxlTLX + (pxlWidth / 2);
+                        double y_pt = pxlTLY - (pxlHeight / 2);
+
+                        OGRPoint *pxlCentre = new OGRPoint(x_pt, y_pt);
+                        if(poly->Contains(pxlCentre)) // If polygon contains pixel center
                         {
                             this->calc->calcImageValue(inDataColumn, numInBands, extent);
                         }
+                        delete pxlCentre;
                     }
                     else if (pixelPolyOption == pixelAreaInPoly)
                     {
-                        geos::geom::CoordinateSequence *coords = NULL;
-                        geos::geom::LinearRing *ring = NULL;
-                        geos::geom::Polygon *pixelGeosPoly = NULL;
-                        geos::geom::Geometry *intersectionGeom;
+                        OGRLinearRing *ring = new OGRLinearRing();
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
 
-                        coords = new geos::geom::CoordinateArraySequence();
-                        coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
-                        coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
-                        coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
-                        coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
-                        coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
-                        ring = geomFactory->createLinearRing(coords);
-                        pixelGeosPoly = geomFactory->createPolygon(ring, NULL);
+                        OGRPolygon *pixelPoly = new OGRPolygon();
+                        pixelPoly->addRingDirectly(ring);
 
-
-                        intersectionGeom = pixelGeosPoly->intersection(poly);
-                        double intersectionArea = intersectionGeom->getArea()  / pixelGeosPoly->getArea();
+                        double intersectionArea = 0.0;
+                        OGRGeometry *intersectGeom = pixelPoly->Intersection(poly);
+                        if(intersectGeom->getGeometryType() == wkbPolygon)
+                        {
+                            intersectionArea = dynamic_cast<OGRPolygon*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbMultiPolygon)
+                        {
+                            intersectionArea = dynamic_cast<OGRMultiPolygon*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbSurface)
+                        {
+                            intersectionArea = dynamic_cast<OGRSurface*>(intersectGeom)->get_Area()  / pixelPoly->get_Area();
+                        }
+                        else if(intersectGeom->getGeometryType() == wkbMultiSurface)
+                        {
+                            intersectionArea = dynamic_cast<OGRMultiSurface *>(intersectGeom)->get_Area() / pixelPoly->get_Area();
+                        }
 
                         if(intersectionArea > 0)
                         {
-                            this->calc->calcImageValue(inDataColumn, numInBands, extent);
+                            for(int n = 0; n < numInBands; n++)
+                            {
+                                this->calc->calcImageValue(inDataColumn, numInBands, extent);
+                            }
                         }
+
+                        delete pixelPoly;
+                        delete intersectGeom;
                     }
                     else
                     {
                         RSGISPixelInPoly *pixelInPoly;
                         OGRLinearRing *ring;
                         OGRPolygon *pixelPoly;
-                        OGRPolygon *ogrPoly;
-                        OGRGeometry *ogrGeom;
 
                         pixelInPoly = new RSGISPixelInPoly(pixelPolyOption);
 
@@ -13785,22 +13818,8 @@ namespace rsgis{namespace img{
                         pixelPoly = new OGRPolygon();
                         pixelPoly->addRingDirectly(ring);
 
-                        ogrPoly = new OGRPolygon();
-                        const geos::geom::LineString *line = poly->getExteriorRing();
-                        OGRLinearRing *ogrRing = new OGRLinearRing();
-                        const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
-                        int numCoords = coords->getSize();
-                        geos::geom::Coordinate coord;
-                        for(int i = 0; i < numCoords; i++)
-                        {
-                            coord = coords->getAt(i);
-                            ogrRing->addPoint(coord.x, coord.y, coord.z);
-                        }
-                        ogrPoly->addRing(ogrRing);
-                        ogrGeom = (OGRGeometry *) ogrPoly;
-
                         // Check if the pixel should be classed as part of the polygon using the specified method
-                        if (pixelInPoly->findPixelInPoly(ogrGeom, pixelPoly))
+                        if (pixelInPoly->findPixelInPoly(poly, pixelPoly))
                         {
                             this->calc->calcImageValue(inDataColumn, numInBands, extent);
                         }
@@ -13808,10 +13827,7 @@ namespace rsgis{namespace img{
                         // Tidy
                         delete pixelInPoly;
                         delete pixelPoly;
-                        delete ogrPoly;
                     }
-
-                    delete pt;
 
                     pxlTLX += pxlWidth;
                 }
@@ -13983,7 +13999,7 @@ namespace rsgis{namespace img{
     }
 	
 	/* calcImageWithinRasterPolygon - takes existing output image */
-	void RSGISCalcImage::calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, long fid)
+	void RSGISCalcImage::calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, OGREnvelope *env, long fid)
 	{
 		/** Input and output images as gdal datasets
 		 * Stored as:
@@ -14016,8 +14032,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand **outputRasterBands = NULL;
 		GDALRasterBand **inputMaskBand = NULL;
 
-		geos::geom::Envelope extent;
-		geos::geom::Coordinate pxlCentre;
+		OGREnvelope extent;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;

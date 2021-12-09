@@ -67,7 +67,7 @@ Methods of calculating distance:
     * DIST_CHEBYSHEV = 5
     * DIST_MUTUALINFO = 6
     
-Methods of summerising data:
+Methods of summarising data:
 
     * SUMTYPE_UNDEFINED = 0
     * SUMTYPE_MODE = 1
@@ -88,7 +88,6 @@ Constants specifying how bands should be treated when sharpening (see rsgislib.i
 """
 from __future__ import print_function
 
-import os.path
 import os
 import time
 import datetime
@@ -167,21 +166,38 @@ SHARP_RES_IGNORE = 0
 SHARP_RES_LOW = 1
 SHARP_RES_HIGH = 2
 
-def getRSGISLibVersion():
+INTERP_NEAREST_NEIGHBOUR = 0
+INTERP_BILINEAR = 1
+INTERP_CUBIC = 2
+INTERP_CUBICSPLINE = 3
+INTERP_LANCZOS = 4
+INTERP_AVERAGE = 5
+INTERP_MODE = 6
+
+
+def get_rsgislib_version():
     """ Calls rsgis-config to get the version number. """
 
     # Try calling rsgis-config to get minor version number
     try:
-        import subprocess
-        out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (stdout, stderr) = out.communicate()
-        versionStr = stdout.decode()
-        versionStr = versionStr.split('\n')[0]
+        import distutils.spawn
+        if distutils.spawn.find_executable("rsgis-config") is not None:
+            import subprocess
+            out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            (stdout, stderr) = out.communicate()
+            version_str = stdout.decode()
+            version_str = version_str.split('\n')[0]
+        else:
+            version_str = 'NA.NA'
     except Exception:
-        versionStr = 'NA'
-    return(versionStr)
+        version_str = 'NA.NA'
+    return(version_str)
 
-__version__ = getRSGISLibVersion()
+__version__ = get_rsgislib_version()
+
+py_sys_version_str = "{}.{}".format(sys.version_info.major, sys.version_info.minor)
+py_sys_version_flt = float(py_sys_version_str)
+
 
 class RSGISPyException(Exception):
     """
@@ -201,1447 +217,173 @@ class RSGISPyException(Exception):
         return repr(self.value)
 
 
-class RSGISPyUtils (object):
+class RSGISGDALErrorHandler(object):
     """
-    A class with useful utilities within RSGISLib.
+    A class representing a generic GDAL Error Handler which
+    can be used to pick up GDAL warnings rather than just
+    failure errors.
     """
-    
-    def getFileExtension(self, gdalformat):
-        """
-        A function to get the extension for a given file format 
-        (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
 
-        :return: string
+    def __init__(self):
+        """
+        Init for RSGISGDALErrorHandler. Class attributes are err_level, err_no and err_msg
 
         """
-        ext = ".NA"
-        if gdalformat.lower() == "kea":
-            ext = ".kea"
-        elif gdalformat.lower() == "gtiff":
-            ext = ".tif"
-        elif gdalformat.lower() == "hfa":
-            ext = ".img"
-        elif gdalformat.lower() == "envi":
-            ext = ".env"
-        elif gdalformat.lower() == "pcidsk":
-            ext = ".pix"
-        else:
-            raise RSGISPyException("The extension for the gdalformat specified is unknown.")
-        return ext
-    
-    def getGDALFormatFromExt(self, fileName):
-        """
-        Get GDAL format, based on filename
+        from osgeo import gdal
+        self.err_level = gdal.CE_None
+        self.err_no = 0
+        self.err_msg = ''
 
-        :return: string
+    def handler(self, err_level, err_no, err_msg):
+        """
+        The handler function which is called with the error information.
+
+        :param err_level: The level of the error
+        :param err_no: The error number
+        :param err_msg: The message (string) associated with the error.
 
         """
-        gdalStr = ''
-        extension = os.path.splitext(fileName)[-1] 
-        if extension == '.env':
-            gdalStr = 'ENVI'
-        elif extension == '.kea':
-            gdalStr = 'KEA'
-        elif extension == '.tif' or extension == '.tiff':
-            gdalStr = 'GTiff'
-        elif extension == '.img':
-            gdalStr = 'HFA'
-        elif extension == '.pix':
-            gdalStr = 'PCIDSK'
-        else:
-            raise RSGISPyException('Type not recognised')
-        
-        return gdalStr
+        self.err_level = err_level
+        self.err_no = err_no
+        self.err_msg = err_msg
 
-    def get_file_basename(self, filepath, checkvalid=False, n_comps=0):
-        """
-        Uses os.path module to return file basename (i.e., path and extension removed)
 
-        :param filepath: string for the input file name and path
-        :param checkvalid: if True then resulting basename will be checked for punctuation
-                           characters (other than underscores) and spaces, punctuation
-                           will be either removed and spaces changed to an underscore.
-                           (Default = False)
-        :param n_comps: if > 0 then the resulting basename will be split using underscores
-                        and the return based name will be defined using the n_comps
-                        components split by under scores.
-        :return: basename for file
+def get_rsgislib_datatype(gdaltype):
+    """
+    Convert from GDAL data type string to RSGISLib data type int.
 
-        """
-        import string
-        basename = os.path.splitext(os.path.basename(filepath))[0]
-        if checkvalid:
-            basename = basename.replace(' ', '_')
-            for punct in string.punctuation:
-                if (punct != '_') and (punct != '-'):
-                    basename = basename.replace(punct, '')
-        if n_comps > 0:
-            basename_split = basename.split('_')
-            if len(basename_split) < n_comps:
-                raise RSGISPyException(
-                    "The number of components specified is more than the number of components in the basename.")
-            out_basename = ""
-            for i in range(n_comps):
-                if i == 0:
-                    out_basename = basename_split[i]
-                else:
-                    out_basename = out_basename + '_' + basename_split[i]
-            basename = out_basename
-        return basename
+    :return: int
 
-    def get_dir_name(self, in_file):
-        """
-        A function which returns just the name of the directory of the input file without the rest of the path.
+    """
+    gdaltype = gdaltype.lower()
+    if gdaltype == 'int8':
+        return TYPE_8INT
+    elif gdaltype == 'int16':
+        return TYPE_16INT
+    elif gdaltype == 'int32':
+        return TYPE_32INT
+    elif gdaltype == 'int64':
+        return TYPE_64INT
+    elif gdaltype == 'byte' or gdaltype == 'uint8':
+        return TYPE_8UINT
+    elif gdaltype == 'uint16':
+        return TYPE_16UINT
+    elif gdaltype == 'uint32':
+        return TYPE_32UINT
+    elif gdaltype == 'uint64':
+        return TYPE_64UINT
+    elif gdaltype == 'float32':
+        return TYPE_32FLOAT
+    elif gdaltype == 'float64':
+        return TYPE_64FLOAT
+    else:
+        raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
 
-        :param in_file: string for the input file name and path
-        :return: directory name
-        """
-        in_file = os.path.abspath(in_file)
-        dir_path = os.path.dirname(in_file)
-        dir_name = os.path.basename(dir_path)
-        return dir_name
+def get_gdal_datatype(rsgislib_datatype):
+    """
+    Convert from RSGIS data type to GDAL data type int.
 
-    def getRSGISLibDataTypeFromImg(self, inImg):
-        """
-        Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) 
-        for the inputted raster file
+    :return: int
 
-        :return: int
+    """
+    if rsgislib_datatype == TYPE_16INT:
+        return gdal.GDT_Int16
+    elif rsgislib_datatype == TYPE_32INT:
+        return gdal.GDT_Int32
+    elif rsgislib_datatype == TYPE_8UINT:
+        return gdal.GDT_Byte
+    elif rsgislib_datatype == TYPE_16UINT:
+        return gdal.GDT_UInt16
+    elif rsgislib_datatype == TYPE_32UINT:
+        return gdal.GDT_UInt32
+    elif rsgislib_datatype == TYPE_32FLOAT:
+        return gdal.GDT_Float32
+    elif rsgislib_datatype == TYPE_64FLOAT:
+        return gdal.GDT_Float64
+    else:
+        raise RSGISPyException("The data type '" + str(rsgislib_datatype) + "' is unknown / not supported.")
 
-        """
-        raster = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if raster == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        band = raster.GetRasterBand(1)
-        if band == None:
-            raise RSGISPyException('Could not open raster band 1 in image: \'' + inImg+ '\'')
-        gdal_dtype = gdal.GetDataTypeName(band.DataType)
-        raster = None
-        return self.getRSGISLibDataType(gdal_dtype)
-        
-    def getGDALDataTypeFromImg(self, inImg):
-        """
-        Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
+def get_numpy_datatype(rsgislib_datatype):
+    """
+    Convert from RSGISLib data type to numpy datatype
 
-        :return: ints
-
-        """
-        raster = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if raster == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        band = raster.GetRasterBand(1)
-        if band == None:
-            raise RSGISPyException('Could not open raster band 1 in image: \'' + inImg+ '\'')
-        gdal_dtype = band.DataType
-        raster = None
-        return gdal_dtype
-        
-    def getGDALDataTypeNameFromImg(self, inImg):
-        """
-        Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
-
-        :return: int
-
-        """
-        raster = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if raster == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        band = raster.GetRasterBand(1)
-        if band == None:
-            raise RSGISPyException('Could not open raster band 1 in image: \'' + inImg+ '\'')
-        dtypeName = gdal.GetDataTypeName(band.DataType)
-        raster = None
-        return dtypeName
-    
-    def deleteFileWithBasename(self, filePath):
-        """
-        Function to delete all the files which have a path
-        and base name defined in the filePath attribute.
-
-        """
-        import glob
-        baseName = os.path.splitext(filePath)[0]
-        fileList = glob.glob(baseName+str('.*'))
-        for file in fileList:
-            print("Deleting file: " + str(file))
-            os.remove(file)
-                
-    def deleteDIR(self, dirPath):
-        """
-        A function which will delete a directory, if files and other directories
-        are within the path specified they will be recursively deleted as well.
-        So be careful you don't delete things within meaning it.
-
-        """
-        for root, dirs, files in os.walk(dirPath, topdown=False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        os.rmdir(dirPath)
-        print("Deleted " + dirPath)
-        
-    def renameGDALLayer(self, cFileName, oFileName):
-        """
-        Rename all the files associated with a GDAL layer.
-
-        :param cFileName: The current name of the GDAL layer.
-        :param oFileName: The output name of the GDAL layer.
-
-        """
-        layerDS = gdal.Open(cFileName, gdal.GA_ReadOnly)
-        gdalDriver = layerDS.GetDriver()
-        layerDS = None
-        gdalDriver.Rename(oFileName, cFileName)
-
-    def getRSGISLibDataType(self, gdaltype):
-        """
-        Convert from GDAL data type string to RSGISLib data type int.
-
-        :return: int
-
-        """
-        gdaltype = gdaltype.lower()
-        if gdaltype == 'int8':
-            return TYPE_8INT
-        elif gdaltype == 'int16':
-            return TYPE_16INT
-        elif gdaltype == 'int32':
-            return TYPE_32INT
-        elif gdaltype == 'int64':
-            return TYPE_64INT
-        elif gdaltype == 'byte' or gdaltype == 'uint8':
-            return TYPE_8UINT
-        elif gdaltype == 'uint16':
-            return TYPE_16UINT
-        elif gdaltype == 'uint32':
-            return TYPE_32UINT
-        elif gdaltype == 'uint64':
-            return TYPE_64UINT
-        elif gdaltype == 'float32':
-            return TYPE_32FLOAT
-        elif gdaltype == 'float64':
-            return TYPE_64FLOAT
-        else:
-            raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
-
-    def getGDALDataType(self, rsgislib_datatype):
-        """
-        Convert from RSGIS data type to GDAL data type int.
-
-        :return: int
-
-        """
-        if rsgislib_datatype == TYPE_16INT:
-            return gdal.GDT_Int16
-        elif rsgislib_datatype == TYPE_32INT:
-            return gdal.GDT_Int32
-        elif rsgislib_datatype == TYPE_8UINT:
-            return gdal.GDT_Byte
-        elif rsgislib_datatype == TYPE_16UINT:
-            return gdal.GDT_UInt16
-        elif rsgislib_datatype == TYPE_32UINT:
-            return gdal.GDT_UInt32
-        elif rsgislib_datatype == TYPE_32FLOAT:
-            return gdal.GDT_Float32
-        elif rsgislib_datatype == TYPE_64FLOAT:
-            return gdal.GDT_Float64
-        else:
-            raise RSGISPyException("The data type '" + str(rsgislib_datatype) + "' is unknown / not supported.")
-
-    def getNumpyDataType(self, rsgislib_datatype):
-        """
-        Convert from RSGISLib data type to numpy datatype
-
-        :param rsgis_datatype:
-        :return: numpy datatype
-        """
-        import numpy
+    :param rsgis_datatype:
+    :return: numpy datatype
+    """
+    import numpy
+    numpyDT = numpy.float32
+    if rsgislib_datatype == TYPE_8INT:
+        numpyDT = numpy.int8
+    elif rsgislib_datatype == TYPE_16INT:
+        numpyDT = numpy.int16
+    elif rsgislib_datatype == TYPE_32INT:
+        numpyDT = numpy.int32
+    elif rsgislib_datatype == TYPE_64INT:
+        numpyDT = numpy.int64
+    elif rsgislib_datatype == TYPE_8UINT:
+        numpyDT = numpy.uint8
+    elif rsgislib_datatype == TYPE_16UINT:
+        numpyDT = numpy.uint16
+    elif rsgislib_datatype == TYPE_32UINT:
+        numpyDT = numpy.uint32
+    elif rsgislib_datatype == TYPE_64UINT:
+        numpyDT = numpy.uint64
+    elif rsgislib_datatype == TYPE_32FLOAT:
         numpyDT = numpy.float32
-        if rsgislib_datatype == TYPE_8INT:
-            numpyDT = numpy.int8
-        elif rsgislib_datatype == TYPE_16INT:
-            numpyDT = numpy.int16
-        elif rsgislib_datatype == TYPE_32INT:
-            numpyDT = numpy.int32
-        elif rsgislib_datatype == TYPE_64INT:
-            numpyDT = numpy.int64
-        elif rsgislib_datatype == TYPE_8UINT:
-            numpyDT = numpy.uint8
-        elif rsgislib_datatype == TYPE_16UINT:
-            numpyDT = numpy.uint16
-        elif rsgislib_datatype == TYPE_32UINT:
-            numpyDT = numpy.uint32
-        elif rsgislib_datatype == TYPE_64UINT:
-            numpyDT = numpy.uint64
-        elif rsgislib_datatype == TYPE_32FLOAT:
-            numpyDT = numpy.float32
-        elif rsgislib_datatype == TYPE_64FLOAT:
-            numpyDT = numpy.float64
-        else:
-            raise Exception('Datatype was not recognised.')
-        return numpyDT
+    elif rsgislib_datatype == TYPE_64FLOAT:
+        numpyDT = numpy.float64
+    else:
+        raise Exception('Datatype was not recognised.')
+    return numpyDT
 
-    def getNumpyCharCodesDataType(self, rsgislib_datatype):
-        """
-        Convert from RSGISLib data type to numpy datatype
+def get_numpy_char_codes_datatype(rsgislib_datatype):
+    """
+    Convert from RSGISLib data type to numpy datatype
 
-        :param rsgis_datatype:
-        :return: numpy character code datatype
-        """
-        import numpy
+    :param rsgis_datatype:
+    :return: numpy character code datatype
+    """
+    import numpy
+    numpyDT = numpy.dtype(numpy.float32).char
+    if rsgislib_datatype == TYPE_8INT:
+        numpyDT = numpy.dtype(numpy.int8).char
+    elif rsgislib_datatype == TYPE_16INT:
+        numpyDT = numpy.dtype(numpy.int16).char
+    elif rsgislib_datatype == TYPE_32INT:
+        numpyDT = numpy.dtype(numpy.int32).char
+    elif rsgislib_datatype == TYPE_64INT:
+        numpyDT = numpy.dtype(numpy.int64).char
+    elif rsgislib_datatype == TYPE_8UINT:
+        numpyDT = numpy.dtype(numpy.uint8).char
+    elif rsgislib_datatype == TYPE_16UINT:
+        numpyDT = numpy.dtype(numpy.uint16).char
+    elif rsgislib_datatype == TYPE_32UINT:
+        numpyDT = numpy.dtype(numpy.uint32).char
+    elif rsgislib_datatype == TYPE_64UINT:
+        numpyDT = numpy.dtype(numpy.uint64).char
+    elif rsgislib_datatype == TYPE_32FLOAT:
         numpyDT = numpy.dtype(numpy.float32).char
-        if rsgislib_datatype == TYPE_8INT:
-            numpyDT = numpy.dtype(numpy.int8).char
-        elif rsgislib_datatype == TYPE_16INT:
-            numpyDT = numpy.dtype(numpy.int16).char
-        elif rsgislib_datatype == TYPE_32INT:
-            numpyDT = numpy.dtype(numpy.int32).char
-        elif rsgislib_datatype == TYPE_64INT:
-            numpyDT = numpy.dtype(numpy.int64).char
-        elif rsgislib_datatype == TYPE_8UINT:
-            numpyDT = numpy.dtype(numpy.uint8).char
-        elif rsgislib_datatype == TYPE_16UINT:
-            numpyDT = numpy.dtype(numpy.uint16).char
-        elif rsgislib_datatype == TYPE_32UINT:
-            numpyDT = numpy.dtype(numpy.uint32).char
-        elif rsgislib_datatype == TYPE_64UINT:
-            numpyDT = numpy.dtype(numpy.uint64).char
-        elif rsgislib_datatype == TYPE_32FLOAT:
-            numpyDT = numpy.dtype(numpy.float32).char
-        elif rsgislib_datatype == TYPE_64FLOAT:
-            numpyDT = numpy.dtype(numpy.float64).char
-        else:
-            raise Exception('Datatype was not recognised.')
-        return numpyDT
-    
-    def getImageRes(self, inImg):
-        """
-        A function to retrieve the image resolution.
-
-        :return: xRes, yRes
-
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        
-        geotransform = rasterDS.GetGeoTransform()
-        xRes = geotransform[1]
-        yRes = geotransform[5]
-        if yRes < 0:
-            yRes = yRes * -1
-        rasterDS = None
-        return xRes, yRes
-    
-    def doImageResMatch(self, img1, img2):
-        """
-        A function to test whether two images have the same
-        image pixel resolution.
-
-        :return: boolean
-
-        """
-        img1XRes, img1YRes = self.getImageRes(img1)
-        img2XRes, img2YRes = self.getImageRes(img2)
-
-        return ((img1XRes == img2XRes) and (img1YRes == img2YRes))
-    
-    def getImageSize(self, inImg):
-        """
-        A function to retrieve the image size in pixels.
-
-        :return: xSize, ySize
-
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        
-        xSize = rasterDS.RasterXSize
-        ySize = rasterDS.RasterYSize
-        rasterDS = None
-        return xSize, ySize
-        
-    def getImageBBOX(self, inImg):
-        """
-        A function to retrieve the bounding box in the spatial 
-        coordinates of the image.
-
-        :return: (MinX, MaxX, MinY, MaxY)
-
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        
-        xSize = rasterDS.RasterXSize
-        ySize = rasterDS.RasterYSize
-        
-        geotransform = rasterDS.GetGeoTransform()
-        tlX = geotransform[0]
-        tlY = geotransform[3]
-        xRes = geotransform[1]
-        yRes = geotransform[5]
-        if yRes < 0:
-            yRes = yRes * -1
-        rasterDS = None
-        
-        brX = tlX + (xRes * xSize)
-        brY = tlY - (yRes * ySize)
-        
-        return [tlX, brX, brY, tlY]
-    
-    def getImageBBOXInProj(self, inImg, outEPSG):
-        """
-        A function to retrieve the bounding box in the spatial 
-        coordinates of the image.
-
-        :return: (MinX, MaxX, MinY, MaxY)
-
-        """
-        inProjWKT = self.getWKTProjFromImage(inImg)
-        inSpatRef = osr.SpatialReference()
-        inSpatRef.ImportFromWkt(inProjWKT)
-        
-        outSpatRef = osr.SpatialReference()
-        outSpatRef.ImportFromEPSG(int(outEPSG))
-
-        img_bbox = self.getImageBBOX(inImg)
-        reproj_img_bbox = self.reprojBBOX(img_bbox, inSpatRef, outSpatRef)
-        return reproj_img_bbox
-        
-    def reprojBBOX(self, bbox, inProjObj, outProjObj):
-        """
-        A function to reproject a bounding box.
-
-        :param bbox: input bounding box (MinX, MaxX, MinY, MaxY)
-        :param inProjObj: an osr.SpatialReference() object representing input projection.
-        :param outProjObj: an osr.SpatialReference() object representing output projection.
-
-        :return: (MinX, MaxX, MinY, MaxY)
-
-        """
-        tlX = bbox[0]
-        tlY = bbox[3]
-        trX = bbox[1]
-        trY = bbox[3]
-        brX = bbox[1]
-        brY = bbox[2]
-        blX = bbox[0]
-        blY = bbox[2]
-
-        out_tlX, out_tlY = self.reprojPoint(inProjObj, outProjObj, tlX, tlY)
-        out_trX, out_trY = self.reprojPoint(inProjObj, outProjObj, trX, trY)
-        out_brX, out_brY = self.reprojPoint(inProjObj, outProjObj, brX, brY)
-        out_blX, out_blY = self.reprojPoint(inProjObj, outProjObj, blX, blY)
-
-        minX = out_tlX
-        if out_blX < minX:
-            minX = out_blX
-
-        maxX = out_brX
-        if out_trX > maxX:
-            maxX = out_trX
-
-        minY = out_brY
-        if out_blY < minY:
-            minY = out_blY
-
-        maxY = out_tlY
-        if out_trY > maxY:
-            maxY = out_trY
-
-        return [minX, maxX, minY, maxY]
-
-    def reprojBBOX_epsg(self, bbox, inEPSG, outEPSG):
-        """
-        A function to reproject a bounding box.
-
-        :param bbox: input bounding box (MinX, MaxX, MinY, MaxY)
-        :param inEPSG: an EPSG code representing input projection.
-        :param outEPSG: an EPSG code representing output projection.
-        :return: (MinX, MaxX, MinY, MaxY)
-
-        """
-        inProjObj = osr.SpatialReference()
-        inProjObj.ImportFromEPSG(int(inEPSG))
-
-        outProjObj = osr.SpatialReference()
-        outProjObj.ImportFromEPSG(int(outEPSG))
-
-        out_bbox = self.reprojBBOX(bbox, inProjObj, outProjObj)
-        return out_bbox
-
-    def do_bboxes_intersect(self, bbox1, bbox2):
-        """
-        A function which tests whether two bboxes (MinX, MaxX, MinY, MaxY) intersect.
-
-        :param bbox1: The first bounding box (MinX, MaxX, MinY, MaxY)
-        :param bbox2: The first bounding box (MinX, MaxX, MinY, MaxY)
-        :return: boolean (True they intersect; False they do not intersect)
-
-        """
-        x_min = 0
-        x_max = 1
-        y_min = 2
-        y_max = 3
-        intersect = ((bbox1[x_max] > bbox2[x_min]) and (bbox2[x_max] > bbox1[x_min]) and (
-                    bbox1[y_max] > bbox2[y_min]) and (bbox2[y_max] > bbox1[y_min]))
-        return intersect
-
-    def bbox_intersection(self, bbox1, bbox2):
-        """
-        A function which calculates the intersection of the two bboxes (xMin, xMax, yMin, yMax).
-
-        :param bbox1: is a bbox (xMin, xMax, yMin, yMax)
-        :param bbox2: is a bbox (xMin, xMax, yMin, yMax)
-        :return: bbox (xMin, xMax, yMin, yMax)
-
-        """
-        if not self.do_bboxes_intersect(bbox1, bbox2):
-            raise Exception("Bounding Boxes do not intersect.")
-
-        xMinOverlap = bbox1[0]
-        xMaxOverlap = bbox1[1]
-        yMinOverlap = bbox1[2]
-        yMaxOverlap = bbox1[3]
-
-        if bbox2[0] > xMinOverlap:
-            xMinOverlap = bbox2[0]
-
-        if bbox2[1] < xMaxOverlap:
-            xMaxOverlap = bbox2[1]
-
-        if bbox2[2] > yMinOverlap:
-            yMinOverlap = bbox2[2]
-
-        if bbox2[3] < yMaxOverlap:
-            yMaxOverlap = bbox2[3]
-
-        return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
-
-    def bboxes_intersection(self, bboxes):
-        """
-        A function to find the intersection between a list of
-        bboxes.
-
-        :param bboxes: a list of bboxes [(xMin, xMax, yMin, yMax)]
-        :return: bbox (xMin, xMax, yMin, yMax)
-
-        """
-        if len(bboxes) == 1:
-            return bboxes[0]
-        elif len(bboxes) == 2:
-            return self.bbox_intersection(bboxes[0], bboxes[1])
-
-        inter_bbox = bboxes[0]
-        for bbox in bboxes[1:]:
-            inter_bbox = self.bbox_intersection(inter_bbox, bbox)
-        return inter_bbox
-
-    def buffer_bbox(self, bbox, buf):
-        """
-        Buffer the input BBOX by a set amount.
-
-        :param bbox: the bounding box (MinX, MaxX, MinY, MaxY)
-        :param buf: the amount of buffer by
-        :return: the buffered bbox (MinX, MaxX, MinY, MaxY)
-
-        """
-        out_bbox = [0, 0, 0, 0]
-        out_bbox[0] = bbox[0] - buf
-        out_bbox[1] = bbox[1] + buf
-        out_bbox[2] = bbox[2] - buf
-        out_bbox[3] = bbox[3] + buf
-        return out_bbox
-        
-    def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
-        """
-        Get the extent of the vector layer.
-        
-        :param inVec: is a string with the input vector file name and path.
-        :param layerName: is the layer for which extent is to be calculated (Default: None)
-                          if None assume there is only one layer and that will be read.
-        :param computeIfExp: is a boolean which specifies whether the layer extent
-                             should be calculated (rather than estimated from header)
-                             even if that operation is computationally expensive.
-        :return: boundary box is returned (MinX, MaxX, MinY, MaxY)
-        
-        """
-        inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
-        if layerName is not None:
-            inLayer = inDataSource.GetLayer(layerName)
-        else:
-            inLayer = inDataSource.GetLayer()
-        extent = inLayer.GetExtent(computeIfExp)
-        return extent
-        
-    def getVecFeatCount(self, inVec, layerName=None, computeCount=True):
-        """
-        Get a count of the number of features in the vector layers.
-        
-        :param inVec: is a string with the input vector file name and path.
-        :param layerName: is the layer for which extent is to be calculated (Default: None)
-                          if None assume there is only one layer and that will be read.
-        :param computeCount: is a boolean which specifies whether the layer extent
-                             should be calculated (rather than estimated from header)
-                             even if that operation is computationally expensive.
-        
-        :return: nfeats
-        
-        """
-        inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
-        if layerName is not None:
-            inLayer = inDataSource.GetLayer(layerName)
-        else:
-            inLayer = inDataSource.GetLayer()
-        nFeats = inLayer.GetFeatureCount(computeCount)
-        return nFeats
-
-    def findCommonExtentOnGrid(self, baseExtent, baseGrid, otherExtent, fullContain=True):
-        """
-        A function which calculates the common extent between two extents but defines output on 
-        grid with defined resolutions. Useful for finding common extent on a particular image grid.
-        
-        :param baseExtent: is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
-        :param baseGrid: the size of the (square) grid on which output will be defined.
-        :param otherExtent: is a bbox (xMin, xMax, yMin, yMax) to be intersected with the baseExtent.
-        :param fullContain: is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
-                                          False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
-        
-        :return: bbox (xMin, xMax, yMin, yMax)
-
-        """
-        xMinOverlap = baseExtent[0]
-        xMaxOverlap = baseExtent[1]
-        yMinOverlap = baseExtent[2]
-        yMaxOverlap = baseExtent[3]
-        
-        if otherExtent[0] > xMinOverlap:
-            if fullContain:
-                diff = math.floor((otherExtent[0] - xMinOverlap)/baseGrid)*baseGrid
-            else:   
-                diff = math.ceil((otherExtent[0] - xMinOverlap)/baseGrid)*baseGrid
-            xMinOverlap = xMinOverlap + diff
-        
-        if otherExtent[1] < xMaxOverlap:
-            if fullContain:
-                diff = math.floor((xMaxOverlap - otherExtent[1])/baseGrid)*baseGrid
-            else:
-                diff = math.ceil((xMaxOverlap - otherExtent[1])/baseGrid)*baseGrid
-            xMaxOverlap = xMaxOverlap - diff
-        
-        if otherExtent[2] > yMinOverlap:
-            if fullContain:
-                diff = math.floor(abs(otherExtent[2] - yMinOverlap)/baseGrid)*baseGrid
-            else:
-                diff = math.ceil(abs(otherExtent[2] - yMinOverlap)/baseGrid)*baseGrid
-            yMinOverlap = yMinOverlap + diff
-        
-        if otherExtent[3] < yMaxOverlap:
-            if fullContain:
-                diff = math.floor(abs(yMaxOverlap - otherExtent[3])/baseGrid)*baseGrid
-            else:
-                diff = math.ceil(abs(yMaxOverlap - otherExtent[3])/baseGrid)*baseGrid
-            yMaxOverlap = yMaxOverlap - diff
-    
-        return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
-    
-    def findExtentOnGrid(self, baseExtent, baseGrid, fullContain=True):
-        """
-        A function which calculates the extent but defined on a grid with defined resolution. 
-        Useful for finding extent on a particular image grid.
-        
-        :param baseExtent: is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
-        :param baseGrid: the size of the (square) grid on which output will be defined.
-        :param fullContain: is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
-                                          False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
-        
-        :return: bbox (xMin, xMax, yMin, yMax)
-
-        """
-        xMin = baseExtent[0]
-        xMax = baseExtent[1]
-        yMin = baseExtent[2]
-        yMax = baseExtent[3]
-        
-        diffX = xMax - xMin
-        diffY = abs(yMax - yMin)
-        
-        nPxlX = 0.0
-        nPxlY = 0.0
-        if fullContain:
-            nPxlX = math.ceil(diffX/baseGrid)
-            nPxlY = math.ceil(diffY/baseGrid)
-        else:
-            nPxlX = math.floor(diffX/baseGrid)
-            nPxlY = math.floor(diffY/baseGrid)
-        
-        xMaxOut = xMin + (nPxlX * baseGrid)
-        yMinOut = yMax - (nPxlY * baseGrid)
-    
-        return [xMin, xMaxOut, yMinOut, yMax]
-
-    def findExtentOnWholeNumGrid(self, baseExtent, baseGrid, fullContain=True, round_vals=None):
-        """
-        A function which calculates the extent but defined on a grid with defined resolution.
-        Useful for finding extent on a particular image grid.
-
-        :param baseExtent: is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
-        :param baseGrid: the size of the (square) grid on which output will be defined.
-        :param fullContain: is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
-                                          False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
-        :param round_vals: specify whether outputted values should be rounded. None for no rounding (default) or integer for number of
-                           significant figures to round to.
-
-        :return: bbox (xMin, xMax, yMin, yMax)
-
-        """
-        xMin = baseExtent[0]
-        xMax = baseExtent[1]
-        yMin = baseExtent[2]
-        yMax = baseExtent[3]
-
-        nPxlXMin = math.floor(xMin / baseGrid)
-        nPxlYMin = math.floor(yMin / baseGrid)
-
-        xMinOut = nPxlXMin * baseGrid
-        yMinOut = nPxlYMin * baseGrid
-
-        diffX = xMax - xMinOut
-        diffY = abs(yMax - yMinOut)
-
-        nPxlX = 0.0
-        nPxlY = 0.0
-        if fullContain:
-            nPxlX = math.ceil(diffX / baseGrid)
-            nPxlY = math.ceil(diffY / baseGrid)
-        else:
-            nPxlX = math.floor(diffX / baseGrid)
-            nPxlY = math.floor(diffY / baseGrid)
-
-        xMaxOut = xMinOut + (nPxlX * baseGrid)
-        yMaxOut = yMinOut + (nPxlY * baseGrid)
-
-        if round_vals is None:
-            out_bbox = [xMinOut, xMaxOut, yMinOut, yMaxOut]
-        else:
-            out_bbox = [round(xMinOut, round_vals), round(xMaxOut, round_vals), round(yMinOut, round_vals),
-                        round(yMaxOut, round_vals)]
-        return out_bbox
-
-    def getBBoxGrid(self, bbox, x_size, y_size):
-        """
-        Create a grid with size x_size, y_size for the area represented by bbox.
-
-        :param bbox: a bounding box within which the grid will be created (xMin, xMax, yMin, yMax)
-        :param x_size: Output grid size in X axis (same unit as bbox).
-        :param y_size: Output grid size in Y axis (same unit as bbox).
-
-        :return: list of bounding boxes (xMin, xMax, yMin, yMax)
-
-        """
-        width = bbox[1] - bbox[0]
-        height = bbox[3] - bbox[2]
-
-        n_tiles_x = math.floor(width / x_size)
-        n_tiles_y = math.floor(height / y_size)
-
-        if (n_tiles_x > 10000) or (n_tiles_y > 10000):
-            print("WARNING: did you mean to product so many tiles (X: {}, Y: {}) "
-                  "might want to check your units".format(n_tiles_x, n_tiles_y))
-
-        full_tile_width = n_tiles_x * x_size
-        full_tile_height = n_tiles_y * y_size
-
-        x_remain = width - full_tile_width
-        if x_remain < 0.000001:
-            x_remain = 0.0
-        y_remain = height - full_tile_height
-        if y_remain < 0.000001:
-            y_remain = 0.0
-
-        c_min_y = bbox[2]
-        c_max_y = c_min_y + y_size
-
-        bboxs = list()
-        for ny in range(n_tiles_y):
-            c_min_x = bbox[0]
-            c_max_x = c_min_x + x_size
-            for nx in range(n_tiles_x):
-                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
-                c_min_x = c_max_x
-                c_max_x = c_max_x + x_size
-            if x_remain > 0:
-                c_max_x = c_min_x + x_remain
-                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
-            c_min_y = c_max_y
-            c_max_y = c_max_y + y_size
-        if y_remain > 0:
-            c_max_y = c_min_y + y_remain
-            c_min_x = bbox[0]
-            c_max_x = c_min_x + x_size
-            for nx in range(n_tiles_x):
-                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
-                c_min_x = c_max_x
-                c_max_x = c_max_x + x_size
-            if x_remain > 0:
-                c_max_x = c_min_x + x_remain
-                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
-
-        return bboxs
-
-    def reprojPoint(self, inProjOSRObj, outProjOSRObj, x, y):
-        """
-        Reproject a point from 'inProjOSRObj' to 'outProjOSRObj' where they are gdal
-        osgeo.osr.SpatialReference objects. 
-        
-        :return: x, y. (note if returning long, lat you might need to invert)
-
-        """
-        if inProjOSRObj.EPSGTreatsAsLatLong():
-            wktPt = 'POINT(%s %s)' % (y, x)
-        else:
-            wktPt = 'POINT(%s %s)' % (x, y)
-        point = ogr.CreateGeometryFromWkt(wktPt)
-        point.AssignSpatialReference(inProjOSRObj)
-        point.TransformTo(outProjOSRObj)
-        if outProjOSRObj.EPSGTreatsAsLatLong():
-            outX = point.GetY()
-            outY = point.GetX()
-        else:
-            outX = point.GetX()
-            outY = point.GetY()
-        return outX, outY
-
-    def getImageBandStats(self, img, band, compute=True):
-        """
-        A function which calls the GDAL function on the band selected to calculate the pixel stats
-        (min, max, mean, standard deviation). 
-        
-        :param img: input image file path
-        :param band: specified image band for which stats are to be calculated (starts at 1).
-        :param compute: whether the stats should be calculated (True; Default) or an approximation or pre-calculated stats are OK (False).
-        
-        :return: stats (min, max, mean, stddev)
-
-        """
-        img_ds = gdal.Open(img, gdal.GA_ReadOnly)
-        if img_ds is None:
-            raise Exception("Could not open image: '{}'".format(img))
-        n_bands = img_ds.RasterCount
-        
-        if band > 0 and band <= n_bands:
-            img_band = img_ds.GetRasterBand(band)
-            if img_band is None:
-                raise Exception("Could not open image band ('{0}') from : '{1}'".format(band, img))
-            img_stats = img_band.ComputeStatistics((not compute))
-        else:
-            raise Exception("Band specified is not within the image: '{}'".format(img))
-        return img_stats
-    
-    
-    def getImageBandCount(self, inImg):
-        """
-        A function to retrieve the number of image bands in an image file.
-
-        :return: nBands
-
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        
-        nBands = rasterDS.RasterCount
-        rasterDS = None
-        return nBands
-        
-    def getImageNoDataValue(self, inImg, band=1):
-        """
-        A function to retrieve the no data value for the image 
-        (from band; default 1).
-
-        :return: number
-
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        
-        noDataVal = rasterDS.GetRasterBand(band).GetNoDataValue()
-        rasterDS = None
-        return noDataVal
-
-    def setImageNoDataValue(self, inImg, noDataValue, band=None):
-        """
-        A function to set the no data value for an image.
-        If band is not specified sets value for all bands.
-
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_Update)
-        if rasterDS is None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg + '\'')
-
-        if band is not None:
-            rasterDS.GetRasterBand(band).SetNoDataValue(noDataValue)
-        else:
-            for b in range(rasterDS.RasterCount):
-                rasterDS.GetRasterBand(b+1).SetNoDataValue(noDataValue)
-
-        rasterDS = None
-    
-    def getImgBandColourInterp(self, inImg, band):
-        """
-        A function to get the colour interpretation for a specific band.
-
-        :return: is a GDALColorInterp value:
-        
-        * GCI_Undefined=0, 
-        * GCI_GrayIndex=1, 
-        * GCI_PaletteIndex=2, 
-        * GCI_RedBand=3, 
-        * GCI_GreenBand=4, 
-        * GCI_BlueBand=5, 
-        * GCI_AlphaBand=6, 
-        * GCI_HueBand=7, 
-        * GCI_SaturationBand=8, 
-        * GCI_LightnessBand=9, 
-        * GCI_CyanBand=10, 
-        * GCI_MagentaBand=11, 
-        * GCI_YellowBand=12, 
-        * GCI_BlackBand=13, 
-        * GCI_YCbCr_YBand=14, 
-        * GCI_YCbCr_CbBand=15, 
-        * GCI_YCbCr_CrBand=16, 
-        * GCI_Max=16 
-         
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if rasterDS is None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg + '\'')
-        clrItrpVal = rasterDS.GetRasterBand(band).GetRasterColorInterpretation()
-        rasterDS = None
-        return clrItrpVal
-        
-    def setImgBandColourInterp(self, inImg, band, clrItrpVal):
-        """
-        A function to set the colour interpretation for a specific band.
-        input is a GDALColorInterp value:
-        
-        * GCI_Undefined=0, 
-        * GCI_GrayIndex=1, 
-        * GCI_PaletteIndex=2, 
-        * GCI_RedBand=3, 
-        * GCI_GreenBand=4, 
-        * GCI_BlueBand=5, 
-        * GCI_AlphaBand=6, 
-        * GCI_HueBand=7, 
-        * GCI_SaturationBand=8, 
-        * GCI_LightnessBand=9, 
-        * GCI_CyanBand=10, 
-        * GCI_MagentaBand=11, 
-        * GCI_YellowBand=12, 
-        * GCI_BlackBand=13, 
-        * GCI_YCbCr_YBand=14, 
-        * GCI_YCbCr_CbBand=15, 
-        * GCI_YCbCr_CrBand=16, 
-        * GCI_Max=16 
-         
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_Update)
-        if rasterDS is None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg + '\'')
-        rasterDS.GetRasterBand(band).SetColorInterpretation(clrItrpVal)
-        rasterDS = None
-    
-    def getWKTProjFromImage(self, inImg):
-        """
-        A function which returns the WKT string representing the projection 
-        of the input image.
-
-        :return: string
-
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        projStr = rasterDS.GetProjection()
-        rasterDS = None
-        return projStr
-    
-    def getImageFiles(self, inImg):
-        """
-        A function which returns a list of the files associated (e.g., header etc.) 
-        with the input image file.
-
-        :return: lists
-
-        """
-        imgDS = gdal.Open(inImg)
-        fileList = imgDS.GetFileList()
-        imgDS = None
-        return fileList
-    
-    def getUTMZone(self, inImg):
-        """
-        A function which returns a string with the UTM (XXN | XXS) zone of the input image 
-        but only if it is projected within the UTM projection/coordinate system.
-
-        :return: string
-
-        """
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        projStr = rasterDS.GetProjection()
-        rasterDS = None
-    
-        spatRef = osr.SpatialReference()
-        spatRef.ImportFromWkt(projStr)
-        utmZone = None
-        if spatRef.IsProjected():
-            projName = spatRef.GetAttrValue('projcs')
-            zone = spatRef.GetUTMZone()
-            if zone != 0:
-                if zone < 0:
-                    utmZone = str(zone*(-1))
-                    if len(utmZone) == 1:
-                        utmZone = '0' + utmZone
-                    utmZone = utmZone+'S'
-                else:
-                    utmZone = str(zone)
-                    if len(utmZone) == 1:
-                        utmZone = '0' + utmZone
-                    utmZone = utmZone+'N'
-        return utmZone
-    
-    def getEPSGCode(self, gdalLayer):
-        """
-        Using GDAL to return the EPSG code for the input layer.
-
-        :return: EPSG code
-
-        """
-        epsgCode = None
-        try:
-            layerDS = gdal.Open(gdalLayer, gdal.GA_ReadOnly)
-            if layerDS == None:
-                raise RSGISPyException('Could not open raster image: \'' + gdalLayer+ '\'')
-            projStr = layerDS.GetProjection()
-            layerDS = None
-            
-            spatRef = osr.SpatialReference()
-            spatRef.ImportFromWkt(projStr)            
-            spatRef.AutoIdentifyEPSG()
-            epsgCode = spatRef.GetAuthorityCode(None)
-            if epsgCode is not None:
-                epsgCode = int(epsgCode)
-        except Exception:
-            epsgCode = None
-        return epsgCode
-        
-    def doGDALLayersHaveSameProj(self, layer1, layer2):
-        """
-        A function which tests whether two gdal compatiable layers are in the same
-        projection/coordinate system. This is done using the GDAL SpatialReference
-        function AutoIdentifyEPSG. If the identified EPSG codes are different then 
-        False is returned otherwise True.
-
-        :return: boolean
-
-        """
-        layer1EPSG = self.getEPSGCode(layer1)
-        layer2EPSG = self.getEPSGCode(layer2)
-        
-        sameEPSG = False
-        if layer1EPSG == layer2EPSG:
-            sameEPSG = True
-        
-        return sameEPSG
-        
-    def getProjWKTFromVec(self, inVec, vecLyr=None):
-        """
-        A function which gets the WKT projection from the inputted vector file.
-        
-        :param inVec: is a string with the input vector file name and path.
-        :param vecLyr: is a string with the input vector layer name, if None then first layer read. (default: None)
-        
-        :return: WKT representation of projection
-
-        """
-        dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR )
-        if dataset is None:
-            raise Exception("Could not open file: {}".format(inVec))
-        if vecLyr is None:
-            layer = dataset.GetLayer()
-        else:
-            layer = dataset.GetLayer(vecLyr)
-        if layer is None:
-            raise Exception("Could not open layer within file: {}".format(inVec))
-        spatialRef = layer.GetSpatialRef()
-        return spatialRef.ExportToWkt()
-
-    def getProjEPSGFromVec(self, inVec, vecLyr=None):
-        """
-        A function which gets the EPSG projection from the inputted vector file.
-
-        :param inVec: is a string with the input vector file name and path.
-        :param vecLyr: is a string with the input vector layer name, if None then first layer read. (default: None)
-
-        :return: EPSG representation of projection
-
-        """
-        dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR)
-        if dataset is None:
-            raise Exception("Could not open file: {}".format(inVec))
-        if vecLyr is None:
-            layer = dataset.GetLayer()
-        else:
-            layer = dataset.GetLayer(vecLyr)
-        if layer is None:
-            raise Exception("Could not open layer within file: {}".format(inVec))
-        spatialRef = layer.GetSpatialRef()
-        spatialRef.AutoIdentifyEPSG()
-        return spatialRef.GetAuthorityCode(None)
-        
-    def getEPSGCodeFromWKT(self, wktString):
-        """
-        Using GDAL to return the EPSG code for inputted WKT string.
-
-        :return: the EPSG code.
-
-        """
-        epsgCode = None
-        try:        
-            spatRef = osr.SpatialReference()
-            spatRef.ImportFromWkt(wktString)            
-            spatRef.AutoIdentifyEPSG()
-            epsgCode = spatRef.GetAuthorityCode(None)
-        except Exception:
-            epsgCode = None
-        return epsgCode
-        
-    def getWKTFromEPSGCode(self, epsgCode):
-        """
-        Using GDAL to return the WKT string for inputted EPSG Code.
-        
-        :param epsgCode: integer variable of the epsg code.
-
-        :return: string with WKT representation of the projection.
-
-        """
-        wktString = None
-        try:        
-            spatRef = osr.SpatialReference()
-            spatRef.ImportFromEPSG(epsgCode)            
-            wktString = spatRef.ExportToWkt()
-        except Exception:
-            wktString = None
-        return wktString
-    
-    def uidGenerator(self, size=6):
-        """
-        A function which will generate a 'random' string of the specified length based on the UUID
-
-        :param size: the length of the returned string.
-        :return: string of length size.
-
-        """
-        import uuid
-        randomStr = str(uuid.uuid4())
-        randomStr = randomStr.replace("-","")
-        return randomStr[0:size]
-    
-    def isNumber(self, strVal):
-        """
-        A function which tests whether the input string contains a number of not.
-
-        :return: boolean
-
-        """
-        try:
-            float(strVal) # for int, long and float
-        except ValueError:
-            try:
-                complex(strVal) # for complex
-            except ValueError:
-                return False
-        return True
-    
-    def getEnvironmentVariable(self, var):
-        """
-        A function to get an environmental variable, if variable is not present returns None.
-
-        :return: value of env var.
-
-        """
-        outVar = None
-        try:
-            outVar = os.environ[var]
-        except Exception:
-            outVar = None
-        return outVar
-    
-    def numProcessCores(self):
-        """
-        A functions which returns the number of processing cores available on the machine
-
-        :return: int
-
-        """
-        import multiprocessing
-        return multiprocessing.cpu_count()
-        
-    def readTextFileNoNewLines(self, file):
-        """
-        Read a text file into a single string
-        removing new lines.
-
-        :param file: File path to the input file.
-        :return: string
-
-        """
-        txtStr = ""
-        try:
-            dataFile = open(file, 'r')
-            for line in dataFile:
-                txtStr += line.strip()
-            dataFile.close()
-        except Exception as e:
-            raise e
-        return txtStr
-
-    def readTextFile2List(self, file):
-        """
-        Read a text file into a list where each line 
-        is an element in the list.
-
-        :param file: File path to the input file.
-        :return: list
-
-        """
-        outList = []
-        try:
-            dataFile = open(file, 'r')
-            for line in dataFile:
-                line = line.strip()
-                if line != "":
-                    outList.append(line)
-            dataFile.close()
-        except Exception as e:
-            raise e
-        return outList
-
-    def writeList2File(self, dataList, outFile):
-        """
-        Write a list a text file, one line per item.
-
-        :param dataList: List of values to be written to the output file.
-        :param out_file: File path to the output file.
-
-        """
-        try:
-            f = open(outFile, 'w')
-            for item in dataList:
-               f.write(str(item)+'\n')
-            f.flush()
-            f.close()
-        except Exception as e:
-            raise e
-
-    def writeData2File(self, data_val, out_file):
-        """
-        Write some data (a string or can be converted to a string using str(data_val) to
-        an output text file.
-
-        :param data_val: Data to be written to the output file.
-        :param out_file: File path to the output file.
-
-        """
-        try:
-            f = open(out_file, 'w')
-            f.write(str(data_val)+'\n')
-            f.flush()
-            f.close()
-        except Exception as e:
-            raise e
-
-    def writeDict2JSON(self, data_dict, out_file):
-        """
-        Write some data to a JSON file. The data would commonly be structured as a dict but could also be a list.
-
-        :param data_dict: The dict (or list) to be written to the output JSON file.
-        :param out_file: The file path to the output file.
-
-        """
-        import json
-        with open(out_file, 'w') as fp:
-            json.dump(data_dict, fp, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
-
-    def readJSON2Dict(self, input_file):
-        """
-        Read a JSON file. Will return a list or dict.
-
-        :param input_file: input JSON file path.
-
-        """
-        import json
-        with open(input_file) as f:
-            data = json.load(f)
-        return data
-
-    def findFile(self, dirPath, fileSearch):
-        """
-        Search for a single file with a path using glob. Therefore, the file 
-        path returned is a true path. Within the fileSearch provide the file
-        name with '*' as wildcard(s).
-
-        :return: string
-
-        """
-        import glob
-        files = glob.glob(os.path.join(dirPath, fileSearch))
-        if len(files) != 1:
-            raise RSGISPyException('Could not find a single file ('+fileSearch+'); found ' + str(len(files)) + ' files.')
-        return files[0]
-
-    def findFileNone(self, dirPath, fileSearch):
-        """
-        Search for a single file with a path using glob. Therefore, the file
-        path returned is a true path. Within the fileSearch provide the file
-        name with '*' as wildcard(s). Returns None is not found.
-
-        :return: string
-
-        """
-        import glob
-        import os.path
-        files = glob.glob(os.path.join(dirPath, fileSearch))
-        if len(files) != 1:
-            return None
-        return files[0]
-
-    def createVarList(self, in_vals_lsts, val_dict=None):
-        """
-        A function which will produce a list of dictionaries with all the combinations 
-        of the input variables listed (i.e., the powerset). 
-        
-        :param in_vals_lsts: dictionary with each value having a list of values.
-        :param val_dict: variable used in iterative nature of function which lists
-                         the variable for which are still to be looped through. Would
-                         normally not be provided by the user as default is None. Be
-                         careful if you set as otherwise.
-
-        :returns: list of dictionaries with the same keys are the input but only a
-                  single value will be associate with key rather than a list.
-                   
-        Example::
-
-            seg_vars_ranges = dict()
-            seg_vars_ranges['k'] = [5, 10, 20, 30, 40, 50, 60, 80, 100, 120]
-            seg_vars_ranges['d'] = [10, 20, 50, 100, 200, 1000, 10000]
-            seg_vars_ranges['minsize'] = [5, 10, 20, 50, 100, 200]
-            seg_vars = rsgis_utils.createVarList(seg_vars_ranges)
-        
-        """
-        out_vars = []
-        if (in_vals_lsts is None) and (val_dict is not None):
-            out_val_dict = dict()
-            for key in val_dict.keys():
-                out_val_dict[key] = val_dict[key]
-            out_vars.append(out_val_dict)
-        elif in_vals_lsts is not None:
-            if len(in_vals_lsts.keys()) > 0:
-                key = list(in_vals_lsts.keys())[0]
-                vals_arr = in_vals_lsts[key]
-                next_vals_lsts = dict()
-                for ckey in in_vals_lsts.keys():
-                    if ckey != key:
-                        next_vals_lsts[ckey] = in_vals_lsts[ckey]
-                        
-                if len(next_vals_lsts.keys()) == 0:
-                    next_vals_lsts = None
-                
-                if val_dict is None:
-                    val_dict = dict()
-                
-                for val in vals_arr:
-                    c_val_dict = dict()
-                    for ckey in val_dict.keys():
-                        c_val_dict[ckey] = val_dict[ckey]
-                    c_val_dict[key] = val
-                    c_out_vars = self.createVarList(next_vals_lsts, c_val_dict)
-                    out_vars = out_vars+c_out_vars
-        return out_vars
-
-    def in_bounds(self, x, lower, upper, upper_strict=False):
-        """
-        Checks whether a value is within specified bounds.
-
-        :param x: value or array of values to check.
-        :param lower: lower bound
-        :param upper: upper bound
-        :param upper_strict: True is less than upper; False is less than equal to upper
-
-        :return: boolean
-
-        """
-        import numpy
-        if upper_strict:
-            return lower <= numpy.min(x) and numpy.max(x) < upper
-        else:
-            return lower <= numpy.min(x) and numpy.max(x) <= upper
-
-    def mixed_signs(self, x):
-        """
-        Check whether a list of numbers has a mix of postive and negative values.
-
-        :param x: list of values.
-
-        :return: boolean
-
-        """
-        import numpy
-        return numpy.min(x) < 0 and numpy.max(x) >= 0
-
-    def negative(self, x):
-        """
-        Is the maximum number in the list negative.
-        :param x: list of values
-
-        :return: boolean
-
-        """
-        import numpy
-        return numpy.max(x) < 0
-
-    def isodd(self, number):
-        """
-        A function which tests whether a number is odd
-
-        :param number: number value to test.
-        :return: True = input number is odd; False = input number is even
-
-        """
-        if (number % 2) != 0:
-            return True
-        return False
+    elif rsgislib_datatype == TYPE_64FLOAT:
+        numpyDT = numpy.dtype(numpy.float64).char
+    else:
+        raise Exception('Datatype was not recognised.')
+    return numpyDT
 
 
 class RSGISTime (object):
-    """ Class to calculate run time for a function, format and print out (similar to for XML interface).
+    """
+    Class to calculate run time for a function, format and print out (similar to for XML interface).
 
-        Need to call start before running function and end immediately after.
-        Example::
+    Need to call start before running function and end immediately after.
+    Example::
 
-            t = RSGISTime()
-            t.start()
-            rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, False, 0) 
-            t.end()
-        
-        Note, this is only designed to provide some general feedback, for benchmarking the timeit module
-        is better suited.
+        t = RSGISTime()
+        t.start()
+        rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, False, 0)
+        t.end()
+
+    Note, this is only designed to provide some general feedback, for benchmarking the timeit module
+    is better suited.
 
     """
 
@@ -1649,50 +391,50 @@ class RSGISTime (object):
         self.startTime = time.time()
         self.endTime = time.time()
 
-    def start(self, printStartTime=False):
+    def start(self, print_start_time=False):
         """
         Start timer, optionally printing start time
 
-        :param printStartTime: A boolean specifiying whether the start time should be printed to console.
+        :param print_start_time: A boolean specifying whether the start time should be printed to console.
 
         """
         self.startTime = time.time()
-        if printStartTime:
+        if print_start_time:
             print(time.strftime('Start Time: %H:%M:%S, %a %b %m %Y.'))
 
-    def end(self, reportDiff=True, preceedStr="", postStr=""):
+    def end(self, report_diff=True, precede_str="", post_str=""):
         """ 
         End timer and optionally print difference.
-        If preceedStr or postStr have a value then they will be used instead
-        of the generic wording around the time. 
+        If precedeStr or postStr have a value then they will be used instead of the generic wording around the time.
         
-        preceedStr + time + postStr
+        precede_str + " " + time + " " + postStr
 
-        :param reportDiff: A boolean specifiying whether time difference should be printed to console.
-        :param preceedStr: A string which is printed ahead of time difference
-        :param postStr: A string which is printed after the time difference
+        :param report_diff: A boolean specifiying whether time difference should be printed to console.
+        :param precede_str: A string which is printed ahead of time difference
+        :param post_str: A string which is printed after the time difference
 
         """
         self.endTime = time.time()
-        if reportDiff:
-            self.calcDiff(preceedStr, postStr)
+        if report_diff:
+            self.calc_diff(precede_str, post_str)
 
-    def calcDiff(self, preceedStr="", postStr=""):
+    def calc_diff(self, precede_str="", post_str=""):
         """
         Calculate time difference, format and print.
-        :param preceedStr: A string which is printed ahead of time difference
-        :param postStr: A string which is printed after the time difference
+
+        :param precede_str: A string which is printed ahead of time difference
+        :param post_str: A string which is printed after the time difference
 
         """
         timeDiff = self.endTime - self.startTime
         
         useCustomMss = False
-        if (len(preceedStr) > 0) or (len(postStr) > 0):
+        if (len(precede_str) > 0) or (len(post_str) > 0):
             useCustomMss = True
         
         if timeDiff <= 1:
             if useCustomMss:
-                outStr = preceedStr + str("in less than a second") + postStr
+                outStr = "{} in less than a second {}".format(precede_str, post_str)
                 print(outStr)
             else:
                 print("Algorithm Completed in less than a second.")
@@ -1700,9 +442,9 @@ class RSGISTime (object):
             timeObj = datetime.datetime.utcfromtimestamp(timeDiff)
             timeDiffStr = timeObj.strftime('%H:%M:%S')
             if useCustomMss:
-                print(preceedStr + timeDiffStr + postStr)
+                print("{} {} {}".format(precede_str, timeDiffStr, post_str))
             else:
-                print('Algorithm Completed in %s.'%(timeDiffStr))
+                print('Algorithm Completed in {}.'.format(timeDiffStr))
         
 class TQDMProgressBar(object):
     """
@@ -1711,7 +453,7 @@ class TQDMProgressBar(object):
     def __init__(self):
         self.lprogress = 0
 
-    def setTotalSteps(self,steps):
+    def setTotalSteps(self, steps):
         import tqdm
         self.pbar = tqdm.tqdm(total=steps)
         self.lprogress = 0
@@ -1727,20 +469,20 @@ class TQDMProgressBar(object):
         self.pbar = tqdm.tqdm(total=100)
         self.lprogress = 0
 
-    def setLabelText(self,text):
+    def setLabelText(self, text):
         sys.stdout.write('\n%s\n' % text)
 
     def wasCancelled(self):
         return False
 
-    def displayException(self,trace):
+    def displayException(self, trace):
         sys.stdout.write(trace)
 
-    def displayWarning(self,text):
+    def displayWarning(self, text):
         sys.stdout.write("Warning: %s\n" % text)
 
-    def displayError(self,text):
+    def displayError(self, text):
         sys.stdout.write("Error: %s\n" % text)
 
-    def displayInfo(self,text):
+    def displayInfo(self, text):
         sys.stdout.write("Info: %s\n" % text)

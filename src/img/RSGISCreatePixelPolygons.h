@@ -29,14 +29,8 @@
 
 #include "gdal_priv.h"
 
-#include "utils/RSGISGEOSFactoryGenerator.h"
-
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
-
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/geom/LinearRing.h"
-#include "geos/geom/Polygon.h"
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
@@ -57,21 +51,12 @@ namespace rsgis{namespace img{
 	class DllExport RSGISCreatePixelPolygons : public RSGISCalcImageValue
 	{
 	public: 
-		RSGISCreatePixelPolygons(std::vector<geos::geom::Polygon*> *polys, float threshold);
-		void calcImageValue(float *bandValues, int numBands, double *output);
-		void calcImageValue(float *bandValues, int numBands);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent);
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent);
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
+		RSGISCreatePixelPolygons(std::vector<OGRPolygon*> *polys, float threshold);
+		void calcImageValue(float *bandValues, int numBands, OGREnvelope extent);
 		~RSGISCreatePixelPolygons();
 	protected:
-		geos::geom::Polygon* createPolygonFromEnv(geos::geom::Envelope env);
-        std::vector<geos::geom::Polygon*> *polys;
+		OGRPolygon* createPolygonFromEnv(OGREnvelope env);
+        std::vector<OGRPolygon*> *polys;
 		float threshold;
 	};
 	

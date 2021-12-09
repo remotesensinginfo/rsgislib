@@ -34,7 +34,7 @@ namespace rsgis{namespace vec{
 	{
 		RSGISVectorUtils vecUtils;
 		
-		geos::geom::Envelope *env = NULL;
+		OGREnvelope *env = NULL;
 		OGRGeometry *geometry = NULL;
 		
 		OGRFeature *inFeature = NULL;
@@ -188,7 +188,7 @@ namespace rsgis{namespace vec{
 	{
 		RSGISVectorUtils vecUtils;
 		
-		geos::geom::Envelope *env = NULL;
+		OGREnvelope *env = NULL;
 		OGRGeometry *geometry = NULL;
 		
 		OGRFeature *inFeature = NULL;
@@ -334,7 +334,7 @@ namespace rsgis{namespace vec{
 	{
 		RSGISVectorUtils vecUtils;
 		
-		geos::geom::Envelope *env = NULL;
+		OGREnvelope *env = NULL;
 		OGRGeometry *geometry = NULL;
 		
 		OGRFeature *inFeature = NULL;

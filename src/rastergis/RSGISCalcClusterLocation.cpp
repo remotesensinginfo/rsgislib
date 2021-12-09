@@ -447,14 +447,14 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterLocationCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) 
+    void RSGISCalcClusterLocationCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, OGREnvelope extent) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
             size_t fid = boost::lexical_cast<size_t>(intBandValues[ratBand-1]);
             
-            double eastings = extent.getMinX() + extent.getWidth()/2;
-            double northings = extent.getMinY() + extent.getHeight()/2;
+            double eastings = extent.MinX + (extent.MaxX - extent.MinX)/2;
+            double northings = extent.MinY + (extent.MaxY - extent.MinY)/2;
             
             spatialLoc[fid][0] += eastings;
             spatialLoc[fid][1] += northings;
@@ -475,7 +475,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterExtentCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) 
+    void RSGISCalcClusterExtentCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, OGREnvelope extent) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
@@ -483,40 +483,40 @@ namespace rsgis{namespace rastergis{
             
             if(first[fid])
             {
-                spatialLoc[fid][0] = extent.getMinX(); // minX_X TLX
-                spatialLoc[fid][1] = extent.getMaxY(); // minX_Y TLY
-                spatialLoc[fid][2] = extent.getMaxX(); // maxX_X BRX
-                spatialLoc[fid][3] = extent.getMinY(); // maxX_Y BRX
-                spatialLoc[fid][4] = extent.getMinX(); // minY_X BLX
-                spatialLoc[fid][5] = extent.getMinY(); // minY_Y BLY
-                spatialLoc[fid][6] = extent.getMaxX(); // maxY_X TRX
-                spatialLoc[fid][7] = extent.getMaxY(); // maxY_Y TRY
+                spatialLoc[fid][0] = extent.MinX; // minX_X TLX
+                spatialLoc[fid][1] = extent.MaxY; // minX_Y TLY
+                spatialLoc[fid][2] = extent.MaxX; // maxX_X BRX
+                spatialLoc[fid][3] = extent.MinY; // maxX_Y BRX
+                spatialLoc[fid][4] = extent.MinX; // minY_X BLX
+                spatialLoc[fid][5] = extent.MinY; // minY_Y BLY
+                spatialLoc[fid][6] = extent.MaxX; // maxY_X TRX
+                spatialLoc[fid][7] = extent.MaxY; // maxY_Y TRY
                 first[fid] = false;
             }
             else
             {
-                if(extent.getMinX() < spatialLoc[fid][0])
+                if(extent.MinX < spatialLoc[fid][0])
                 {
-                    spatialLoc[fid][0] = extent.getMinX(); // minX_X TLX
-                    spatialLoc[fid][1] = extent.getMaxY(); // minX_Y TLY
+                    spatialLoc[fid][0] = extent.MinX; // minX_X TLX
+                    spatialLoc[fid][1] = extent.MaxY; // minX_Y TLY
                 }
                 
-                if(extent.getMaxX() > spatialLoc[fid][2])
+                if(extent.MaxX > spatialLoc[fid][2])
                 {
-                    spatialLoc[fid][2] = extent.getMaxX(); // maxX_X BRX
-                    spatialLoc[fid][3] = extent.getMinY(); // maxX_Y BRX
+                    spatialLoc[fid][2] = extent.MaxX; // maxX_X BRX
+                    spatialLoc[fid][3] = extent.MinY; // maxX_Y BRX
                 }
                 
-                if(extent.getMinY() < spatialLoc[fid][5])
+                if(extent.MinY < spatialLoc[fid][5])
                 {
-                    spatialLoc[fid][4] = extent.getMinX(); // minY_X BLX
-                    spatialLoc[fid][5] = extent.getMinY(); // minY_Y BLY
+                    spatialLoc[fid][4] = extent.MinX; // minY_X BLX
+                    spatialLoc[fid][5] = extent.MinY; // minY_Y BLY
                 }
                 
-                if(extent.getMaxY() > spatialLoc[fid][7])
+                if(extent.MaxY > spatialLoc[fid][7])
                 {
-                    spatialLoc[fid][6] = extent.getMaxX(); // maxY_X TRX
-                    spatialLoc[fid][7] = extent.getMaxY(); // maxY_Y TRY
+                    spatialLoc[fid][6] = extent.MaxX; // maxY_X TRX
+                    spatialLoc[fid][7] = extent.MaxY; // maxY_Y TRY
                 }
             }
         }
@@ -535,7 +535,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterPxlExtentCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) 
+    void RSGISCalcClusterPxlExtentCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, OGREnvelope extent) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
@@ -543,32 +543,32 @@ namespace rsgis{namespace rastergis{
             
             if(first[fid])
             {
-                pxlLoc[fid][0] = extent.getMinX(); // minX
-                pxlLoc[fid][1] = extent.getMinY(); // minY
-                pxlLoc[fid][2] = extent.getMaxX(); // maxX
-                pxlLoc[fid][3] = extent.getMaxY(); // maxY
+                pxlLoc[fid][0] = extent.MinX; // minX
+                pxlLoc[fid][1] = extent.MinY; // minY
+                pxlLoc[fid][2] = extent.MaxX; // maxX
+                pxlLoc[fid][3] = extent.MaxY; // maxY
                 first[fid] = false;
             }
             else
             {
-                if(extent.getMinX() < pxlLoc[fid][0])
+                if(extent.MinX < pxlLoc[fid][0])
                 {
-                    pxlLoc[fid][0] = extent.getMinX(); // minX
+                    pxlLoc[fid][0] = extent.MinX; // minX
                 }
                 
-                if(extent.getMaxX() > pxlLoc[fid][2])
+                if(extent.MaxX > pxlLoc[fid][2])
                 {
-                    pxlLoc[fid][2] = extent.getMaxX(); // maxX
+                    pxlLoc[fid][2] = extent.MaxX; // maxX
                 }
                 
-                if(extent.getMinY() < pxlLoc[fid][1])
+                if(extent.MinY < pxlLoc[fid][1])
                 {
-                    pxlLoc[fid][1] = extent.getMinY(); // minY
+                    pxlLoc[fid][1] = extent.MinY; // minY
                 }
                 
-                if(extent.getMaxY() > pxlLoc[fid][3])
+                if(extent.MaxY > pxlLoc[fid][3])
                 {
-                    pxlLoc[fid][3] = extent.getMaxY(); // maxY
+                    pxlLoc[fid][3] = extent.MaxY; // maxY
                 }
             }
         }

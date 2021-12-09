@@ -30,10 +30,16 @@
 
 #include "common/RSGISCommons.h"
 
+#define RSGIS_PY_C_TEXT( text ) (const_cast<char*>(text))
+
 // hides differences between Python2 and 3. 
 // PyString for Python2 - PyUnicode for Python3
 inline bool RSGISPY_CHECK_STRING(PyObject *o)
 {
+    if(o == nullptr)
+    {
+        return false;
+    }
 #if PY_MAJOR_VERSION >= 3
     return PyUnicode_Check(o);
 #else
@@ -48,7 +54,7 @@ inline std::string RSGISPY_STRING_EXTRACT(PyObject *o)
     std::string sVal;
 #if PY_MAJOR_VERSION >= 3
     // convert from a unicode to a bytes
-    PyObject *pBytes = PyUnicode_AsEncodedString(o, NULL, NULL);
+    PyObject *pBytes = PyUnicode_AsEncodedString(o, nullptr, nullptr);
     sVal = PyBytes_AsString(pBytes);
     Py_DECREF(pBytes);
 #else
@@ -110,5 +116,6 @@ inline double RSGISPY_FLOAT_EXTRACT(PyObject *o)
     return PyFloat_AsDouble(o);
 #endif
 }
+
 
 #endif // RSGISPY_COMMON_H

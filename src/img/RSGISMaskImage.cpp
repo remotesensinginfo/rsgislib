@@ -103,6 +103,27 @@ namespace rsgis{namespace img{
             throw e;
         }
     }
+
+    void RSGISMaskImage::genImgEdgeMask(GDALDataset *dataset, std::string outputImage, std::string imageFormat, unsigned int nEdgePxls)
+    {
+        try
+        {
+            RSGISImageUtils imgUtils = RSGISImageUtils();
+            GDALDataset *outDS = imgUtils.createCopy(dataset, 1, outputImage, imageFormat, GDT_Byte, true, "");
+            imgUtils.defineImageEdge(outDS, nEdgePxls, 1, 0);
+            GDALClose(outDS);
+        }
+        catch(RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(RSGISImageBandException &e)
+        {
+            throw e;
+        }
+    }
+
+
     
 	
 	RSGISApplyImageMask::RSGISApplyImageMask(int numberOutBands, double outputValue, std::vector<float> maskValues) : RSGISCalcImageValue(numberOutBands)

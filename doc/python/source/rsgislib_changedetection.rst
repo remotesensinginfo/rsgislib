@@ -1,14 +1,11 @@
-RSGISLib Image Change Detection Module
-======================================
+RSGISLib Image Change Detection
+==================================
 
-.. automodule:: rsgislib.changedetect
-   :members:
-   :undoc-members:
 
 Image Pixel Change Detection
 -----------------------------
 
-.. autofunction:: rsgislib.changedetect.pxl_outlier_chng.find_class_outliers
+.. autofunction:: rsgislib.changedetect.pxloutlierchng.find_class_outliers
 
 
 

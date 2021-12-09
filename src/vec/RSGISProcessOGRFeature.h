@@ -32,7 +32,6 @@
 
 #include "vec/RSGISVectorOutputException.h"
 
-#include "geos/geom/Envelope.h"
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
@@ -53,8 +52,8 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISProcessOGRFeature(){};
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)= 0;
-			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)= 0;
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, OGREnvelope *env, long fid)= 0;
+			virtual void processFeature(OGRFeature *feature, OGREnvelope *env, long fid)= 0;
 			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) = 0;
 			virtual ~RSGISProcessOGRFeature(){};
 		};

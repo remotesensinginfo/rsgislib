@@ -1155,7 +1155,7 @@ namespace rsgis{namespace segment{
         this->numSpecBands = numSpecBands;
     }
     
-    void RSGISPopulateMeansPxlLocs::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
+    void RSGISPopulateMeansPxlLocs::calcImageValue(float *bandValues, int numBands, OGREnvelope extent)
     {
         try
         {            
@@ -1169,8 +1169,8 @@ namespace rsgis{namespace segment{
                     cClump->sumVals[n] += bandValues[n+1];
                 }
                 
-                unsigned int xPos = boost::lexical_cast<unsigned int>(extent.getMinX());
-                unsigned int yPos = boost::lexical_cast<unsigned int>(extent.getMinY());
+                unsigned int xPos = boost::lexical_cast<unsigned int>(extent.MinX);
+                unsigned int yPos = boost::lexical_cast<unsigned int>(extent.MinY);
                 
                 cClump->pxls->push_back(rsgis::img::PxlLoc(xPos, yPos));
             }

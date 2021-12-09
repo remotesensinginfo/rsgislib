@@ -28,15 +28,6 @@
 
 #include "gdal_priv.h"
 
-#include "geos/geom/Envelope.h"
-#include "geos/geom/Point.h"
-#include "geos/geom/LineString.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/MultiPolygon.h"
-#include "geos/geom/Coordinate.h"
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/geom/PrecisionModel.h"
-
 #include "common/rsgis-tqdm.h"
 
 #include "img/RSGISPixelInPoly.h"
@@ -74,15 +65,15 @@ namespace rsgis
 				void calcImage(GDALDataset **datasets, int numDS);
                 void calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, std::string outputImage, bool setOutNames = false, std::string *bandNames = NULL, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32);
                 void calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, std::string outputImage, std::string outputRefIntImage, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32);
-                void calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env=NULL, bool quiet=false);
+                void calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, OGREnvelope *env=NULL, bool quiet=false);
                 void calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, GDALDataset *outputImageDS);
                 void calcImageBand(GDALDataset **datasets, int numDS, std::string outputImageBase, std::string gdalFormat="KEA");
-                void calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames = false, std::string *bandNames = NULL, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32);
-                void calcImageInEnv(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, bool quiet=false);
-                void calcImageInEnv(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env, bool quiet=false);
+                void calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, OGREnvelope *env, bool setOutNames = false, std::string *bandNames = NULL, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32);
+                void calcImageInEnv(GDALDataset **datasets, int numDS, OGREnvelope *env, bool quiet=false);
+                void calcImageInEnv(GDALDataset **datasets, int numIntDS, int numFloatDS, OGREnvelope *env, bool quiet=false);
                 void calcImagePosPxl(GDALDataset **datasets, int numDS);
                 void calcImagePosPxl(GDALDataset **datasets, int numIntDS, int numFloatDS);
-                void calcImageExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env=NULL, bool quiet=false);
+                void calcImageExtent(GDALDataset **datasets, int numDS, OGREnvelope *env=NULL, bool quiet=false);
                 void calcImageExtent(GDALDataset **datasets, int numIntDS, int numFloatDS);
                 void calcImageExtent(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32);
 				void calcImageWindowData(GDALDataset **datasets, int numDS, int windowSize);
@@ -90,11 +81,11 @@ namespace rsgis
                 void calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, std::string outputRefIntImage, int windowSize, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32);                
                 void calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize, bool passPxlXY=false);
                 void calcImageWindowDataExtent(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32);
-				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat="KEA",  GDALDataType gdalDataType=GDT_Float32);
-				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption);
-                void calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption);
-                void calcImageWithinPolygonExtentInMem(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption);
-				void calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, long fid);
+				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, OGREnvelope *env, OGRPolygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat="KEA",  GDALDataType gdalDataType=GDT_Float32);
+				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, OGREnvelope *env, OGRPolygon *poly, pixelInPolyOption pixelPolyOption);
+                void calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, OGREnvelope *env, OGRPolygon *poly, pixelInPolyOption pixelPolyOption);
+                void calcImageWithinPolygonExtentInMem(GDALDataset **datasets, int numDS, OGREnvelope *env, OGRPolygon *poly, pixelInPolyOption pixelPolyOption);
+				void calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, OGREnvelope *env, long fid);
                 void calcImageBorderPixels(GDALDataset *dataset, bool returnInt);
                 virtual ~RSGISCalcImage();
 			private:

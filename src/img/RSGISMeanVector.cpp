@@ -30,21 +30,6 @@ namespace rsgis{namespace img{
 		this->sum = 0;
 	}
 	
-	void RSGISCalcMeanVectorIndividual::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISCalcMeanVectorIndividual::calcImageValue(float *bandValuesImageA, int numBands, geos::geom::Envelope *extent) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISCalcMeanVectorIndividual::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
 	void RSGISCalcMeanVectorIndividual::calcImageValue(float *bandValuesImageA, int numBands, int band) 
 	{
 		this->n++;
@@ -69,17 +54,7 @@ namespace rsgis{namespace img{
 		this->n = 0;
 		this->sum = new double[numOutputValues];
 	}
-	
-	void RSGISCalcMeanVectorAll::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISCalcMeanVectorAll::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
+
 	void RSGISCalcMeanVectorAll::calcImageValue(float *bandValuesImage, int numBands, int band) 
 	{
 		if(this->numOutputValues != numBands)
@@ -93,12 +68,7 @@ namespace rsgis{namespace img{
 			this->sum[i] += bandValuesImage[i];
 		}
 	}
-	
-	void RSGISCalcMeanVectorAll::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
+
 	double* RSGISCalcMeanVectorAll::getOutputValues() 
 	{
 		for(int i = 0; i < this->numOutputValues; i++)

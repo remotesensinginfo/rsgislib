@@ -1,7 +1,5 @@
-RSGISLib Keras Pixel Classification Module
-===========================================
-
-.. automodule:: rsgislib.classification.classkeraspxl
+RSGISLib Keras Pixel Classification
+=====================================
 
 While per-pixel neural network based classifers can be created using the scikit-learn library the `Keras <https://keras.io>`_ library provide many more options and flexibility for the creation of a neural network.
 

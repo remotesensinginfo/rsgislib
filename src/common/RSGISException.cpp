@@ -44,7 +44,7 @@ namespace rsgis
 		msgs = message;
 	}
 
-	const char* RSGISException::what()
+	const char* RSGISException::what() const noexcept
 	{
 		return msgs.c_str();
 	}

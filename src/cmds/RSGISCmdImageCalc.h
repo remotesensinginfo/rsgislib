@@ -104,14 +104,10 @@ namespace rsgis{ namespace cmds {
     DllExport void executeMahalanobisDistFilter(std::string inputImage, std::string outputImage, unsigned int winSize, std::string gdalFormat, RSGISLibDataType outDataType);
     /** Function to run mahalanobis distance Image to Window Filter */
     DllExport void executeMahalanobisDist2ImgFilter(std::string inputImage, std::string outputImage, unsigned int winSize, std::string gdalFormat, RSGISLibDataType outDataType);
-    /** Function to run image calculate distance command */
-    DllExport void executeImageCalcDistance(std::string inputImage, std::string outputImage, std::string gdalFormat);
     /** Function to calculate summary statistics for a column of pixels */
     DllExport void executeImagePixelColumnSummary(std::string inputImage, std::string outputImage, rsgis::cmds::RSGISCmdStatsSummary summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, float noDataValue, bool useNoDataValue);
     /** Function to perform a linear regression on each column of pixels */
-    DllExport void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue);
-    /** Function to perform image normalisation */
-    DllExport void executeNormalisation(std::vector<std::string> inputImages, std::vector<std::string> outputImages, bool calcInMinMax, double inMin, double inMax, double outMin, double outMax);
+    DllExport void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<float> bandValues, float noDataValue, bool useNoDataValue);
     /** Function to calculate the correlation between 2 images */
     DllExport double** executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrixFile = "", unsigned int *nrows = 0, unsigned int *ncols = 0);
     /** Function to calculate the covariance between 2 images */
@@ -122,38 +118,18 @@ namespace rsgis{ namespace cmds {
     DllExport void executePCA(std::string inputImage, std::string eigenvectors, std::string outputImage, int numComponents, std::string gdalFormat, RSGISLibDataType outDataType);
     /** Function to generate a standardised image using the mean vector provided */
     DllExport void executeStandardise(std::string meanvectorStr, std::string inputImage, std::string outputImage);
-    /** Function to replace values less then given, using a threshold */
-    DllExport void executeReplaceValuesLessThan(std::string inputImage, std::string outputImage, double threshold, double value);
     /** Function to convert the image spectra to unit area */
     DllExport void executeUnitArea(std::string inputImage, std::string outputImage, std::string inMatrixfile);
-    /** Function to calculate the speed of movement (mean, min and max) */
-    DllExport void executeMovementSpeed(std::vector<std::string> inputImages, std::vector<unsigned int> imageBands, std::vector<float> imageTimes, float upper, float lower, std::string outputImage);
     /** Function that counts the number of values with a given range for each column*/
     DllExport void executeCountValsInCols(std::string inputImage, float upper, float lower, std::string outputImage);
     /** Function to calculate the root mean squared error between 2 images */
     DllExport double executeCalculateRMSE(std::string inputImageA, int inputBandA, std::string inputImageB, int inputBandB);
-    /** Function to apply 2 var function to image */
-    DllExport void executeApply2VarFunction(std::string inputImage, void *twoVarFunction, std::string outputImage);
-    /** Function to apply 3 var function to image */
-    DllExport void executeApply3VarFunction(std::string inputImage, void *threeVarFunction, std::string outputImage);
-    /** Function to calculate the distance to the nearest geometry for each pixel in an image */
-    DllExport void executeDist2Geoms(std::string inputVector, float imgResolution, std::string outputImage);
     /** Function to calculate statistics for individual image bands */
     DllExport void executeImageBandStats(std::string inputImage, std::string outputFile, bool ignoreZeros);
     /** Function to calculate the statistics for the whole image across all bands */
     DllExport void executeImageStats(std::string inputImage, std::string outputFile, bool ignoreZeros);
-    /** Function to undertake an unconstrained linear spectral unmixing of the input image for a set of endmembers */
-    DllExport void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile);
-    /** Function to undertake an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers */
+      /** Function to undertake an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers */
     DllExport void executeExhconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile, float stepResolution);
-    /** Function to undertake a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1*/
-    DllExport void executeConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile);
-    /** Function to undertake a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative */
-    DllExport void executeNnConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile);
-    
-    /** Funtion to undertake multiple endmember spectral mixture analysis using non-negative constrained linear spectral unmixing */
-    
-    
     /** Function to test whether all bands are equal to the same value */
     DllExport void executeAllBandsEqualTo(std::string inputImage, float imgValue, float outputTrueVal, float outputFalseVal, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType);
     /** Function to generate a histogram for the region of the mask selected */
@@ -162,8 +138,6 @@ namespace rsgis{ namespace cmds {
     DllExport unsigned int* executeGetHistogram(std::string inputImage, unsigned int imgBand, double binWidth, unsigned int *nBins, bool calcInMinMax, double *inMin, double *inMax);
     /** Function to calculate image band percentiles */
     DllExport std::vector<double> executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified);
-    /** Function to calculate the distance to the nearest geometry for every pixel in an image */
-    DllExport void executeImageDist2Geoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage);
     /** Function to calculate correlation for windows */
     DllExport void executeCorrelationWindow(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType);
     /** Function to calculate the statistics for an individual image band within an envelope defined in Lat / Long */

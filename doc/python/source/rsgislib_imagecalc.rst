@@ -1,111 +1,114 @@
-RSGISLib Image Calculations Module
-===================================
-.. automodule:: rsgislib.imagecalc
-   :members:
-   :undoc-members:
+RSGISLib Image Calculations
+===============================
 
 Band & Image Maths
 ---------------------
 
-.. autofunction:: rsgislib.imagecalc.bandMath
-.. autofunction:: rsgislib.imagecalc.imageMath
-.. autofunction:: rsgislib.imagecalc.imageBandMath
-.. autofunction:: rsgislib.imagecalc.allBandsEqualTo
-.. autofunction:: rsgislib.imagecalc.replaceValuesLessThan
+.. autofunction:: rsgislib.imagecalc.band_math
+.. autofunction:: rsgislib.imagecalc.image_math
+.. autofunction:: rsgislib.imagecalc.image_band_math
+.. autofunction:: rsgislib.imagecalc.all_bands_equal_to
+.. autoclass:: rsgislib.imagecalc.BandDefn
+
 
 Clustering
 -----------
 
-.. autofunction:: rsgislib.imagecalc.kMeansClustering
-.. autofunction:: rsgislib.imagecalc.isoDataClustering
+.. autofunction:: rsgislib.imagecalc.kmeans_clustering
+.. autofunction:: rsgislib.imagecalc.isodata_clustering
 
+Statistical Summary
+---------------------
 
-Spectral Unmixing
-------------------
+.. autofunction:: rsgislib.imagecalc.image_pixel_column_summary
+.. autofunction:: rsgislib.imagecalc.calc_band_percentile
+.. autofunction:: rsgislib.imagecalc.get_img_band_stats_in_env
+.. autofunction:: rsgislib.imagecalc.get_img_band_mode_in_env
+.. autofunction:: rsgislib.imagecalc.calc_prop_true_exp
+.. autofunction:: rsgislib.imagecalc.calc_multi_img_band_stats
+.. autofunction:: rsgislib.imagecalc.get_img_band_min_max
+.. autofunction:: rsgislib.imagecalc.get_img_sum_stats_in_pxl
+.. autofunction:: rsgislib.imagecalc.get_img_idx_for_stat
+.. autofunction:: rsgislib.imagecalc.identify_min_pxl_value_in_win
+.. autofunction:: rsgislib.imagecalc.calc_img_mean_in_mask
+.. autofunction:: rsgislib.imagecalc.count_pxls_of_val
+.. autofunction:: rsgislib.imagecalc.get_unique_values
+.. autofunction:: rsgislib.imagecalc.calc_imgs_pxl_mode
+.. autofunction:: rsgislib.imagecalc.calc_img_basic_stats_for_ref_region
+.. autoclass:: rsgislib.imagecalc.StatsSummary
 
-.. autofunction:: rsgislib.imagecalc.unconLinearSpecUnmix
-.. autofunction:: rsgislib.imagecalc.exhconLinearSpecUnmix
-.. autofunction:: rsgislib.imagecalc.conSum1LinearSpecUnmix
-.. autofunction:: rsgislib.imagecalc.specunmixing.rescale_unmixing_results
-.. autofunction:: rsgislib.imagecalc.specunmixing.calc_unconstrained_unmixing
-.. autofunction:: rsgislib.imagecalc.specunmixing.calc_non_negative_unmixing
-.. autofunction:: rsgislib.imagecalc.specunmixing.calc_fully_constrained_unmixing
-.. autofunction:: rsgislib.imagecalc.specunmixing.calc_unmix_rmse_residualerr
-.. autofunction:: rsgislib.imagecalc.specunmixing.predict_refl_img_from_simple_unmixing
+Update Pixel Values
+--------------------
+
+.. autofunction:: rsgislib.imagecalc.recode_int_raster
+.. autofunction:: rsgislib.imagecalc.calc_fill_regions_knn
 
 
 Statistics
 -----------
 
-.. autofunction:: rsgislib.imagecalc.getImageBandMinMax
-.. autofunction:: rsgislib.imagecalc.imageStats
-.. autofunction:: rsgislib.imagecalc.imageBandStats
-.. autofunction:: rsgislib.imagecalc.meanVector
-.. autofunction:: rsgislib.imagecalc.imagePixelLinearFit
+.. autofunction:: rsgislib.imagecalc.image_pixel_linear_fit
 .. autofunction:: rsgislib.imagecalc.pca
-.. autofunction:: rsgislib.imagecalc.getPCAEigenVector
-.. autofunction:: rsgislib.imagecalc.performImagePCA
-.. autofunction:: rsgislib.imagecalc.calculateRMSE
-.. autofunction:: rsgislib.imagecalc.bandPercentile
-.. autofunction:: rsgislib.imagecalc.covariance
+.. autofunction:: rsgislib.imagecalc.get_pca_eigen_vector
+.. autofunction:: rsgislib.imagecalc.perform_image_pca
+.. autofunction:: rsgislib.imagecalc.perform_image_mnf
+.. autofunction:: rsgislib.imagecalc.calculate_img_band_rmse
+.. autofunction:: rsgislib.imagecalc.correlation_window
+.. autofunction:: rsgislib.imagecalc.calc_mask_img_pxl_val_prob
+.. autofunction:: rsgislib.imagecalc.calc_img_difference
+
+Histogram
+------------
+
 .. autofunction:: rsgislib.imagecalc.histogram
-.. autofunction:: rsgislib.imagecalc.getHistogram
-.. autofunction:: rsgislib.imagecalc.get2DImageHistogram
-.. autofunction:: rsgislib.imagecalc.correlation
-.. autofunction:: rsgislib.imagecalc.correlationWindow
-.. autofunction:: rsgislib.imagecalc.getImageBandModeInEnv
-.. autofunction:: rsgislib.imagecalc.getImageStatsInEnv
-.. autofunction:: rsgislib.imagecalc.calcPropTrueExp
-.. autofunction:: rsgislib.imagecalc.calcMultiImgBandStats
-.. autofunction:: rsgislib.imagecalc.calcMaskImgPxlValProb
-.. autofunction:: rsgislib.imagecalc.calcImageDifference
-.. autofunction:: rsgislib.imagecalc.getImgIdxForStat
-.. autofunction:: rsgislib.imagecalc.countPxlsOfVal
-.. autofunction:: rsgislib.imagecalc.getImgSumStatsInPxl
-.. autofunction:: rsgislib.imagecalc.calcImgMeanInMask
-.. autofunction:: rsgislib.imagecalc.identifyMinPxlValueInWin
+.. autofunction:: rsgislib.imagecalc.get_histogram
+.. autofunction:: rsgislib.imagecalc.get_2d_img_histogram
+.. autofunction:: rsgislib.imagecalc.calc_histograms_for_msk_vals
+
 
 
 Normalise
 ----------
 
-.. autofunction:: rsgislib.imagecalc.standardise
-.. autofunction:: rsgislib.imagecalc.normalisation
-.. autofunction:: rsgislib.imagecalc.rescaleImgPxlVals
-.. autofunction:: rsgislib.imagecalc.calcImageRescale
-
+.. autofunction:: rsgislib.imagecalc.normalise_image_band
+.. autofunction:: rsgislib.imagecalc.calc_img_rescale
+.. autofunction:: rsgislib.imagecalc.rescale_img_pxl_vals
+.. autoclass:: rsgislib.imagecalc.ImageBandRescale
 
 Geometry
 ---------
 
-.. autofunction:: rsgislib.imagecalc.dist2Geoms
-.. autofunction:: rsgislib.imagecalc.imageDist2Geoms
-.. autofunction:: rsgislib.imagecalc.mahalanobisDistFilter
-.. autofunction:: rsgislib.imagecalc.mahalanobisDist2ImgFilter
-.. autofunction:: rsgislib.imagecalc.imageCalcDistance
-.. autofunction:: rsgislib.imagecalc.calcDist2ImgVals
-.. autofunction:: rsgislib.imagecalc.calcDist2ImgValsTiled
+.. autofunction:: rsgislib.imagecalc.mahalanobis_dist_filter
+.. autofunction:: rsgislib.imagecalc.mahalanobis_dist_to_img_filter
+.. autofunction:: rsgislib.imagecalc.calc_dist_to_img_vals
+.. autofunction:: rsgislib.imagecalc.calc_dist_to_img_vals_tiled
 
 Image Indices
 -------------
-.. autofunction:: rsgislib.imagecalc.calcindices.calcNDVI
-.. autofunction:: rsgislib.imagecalc.calcindices.calcWBI
-.. autofunction:: rsgislib.imagecalc.calcindices.calcNDWI
-.. autofunction:: rsgislib.imagecalc.calcindices.calcGNDWI
-.. autofunction:: rsgislib.imagecalc.calcindices.calcGMNDWI
-.. autofunction:: rsgislib.imagecalc.calcindices.calcWhiteness
-.. autofunction:: rsgislib.imagecalc.calcindices.calcBrightness
-.. autofunction:: rsgislib.imagecalc.calcindices.calcBrightnessScaled
-.. autofunction:: rsgislib.imagecalc.calcindices.calcCTVI
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_ndvi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_wbi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_ndwi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_gndwi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_gmndwi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_whiteness
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_brightness
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_brightness_scaled
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_ctvi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_ndsi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_nbr
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_bai
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_mvi
 
-Other
-------
+Equalivance
+-------------
 
-.. autofunction:: rsgislib.imagecalc.countValsInCols
-.. autofunction:: rsgislib.imagecalc.imagePixelColumnSummary
-.. autofunction:: rsgislib.imagecalc.movementSpeed
-.. autofunction:: rsgislib.imagecalc.unitArea
-.. autofunction:: rsgislib.imagecalc.leastcostpath.performLeastCostPathCalc
+.. autofunction:: rsgislib.imagecalc.are_imgs_equal
+.. autofunction:: rsgislib.imagecalc.are_img_bands_equal
+
+
+Least Cost Path
+----------------
+.. autofunction:: rsgislib.imagecalc.leastcostpath.perform_least_cost_path_calc
 
 
 * :ref:`genindex`

@@ -214,20 +214,21 @@ endif(MSVC)
 
 install(TARGETS _imagemorphology DESTINATION "${PYRSGIS_INSTALL_PATH}/imagemorphology")
 
-# _histocube
-add_library(_histocube SHARED src/histocube.cpp)
+
+# _specunmixing
+add_library(_specunmixing SHARED src/specunmixing.cpp)
 if(APPLE)
-    set_target_properties(_histocube PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-    target_link_libraries(_histocube ${RSGISLIB_CMDSINTERFACE_LIB_NAME}) 
+    set_target_properties(_specunmixing PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+    target_link_libraries(_specunmixing ${RSGISLIB_CMDSINTERFACE_LIB_NAME})
 else()
-    target_link_libraries(_histocube ${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${Python_LIBRARIES}) 
+    target_link_libraries(_specunmixing ${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${Python_LIBRARIES})
 endif(APPLE)
-set_target_properties(_histocube PROPERTIES PREFIX "")
+set_target_properties(_specunmixing PROPERTIES PREFIX "")
 if(MSVC)
-    set_target_properties(_histocube PROPERTIES SUFFIX ".pyd")
+    set_target_properties(_specunmixing PROPERTIES SUFFIX ".pyd")
 endif(MSVC)
 
-install(TARGETS _histocube DESTINATION "${PYRSGIS_INSTALL_PATH}/histocube")
+install(TARGETS _specunmixing DESTINATION "${PYRSGIS_INSTALL_PATH}/imagecalc/specunmixing")
 
 # custom install step to create .pyc files
 install(CODE "execute_process(COMMAND ${Python_EXECUTABLE} -m compileall ${PYRSGIS_INSTALL_PATH})")

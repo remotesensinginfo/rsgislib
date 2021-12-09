@@ -213,14 +213,14 @@ def create_datejson_file(image_list, out_msk_dir, out_json_file, gdal_format='KE
     Assume the date is the second component of the file name (XXX_YYYYMMDD_XXXX.xxx)
     
     """
-    import rsgislib
     import datetime
     import os.path
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    out_img_ext = rsgis_utils.getFileExtension(gdal_format)
+    import rsgislib.tools.filetools
+
+    out_img_ext = rsgislib.imageutils.get_file_img_extension(gdal_format)
     date_imgs = dict()
     for img in image_list:
-        basename = rsgis_utils.get_file_basename(img)
+        basename = rsgislib.tools.filetools.get_file_basename(img)
         basename_comps = basename.split('_')
         print(basename_comps)
         if len(basename_comps) < 2:

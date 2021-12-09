@@ -25,7 +25,7 @@
 
 #include <iostream>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <map>
 
@@ -84,16 +84,7 @@ namespace rsgis{namespace rastergis{
 	{
 	public: 
 		RSGISCountNumPxlsInCats(size_t *catsCount, size_t minCat, size_t numCatVals, unsigned int ratBandCats);
-		void calcImageValue(float *bandValues, int numBands, double *output) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		~RSGISCountNumPxlsInCats();
     private:
         size_t *catsCount;
@@ -107,16 +98,7 @@ namespace rsgis{namespace rastergis{
 	{
 	public: 
 		RSGISCountNumPxlsInCatsPerClump(unsigned int **catStats, std::map<size_t,CategoryField> *cats, unsigned int ratClumpsBand, unsigned int ratCatsBand);
-		void calcImageValue(float *bandValues, int numBands, double *output) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		~RSGISCountNumPxlsInCatsPerClump();
     private:
         unsigned int **catStats;

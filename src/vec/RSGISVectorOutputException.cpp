@@ -31,7 +31,6 @@ namespace rsgis {namespace vec{
 
 	}
 	
-	
 	RSGISVectorOutputException::RSGISVectorOutputException(const char* message) : RSGISVectorException(message)
 	{
 		

@@ -73,9 +73,6 @@ namespace rsgis{ namespace cmds {
     /** A function to perform a morphological white top hat on an image */
     DllExport void executeImageWhiteTopHat(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType);
     
-    
-    
-    
 }}
 
 

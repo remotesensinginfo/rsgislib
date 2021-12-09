@@ -28,10 +28,7 @@
 #include "common/RSGISImageException.h"
 #include "common/RSGISAttributeTableException.h"
 
-#include "math/RSGIS2DInterpolation.h"
 #include "math/RSGISMathsUtils.h"
-
-#include "utils/RSGISTextUtils.h"
 
 #include "img/RSGISCalcImage.h"
 
@@ -49,10 +46,7 @@
 #include "rastergis/RSGISRATCalc.h"
 #include "rastergis/RSGISFindInfoBetweenLayers.h"
 #include "rastergis/RSGISClumpBorders.h"
-#include "rastergis/RSGISInterpolateClumpValues2Image.h"
 #include "rastergis/RSGISCalcNeighbourStats.h"
-#include "rastergis/RSGISBinaryClassifyClumps.h"
-#include "rastergis/RSGISClumpRegionGrowing.h"
 #include "rastergis/RSGISCollapseRAT.h"
 #include "rastergis/RSGISInputShapefileAttributes2RAT.h"
 #include "rastergis/RSGISRATKNN.h"
@@ -1376,190 +1370,6 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
-    void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType, unsigned int ratband)
-    {
-        GDALAllRegister();
-        GDALDataset *clumpsDataset;
-
-        try
-        {
-            std::cout.precision(12);
-
-            rsgis::math::RSGIS2DInterpolator *interpolator = NULL;
-            if(methodStr == "nearestneighbour")
-            {
-                interpolator = new rsgis::math::RSGISNearestNeighbour2DInterpolator();
-            }
-            else if(methodStr == "naturalneighbour")
-            {
-                interpolator = new rsgis::math::RSGISNaturalNeighbor2DInterpolator();
-            }
-            else if(methodStr == "naturalnearestneighbour")
-            {
-                interpolator = new rsgis::math::RSGISNaturalNeighbor2DInterpolator();
-            }
-            else if(methodStr == "knearestneighbour")
-            {
-                interpolator = new rsgis::math::RSGISKNearestNeighbour2DInterpolator(3);
-            }
-            else if(methodStr == "idwall")
-            {
-                interpolator = new rsgis::math::RSGISAllPointsIDWInterpolator(8);
-            }
-            else if(methodStr == "plane")
-            {
-                interpolator = new rsgis::math::RSGISLinearTrendInterpolator();
-            }
-            else if(methodStr == "naturalneighbourplane")
-            {
-                interpolator = new rsgis::math::RSGISCombine2DInterpolators(new rsgis::math::RSGISNaturalNeighbor2DInterpolator(), new rsgis::math::RSGISLinearTrendInterpolator(), 1);
-            }
-            else if(methodStr == "nnandnn")
-            {
-                interpolator = new rsgis::math::RSGISCombine2DInterpolators(new rsgis::math::RSGISNaturalNeighbor2DInterpolator(), new rsgis::math::RSGISNearestNeighbour2DInterpolator(), 1);
-            }
-            else
-            {
-                std::cerr << "Available Interpolators: \'nearestneighbour\', \'naturalneighbour\', \'naturalnearestneighbour\', \'knearestneighbour\', \'idwall\'\n";
-                throw rsgis::RSGISAttributeTableException("The interpolated specified was not recognised.");
-            }
-
-            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
-            if(clumpsDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + clumpsImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            rsgis::rastergis::RSGISInterpolateClumpValues2Image interpClumpVals;
-            interpClumpVals.interpolateImageFromClumps(clumpsDataset, selectField, eastingsField, northingsField, valueField, outputFile, imageFormat, rsgis::cmds::RSGIS_to_GDAL_Type(dataType), interpolator, ratband);
-
-            delete interpolator;
-
-            GDALClose(clumpsDataset);
-        }
-        catch(rsgis::RSGISAttributeTableException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-
-
-/*
-
-    float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)
-    {
-        double returnGSSVal = 0.0;
-        GDALAllRegister();
-        GDALDataset *clumpsDataset;
-        GDALDataset *inputImageDataset;
-
-        try
-        {
-            std::cout.precision(12);
-            rsgis::utils::RSGISTextUtils txtUtils;
-
-            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
-            if(clumpsDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + clumpsImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            inputImageDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
-            if(inputImageDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            if(calcNeighbours)
-            {
-                std::cout << "Populating the clumps with their neighbours\n";
-                rsgis::rastergis::RSGISFindClumpNeighbours findNeighboursObj;
-                findNeighboursObj.findNeighboursKEAImageCalc(clumpsDataset);
-            }
-
-            unsigned int numImgBands = inputImageDataset->GetRasterCount();
-
-            std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats = new std::vector<rsgis::rastergis::RSGISBandAttStats*>();
-            bandStats->reserve(numImgBands);
-
-            rsgis::rastergis::RSGISBandAttStats *bandStat = NULL;
-            for(unsigned int i = 0; i < numImgBands; ++i)
-            {
-                bandStat = new rsgis::rastergis::RSGISBandAttStats();
-                bandStat->band = i+1;
-                bandStat->threshold = 0;
-                bandStat->calcCount = false;
-                bandStat->countField = "";
-                bandStat->calcMin = false;
-                bandStat->minField = "";
-                bandStat->calcMax = false;
-                bandStat->maxField = "";
-                bandStat->calcMean = true;
-                bandStat->meanField = colPrefix + "_b" + txtUtils.uInt16bittostring(i+1) + "_Mean";
-                bandStat->calcStdDev = true;
-                bandStat->stdDevField = colPrefix + "_b" + txtUtils.uInt16bittostring(i+1) + "_StdDev";
-                bandStat->calcMedian = false;
-                bandStat->medianField = "";
-                bandStat->calcSum = false;
-                bandStat->sumField = "";
-
-                bandStat->countIdxDef = false;
-                bandStat->minIdxDef = false;
-                bandStat->maxIdxDef = false;
-                bandStat->meanIdxDef = false;
-                bandStat->sumIdxDef = false;
-                bandStat->stdDevIdxDef = false;
-                bandStat->medianIdxDef = false;
-
-                bandStats->push_back(bandStat);
-            }
-
-            std::cout << "Calculating the clump statistics (Mean and Standard Deviation).\n";
-            rsgis::rastergis::RSGISCalcClumpStats clumpStats;
-            clumpStats.calcImageClumpStatistic(clumpsDataset, inputImageDataset, bandStats);
-
-            for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBand = bandStats->begin(); iterBand != bandStats->end(); ++iterBand)
-            {
-                delete *iterBand;
-            }
-            delete bandStats;
-
-            std::vector<rsgis::rastergis::JXSegQualityScoreBand*> *scoreComponents = new std::vector<rsgis::rastergis::JXSegQualityScoreBand*>();
-            rsgis::rastergis::RSGISCalcSegmentQualityStatistics  calcSegsQuality;
-            returnGSSVal = calcSegsQuality.calcJohnsonXie2011Metric(clumpsDataset, numImgBands, colPrefix, minNormV, maxNormV, minNormMI, maxNormMI, scoreComponents);
-
-            for(std::vector<rsgis::rastergis::JXSegQualityScoreBand*>::iterator iterScores = scoreComponents->begin(); iterScores != scoreComponents->end(); ++iterScores)
-            {
-                scoreBandComps->push_back(cmds::RSGISJXSegQualityScoreBandCmds((*iterScores)->bandVar, (*iterScores)->bandMI, (*iterScores)->bandVarNorm, (*iterScores)->bandMINorm));
-
-                delete *iterScores;
-            }
-            delete scoreComponents;
-
-            GDALClose(clumpsDataset);
-            GDALClose(inputImageDataset);
-        }
-        catch(rsgis::RSGISAttributeTableException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-
-        return returnGSSVal;
-    }
-*/
-            
             
     void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds *fieldStatsCmds, bool useAbsDiff, unsigned int ratBand)
     {
@@ -1594,64 +1404,6 @@ namespace rsgis{ namespace cmds {
             delete fieldStatsCmds;
             delete fieldStats;
                 
-            GDALClose(clumpsDataset);
-        }
-        catch(rsgis::RSGISAttributeTableException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-      
-    void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlock)
-    {
-        try
-        {
-            GDALAllRegister();
-            std::cout.precision(12);
-            
-            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
-            if(clumpsDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + clumpsImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            rsgis::rastergis::RSGISClumpRegionGrowing growClumpRegions;
-            growClumpRegions.growClassRegion(clumpsDataset, classColumn, classVal, maxIter, ratBand, xmlBlock);
-            
-            GDALClose(clumpsDataset);
-        }
-        catch(rsgis::RSGISAttributeTableException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-            
-    void executeBinaryClassify(std::string clumpsImage, unsigned int ratBand, std::string xmlBlock, std::string outColumn)
-    {
-        try
-        {
-            GDALAllRegister();
-            std::cout.precision(12);
-            
-            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
-            if(clumpsDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + clumpsImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            rsgis::rastergis::RSGISBinaryClassifyClumps classClumps;
-            classClumps.classifyClumps(clumpsDataset, ratBand, xmlBlock, outColumn);
-            
             GDALClose(clumpsDataset);
         }
         catch(rsgis::RSGISAttributeTableException &e)
@@ -1768,25 +1520,20 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> *colNames)
+    void executeImportVecAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> colNames)
     {
         try
         {
-            if((colNames != NULL) & (colNames->empty()))
-            {
-                throw RSGISCmdException("The list of column names is empty.");
-            }
-            
             GDALAllRegister();
             OGRRegisterAll();
-            
+
             GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(clumpsImage.c_str(), GA_Update);
             if(clumpsDataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-            
+
             rsgis::vec::RSGISVectorUtils vecUtils;
             /////////////////////////////////////
             //
@@ -1807,17 +1554,16 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open vector layer ") + inputVectorLyr;
                 throw RSGISFileException(message.c_str());
             }
-            
-            if(colNames == NULL)
+
+            if(colNames.empty())
             {
                 std::cout << "No column names were specified so copying them all.\n";
-                colNames = vecUtils.getColumnNames(inputVecLyr);
+                colNames = vecUtils.getColumnNamesLitVec(inputVecLyr);
             }
 
             rsgis::rastergis::RSGISInputShapefileAttributes2RAT copyShpAtts2RAT;
-            copyShpAtts2RAT.copyVectorAtt2Rat(clumpsDataset, ratBand, inputVecLyr, fidColStr, colNames);
-            
-            delete colNames;
+            copyShpAtts2RAT.copyVectorAtt2Rat(clumpsDataset, ratBand, inputVecLyr, fidColStr, &colNames);
+
             GDALClose(clumpsDataset);
             GDALClose(inputVecDS);
         }
@@ -1830,36 +1576,6 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
-    void executeClassRegionGrowingNeighCritera(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlockGrowCriteria, std::string xmlBlockNeighCriteria)
-    {
-        try
-        {
-            GDALAllRegister();
-            std::cout.precision(12);
-            
-            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
-            if(clumpsDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + clumpsImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            rsgis::rastergis::RSGISClumpRegionGrowing growClumpRegions;
-            growClumpRegions.growClassRegionNeighCriteria(clumpsDataset, classColumn, classVal, maxIter, ratBand, xmlBlockGrowCriteria, xmlBlockNeighCriteria);
-            
-            GDALClose(clumpsDataset);
-        }
-        catch(rsgis::RSGISAttributeTableException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-            
             
     void executeHistSampling(std::string clumpsImage, unsigned int ratBand, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict, std::string classColumn, std::string classVal)
     {
