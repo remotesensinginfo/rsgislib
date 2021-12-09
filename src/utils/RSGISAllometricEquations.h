@@ -24,7 +24,7 @@
 #ifndef RSGISAllometricEquations_H
 #define RSGISAllometricEquations_H
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <string>
 

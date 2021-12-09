@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 #include "math/RSGISMathException.h"
 #include "math/cmpfit/rsgis_mpfit.h"

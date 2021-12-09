@@ -305,6 +305,19 @@ namespace rsgis{namespace utils{
         return boost::filesystem::exists(boost::filesystem::path(file));
     }
 
+    bool RSGISFileUtils::removeFileIfPresent(std::string file)
+    {
+        bool rm_file = false;
+        if(boost::filesystem::exists(boost::filesystem::path(file)))
+        {
+            if(boost::filesystem::remove(boost::filesystem::path(file)))
+            {
+                rm_file = true;
+            }
+        }
+        return rm_file;
+    }
+
     RSGISFileUtils::~RSGISFileUtils()
     {
         

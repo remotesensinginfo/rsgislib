@@ -25,7 +25,7 @@
 
 #include <string>
 #include <sstream>
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 #include <algorithm>
 #include <vector>

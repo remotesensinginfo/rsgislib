@@ -137,11 +137,11 @@ namespace rsgis{namespace reg{
 			double windowXWidth = (((double)windowSize)*overlap->xRes);
 			double windowYHeight = (((double)windowSize)*overlap->yRes);
 			
-			geos::geom::Envelope *env = new geos::geom::Envelope();
-			env->init((tiePt->eastings - windowXWidth), 
-					  (tiePt->eastings + windowXWidth + overlap->xRes), 
-					  (tiePt->northings - windowYHeight),
-					  (tiePt->northings + windowYHeight + +overlap->yRes));
+			OGREnvelope *env = new OGREnvelope();
+			env->MinX = (tiePt->eastings - windowXWidth);
+			env->MaxX = (tiePt->eastings + windowXWidth + overlap->xRes);
+			env->MinY = (tiePt->northings - windowYHeight);
+			env->MaxY = (tiePt->northings + windowYHeight + overlap->yRes);
 			
 			unsigned int numSearchPoints = (searchArea*2)+1;
 			float **imageSimilarity = new float*[numSearchPoints];
@@ -177,8 +177,6 @@ namespace rsgis{namespace reg{
             // Remainder for heighest metric
             float currentRemainderX = 0;
             float currentRemainderY = 0;
-            
-            
 			
             // Move floating window over search space
 			for(int yShift = yShiftStart; yShift <= yShiftEnd; ++yShift)
@@ -433,12 +431,12 @@ namespace rsgis{namespace reg{
 			
 			double windowXWidth = (((double)windowSize)*overlap->xRes);
 			double windowYHeight = (((double)windowSize)*overlap->yRes);
-			
-			geos::geom::Envelope *env = new geos::geom::Envelope();
-			env->init((tiePt->eastings - windowXWidth),
-					  (tiePt->eastings + windowXWidth + overlap->xRes),
-					  (tiePt->northings - windowYHeight),
-					  (tiePt->northings + windowYHeight + +overlap->yRes));
+
+            OGREnvelope *env = new OGREnvelope();
+            env->MinX = (tiePt->eastings - windowXWidth);
+            env->MaxX = (tiePt->eastings + windowXWidth + overlap->xRes);
+            env->MinY = (tiePt->northings - windowYHeight);
+            env->MaxY = (tiePt->northings + windowYHeight + overlap->yRes);
 			
 			unsigned int numSearchPoints = (searchArea*2)+1;
 			float **imageSimilarity = new float*[numSearchPoints];
@@ -1025,7 +1023,7 @@ namespace rsgis{namespace reg{
 		}
 	}
     
-    void RSGISImageRegistration::getImageOverlapWithFloatShift(float xShift, float yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, float *remainderX, float *remainderY)
+    void RSGISImageRegistration::getImageOverlapWithFloatShift(float xShift, float yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, OGREnvelope *env, float *remainderX, float *remainderY)
 	{
 		if(!overlapDefined)
 		{
@@ -1113,31 +1111,36 @@ namespace rsgis{namespace reg{
 			}
 			
 			// Check whether the overlapping region intersects within the Envelop
-			geos::geom::Envelope overlapEnv = geos::geom::Envelope(tlX, brX, brY, tlY);
-			if(!env->intersects(&overlapEnv))
+            OGREnvelope overlapEnv = OGREnvelope();
+            overlapEnv.MinX = tlX;
+            overlapEnv.MaxX = brX;
+            overlapEnv.MinY = brY;
+            overlapEnv.MaxY = tlY;
+
+			if(!env->Intersects(overlapEnv))
 			{
 				throw RSGISRegistrationException("The overlapping region of the images does not intersect with the envelop provided");
 			}
 			
 			// Trim to region overlapping with the envelop
-			if(tlX < env->getMinX())
+			if(tlX < env->MinX)
 			{
-				tlX = env->getMinX();
+				tlX = env->MinX;
 			}
 			
-			if(tlY > env->getMaxY())
+			if(tlY > env->MaxY)
 			{
-				tlY = env->getMaxY();
+				tlY = env->MaxY;
 			}
 			
-			if(brX > env->getMaxX())
+			if(brX > env->MaxX)
 			{
-				brX = env->getMaxX();
+				brX = env->MaxX;
 			}
 			
-			if(brY < env->getMinY())
+			if(brY < env->MinY)
 			{
-				brY = env->getMinY();
+				brY = env->MinY;
 			}
 
 			
@@ -1227,7 +1230,7 @@ namespace rsgis{namespace reg{
 		double windowXWidth = (((double)windowSize)*overlap->xRes);
 		double windowYHeight = (((double)windowSize)*overlap->yRes);
 		
-		geos::geom::Envelope *env = new geos::geom::Envelope();
+		OGREnvelope *env = new OGREnvelope();
 		
 		float **refDataBlock = NULL;
 		float **floatDataBlock = NULL;
@@ -1246,10 +1249,10 @@ namespace rsgis{namespace reg{
 			std::list<TiePoint*>::iterator iterTiePts;
 			for(iterTiePts = tiePts->begin(); iterTiePts != tiePts->end(); )
 			{
-				env->init(((*iterTiePts)->eastings - windowXWidth), 
-						  ((*iterTiePts)->eastings + windowXWidth + overlap->xRes), 
-						  ((*iterTiePts)->northings - windowYHeight),
-						  ((*iterTiePts)->northings + windowYHeight + +overlap->yRes));
+                env->MinX = ((*iterTiePts)->eastings - windowXWidth);
+                env->MaxX = ((*iterTiePts)->eastings + windowXWidth + overlap->xRes);
+                env->MinY = ((*iterTiePts)->northings - windowYHeight);
+                env->MaxY = ((*iterTiePts)->northings + windowYHeight + +overlap->yRes);
 				
 				this->getImageOverlapWithFloatShift(0, 0, dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env, &remainderX, &remainderY);
 				

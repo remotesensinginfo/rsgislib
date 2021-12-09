@@ -40,7 +40,7 @@ namespace rsgis{namespace vec{
 		muParser->SetExpr(mathsExpression.c_str());
 	}
 	
-	void RSGISVectorMaths::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
+	void RSGISVectorMaths::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, OGREnvelope *env, long fid)
 	{
 		try 
 		{

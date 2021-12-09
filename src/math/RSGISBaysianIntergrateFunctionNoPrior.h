@@ -24,7 +24,7 @@
 #ifndef RSGISBaysianIntergrateFunctionNoPrior_H
 #define RSGISBaysianIntergrateFunctionNoPrior_H
 
-#include <math.h>
+#include <cmath>
 #include "math/RSGISMathFunction.h"
 
 // mark all exported classes/functions with DllExport to have

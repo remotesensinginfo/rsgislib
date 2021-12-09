@@ -94,10 +94,7 @@ namespace rsgis{ namespace cmds {
 
     /** Function to run command to merge clump image */
     DllExport void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage, bool mergeRATs);
-    
-    /** Function to run command to merge clump image */
-    DllExport void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript);
-    
+
     /** Function to remove small clumps */
     DllExport void executeRMSmallClumps(std::string clumpsImage, std::string outputImage, float threshold, std::string imgFormat);
     
@@ -115,10 +112,7 @@ namespace rsgis{ namespace cmds {
     
     /** Function merge clumps with same value */
     DllExport void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::vector<std::string> clumpsValCols);
-    
-    /** Function to grow regions until some termination criteria are met */
-    DllExport void executePxlGrowRegions(std::string clumpsImage, std::string valsImage, std::string outputImage, std::string imageFormat, std::string muParseCriteria, std::vector<VarImgBandPairs> varNameBandPairs);
-    
+
     
 }}
 

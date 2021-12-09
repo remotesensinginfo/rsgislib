@@ -44,19 +44,24 @@ static void FreePythonObjects(std::vector<PyObject*> toFree) {
     }
 }
 
-static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
+static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("out_img_base"),
+                             RSGIS_PY_C_TEXT("image_filters"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("out_img_ext"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pszInputImage, *pszOutputImageBase;
     const char *pszImageFormat = "KEA";
     const char *pszImageExt = "kea";
     int dataType = 9; // Default to 32 bit float
     PyObject *pImageFilterCmds;
-    if( !PyArg_ParseTuple(args, "ssO|ssi:applyfilters", &pszInputImage, &pszOutputImageBase, &pImageFilterCmds, &pszImageFormat, &pszImageExt, &dataType))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO|ssi:apply_filters", kwlist, &pszInputImage, &pszOutputImageBase, &pImageFilterCmds, &pszImageFormat, &pszImageExt, &dataType))
+    {
+        return nullptr;
+    }
 
     // extract the attributes from the sequence of objects into our structs
     Py_ssize_t nFilters = PySequence_Size(pImageFilterCmds);
-    std::vector<rsgis::cmds::RSGISFilterParameters*> *filterParameters = NULL;
+    std::vector<rsgis::cmds::RSGISFilterParameters*> *filterParameters = nullptr;
     filterParameters = new std::vector<rsgis::cmds::RSGISFilterParameters*>();
     filterParameters->reserve(nFilters);
 
@@ -69,58 +74,58 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
         rsgis::cmds::RSGISFilterParameters *cmdObj = new rsgis::cmds::RSGISFilterParameters();   // the c++ object we need to pass pointers of
 
         // declare and initialise pointers for all the attributes of the struct
-        PyObject *pFilterType, *pFileEnding, *pSize, *pOption, *pNLooks, *pStdDev, *pStdDevX , *pStdDevY, *pAngle = NULL;
+        PyObject *pFilterType, *pFileEnding, *pSize, *pOption, *pNLooks, *pStdDev, *pStdDevX , *pStdDevY, *pAngle = nullptr;
 
         std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
         extractedAttributes.push_back(o);
         
         // Get required fields
         // Filter type
-        pFilterType = PyObject_GetAttrString(o, "filterType");
+        pFilterType = PyObject_GetAttrString(o, "filter_type");
         extractedAttributes.push_back(pFilterType);
-        if( ( pFilterType == NULL ) || ( pFilterType == Py_None ) || !RSGISPY_CHECK_STRING(pFilterType) ) 
+        if( ( pFilterType == nullptr ) || ( pFilterType == Py_None ) || !RSGISPY_CHECK_STRING(pFilterType) ) 
         {
-            PyErr_SetString(GETSTATE(self)->error, "Need to provide filter 'type'" );
+            PyErr_SetString(GETSTATE(self)->error, "Need to provide filter 'filter_type'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iter = filterParameters->begin(); iter != filterParameters->end(); ++iter) 
+            for(auto iter = filterParameters->begin(); iter != filterParameters->end(); ++iter)
             {
                 delete *iter;
             }
             delete cmdObj;
-            return NULL;
+            return nullptr;
         }
         cmdObj->type = RSGISPY_STRING_EXTRACT(pFilterType);
         std::cout << " " << i+1 << ") " << cmdObj->type << ": ";
 
         // File Ending
-        pFileEnding = PyObject_GetAttrString(o, "fileEnding");
+        pFileEnding = PyObject_GetAttrString(o, "file_ending");
         extractedAttributes.push_back(pFileEnding);
-        if( ( pFileEnding == NULL ) || ( pFileEnding == Py_None ) || !RSGISPY_CHECK_STRING(pFileEnding) ) 
+        if( ( pFileEnding == nullptr ) || ( pFileEnding == Py_None ) || !RSGISPY_CHECK_STRING(pFileEnding) ) 
         {
-            PyErr_SetString(GETSTATE(self)->error, "Need to provide 'fileEnding'" );
+            PyErr_SetString(GETSTATE(self)->error, "Need to provide 'file_ending'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iter = filterParameters->begin(); iter != filterParameters->end(); ++iter) 
+            for(auto iter = filterParameters->begin(); iter != filterParameters->end(); ++iter)
             {
                 delete *iter;
             }
             delete cmdObj;
-            return NULL;
+            return nullptr;
         }
         cmdObj->fileEnding = RSGISPY_STRING_EXTRACT(pFileEnding);
          
         // Filter size
         pSize = PyObject_GetAttrString(o, "size");
         extractedAttributes.push_back(pSize);
-        if( ( pSize == NULL ) || ( pSize == Py_None ) || !RSGISPY_CHECK_INT(pSize) )
+        if( ( pSize == nullptr ) || ( pSize == Py_None ) || !RSGISPY_CHECK_INT(pSize) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Need to provide filter 'size'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iter = filterParameters->begin(); iter != filterParameters->end(); ++iter) 
+            for(auto iter = filterParameters->begin(); iter != filterParameters->end(); ++iter)
             {
                 delete *iter;
             }
             delete cmdObj;
-            return NULL;
+            return nullptr;
         }
         if( (cmdObj->type != "Sobel") && (cmdObj->type != "Prewitt") )
         {
@@ -132,15 +137,15 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
         // TODO: Add checks that required parameters are passed in for each filter.
         pOption = PyObject_GetAttrString(o, "option");
         extractedAttributes.push_back(pOption);
-        if( (pOption != NULL) & RSGISPY_CHECK_STRING(pOption) )
+        if( (pOption != nullptr) & RSGISPY_CHECK_STRING(pOption) )
         {
             cmdObj->option = RSGISPY_STRING_EXTRACT(pOption);
             std::cout << "option = " << cmdObj->option << " ";
         }
 
-        pNLooks = PyObject_GetAttrString(o, "nLooks");
+        pNLooks = PyObject_GetAttrString(o, "n_looks");
         extractedAttributes.push_back(pNLooks);
-        if( !(pNLooks == NULL) & RSGISPY_CHECK_INT(pNLooks) )
+        if( !(pNLooks == nullptr) & RSGISPY_CHECK_INT(pNLooks) )
         {
             cmdObj->nLooks = RSGISPY_INT_EXTRACT(pNLooks);
             std::cout << "nLooks = " << cmdObj->nLooks << " ";
@@ -148,23 +153,23 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
 
         pStdDev = PyObject_GetAttrString(o, "stddev");
         extractedAttributes.push_back(pStdDev);
-        if( !(pStdDev == NULL) & (RSGISPY_CHECK_FLOAT(pStdDev) | RSGISPY_CHECK_INT(pStdDev)) )
+        if( !(pStdDev == nullptr) & (RSGISPY_CHECK_FLOAT(pStdDev) | RSGISPY_CHECK_INT(pStdDev)) )
         {
             cmdObj->stddev = RSGISPY_FLOAT_EXTRACT(pStdDev);
             std::cout << "StdDev = " << cmdObj->stddev << " ";
         }
         
-        pStdDevX = PyObject_GetAttrString(o, "stddevX");
+        pStdDevX = PyObject_GetAttrString(o, "stddev_x");
         extractedAttributes.push_back(pStdDevX);
-        if( !(pStdDevX == NULL) & (RSGISPY_CHECK_FLOAT(pStdDevX) | RSGISPY_CHECK_INT(pStdDevX)) )
+        if( !(pStdDevX == nullptr) & (RSGISPY_CHECK_FLOAT(pStdDevX) | RSGISPY_CHECK_INT(pStdDevX)) )
         {
             cmdObj->stddevX = RSGISPY_FLOAT_EXTRACT(pStdDevX);
             std::cout << "StdDevX = " << cmdObj->stddevX << " ";
         }
 
-        pStdDevY = PyObject_GetAttrString(o, "stddevY");
+        pStdDevY = PyObject_GetAttrString(o, "stddev_y");
         extractedAttributes.push_back(pStdDevY);
-        if( !(pStdDevY == NULL) & (RSGISPY_CHECK_FLOAT(pStdDevY) | RSGISPY_CHECK_INT(pStdDevY)) )
+        if( !(pStdDevY == nullptr) & (RSGISPY_CHECK_FLOAT(pStdDevY) | RSGISPY_CHECK_INT(pStdDevY)) )
         {
             cmdObj->stddevY = RSGISPY_FLOAT_EXTRACT(pStdDevY);
             std::cout << "StdDevY = " << cmdObj->stddevY << " ";
@@ -172,7 +177,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
 
         pAngle = PyObject_GetAttrString(o, "angle");
         extractedAttributes.push_back(pAngle);
-        if( !(pAngle == NULL) & RSGISPY_CHECK_FLOAT(pAngle) )
+        if( !(pAngle == nullptr) & RSGISPY_CHECK_FLOAT(pAngle) )
         {
             cmdObj->angle = RSGISPY_FLOAT_EXTRACT(pAngle);
             std::cout << "angle = " << cmdObj->angle << " ";
@@ -189,7 +194,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
         rsgis::cmds::executeFilter(pszInputImage, filterParameters, pszOutputImageBase, pszImageFormat, pszImageExt, type);
 
         // Delete filter parameters
-        for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
+        for(auto iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
         {
             delete *iterFilter;
         }
@@ -199,25 +204,30 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args)
+static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("out_img_base"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("out_img_ext"),
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pszInputImage, *pszOutputImageBase;
     const char *pszImageFormat = "KEA";
     const char *pszImageExt = "kea";
     int dataType = 9; // Default to 32 bit float
-    if( !PyArg_ParseTuple(args, "ss|ssi:LeungMalikFilterBank", &pszInputImage, &pszOutputImageBase, &pszImageFormat, &pszImageExt, &dataType))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ss|ssi:leung_malik_filter_bank", kwlist, &pszInputImage, &pszOutputImageBase, &pszImageFormat, &pszImageExt, &dataType))
+    {
+        return nullptr;
+    }
 
     try
     {
         // Set up filter Band
-        std::vector<rsgis::cmds::RSGISFilterParameters*> *filterParameters = NULL;
+        std::vector<rsgis::cmds::RSGISFilterParameters*> *filterParameters = nullptr;
         
         filterParameters = rsgis::cmds::createLeungMalikFilterBank();
         
@@ -228,7 +238,7 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
         rsgis::cmds::executeFilter(pszInputImage, filterParameters, pszOutputImageBase, pszImageFormat, pszImageExt, type);
 
         // Delete filter parameters
-        for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
+        for(auto iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
         {
             delete *iterFilter;
         }
@@ -238,7 +248,7 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -246,16 +256,17 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
 
 // Our list of functions in this module
 static PyMethodDef ImageFilterMethods[] = {
-    {"applyfilters", ImageFilter_Filter, METH_VARARGS, 
-"imagefilter.applyfilters(inputimage, outputImageBase, filterparameters, gdalformat, outExt, datatype)\n"
+{"apply_filters", (PyCFunction)ImageFilter_Filter, METH_VARARGS | METH_KEYWORDS,
+"imagefilter.apply_filters(input_img, out_img_base, image_filters, gdalformat, out_img_ext, datatype)\n"
 "Filters images\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputimage: is a string containing the name of the input image\n"
-":param outputImageBase: is a string containing the base name of the output images\n"
-":param filterparameters: is list of rsgislib.imagefilter.FilterParameters objects providing the type of filter and required parameters (see example)\n"
+":param input_img: is a string containing the name of the input image\n"
+":param out_img_base: is a string containing the base name of the output images\n"
+":param image_filters: is list of rsgislib.imagefilter.FilterParameters objects providing the type of filter and required parameters (see example)\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param out_img_ext: is a string with the output image file extention (e.g., kea)"
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 "Example::\n"
@@ -298,19 +309,20 @@ static PyMethodDef ImageFilterMethods[] = {
 "   filters.append(imagefilter.FilterParameters(filterType = 'NormVarLn', fileEnding = 'normvarln', size=3) )\n"
 "   filters.append(imagefilter.FilterParameters(filterType = 'TextureVar', fileEnding = 'texturevar', size=3) )\n"
 "   # Apply filters\n"
-"   imagefilter.applyfilters(inputImage, outputImageBase, filters, gdalformat, outExt, datatype)\n"
+"   imagefilter.apply_filters(inputImage, outputImageBase, filters, gdalformat, outExt, datatype)\n"
 "\n"},
 
-    {"LeungMalikFilterBank", ImageFilter_LeungMalikFilterBank, METH_VARARGS, 
-"imagefilter.(inputimage, outputImageBase, gdalformat, outExt, datatype)\n"
+{"leung_malik_filter_bank", (PyCFunction)ImageFilter_LeungMalikFilterBank, METH_VARARGS | METH_KEYWORDS,
+"imagefilter.(input_img, out_img_base, gdalformat, out_img_ext, datatype)\n"
 "Implements the Leung-Malik filter bank described in:\n"
 "Leung, T., Malik, J., 2001. Representing and recognizing the visual appearance of materials using three-dimensional textons.\n"
 "International Journal of Computer Vision 43 (1), 29-44.\n"
 "Where:\n"
 "\n"
-":param inputimage: is a string containing the name of the input image\n"
-":param outputImageBase: is a string containing the base name of the output images\n"
+":param input_img: is a string containing the name of the input image\n"
+":param out_img_base: is a string containing the base name of the output images\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param out_img_ext: is a string with the output image file extention (e.g., kea)"
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 "Example::\n"
@@ -322,10 +334,10 @@ static PyMethodDef ImageFilterMethods[] = {
 "   gdalformat = 'KEA'\n"
 "   outExt = 'kea'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
-"   imagefilter.LeungMalikFilterBank(inputImage, outputImageBase, gdalformat, outExt, datatype)\n"
+"   imagefilter.leung_malik_filter_bank(inputImage, outputImageBase, gdalformat, outExt, datatype)\n"
 "\n"},
 
-    {NULL}        /* Sentinel */
+    {nullptr}        /* Sentinel */
 };
 
 
@@ -346,16 +358,16 @@ static int ImageFilter_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_imagefilter",
-        NULL,
+        nullptr,
         sizeof(struct ImageFilterState),
         ImageFilterMethods,
-        NULL,
+        nullptr,
         ImageFilter_traverse,
         ImageFilter_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__imagefilter(void)
@@ -372,14 +384,14 @@ init_imagefilter(void)
 #else
     PyObject *pModule = Py_InitModule("_imagefilter", ImageFilterMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct ImageFilterState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_imagefilter.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_imagefilter.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;

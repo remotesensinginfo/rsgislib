@@ -17,6 +17,8 @@ import os
 import rsgislib
 import datetime
 
+import stanford_theme
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -65,7 +67,7 @@ copyright = u'{}, Pete Bunting and Daniel Clewley'.format(datetime.datetime.now(
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-version_str = '{}'.format(rsgislib.getRSGISLibVersion())
+version_str = '{}'.format(rsgislib.get_rsgislib_version())
 version_comps = version_str.split('.')
 short_version = '{}.{}'.format(version_comps[0], version_comps[1])
 # The short X.Y version.
@@ -118,7 +120,10 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #html_theme = 'default'
-html_theme = 'python_docs_theme'
+#html_theme = 'python_docs_theme'
+#html_theme = 'karma_sphinx_theme'
+html_theme = 'stanford_theme'
+html_theme_path = [stanford_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -137,7 +142,7 @@ html_title = "RSGISLib"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "rsgislib-logo.png"
+html_logo = "rsgislib-logo-white-sml.png"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -151,11 +156,11 @@ html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
-#html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
-#html_use_smartypants = True
+html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
@@ -174,7 +179,7 @@ html_static_path = ['_static']
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 #html_show_sphinx = True
@@ -193,8 +198,7 @@ html_use_opensearch = 'True'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'RSGISLibdoc'
 
-extlinks = {'issue': ('https://bitbucket.org/petebunting/rsgislib/issue/%s/',
-                      'issue ')}
+extlinks = {'issue': ('https://github.com/remotesensinginfo/rsgislib/issues')}
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -276,4 +280,4 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+#intersphinx_mapping = {'http://docs.python.org/': None}

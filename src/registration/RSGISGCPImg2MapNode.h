@@ -25,7 +25,7 @@
 #ifndef RSGISGCPImg2MapNode_H
 #define RSGISGCPImg2MapNode_H
 
-#include <math.h>
+#include <cmath>
 
 #include "common/RSGISCommons.h"
 

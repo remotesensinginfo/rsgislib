@@ -28,16 +28,6 @@
 
 #include "gdal_priv.h"
 
-#include <geos/geom/Envelope.h>
-#include <geos/geom/Polygon.h>
-#include <geos/geom/GeometryFactory.h>
-#include <geos/geom/Coordinate.h>
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/geom/LinearRing.h"
-#include "geos/geom/LineString.h"
-#include "geos/geom/PrecisionModel.h"
-#include "geos/util/IllegalArgumentException.h"
-
 #include "common/rsgis-tqdm.h"
 
 #include "img/RSGISImageCalcException.h"
@@ -67,8 +57,8 @@ namespace rsgis{namespace img{
 			void calcImage(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS, double *outputValue, int bandA, int bandB);
 			void calcImage(GDALDataset **datasetsA, int numDS, double *outputValue, int band);
 			void calcImageWindow(GDALDataset **datasetsA, int numDS, double *outputValue);
-			void calcImageWithinPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, geos::geom::Polygon *poly, bool output, pixelInPolyOption pixelPolyOption);
-			void calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, long fid, bool output);
+			void calcImageWithinPolygon(GDALDataset **datasets, int numDS, double *outputValue, OGREnvelope *env, OGRPolygon *poly, bool output, pixelInPolyOption pixelPolyOption);
+			void calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, double *outputValue, OGREnvelope *env, long fid, bool output);
 			RSGISCalcImageSingleValue* getRSGISCalcImageSingleValue();
 			virtual ~RSGISCalcImageSingle();
 		protected:

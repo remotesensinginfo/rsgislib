@@ -25,7 +25,7 @@
 #ifndef RSGISStandardImageSimilarityMetrics_H
 #define RSGISStandardImageSimilarityMetrics_H
 
-#include <math.h>
+#include <cmath>
 
 #include "math/RSGISMathException.h"
 
@@ -83,6 +83,74 @@ namespace rsgis{namespace reg{
 		bool findMin(){return false;};
 		~RSGISCorrelationSimilarityMetric(){};
 	};
+
+
+
+
+
+
+
+    class DllExport RSGISImgCalcEuclideanSimilarityMetric : public RSGISImageCalcSimilarityMetric
+    {
+    public:
+        RSGISImgCalcEuclideanSimilarityMetric(std::vector<unsigned int> imgABands, std::vector<unsigned int> imgBBands, float imgANoData, bool useImgANoData, float imgBNoData, bool useImgBNoData);
+        void calcImageValue(float *bandValues, int numBands);
+        bool findMin(){return true;};
+        void reset();
+        double metricVal();
+        ~RSGISImgCalcEuclideanSimilarityMetric(){};
+    protected:
+        unsigned int n;
+        double sum;
+    };
+
+    class DllExport RSGISImgCalcManhattanSimilarityMetric : public RSGISImageCalcSimilarityMetric // Also referred to as the taxicab distance
+    {
+    public:
+        RSGISImgCalcManhattanSimilarityMetric(std::vector<unsigned int> imgABands, std::vector<unsigned int> imgBBands, float imgANoData, bool useImgANoData, float imgBNoData, bool useImgBNoData);
+        void calcImageValue(float *bandValues, int numBands);
+        bool findMin(){return true;};
+        void reset();
+        double metricVal();
+        ~RSGISImgCalcManhattanSimilarityMetric(){};
+    protected:
+        unsigned int n;
+        double sum;
+    };
+
+    class DllExport RSGISImgCalcSquaredDifferenceSimilarityMetric : public RSGISImageCalcSimilarityMetric
+    {
+    public:
+        RSGISImgCalcSquaredDifferenceSimilarityMetric(std::vector<unsigned int> imgABands, std::vector<unsigned int> imgBBands, float imgANoData, bool useImgANoData, float imgBNoData, bool useImgBNoData);
+        void calcImageValue(float *bandValues, int numBands);
+        bool findMin(){return true;};
+        void reset();
+        double metricVal();
+        ~RSGISImgCalcSquaredDifferenceSimilarityMetric(){};
+    protected:
+        unsigned int n;
+        double sum;
+    };
+
+    class DllExport RSGISImgCalcCorrelationSimilarityMetric : public RSGISImageCalcSimilarityMetric
+    {
+    public:
+        RSGISImgCalcCorrelationSimilarityMetric(std::vector<unsigned int> imgABands, std::vector<unsigned int> imgBBands, float imgANoData, bool useImgANoData, float imgBNoData, bool useImgBNoData);
+        void calcImageValue(float *bandValues, int numBands);
+        bool findMin(){return false;};
+        void reset();
+        double metricVal();
+        ~RSGISImgCalcCorrelationSimilarityMetric(){};
+    protected:
+        unsigned int n;
+        double sumRF;
+        double sumR;
+        double sumF;
+        double sumRSq;
+        double sumFSq;
+    };
+
+
 }}
 
 #endif

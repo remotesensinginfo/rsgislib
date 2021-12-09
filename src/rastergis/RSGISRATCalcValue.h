@@ -25,7 +25,7 @@
 
 #include <iostream>
 #include <string>
-#include <math.h>
+#include <cmath>
 
 #include "common/RSGISAttributeTableException.h"
 

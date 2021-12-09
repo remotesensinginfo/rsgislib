@@ -23,7 +23,7 @@
 #ifndef RSGISProbDistro_H
 #define RSGISProbDistro_H
 
-#include <math.h>
+#include <cmath>
 
 #include "common/RSGISCommons.h"
 

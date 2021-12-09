@@ -1,5 +1,8 @@
 # RSGISLib #
 
+[![<remotesensinginfo>](https://circleci.com/gh/remotesensinginfo/rsgislib/tree/rsgislib_v5_dev.svg?style=shield)](https://app.circleci.com/pipelines/github/remotesensinginfo/rsgislib)
+[![codecov](https://codecov.io/gh/remotesensinginfo/rsgislib/branch/rsgislib_v5_dev/graph/badge.svg?token=EHTF2G1KCL)](https://codecov.io/gh/remotesensinginfo/rsgislib)
+
 The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets.
 For more details see the project website: http://rsgislib.org/
 
@@ -17,7 +20,7 @@ You need to be a member of the group to post.
 Please check through existing posts to see if there is already an answer to your question before emailing.
 To help us answer your question provide as much information as possible (RSGISLib version and how you installed it, OS, things you have already tried to solve the problem etc.,).
 
-We occasionally post tutorials on RSGISLib to our [blog](https://spectraldifferences.wordpress.com/tag/rsgislib/).
+We occasionally post tutorials on RSGISLib and other useful bits and pieces to our [website remotesensing.info](https://remotesensing.info).
 
 ## Citing ##
 

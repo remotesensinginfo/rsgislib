@@ -288,33 +288,18 @@ namespace rsgis{ namespace cmds {
     /** Function to identify an extreme clump/segment with regions of the image, regions defined on a grid */
     DllExport void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField);
 
-    /** Function to interpolate values from clumps to the whole image of pixels */
-    DllExport void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType, unsigned int ratband);
-
-    /** Function to calculate the 'Global Segmentation Score' for the clumps using a given input image */
-    //float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps);
-
     /** Function to calculate relative difference statistic to neighbouring clumps. */
     DllExport void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds *fieldStatsCmds, bool useAbsDiff, unsigned int ratBand);
-    
-    /** Function to undertaken region growing of a class */
-    DllExport void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlock);
-    
-    /** Function to evaluate regions to produce a binary classification */
-    DllExport void executeBinaryClassify(std::string clumpsImage, unsigned int ratBand, std::string xmlBlock, std::string outColumn);
-    
-    /** Function for populating an attribute table from an image with 'mean-lit' values. */
+
+       /** Function for populating an attribute table from an image with 'mean-lit' values. */
     DllExport void executePopulateRATWithMeanLitStats(std::string inputImage, std::string clumpsImage, std::string inputMeanLitImage, unsigned int meanlitBand, std::string meanLitColumn, std::string pxlCountCol, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand);
     
     /** Function for collapsing a RAT and assocated image clumps based on a binary column 'selected' column in the RAT */
     DllExport void executeCollapseRAT(std::string clumpsImage, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat);
     
     /** Function for importing attribute table from a shapefile into a RAT */
-    DllExport void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> *colNames=NULL);
-    
-    /** Function to undertaken region growing of a class with a neighbour / object criteria */
-    DllExport void executeClassRegionGrowingNeighCritera(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlockGrowCriteria, std::string xmlBlockNeighCriteria);
-    
+    DllExport void executeImportVecAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> colNames);
+
     /** Function to statistically sample the RAT using a histogram method for a single variable. */
     DllExport void executeHistSampling(std::string clumpsImage, unsigned int ratBand, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict=false, std::string classColumn="", std::string classVal="");
     

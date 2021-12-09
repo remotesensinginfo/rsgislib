@@ -74,7 +74,7 @@ namespace rsgis{ namespace cmds {
                 std::cout << "Opening: " << (*iterBands).imagePath << std::endl;
                 
                 datasets[i] = (GDALDataset *) GDALOpen((*iterBands).imagePath.c_str(), GA_ReadOnly);
-                if(datasets[i] == NULL)
+                if(datasets[i] == nullptr)
                 {
                     std::string message = std::string("Could not open image ") + (*iterBands).imagePath;
                     throw RSGISImageException(message.c_str());
@@ -146,7 +146,7 @@ namespace rsgis{ namespace cmds {
                 std::cout << "Opening: " << (*iterBands).imagePath << std::endl;
                 
                 datasets[i] = (GDALDataset *) GDALOpen((*iterBands).imagePath.c_str(), GA_ReadOnly);
-                if(datasets[i] == NULL)
+                if(datasets[i] == nullptr)
                 {
                     std::string message = std::string("Could not open image ") + (*iterBands).imagePath;
                     throw RSGISImageException(message.c_str());
@@ -203,7 +203,7 @@ namespace rsgis{ namespace cmds {
         {
             std::cout << "Open " << inputImage << std::endl;
             GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
-            if(dataset == NULL)
+            if(dataset == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
@@ -225,7 +225,7 @@ namespace rsgis{ namespace cmds {
             
             rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance calcTopAtmosRefl = rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance(numRasterBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcTopAtmosRefl, "", true);
-            calcImage.calcImage(&dataset, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+            calcImage.calcImage(&dataset, 1, outputImage, false, nullptr, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
             
             GDALClose(dataset);
         }
@@ -249,7 +249,7 @@ namespace rsgis{ namespace cmds {
                 std::string inputImage = inputImages.at(1);
                 std::cout << "Open " << inputImage << std::endl;
                 GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
-                if(dataset == NULL)
+                if(dataset == nullptr)
                 {
                     std::string message = std::string("Could not open image ") + inputImage;
                     throw rsgis::RSGISImageException(message.c_str());
@@ -264,7 +264,7 @@ namespace rsgis{ namespace cmds {
                 
                 rsgis::calib::RSGISCalculateRadianceFromTOAReflectance calcRadFromTOARefl = rsgis::calib::RSGISCalculateRadianceFromTOAReflectance(numRasterBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
                 rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcRadFromTOARefl, "", true);
-                calcImage.calcImage(&dataset, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+                calcImage.calcImage(&dataset, 1, outputImage, false, nullptr, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
                 
                 GDALClose(dataset);
             }
@@ -281,7 +281,7 @@ namespace rsgis{ namespace cmds {
                 {
                     datasets[i] = (GDALDataset *) GDALOpen(inputImages.at(i).c_str(), GA_ReadOnly);
                     
-                    if(datasets[i] == NULL)
+                    if(datasets[i] == nullptr)
                     {
                         std::string message = std::string("Could not open image ") + inputImages.at(i);
                         throw rsgis::RSGISImageException(message.c_str());
@@ -295,7 +295,7 @@ namespace rsgis{ namespace cmds {
                 
                 rsgis::calib::RSGISCalculateRadianceFromTOAReflectance calcTopAtmosRefl = rsgis::calib::RSGISCalculateRadianceFromTOAReflectance(nImgsBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
                 rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcTopAtmosRefl, "", true);
-                calcImage.calcImage(datasets, nImgsBands, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+                calcImage.calcImage(datasets, nImgsBands, outputImage, false, nullptr, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
                 for(unsigned int i = 0; i < nImgsBands; ++i)
                 {
                     GDALClose(datasets[i]);
@@ -325,7 +325,7 @@ namespace rsgis{ namespace cmds {
             GDALDataset **datasets = new GDALDataset*[1];
             std::cout << "Open image" << inputImage << std::endl;
             datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
+            if(datasets[0] == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
@@ -347,7 +347,7 @@ namespace rsgis{ namespace cmds {
             rsgis::calib::RSGISApply6SCoefficientsSingleParam *apply6SCoefficients = new rsgis::calib::RSGISApply6SCoefficientsSingleParam(imageBands, aX, bX, cX, numValues, noDataVal, useNoDataVal, scaleFactor);
             
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(apply6SCoefficients, "", true);
-            calcImage->calcImage(datasets, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+            calcImage->calcImage(datasets, 1, outputImage, false, nullptr, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
             
             delete apply6SCoefficients;
             delete calcImage;
@@ -374,7 +374,7 @@ namespace rsgis{ namespace cmds {
             GDALDataset **datasets = new GDALDataset*[2];
             std::cout << "Open DEM image: \'" << inputDEM << "\'" << std::endl;
             datasets[0] = (GDALDataset *) GDALOpen(inputDEM.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
+            if(datasets[0] == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputDEM;
                 throw rsgis::RSGISImageException(message.c_str());
@@ -392,7 +392,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Open Radiance image: \'" << inputRadImage << "\'" << std::endl;
             datasets[1] = (GDALDataset *) GDALOpen(inputRadImage.c_str(), GA_ReadOnly);
-            if(datasets[1] == NULL)
+            if(datasets[1] == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputRadImage;
                 throw rsgis::RSGISImageException(message.c_str());
@@ -438,7 +438,7 @@ namespace rsgis{ namespace cmds {
             rsgis::calib::RSGISApply6SCoefficientsElevLUTParam *apply6SCoefficients = new rsgis::calib::RSGISApply6SCoefficientsElevLUTParam(numRasterBands, rsgisLUT, demNoDataVal, noDataVal, useNoDataVal, scaleFactor);
             
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(apply6SCoefficients, "", true);
-            calcImage->calcImage(datasets, 2, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+            calcImage->calcImage(datasets, 2, outputImage, false, nullptr, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
             
             delete apply6SCoefficients;
             delete calcImage;
@@ -474,7 +474,7 @@ namespace rsgis{ namespace cmds {
             GDALDataset **datasets = new GDALDataset*[3];
             std::cout << "Open DEM image: \'" << inputDEM << "\'" << std::endl;
             datasets[0] = (GDALDataset *) GDALOpen(inputDEM.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
+            if(datasets[0] == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputDEM;
                 throw rsgis::RSGISImageException(message.c_str());
@@ -482,7 +482,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Open AOT image: \'" << inputAOTImg << "\'" << std::endl;
             datasets[1] = (GDALDataset *) GDALOpen(inputAOTImg.c_str(), GA_ReadOnly);
-            if(datasets[1] == NULL)
+            if(datasets[1] == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputAOTImg;
                 throw rsgis::RSGISImageException(message.c_str());
@@ -490,7 +490,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Open Radiance image: \'" << inputRadImage << "\'" << std::endl;
             datasets[2] = (GDALDataset *) GDALOpen(inputRadImage.c_str(), GA_ReadOnly);
-            if(datasets[2] == NULL)
+            if(datasets[2] == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputRadImage;
                 throw rsgis::RSGISImageException(message.c_str());

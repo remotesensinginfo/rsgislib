@@ -28,7 +28,7 @@
 #include "classifier/RSGISClassifier.h"
 #include "math/RSGISMatrices.h"
 #include "common/RSGISClassificationException.h"
-#include <math.h>
+#include <cmath>
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio

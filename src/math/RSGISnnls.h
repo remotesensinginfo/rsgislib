@@ -10,7 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
-#include <math.h>
+#include <cmath>
 
 #include "common/RSGISCommons.h"
 

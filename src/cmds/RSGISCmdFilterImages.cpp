@@ -49,9 +49,10 @@ namespace rsgis{ namespace cmds {
             // Get filter parameters and add to filter bank
             for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
             {
-                
-                if((*iterFilter)->type == ""){std::cerr << "No type set, skipping filter" << std::endl;}
-                                        
+                if((*iterFilter)->type == "")
+                {
+                    std::cerr << "No type set, skipping filter" << std::endl;
+                }
                 else if((*iterFilter)->type == "GaussianSmooth")
                 {
                     rsgis::filter::RSGISCalcGaussianSmoothFilter *calcGaussianSmoothFilter = new rsgis::filter::RSGISCalcGaussianSmoothFilter((*iterFilter)->stddevX, (*iterFilter)->stddevY, (*iterFilter)->angle);
@@ -94,9 +95,7 @@ namespace rsgis{ namespace cmds {
                 }
                 else if((*iterFilter)->type == "Sobel")
                 {
-                    
                     rsgis::filter::RSGISImageFilter *filter = NULL;
-                    
                     if((*iterFilter)->option == "x")
                     {
                         filter = new rsgis::filter::RSGISSobelFilter(0, 3, (*iterFilter)->fileEnding, rsgis::filter::RSGISSobelFilter::x);
@@ -118,7 +117,6 @@ namespace rsgis{ namespace cmds {
                 }
                 else if((*iterFilter)->type == "Prewitt")
                 {
-                    
                     rsgis::filter::RSGISImageFilter *filter = NULL;
                     
                     if((*iterFilter)->option == "x")
@@ -241,7 +239,6 @@ namespace rsgis{ namespace cmds {
                     filterBank->addFilter(filter);
                 }
                 else{std::cerr << "Filter not recognised - skipping" << std::endl;}
-
             }
             
             GDALAllRegister();
@@ -261,7 +258,6 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset[0]);
             delete[] dataset;
             delete filterBank;
-            
         }
         catch(rsgis::RSGISException &e)
         {
@@ -290,7 +286,6 @@ namespace rsgis{ namespace cmds {
             filterParameters->reserve(48);
             
             rsgis::cmds::RSGISFilterParameters *filterPar = NULL;
-            
 
             // GENERATE LAPACIAN FILTERS
             for(int i = 0; i < 8; i++)
@@ -345,8 +340,7 @@ namespace rsgis{ namespace cmds {
                 
                 filterParameters->push_back(filterPar);
             }
-            
-            
+
             // Gaussian Smoothing Filters
             angle = 0;
             for(int i = 0; i < 4; i++)
@@ -371,8 +365,8 @@ namespace rsgis{ namespace cmds {
                 }
                 else if(i == 3)
                 {
-                    stddevX = 2*sqrt(2.0);
-                    stddevY = 2*sqrt(2.0);
+                    stddevX = 2.0*sqrt(2.0);
+                    stddevY = 2.0*sqrt(2.0);
                     fileEnding = "gausmooth2sqrt2";
                 }
                 
@@ -453,7 +447,6 @@ namespace rsgis{ namespace cmds {
                     filterPar->angle = angle;
                     
                     filterParameters->push_back(filterPar);
-			
                 }
             }
             
@@ -528,7 +521,6 @@ namespace rsgis{ namespace cmds {
             }
             
             return filterParameters;
-            
         }
         catch(rsgis::RSGISException &e)
         {

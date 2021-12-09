@@ -1,100 +1,90 @@
 RSGISLib Raster GIS Module
 =================================
 
-.. automodule:: rsgislib.rastergis
-   :members:
-   :undoc-members:
 
 Utilities
 ----------
 
-.. autofunction:: rsgislib.rastergis.populateStats
-.. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
-.. autofunction:: rsgislib.rastergis.collapseRAT
-.. autofunction:: rsgislib.rastergis.ratutils.createClumpsSHPBBOX
-.. autofunction:: rsgislib.rastergis.ratutils.getColumnData
+.. autofunction:: rsgislib.rastergis.pop_rat_img_stats
+.. autofunction:: rsgislib.rastergis.collapse_rat
+.. autofunction:: rsgislib.rastergis.ratutils.create_clumps_shp_bbox
+.. autofunction:: rsgislib.rastergis.ratutils.get_column_data
 
 Attribute Clumps
 -------------------
 
-.. autofunction:: rsgislib.rastergis.calcBorderLength
-.. autofunction:: rsgislib.rastergis.ratutils.calcDistBetweenClumps
-.. autofunction:: rsgislib.rastergis.ratutils.calcDistToLargeClumps
-.. autofunction:: rsgislib.rastergis.calcRelBorder
-.. autofunction:: rsgislib.rastergis.calcRelDiffNeighStats
-.. autofunction:: rsgislib.rastergis.defineBorderClumps
-.. autofunction:: rsgislib.rastergis.defineClumpTilePositions
-.. autofunction:: rsgislib.rastergis.findBoundaryPixels
-.. autofunction:: rsgislib.rastergis.findNeighbours
-.. autofunction:: rsgislib.rastergis.populateCategoryProportions
-.. autofunction:: rsgislib.rastergis.populateRATWithPercentiles
-.. autofunction:: rsgislib.rastergis.populateRATWithStats
-.. autofunction:: rsgislib.rastergis.populateRATWithMeanLitStats
-.. autofunction:: rsgislib.rastergis.selectClumpsOnGrid
-.. autofunction:: rsgislib.rastergis.spatialLocation
-.. autofunction:: rsgislib.rastergis.spatialExtent
-.. autofunction:: rsgislib.rastergis.strClassMajority
-.. autofunction:: rsgislib.rastergis.populateRATWithMode
-.. autofunction:: rsgislib.rastergis.populateRATWithPropValidPxls
-.. autofunction:: rsgislib.rastergis.ratutils.defineClassNames
-.. autofunction:: rsgislib.rastergis.ratutils.calcDist2Classes
-.. autofunction:: rsgislib.rastergis.ratutils.setColumnData
+.. autofunction:: rsgislib.rastergis.calc_border_length
+.. autofunction:: rsgislib.rastergis.ratutils.calc_dist_between_clumps
+.. autofunction:: rsgislib.rastergis.ratutils.calc_dist_to_large_clumps
+.. autofunction:: rsgislib.rastergis.calc_rel_border
+.. autofunction:: rsgislib.rastergis.calc_rel_diff_neigh_stats
+.. autofunction:: rsgislib.rastergis.define_border_clumps
+.. autofunction:: rsgislib.rastergis.define_clump_tile_positions
+.. autofunction:: rsgislib.rastergis.find_boundary_pixels
+.. autofunction:: rsgislib.rastergis.find_neighbours
+.. autofunction:: rsgislib.rastergis.populate_rat_with_cat_proportions
+.. autofunction:: rsgislib.rastergis.populate_rat_with_percentiles
+.. autofunction:: rsgislib.rastergis.populate_rat_with_stats
+.. autofunction:: rsgislib.rastergis.populate_rat_with_meanlit_stats
+.. autofunction:: rsgislib.rastergis.select_clumps_on_grid
+.. autofunction:: rsgislib.rastergis.clumps_spatial_location
+.. autofunction:: rsgislib.rastergis.clumps_spatial_extent
+.. autofunction:: rsgislib.rastergis.str_class_majority
+.. autofunction:: rsgislib.rastergis.populate_rat_with_mode
+.. autofunction:: rsgislib.rastergis.populate_rat_with_prop_valid_pxls
+.. autofunction:: rsgislib.rastergis.ratutils.define_class_names
+.. autofunction:: rsgislib.rastergis.ratutils.calc_dist_to_classes
+.. autofunction:: rsgislib.rastergis.ratutils.set_column_data
+
 
 Sampling
 --------
-.. autofunction:: rsgislib.rastergis.histoSampling
-.. autofunction:: rsgislib.rastergis.ratutils.takeRandomSample
+.. autofunction:: rsgislib.rastergis.histo_sampling
+.. autofunction:: rsgislib.rastergis.ratutils.take_random_sample
 
 Classification
 --------------
 
-.. autofunction:: rsgislib.rastergis.binaryClassification
-.. autofunction:: rsgislib.rastergis.regionGrowClass
-.. autofunction:: rsgislib.rastergis.regionGrowClassNeighCritera
-.. autofunction:: rsgislib.rastergis.ratutils.identifySmallUnits
-.. autofunction:: rsgislib.rastergis.ratutils.populateClumpsWithClassTraining
-
+.. autofunction:: rsgislib.rastergis.ratutils.identify_small_units
+.. autofunction:: rsgislib.rastergis.class_split_fit_hist_gausian_mixture_model
 
 Extrapolation
 -------------
-.. autofunction:: rsgislib.rastergis.applyKNN
+.. autofunction:: rsgislib.rastergis.apply_rat_knn
 
 Change Detection
 -----------------
 
-.. autofunction:: rsgislib.rastergis.findChangeClumpsFromStdDev
-.. autofunction:: rsgislib.rastergis.getGlobalClassStats
-.. autofunction:: rsgislib.rastergis.classSplitFitHistGausianMixtureModel
-.. autofunction:: rsgislib.rastergis.ratutils.calcPlotGaussianHistoModel
-.. autofunction:: rsgislib.rastergis.ratutils.findChangeClumpsHistSkewKurtTest
-.. autofunction:: rsgislib.rastergis.ratutils.findChangeClumpsHistSkewKurtTestLower
-.. autofunction:: rsgislib.rastergis.ratutils.findChangeClumpsHistSkewKurtTestUpper
-.. autofunction:: rsgislib.rastergis.ratutils.findChangeClumpsHistSkewKurtTestVoteMultiVars
-.. autofunction:: rsgislib.rastergis.ratutils.findClumpsWithinExistingThresholds
+.. autofunction:: rsgislib.rastergis.get_global_class_stats
+.. autofunction:: rsgislib.rastergis.ratutils.find_change_clumps_hist_skew_kurt_test
+.. autofunction:: rsgislib.rastergis.ratutils.find_change_clumps_hist_skew_kurt_test_lower
+.. autofunction:: rsgislib.rastergis.ratutils.find_change_clumps_hist_skew_kurt_test_upper
+.. autofunction:: rsgislib.rastergis.ratutils.find_change_clumps_hist_skew_kurt_test_vote_multi_vars
+.. autofunction:: rsgislib.rastergis.ratutils.find_clumps_within_existing_thresholds
 
 Statistics
 ----------
-.. autofunction:: rsgislib.rastergis.fitHistGausianMixtureModel
-.. autofunction:: rsgislib.rastergis.ratutils.calcPlotGaussianHistoModel
-.. autofunction:: rsgislib.rastergis.calc1DJMDistance
-.. autofunction:: rsgislib.rastergis.calc2DJMDistance
-.. autofunction:: rsgislib.rastergis.calcBhattacharyyaDistance
+.. autofunction:: rsgislib.rastergis.fit_hist_gausian_mixture_model
+.. autofunction:: rsgislib.rastergis.ratutils.calc_plot_gaussian_histo_model
+.. autofunction:: rsgislib.rastergis.calc_1d_jm_distance
+.. autofunction:: rsgislib.rastergis.calc_2d_jm_distance
+.. autofunction:: rsgislib.rastergis.calc_bhattacharyya_distance
+
 
 Copy & Export
 ----------------
-.. autofunction:: rsgislib.rastergis.export2Ascii
-.. autofunction:: rsgislib.rastergis.exportCol2GDALImage
-.. autofunction:: rsgislib.rastergis.exportCols2GDALImage
-.. autofunction:: rsgislib.rastergis.exportClumps2Images
-.. autofunction:: rsgislib.rastergis.copyGDALATTColumns
-.. autofunction:: rsgislib.rastergis.copyRAT
-.. autofunction:: rsgislib.rastergis.interpolateClumpValues2Image
-.. autofunction:: rsgislib.rastergis.importVecAtts
+.. autofunction:: rsgislib.rastergis.export_rat_cols_to_ascii
+.. autofunction:: rsgislib.rastergis.export_col_to_gdal_img
+.. autofunction:: rsgislib.rastergis.export_cols_to_gdal_img
+.. autofunction:: rsgislib.rastergis.export_clumps_to_images
+.. autofunction:: rsgislib.rastergis.copy_gdal_rat_columns
+.. autofunction:: rsgislib.rastergis.copy_rat
+.. autofunction:: rsgislib.rastergis.import_vec_atts
 
 Colour Tables
 ---------------
-.. autofunction:: rsgislib.rastergis.colourClasses
-.. autofunction:: rsgislib.rastergis.ratutils.setClassNamesColours
+.. autofunction:: rsgislib.rastergis.colour_rat_classes
+.. autofunction:: rsgislib.rastergis.ratutils.set_class_names_colours
 
 Data Structures / Enums
 -----------------------

@@ -51,9 +51,9 @@ namespace rsgis{namespace math{
 		
 	void RSGISVectors::freeVector(Vector *vector)
 	{
-		if(vector != NULL)
+		if(vector != nullptr)
 		{
-			if(vector->vector != NULL)
+			if(vector->vector != nullptr)
 			{
 				delete[] vector->vector;
 			}
@@ -193,7 +193,7 @@ namespace rsgis{namespace math{
 					{
 						// n
 						word = strLine.substr(2);
-						number = strtol(word.c_str(), NULL, 10);
+						number = strtol(word.c_str(), nullptr, 10);
 						vector->n = number;
 					}
 					else if(lineCounter == 1)
@@ -209,7 +209,7 @@ namespace rsgis{namespace math{
 							if(strLine.at(i) == ',')
 							{
 								word = strLine.substr(start, i-start);								
-								value = strtod(word.c_str(), NULL);
+								value = strtod(word.c_str(), nullptr);
 								vector->vector[dataCounter] = value;
 								dataCounter++;
 								
@@ -222,7 +222,7 @@ namespace rsgis{namespace math{
 							}
 						}
 						word = strLine.substr(start);
-						value = strtod(word.c_str(), NULL);
+						value = strtod(word.c_str(), nullptr);
 						vector->vector[dataCounter] = value;
 						dataCounter++;
 						
@@ -278,7 +278,7 @@ namespace rsgis{namespace math{
 					{
 						// n
 						word = strLine.substr(2);
-						number = strtol(word.c_str(), NULL, 10);
+						number = strtol(word.c_str(), nullptr, 10);
 						vector->n = number;
 					}
 					else 
@@ -310,7 +310,7 @@ namespace rsgis{namespace math{
 				if(wholeline.at(i) == ',')
 				{
 					word = wholeline.substr(start, i-start);								
-					value = strtod(word.c_str(), NULL);
+					value = strtod(word.c_str(), nullptr);
 					vector->vector[dataCounter] = value;
 					dataCounter++;
 					
@@ -324,7 +324,7 @@ namespace rsgis{namespace math{
 			}
 			
 			word = wholeline.substr(start);
-			value = strtod(word.c_str(), NULL);
+			value = strtod(word.c_str(), nullptr);
 			vector->vector[dataCounter] = value;
 			dataCounter++;
 			
@@ -415,7 +415,7 @@ namespace rsgis{namespace math{
 		/**
 		 * For an explantion of cross products see <a href="http://mathworld.wolfram.com/CrossProduct.html">
 		 */
-		return NULL;
+		return nullptr;
 	}
 	
 	double RSGISVectors::euclideanDistance(Vector *vecA, Vector *vecB)

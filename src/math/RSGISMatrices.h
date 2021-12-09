@@ -26,7 +26,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <math.h>
+#include <cmath>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
 #include "gdal_priv.h"

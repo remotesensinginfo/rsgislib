@@ -2,14 +2,14 @@
 """
 The segmentation module contains the segmentation functionality for RSGISLib.
 
-A number of steps are required for the segmentation, for most users it is recommended to use the `runShepherdSegmentation`
+A number of steps are required for the segmentation, for most users it is recommended to use the `run_shepherd_segmentation`
 helper function which will run all the required steps to generate a segmentation:
 
 Example::
 
     from rsgislib.segmentation import segutils
     
-    segutils.runShepherdSegmentation(inImage,
+    segutils.run_shepherd_segmentation(inImage,
                                      outputClumps,
                                      tmpath='./',
                                      numClusters=60,
@@ -31,5 +31,3 @@ Daniel Clewley, Peter Bunting, James Shepherd, Sam Gillingham, Neil Flood, John 
 
 # import the C++ extension into this level
 from ._segmentation import *
-
-

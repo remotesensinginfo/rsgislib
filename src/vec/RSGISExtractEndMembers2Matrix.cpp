@@ -64,7 +64,7 @@ namespace rsgis{namespace vec{
             RSGISVectorUtils vecUtils;
             OGRPolygon *polygon = NULL;
             OGRGeometry *geometry = NULL;
-            geos::geom::Envelope *env = NULL;            
+            OGREnvelope *env = NULL;
             OGRFeature *inFeature = NULL;
             long fid = 0;
             bool nullGeometry;
@@ -91,7 +91,7 @@ namespace rsgis{namespace vec{
 				
 				if(!nullGeometry)
 				{
-                    std::cout << "Env: [" << env->getMinX() << ", " << env->getMaxX() << "][" << env->getMinY() << ", " << env->getMaxY() << "]\n";
+                    std::cout << "Env: [" << env->MinX << ", " << env->MaxX << "][" << env->MinY << ", " << env->MaxY << "]\n";
                     
 					extractMeanValues->processFeature(inFeature, polygon, env, fid);
                     
@@ -139,15 +139,13 @@ namespace rsgis{namespace vec{
         this->pixelPolyOption = pixelPolyOption;
     }
     
-    void RSGISExtractSumPixelValues::processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid)
+    void RSGISExtractSumPixelValues::processFeature(OGRFeature *feature, OGRPolygon *poly, OGREnvelope *env, long fid)
     {
         try
         {
             RSGISVectorUtils vecUtils;
             rsgis::img::RSGISCalcImage calcImage(valueCalc);
-            geos::geom::Polygon *geosPoly = vecUtils.convertOGRPolygon2GEOSPolygon(poly);
-            calcImage.calcImageWithinPolygonExtent(this->datasets, this->numDS, env, geosPoly, this->pixelPolyOption);
-            delete geosPoly;
+            calcImage.calcImageWithinPolygonExtent(this->datasets, this->numDS, env, poly, this->pixelPolyOption);
         }
         catch(RSGISException &e)
         {
@@ -169,7 +167,7 @@ namespace rsgis{namespace vec{
         this->numSumVals = numSumVals;
     }
     
-    void RSGISCalcSumValues::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
+    void RSGISCalcSumValues::calcImageValue(float *bandValues, int numBands, OGREnvelope extent)
     {
         if(numSumVals != ((unsigned int) numBands))
         {
@@ -187,8 +185,6 @@ namespace rsgis{namespace vec{
     {
         
     }
-
-    
     
 }}
 

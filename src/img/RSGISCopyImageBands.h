@@ -62,11 +62,6 @@ namespace rsgis{namespace img{
 		public:
 			RSGISIdentifyImageValues(int numberOutBands, int *outBands);
 			void calcImageValue(float *bandValues, int numBands, double *output);
-			void calcImageValue(float *bandValues, int numBands);
-            void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent);
-			void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent);
-			void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
 		protected:
 			int *outBands;
 		};

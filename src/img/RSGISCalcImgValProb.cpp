@@ -164,7 +164,7 @@ namespace rsgis{namespace img{
             }
             
             std::cout << "Populate the output image\n";
-            calcImg.calcImage(&inImgDS, 1, outputImage, false, NULL, gdalFormat, GDT_Float32);
+            calcImg.calcImage(&inImgDS, 1, outputImage, false, nullptr, gdalFormat, GDT_Float32);
             
             delete[] hist;
             delete[] bandMin;

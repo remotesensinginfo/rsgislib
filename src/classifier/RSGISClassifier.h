@@ -31,7 +31,7 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageCalcException.h"
 #include "common/RSGISClassificationException.h"
-#include "utils/RSGIS_ENVI_ASCII_ROI.h"
+
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
@@ -94,15 +94,6 @@ namespace rsgis{ namespace classifier{
 	public: 
 		RSGISApplyClassifier(int numberOutBands, RSGISClassifier *classifier);
 		void calcImageValue(float *bandValues, int numBands, double *output);
-		void calcImageValue(float *bandValues, int numBands);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent);
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent);
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
 		~RSGISApplyClassifier();
 	protected:
 		RSGISClassifier *classifier;

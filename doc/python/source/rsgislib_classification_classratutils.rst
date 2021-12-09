@@ -1,7 +1,5 @@
-RSGISLib Scikit-Learn Clumps Classification Module
-====================================================
-
-.. automodule:: rsgislib.classification.classratutils
+RSGISLib Clumps Classification Utilities
+==============================================
 
 The steps to undertaking a classification using clumps are:
 
@@ -60,69 +58,16 @@ To train the classifier you need to create a column within the clump raster attr
     classes_name_col = 'ClassStr'
     rsgislib.rastergis.ratutils.populateClumpsWithClassTraining(clumps_img, classes_dict, tmp_path, classes_int_col_in, classes_name_col)
 
-To balance the training samples (ensuring there are the same number for each class) you can use the following function::
-
-   import rsgislib.classification.classratutils
-
-   classes_int_col = 'ClassIntSamp'
-   rsgislib.classification.classratutils.balanceSampleTrainingRandom(clumps_img, classes_int_col_in, classes_int_col, 100, 200)
-
-To train the classifier you need to use the findClassifierParameters function::
-
-    from sklearn.model_selection import GridSearchCV
-    from sklearn.ensemble import RandomForestClassifier
-
-    # RAT variables used for the classification
-    variables = ['BlueMean', 'GrnMean', 'RedMean', 'RE1Mean']
-
-    grid_search = GridSearchCV(RandomForestClassifier(), param_grid={'n_estimators':[10,20,50,100], 'max_depth':[2,4,8]})
-
-    classifier = rsgislib.classification.classratutils.findClassifierParameters(clumps_img, classes_int_col, variables, preProcessor=None, gridSearch=grid_search)
-
-To apply the classification you can use either the classifyWithinRAT or classifyWithinRATTiled functions. classifyWithinRAT loads the attribute table columns you are using for the classification to memory with a single read of the attribute table, this can therefore be faster to compute for smaller scenes. However, if you have a large number of clumps within your RAT then this can use more memory then you have available and you'll need to use the classifyWithinRATTiled function, which steps through the RAT in chunks using only a small amount of memory. If you are unsure use the classifyWithinRATTiled function as the extra I/O time will be minimal.
-
-Classification use the classifyWithinRATTiled function::
-
-    class_colours = dict()
-    class_colours['Mangroves'] = [0,255,0]
-    class_colours['Other'] = [100,100,100]
-
-    out_class_int_col = 'OutClass'
-    out_class_str_col = 'OutClassName'
-    rsgislib.classification.classratutils.classifyWithinRATTiled(clumps_img, classes_int_col, classes_name_col, variables, classifier=classifier, outColInt=out_class_int_col, outColStr=out_class_str_col, classColours=class_colours, preProcessor=None)
-
-Classification use the classifyWithinRAT function::
-
-    class_colours = dict()
-    class_colours['Mangroves'] = [0,255,0]
-    class_colours['Other'] = [100,100,100]
-
-    out_class_int_col = 'OutClass'
-    out_class_str_col = 'OutClassName'
-    rsgislib.classification.classratutils.classifyWithinRAT(clumps_img, classes_int_col, classes_name_col, variables, classifier=classifier, outColInt=out_class_int_col, outColStr=out_class_str_col, classColours=class_colours, preProcessor=None)
-
-Finally, to produce a classification image file, rather than segmentation, where the image pixel value corresponds with the classified class, you can use the following function which 'collapses' the RAT to create a classification image::
-
-    import rsgislib.classification
-
-    # Export to a 'classification image' rather than a RAT...
-    out_class_img = 's2_uvd_27sept_class.kea'
-    rsgislib.classification.collapseClasses(clumps_img, out_class_img, 'KEA', out_class_str_col, out_class_int_col)
-
-Training Functions
--------------------
-
-.. autofunction:: rsgislib.classification.classratutils.findClassifierParameters
-.. autofunction:: rsgislib.classification.classratutils.balanceSampleTrainingRandom
 
 
-Classify Functions
--------------------
+Populate RAT Training
+------------------------
+.. autofunction:: rsgislib.classification.classratutils.populate_clumps_with_class_training
 
-.. autofunction:: rsgislib.classification.classratutils.classifyWithinRAT
-.. autofunction:: rsgislib.classification.classratutils.classifyWithinRATTiled
-.. autofunction:: rsgislib.classification.classratutils.clusterWithinRAT
 
+Extract Data for Training
+----------------------------
+.. autofunction:: rsgislib.classification.classratutils.extract_rat_col_data
 
 
 

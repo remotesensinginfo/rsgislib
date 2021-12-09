@@ -99,7 +99,7 @@ namespace rsgis{namespace reg{
 						delete tokens;
 						gcpFile.close();
 						std::string message = "Line should have 4 tokens: \"" + strLine + "\"";
-						throw RSGISImageWarpException(message);
+						throw RSGISImageException(message);
 					}
 					
 					gcp = new RSGISGCPImg2MapNode(mathUtils.strtodouble(tokens->at(0)),
@@ -117,7 +117,7 @@ namespace rsgis{namespace reg{
 		else
 		{
 			std::string message = "Could not open " + gcpFilePath;
-			throw RSGISImageWarpException(message);
+			throw RSGISImageException(message);
 		}
         
         std::cout << "Read in " << gcps->size() << " GCPs OK" << std::endl;
@@ -174,14 +174,14 @@ namespace rsgis{namespace reg{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
 			if(gdalDriver == NULL)
 			{
-				throw RSGISImageWarpException("Requested GDAL driver does not exists..");
+				throw RSGISImageException("Requested GDAL driver does not exists..");
 			}
 			char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			outputImageDS = gdalDriver->Create(outFileName.c_str(), width, height,numInBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
-				throw RSGISImageWarpException("Output image could not be created. Check filepath.");
+				throw RSGISImageException("Output image could not be created. Check filepath.");
 			}
             
             // Set projection (but not geotransform)
@@ -245,7 +245,7 @@ namespace rsgis{namespace reg{
             }
 			pbar.finish();
 		}
-		catch(RSGISImageWarpException& e)
+		catch(RSGISImageException& e)
 		{
 			if(inputData != NULL)
 			{

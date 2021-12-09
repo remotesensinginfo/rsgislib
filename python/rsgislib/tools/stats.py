@@ -3,9 +3,10 @@
 The tools.stats module contains some useful tools for calculating useful statistics which aren't
 easily available else where.
 """
+import numpy
 
 
-def calc_pandas_VIF(df, cols=None):
+def calc_pandas_vif(df, cols=None):
     """
     A function to calculate variance inflation factors to
     investigate multicollinearity between predictor variables.
@@ -25,13 +26,12 @@ def calc_pandas_VIF(df, cols=None):
         cols = list(df.columns)
         # Subset to the column names of interest
         ind_vars = cols[6:]
-        vifs_series = calc_pandas_VIF(df, ind_vars)
+        vifs_series = calc_pandas_vif(df, ind_vars)
         vifs_series.to_csv('VIF_scores.csv')
 
     """
     # Import the linear model module.
     import sklearn.linear_model
-    import numpy
     import pandas
 
     # If the cols is None then get a list of all the columns
@@ -40,9 +40,9 @@ def calc_pandas_VIF(df, cols=None):
 
     # If there is less than 2 columns product error message.
     if len(cols) < 2:
-        raise Exception('The list of columns must be have a length of at least 2.')
+        raise Exception("The list of columns must be have a length of at least 2.")
 
-    print('Calculating VIF for {} predictors variables...'.format(len(cols)))
+    print("Calculating VIF for {} predictors variables...".format(len(cols)))
 
     # Create a linear model instance.
     lm = sklearn.linear_model.LinearRegression()
@@ -71,10 +71,10 @@ def calc_pandas_VIF(df, cols=None):
         if r2 == 1:
             vif_scores[col] = 0.0
         else:
-            vif_scores[col] = (1 / (1 - r2))
+            vif_scores[col] = 1 / (1 - r2)
 
     # Create a pandas series and return it.
-    return pandas.Series(vif_scores, name='VIF')
+    return pandas.Series(vif_scores, name="VIF")
 
 
 def cqv_threshold(df, cols=None, lowthreshold=0.25, highthreshold=0.75):
@@ -100,26 +100,24 @@ def cqv_threshold(df, cols=None, lowthreshold=0.25, highthreshold=0.75):
     :return: list of column names for good predictor variables
 
     """
-    import numpy
-
     # If the cols is None then get a list of all the columns
     if cols is None:
         cols = list(df.columns)
 
     # If there is less than 2 columns product error message.
     if len(cols) < 2:
-        raise Exception('The list of columns must be have a length of at least 2.')
+        raise Exception("The list of columns must be have a length of at least 2.")
 
     # Create numpy array from the list columns
     x = df[cols].values
 
     # Calculate the Coefficient of Variation:
-    print('Calculating CQV for {} predictor variables...'.format(len(cols)))
+    print("Calculating CQV for {} predictor variables...".format(len(cols)))
     q1 = numpy.percentile(x, 25, axis=0)
     q3 = numpy.percentile(x, 75, axis=0)
     cqv = (q3 - q1) / (q3 + q1)
 
-    print('Median CQV: {}'.format(numpy.median(cqv)))
+    print("Median CQV: {}".format(numpy.median(cqv)))
 
     # Index the good predictors:
     good_idx = numpy.where((cqv >= lowthreshold) & (cqv <= highthreshold))[0]
@@ -129,7 +127,7 @@ def cqv_threshold(df, cols=None, lowthreshold=0.25, highthreshold=0.75):
     for i in good_idx:
         good_cols.append(cols[i])
 
-    print('Selected {} useful predictors...'.format(len(good_cols)))
+    print("Selected {} useful predictors...".format(len(good_cols)))
 
     return good_cols
 
@@ -149,7 +147,6 @@ def corr_feature_selection(df, dep_vars, ind_vars, n_min_clusters=3, n_max_clust
     :return: list of column names for good predictor variables
 
     """
-    import numpy
     import tqdm
     import scipy.stats
     import sklearn.cluster
@@ -164,7 +161,7 @@ def corr_feature_selection(df, dep_vars, ind_vars, n_min_clusters=3, n_max_clust
         # Loop through the independent variables
         for ind_var in ind_vars:
             # add the correlation values to the list
-            corr_vals.append(df[dep_var].corr(df[ind_var], method='pearson'))
+            corr_vals.append(df[dep_var].corr(df[ind_var], method="pearson"))
         # Add the list of correlation values to the overall list.
         corr_data.append(corr_vals)
 
@@ -183,18 +180,21 @@ def corr_feature_selection(df, dep_vars, ind_vars, n_min_clusters=3, n_max_clust
         """
         # check inputs:
         if X.ndim != 2:
-            raise Exception('Error: the input array must be 2D.')
+            raise Exception("Error: the input array must be 2D.")
 
         def _pearson_affinity(a):
-            """ An utility function to generate an affinity matrix based on Pearson correlation."""
-            return 1 - numpy.array([[abs(scipy.stats.pearsonr(x, y)[0]) for x in a] for y in a])
+            """An utility function to generate an affinity matrix based on Pearson correlation."""
+            return 1 - numpy.array(
+                [[abs(scipy.stats.pearsonr(x, y)[0]) for x in a] for y in a]
+            )
 
-        clf = sklearn.cluster.FeatureAgglomeration(n_clusters=n_clusters, linkage='complete',
-                                                   affinity=_pearson_affinity)
+        clf = sklearn.cluster.FeatureAgglomeration(
+            n_clusters=n_clusters, linkage="complete", affinity=_pearson_affinity
+        )
         clf.fit(X)
 
         # Get the cluster id for each feature/predictor variable:
-        labels = (clf.labels_ + 1)
+        labels = clf.labels_ + 1
 
         return labels
 
@@ -205,18 +205,20 @@ def corr_feature_selection(df, dep_vars, ind_vars, n_min_clusters=3, n_max_clust
     # Test for optimal number of clusters using the Silhouette Coefficient as a
     # performance metric.
 
-    n_clusters = numpy.arange(n_min_clusters, n_max_clusters, dtype='uint8')
+    n_clusters = numpy.arange(n_min_clusters, n_max_clusters, dtype="uint8")
     cluster_score = list()
     for n in tqdm.tqdm(n_clusters):
         x_lbls = _cluster_features(x, n)
-        cluster_score.append(sklearn.metrics.silhouette_score(x.T, x_lbls, metric='correlation'))
+        cluster_score.append(
+            sklearn.metrics.silhouette_score(x.T, x_lbls, metric="correlation")
+        )
 
     # find the maximum Silhouette Coefficient = best clustering:
     best_idx = numpy.argmax(cluster_score)
     opt_n_clusters = n_clusters[best_idx]
     opt_n_clusters_scr = cluster_score[best_idx]
-    print('Found optimal number of clusters: {}'.format(opt_n_clusters))
-    print('Silhouette Coefficient: {}'.format(opt_n_clusters_scr))
+    print("Found optimal number of clusters: {}".format(opt_n_clusters))
+    print("Silhouette Coefficient: {}".format(opt_n_clusters_scr))
 
     # Perform clustering with optimal number of clusters
     cluster_lbls = _cluster_features(x, opt_n_clusters)
@@ -254,7 +256,6 @@ def lassolars_feature_selection(df, dep_vars, ind_vars, alpha_val=None):
     import sklearn.linear_model
     import sklearn.feature_selection
     import sklearn.exceptions
-    import numpy
 
     # Create the nd array from the pandas data range with all the predictor
     # variables listed.
@@ -267,23 +268,31 @@ def lassolars_feature_selection(df, dep_vars, ind_vars, alpha_val=None):
     if alpha_val is None:
         # Use the Bayes Information criterion (BIC) and cross-validation to find the
         # optimal value of the regularization parameter (alpha) for the Lasso estimator.
-        estimator = sklearn.linear_model.LassoLarsIC('bic')
+        estimator = sklearn.linear_model.LassoLarsIC("bic")
 
         with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=sklearn.exceptions.ConvergenceWarning)
+            warnings.filterwarnings(
+                "ignore", category=sklearn.exceptions.ConvergenceWarning
+            )
             estimator.fit(x, y[:, -1])
 
         optimal_alpha = estimator.alpha_
     else:
         optimal_alpha = float(alpha_val)
 
-    print("Using regularization parameter (alpha) for the Lasso estimator of: {}".format(optimal_alpha))
+    print(
+        "Using regularization parameter (alpha) for the Lasso estimator of: {}".format(
+            optimal_alpha
+        )
+    )
 
     # Fit the regressor using tuned regularisation parameter:
     estimator = sklearn.linear_model.LassoLars(alpha=optimal_alpha)
 
     with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=sklearn.exceptions.ConvergenceWarning)
+        warnings.filterwarnings(
+            "ignore", category=sklearn.exceptions.ConvergenceWarning
+        )
         estimator.fit(x, y)
 
     # Select the variables with non-zero coefficients:
@@ -295,7 +304,7 @@ def lassolars_feature_selection(df, dep_vars, ind_vars, alpha_val=None):
 
 
 def breusch_pagan_test(x, y):
-    """"
+    """ "
     A function to perform a Breusch-Pagan test for heteroskedasticity in a linear model:
     H_0 = No heteroskedasticity.
     H_1 = Heteroskedasticity is present.
@@ -304,17 +313,16 @@ def breusch_pagan_test(x, y):
     1. the Breusch-Pagan test statistic.
     2. the p-value for the test.
     3. the test result.
-    
+
     :param x: a numpy.ndarray containing the predictor variables. Shape = (nSamples, nPredictors).
     :param y: a 1D numpy.ndarray containing the response variable. Shape = (nSamples, ).
     :return: list containing 3 elements (Breusch-Pagan test statistic, p-value for the test, test result)
 
     """
     import sklearn.linear_model
-    import numpy
 
     if x.shape[0] != y.shape[0]:
-        raise SystemExit('Error: the number of samples differs between x and y.')
+        raise SystemExit("Error: the number of samples differs between x and y.")
     else:
         n_samples = x.shape[0]
 
@@ -323,7 +331,7 @@ def breusch_pagan_test(x, y):
     lm.fit(x, y)
 
     # calculate the squared errors:
-    err = (y - lm.predict(x))**2
+    err = (y - lm.predict(x)) ** 2
 
     # fit an auxiliary regression to the squared errors:
     # why?: to estimate the variance in err explained by x
@@ -331,8 +339,8 @@ def breusch_pagan_test(x, y):
     pred_err = lm.predict(x)
 
     # calculate the coefficient of determination:
-    ss_tot = numpy.sum((err - numpy.mean(err, axis=0))**2)
-    ss_res = numpy.sum((err - pred_err)**2)
+    ss_tot = numpy.sum((err - numpy.mean(err, axis=0)) ** 2)
+    ss_res = numpy.sum((err - pred_err) ** 2)
     r2 = 1 - (ss_res / ss_tot)
 
     # calculate the Lagrange multiplier:
@@ -342,17 +350,19 @@ def breusch_pagan_test(x, y):
     # this is equivalent to (p - 1) parameter restrictions in Wikipedia entry.
     try:
         from scipy.stats import chisqprob
+
         pval = chisqprob(LM, x.shape[1])
     except Exception:
         from scipy.stats.distributions import chi2
+
         pval = chi2.sf(LM, x.shape[1])
 
     if pval < 0.01:
-        test_result = 'Heteroskedasticity present at 99% CI.'
+        test_result = "Heteroskedasticity present at 99% CI."
     elif pval < 0.05:
-        test_result = 'Heteroskedasticity present at 95% CI.'
+        test_result = "Heteroskedasticity present at 95% CI."
     else:
-        test_result = 'No significant heteroskedasticity.'
+        test_result = "No significant heteroskedasticity."
     return [LM, pval, test_result]
 
 
@@ -369,51 +379,65 @@ def bin_accuracy_scores_prob(y_true, y_prob):
     https://machinelearningmastery.com/how-to-score-probability-predictions-in-python
 
     """
-    import numpy
     # check inputs:
     if not isinstance(y_true, numpy.ndarray):
         y_true = numpy.array(y_true)
     if not isinstance(y_prob, numpy.ndarray):
         y_prob = numpy.array(y_prob)
     if y_true.ndim != 1:
-        raise SystemExit('ERROR: the true labels are not in a 1D array.')
+        raise SystemExit("ERROR: the true labels are not in a 1D array.")
     if y_prob.ndim != 1:
-        raise SystemExit('ERROR: the probability of presence values are not in a 1D array.')
+        raise SystemExit(
+            "ERROR: the probability of presence values are not in a 1D array."
+        )
     if y_true.size != y_prob.size:
-        raise SystemExit('ERROR: unequal number of binary labels and probabilities.')
+        raise SystemExit("ERROR: unequal number of binary labels and probabilities.")
 
         # ensure that y_true contains binary labels (i.e. 0 or 1 values):
-    y_true = y_true.astype('uint8')
+    y_true = y_true.astype("uint8")
     if numpy.min(y_true) != 0 or numpy.max(y_true) != 1:
-        raise SystemExit('ERROR: the true labels are not binary (zero or one values).')
+        raise SystemExit("ERROR: the true labels are not binary (zero or one values).")
 
     from sklearn.metrics import roc_auc_score
+
     # calculates area under the receiver operating curve score.
     # A score of 0.5 shows the model is unable to discriminate between presence and absence.
     roc_auc = roc_auc_score(y_true, y_prob)
 
     from sklearn.metrics import average_precision_score
+
     # calculates area under the precision-recall curve. Perfect model = 1.0.
     average_precision = average_precision_score(y_true, y_prob)
 
     from sklearn.metrics import brier_score_loss
+
     # This is a quadratic loss function that calculates the mean squared error between
     # predicted probabilities and the true presence-absence (binary) labels.
     # A model with no false positives/negatives has a score of 0.0. Perfect model = 1.0.
     brier_score = brier_score_loss(y_true, y_prob)
 
     from sklearn.metrics import log_loss
+
     # The is logarithmic loss function that more heavily penalises false positives/negatives than the brier score.
     # A model with no false positives/negatives has a score of 0.0. There is no upper bound.
     log_loss_score = log_loss(y_true, y_prob)
 
     from scipy.stats import pointbiserialr
+
     # The point biserial correlation coefficient, range -1 to 1.
     # Quantifies the correlation between a binary and continuous variable.
     r = pointbiserialr(y_true, y_prob)[0]
 
-    metrics = ['Test AUC', 'Point-Biserial r', 'Av. Precision', 'Brier Score', 'Log-Loss Score']
-    scores = numpy.array([roc_auc, r, average_precision, brier_score, log_loss_score]).round(decimals=6)
+    metrics = [
+        "Test AUC",
+        "Point-Biserial r",
+        "Av. Precision",
+        "Brier Score",
+        "Log-Loss Score",
+    ]
+    scores = numpy.array(
+        [roc_auc, r, average_precision, brier_score, log_loss_score]
+    ).round(decimals=6)
     del roc_auc, r, average_precision, brier_score, log_loss_score, y_true, y_prob
     return [metrics, scores]
 
@@ -430,35 +454,50 @@ def accuracy_scores_binary(y_true, y_pred):
 
     Reference: See pages 253 - 255 in:
     Guisan et al. (2017). Habitat suitability and distribution models: with applications in R.
-    
-    """
-    import numpy
 
+    """
     # check inputs:
     if not isinstance(y_true, numpy.ndarray):
         y_true = numpy.array(y_true)
     if not isinstance(y_pred, numpy.ndarray):
         y_pred = numpy.array(y_pred)
     if y_true.ndim != 1:
-        raise SystemExit('ERROR: the true labels are not in a 1D array.')
+        raise SystemExit("ERROR: the true labels are not in a 1D array.")
     if y_pred.ndim != 1:
-        raise SystemExit('ERROR: the predicted labels are not in a 1D array.')
+        raise SystemExit("ERROR: the predicted labels are not in a 1D array.")
     if y_true.size != y_pred.size:
-        raise SystemExit('ERROR: unequal number of binary labels.')
+        raise SystemExit("ERROR: unequal number of binary labels.")
 
     # ensure that y_true, y_pred contain binary labels (i.e. 0 or 1 values):
-    y_true = y_true.astype('uint8')
-    y_pred = y_pred.astype('uint8')
+    y_true = y_true.astype("uint8")
+    y_pred = y_pred.astype("uint8")
     if numpy.min(y_true) != 0 or numpy.max(y_true) != 1:
-        raise SystemExit('ERROR: the true labels are not binary (zero or one values).')
+        raise SystemExit("ERROR: the true labels are not binary (zero or one values).")
     if numpy.min(y_pred) != 0 or numpy.max(y_pred) != 1:
-        raise SystemExit('ERROR: the predicted labels are not binary (zero or one values).')
+        raise SystemExit(
+            "ERROR: the predicted labels are not binary (zero or one values)."
+        )
 
-    metrics = numpy.array(['Prevalence', 'Overall Diagnostic Power', 'Correct Classification Rate',
-                           'Misclassification Rate', 'Presence Predictive Power', 'Absence Predictive Power',
-                           'Accuracy', 'Balanced Accuracy', 'Sensitivity', 'Specificity', 'Precision', 'F1 Score',
-                           'Matthews Correlation', 'Cohen Kappa', 'Normalised Mutual Information',
-                           'Hanssen-Kuiper skill'])
+    metrics = numpy.array(
+        [
+            "Prevalence",
+            "Overall Diagnostic Power",
+            "Correct Classification Rate",
+            "Misclassification Rate",
+            "Presence Predictive Power",
+            "Absence Predictive Power",
+            "Accuracy",
+            "Balanced Accuracy",
+            "Sensitivity",
+            "Specificity",
+            "Precision",
+            "F1 Score",
+            "Matthews Correlation",
+            "Cohen Kappa",
+            "Normalised Mutual Information",
+            "Hanssen-Kuiper skill",
+        ]
+    )
 
     try:
         n_presence = numpy.where(y_true == 1)[0].size
@@ -484,7 +523,7 @@ def accuracy_scores_binary(y_true, y_pred):
         sensitivity = TP / n_presence
 
         # false presence rate - inverse of sensitivity (redundant?)
-        #FPR = 1  - sensitivity
+        # FPR = 1  - sensitivity
 
         # Presence and absence predictive power:
         PPP = TP / (TP + FP)
@@ -494,7 +533,7 @@ def accuracy_scores_binary(y_true, y_pred):
         specificity = TA / n_absence
 
         # false positive rate - inverse of specificity (redundant?)
-        #FPR = 1 - specificity
+        # FPR = 1 - specificity
 
         # Accuracy scores:
         accuracy = (TP + TA) / (n_presence + n_absence)
@@ -504,24 +543,46 @@ def accuracy_scores_binary(y_true, y_pred):
         precision = TP / (TP + FP)
 
         # F1 score:
-        f1_score = 2 * TP / ((2*TP) + FP + FA)
+        f1_score = 2 * TP / ((2 * TP) + FP + FA)
 
         # Matthews Correlation Coefficient:
-        MCC = ((TP * TA) - (FP * FA)) / (((TP + FP) * (TP + FA) * (TA + FP) * (TA + FA))**0.5)
+        MCC = ((TP * TA) - (FP * FA)) / (
+            ((TP + FP) * (TP + FA) * (TA + FP) * (TA + FA)) ** 0.5
+        )
 
         # Hanssen-Kuiper skill (unreliable when TA is very large):
         TSS = sensitivity + specificity - 1
         del n_presence, n_absence, TP, TA, FP, FA
 
         from sklearn.metrics import normalized_mutual_info_score as nmi_score
+
         nmi_score = nmi_score(y_true, y_pred)
 
         # Cohen's Kappa (caution: sensitive to sample size and proportion of presence records):
         from sklearn.metrics import cohen_kappa_score as kappa
+
         kappa = kappa(y_true, y_pred)
 
-        scores = numpy.array([prevalence, ODP, CCR, MR, PPP, APP, accuracy, balanced_accuracy, sensitivity,
-                           specificity, precision, f1_score, MCC, kappa, nmi_score, TSS]).round(decimals=6)
+        scores = numpy.array(
+            [
+                prevalence,
+                ODP,
+                CCR,
+                MR,
+                PPP,
+                APP,
+                accuracy,
+                balanced_accuracy,
+                sensitivity,
+                specificity,
+                precision,
+                f1_score,
+                MCC,
+                kappa,
+                nmi_score,
+                TSS,
+            ]
+        ).round(decimals=6)
         del prevalence, ODP, CCR, MR, PPP, APP, accuracy, balanced_accuracy, sensitivity
         del specificity, precision, f1_score, MCC, kappa, nmi_score, TSS
     except Exception:
@@ -530,7 +591,7 @@ def accuracy_scores_binary(y_true, y_pred):
     if metrics.size == scores.size:
         return [metrics, scores]
     else:
-        raise SystemExit('ERROR: unable to calculate accuracy metrics.')
+        raise SystemExit("ERROR: unable to calculate accuracy metrics.")
 
 
 def get_nbins_histogram(data):
@@ -541,7 +602,6 @@ def get_nbins_histogram(data):
     :return: (n_bins, bin_width) n_bins: int for the number of bins. bin_width: float with the width of the bins.
 
     """
-    import numpy
     n = data.shape[0]
     lq = numpy.percentile(data, 25)
     uq = numpy.percentile(data, 75)
@@ -564,7 +624,6 @@ def get_bin_centres(bin_edges, geometric=False):
     :returns: bin_centres - numpy array
 
     """
-    import numpy
     if geometric:
         bin_centres = numpy.sqrt(bin_edges[1:] * bin_edges[:-1])
     else:
@@ -583,7 +642,6 @@ def calc_otsu_threshold(data):
     :returns: float (threshold)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     # Calculate the histogram
@@ -618,13 +676,12 @@ def calc_yen_threshold(data):
 
     Yen J.C., Chang F.J., and Chang S. (1995) "A New Criterion
     for Automatic Multilevel Thresholding" IEEE Trans. on Image
-    Processing, 4(3): 370-378. :DOI:`10.1109/83.366472`
+    Processing, 4(3): 370-378. DOI:`10.1109/83.366472`
 
     :param data: 1d numeric numpy array
     :returns: float (threshold)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     # Calculate the histogram
@@ -644,7 +701,9 @@ def calc_yen_threshold(data):
     p2_sq = numpy.cumsum(pmf[::-1] ** 2)[::-1]
     # P2_sq indexes is shifted +1. I assume, with P1[:-1] it's help avoid
     # '-inf' in crit. ImageJ Yen implementation replaces those values by zero.
-    crit = numpy.log(((p1_sq[:-1] * p2_sq[1:]) ** -1) * (p1[:-1] * (1.0 - p1[:-1])) ** 2)
+    crit = numpy.log(
+        ((p1_sq[:-1] * p2_sq[1:]) ** -1) * (p1[:-1] * (1.0 - p1[:-1])) ** 2
+    )
     return bin_centres[crit.argmax()]
 
 
@@ -657,13 +716,12 @@ def calc_isodata_threshold(data):
     threshold = (data[data <= threshold].mean() + data[data > threshold].mean()) / 2.0
 
     Ridler, TW & Calvard, S (1978), "Picture thresholding using an iterative selection method"
-    IEEE Transactions on Systems, Man and Cybernetics 8: 630-632, :DOI:`10.1109/TSMC.1978.4310039`
+    IEEE Transactions on Systems, Man and Cybernetics 8: 630-632, DOI:`10.1109/TSMC.1978.4310039`
 
     :param data: 1d numeric numpy array
     :returns: float (threshold)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     # Calculate the histogram
@@ -730,18 +788,17 @@ def calc_hist_cross_entropy(data, threshold):
     Li and Tam (1998).
 
     Li C.H. and Lee C.K. (1993) "Minimum Cross Entropy Thresholding"
-    Pattern Recognition, 26(4): 617-625 :DOI:`10.1016/0031-3203(93)90115-D`
+    Pattern Recognition, 26(4): 617-625 DOI:`10.1016/0031-3203(93)90115-D`
 
     Li C.H. and Tam P.K.S. (1998) "An Iterative Algorithm for Minimum
     Cross Entropy Thresholding" Pattern Recognition Letters, 18(8): 771-776
-    :DOI:`10.1016/S0167-8655(98)00057-9`
+    DOI: `10.1016/S0167-8655(98)00057-9`
 
     :param data: 1d numeric numpy array
     :param threshold: float spliting to the two parts of the histogram.
     :returns: float (cross-entropy target value)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     n_bins, bin_width = get_nbins_histogram(data)
@@ -772,7 +829,7 @@ def calc_li_threshold(data, tolerance=None, initial_guess=None):
     Minimum Cross Entropy method.
 
     Li C.H. and Lee C.K. (1993) "Minimum Cross Entropy Thresholding"
-    Pattern Recognition, 26(4): 617-625 :DOI:`10.1016/0031-3203(93)90115-D`
+    Pattern Recognition, 26(4): 617-625 DOI:`10.1016/0031-3203(93)90115-D`
 
 
     :param data: 1d numeric numpy array
@@ -790,7 +847,6 @@ def calc_li_threshold(data, tolerance=None, initial_guess=None):
     :returns: float (threshold)
 
     """
-    import numpy
     # Note, this is based on the implementation within scikit-image
 
     # At this point, the data only contains numpy.inf, -numpy.inf, or valid numbers
@@ -823,19 +879,25 @@ def calc_li_threshold(data, tolerance=None, initial_guess=None):
     # new and old threshold values is less than the tolerance
     while abs(t_next - t_curr) > tolerance:
         t_curr = t_next
-        foreground = (data > t_curr)
+        foreground = data > t_curr
         mean_fore = numpy.mean(data[foreground])
         mean_back = numpy.mean(data[~foreground])
 
-        t_next = ((mean_back - mean_fore) /
-                  (numpy.log(mean_back) - numpy.log(mean_fore)))
+        t_next = (mean_back - mean_fore) / (numpy.log(mean_back) - numpy.log(mean_fore))
 
     threshold = t_next - offset
     return threshold
 
 
-def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True, contamination=10.0,
-                             only_kurtosis=False):
+def calc_kurt_skew_threshold(
+    data,
+    max_val,
+    min_val,
+    init_thres,
+    low_thres=True,
+    contamination=10.0,
+    only_kurtosis=False,
+):
     """
     A function to calculate a threshold either side of the histogram based on
 
@@ -851,12 +913,14 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
     """
     import scipy.optimize
     import scipy.stats
-    import numpy
+
     if len(data.shape) > 1:
         raise Exception("Expecting a single variable.")
 
     if (contamination < 1) or (contamination > 100):
-        raise Exception("contamination parameter should have a value between 1 and 100.")
+        raise Exception(
+            "contamination parameter should have a value between 1 and 100."
+        )
 
     if low_thres:
         low_percent = numpy.percentile(data, contamination)
@@ -880,8 +944,10 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
     elif min_val > max_val:
         print("Min: {}".format(min_val))
         print("Max: {}".format(max_val))
-        raise Exception("Min value is greater than max - note this can happened if the "
-                        "contamination parameter caused threshold to be changed.")
+        raise Exception(
+            "Min value is greater than max - note this can happened if the "
+            "contamination parameter caused threshold to be changed."
+        )
 
     if (init_thres < min_val) or (init_thres > max_val):
         init_thres = min_val + ((max_val - min_val) / 2)
@@ -906,7 +972,9 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
 
         return kur_skew
 
-    opt_rslt = scipy.optimize.dual_annealing(_opt_fun, bounds=[(min_val, max_val)], args=[data], x0=[init_thres])
+    opt_rslt = scipy.optimize.dual_annealing(
+        _opt_fun, bounds=[(min_val, max_val)], args=[data], x0=[init_thres]
+    )
 
     out_thres = None
     if opt_rslt.success:
@@ -917,3 +985,81 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
     return out_thres
 
 
+def mask_data_to_valid(
+    data: numpy.array, lower_limit: float = None, upper_limit: float = None
+):
+    """
+    A function which removes rows from an nxm numpy array which are
+    not finite or outside of the upper and lower thresholds provided.
+
+    :param data: nxm numpy array (n rows, m features)
+    :param lower_limit: lower threshold valid data is greater than this value.
+    :param upper_limit: upper threshold valid data is lower than this value.
+
+    """
+    data = data[numpy.all(numpy.isfinite(data), axis=1)]
+    if lower_limit is not None:
+        data = data[numpy.all(data > lower_limit, axis=1)]
+    if upper_limit is not None:
+        data = data[numpy.all(data < upper_limit, axis=1)]
+    return data
+
+
+def bias_score(y_true, y_pred):
+    """
+    A function to calculate the regression model bias for each response variable
+    in a multivariate regression.
+
+    :param y_true: numpy.ndarray of true y values, shape=(n_samples, n_responses).
+    :param y_true: numpy.ndarray of predicted y values, shape=(n_samples, n_responses).
+    :return: bias (absolute bias), norm_bias (normalised bias (aka percentage bias))
+
+    """
+    import numpy
+
+    if not isinstance(y_true, numpy.ndarray):
+        y_true = numpy.array(y_true)
+    if not isinstance(y_pred, numpy.ndarray):
+        y_pred = numpy.array(y_pred)
+    if y_true.ndim != y_pred.ndim:
+        raise Exception("Error: y_true dimensions != y_pred.")
+    if y_true.size != y_pred.size:
+        raise Exception("Error: y_true size != y_pred.")
+
+    bias = numpy.mean(y_pred - y_true, axis=0)
+    norm_bias = (bias / numpy.mean(y_true, axis=0)) * 100
+    return bias, norm_bias
+
+
+def decompose_bias_variance(y_true, y_pred):
+    """
+    A function to perform bias-variance decomposition.
+    Decompose the mean squared error into: Bias^2 + Variance + Irreducible Error.
+    Useful example: https://towardsdatascience.com/mse-and-bias-variance-decomposition-77449dd2ff55
+
+    :param y_true: numpy.ndarray of true y values, shape=(n_samples, n_responses).
+    :param y_true: numpy.ndarray of predicted y values, shape=(n_samples, n_responses).
+    :return: set (mse, bias_squared, variance, noise)
+
+    """
+    import numpy
+
+    if not isinstance(y_true, numpy.ndarray):
+        y_true = numpy.array(y_true)
+    if not isinstance(y_pred, numpy.ndarray):
+        y_pred = numpy.array(y_pred)
+    if y_true.ndim != y_pred.ndim:
+        raise SystemExit("Error: y_true dimensions != y_pred.")
+    if y_true.size != y_pred.size:
+        raise SystemExit("Error: y_true size != y_pred.")
+
+    mse = numpy.mean((y_pred - y_true) ** 2, axis=0)
+    bias_squared = numpy.mean(y_pred - y_true, axis=0) ** 2
+    variance = numpy.var(y_pred - y_true, axis=0)
+    noise = mse - (bias_squared + variance)
+    if isinstance(noise, numpy.ndarray):
+        noise[noise < 0] = 0
+    else:
+        if noise < 0:
+            noise = 0
+    return mse, bias_squared, variance, noise

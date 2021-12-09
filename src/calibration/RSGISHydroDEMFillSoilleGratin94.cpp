@@ -343,7 +343,7 @@ namespace rsgis{namespace calib{
         this->pxQ = pxQ;
     }
     
-    void RSGISInitOutputImageSoilleGratin94::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) 
+    void RSGISInitOutputImageSoilleGratin94::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, OGREnvelope extent)
     {
         if(winSize != 3)
         {
@@ -378,7 +378,7 @@ namespace rsgis{namespace calib{
             if(boundary)
             {
                 output[0] = borderVal;
-                this->pxQ->push_back(Q2DPxl(extent.getMaxX(), extent.getMaxY()));
+                this->pxQ->push_back(Q2DPxl(extent.MaxX, extent.MaxY));
             }
             else
             {
@@ -391,8 +391,6 @@ namespace rsgis{namespace calib{
     {
         
     }
-    
-    
     
 }}
 

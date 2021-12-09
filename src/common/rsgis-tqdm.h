@@ -26,7 +26,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 // mark all exported classes/functions with DllExport to have

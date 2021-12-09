@@ -32,10 +32,9 @@
 #
 ############################################################################
 
-import gdal, osr
-import skimage.graph
+import osgeo.gdal as gdal
+import osgeo.osr as osr
 import numpy
-
 
 
 def _coord2pixelOffset(rasterfn, x, y):
@@ -45,27 +44,38 @@ def _coord2pixelOffset(rasterfn, x, y):
     originY = geotransform[3]
     pixelWidth = geotransform[1]
     pixelHeight = geotransform[5]
-    xOffset = int((x - originX)/pixelWidth)
-    yOffset = int((y - originY)/pixelHeight)
-    return xOffset,yOffset
+    xOffset = int((x - originX) / pixelWidth)
+    yOffset = int((y - originY) / pixelHeight)
+    return xOffset, yOffset
+
 
 def _createPath(CostSurfaceImg, costSurfaceArray, startCoord, stopCoord):
+    import skimage.graph
 
     # coordinates to array index
     startCoordX = startCoord[0]
     startCoordY = startCoord[1]
-    startIndexX,startIndexY = _coord2pixelOffset(CostSurfaceImg, startCoordX,startCoordY)
+    startIndexX, startIndexY = _coord2pixelOffset(
+        CostSurfaceImg, startCoordX, startCoordY
+    )
 
     stopCoordX = stopCoord[0]
     stopCoordY = stopCoord[1]
-    stopIndexX,stopIndexY = _coord2pixelOffset(CostSurfaceImg, stopCoordX,stopCoordY)
+    stopIndexX, stopIndexY = _coord2pixelOffset(CostSurfaceImg, stopCoordX, stopCoordY)
 
     # create path
-    indices, weight = skimage.graph.route_through_array(costSurfaceArray, (startIndexY,startIndexX), (stopIndexY,stopIndexX), geometric=True, fully_connected=True)
+    indices, weight = skimage.graph.route_through_array(
+        costSurfaceArray,
+        (startIndexY, startIndexX),
+        (stopIndexY, stopIndexX),
+        geometric=True,
+        fully_connected=True,
+    )
     indices = numpy.array(indices).T
     path = numpy.zeros_like(costSurfaceArray)
     path[indices[0], indices[1]] = 1
     return path
+
 
 def _array2raster(newRasterfn, rasterfn, array, outFormat):
     raster = gdal.Open(rasterfn)
@@ -90,29 +100,34 @@ def _array2raster(newRasterfn, rasterfn, array, outFormat):
     raster = None
 
 
-def performLeastCostPathCalc(costSurfaceImg, outputPathImg, startCoord, stopCoord, gdalformat="KEA", costImgBand=1):
+def perform_least_cost_path_calc(
+    cost_surface_img: str,
+    output_img: str,
+    start_coord: list,
+    stop_coord: list,
+    gdalformat: str = "KEA",
+    cost_img_band: int = 1,
+):
     """
     Calculates least cost path for a raster surface from start coord to stop coord:
 
-    Version of code from: https://pcjericks.github.io/py-gdalogr-cookbook/raster_layers.html#create-least-cost-path
+    Version of code from:
+    https://pcjericks.github.io/py-gdalogr-cookbook/raster_layers.html#create-least-cost-path
 
-    :param costSurfaceImg: Input image to calculate cost path from
-    :param outputPathImg: Output image
-    :param startCoord: Start coordinate (e.g., (263155.9, 291809.1))
-    :param stopCoord: End coordinate (e.g., (263000.1, 292263.7))
+    :param cost_surface_img: Input image to calculate cost path from
+    :param output_img: Output image
+    :param start_coord: Start coordinate (e.g., (263155.9, 291809.1))
+    :param stop_coord: End coordinate (e.g., (263000.1, 292263.7))
     :param gdalformat: GDAL format (default=KEA)
-    :param costImgBand: Band in input image to use for cost analysis (default=1)
+    :param cost_img_band: Band in input image to use for cost analysis (default=1)
 
     """
     # Read gdal raster as array.
-    gdalRasterDS = gdal.Open(costSurfaceImg)
-    costSurfaceArray = gdalRasterDS.GetRasterBand(costImgBand).ReadAsArray()
+    gdalRasterDS = gdal.Open(cost_surface_img)
+    costSurfaceArray = gdalRasterDS.GetRasterBand(cost_img_band).ReadAsArray()
 
     # Creates path array
-    pathArray = _createPath(costSurfaceImg, costSurfaceArray, startCoord, stopCoord)
+    pathArray = _createPath(cost_surface_img, costSurfaceArray, start_coord, stop_coord)
 
     # Converts path array to raster
-    _array2raster(outputPathImg, costSurfaceImg, pathArray, gdalformat)
-
-
-
+    _array2raster(output_img, cost_surface_img, pathArray, gdalformat)

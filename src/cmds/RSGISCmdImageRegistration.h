@@ -45,6 +45,14 @@
 
 namespace rsgis{ namespace cmds {
 
+    /** Find simple image offsets */
+    DllExport std::pair<double, double> excecuteFindImageOffset(std::string inputReferenceImage, std::string inputFloatingmage,
+                                                                std::vector<unsigned int> refImageBands,
+                                                                std::vector<unsigned int> fltImageBands,
+                                                                unsigned int xSearch, unsigned int ySearch,
+                                                                unsigned int metricTypeInt,
+                                                                int subPixelResolution);
+
     /** Basic image registration */
     DllExport void excecuteBasicRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
                                    float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,
@@ -58,18 +66,6 @@ namespace rsgis{ namespace cmds {
                                                   int maxNumIterations, float moveChangeThreshold, float pSmoothness, unsigned int metricTypeInt,
                                                   unsigned int outputType, std::string outputGCPFile);
 
-    /** Warp image using triangulation interpolation */
-    DllExport void excecuteTriangularWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
-                        float resolution, std::string imageFormat = "KEA", bool genTransformImage = false);
-    
-    /** Warp image using NN interpolation */
-    DllExport void excecuteNNWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
-                        float resolution, std::string imageFormat = "KEA", bool genTransformImage = false);
-    
-    /** Warp image using polynominal interpolation */
-    DllExport void excecutePolyWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
-                        float resolution, int polyOrder = 3, std::string imageFormat = "KEA", bool genTransformImage = false);
-    
     /** Add tie points to GCP */
     DllExport void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType);
     

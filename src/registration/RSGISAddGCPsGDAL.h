@@ -28,7 +28,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <list>
 
 #include "gdal_priv.h"
@@ -41,7 +41,7 @@
 #include "img/RSGISImageUtils.h"
 #include "common/rsgis-tqdm.h"
 
-#include "registration/RSGISImageWarpException.h"
+#include "common/RSGISImageException.h"
 #include "registration/RSGISGCPImg2MapNode.h"
 
 // mark all exported classes/functions with DllExport to have

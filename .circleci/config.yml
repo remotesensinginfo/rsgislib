@@ -1,0 +1,68 @@
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.2.5
+  sonarcloud: sonarsource/sonarcloud@1.0.1
+  aws-s3: circleci/aws-s3@3.0.0
+
+executors: #(1)
+  exectr:
+    docker:
+      - image: petebunting/rsinfo_rsgislib_build:latest #(2)
+
+# Testing needs to be part of build command as environment needed following build and installation.
+jobs:
+  build_and_test:
+    executor: exectr #(1)
+    steps:
+      - checkout
+      - run:
+          name: Create build directory
+          command: |
+            mkdir -p build_dir
+      - run:
+          name: Setup cmake and build
+          command: |
+            cd build_dir
+            cmake -DCMAKE_INSTALL_PREFIX=/opt/miniconda -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_SKIP_RPATH=OFF -DGDAL_INCLUDE_DIR=/opt/miniconda/include -DGDAL_LIB_PATH=/opt/miniconda/lib -DBOOST_INCLUDE_DIR=/opt/miniconda/include -DBOOST_LIB_PATH=/opt/miniconda/lib -DGSL_INCLUDE_DIR=/opt/miniconda/include -DGSL_LIB_PATH=/opt/miniconda/lib -DMUPARSER_INCLUDE_DIR=/opt/miniconda/include -DMUPARSER_LIB_PATH=/opt/miniconda/lib -DHDF5_INCLUDE_DIR=/opt/miniconda/include -DHDF5_LIB_PATH=/opt/miniconda/lib -DKEA_INCLUDE_DIR=/opt/miniconda/include -DKEA_LIB_PATH=/opt/miniconda/lib ..
+            make
+      - run:
+          name: Run installation.
+          command: |
+            cd build_dir
+            make install
+      - run:
+          name: Run tests.
+          command: |
+            mkdir -p pytest_reports/coverage
+            pip install pytest-html coverage pytest-cov
+            pytest -v python_tests --cov=/opt/miniconda/lib/python3.9/site-packages/rsgislib --cov-report=xml:pytest_reports/coverage.xml --cov-report=html:pytest_reports/coverage/ --junitxml=pytest_reports/junit.xml --html=pytest_reports/rsgisib_tests_report.html --self-contained-html
+      - store_test_results:
+          path: pytest_reports
+      - store_artifacts:
+          path: pytest_reports
+          destination: pytest_reports
+      - codecov/upload:
+          file: pytest_reports/coverage.xml
+      - sonarcloud/scan
+      - run:
+          name: build documentation
+          command: |
+            cd doc/python
+            sh run_doc_gen.sh
+      - aws-s3/sync:
+          arguments: |
+            --acl public-read
+          aws-access-key-id: AWS_ACCESS_KEY_ID_RSGISLIB_WEB
+          aws-region: AWS_REGION_RSGISLIB_WEB
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_RSGISLIB_WEB
+          from: doc/python/html
+          to: 's3://rsgislib.org/dev'
+      
+
+# Orchestrate our job run sequence
+workflows:
+  build-and-test:
+    jobs:
+      - build_and_test:
+          context: SonarCloud

@@ -25,7 +25,7 @@
 
 #include <iostream>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include "math/RSGISMathFunction.h"
 #include "math/RSGISMathException.h"
 

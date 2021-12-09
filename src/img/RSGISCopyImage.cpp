@@ -84,6 +84,46 @@ namespace rsgis{namespace img{
     {
         
     }
+
+
+    RSGISCopyImageBandToBits::RSGISCopyImageBandToBits(int numberOutBands, unsigned int imgBand, GDALDataType gdalDataType) : RSGISCalcImageValue(numberOutBands)
+    {
+        this->imgBandIdx = imgBand-1;
+        this->gdalDataType = gdalDataType;
+    }
+
+    void RSGISCopyImageBandToBits::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output)
+    {
+        if(gdalDataType == GDT_Byte)
+        {
+            std::bitset<8> bitValsArr = intBandValues[this->imgBandIdx];
+            for(int i = 0; i < 8; ++i)
+            {
+                output[i]=bitValsArr[i];
+            }
+        }
+        else if((gdalDataType == GDT_UInt16) | (gdalDataType == GDT_Int16))
+        {
+            std::bitset<16> bitValsArr = intBandValues[this->imgBandIdx];
+            for(int i = 0; i < 16; ++i)
+            {
+                output[i]=bitValsArr[i];
+            }
+        }
+        else if((gdalDataType == GDT_UInt32) | (gdalDataType == GDT_Int32))
+        {
+            std::bitset<32> bitValsArr = intBandValues[this->imgBandIdx];
+            for(int i = 0; i < 32; ++i)
+            {
+                output[i]=bitValsArr[i];
+            }
+        }
+    }
+
+    RSGISCopyImageBandToBits::~RSGISCopyImageBandToBits()
+    {
+
+    }
     
     
 }}

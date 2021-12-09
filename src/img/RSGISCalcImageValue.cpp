@@ -60,6 +60,5 @@ namespace rsgis{namespace img{
     {
         
     }
-
 	
 }} //rsgis::img

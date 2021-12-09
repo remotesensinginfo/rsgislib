@@ -45,7 +45,7 @@ static std::string* ExtractStringArrayFromSequence(PyObject *sequence, int *nEle
     *nElements = nFields;
     if(nFields == 0)
     {
-        return NULL;
+        return nullptr;
     }
     std::string *stringsArray = new std::string[nFields];
 
@@ -60,7 +60,7 @@ static std::string* ExtractStringArrayFromSequence(PyObject *sequence, int *nEle
             Py_DECREF(stringObj);
             delete[] stringsArray;
             *nElements = 0;
-            return NULL;
+            return nullptr;
         }
 
         stringsArray[i] = RSGISPY_STRING_EXTRACT(stringObj);
@@ -87,6 +87,7 @@ static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequen
     return stringsVec;
 }
 
+/*
 // Helper function to extract python sequence to array of integers
 static std::vector<int> ExtractIntVectorFromSequence(PyObject *sequence)
 {
@@ -110,55 +111,37 @@ static std::vector<int> ExtractIntVectorFromSequence(PyObject *sequence)
 
     return intVals;
 }
+*/
 
 static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputimage", "outputimage", "saveoutstats", "outstatsfile", "ignorezeros", "onepasssd", "gdalformat", "datatype", "stretchtype", "stretchparam", NULL};
-    const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutStatsFile;
-    int saveOutStats, ignoreZeros, onePassSD;
-    int nOutDataType, nStretchType;
-    float fStretchParam = 2.0;
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssisiisii|f:stretchImage", kwlist, &pszInputImage, &pszOutputFile, &saveOutStats, &pszOutStatsFile, &ignoreZeros, &onePassSD, &pszGDALFormat, &nOutDataType, &nStretchType, &fStretchParam))
-    {
-        return NULL;
-    }
-
-    try
-    {
-        rsgis::cmds::executeStretchImage(pszInputImage, pszOutputFile, saveOutStats, pszOutStatsFile, ignoreZeros, onePassSD, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageUtils_StretchImageNoData(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {"inputimage", "outputimage", "saveoutstats", "outstatsfile", "nodataval", "onepasssd", "gdalformat", "datatype", "stretchtype", "stretchparam", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("save_stats"),
+                             RSGIS_PY_C_TEXT("out_stats_file"), RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("one_pass_std"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("stretch_type"),
+                             RSGIS_PY_C_TEXT("stretch_param"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutStatsFile;
     int saveOutStats, onePassSD;
     int nOutDataType, nStretchType;
     float fStretchParam = 2.0;
     float inNoData = 0.0;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssisfisii|f:stretchImageNoData", kwlist, &pszInputImage, &pszOutputFile, &saveOutStats, &pszOutStatsFile, &inNoData, &onePassSD, &pszGDALFormat, &nOutDataType, &nStretchType, &fStretchParam))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssisfisii|f:stretch_img", kwlist, &pszInputImage, &pszOutputFile,
+                                     &saveOutStats, &pszOutStatsFile, &inNoData, &onePassSD, &pszGDALFormat,
+                                     &nOutDataType, &nStretchType, &fStretchParam))
     {
-        return NULL;
+        return nullptr;
     }
 
     try
     {
-        rsgis::cmds::executeStretchImageNoData(pszInputImage, pszOutputFile, inNoData, saveOutStats, pszOutStatsFile, onePassSD, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
+        rsgis::cmds::executeStretchImageNoData(pszInputImage, pszOutputFile, inNoData, saveOutStats,
+                                               pszOutStatsFile, onePassSD, pszGDALFormat,
+                                               (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -166,52 +149,31 @@ static PyObject *ImageUtils_StretchImageNoData(PyObject *self, PyObject *args, P
 
 static PyObject *ImageUtils_StretchImageWithStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputimage", "outputimage", "instatsfile", "gdalformat", "datatype", "stretchtype", "stretchparam", NULL};
-    
-    const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszInStatsFile;
-    int nOutDataType, nStretchType;
-    float fStretchParam = 2.0;
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssii|f:stretchImageWithStats", kwlist, &pszInputImage, &pszOutputFile, &pszInStatsFile, &pszGDALFormat, &nOutDataType, &nStretchType, &fStretchParam))
-    {
-        return NULL;
-    }
-
-    try
-    {
-        rsgis::cmds::executeStretchImageWithStats(pszInputImage, pszOutputFile, pszInStatsFile, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageUtils_StretchImageWithStatsNoData(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {"inputimage", "outputimage", "instatsfile", "gdalformat", "datatype", "nodataval", "stretchtype", "stretchparam", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("in_stats_file"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("no_data_val"),
+                             RSGIS_PY_C_TEXT("stretch_type"), RSGIS_PY_C_TEXT("stretch_param"), nullptr};
     
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszInStatsFile;
     int nOutDataType, nStretchType;
     float fStretchParam = 2.0;
     float nodataval = 0.0;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssifi|f:stretchImageWithStatsNoData", kwlist, &pszInputImage, &pszOutputFile, &pszInStatsFile, &pszGDALFormat, &nOutDataType, &nodataval, &nStretchType, &fStretchParam))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssifi|f:stretch_img_with_stats", kwlist, &pszInputImage, &pszOutputFile,
+                                     &pszInStatsFile, &pszGDALFormat, &nOutDataType, &nodataval, &nStretchType, &fStretchParam))
     {
-        return NULL;
+        return nullptr;
     }
 
     try
     {
-        rsgis::cmds::executeStretchImageWithStatsNoData(pszInputImage, pszOutputFile, pszInStatsFile, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam, nodataval);
+        rsgis::cmds::executeStretchImageWithStatsNoData(pszInputImage, pszOutputFile, pszInStatsFile,
+                                                        pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType,
+                                                        (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam, nodataval);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -219,7 +181,10 @@ static PyObject *ImageUtils_StretchImageWithStatsNoData(PyObject *self, PyObject
 
 static PyObject *ImageUtils_NormaliseImagePxlVals(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputimage", "outputimage", "gdalformat", "datatype", "innodataval", "outnodataval", "outmin", "outmax", "stretchtype", "stretchparam", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("in_no_data_val"), RSGIS_PY_C_TEXT("out_no_data_val"),
+                             RSGIS_PY_C_TEXT("out_min"), RSGIS_PY_C_TEXT("out_max"),
+                             RSGIS_PY_C_TEXT("stretch_type"), RSGIS_PY_C_TEXT("stretch_param"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     int nOutDataType, nStretchType;
     float fStretchParam = 2.0;
@@ -228,33 +193,40 @@ static PyObject *ImageUtils_NormaliseImagePxlVals(PyObject *self, PyObject *args
     float outMinVal = 0;
     float outMaxVal = 1;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiffffi|f:normaliseImagePxlVals", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat, &nOutDataType, &inNoDataVal, &outNoDataVal, &outMinVal, &outMaxVal, &nStretchType, &fStretchParam))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiffffi|f:normalise_img_pxl_vals", kwlist, &pszInputImage, &pszOutputFile,
+                                     &pszGDALFormat, &nOutDataType, &inNoDataVal, &outNoDataVal, &outMinVal, &outMaxVal, &nStretchType, &fStretchParam))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
     {
-        rsgis::cmds::executeNormaliseImgPxlVals(std::string(pszInputImage), std::string(pszOutputFile), std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType, inNoDataVal, outNoDataVal, outMinVal, outMaxVal, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
+        rsgis::cmds::executeNormaliseImgPxlVals(std::string(pszInputImage), std::string(pszOutputFile),
+                                                std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType, inNoDataVal,
+                                                outNoDataVal, outMinVal, outMaxVal, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("in_msk_img"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("out_value"),
+                             RSGIS_PY_C_TEXT("mask_value"),  nullptr};
     const char *pszInputImage, *pszImageMask, *pszOutputImage, *pszGDALFormat;
     int nDataType;
     float outValue;
     PyObject *maskValueObj;
-    if( !PyArg_ParseTuple(args, "ssssifO:maskImage", &pszInputImage, &pszImageMask, &pszOutputImage, &pszGDALFormat, &nDataType, &outValue, &maskValueObj ))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssifO:mask_img", kwlist, &pszInputImage, &pszImageMask, &pszOutputImage, &pszGDALFormat, &nDataType, &outValue, &maskValueObj ))
     {
-        return NULL;
+        return nullptr;
     }
 
     std::vector<float> maskValues;
@@ -268,7 +240,7 @@ static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
         else
         {
             PyErr_SetString(GETSTATE(self)->error, "Mask value must be numeric or a list of numeric.");
-            return NULL;
+            return nullptr;
         }
     }
     else
@@ -285,7 +257,7 @@ static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
             else
             {
                 PyErr_SetString(GETSTATE(self)->error, "Mask value must be numeric or a list of numeric.");
-                return NULL;
+                return nullptr;
             }
         }
     }
@@ -297,22 +269,27 @@ static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("out_img_base"),
+                             RSGIS_PY_C_TEXT("tile_width"), RSGIS_PY_C_TEXT("tile_height"),
+                             RSGIS_PY_C_TEXT("tile_overlap"), RSGIS_PY_C_TEXT("offset_tiles"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
+                             RSGIS_PY_C_TEXT("out_img_ext"), nullptr};
     const char *pszInputImage, *pszImageBase, *pszGDALFormat, *pszExt = "";
     unsigned int imgWidth, imgHeight, imgTileOverlap = 0;
     int offsetTiling = false;
     int nDataType;
     
-    if(!PyArg_ParseTuple(args, "ssIIIisis:createTiles", &pszInputImage, &pszImageBase, &imgWidth, &imgHeight, &imgTileOverlap, &offsetTiling, &pszGDALFormat, &nDataType, &pszExt))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssIIIisis:create_tiles", kwlist, &pszInputImage, &pszImageBase, &imgWidth, &imgHeight, &imgTileOverlap, &offsetTiling, &pszGDALFormat, &nDataType, &pszExt))
     {
-        return NULL;
+        return nullptr;
     }
     
     PyObject *pOutList;
@@ -323,7 +300,7 @@ static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
         
         pOutList = PyList_New(outFileNames.size());
         Py_ssize_t nIndex = 0;
-        for( std::vector<std::string>::iterator itr = outFileNames.begin(); itr != outFileNames.end(); itr++)
+        for( auto itr = outFileNames.begin(); itr != outFileNames.end(); itr++)
         {
             PyObject *pVal = RSGISPY_CREATE_STRING((*itr).c_str());
             PyList_SetItem(pOutList, nIndex, pVal ); // steals a reference
@@ -333,28 +310,35 @@ static PyObject *ImageUtils_createTiles(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     return pOutList;
 }
 
-static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("background_val"), RSGIS_PY_C_TEXT("skip_val"),
+                             RSGIS_PY_C_TEXT("skip_band"), RSGIS_PY_C_TEXT("overlap_behaviour"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pszOutputImage, *pszGDALFormat;
     float backgroundVal, skipVal;
     int skipBand, nDataType, overlapBehaviour;
     PyObject *pInputImages; // List of input images
 
     // Check parameters are present and of correct type
-    if( !PyArg_ParseTuple(args, "Osffiisi:createImageMosaic", &pInputImages, &pszOutputImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Osffiisi:create_img_mosaic", kwlist, &pInputImages, &pszOutputImage,
                                 &backgroundVal, &skipVal, &skipBand, &overlapBehaviour,&pszGDALFormat, &nDataType))
-        return NULL;
+    {
+        return nullptr;
+    }
 
     // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
-    if(!PySequence_Check(pInputImages)) {
+    if(!PySequence_Check(pInputImages))
+    {
         PyErr_SetString(GETSTATE(self)->error, "First argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
 
     // Extract list of images to array of strings.
@@ -363,7 +347,7 @@ static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
     if(numImages == 0) 
     { 
         PyErr_SetString(GETSTATE(self)->error, "No input images provided");
-        return NULL; 
+        return nullptr; 
     }
     
     try
@@ -375,28 +359,30 @@ static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("include_imgs"),
+                             RSGIS_PY_C_TEXT("input_bands"), RSGIS_PY_C_TEXT("skip_val"), nullptr};
     const char *pszBaseImage;
     PyObject *pInputImages; // List of input images
     PyObject *pInputBands = Py_None; // List of bands
     PyObject *pSkipVal = Py_None;
 
     // Check parameters are present and of correct type
-    if( !PyArg_ParseTuple(args, "sO|OO:includeImages", &pszBaseImage, &pInputImages, &pInputBands, &pSkipVal))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sO|OO:include_imgs", kwlist, &pszBaseImage, &pInputImages, &pInputBands, &pSkipVal))
+        return nullptr;
 
     // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
     if(!PySequence_Check(pInputImages))
     {
         PyErr_SetString(GETSTATE(self)->error, "Second argument must be a list of images");
-        return NULL;
+        return nullptr;
     }
 
     // Extract list of images to array of strings.
@@ -405,7 +391,7 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
     if(numImages == 0) 
     { 
         PyErr_SetString(GETSTATE(self)->error, "No input images provided");
-        return NULL; 
+        return nullptr; 
     }
 
     // Extract bands to an array (if using)
@@ -424,7 +410,7 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
             {
                 PyErr_SetString(GETSTATE(pInputBands)->error, "Bands must be integers");
                 Py_DECREF(intObj);
-                return NULL;
+                return nullptr;
             }
             
             imgBands.push_back(RSGISPY_INT_EXTRACT(intObj));
@@ -441,7 +427,7 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
         {
             PyErr_SetString(GETSTATE(pInputBands)->error, "Skip value must be a float.");
             Py_DECREF(pSkipVal);
-            return NULL;
+            return nullptr;
         }
         
         skipVal = RSGISPY_FLOAT_EXTRACT(pSkipVal);
@@ -454,29 +440,31 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_IncludeImagesOverlap(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_IncludeImagesOverlap(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("include_imgs"),
+                             RSGIS_PY_C_TEXT("overlap"), nullptr};
     const char *pszBaseImage;
     PyObject *pInputImages; // List of input images
     int pxlOverlap = 0;
     
     // Check parameters are present and of correct type
-    if( !PyArg_ParseTuple(args, "sOi:includeImagesWithOverlap", &pszBaseImage, &pInputImages, &pxlOverlap))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sOi:include_imgs_with_overlap", kwlist, &pszBaseImage, &pInputImages, &pxlOverlap))
     {
-        return NULL;
+        return nullptr;
     }
     
     // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
     if(!PySequence_Check(pInputImages))
     {
         PyErr_SetString(GETSTATE(self)->error, "Second argument must be a list of images");
-        return NULL;
+        return nullptr;
     }
     
     // Extract list of images to array of strings.
@@ -485,7 +473,7 @@ static PyObject *ImageUtils_IncludeImagesOverlap(PyObject *self, PyObject *args)
     if(numImages == 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "No input images provided");
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -495,28 +483,29 @@ static PyObject *ImageUtils_IncludeImagesOverlap(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_IncludeImagesIndImgIntersect(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_IncludeImagesIndImgIntersect(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("include_imgs"), nullptr};
     const char *pszBaseImage;
     PyObject *pInputImages; // List of input images
     
     // Check parameters are present and of correct type
-    if( !PyArg_ParseTuple(args, "sO:includeImagesIndImgIntersect", &pszBaseImage, &pInputImages))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sO:include_imgs_ind_img_intersect", kwlist, &pszBaseImage, &pInputImages))
     {
-        return NULL;
+        return nullptr;
     }
     
     // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
     if(!PySequence_Check(pInputImages))
     {
         PyErr_SetString(GETSTATE(self)->error, "Second argument must be a list of images");
-        return NULL;
+        return nullptr;
     }
     
     // Extract list of images to array of strings.
@@ -525,7 +514,7 @@ static PyObject *ImageUtils_IncludeImagesIndImgIntersect(PyObject *self, PyObjec
     if(numImages == 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "No input images provided");
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -535,61 +524,7 @@ static PyObject *ImageUtils_IncludeImagesIndImgIntersect(PyObject *self, PyObjec
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-
-static PyObject *ImageUtils_CombineImageOverview(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    const char *pszBaseImage;
-    PyObject *pInputImages; // List of input images
-    PyObject *pyraScales = NULL;
-
-    static char *kwlist[] = {"base", "images", "pyscales", NULL};
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sOO:combineImageOverviews", kwlist, &pszBaseImage, &pInputImages, &pyraScales))
-    {
-        return NULL;
-    }
-    
-    if(!PySequence_Check(pInputImages))
-    {
-        PyErr_SetString(GETSTATE(self)->error, "images argument must be a list strings for image paths.");
-        return NULL;
-    }
-    // Extract list of images to array of strings.
-    std::vector<std::string> inputImages = ExtractStringVectorFromSequence(pInputImages);
-    int numImages = inputImages.size();
-    std::cout << "Num Images: " << numImages << std::endl;
-    if(numImages == 0)
-    {
-        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
-        return NULL;
-    }
-    
-    if(!PySequence_Check(pyraScales))
-    {
-        PyErr_SetString(GETSTATE(self)->error, "pyscales argument must be a list of integers.");
-        return NULL;
-    }
-    std::vector<int> pyraScaleVals = ExtractIntVectorFromSequence(pyraScales);
-    if(pyraScaleVals.size() < 2)
-    {
-        PyErr_SetString(GETSTATE(self)->error, "pyscales should have more than 1 values otherwise it doesn't make sense.");
-        return NULL;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeImageIncludeOverviews(std::string(pszBaseImage), inputImages, pyraScaleVals);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -601,34 +536,16 @@ static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObje
     int useNoDataValue = true;
     int buildPyramids = true;
     float noDataValue = 0;
-    PyObject *pyraScales = NULL;
-    static char *kwlist[] = {"image", "usenodataval","nodataval", "calcpyramids", "pyscales", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("use_no_data"),
+                             RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("calc_pyramids"), nullptr};
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|ifiO:popImageStats", kwlist, &pszInputImage,
-                    &useNoDataValue, &noDataValue, &buildPyramids, &pyraScales))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|ifi:pop_img_stats", kwlist, &pszInputImage,
+                    &useNoDataValue, &noDataValue, &buildPyramids))
     {
-        return NULL;
+        return nullptr;
     }
     
     std::vector<int> pyraScaleVals;
-    if(pyraScales == NULL)
-    {
-        pyraScaleVals.clear();
-    }
-    else if(!PySequence_Check(pyraScales))
-    {
-        PyErr_SetString(GETSTATE(self)->error, "pyscales argument must be a list of integers.");
-        return NULL;
-    }
-    else
-    {
-        pyraScaleVals = ExtractIntVectorFromSequence(pyraScales);
-        if(pyraScaleVals.size() < 2)
-        {
-            PyErr_SetString(GETSTATE(self)->error, "if you use pyscales, it should have more than 1 values otherwise it doesn't make sense.");
-            return NULL;
-        }
-    }
     
     try
     {
@@ -637,7 +554,7 @@ static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObje
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -645,7 +562,8 @@ static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObje
 
 static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimage", "wktString", "wktFile", NULL};
+    // TODO REPLACE WITH PURE PYTHON FUNCTION. ADD VERSIONS FOR WKT, PROJ4 and EPSG.
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("wkt_str"), RSGIS_PY_C_TEXT("wkt_file"), nullptr};
     const char *pszInputImage;
     std::string pszInputProj = "";
     std::string pszInputProjFile = "";
@@ -654,8 +572,10 @@ static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args, PyObject 
     PyObject *pszInputProjFileObj = Py_None;
     
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|OO:assignProj", kwlist, &pszInputImage, &pszInputProjObj, &pszInputProjFileObj))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|OO:assign_proj", kwlist, &pszInputImage, &pszInputProjObj, &pszInputProjFileObj))
+    {
+        return nullptr;
+    }
     
     if(pszInputProjObj == Py_None)
     {
@@ -664,7 +584,7 @@ static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args, PyObject 
         {
             pszInputProjFile = "";
             PyErr_SetString(GETSTATE(self)->error, "Must specify either a wkt string or a file from which it can be read." );
-            return NULL;
+            return nullptr;
         }
         else
         {
@@ -685,19 +605,21 @@ static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args, PyObject 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_CopyProjFromImage(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_CopyProjFromImage(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszInputImage;
     const char *pszInputRefImage;
-    
-    if( !PyArg_ParseTuple(args, "ss:copyProjFromImage", &pszInputImage, &pszInputRefImage))
-        return NULL;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("ref_img"), nullptr};
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ss:copy_proj_from_img", kwlist, &pszInputImage, &pszInputRefImage))
+    {
+        return nullptr;
+    }
     
     try
     {
@@ -706,19 +628,21 @@ static PyObject *ImageUtils_CopyProjFromImage(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_CopySpatialAndProjFromImage(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_CopySpatialAndProjFromImage(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszInputImage;
     const char *pszInputRefImage;
-    
-    if( !PyArg_ParseTuple(args, "ss:copySpatialAndProjFromImage", &pszInputImage, &pszInputRefImage))
-        return NULL;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("ref_img"), nullptr};
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ss:copy_spatial_and_proj_from_img", kwlist, &pszInputImage, &pszInputRefImage))
+    {
+        return nullptr;
+    }
     
     try
     {
@@ -727,13 +651,13 @@ static PyObject *ImageUtils_CopySpatialAndProjFromImage(PyObject *self, PyObject
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_AssignSpatialInfo(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_AssignSpatialInfo(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszInputImage;
     PyObject *xTLObj;
@@ -742,9 +666,14 @@ static PyObject *ImageUtils_AssignSpatialInfo(PyObject *self, PyObject *args)
     PyObject *yResObj;
     PyObject *xRotObj;
     PyObject *yRotObj;
-        
-    if( !PyArg_ParseTuple(args, "sOOOOOO:assignSpatialInfo", &pszInputImage, &xTLObj, &yTLObj, &xResObj, &yResObj, &xRotObj, &yRotObj))
-        return NULL;
+
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("tl_x"), RSGIS_PY_C_TEXT("tl_y"),
+                             RSGIS_PY_C_TEXT("res_x"), RSGIS_PY_C_TEXT("res_y"), RSGIS_PY_C_TEXT("rot_x"),
+                             RSGIS_PY_C_TEXT("rot_y"), nullptr};
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sOOOOOO:assign_spatial_info", kwlist, &pszInputImage, &xTLObj, &yTLObj, &xResObj, &yResObj, &xRotObj, &yRotObj))
+    {
+        return nullptr;
+    }
     
     
     double xTL = 0.0;
@@ -822,148 +751,33 @@ static PyObject *ImageUtils_AssignSpatialInfo(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_ExtractZoneImageValues2HDF(PyObject *self, PyObject *args)
-{
-    const char *pszInputImage;
-    const char *pszInputMaskImage;
-    const char *pszOutputFile;
-    float maskValue = 0;
-    int nDataType = 9;
-    
-    if( !PyArg_ParseTuple(args, "sssf|i:extractZoneImageValues2HDF", &pszInputImage, &pszInputMaskImage, &pszOutputFile, &maskValue, &nDataType))
-    {
-        return NULL;
-    }
-    
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
-    
-    try
-    {
-        rsgis::cmds::executeImageRasterZone2HDF(std::string(pszInputImage), std::string(pszInputMaskImage), std::string(pszOutputFile), maskValue, type);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
 
-static PyObject *ImageUtils_ExtractZoneImageBandValues2HDF(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_SelectImageBands(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    PyObject *inputImageFileInfoObj;
-    const char *pszInputMaskImage;
-    const char *pszOutputFile;
-    float maskValue = 0;
-    int nDataType = 9;
-    
-    if( !PyArg_ParseTuple(args, "Ossf|i:extractZoneImageBandValues2HDF", &inputImageFileInfoObj, &pszInputMaskImage, &pszOutputFile, &maskValue, &nDataType))
-    {
-        return NULL;
-    }
-    
-    if( !PySequence_Check(inputImageFileInfoObj))
-    {
-        PyErr_SetString(GETSTATE(self)->error, "First argument (imageFileInfo) must be a sequence");
-        return NULL;
-    }
-    
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
-    
-    Py_ssize_t nFileInfo = PySequence_Size(inputImageFileInfoObj);
-    std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFilesInfo;
-    imageFilesInfo.reserve(nFileInfo);
-    std::string tmpFileName = "";
-    
-    for( Py_ssize_t n = 0; n < nFileInfo; n++ )
-    {
-        PyObject *o = PySequence_GetItem(inputImageFileInfoObj, n);
-        
-        PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
-        if( ( pFileName == NULL ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fileName\'" );
-            Py_XDECREF(pFileName);
-            Py_DECREF(o);
-            return NULL;
-        }
-        
-        PyObject *pBands = PyObject_GetAttrString(o, "bands");
-        if( ( pBands == NULL ) || ( pBands == Py_None ) || !PySequence_Check(pBands) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find sequence attribute \'bands\'" );
-            Py_DECREF(pFileName);
-            Py_XDECREF(pBands);
-            Py_DECREF(o);
-            return NULL;
-        }
-        
-        Py_ssize_t nBands = PySequence_Size(pBands);
-        if(nBands == 0)
-        {
-            PyErr_SetString(GETSTATE(self)->error, "Sequence attribute \'bands\' is empty." );
-            Py_DECREF(pFileName);
-            Py_DECREF(pBands);
-            Py_DECREF(o);
-            return NULL;
-        }
-        std::vector<unsigned int> bandsVec = std::vector<unsigned int>();
-        bandsVec.reserve(nBands);
-        for( Py_ssize_t i = 0; i < nBands; i++ )
-        {
-            PyObject *bO = PySequence_GetItem(pBands, i);
-            if( ( bO == NULL ) || ( bO == Py_None ) || !RSGISPY_CHECK_INT(bO) )
-            {
-                PyErr_SetString(GETSTATE(self)->error, "Element of 'bands' list was not an integer." );
-                Py_XDECREF(bO);
-                
-                Py_DECREF(pFileName);
-                Py_DECREF(pBands);
-                Py_DECREF(o);
-                return NULL;
-            }
-            bandsVec.push_back(RSGISPY_INT_EXTRACT(bO));
-        }
-        
-        tmpFileName = std::string(RSGISPY_STRING_EXTRACT(pFileName));
-        imageFilesInfo.push_back(std::pair<std::string, std::vector<unsigned int> >(tmpFileName, bandsVec));
-    }
-    
-    try
-    {
-        rsgis::cmds::executeImageBandRasterZone2HDF(imageFilesInfo, std::string(pszInputMaskImage), std::string(pszOutputFile), maskValue, type);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageUtils_SelectImageBands(PyObject *self, PyObject *args)
-{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
+                             RSGIS_PY_C_TEXT("bands"), nullptr};
     const char *pszInputImage;
     const char *pszOutputFile;
     const char *pszGDALFormat;
     int nDataType;
-    PyObject *pImageBands = NULL;
+    PyObject *pImageBands = nullptr;
     
-    if( !PyArg_ParseTuple(args, "sssiO:selectImageBands", &pszInputImage, &pszOutputFile, &pszGDALFormat, &nDataType, &pImageBands))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiO:select_img_bands", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat, &nDataType, &pImageBands))
+    {
+        return nullptr;
+    }
     
     if(!PySequence_Check(pImageBands))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence of image bands (int)");
-        return NULL;
+        return nullptr;
     }
     
     std::vector<unsigned int> imgBands;
@@ -977,7 +791,7 @@ static PyObject *ImageUtils_SelectImageBands(PyObject *self, PyObject *args)
         {
             PyErr_SetString(GETSTATE(pImageBands)->error, "Fields must be integers");
             Py_DECREF(intObj);
-            return NULL;
+            return nullptr;
         }
         
         imgBands.push_back(RSGISPY_INT_EXTRACT(intObj));
@@ -986,46 +800,61 @@ static PyObject *ImageUtils_SelectImageBands(PyObject *self, PyObject *args)
     
     try
     {
-        rsgis::cmds::executeSubsetImageBands(std::string(pszInputImage), std::string(pszOutputFile), imgBands, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nDataType);
+        rsgis::cmds::executeSubsetImageBands(std::string(pszInputImage), std::string(pszOutputFile),
+                                             imgBands, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nDataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_Subset(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_Subset(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputImage, *pszInputVector, *pszOutputImage, *pszGDALFormat;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),
+                             RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
+    const char *pszInputImage, *pszInputVectorFile, *pszInputVectorLyr, *pszOutputImage, *pszGDALFormat;
     int nOutDataType;
 
-    if( !PyArg_ParseTuple(args, "ssssi:subset", &pszInputImage, &pszInputVector, &pszOutputImage, &pszGDALFormat, &nOutDataType))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssi:subset", kwlist, &pszInputImage, &pszInputVectorFile, &pszInputVectorLyr, &pszOutputImage, &pszGDALFormat, &nOutDataType))
+    {
+        return nullptr;
+    }
     
     try
     {
-        rsgis::cmds::executeSubset(pszInputImage, pszInputVector, pszOutputImage, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType);
+        rsgis::cmds::executeSubset(std::string(pszInputImage), std::string(pszInputVectorFile),
+                                   std::string(pszInputVectorLyr), std::string(pszOutputImage),
+                                   std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_SubsetBBox(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_SubsetBBox(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
+                             RSGIS_PY_C_TEXT("min_x"), RSGIS_PY_C_TEXT("max_x"),
+                             RSGIS_PY_C_TEXT("min_y"), RSGIS_PY_C_TEXT("max_y"), nullptr};
+
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
     int nOutDataType;
     double xMin, xMax, yMin, yMax = 0.0;
     
-    if( !PyArg_ParseTuple(args, "sssidddd:subsetbbox", &pszInputImage, &pszOutputImage, &pszGDALFormat, &nOutDataType, &xMin, &xMax, &yMin, &yMax))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssidddd:subset_bbox", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &nOutDataType, &xMin, &xMax, &yMin, &yMax))
+    {
+        return nullptr;
+    }
     
     try
     {
@@ -1034,79 +863,56 @@ static PyObject *ImageUtils_SubsetBBox(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_Subset2Polys(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_Subset2Img(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputImage, *pszInputVector, *pszOutputImageBase, *pszAttribute, *pszGDALFormat, *pszOutputExt;
-    int nOutDataType;
-
-    if( !PyArg_ParseTuple(args, "sssssis:subset2polys", &pszInputImage, &pszInputVector, &pszAttribute, &pszOutputImageBase, &pszGDALFormat, &nOutDataType, &pszOutputExt))
-        return NULL;
-    
-    PyObject *pOutList;
-    try
-    {
-        std::vector<std::string> outFileNames;
-        
-        rsgis::cmds::executeSubset2Polys(pszInputImage, pszInputVector, pszAttribute, pszOutputImageBase, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, pszOutputExt, &outFileNames);
-     
-        pOutList = PyList_New(outFileNames.size());
-        Py_ssize_t nIndex = 0;
-        for( std::vector<std::string>::iterator itr = outFileNames.begin(); itr != outFileNames.end(); itr++)
-        {
-            PyObject *pVal = RSGISPY_CREATE_STRING((*itr).c_str());
-            PyList_SetItem(pOutList, nIndex, pVal ); // steals a reference
-            nIndex++;
-        }
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    return pOutList;
-}
-
-static PyObject *ImageUtils_Subset2Img(PyObject *self, PyObject *args)
-{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("in_roi_img"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pszInputImage, *pszInputROI, *pszOutputImage, *pszGDALFormat;
     int nOutDataType;
 
-    if( !PyArg_ParseTuple(args, "ssssi:subset2img", &pszInputImage, &pszInputROI, &pszOutputImage, &pszGDALFormat, &nOutDataType))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:subset_to_img", kwlist, &pszInputImage, &pszInputROI, &pszOutputImage, &pszGDALFormat, &nOutDataType))
+        return nullptr;
     
     try
     {
-        rsgis::cmds::executeSubset2Img(pszInputImage, pszInputROI, pszOutputImage, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType);
+        rsgis::cmds::executeSubset2Img(std::string(pszInputImage), std::string(pszInputROI),
+                                       std::string(pszOutputImage), std::string(pszGDALFormat),
+                                       (rsgis::RSGISLibDataType)nOutDataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("band_names"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("skip_value"),
+                             RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pszOutputFile;
     const char *pszGDALFormat;
     int nDataType;
     float noDataValue;
-    PyObject *skipValueObj = NULL;
-    PyObject *pInputImages = NULL;
-    PyObject *pimageBandNames = NULL;
+    PyObject *skipValueObj = nullptr;
+    PyObject *pInputImages = nullptr;
+    PyObject *pimageBandNames = nullptr;
     
-    if( !PyArg_ParseTuple(args, "OOsOfsi:stackImageBands", &pInputImages, &pimageBandNames, &pszOutputFile, &skipValueObj, &noDataValue, &pszGDALFormat, &nDataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OOsOfsi:stack_img_bands", kwlist, &pInputImages, &pimageBandNames,
+                                     &pszOutputFile, &skipValueObj, &noDataValue, &pszGDALFormat, &nDataType))
     {
-        return NULL;
+        return nullptr;
     }
     
     bool skipPixels = false;
@@ -1123,7 +929,7 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
     if(!PySequence_Check(pInputImages))
     {
         PyErr_SetString(GETSTATE(self)->error, "First argument must be a sequence with a list of band names.");
-        return NULL;
+        return nullptr;
     }
     
     // Extract list of images to array of strings.
@@ -1132,11 +938,11 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
     if(numImages == 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "No input images were provided");
-        return NULL;
+        return nullptr;
     }
     
     bool replaceBandNames = false;
-    std::string *imageBandNames = NULL;
+    std::string *imageBandNames = nullptr;
     if(PySequence_Check(pimageBandNames))
     {
         // Extract list of images to array of strings.
@@ -1149,7 +955,7 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
         else if(numBandName != numImages)
         {
             PyErr_SetString(GETSTATE(self)->error, "The number of band names must match the number of input images.");
-            return NULL;
+            return nullptr;
         }
         else
         {
@@ -1159,162 +965,176 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
     
     try
     {
-        rsgis::cmds::executeStackImageBands(inputImages, imageBandNames, numImages, std::string(pszOutputFile), skipPixels, skipValue, noDataValue, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nDataType, replaceBandNames);
+        rsgis::cmds::executeStackImageBands(inputImages, imageBandNames, numImages, std::string(pszOutputFile),
+                                            skipPixels, skipValue, noDataValue, std::string(pszGDALFormat),
+                                            (rsgis::RSGISLibDataType)nDataType, replaceBandNames);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
 
-static PyObject *ImageUtils_CreateBlankImage(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_CreateBlankImage(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    // TODO specify projection using EPSG code or wkt string or proj4
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("n_bands"),
+                             RSGIS_PY_C_TEXT("width"), RSGIS_PY_C_TEXT("height"),
+                             RSGIS_PY_C_TEXT("tl_x"), RSGIS_PY_C_TEXT("tl_y"),
+                             RSGIS_PY_C_TEXT("res_x"), RSGIS_PY_C_TEXT("res_y"),
+                             RSGIS_PY_C_TEXT("pxl_val"), RSGIS_PY_C_TEXT("wkt_file"),
+                             RSGIS_PY_C_TEXT("wkt_str"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
+
     const char *pszOutputImage, *pszGDALFormat, *wktFile, *wktString;
     int nOutDataType;
     unsigned int numBands, width, height = 0;
-    double tlX, tlY, res = 0;
+    double tlX, tlY, res_x, res_y = 0;
     float pxlVal = 0;
     
-    if( !PyArg_ParseTuple(args, "sIIIdddfsssi:createBlankImage", &pszOutputImage, &numBands, &width, &height, &tlX, &tlY, &res, &pxlVal, &wktFile, &wktString, &pszGDALFormat, &nOutDataType))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sIIIddddfsssi:create_blank_img", kwlist, &pszOutputImage, &numBands, &width,
+                                     &height, &tlX, &tlY, &res_x, &res_y, &pxlVal, &wktFile, &wktString, &pszGDALFormat, &nOutDataType))
+    {
+        return nullptr;
+    }
     
     try
     {
-        rsgis::cmds::executeCreateBlankImage(std::string(pszOutputImage), numBands, width, height, tlX, tlY, res, pxlVal, std::string(wktFile), std::string(wktString), std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+        rsgis::cmds::executeCreateBlankImage(std::string(pszOutputImage), numBands, width, height, tlX, tlY,
+                                             res_x, res_y, pxlVal, std::string(wktFile), std::string(wktString),
+                                             std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_CreateCopyImage(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_CreateCopyImage(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
     int nOutDataType;
     unsigned int numBands;
     float pxlVal = 0;
+
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("n_bands"), RSGIS_PY_C_TEXT("pxl_val"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     
-    if( !PyArg_ParseTuple(args, "ssIfsi:createCopyImage", &pszInputImage, &pszOutputImage, &numBands, &pxlVal, &pszGDALFormat, &nOutDataType))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssIfsi:create_copy_img", kwlist, &pszInputImage, &pszOutputImage,
+                                     &numBands, &pxlVal, &pszGDALFormat, &nOutDataType))
+    {
+        return nullptr;
+    }
     
     try
     {
-        rsgis::cmds::executeCreateCopyBlankImage(std::string(pszInputImage), std::string(pszOutputImage), numBands, pxlVal, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+        rsgis::cmds::executeCreateCopyBlankImage(std::string(pszInputImage), std::string(pszOutputImage),
+                                                 numBands, pxlVal, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_CreateCopyImageDefExtent(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_CreateCopyImageDefExtent(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
     int nOutDataType;
     unsigned int numBands;
     float pxlVal = 0;
     double xMin, xMax, yMin, yMax, xRes, yRes = 0.0;
+
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("n_bands"), RSGIS_PY_C_TEXT("pxl_val"),
+                             RSGIS_PY_C_TEXT("min_x"), RSGIS_PY_C_TEXT("max_x"),
+                             RSGIS_PY_C_TEXT("min_y"), RSGIS_PY_C_TEXT("max_y"),
+                             RSGIS_PY_C_TEXT("res_x"), RSGIS_PY_C_TEXT("res_y"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     
-    if( !PyArg_ParseTuple(args, "ssIddddddfsi:createCopyImageDefExtent", &pszInputImage, &pszOutputImage, &numBands, &xMin, &xMax, &yMin, &yMax, &xRes, &yRes, &pxlVal, &pszGDALFormat, &nOutDataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssIfddddddsi:create_copy_img_def_extent", kwlist, &pszInputImage,
+                                     &pszOutputImage, &numBands, &pxlVal, &xMin, &xMax, &yMin, &yMax, &xRes, &yRes,
+                                     &pszGDALFormat, &nOutDataType))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
     {
-        rsgis::cmds::executeCreateCopyBlankImage(std::string(pszInputImage), std::string(pszOutputImage), numBands, xMin, xMax, yMin, yMax, xRes, yRes, pxlVal, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+        rsgis::cmds::executeCreateCopyBlankDefExtImage(std::string(pszInputImage), std::string(pszOutputImage),
+                                                 numBands, xMin, xMax, yMin, yMax, xRes, yRes, pxlVal,
+                                                 std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_CreateCopyImageVecExtent(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_CreateCopyImageVecExtent(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputImage, *pszOutputImage, *pszExtentShp, *pszGDALFormat;
+    const char *pszInputImage, *pszOutputImage, *pszInputVectorFile, *pszInputVectorLyr, *pszGDALFormat;
     int nOutDataType;
     unsigned int numBands;
     float pxlVal = 0;
+
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),
+                             RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("n_bands"), RSGIS_PY_C_TEXT("pxl_val"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     
-    if( !PyArg_ParseTuple(args, "sssIfsi:createCopyImageVecExtent", &pszInputImage, &pszExtentShp, &pszOutputImage, &numBands, &pxlVal, &pszGDALFormat, &nOutDataType))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssIfsi:create_copy_img_vec_extent", kwlist, &pszInputImage, &pszInputVectorFile, &pszInputVectorLyr,
+                                     &pszOutputImage, &numBands, &pxlVal, &pszGDALFormat, &nOutDataType))
+    {
+        return nullptr;
+    }
     
     try
     {
-        rsgis::cmds::executeCreateCopyBlankImageVecExtent(std::string(pszInputImage), std::string(pszExtentShp), std::string(pszOutputImage), numBands, pxlVal, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+        rsgis::cmds::executeCreateCopyBlankImageVecExtent(std::string(pszInputImage), std::string(pszInputVectorFile),
+                                                          std::string(pszInputVectorLyr), std::string(pszOutputImage),
+                                                          numBands, pxlVal, std::string(pszGDALFormat),
+                                                          (rsgis::RSGISLibDataType)nOutDataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
-
-static PyObject *ImageUtils_StackStats(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_OrderImagesUsingPropValidData(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputImage, *pszOutputImage, *pszGDALFormat, *pszCalcStat;
-    int nOutDataType;
-    PyObject *nBandsObj;
-    unsigned int numBands = 0;
-    bool allBands = true;
-    
-    if( !PyArg_ParseTuple(args, "ssOssi:stackStats", &pszInputImage, &pszOutputImage, &nBandsObj, &pszCalcStat, &pszGDALFormat, &nOutDataType))
-        return NULL;
-
-    // If an integer has been passes in for bands, extract it, otherwise assume all bands are needed.
-    if(nBandsObj != Py_None)
-    {
-        if(RSGISPY_CHECK_INT(nBandsObj))
-        {
-            numBands = RSGISPY_INT_EXTRACT(nBandsObj);
-            allBands = false;
-        }
-    }
-    
-    try
-    {
-        rsgis::cmds::executeStackStats(pszInputImage, pszOutputImage, pszCalcStat, allBands, numBands, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageUtils_OrderImagesUsingPropValidData(PyObject *self, PyObject *args)
-{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("no_data_val"), nullptr};
     float noDataValue;
     PyObject *pInputImages; // List of input images
     
     // Check parameters are present and of correct type
-    if( !PyArg_ParseTuple(args, "Of:orderImageUsingPropValidPxls", &pInputImages, &noDataValue))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Of:order_img_using_prop_valid_pxls", kwlist, &pInputImages, &noDataValue))
+    {
+        return nullptr;
+    }
     
     // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
     if(!PySequence_Check(pInputImages)) {
         PyErr_SetString(GETSTATE(self)->error, "First argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     // Extract list of images to array of strings.
@@ -1323,17 +1143,17 @@ static PyObject *ImageUtils_OrderImagesUsingPropValidData(PyObject *self, PyObje
     if(numImages == 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "No input images provided");
-        return NULL;
+        return nullptr;
     }
 
-    PyObject *outImagesList = NULL;
+    PyObject *outImagesList = nullptr;
     try
     {
         std::vector<std::string> orderedInputImages = rsgis::cmds::executeOrderImageUsingValidDataProp(inputImages, noDataValue);
         
         outImagesList = PyTuple_New(orderedInputImages.size());
         
-        if(outImagesList == NULL)
+        if(outImagesList == nullptr)
         {
             throw rsgis::cmds::RSGISCmdException("Could not create a python list...");
         }
@@ -1350,34 +1170,40 @@ static PyObject *ImageUtils_OrderImagesUsingPropValidData(PyObject *self, PyObje
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     return outImagesList;
 }
 
 
-static PyObject *ImageUtils_GenSamplingGrid(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_GenSamplingGrid(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("pxl_res"),
+                             RSGIS_PY_C_TEXT("min_val"), RSGIS_PY_C_TEXT("max_val"),
+                             RSGIS_PY_C_TEXT("single_line"), nullptr};
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
     float pxlRes = 0.0;
     int minVal = 0;
     int maxVal = 1;
     int singleLine = false;
     
-    if( !PyArg_ParseTuple(args, "sssfiii:genSamplingGrid", &pszInputImage, &pszOutputImage, &pszGDALFormat, &pxlRes, &minVal, &maxVal, &singleLine))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssfiii:gen_sampling_grid", kwlist, &pszInputImage, &pszOutputImage,
+                                     &pszGDALFormat, &pxlRes, &minVal, &maxVal, &singleLine))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
     {
-        rsgis::cmds::executeProduceRegularGridImage(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), pxlRes, minVal, maxVal, (bool)singleLine);
+        rsgis::cmds::executeProduceRegularGridImage(std::string(pszInputImage), std::string(pszOutputImage),
+                                                    std::string(pszGDALFormat), pxlRes, minVal, maxVal, (bool)singleLine);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1386,15 +1212,15 @@ static PyObject *ImageUtils_GenSamplingGrid(PyObject *self, PyObject *args)
 
 static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimage", "outimage", "gdalformat", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
     
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:genFiniteMask", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:gen_finite_mask", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -1404,7 +1230,7 @@ static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObje
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1412,15 +1238,16 @@ static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObje
 
 static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimages", "outimage", "gdalformat", "nodata", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("no_data_val"), nullptr};
     PyObject *pInputImages;
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
     float noDataVal = 0.0;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Oss|f:genValidMask", kwlist, &pInputImages, &pszOutputImage, &pszGDALFormat, &noDataVal))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Oss|f:gen_valid_mask", kwlist, &pInputImages, &pszOutputImage, &pszGDALFormat, &noDataVal))
     {
-        return NULL;
+        return nullptr;
     }
     
     std::vector<std::string> inputImages;
@@ -1440,7 +1267,7 @@ static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObjec
             {
                 PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
                 Py_DECREF(o);
-                return NULL;
+                return nullptr;
             }
             
             inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
@@ -1449,7 +1276,7 @@ static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObjec
     else
     {
         PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence or string");
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -1459,15 +1286,43 @@ static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObjec
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_GenImageEdgeMask(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("n_edge_pxls"), nullptr};
+    const char *pInputImage = "";
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    unsigned int nEdgePixels = 0.0;
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssI:gen_img_edge_mask", kwlist, &pInputImage, &pszOutputImage, &pszGDALFormat, &nEdgePixels))
+    {
+        return nullptr;
+    }
+
+    try
+    {
+        rsgis::cmds::executeImageEdgeMask(std::string(pInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), nEdgePixels);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return nullptr;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimages", "outimage", "gdalformat", "datatype", "nodata", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_imgs"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("no_data_val"), nullptr};
     PyObject *pInputImages;
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
@@ -1475,9 +1330,9 @@ static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, P
     float noDataVal = 0.0;
     
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Ossi|f:combineImages2Band", kwlist, &pInputImages, &pszOutputImage, &pszGDALFormat, &nDataType, &noDataVal))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Ossi|f:combine_imgs_to_band", kwlist, &pInputImages, &pszOutputImage, &pszGDALFormat, &nDataType, &noDataVal))
     {
-        return NULL;
+        return nullptr;
     }
     
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
@@ -1485,7 +1340,7 @@ static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, P
     if( !PySequence_Check(pInputImages))
     {
         PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nImages = PySequence_Size(pInputImages);
@@ -1499,7 +1354,7 @@ static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, P
         {
             PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
@@ -1512,7 +1367,7 @@ static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, P
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1520,17 +1375,18 @@ static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, P
 
 static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("mask_vals"),
+                             RSGIS_PY_C_TEXT("n_samples"), nullptr};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
     PyObject *maskValsObj;
     unsigned int numSamples = 0;
-    
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOI:performRandomPxlSampleInMask", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &maskValsObj, &numSamples))
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOI:perform_random_pxl_sample_in_mask", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &maskValsObj, &numSamples))
     {
-        return NULL;
+        return nullptr;
     }
     
     std::vector<int> maskVals;
@@ -1544,7 +1400,7 @@ static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *arg
         else
         {
             PyErr_SetString(GETSTATE(self)->error, "Mask value was not a sequence but a single value, however that value was not an integer.");
-            return NULL;
+            return nullptr;
         }
     }
     else
@@ -1561,7 +1417,7 @@ static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *arg
             {
                 Py_DECREF(o);
                 PyErr_SetString(GETSTATE(self)->error, "Mask value was not a sequence but a single value, however that value was not an integer.");
-                return NULL;
+                return nullptr;
             }
         }
     }
@@ -1573,7 +1429,7 @@ static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *arg
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1581,7 +1437,9 @@ static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *arg
 
 static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples", "rndSeed", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("mask_vals"),
+                             RSGIS_PY_C_TEXT("n_samples"), RSGIS_PY_C_TEXT("rnd_seed"), nullptr};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
@@ -1589,9 +1447,9 @@ static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, 
     unsigned int numSamples = 0;
     int rndSeed = 0;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOI|i:performRandomPxlSampleInMaskLowPxlCount", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &maskValsObj, &numSamples, &rndSeed))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOI|i:perform_random_pxl_sample_in_mask_low_pxl_count", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &maskValsObj, &numSamples, &rndSeed))
     {
-        return NULL;
+        return nullptr;
     }
     
     std::vector<int> maskVals;
@@ -1605,7 +1463,7 @@ static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, 
         else
         {
             PyErr_SetString(GETSTATE(self)->error, "Mask value was not a sequence but a single value, however that value was not an integer.");
-            return NULL;
+            return nullptr;
         }
     }
     else
@@ -1622,7 +1480,7 @@ static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, 
             {
                 Py_DECREF(o);
                 PyErr_SetString(GETSTATE(self)->error, "Mask value was not a sequence but a single value, however that value was not an integer.");
-                return NULL;
+                return nullptr;
             }
         }
     }
@@ -1634,7 +1492,7 @@ static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1642,7 +1500,9 @@ static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, 
 
 static PyObject *ImageUtils_PanSharpenHCS(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimage", "outimage", "gdalformat", "datatype", "winsize", "useNaiveMethod", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
+                             RSGIS_PY_C_TEXT("win_size"), RSGIS_PY_C_TEXT("use_naive_method"), nullptr};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
@@ -1650,9 +1510,9 @@ static PyObject *ImageUtils_PanSharpenHCS(PyObject *self, PyObject *args, PyObje
     unsigned int winSize = 7;
     int useNaiveMethInt = false;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssi|Ii:panSharpenHCS", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &nDataType, &winSize, &useNaiveMethInt))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssi|Ii:pan_sharpen_hcs", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &nDataType, &winSize, &useNaiveMethInt))
     {
-        return NULL;
+        return nullptr;
     }
     
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
@@ -1665,7 +1525,7 @@ static PyObject *ImageUtils_PanSharpenHCS(PyObject *self, PyObject *args, PyObje
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1673,7 +1533,10 @@ static PyObject *ImageUtils_PanSharpenHCS(PyObject *self, PyObject *args, PyObje
 
 static PyObject *ImageUtils_SharpenLowResImageBands(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimage", "outimage", "bandinfo", "winsize", "nodata", "gdalformat", "datatype", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("band_info"), RSGIS_PY_C_TEXT("win_size"),
+                             RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     PyObject *bandInfoPyObj;
@@ -1682,9 +1545,10 @@ static PyObject *ImageUtils_SharpenLowResImageBands(PyObject *self, PyObject *ar
     unsigned int winSize;
     int nodata;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssOIisi:sharpenLowResBands", kwlist, &pszInputImage, &pszOutputImage, &bandInfoPyObj, &winSize, &nodata, &pszGDALFormat, &nDataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssOIisi:sharpen_low_res_bands", kwlist, &pszInputImage, &pszOutputImage,
+                                     &bandInfoPyObj, &winSize, &nodata, &pszGDALFormat, &nDataType))
     {
-        return NULL;
+        return nullptr;
     }
     
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
@@ -1694,7 +1558,7 @@ static PyObject *ImageUtils_SharpenLowResImageBands(PyObject *self, PyObject *ar
     if( !PySequence_Check(bandInfoPyObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nBandDefns = PySequence_Size(bandInfoPyObj);
@@ -1707,33 +1571,33 @@ static PyObject *ImageUtils_SharpenLowResImageBands(PyObject *self, PyObject *ar
         PyObject *o = PySequence_GetItem(bandInfoPyObj, n);
         
         PyObject *pBand = PyObject_GetAttrString(o, "band");
-        if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+        if( ( pBand == nullptr ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'band\'" );
             Py_DECREF(pBand);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pStatus = PyObject_GetAttrString(o, "status");
-        if( ( pStatus == NULL ) || ( pStatus == Py_None ) || !RSGISPY_CHECK_INT(pStatus) )
+        if( ( pStatus == nullptr ) || ( pStatus == Py_None ) || !RSGISPY_CHECK_INT(pStatus) )
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'status\'" );
             Py_DECREF(pStatus);
             Py_DECREF(pBand);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pName = PyObject_GetAttrString(o, "name");
-        if( ( pName == NULL ) || ( pName == Py_None ) || !RSGISPY_CHECK_STRING(pName) )
+        if( ( pName == nullptr ) || ( pName == Py_None ) || !RSGISPY_CHECK_STRING(pName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'name\'" );
             Py_DECREF(pName);
             Py_DECREF(pStatus);
             Py_DECREF(pBand);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         rsgis::cmds::RSGISInitSharpenBandInfo sharpInfo = rsgis::cmds::RSGISInitSharpenBandInfo();
@@ -1759,7 +1623,7 @@ static PyObject *ImageUtils_SharpenLowResImageBands(PyObject *self, PyObject *ar
             Py_DECREF(pStatus);
             Py_DECREF(pBand);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         bandInfo.push_back(sharpInfo);
         
@@ -1771,65 +1635,13 @@ static PyObject *ImageUtils_SharpenLowResImageBands(PyObject *self, PyObject *ar
     
     try
     {
-        rsgis::cmds::executeSharpenLowResImgBands(std::string(pszInputImage), std::string(pszOutputImage), bandInfo, winSize, nodata, std::string(pszGDALFormat), type);
+        rsgis::cmds::executeSharpenLowResImgBands(std::string(pszInputImage), std::string(pszOutputImage),
+                                                  bandInfo, winSize, nodata, std::string(pszGDALFormat), type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageUtils_CreateMaxNDVICompositeImg(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {"inimages", "outimage", "redband", "nirband", "gdalformat", "datatype", NULL};
-    PyObject *pInputImages;
-    const char *pszOutputImage = "";
-    const char *pszGDALFormat = "";
-    int nDataType;
-    unsigned int redBand = 0;
-    unsigned int nirBand = 0;
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OsIIsi:createMaxNDVICompositeImg", kwlist, &pInputImages, &pszOutputImage, &redBand, &nirBand, &pszGDALFormat, &nDataType))
-    {
-        return NULL;
-    }
-    
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
-    
-    if( !PySequence_Check(pInputImages))
-    {
-        PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence");
-        return NULL;
-    }
-    
-    Py_ssize_t nImages = PySequence_Size(pInputImages);
-    std::vector<std::string> inputImages;
-    inputImages.reserve(nImages);
-    for( Py_ssize_t n = 0; n < nImages; n++ )
-    {
-        PyObject *o = PySequence_GetItem(pInputImages, n);
-        
-        if(!RSGISPY_CHECK_STRING(o))
-        {
-            PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
-            Py_DECREF(o);
-            return NULL;
-        }
-        
-        inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
-    }
-    
-    try
-    {
-        rsgis::cmds::executeCreateMaxNDVICompsiteImage(inputImages, std::string(pszOutputImage), redBand, nirBand, std::string(pszGDALFormat), type);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1837,7 +1649,9 @@ static PyObject *ImageUtils_CreateMaxNDVICompositeImg(PyObject *self, PyObject *
 
 static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimages", "outimage", "refimg", "gdalformat", "datatype", "outnodata", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("in_ref_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("out_no_data"), nullptr};
     PyObject *pInputImages;
     const char *pszOutputImage = "";
     const char *pszRefImage = "";
@@ -1845,9 +1659,10 @@ static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject 
     int nDataType;
     float outNoData = 0.0;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Osssif:createRefImgCompositeImg", kwlist, &pInputImages, &pszOutputImage, &pszRefImage, &pszGDALFormat, &nDataType, &outNoData))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Osssif:create_ref_img_composite_img", kwlist, &pInputImages,
+                                     &pszOutputImage, &pszRefImage, &pszGDALFormat, &nDataType, &outNoData))
     {
-        return NULL;
+        return nullptr;
     }
     
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
@@ -1855,7 +1670,7 @@ static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject 
     if( !PySequence_Check(pInputImages))
     {
         PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nImages = PySequence_Size(pInputImages);
@@ -1869,7 +1684,7 @@ static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject 
         {
             PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
@@ -1877,12 +1692,14 @@ static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject 
     
     try
     {
-        rsgis::cmds::executeCreateRefImgCompsiteImage(inputImages, std::string(pszOutputImage), std::string(pszRefImage), std::string(pszGDALFormat), type, outNoData);
+        rsgis::cmds::executeCreateRefImgCompsiteImage(inputImages, std::string(pszOutputImage),
+                                                      std::string(pszRefImage), std::string(pszGDALFormat),
+                                                      type, outNoData);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1890,7 +1707,10 @@ static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject 
 
 static PyObject *ImageUtils_GenTimeseriesFillCompositeImg(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"compInfo", "validMask", "outRefFillImg", "outCompImg", "outCompRefImg", "gdalformat", "datatype", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("comp_info"), RSGIS_PY_C_TEXT("in_vld_img"),
+                             RSGIS_PY_C_TEXT("out_ref_fill_img"), RSGIS_PY_C_TEXT("out_comp_img"),
+                             RSGIS_PY_C_TEXT("out_comp_ref_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     PyObject *pCompInfo;
     const char *pszValidMaskImage = "";
     const char *pszOutRefFillImage = "";
@@ -1898,16 +1718,17 @@ static PyObject *ImageUtils_GenTimeseriesFillCompositeImg(PyObject *self, PyObje
     const char *pszOutCompRefImage = "";
     const char *pszGDALFormat = "";
     int nDataType;
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Osssssi:genTimeseriesFillCompositeImg", kwlist, &pCompInfo, &pszValidMaskImage, &pszOutRefFillImage, &pszOutCompImage, &pszOutCompRefImage, &pszGDALFormat, &nDataType))
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Osssssi:gen_timeseries_fill_composite_img", kwlist, &pCompInfo, &pszValidMaskImage,
+                                     &pszOutRefFillImage, &pszOutCompImage, &pszOutCompRefImage, &pszGDALFormat, &nDataType))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pCompInfo))
     {
         PyErr_SetString(GETSTATE(self)->error, "Composite Info object must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nImages = PySequence_Size(pCompInfo);
@@ -1918,37 +1739,37 @@ static PyObject *ImageUtils_GenTimeseriesFillCompositeImg(PyObject *self, PyObje
         PyObject *o = PySequence_GetItem(pCompInfo, n);
         
         PyObject *pYear = PyObject_GetAttrString(o, "year");
-        if( ( pYear == NULL ) || ( pYear == Py_None ) || !RSGISPY_CHECK_INT(pYear) )
+        if( ( pYear == nullptr ) || ( pYear == Py_None ) || !RSGISPY_CHECK_INT(pYear) )
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'year\'" );
             Py_DECREF(pYear);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pDay = PyObject_GetAttrString(o, "day");
-        if( ( pDay == NULL ) || ( pDay == Py_None ) || !RSGISPY_CHECK_INT(pDay) )
+        if( ( pDay == nullptr ) || ( pDay == Py_None ) || !RSGISPY_CHECK_INT(pDay) )
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'day\'" );
             Py_DECREF(pYear);
             Py_DECREF(pDay);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pCompImg = PyObject_GetAttrString(o, "compImg");
-        if( ( pCompImg == NULL ) || ( pCompImg == Py_None ) || !RSGISPY_CHECK_STRING(pCompImg) )
+        if( ( pCompImg == nullptr ) || ( pCompImg == Py_None ) || !RSGISPY_CHECK_STRING(pCompImg) )
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'compImg\'" );
             Py_DECREF(pYear);
             Py_DECREF(pDay);
             Py_DECREF(pCompImg);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pImgRef = PyObject_GetAttrString(o, "imgRef");
-        if( ( pImgRef == NULL ) || ( pImgRef == Py_None ) || !RSGISPY_CHECK_STRING(pImgRef) )
+        if( ( pImgRef == nullptr ) || ( pImgRef == Py_None ) || !RSGISPY_CHECK_STRING(pImgRef) )
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'imgRef\'" );
             Py_DECREF(pYear);
@@ -1956,11 +1777,11 @@ static PyObject *ImageUtils_GenTimeseriesFillCompositeImg(PyObject *self, PyObje
             Py_DECREF(pCompImg);
             Py_DECREF(pImgRef);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pOutRef = PyObject_GetAttrString(o, "outRef");
-        if( ( pOutRef == NULL ) || ( pOutRef == Py_None ) || !RSGISPY_CHECK_INT(pOutRef) )
+        if( ( pOutRef == nullptr ) || ( pOutRef == Py_None ) || !RSGISPY_CHECK_INT(pOutRef) )
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'outRef\'" );
             Py_DECREF(pYear);
@@ -1969,7 +1790,7 @@ static PyObject *ImageUtils_GenTimeseriesFillCompositeImg(PyObject *self, PyObje
             Py_DECREF(pImgRef);
             Py_DECREF(pOutRef);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         rsgis::cmds::RSGISCmdCompositeInfo compInfoObj = rsgis::cmds::RSGISCmdCompositeInfo();
@@ -1985,12 +1806,14 @@ static PyObject *ImageUtils_GenTimeseriesFillCompositeImg(PyObject *self, PyObje
     try
     {
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
-        rsgis::cmds::executeGenTimeseriesFillCompositeImg(inCompInfo, std::string(pszValidMaskImage), std::string(pszOutRefFillImage), std::string(pszOutCompImage), std::string(pszOutCompRefImage), std::string(pszGDALFormat), type);
+        rsgis::cmds::executeGenTimeseriesFillCompositeImg(inCompInfo, std::string(pszValidMaskImage),
+                                                          std::string(pszOutRefFillImage), std::string(pszOutCompImage),
+                                                          std::string(pszOutCompRefImage), std::string(pszGDALFormat), type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1999,16 +1822,18 @@ static PyObject *ImageUtils_GenTimeseriesFillCompositeImg(PyObject *self, PyObje
 
 static PyObject *ImageUtils_ExportSingleMergedImgBand(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputImg", "inputBandRefImg", "outputImg", "gdalformat", "datatype", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("int_band_ref_img"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pInputImg = "";
     const char *pInputBandRefImg = "";
     const char *pOutputImg = "";
     const char *pszGDALFormat = "";
     int nDataType;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:exportSingleMergedImgBand", kwlist, &pInputImg, &pInputBandRefImg, &pOutputImg, &pszGDALFormat, &nDataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:export_single_merged_img_band", kwlist, &pInputImg, &pInputBandRefImg, &pOutputImg, &pszGDALFormat, &nDataType))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -2019,83 +1844,24 @@ static PyObject *ImageUtils_ExportSingleMergedImgBand(PyObject *self, PyObject *
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageUtils_RandomSampleHDF5File(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {"inputh5", "outputh5", "sample", "seed", "datatype", NULL};
-    const char *pInputH5 = "";
-    const char *pOutputH5 = "";
-    unsigned int sampleSize = 0;
-    int seed = 0;
-    int nDataType = 9;
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssIi|i:randomSampleHDF5File", kwlist, &pInputH5, &pOutputH5, &sampleSize, &seed, &nDataType))
-    {
-        return NULL;
-    }
-    
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
-    
-    try
-    {
-        rsgis::cmds::executeRandomSampleH5File(std::string(pInputH5), std::string(pOutputH5), sampleSize, seed, type);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageUtils_SplitSampleHDF5File(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {"inputh5", "outputp1h5", "outputp2h5", "sample", "seed", "datatype", NULL};
-    const char *pInputH5 = "";
-    const char *pOutputP1H5 = "";
-    const char *pOutputP2H5 = "";
-    unsigned int sampleSize = 0;
-    int seed = 0;
-    int nDataType = 9;
-
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIi|i:splitSampleHDF5File", kwlist, &pInputH5, &pOutputP1H5, &pOutputP2H5, &sampleSize, &seed, &nDataType))
-    {
-        return NULL;
-    }
-    
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
-    
-    try
-    {
-        rsgis::cmds::executeSplitSampleH5File(std::string(pInputH5), std::string(pOutputP1H5), std::string(pOutputP2H5), sampleSize, seed, type);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
     Py_RETURN_NONE;
 }
 
 static PyObject *ImageUtils_GetGDALImageCreationOpts(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"gdalformat", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pGDALFormat = "";
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s:getGDALImageCreationOpts", kwlist, &pGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s:get_gdal_img_creation_opts", kwlist, &pGDALFormat))
     {
-        return NULL;
+        return nullptr;
     }
     
     bool rtn_dict = false;
-    PyObject *out_info_dict = NULL;
+    PyObject *out_info_dict = nullptr;
     try
     {
         std::map<std::string, std::string> gdalCreationOpts = rsgis::cmds::executeGetGDALImageCreationOpts(std::string(pGDALFormat));
@@ -2103,18 +1869,17 @@ static PyObject *ImageUtils_GetGDALImageCreationOpts(PyObject *self, PyObject *a
         if(gdalCreationOpts.size() > 0)
         {
             out_info_dict = PyDict_New();
-            for(std::map<std::string, std::string>::iterator iterOpts = gdalCreationOpts.begin(); iterOpts != gdalCreationOpts.end(); ++iterOpts)
+            for(auto iterOpts = gdalCreationOpts.begin(); iterOpts != gdalCreationOpts.end(); ++iterOpts)
             {
                 PyDict_SetItem(out_info_dict, Py_BuildValue("s", (iterOpts->first).c_str()), Py_BuildValue("s", (iterOpts->second).c_str()));
             }
             rtn_dict = true;
         }
-            
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     if(rtn_dict)
@@ -2128,30 +1893,59 @@ static PyObject *ImageUtils_GetGDALImageCreationOpts(PyObject *self, PyObject *a
 }
 
 
+
+static PyObject *ImageUtils_UnPackPixelVals(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("img_band"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
+    const char *pInputImage = "";
+    unsigned int pInputImageBand = 1;
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sIss:unpack_pxl_vals", kwlist, &pInputImage, &pInputImageBand, &pszOutputImage, &pszGDALFormat))
+    {
+        return nullptr;
+    }
+
+    try
+    {
+        rsgis::cmds::executeUnpackPxlValues(std::string(pInputImage), pInputImageBand, std::string(pszOutputImage), std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return nullptr;
+    }
+
+    Py_RETURN_NONE;
+}
+
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
-{"stretchImage", (PyCFunction)ImageUtils_StretchImage, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.stretchImage(inputimage, outputimage, saveoutstats, outstatsfile, ignorezeros, onepasssd, gdalformat, datatype, stretchtype, stretchparam)\n"
+{"stretch_img", (PyCFunction)ImageUtils_StretchImage, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.stretch_img(input_img, output_img, save_stats, out_stats_file, no_data_val, one_pass_std, gdalformat, datatype, stretch_type, stretch_param)\n"
 "Stretches (scales) pixel values to a range of 0 - 255, which is typically for visualisation but the function can also be used for normalisation.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
-":param saveoutstats: is a bool specifying if stats should be saved to a text file.\n"
-":param outstatsfile: is a string providing the name of the file to save stats to.\n"
-":param ignorezeros: is a bool specifying if pixels with a value of zero should be ignored.\n"
-":param onepasssd: is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
+":param save_stats: is a bool specifying if stats should be saved to a text file.\n"
+":param out_stats_file: is a string providing the name of the file to save stats to.\n"
+":param no_data_val: is a float specifying the no data value of the input image.\n"
+":param one_pass_std: is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
 ":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the output data type.\n"
-":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
+":param stretch_type: is a STRETCH_* value providing the type of stretch, options are:\n"
 "        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
 "        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
 "        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
 "        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
 "        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
 "        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
-":param stretchparam: is a float, providing the input parameter to the stretch (if required).\n"
+":param stretch_param: is a float, providing the input parameter to the stretch (if required).\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2161,103 +1955,30 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_2sd.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_8INT\n"
-"   imageutils.stretchImage(inputImage, outputImage, False, '', True, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
-"\n"},
-    
-{"stretchImageNoData", (PyCFunction)ImageUtils_StretchImageNoData, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.stretchImageNoData(inputimage, outputimage, saveoutstats, outstatsfile, nodataval, onepasssd, gdalformat, datatype, stretchtype, stretchparam)\n"
-"Stretches (scales) pixel values to a range of 0 - 255, which is typically for visualisation but the function can also be used for normalisation.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
-":param saveoutstats: is a bool specifying if stats should be saved to a text file.\n"
-":param outstatsfile: is a string providing the name of the file to save stats to.\n"
-":param nodataval: is a float specifying the no data value of the input image.\n"
-":param onepasssd: is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
-":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
-":param datatype: is a rsgislib.TYPE_* value providing the output data type.\n"
-":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
-"        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
-"        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
-"        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
-"        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
-":param stretchparam: is a float, providing the input parameter to the stretch (if required).\n"
-"\n"
-"Example::\n"
-"\n"
-"   import rsgislib\n"
-"   from rsgislib import imageutils\n"
-"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"   outputImage = './TestOutputs/injune_p142_casi_sub_utm_2sd.kea'\n"
-"   gdalformat = 'KEA'\n"
-"   datatype = rsgislib.TYPE_8INT\n"
-"   nodataval = 0.0\n"
-"   imageutils.stretchImage(inputImage, outputImage, False, '', nodataval, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
+"   imageutils.stretch_img(inputImage, outputImage, False, '', 0.0, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
 "\n"},
 
-{"stretchImageWithStats", (PyCFunction)ImageUtils_StretchImageWithStats, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, datatype, stretchtype, stretchparam)\n"
+{"stretch_img_with_stats", (PyCFunction)ImageUtils_StretchImageWithStats, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.stretch_img_with_stats(input_img, output_img, in_stats_file, gdalformat, datatype, no_data_val, stretch_type, stretch_param)\n"
 "Stretches (scales) pixel values to a range of 0 - 255, which is typically for visualisation but the function can also be used for normalisation.\n"
-"This function uses pre-calculated statistics - normally from rsgislib.imageutils.stretchImage.\n"
+"This function uses pre-calculated statistics - normally from rsgislib.imageutils.stretch_img.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
-":param instatsfile: is a string providing the name of the file to read stats from.\n"
-":param ignorezeros: is a bool specifying if pixels with a value of zero should be ignored.\n"
-":param onepasssd: is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
+":param in_stats_file: is a string providing the name of the file to read stats from.\n"
 ":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the output data type.\n"
-":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
+":param no_data_val: is a float with the no data value of the input image.\n"
+":param stretch_type: is a STRETCH_* value providing the type of stretch, options are:\n"
 "        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
 "        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
 "        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
 "        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
 "        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
 "        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
-":param stretchparam: is a float, providing the input parameter to the stretch (if required).\n"
-"\n"
-"Example::\n"
-"\n"
-"   import rsgislib\n"
-"   from rsgislib import imageutils\n"
-"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"   inputImageStats = './Rasters/injune_p142_casi_sub_utm_stats.txt'\n"
-"   outputImage = './TestOutputs/injune_p142_casi_sub_utm_2sd.kea'\n"
-"   gdalformat = 'KEA'\n"
-"   datatype = rsgislib.TYPE_8UINT\n"
-"   imageutils.stretchImageWithStats(inputImage, outputImage, inputImageStats, True, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
-"\n"
-"\n"},
-
-{"stretchImageWithStatsNoData", (PyCFunction)ImageUtils_StretchImageWithStatsNoData, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.stretchImageWithStatsNoData(inputimage, outputimage, instatsfile, gdalformat, datatype, nodataval, stretchtype, stretchparam)\n"
-"Stretches (scales) pixel values to a range of 0 - 255, which is typically for visualisation but the function can also be used for normalisation.\n"
-"This function uses pre-calculated statistics - normally from rsgislib.imageutils.stretchImage.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
-":param instatsfile: is a string providing the name of the file to read stats from.\n"
-":param ignorezeros: is a bool specifying if pixels with a value of zero should be ignored.\n"
-":param onepasssd: is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
-":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
-":param datatype: is a rsgislib.TYPE_* value providing the output data type.\n"
-":param nodataval: is a float with the no data value of the input image.\n"
-":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
-"        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
-"        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
-"        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
-"        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
-":param stretchparam: is a float, providing the input parameter to the stretch (if required).\n"
+":param stretch_param: is a float, providing the input parameter to the stretch (if required).\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2269,35 +1990,35 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_8UINT\n"
 "   nodataval = 0.0\n"
-"   imageutils.stretchImageWithStatsNoData(inputImage, outputImage, inputImageStats, True, False, gdalformat, datatype, nodataval, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
+"   imageutils.stretch_img_with_stats(inputImage, outputImage, inputImageStats, True, False, gdalformat, datatype, nodataval, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
 "\n"
 "\n"},
     
     
-{"normaliseImagePxlVals", (PyCFunction)ImageUtils_NormaliseImagePxlVals, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.normaliseImagePxlVals(inputimage=string, outputimage=string, gdalformat=string, datatype=rsgislib.TYPE_*, innodataval=float, outnodataval=float, outmin=float, outmax=float, stretchtype=imageutils.STRETCH_*, stretchparam=float)\n"
+{"normalise_img_pxl_vals", (PyCFunction)ImageUtils_NormaliseImagePxlVals, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.normalise_img_pxl_vals(input_img=string, output_img=string, gdalformat=string, datatype=rsgislib.TYPE_*, in_no_data_val=float, out_no_data_val=float, out_min=float, out_max=float, stretch_type=imageutils.STRETCH_*, stretch_param=float)\n"
 "Normalises the image pixel values to a range of outmin to outmax (default 0-1) where the no data value is specified by the user.\n"
-"This function is largely similar to rsgislib.imageutils.stretchImage but deals with no data values correctly and intended\n"
+"This function is largely similar to rsgislib.imageutils.stretch_img but deals with no data values correctly and intended\n"
 "for data processing normalisation rather than visualisation.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the output data type.\n"
-":param innodataval: is a float with the input image no data value. (Default = 0)\n"
-":param outnodataval: is a float with the no data value used within the output image. (Default = -1)\n"
-":param outmin: is a float which specifies the output minimum pixel value (Default = 0)\n"
-":param outmax: is a float which specifies the output maximum pixel value (Default = 1)\n"
-":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
+":param in_no_data_val: is a float with the input image no data value. (Default = 0)\n"
+":param out_no_data_val: is a float with the no data value used within the output image. (Default = -1)\n"
+":param out_min: is a float which specifies the output minimum pixel value (Default = 0)\n"
+":param out_max: is a float which specifies the output maximum pixel value (Default = 1)\n"
+":param stretch_type: is a STRETCH_* value providing the type of stretch, options are:\n"
 "        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
 "        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
 "        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
 "        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
 "        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
 "        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
-":param stretchparam: is a float, providing the input parameter to the stretch (if required; Default=2.0).\n"
+":param stretch_param: is a float, providing the input parameter to the stretch (if required; Default=2.0).\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2307,30 +2028,30 @@ static PyMethodDef ImageUtilsMethods[] = {
 "    inImg = './LS5TM_19851990Comp_lat7lon3896_r65p166_stdsref.kea'\n"
 "\n"
 "    outImg = 'LS5TM_19851990Comp_lat7lon3896_r65p166_stdsref_NORM_0-255.kea'\n"
-"    rsgislib.imageutils.normaliseImagePxlVals(inImg, outImg, 'KEA', rsgislib.TYPE_8UINT, innodataval=0, outnodataval=0, outmin=0, outmax=255,\n"
+"    rsgislib.imageutils.normalise_img_pxl_vals(inImg, outImg, 'KEA', rsgislib.TYPE_8UINT, innodataval=0, outnodataval=0, outmin=0, outmax=255,\n"
 "                                              stretchtype=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretchparam=2)\n"
-"    rsgislib.imageutils.popImageStats(outImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
+"    rsgislib.imageutils.pop_img_stats(outImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
 "\n"
 "    outImg = 'LS5TM_19851990Comp_lat7lon3896_r65p166_stdsref_NORM_0-1.kea'\n"
-"    rsgislib.imageutils.normaliseImagePxlVals(inImg, outImg, 'KEA', rsgislib.TYPE_32FLOAT, innodataval=0, outnodataval=0, outmin=0, outmax=1,\n"
+"    rsgislib.imageutils.normalise_img_pxl_vals(inImg, outImg, 'KEA', rsgislib.TYPE_32FLOAT, innodataval=0, outnodataval=0, outmin=0, outmax=1,\n"
 "                                              stretchtype=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretchparam=2)\n"
-"    rsgislib.imageutils.popImageStats(outImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
+"    rsgislib.imageutils.pop_img_stats(outImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
 "\n"
 "\n"},
 
-{"maskImage", ImageUtils_maskImage, METH_VARARGS,
-"rsgislib.imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, datatype, outvalue, maskvalue)\n"
+{"mask_img", (PyCFunction)ImageUtils_maskImage, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.mask_img(input_img, in_msk_img, output_img, gdalformat, datatype, out_value, mask_value)\n"
 "This command will mask an input image using a single band mask image - commonly this is a binary image.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name and path of the input image file.\n"
-":param imagemask: is a string containing the name and path of the mask image file.\n"
-":param outputimage: is a string containing the name and path for the output image following application of the mask.\n"
+":param input_img: is a string containing the name and path of the input image file.\n"
+":param in_msk_img: is a string containing the name and path of the mask image file.\n"
+":param output_img: is a string containing the name and path for the output image following application of the mask.\n"
 ":param gdalformat: is a string representing the output image file format (e.g., KEA, ENVI, GTIFF, HFA etc).\n"
 ":param datatype: is a rsgislib.TYPE_* value for the data type of the output image.\n"
-":param outvalue: is a float representing the value written to the output image in place of the regions being masked.\n"
-":param maskvalue: is a float or list of floats representing the value(s) within the mask image for the regions which are to be replaced with the outvalue.\n"
+":param out_value: is a float representing the value written to the output image in place of the regions being masked.\n"
+":param mask_value: is a float or list of floats representing the value(s) within the mask image for the regions which are to be replaced with the outvalue.\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2341,25 +2062,25 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   imgMask = './LS5/Outputs/LS5TM_20110926_lat53lon511_r23p205_clouds.kea'\n"
 "   outImg = './LS5/Outputs/LS5TM_20110926_lat53lon511_r23p205_rad_toa_mclds.kea'\n"
 "   \n"
-"   imageutils.maskImage(inImg, imgMask, outImg, 'KEA', rsgislib.TYPE_16UINT, 0, [1,2])\n"
-"   imageutils.popImageStats(outImg, True, 0.0, True)\n"
+"   imageutils.mask_img(inImg, imgMask, outImg, 'KEA', rsgislib.TYPE_16UINT, 0, [1,2])\n"
+"   imageutils.pop_img_stats(outImg, True, 0.0, True)\n"
 "\n"},
 
-{"createTiles", ImageUtils_createTiles, METH_VARARGS,
-"rsgislib.imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, datatype, ext)\n"
+{"create_tiles", (PyCFunction)ImageUtils_createTiles, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.create_tiles(input_img, out_img_base, tile_width, tile_height, tile_overlap, offset_tiles, gdalformat, datatype, out_img_ext)\n"
 "Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
 "\n"
 "Where\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param baseimage: is a string containing the base name of the output file the number of the tile and file extension will be appended.\n"
-":param width: is the width of each tile, in pixels.\n"
-":param height: is the height of each tile, in pixels.\n"
-":param overlap: is the overlap between tiles, in pixels\n"
-":param offsettiling: is a bool, determining if tiles should start halfway into the image useful for generating overlapping sets of tiles.\n"
+":param input_img: is a string containing the name of the input file\n"
+":param out_img_base: is a string containing the base name of the output file the number of the tile and file extension will be appended.\n"
+":param tile_width: is the width of each tile, in pixels.\n"
+":param tile_height: is the height of each tile, in pixels.\n"
+":param tile_overlap: is the overlap between tiles, in pixels\n"
+":param offset_tiles: is a bool, determining if tiles should start halfway into the image useful for generating overlapping sets of tiles.\n"
 ":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
-":param ext: is a string providing the extension for the tiles (as required by the specified data type).\n"
+":param out_img_ext: is a string providing the extension for the tiles (as required by the specified data type).\n"
 "\n"
 ":return: list of tile file names\n"
 "\n"
@@ -2376,21 +2097,21 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32INT\n"
 "   ext='kea'\n"
-"   tiles = imageutils.createTiles(inputImage, outBase, width, height, overlap, offsettiling, gdalformat, datatype, ext)\n"
+"   tiles = imageutils.create_tiles(inputImage, outBase, width, height, overlap, offsettiling, gdalformat, datatype, ext)\n"
 "\n"},
     
-{"createImageMosaic", ImageUtils_createImageMosaic, METH_VARARGS,
-"rsgislib.imageutils.createImageMosaic(inputimagelist, outputimage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, datatype)\n"
+{"create_img_mosaic", (PyCFunction)ImageUtils_createImageMosaic, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.create_img_mosaic(input_imgs, output_img, background_val, skip_val, skip_band, overlap_behaviour, gdalformat, datatype)\n"
 "Create mosaic from list of input images.\n"
 "\n"
 "Where\n"
 "\n"
-":param inputimagelist: is a list of input images.\n"
-":param outputimage: is a string containing the name of the output mosaic\n"
-":param backgroundVal: is a float providing the background (nodata) value for the mosaic\n"
-":param skipVal: is a float providing the value to be skipped (nodata values) in the input images\n"
-":param skipBand: is an integer providing the band to check for skipVal\n"
-":param overlapBehaviour: is an integer specifying the behaviour for overlaping regions\n"
+":param input_imgs: is a list of input images.\n"
+":param output_img: is a string containing the name of the output mosaic\n"
+":param background_val: is a float providing the background (nodata) value for the mosaic\n"
+":param skip_val: is a float providing the value to be skipped (nodata values) in the input images\n"
+":param skip_band: is an integer providing the band to check for skipVal\n"
+":param overlap_behaviour: is an integer specifying the behaviour for overlaping regions\n"
 "      * 0 - Overwrite\n"
 "      * 1 - Overwrite if value of new pixel is lower (minimum)\n"
 "      * 2 - Overwrite if value of new pixel is higher (maximum)\n"
@@ -2412,19 +2133,19 @@ static PyMethodDef ImageUtilsMethods[] = {
 "	overlapBehaviour = 0\n"
 "	gdalformat = 'KEA'\n"
 "	datatype = rsgislib.TYPE_32FLOAT\n"
-"	imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, datatype)\n"
+"	imageutils.create_img_mosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, datatype)\n"
 "\n"},
  
-    {"includeImages", ImageUtils_IncludeImages, METH_VARARGS,
-"rsgislib.imageutils.includeImages(baseImage, inputImages, inputBands=None, skipVal=None)\n"
+    {"include_imgs", (PyCFunction)ImageUtils_IncludeImages, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.include_imgs(input_img, include_imgs, input_bands=None, skip_val=None)\n"
 "Create mosaic from list of input images.\n"
 "\n"
 "Where:\n"
 "\n"
-":param baseImage: is a string containing the name of the input image to add image to\n"
-":param inputimagelist: is a list of input images\n"
-":param inputBands: is a subset of input bands to use (optional)\n"
-":param skipVal: is a float specifying a value which should be ignored and not copied into the new image (optional). To use you must also provided a list of subset image bands.\n"
+":param input_img: is a string containing the name of the input image to add image to\n"
+":param include_imgs: is a list of input images\n"
+":param input_bands: is a subset of input bands to use (optional)\n"
+":param skip_val: is a float specifying a value which should be ignored and not copied into the new image (optional). To use you must also provided a list of subset image bands.\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2434,18 +2155,18 @@ static PyMethodDef ImageUtilsMethods[] = {
 "	# Search for all files with the extension 'kea'\n"
 "	baseImage = './TestOutputs/injune_p142_casi_sub_utm_mosaic.kea'\n"
 "	inputList = glob.glob('./TestOutputs/Tiles/*.kea')\n"
-"	imageutils.includeImages(baseImage, inputList)\n"
+"	imageutils.include_imgs(baseImage, inputList)\n"
 "\n"},
  
-{"includeImagesWithOverlap", ImageUtils_IncludeImagesOverlap, METH_VARARGS,
-"rsgislib.imageutils.includeImagesWithOverlap(baseImage, inputImages, pxlOverlap)\n"
+{"include_imgs_with_overlap", (PyCFunction)ImageUtils_IncludeImagesOverlap, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.include_imgs_with_overlap(input_img, include_imgs, overlap)\n"
 "Create mosaic from list of input images where the input images have an overlap.\n"
 "\n"
 "Where:\n"
 "\n"
-":param baseImage: is a string containing the name of the input image to add image to\n"
-":param inputimagelist: is a list of input images\n"
-":param inputBands: is a subset of input bands to use (optional)\n"
+":param input_img: is a string containing the name of the input image to add image to\n"
+":param include_imgs: is a list of input images\n"
+":param overlap: the size, in pixels, of the each on the images which should be ignored as an overlapping region.\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2455,21 +2176,21 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   inputImg = 'LandsatImg.kea'\n"
 "   tilesImgBase = './tiles/LandsatTile'\n"
 "   outputImg = 'LandsatImgProcessed.kea'\n"
-"   imageutils.createTiles(inputImg, tilesImgBase, 1000, 1000, 10, False, 'KEA', rsgislib.TYPE_32FLOAT, 'kea')\n"
+"   imageutils.create_tiles(inputImg, tilesImgBase, 1000, 1000, 10, False, 'KEA', rsgislib.TYPE_32FLOAT, 'kea')\n"
 "   # Do some processing on the tiles... \n"
-"   imageutils.createCopyImage(inputImg, outputImg, 6, 0, 'KEA', rsgislib.TYPE_32FLOAT)\n"
+"   imageutils.create_copy_img(inputImg, outputImg, 6, 0, 'KEA', rsgislib.TYPE_32FLOAT)\n"
 "	inputList = glob.glob('./tiles/LandsatTile*.kea')\n"
-"	imageutils.includeImagesWithOverlap(outputImg, inputList, 10)\n"
+"	imageutils.include_imgs_with_overlap(outputImg, inputList, 10)\n"
 "\n"},
 
-{"includeImagesIndImgIntersect", ImageUtils_IncludeImagesIndImgIntersect, METH_VARARGS,
-"rsgislib.imageutils.includeImagesIndImgIntersect(baseImage, inputImages)\n"
-"Create mosaic from list of input images written to the base image. The no data value will be honered and values over written.\n"
+{"include_imgs_ind_img_intersect", (PyCFunction)ImageUtils_IncludeImagesIndImgIntersect, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.include_imgs_ind_img_intersect(input_img, include_imgs)\n"
+"Create mosaic from list of input images written to the base image. The no data value will be honored and values over written.\n"
 "\n"
 "Where:\n"
 "\n"
-":param baseImage: is a string containing the name of the input image to add image to\n"
-":param inputimagelist: is a list of input images\n"
+":param input_img: is a string containing the name of the input image to add image to\n"
+":param include_imgs: is a list of input images\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2479,53 +2200,29 @@ static PyMethodDef ImageUtilsMethods[] = {
 "    # Search for all files with the extension 'kea'\n"
 "    baseImage = './TestOutputs/injune_p142_casi_sub_utm_mosaic.kea'\n"
 "    inputList = glob.glob('./TestOutputs/Tiles/*.kea')\n"
-"    imageutils.includeImagesIndImgIntersect(baseImage, inputList)\n"
-"\n"},
-    
-{"combineImageOverviews", (PyCFunction)ImageUtils_CombineImageOverview, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.combineImageOverviews(base=string, images=list, pyscales=list)\n"
-"A function to combine (mosaic) the image overviews (pyramids) from the list of input images and add\n"
-"them to the base image, enables pyramids to be created using a tiled processing chain for large images.\n"
-"Note. For small images use rsgislib.imageutils.popImageStats.\n"
-"\n"
-"Where:\n"
-"\n"
-":param base: is a string containing the name of the input image file the overviews will be added to\n"
-":param images: is a list of input images that have the same number of bands and overviews and are within the extent of the base image.\n"
-":param pyscales: is a list specifying the scales (levels) of the pyramids which will be defined in the base image\n"
-"           (Note. the input images need to have the same pyramids scales; use rsgislib.imageutils.popImageStats).\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import imageutils\n"
-"   baseImage = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
-"   imgTiles = ['./TestOutputs/injune_p142_casi_sub_utm_tile1.kea', './TestOutputs/injune_p142_casi_sub_utm_tile2.kea']\n"
-"   imageutils.combineImageOverviews(baseImage, imgTiles, [4,8,16,32,64,128])\n"
+"    imageutils.include_imgs_ind_img_intersect(baseImage, inputList)\n"
 "\n"},
 
-{"popImageStats", (PyCFunction)ImageUtils_PopImageStats, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.popImageStats(image, usenodataval=True,nodataval=0, calcpyramids=True, pyscales=list)\n"
+{"pop_img_stats", (PyCFunction)ImageUtils_PopImageStats, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.pop_img_stats(input_img, use_no_data=True, no_data_val=0, calc_pyramids=True)\n"
 "Calculate the image statistics and build image pyramids populating the image file.\n"
 "\n"
 "Where:\n"
 "\n"
-":param image: is a string containing the name of the input file\n"
-":param usenodataval: is a boolean stating whether the no data value is to be used (default=True).\n"
-":param nodataval: is a floating point value to be used as the no data value (default=0.0).\n"
-":param calcpyramids: is a boolean stating whether image pyramids should be calculated (default=True).\n"
-":param pyscales: is a list which allows the levels of the image pyramid to be specified. If not provided then levels automatically calculated.\n"
+":param input_img: is a string containing the name of the input file\n"
+":param use_no_data: is a boolean stating whether the no data value is to be used (default=True).\n"
+":param no_data_val: is a floating point value to be used as the no data value (default=0.0).\n"
+":param calc_pyramids: is a boolean stating whether image pyramids should be calculated (default=True).\n"
 "\n"
 "Example::\n"
 "\n"
 "   from rsgislib import imageutils\n"
 "   inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
-"   imageutils.popImageStats(inputImage,True,0.,True)\n"
-"   # OR Define the pyramids levels.\n"
-"   imageutils.popImageStats(inputImage,True,0.,True, [4,8,16,32,64,128])\n"
+"   imageutils.pop_img_stats(inputImage,True,0.,True)\n"
 "\n"},
     
-    {"assignProj", (PyCFunction)ImageUtils_AssignProj, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.assignProj(inputImage, wktString, wktFile)\n"
+    {"assign_proj", (PyCFunction)ImageUtils_AssignProj, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.assign_proj(input_img, wkt_str, wkt_file)\n"
 "Assign a projection to the input GDAL image file.\n"
 "\n"
 "Where:\n"
@@ -2556,116 +2253,52 @@ static PyMethodDef ImageUtilsMethods[] = {
 "        AUTHORITY[\"EPSG\",\"9001\"]],\n"
 "    AUTHORITY[\"EPSG\",\"32755\"]]'''\n"
 "   inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
-"   imageutils.assignProj(inputImage, wktString)\n"
+"   imageutils.assign_proj(inputImage, wktString)\n"
 "\n"},
     
-    {"copyProjFromImage", ImageUtils_CopyProjFromImage, METH_VARARGS,
-"rsgislib.imageutils.copyProjFromImage(inputImage, refImage)\n"
+    {"copy_proj_from_img", (PyCFunction)ImageUtils_CopyProjFromImage, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.copy_proj_from_img(input_img, ref_img)\n"
 "Copy the projection from a reference image to an input GDAL image file.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name and path of the input file\n"
-":param refImage: is a string containing the name and path of the reference image.\n"
+":param input_img: is a string containing the name and path of the input file\n"
+":param ref_img: is a string containing the name and path of the reference image.\n"
 "\n"},
     
-    {"copySpatialAndProjFromImage", ImageUtils_CopySpatialAndProjFromImage, METH_VARARGS,
-"rsgislib.imageutils.copySpatialAndProjFromImage(inputImage, refImage)\n"
+    {"copy_spatial_and_proj_from_img", (PyCFunction)ImageUtils_CopySpatialAndProjFromImage, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.copy_spatial_and_proj_from_img(input_img, ref_img)\n"
 "Copy the spatial information and projection from a reference image to an input GDAL image file.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name and path of the input file\n"
-":param refImage: is a string containing the name and path of the reference image.\n"
+":param input_img: is a string containing the name and path of the input file\n"
+":param ref_img: is a string containing the name and path of the reference image.\n"
 "\n"},
 
-    {"assignSpatialInfo", ImageUtils_AssignSpatialInfo, METH_VARARGS,
-"rsgislib.imageutils.assignSpatialInfo(inputImage, tlX, tlY, resX, resY, rotX, rotY)\n"
+    {"assign_spatial_info", (PyCFunction)ImageUtils_AssignSpatialInfo, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.assign_spatial_info(input_img, tl_x, tl_y, res_x, res_y, rot_x, rot_y)\n"
 "Assign the spatial information to an input GDAL image file.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name and path of the input file\n"
-":param tlX: is a double representing the top left X coordinate of the image.\n"
-":param tlY: is a double representing the top left Y coordinate of the image.\n"
-":param resX: is a double representing X resolution of the image.\n"
-":param resY: is a double representing Y resolution of the image.\n"
-":param rotX: is a double representing X rotation of the image.\n"
-":param rotY: is a double representing Y rotation of the image.\n"
-"\n"},
-    
-{"extractZoneImageValues2HDF", ImageUtils_ExtractZoneImageValues2HDF, METH_VARARGS,
-"rsgislib.imageutils.extractZoneImageValues2HDF(inputImage, imageMask, outputHDF, maskValue, datatype)\n"
-"Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputImage: is a string containing the name and path of the input file\n"
-":param imageMask: is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
-":param outputHDF: is a string containing the name and path of the output HDF5 file\n"
-":param maskValue: is a float containing the value of the pixel within the mask for which values are to be extracted\n"
-":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
-"\n"},
-    
-{"extractZoneImageBandValues2HDF", ImageUtils_ExtractZoneImageBandValues2HDF, METH_VARARGS,
-"rsgislib.imageutils.extractZoneImageBandValues2HDF(inputImageInfo, imageMask, outputHDF, maskValue, datatype)\n"
-"Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
-"Multiple input rasters can be provided and the bands extracted selected.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputImageInfo: is a list of rsgislib::imageutils::ImageBandInfo objects with the file names and list of image bands within that file to be extracted.\n"
-":param imageMask: is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
-":param outputHDF: is a string containing the name and path of the output HDF5 file\n"
-":param maskValue: is a float containing the value of the pixel within the mask for which values are to be extracted\n"
-":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
-"\n"
-"Example::\n"
-"\n"
-"   import rsgislib.imageutils\n"
-"   fileInfo = []\n"
-"   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg1.kea', 'Image1', [1,3,4]))\n"
-"   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg2.kea', 'Image2', [2]))\n"
-"   rsgislib.imageutils.extractZoneImageBandValues2HDF(fileInfo, 'ClassMask.kea', 'ForestRefl.h5', 1.0)\n"
+":param input_img: is a string containing the name and path of the input file\n"
+":param tl_x: is a double representing the top left X coordinate of the image.\n"
+":param tl_y: is a double representing the top left Y coordinate of the image.\n"
+":param res_x: is a double representing X resolution of the image.\n"
+":param res_y: is a double representing Y resolution of the image.\n"
+":param rot_x: is a double representing X rotation of the image.\n"
+":param rot_y: is a double representing Y rotation of the image.\n"
 "\n"},
 
-{"randomSampleHDF5File", (PyCFunction)ImageUtils_RandomSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.randomSampleHDF5File(inputh5, outputh5, sample, seed, datatype)\n"
-"A function which randomly samples a HDF5 of extracted values.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputh5: is a string with the path to the input file.\n"
-":param outputh5: is a string with the path to the output file.\n"
-":param sample: is an integer with the number values to be sampled from the input file.\n"
-":param seed: is an integer which seeds the random number generator\n."
-":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
-"\n\n"
-},
-
-{"splitSampleHDF5File", (PyCFunction)ImageUtils_SplitSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.splitSampleHDF5File(inputh5, outputp1h5, outputp2h5, sample, seed, datatype)\n"
-"A function which splits samples a HDF5 of extracted values.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputh5: is a string with the path to the input file.\n"
-":param outputp1h5: is a string with the path to the output file.\n"
-":param outputp2h5: is a string with the path to the output file.\n"
-":param sample: is an integer with the number values to be sampled from the input file.\n"
-":param seed: is an integer which seeds the random number generator\n."
-":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
-"\n\n"
-},
-
-{"selectImageBands", ImageUtils_SelectImageBands, METH_VARARGS,
-"rsgislib.imageutils.selectImageBands(inputImage, outputImage, gdalformat, datatype, bands)\n"
+{"select_img_bands", (PyCFunction)ImageUtils_SelectImageBands, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.select_img_bands(input_img, output_img, gdalformat, datatype, bands)\n"
 "Copy selected image bands from an image to a new image.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name and path of the input file\n"
-":param outputImage: is a string containing the name and path of the output file.\n"
+":param input_img: is a string containing the name and path of the input file\n"
+":param output_img: is a string containing the name and path of the output file.\n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 ":param bands: is a list of integers for the bands in the input image to exported to the output image (Note band count starts at 1).\n"
@@ -2675,20 +2308,21 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   import rsgislib.imageutils\n"
 "   import rsgislib\n"
 "   bands = [1,2]\n"
-"   rsgislib.imageutils.selectImageBands('N06W053_07_ALL_sl_sub.kea', 'N06W053_07_ALL_sl_sub_HHVV.kea', 'KEA', rsgislib.TYPE_32INT, bands)\n"
+"   rsgislib.imageutils.select_img_bands('N06W053_07_ALL_sl_sub.kea', 'N06W053_07_ALL_sl_sub_HHVV.kea', 'KEA', rsgislib.TYPE_32INT, bands)\n"
 "\n"
 "\n"
 },
 
-{"subset", ImageUtils_Subset, METH_VARARGS,
-"rsgislib.imageutils.subset(inputimage, inputvector, outputimage, gdalformat, datatype)\n"
+{"subset", (PyCFunction)ImageUtils_Subset, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.subset(input_img, vec_file, vec_lyr, output_img, gdalformat, datatype)\n"
 "Subset an image to the bounding box of a vector.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputimage: is a string providing the name of the input file.\n"
-":param inputvector: is a string providing the vector which the image is to be clipped to. \n"
-":param outputimage: is a string providing the output image. \n"
+":param input_img: is a string providing the name of the input file.\n"
+":param vec_file: is a string providing the vector which the image is to be clipped to. \n"
+":param vec_lyr: is a string specifying the layer within the vector file to be used\n"
+":param output_img: is a string providing the output image. \n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"
@@ -2704,20 +2338,20 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   imageutils.subset(inputImage, inputVector, outputImage, gdalformat, datatype)\n"
 "\n"},
     
-{"subsetbbox", ImageUtils_SubsetBBox, METH_VARARGS,
-"rsgislib.imageutils.subsetbbox(inputimage, outputimage, gdalformat, datatype, xMin, xMax, yMin, yMax)\n"
+{"subset_bbox", (PyCFunction)ImageUtils_SubsetBBox, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.subset_bbox(input_img, output_img, gdalformat, datatype, min_x, max_x, min_y, max_y)\n"
 "Subset an image to the bounding box of a vector.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputimage: is a string providing the name of the input file.\n"
-":param outputimage: is a string providing the output image. \n"
+":param input_img: is a string providing the name of the input file.\n"
+":param output_img: is a string providing the output image. \n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
-":param xMin: double within the minimum X for the bounding box\n"
-":param xMax: double within the maximum X for the bounding box\n"
-":param yMin: double within the minimum Y for the bounding box\n"
-":param yMax: double within the maximum X for the bounding box\n"
+":param min_x: double within the minimum X for the bounding box\n"
+":param max_x: double within the maximum X for the bounding box\n"
+":param min_y: double within the minimum Y for the bounding box\n"
+":param max_y: double within the maximum X for the bounding box\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2731,49 +2365,18 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   xMax = 295401.5\n"
 "   yMin = 359470.8\n"
 "   yMax = 359500.8\n"
-"   imageutils.subsetbbox(inputImage, outputImage, gdalformat, datatype, xMin, xMax, yMin, yMax)\n"
+"   imageutils.subset_bbox(inputImage, outputImage, gdalformat, datatype, xMin, xMax, yMin, yMax)\n"
 "\n"},
 
-    {"subset2polys", ImageUtils_Subset2Polys, METH_VARARGS,
-"rsgislib.imageutils.subset(inputimage, inputvector, attribute, baseimage, gdalformat, datatype, ext)\n"
-"Subset an image to the bounding box of a each polygon in an input vector.\n"
-"Useful for splitting an image into tiles of unequal sizes.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string providing the name of the input file.\n"
-":param inputvector: is a string providing the vector which the image is to be clipped to. \n"
-":param attribute: is a string providing the attribute in the vector to use for the ouput name\n"
-":param baseimage: is a string providing the base name of the output file. The specified attribute of each polygon and extension will be appended.\n"
-":param gdalformat: is a string providing the output gdalformat of the subsets (e.g., KEA).\n"
-":param datatype: is a rsgislib.TYPE_* value providing the output data type of the subsets.\n"
-":param ext: is a string providing the extension for the tiles (as required by the specified data gdalformat).\n"
-"\n"
-":return: A list of strings containing the filenames.\n"
-"\n"
-"Example::\n"
-"\n"
-"   import rsgislib\n"
-"   from rsgislib import imageutils\n"
-"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"   inputVector = './Vectors/injune_p142_plot_location_utm.shp'\n"
-"   attribute = 'PLOTNO'\n"
-"   outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_subset_polys_'\n"
-"   gdalformat = 'KEA'\n"
-"   gdaltype = rsgislib.TYPE_32FLOAT\n"
-"   ext = 'kea'\n"
-"   imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, gdalformat, gdaltype, ext)\n"
-"\n"},
-
-    {"subset2img", ImageUtils_Subset2Img, METH_VARARGS,
-"rsgislib.imageutils.subset2img(inputimage, inputROIimage, outputimage, gdalformat, type)\n"
+    {"subset_to_img", (PyCFunction)ImageUtils_Subset2Img, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.subset_to_img(input_img:str, in_roi_img:str, output_img:str, gdalformat:str, datatype:int)\n"
 "Subset an image to the bounding box of an image.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputimage: is a string providing the name of the input file.\n"
-":param inputROIimage: is a string providing the image which the 'inputimage' is to be clipped to. \n"
-":param outputimage: is a string providing the output image. \n"
+":param input_img: is a string providing the name of the input file.\n"
+":param in_roi_img: is a string providing the image which the 'inputimage' is to be clipped to. \n"
+":param output_img: is a string providing the output image. \n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"
@@ -2786,21 +2389,21 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   gdaltype = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.subset2img(inputImage, inputROIimage, outputImage, gdalformat, datatype)\n"
+"   imageutils.subset_to_img(inputImage, inputROIimage, outputImage, gdalformat, datatype)\n"
 "\n"},
     
     
-{"stackImageBands", ImageUtils_StackImageBands, METH_VARARGS,
-"rsgislib.imageutils.stackImageBands(inputImages, imageBandNames, outputImage, skipValue, noDataValue, gdalformat, datatype)\n"
+{"stack_img_bands", (PyCFunction)ImageUtils_StackImageBands, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.stack_img_bands(input_imgs, band_names, output_img, skip_value, no_data_val, gdalformat, datatype)\n"
 "Create a single image from list of input images through band stacking.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImages: is a list of input images.\n"
-":param imageBandNames: is a list of band names (one for each input image). If None then ignored.\n"
-":param outputImage: is a string containing the name and path for the outputted image.\n"
-":param skipVal: is a float providing the value to be skipped (nodata values) in the input images (If None then ignored)\n"
-":param noDataValue: is float specifying a no data value.\n"
+":param input_imgs: is a list of input images.\n"
+":param band_names: is a list of band names (one for each input image). If None then ignored.\n"
+":param output_img: is a string containing the name and path for the outputted image.\n"
+":param skip_value: is a float providing the value to be skipped (nodata values) in the input images (If None then ignored)\n"
+":param no_data_val: is float specifying a no data value.\n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"
@@ -2813,39 +2416,40 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   outputImage = './TestOutputs/injune_p142_casi_sub_stack.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   gdaltype = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.stackImageBands(imageList, bandNamesList, outputImage, None, 0, gdalformat, gdaltype)\n"
+"   imageutils.stack_img_bands(imageList, bandNamesList, outputImage, None, 0, gdalformat, gdaltype)\n"
 "\n"},
     
-{"createBlankImage", ImageUtils_CreateBlankImage, METH_VARARGS,
-"rsgislib.imageutils.createBlankImage(outputImage, numBands, width, height, tlX, tlY, res, pxlVal, wktFile, wktString, gdalformat, datatype)\n"
+{"create_blank_img", (PyCFunction)ImageUtils_CreateBlankImage, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.create_blank_img(output_img, n_bands, width, height, tl_x, tl_y, res_x, res_y, pxl_val, wkt_file, wkt_str, gdalformat, datatype)\n"
 "Create a new blank image with the parameters specified.\n"
 "\n"
 "Where:\n"
 "\n"
-":param outputImage: is a string containing the name and path for the outputted image.\n"
-":param numBands: is an integer specifying the number of image bands in the output image.\n"
+":param output_img: is a string containing the name and path for the outputted image.\n"
+":param n_bands: is an integer specifying the number of image bands in the output image.\n"
 ":param width: is an integer specifying the width of the output image.\n"
 ":param height: is an integer specifying the height of the output image.\n"
-":param tlX: is a double specifying the Top Left pixel X coordinate (eastings) of the output image.\n"
-":param tlY: is a double specifying the Top Left pixel Y coordinate (northings) of the output image.\n"
-":param res: is a double specifying the pixel resolution of the output image.\n"
-":param pxlVal: is a float specifying the pixel value of the output image.\n"
-":param wktFile: is a string specifying the location of a file containing the WKT string representing the coordinate system and projection of the output image (if specified this parameter overrides the wktString parameter).\n"
-":param wktString: is a string specifying the WKT string representing the coordinate system and projection of the output image.\n"
+":param tl_x: is a double specifying the Top Left pixel X coordinate (eastings) of the output image.\n"
+":param tl_y: is a double specifying the Top Left pixel Y coordinate (northings) of the output image.\n"
+":param res_x: is a double specifying the pixel resolution in the x-axis for the output image.\n"
+":param res_y: is a double specifying the pixel resolution in the y-axis for the output image.\n"
+":param pxl_val: is a float specifying the pixel value of the output image.\n"
+":param wkt_file: is a string specifying the location of a file containing the WKT string representing the coordinate system and projection of the output image (if specified this parameter overrides the wktString parameter).\n"
+":param wkt_str: is a string specifying the WKT string representing the coordinate system and projection of the output image.\n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"},
 
-{"createCopyImage", ImageUtils_CreateCopyImage, METH_VARARGS,
-"rsgislib.imageutils.createCopyImage(inputImage, outputImage, numBands, pxlVal, gdalformat, datatype)\n"
+{"create_copy_img", (PyCFunction)ImageUtils_CreateCopyImage, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.create_copy_img(input_img, output_img, n_bands, pxl_val, gdalformat, datatype)\n"
 "Create a new blank image with the parameters specified.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name and path for the input image, which is to be copied.\n"
-":param outputImage: is a string containing the name and path for the outputted image.\n"
-":param numBands: is an integer specifying the number of image bands in the output image.\n"
-":param pxlVal: is a float specifying the pixel value of the output image.\n"
+":param input_img: is a string containing the name and path for the input image, which is to be copied.\n"
+":param output_img: is a string containing the name and path for the outputted image.\n"
+":param n_bands: is an integer specifying the number of image bands in the output image.\n"
+":param pxl_val: is a float specifying the pixel value of the output image.\n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"
@@ -2855,115 +2459,91 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_blank.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.createCopyImage(inputImage, outputImage, 1, 3, gdalformat, datatype)\n"
+"   imageutils.create_copy_img(inputImage, outputImage, 1, 3, gdalformat, datatype)\n"
 "\n"},
     
-{"createCopyImageDefExtent", ImageUtils_CreateCopyImageDefExtent, METH_VARARGS,
-"rsgislib.imageutils.createCopyImageDefExtent(inputImage, outputImage, numBands, xMin, xMax, yMin, yMax, xRes, yRes, pxlVal, gdalformat, datatype)\n"
+{"create_copy_img_def_extent", (PyCFunction)ImageUtils_CreateCopyImageDefExtent, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.create_copy_img_def_extent(input_img, output_img, n_bands, pxl_val, min_x, max_x, min_y, max_y, res_x, res_y, gdalformat, datatype)\n"
 "Create a new blank image with the parameters specified.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name and path for the input image, which is to be copied.\n"
-":param outputImage: is a string containing the name and path for the outputted image.\n"
-":param numBands: is an integer specifying the number of image bands in the output image.\n"
-":param xMin: is a double specifying the X minimum coordinate of the output image.\n"
-":param xMax: is a double specifying the X maximum coordinate of the output image.\n"
-":param yMin: is a double specifying the Y minimum coordinate of the output image.\n"
-":param yMax: is a double specifying the Y maximum coordinate of the output image.\n"
-":param xRes: is a double specifying the X resolution of the output image.\n"
-":param yRes: is a double specifying the Y resolution of the output image.\n"
-":param pxlVal: is a float specifying the pixel value of the output image.\n"
+":param input_img: is a string containing the name and path for the input image, which is to be copied.\n"
+":param output_img: is a string containing the name and path for the outputted image.\n"
+":param n_bands: is an integer specifying the number of image bands in the output image.\n"
+":param pxl_val: is a float specifying the pixel value of the output image.\n"
+":param min_x: is a double specifying the X minimum coordinate of the output image.\n"
+":param max_x: is a double specifying the X maximum coordinate of the output image.\n"
+":param min_y: is a double specifying the Y minimum coordinate of the output image.\n"
+":param max_y: is a double specifying the Y maximum coordinate of the output image.\n"
+":param res_x: is a double specifying the X resolution of the output image.\n"
+":param res_y: is a double specifying the Y resolution of the output image.\n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"},
 
-{"createCopyImageVecExtent", ImageUtils_CreateCopyImageVecExtent, METH_VARARGS,
-"rsgislib.imageutils.createCopyImageVecExtent(inputImage, shpFile, outputImage, numBands, pxlVal, gdalformat, datatype)\n"
+{"create_copy_img_vec_extent", (PyCFunction)ImageUtils_CreateCopyImageVecExtent, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.create_copy_img_vec_extent(input_img, vec_file, vec_lyr, output_img, n_bands, pxl_val, gdalformat, datatype)\n"
 "Create a new blank image with the parameters specified but with the extent of the inputted shapefile.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name and path for the input image, which is to be copied.\n"
-":param shpFile: is a string specifying the name and path of the shapefile to which the image extent will be cut\n"
-":param outputImage: is a string containing the name and path for the outputted image.\n"
-":param numBands: is an integer specifying the number of image bands in the output image.\n"
-":param pxlVal: is a float specifying the pixel value of the output image.\n"
+":param input_img: is a string containing the name and path for the input image, which is to be copied.\n"
+":param vec_file: is a string specifying the name and path of the vector file to which the image extent will be defined\n"
+":param vec_lyr: is a string specifying the vector layer within the vector file.\n"
+":param output_img: is a string containing the name and path for the outputted image.\n"
+":param n_bands: is an integer specifying the number of image bands in the output image.\n"
+":param pxl_val: is a float specifying the pixel value of the output image.\n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"
 "Example::\n"
 "\n"
 "   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"   shpFile = './Rasters/injune_p142_roi.shp'\n"
+"   vec_file = './Rasters/injune_p142_roi.shp'\n"
+"   vec_lyr = 'injune_p142_roi'\n"
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_blank.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.createCopyImageVecExtent(inputImage, shpFile, outputImage, 3, 1, gdalformat, datatype)\n"
+"   imageutils.create_copy_img_vec_extent(inputImage, vec_file, vec_lyr, outputImage, 3, 1, gdalformat, datatype)\n"
 "\n"},
 
-{"stackStats", ImageUtils_StackStats, METH_VARARGS,
-"rsgislib.imageutils.stackStats(inputImage, outputImage, numBands, stat, gdalformat, datatype)\n"
-"Calculate statistics for every pixel in a stack of image. If all bands are used a single band image is produced with the specified statistics.\n"
-"If a number of bands are specified statistics are taken over every n bands to provide an image with B / n bands (where B is the number of input bands. \
-For example, can be used to produce monthly composite images from a stack with images from every day.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputImage: is a string containing the name and path for the input image.\n"
-":param outputImage: is a string containing the name and path for the output image.\n"
-":param numBands: is an integer specifying the number of image bands in the output image, pass 'None' to use all bands.\n"
-":param stat: is a string providing the statistics to calculate, options are 'mean', 'min', 'max', and 'range'.\n"
-":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
-":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
-"\n"
-"Example::\n"
-"\n"
-"   import rsgislib\n"
-"   from rsgislib import imageutils\n"
-"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"   outputImage = './TestOutputs/injune_p142_casi_sub_utm_stackStats.kea'\n"
-"   gdalformat = 'KEA'\n"
-"   datatype = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.stackStats(inputImage, outputImage, None, 'mean', gdalformat, datatype)\n"
-"\n"},
-
-{"orderImageUsingValidPxls", ImageUtils_OrderImagesUsingPropValidData, METH_VARARGS,
-"rsgislib.imageutils.orderImageUsingValidPxls(inputImages, noDataVal)\n"
+{"order_img_using_prop_valid_pxls", (PyCFunction)ImageUtils_OrderImagesUsingPropValidData, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.order_img_using_prop_valid_pxls(input_imgs, no_data_val)\n"
 "Order the list of input images based on the their proportion of valid image pixels.\n"
 "The primary use of this function is expected to be order (rank) images ahead of mosaicing.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImages: is a list of string containing the name and path for the input images.\n"
-":param noDataVal: is a float which specifies the no data value used to defined \'invalid\' pixels.\n"
+":param input_imgs: is a list of string containing the name and path for the input images.\n"
+":param no_data_val: is a float which specifies the no data value used to defined \'invalid\' pixels.\n"
 "\n"
 ":return: a list of images ordered, from low to high (i.e., the first image will be the image with the smallest number of valid image pixels).\n"
 "\n"},
 
-{"genSamplingGrid", ImageUtils_GenSamplingGrid, METH_VARARGS,
-"rsgislib.imageutils.genSamplingGrid(onputImage, outputImage, gdalformat, pxlRes, minVal, maxVal, singleLine)\n"
+{"gen_sampling_grid", (PyCFunction)ImageUtils_GenSamplingGrid, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.gen_sampling_grid(input_img, output_img, gdalformat, pxl_res, min_val, max_val, single_line)\n"
 "Generate a regular sampling grid.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string specifying an image which defines the area of interest.\n"
-":param outputImage: is a string specifying an output image location.\n"
+":param input_img: is a string specifying an image which defines the area of interest.\n"
+":param output_img: is a string specifying an output image location.\n"
 ":param gdalformat: is a string providing the gdalformat of the output image (e.g., KEA).\n"
-":param pxlRes: is a float specifying the output image resolution.\n"
-":param minVal: is a minimum value for the output image pixel values.\n"
-":param maxVal: is a maximum value for the output image pixel values.\n"
-":param singleLine: is a boolean specifying whether the image is seen as a single line or new line with an offset in the starting value.\n"
+":param pxl_res: is a float specifying the output image resolution.\n"
+":param min_val: is a minimum value for the output image pixel values.\n"
+":param max_val: is a maximum value for the output image pixel values.\n"
+":param single_line: is a boolean specifying whether the image is seen as a single line or new line with an offset in the starting value.\n"
 "\n"},
 
-{"genFiniteMask", (PyCFunction)ImageUtils_GenFiniteMask, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.genFiniteMask(inimage=string, outimage=string, gdalformat=string)\n"
+{"gen_finite_mask", (PyCFunction)ImageUtils_GenFiniteMask, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.gen_finite_mask(input_img=string, output_img=string, gdalformat=string)\n"
 "Generate a binary image mask defining the finite image regions.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inimage: is a string containing the name of the input file\n"
-":param outimage: is a string containing the name of the output file.\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
 "\n"
 "\nExample::\n"
@@ -2971,39 +2551,54 @@ For example, can be used to produce monthly composite images from a stack with i
 "   from rsgislib import imageutils\n"
 "   inputImage = './injune_p142_casi_sub_utm.kea'\n"
 "   outputImage = './injune_p142_casi_sub_utm.kea'\n"
-"   imageutils.genFiniteMask(inputImage, outputImage, \'KEA\')\n"
+"   imageutils.gen_finite_mask(inputImage, outputImage, \'KEA\')\n"
 "\n"},
     
-{"genValidMask", (PyCFunction)ImageUtils_GenValidMask, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.genValidMask(inimages=string|list, outimage=string, gdalformat=string, nodata=float)\n"
+{"gen_valid_mask", (PyCFunction)ImageUtils_GenValidMask, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.gen_valid_mask(input_imgs=string|list, output_img=string, gdalformat=string, no_data_val=float)\n"
 "Generate a binary image mask defining the regions which are not 'no data'.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inimages: can be either a string or a list containing the input file(s)\n"
-":param outimage: is a string containing the name of the output file.\n"
+":param input_imgs: can be either a string or a list containing the input file(s)\n"
+":param output_img: is a string containing the name of the output file.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
-":param nodata: is a float defining the no data value (Optional and default is 0.0)\n"
+":param no_data_val: is a float defining the no data value (Optional and default is 0.0)\n"
 "\n"
 "\nExample::\n"
 "\n"
 "   from rsgislib import imageutils\n"
 "   inputImage = './injune_p142_casi_sub_utm.kea'\n"
 "   outputImage = './injune_p142_casi_sub_utm.kea'\n"
-"   imageutils.genValidMask(inputImage, outputImage, \'KEA\', 0.0)\n"
+"   imageutils.gen_valid_mask(inputImage, outputImage, \'KEA\', 0.0)\n"
 "\n"},
+
+{"gen_img_edge_mask", (PyCFunction)ImageUtils_GenImageEdgeMask, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.gen_img_edge_mask(input_img=string, output_img=string, gdalformat=string, n_edge_pxls=int)\n"
+"Generate a binary image mask defining the edges of the pixel. The n_edge_pxls parameter specifies the \n"
+" number of pixels from the edge of the input image which will be provided as the output mask.\n"
+"\n"
+"Where:\n"
+"\n"
+":param input_img: the input image\n"
+":param output_img: is a string containing the name of the output file.\n"
+":param gdalformat: is a string with the GDAL output file format.\n"
+":param n_edge_pxls: is int specifying the number of pixels from the edge to create the mask for.\n"
+"\n"
+"\n"},
+
    
-{"combineImages2Band", (PyCFunction)ImageUtils_CombineImages2Band, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.combineImages2Band(inimages=list, outimage=string, gdalformat=string, datatype=int, nodata=float)\n"
+{"combine_imgs_to_band", (PyCFunction)ImageUtils_CombineImages2Band, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.combine_imgs_to_band(input_imgs=list, output_imgs=string, gdalformat=string, datatype=int, no_data_val=float)\n"
 "Combine images together into a single image band by excluding the no data value.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inimages: is a list of strings containing the names and paths of the input image files\n"
-":param outimage: is a string containing the name of the output file.\n"
+":param input_imgs: is a list of strings containing the names and paths of the input image files\n"
+":param output_imgs: is a string containing the name of the output file.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param nodata: is the no data value which will be ignored (Default is 0)\n"
+":param no_data_val: is the no data value which will be ignored (Default is 0)\n"
 "\n"
 "\nExample::\n"
 "\n"
@@ -3012,52 +2607,52 @@ For example, can be used to produce monthly composite images from a stack with i
 "   outputImage = './classes.kea'\n"
 "   datatype = rsgislib.TYPE_8UINT\n"
 "   format = 'KEA'\n"
-"   imageutils.combineImages2Band(inputImages, outputImage, format, datatype, 0.0)\n"
+"   imageutils.combine_imgs_to_band(inputImages, outputImage, format, datatype, 0.0)\n"
 "\n"},
     
-{"performRandomPxlSampleInMask", (PyCFunction)ImageUtils_PerformRandomPxlSample, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.performRandomPxlSampleInMask(inputImage=string, outputImage=string, gdalformat=string, maskvals=int|list, numSamples=unsigned int)\n"
+{"perform_random_pxl_sample_in_mask", (PyCFunction)ImageUtils_PerformRandomPxlSample, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.perform_random_pxl_sample_in_mask(input_img=string, output_img=string, gdalformat=string, mask_vals=int|list, n_samples=unsigned int)\n"
 "Randomly sample with a mask (e.g., classification). The same number of samples will be identified within each mask value listed by maskvals.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string for the input image mask - mask is typically whole values within regions (e.g., classifications).\n"
-":param outputImage: is a string with the name and path of the output image. Output is the mask pixel values.\n"
+":param input_img: is a string for the input image mask - mask is typically whole values within regions (e.g., classifications).\n"
+":param output_img: is a string with the name and path of the output image. Output is the mask pixel values.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
-":param maskvals: can either be a single integer value or a list of values. If a list of values is specified then the total number of points identified (numSamples x n-maskVals).\n"
-":param numSamples: is the number of samples to be created within each region.\n"
+":param mask_vals: can either be a single integer value or a list of values. If a list of values is specified then the total number of points identified (numSamples x n-maskVals).\n"
+":param n_samples: is the number of samples to be created within each region.\n"
 "\n"},
     
-{"performRandomPxlSampleInMaskLowPxlCount", (PyCFunction)ImageUtils_PerformRandomPxlSampleSmallPxlCount, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(inputImage=string, outputImage=string, gdalformat=string, maskvals=int|list, numSamples=unsigned int, rndSeed=int)\n"
+{"perform_random_pxl_sample_in_mask_low_pxl_count", (PyCFunction)ImageUtils_PerformRandomPxlSampleSmallPxlCount, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.perform_random_pxl_sample_in_mask_low_pxl_count(input_img=string, output_img=string, gdalformat=string, mask_vals=int|list, n_samples=unsigned int, rnd_seed=int)\n"
 "Randomly sample with a mask (e.g., classification). The same number of samples will be identified within each mask value listed by maskvals.\n"
-"This function produces a similar result to rsgislib.imageutils.performRandomPxlSampleInMask but is more efficient for classes where only a small number of\n"
+"This function produces a similar result to rsgislib.imageutils.perform_random_pxl_sample_in_mask but is more efficient for classes where only a small number of\n"
 "pixels have that value. However, this function uses much more memory.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string for the input image mask - mask is typically whole values within regions (e.g., classifications).\n"
-":param outputImage: is a string with the name and path of the output image. Output is the mask pixel values.\n"
+":param input_img: is a string for the input image mask - mask is typically whole values within regions (e.g., classifications).\n"
+":param output_img: is a string with the name and path of the output image. Output is the mask pixel values.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
-":param maskvals: can either be a single integer value or a list of values. If a list of values is specified then the total number of points identified (numSamples x n-maskVals).\n"
-":param numSamples: is the number of samples to be created within each region.\n"
-":param rndSeed: is a an integer providing a seed for the random number generator. Please not that if this number is the same then the same random set of points will be generated.\n"
+":param mask_vals: can either be a single integer value or a list of values. If a list of values is specified then the total number of points identified (numSamples x n-maskVals).\n"
+":param n_samples: is the number of samples to be created within each region.\n"
+":param rnd_seed: is a an integer providing a seed for the random number generator. Please not that if this number is the same then the same random set of points will be generated.\n"
 "\n"},
     
-{"panSharpenHCS", (PyCFunction)ImageUtils_PanSharpenHCS, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.panSharpenHCS(inimage=string, outimage=string, gdalformat=string, datatype=int, winsize=unsigned int, useNaiveMethod=boolean)\n"
+{"pan_sharpen_hcs", (PyCFunction)ImageUtils_PanSharpenHCS, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.pan_sharpen_hcs(input_img=string, output_img=string, gdalformat=string, datatype=int, win_size=unsigned int, use_naive_method=boolean)\n"
 "A function which performs a Hyperspherical Colour Space (HSC) Pan Sharpening of an input image.\n"
 "Padwick, C., Deskevich, M., Pacifici, F., Smallwood, S. 2010. WorldView-2 Pan-Sharpening.\n"
 "ASPRS 2010 Annual Conference, San Diego, California (2010) pp. 26-30.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string for the input file, where the single panchromatic band must be the last in the stack.\n"
-":param outputImage: is a string with the name and path of the output image.\n"
+":param input_img: is a string for the input file, where the single panchromatic band must be the last in the stack.\n"
+":param output_img: is a string with the name and path of the output image.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param winsize: is an optional integer, which must be an odd number, specifying the window size used for the analysis (Default = 7; Only used if useNaiveMethod=False).\n"
-":param useNaiveMethod: is an optional boolean option to specify whether the naive or smart method should be used - False=Smart (Default), True=Naive Method.\n"
+":param win_size: is an optional integer, which must be an odd number, specifying the window size used for the analysis (Default = 7; Only used if useNaiveMethod=False).\n"
+":param use_naive_method: is an optional boolean option to specify whether the naive or smart method should be used - False=Smart (Default), True=Naive Method.\n"
 "\n"
 "\nExample::\n"
 "\n"
@@ -3067,31 +2662,31 @@ For example, can be used to produce monthly composite images from a stack with i
 "    rsgislib.imageutils.resampleImage2Match('./14SEP03025718-P2AS-054000253010_01_P001.TIF', './14SEP03025718-M2AS-054000253010_01_P001.TIF',\n"
 "                                        './14SEP03025718-M2AS-054000253010_01_P001_resample.kea', 'KEA', 'nearestneighbour', rsgislib.TYPE_16UINT)\n"
 "\n"
-"    rsgislib.imageutils.stackImageBands(['14SEP03025718-M2AS-054000253010_01_P001_resample.kea', '14SEP03025718-P2AS-054000253010_01_P001.TIF'],\n"
+"    rsgislib.imageutils.stack_img_bands(['14SEP03025718-M2AS-054000253010_01_P001_resample.kea', '14SEP03025718-P2AS-054000253010_01_P001.TIF'],\n"
 "                                         None, 'StackPanImg.kea', 0.0, 0.0, 'KEA', rsgislib.TYPE_16UINT)\n"
 "\n"
-"    rsgislib.imageutils.panSharpenHCS(inimage='StackPanImg.kea', outimage='StackPanImgSharp.kea', gdalformat='KEA', datatype=rsgislib.TYPE_16UINT)\n"
+"    rsgislib.imageutils.pan_sharpen_hcs(inimage='StackPanImg.kea', outimage='StackPanImgSharp.kea', gdalformat='KEA', datatype=rsgislib.TYPE_16UINT)\n"
 "\n"
-"    rsgislib.imageutils.popImageStats('StackPanImgSharp.kea', usenodataval=True, nodataval=0, calcpyramids=True)\n"
+"    rsgislib.imageutils.pop_img_stats('StackPanImgSharp.kea', usenodataval=True, nodataval=0, calcpyramids=True)\n"
 "\n"
 "\n"},
     
-{"sharpenLowResBands", (PyCFunction)ImageUtils_SharpenLowResImageBands, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.sharpenLowResBands(inimage=string, outimage=string, bandinfo=list, winsize=unsigned int, nodata=int, gdalformat=string, datatype=int)\n"
+{"sharpen_low_res_bands", (PyCFunction)ImageUtils_SharpenLowResImageBands, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.sharpen_low_res_bands(input_img=string, output_img=string, band_info=list, win_size=unsigned int, no_data_val=int, gdalformat=string, datatype=int)\n"
 "A function which performs band sharpening using local linear fitting (orignal method proposed by Shepherd and Dymond).\n"
 "\n"
 "Where:\n"
 "\n"
-":param inimage: is a string for the input file where the high resolution input image bands have been resampled \n"
+":param input_img: is a string for the input file where the high resolution input image bands have been resampled \n"
 "             (recommend nearest neighbour) to the same resolution has the higher resolution bands\n"
-":param outimage: is a string with the name and path of the output image.\n"
-":param bandinfo: is a list of the input image bands (type: rsgislib.imageutils.SharpBandInfo) specifying the band number, name and status.\n"
+":param output_img: is a string with the name and path of the output image.\n"
+":param band_info: is a list of the input image bands (type: rsgislib.imageutils.SharpBandInfo) specifying the band number, name and status.\n"
 "           the status is either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW or rsgislib.SHARP_RES_HIGH\n"
-":param winsize: is an integer, which must be an odd number, specifying the window size (in pixels) used for the analysis (Default = 7). \n"
+":param win_size: is an integer, which must be an odd number, specifying the window size (in pixels) used for the analysis (Default = 7). \n"
 "          Recommend that the window size values fits at least 9 low resolution image pixels. \n"
 "          For example, if the high resolution image is 10 m and the low 20 m then a 7 x 7 window\n"
 "          will include 12.25 low resolution pixels.\n"
-":param nodata: is an integer specifying the no data value for the scene\n"
+":param no_data_val: is an integer specifying the no data value for the scene\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 "\n"
@@ -3107,57 +2702,26 @@ For example, can be used to produce monthly composite images from a stack with i
 "    bandInfo.append(imageutils.SharpBandInfo(band=4, status=rsgislib.SHARP_RES_LOW, name='NIR'))\n"
 "    bandInfo.append(imageutils.SharpBandInfo(band=5, status=rsgislib.SHARP_RES_HIGH, name='PAN'))\n"
 "\n"
-"    imageutils.sharpenLowResBands(inimage='./wv2/wv2_20140903_panstack.kea',\n"
+"    imageutils.sharpen_low_res_bands(inimage='./wv2/wv2_20140903_panstack.kea',\n"
 "                                  outimage='./wv2/wv2_20140903_panstack_sharp.kea',\n"
 "                                  bandinfo=bandInfo, winsize=7, nodata=0,\n"
 "                                  gdalformat='KEA', datatype=rsgislib.TYPE_UINT16)\n"
 "\n"
 "\n"},
-/*
-{"createMaxNDVICompositeImg", (PyCFunction)ImageUtils_CreateMaxNDVICompositeImg, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.createMaxNDVICompositeImg(inimages=list, outimage=string, redband=int, nirband=int, gdalformat=string, datatype=int)\n"
-"A function which creates a composite image where the pixel values from the image with the maximum NDVI is selected.\n"
-"\n"
-"Where:\n"
-"\n"
-"* inimages is a list of input images, each image must have the same number of bands in the same order.\n"
-"* outputImage is a string with the name and path of the output image.\n"
-"* redband is the image band number for the red band (note. band numbers start at 1).\n"
-"* nirband is the image band number for the nir band (note. band numbers start at 1).\n"
-"* gdalformat is a string with the GDAL output file format.\n"
-"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
-"\n"
-"\nExample::\n"
-"\n"
-"    import rsgislib\n"
-"    import rsgislib.imageutils\n"
-"\n"
-"    inputImgs = ['LS5/Outputs/LS5TM_20100127_lat0lon11772_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea',\n"
-"                 'LS5/Outputs/LS5TM_20100212_lat0lon11772_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea',\n"
-"                 'LS5/Outputs/LS5TM_20100503_lat0lon11773_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea',\n"
-"                 'LS5/Outputs/LS5TM_20100519_lat0lon11773_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea',\n"
-"                 'LS7/Outputs/LS7_20100612_lat0lon11773_r60p116_msk_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea']\n"
-"\n"
-"    outputImg = 'LS5TM_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea'\n"
-"\n"
-"    rsgislib.imageutils.createMaxNDVICompositeImg(inputImgs, outputImg, redband=3, nirband=4, gdalformat='KEA', datatype=rsgislib.TYPE_16UINT)\n"
-"    rsgislib.imageutils.popImageStats(outputImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
-"\n"
-"\n"},
-*/
-{"createRefImgCompositeImg", (PyCFunction)ImageUtils_CreateRefImageCompositeImg, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.createRefImgCompositeImg(inimages=list, outimage=string, refimg=string, gdalformat=string, datatype=int, outnodata=float)\n"
+
+{"create_ref_img_composite_img", (PyCFunction)ImageUtils_CreateRefImageCompositeImg, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.create_ref_img_composite_img(input_imgs=list, output_img=string, in_ref_img=string, gdalformat=string, datatype=int, out_no_data=float)\n"
 "A function which creates a composite image where the pixel values going into the output image by the\n"
-"reference image. The reference image can be created using the rsgislib.imagecalc.getImgIdxForStat function.\n"
+"reference image. The reference image can be created using the rsgislib.imagecalc.get_img_idx_for_stat function.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inimages: is a list of input images, each image must have the same number of bands in the same order.\n"
-":param outputImage: is a string with the name and path of the output image.\n"
-":param refimg: is an image which specifies index of the image in inimages for which output pixel will be derived. Indexes start at 1, where 0 is no data.\n"
+":param input_imgs: is a list of input images, each image must have the same number of bands in the same order.\n"
+":param output_img: is a string with the name and path of the output image.\n"
+":param in_ref_img: is an image which specifies index of the image in inimages for which output pixel will be derived. Indexes start at 1, where 0 is no data.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
 ":param datatype: is an integer containing one of the values from rsgislib.TYPE_*\n"
-":param outnodata: is the value which will be given to no data pixels in the output image."
+":param out_no_data: is the value which will be given to no data pixels in the output image."
 "\n"
 "\n"
 "Example::\n"
@@ -3181,62 +2745,62 @@ For example, can be used to produce monthly composite images from a stack with i
 "        print('In Image ('+str(idx) + '):\t' + img)\n"
 "        baseImgName = os.path.splitext(os.path.basename(img))[0]\n"
 "        refLyrImg = os.path.join(refLayerPath, baseImgName+'_ndvi.kea')\n"
-"        rsgislib.imagecalc.calcNDVI(img, 3, 4, refLyrImg)\n"
+"        rsgislib.imagecalc.calc_ndvi(img, 3, 4, refLyrImg)\n"
 "        refLyrsLst.append(refLyrImg)\n"
 "        idx = idx + 1\n"
 "\n"
 "    # Create REF Image\n"
 "    pxlRefImg = 'LS5TM_19851990CompRefImg_lat7lon3896_r65p166_vmsk_mclds_topshad_rad_srefdem_stdsref.kea'\n"
-"    rsgislib.imagecalc.getImgIdxForStat(refLyrsLst, pxlRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)\n"
+"    rsgislib.imagecalc.get_img_idx_for_stat(refLyrsLst, pxlRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)\n"
 "\n"
 "    # Pop Ref Image with stats\n"
 "    rsgislib.rastergis.populateStats(pxlRefImg, True, True, True)\n"
 "\n"
 "    # Create Composite Image\n"
 "    outCompImg = 'LS5TM_19851990CompRefImgMAX_lat7lon3896_r65p166_vmsk_mclds_topshad_rad_srefdem_stdsref.kea'\n"
-"    rsgislib.imageutils.createRefImgCompositeImg(inImages, outCompImg, pxlRefImg, 'KEA', rsgislib.TYPE_16UINT, 0.0)\n"
+"    rsgislib.imageutils.create_ref_img_composite_img(inImages, outCompImg, pxlRefImg, 'KEA', rsgislib.TYPE_16UINT, 0.0)\n"
 "\n"
 "    # Calc Stats\n"
-"    rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
+"    rsgislib.imageutils.pop_img_stats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
 "\n"
 "\n"},
     
     
-{"genTimeseriesFillCompositeImg", (PyCFunction)ImageUtils_GenTimeseriesFillCompositeImg, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.genTimeseriesFillCompositeImg(compInfo=list, validMask=string, outRefFillImg=string, outCompImg=string, gdalformat=string, datatype=int)\n"
+{"gen_timeseries_fill_composite_img", (PyCFunction)ImageUtils_GenTimeseriesFillCompositeImg, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.gen_timeseries_fill_composite_img(comp_info=list, in_vld_img=string, out_ref_fill_img=string, out_comp_img=string, out_comp_ref_img=string, gdalformat=string, datatype=int)\n"
 "A function which aids the creation of timeseries composites. This function uses reference images to identify\n"
 "which pixels should be used to in-fill composite gaps.\n"
 "\n"
 "Where:\n"
 "\n"
-":param compInfo: is a list of rsgislib.imageutils.RSGISTimeseriesFillInfo objects\n"
-":param validMask: is a string with the name and path to an image specifying the valid area within which the compsites are being generated.\n"
-":param outRefFillImg: \n"
-":param outCompImg: \n"
-":param outCompRefImg: \n"
+":param comp_info: is a list of rsgislib.imageutils.RSGISTimeseriesFillInfo objects\n"
+":param in_vld_img: is a string with the name and path to an image specifying the valid area within which the compsites are being generated.\n"
+":param out_ref_fill_img: \n"
+":param out_comp_img: \n"
+":param out_comp_ref_img: \n"
 ":param gdalformat: is a string with the GDAL outCompImg file format.\n"
 ":param datatype: is an integer containing one of the values from rsgislib.TYPE_*, used for outCompImg\n"
 "\n"
 "\n"},
     
     
-{"exportSingleMergedImgBand", (PyCFunction)ImageUtils_ExportSingleMergedImgBand, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.exportSingleMergedImgBand(inputImg=string, inputBandRefImg=string, outputImg=string, gdalformat=string, datatype=int)\n"
+{"export_single_merged_img_band", (PyCFunction)ImageUtils_ExportSingleMergedImgBand, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.export_single_merged_img_band(input_img=string, int_band_ref_img=string, output_img=string, gdalformat=string, datatype=int)\n"
 "A function which exports a single image band where the reference image specifies \n"
 "from which image band the output pixel is extracted from. \n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImg: is a string for the full (multi-band) image.\n"
-":param inputBandRefImg: is a string with the reference image specifying the band to be outputted for each pixel.\n"
-":param outputImg: is a string for the single band output image.\n"
+":param input_img: is a string for the full (multi-band) image.\n"
+":param int_band_ref_img: is a string with the reference image specifying the band to be outputted for each pixel.\n"
+":param output_img: is a string for the single band output image.\n"
 ":param gdalformat: is a string with the GDAL outCompImg file format.\n"
 ":param datatype: is an integer containing one of the values from rsgislib.TYPE_*, used for outCompImg\n"
 "\n"
 "\n"},
     
-{"getGDALImageCreationOpts", (PyCFunction)ImageUtils_GetGDALImageCreationOpts, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.getGDALImageCreationOpts(gdalformat=string)\n"
+{"get_gdal_img_creation_opts", (PyCFunction)ImageUtils_GetGDALImageCreationOpts, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.get_gdal_img_creation_opts(gdalformat=string)\n"
 "This function returns a dict from by reading an environment variable to retrieve any creation options for \n"
 "a particular image file format. Variables should have the name RSGISLIB_IMG_CRT_OPTS_<GDAL_FORMAT> where \n"
 "a key value pairs separated by colons (:) is provided. The gdal format string must be upper case.\n"
@@ -3250,8 +2814,21 @@ For example, can be used to produce monthly composite images from a stack with i
 ":returns: a dict of the options.\n"
 "\n"
 "\n"},
-    
-{NULL}        /* Sentinel */
+
+{"unpack_pxl_vals", (PyCFunction)ImageUtils_UnPackPixelVals, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.unpack_pxl_vals(input_img=string, img_band=int, output_img=string, gdalformat=string)\n"
+"This function unpacks the image pixel values in the first band to a multiple band output image (1 band per bit).\n"
+"\n"
+"Where:\n"
+"\n"
+":param input_img: is a string specifying the input image file.\n"
+":param img_band: is the image band in the input image to use (index starts at 1).\n"
+":param output_img: is a string specifying the output image file\n"
+":param gdalformat: is a string specifying the GDAL image file format for the output file.\n"
+"\n"
+"\n"},
+
+{nullptr}        /* Sentinel */
 };
 
 
@@ -3273,16 +2850,16 @@ static int ImageUtils_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_imageutils",
-        NULL,
+        nullptr,
         sizeof(struct ImageUtilsState),
         ImageUtilsMethods,
-        NULL,
+        nullptr,
         ImageUtils_traverse,
         ImageUtils_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__imageutils(void)
@@ -3299,14 +2876,14 @@ init_imageutils(void)
 #else
     PyObject *pModule = Py_InitModule("_imageutils", ImageUtilsMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct ImageUtilsState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_imageutils.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_imageutils.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;

@@ -47,31 +47,6 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISStandardiseImage::calcImageValue(float *bandValues, int numBands) 
-	{
-		throw RSGISImageCalcException("Not implemented");
-	}
-	
-	void RSGISStandardiseImage::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISStandardiseImage::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
-	{
-		throw RSGISImageCalcException("Not implemented");
-	}
-	
-	void RSGISStandardiseImage::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
-	{
-		throw RSGISImageCalcException("Not implemented");
-	}
-	
-	bool RSGISStandardiseImage::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
-	{
-		throw RSGISImageCalcException("Not implemented");
-	}
-	
 	RSGISStandardiseImage::~RSGISStandardiseImage()
 	{
 		

@@ -1,7 +1,5 @@
-RSGISLib LightGBM Pixel Classification Module
-==============================================
-
-.. automodule:: rsgislib.classification.classlightgbm
+RSGISLib LightGBM Pixel Classification
+========================================
 
 LightGBM (https://lightgbm.readthedocs.io) is an alternative library to scikit-learn which has specialist implementation of Gradient Boosted Decision Tree (GBDT), but it also implements random forests, Dropouts meet Multiple Additive Regression Trees (DART), and Gradient Based One-Side Sampling (Goss).
 
@@ -121,7 +119,9 @@ To apply the multi-class classifier use the following function::
 Training Functions
 -------------------
 
+.. autofunction:: rsgislib.classification.classlightgbm.optimise_lightgbm_binary_classifer
 .. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_binary_classifer
+.. autofunction:: rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifer
 .. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifer
 
 Classify Functions

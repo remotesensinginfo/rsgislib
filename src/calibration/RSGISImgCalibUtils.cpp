@@ -81,7 +81,7 @@ namespace rsgis{namespace calib{
         this->sateAltitude = sateAltitude;
     }
     
-    void RSGISCalcNadirViewAngle::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent)
+    void RSGISCalcNadirViewAngle::calcImageValue(float *bandValues, int numBands, double *output, OGREnvelope extent)
     {
         if(numBands != 1)
         {
@@ -95,9 +95,8 @@ namespace rsgis{namespace calib{
         }
         else
         {
-            double ptX = extent.getMinX() + extent.getWidth()/2;
-            double ptY = extent.getMinY() + extent.getHeight()/2;
-            
+            double ptX = extent.MinX + (extent.MaxX - extent.MinX)/2;
+            double ptY = extent.MinY + (extent.MaxY - extent.MinY)/2;
             
             double orthSlope = -1/(clSlope);
             double orthLineOff = ptY-(orthSlope*ptX);

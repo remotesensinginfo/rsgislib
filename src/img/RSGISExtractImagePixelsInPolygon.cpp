@@ -33,7 +33,7 @@ namespace rsgis
 
         }
         
-        std::vector<ImagePixelValuePt*>* RSGISExtractImagePixelsOnLine::getImagePixelValues(GDALDataset *image, unsigned int imageBand, geos::geom::Coordinate *pt1, float azimuthRad, float zenithRad, float rayElevThreshold) 
+        std::vector<ImagePixelValuePt*>* RSGISExtractImagePixelsOnLine::getImagePixelValues(GDALDataset *image, unsigned int imageBand, OGRPoint *pt1, float azimuthRad, float zenithRad, float rayElevThreshold)
         {
             std::vector<ImagePixelValuePt*> *pxlValues = new std::vector<ImagePixelValuePt*>();
             
@@ -52,8 +52,8 @@ namespace rsgis
                     transform[5] *= -1;
                 }
                 
-                double xDiff = (pt1->x - xMin)/transform[1];
-                double yDiff = (yMax - pt1->y)/transform[5];
+                double xDiff = (pt1->getX() - xMin)/transform[1];
+                double yDiff = (yMax - pt1->getY())/transform[5];
                 
                 boost::uint_fast32_t xPxl = 0;
                 boost::uint_fast32_t yPxl = 0;
@@ -93,9 +93,9 @@ namespace rsgis
                 yStep = yStep/3;
                 zStep = zStep/3;
                 
-                double xVal = pt1->x;
-                double yVal = pt1->y;
-                double zVal = pt1->z;
+                double xVal = pt1->getX();
+                double yVal = pt1->getY();
+                double zVal = pt1->getZ();
                 
                 bool complete = false;
                 while(!complete)
@@ -153,10 +153,7 @@ namespace rsgis
                         if((xPxl != xPxlPrev) | (yPxl != yPxlPrev))
                         {
                             ImagePixelValuePt *pxlVal = new ImagePixelValuePt();
-                            pxlVal->pt  = new geos::geom::Coordinate();
-                            pxlVal->pt->x = xVal;
-                            pxlVal->pt->y = yVal;
-                            pxlVal->pt->z = zVal;
+                            pxlVal->pt  = new OGRPoint(xVal, yVal, zVal);
                             pxlVal->imgX = xPxl;
                             pxlVal->imgY = yPxl;
                             

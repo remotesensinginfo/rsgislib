@@ -67,7 +67,7 @@ namespace rsgis
                 }
                 inDataColumn = new float[numInBands];
                 
-                geos::geom::Envelope extent;
+                OGREnvelope extent;
                 double pxlTLX = 0;
                 double pxlTLY = 0;
                 double pxlWidth = 0;
@@ -101,7 +101,10 @@ namespace rsgis
                             inDataColumn[n] = inputData[n][j];
                         }
                         
-                        extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
+                        extent.MinX = pxlTLX;
+                        extent.MaxX = (pxlTLX+pxlWidth);
+                        extent.MinY = pxlTLY;
+                        extent.MaxY = (pxlTLY-pxlHeight);
                         this->calc->calcImageValue(inDataColumn, numInBands, extent);
                         
                         for(int n = 0; n < numInBands; n++)

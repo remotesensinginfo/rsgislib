@@ -824,7 +824,7 @@ namespace rsgis{namespace calib{
             double *hBaseMin = new double[numcloudsRATHistoRows];
             double *hBaseMax = new double[numcloudsRATHistoRows];
             
-            geos::geom::Envelope *env = new geos::geom::Envelope();
+            OGREnvelope *env = new OGREnvelope();
             
             rsgis::img::RSGISImagePercentiles calcImgPercentiles;
             
@@ -838,8 +838,11 @@ namespace rsgis{namespace calib{
                 if(r > 8)
                 {
                     percentile = ((r-8.0)*(r-8.0)) / (r*r);
-                    env->init(minX[i], maxX[i], minY[i], maxY[i]);
-                    
+                    env->MinX = minX[i];
+                    env->MaxX = maxX[i];
+                    env->MinY = minY[i];
+                    env->MaxY = maxY[i];
+
                     cloudBase[i] = calcImgPercentiles.getPercentile(thermal, 1, cloudClumpsDS, i, percentile, 0, true, env, true);
                 }
                 else
@@ -861,7 +864,6 @@ namespace rsgis{namespace calib{
                 {
                     hBaseMax[i] = 12;
                 }
-                
             }
             
             cloudBase[0] = 0;
@@ -979,7 +981,7 @@ namespace rsgis{namespace calib{
             RSGISEditCloudShadowImg editFinalShadImg = RSGISEditCloudShadowImg(cloudShadowRegionsDS, 1);
             editFinalShadImg.reset();
             rsgis::img::RSGISExtractPxlsAsPts getPxPts;
-            geos::geom::Envelope *env = new geos::geom::Envelope();
+            OGREnvelope *env = new OGREnvelope();
             double baseHeight = 0.0;
             double pxlX = 0.0;
             double pxlY = 0.0;
@@ -1006,7 +1008,10 @@ namespace rsgis{namespace calib{
                 
                 std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
                 pxPts->reserve(cloudsRATHisto[i]);
-                env->init(minX[i], maxX[i], minY[i], maxY[i]);
+                env->MinX = minX[i];
+                env->MaxX = maxX[i];
+                env->MinY = minY[i];
+                env->MaxY = maxY[i];
                 getPxPts.exportPixelsAsPointsWithVal(cloudClumpsDS, (float)i, initCloudHeights, 2, pxPts, true, env);
                 
                 
@@ -1112,7 +1117,10 @@ namespace rsgis{namespace calib{
                 
                 std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
                 pxPts->reserve(cloudsRATHisto[i]);
-                env->init(minX[i], maxX[i], minY[i], maxY[i]);
+                env->MinX = minX[i];
+                env->MaxX = maxX[i];
+                env->MinY = minY[i];
+                env->MaxY = maxY[i];
                 getPxPts.exportPixelsAsPointsWithVal(cloudClumpsDS, (float)i, initCloudHeights, 2, pxPts, true, env);
                 
                 for(std::vector<std::pair<std::pair<double,double>,double> >::iterator iterPts = pxPts->begin(); iterPts != pxPts->end(); ++iterPts)
@@ -1183,7 +1191,11 @@ namespace rsgis{namespace calib{
         this->brX = this->tlX + (this->nXPxl * this->xRes);
         this->brY = this->tlY - (this->nYPxl * this->yRes);
         
-        extent.init(0,0,0,0);
+        extent.MinX = 0;
+        extent.MaxX = 0;
+        extent.MinY = 0;
+        extent.MaxY = 0;
+
         this->firstPts = true;
         
         this->calcCloudShadCorr = new RSGISCalcCloudShadowCorrespondance();
@@ -1216,12 +1228,15 @@ namespace rsgis{namespace calib{
                 this->testImgBand->RasterIO(GF_Write, xPxlLoc, yPxlLoc, 1, 1, &outValue, 1, 1, GDT_Float32, 0, 0);
                 if(this->firstPts)
                 {
-                    extent.init(x,x,y,y);
+                    extent.MinX = x;
+                    extent.MaxX = x;
+                    extent.MinY = y;
+                    extent.MaxY = y;
                     this->firstPts=false;
                 }
                 else
                 {
-                    extent.expandToInclude(x, y);
+                    extent.Merge(x, y);
                 }
             }
             else
@@ -1237,7 +1252,10 @@ namespace rsgis{namespace calib{
     void RSGISEditCloudShadowImg::reset()
     {
         this->testImgBand->Fill(0.0);
-        extent.init(0,0,0,0);
+        extent.MinX = 0;
+        extent.MaxX = 0;
+        extent.MinY = 0;
+        extent.MaxY = 0;
         this->firstPts = true;
     }
     
@@ -1247,27 +1265,27 @@ namespace rsgis{namespace calib{
         try
         {
             // Check envelope is within image (i.e., shadow hasn't been projected outside of the image extent)
-            if((extent.getMinX() < this->tlX) | (extent.getMinX() > this->brX))
+            if((extent.MinX < this->tlX) | (extent.MinX > this->brX))
             {
                 insideimg = false;
             }
-            else if((extent.getMaxX() < this->tlX) | (extent.getMaxX() > this->brX))
+            else if((extent.MaxX < this->tlX) | (extent.MaxX > this->brX))
             {
                 insideimg = false;
             }
-            else if((extent.getMinY() < this->brY) | (extent.getMinY() > this->tlY))
+            else if((extent.MinY < this->brY) | (extent.MinY > this->tlY))
             {
                 insideimg = false;
             }
-            else if((extent.getMaxY() < this->brY) | (extent.getMaxY() > this->tlY))
+            else if((extent.MaxY < this->brY) | (extent.MaxY > this->tlY))
             {
                 insideimg = false;
             }
-            else if(extent.getWidth() < (this->xRes*2))
+            else if((extent.MaxX - extent.MinX) < (this->xRes*2))
             {
                 insideimg = false;
             }
-            else if(extent.getHeight() < (this->yRes*2))
+            else if((extent.MaxY - extent.MinY) < (this->yRes*2))
             {
                 insideimg = false;
             }

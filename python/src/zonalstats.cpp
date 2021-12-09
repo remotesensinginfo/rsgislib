@@ -37,774 +37,318 @@ struct ZonalStatsState
 static struct ZonalStatsState _state;
 #endif
 
+/*
 static void FreePythonObjects(std::vector<PyObject*> toFree) {
     std::vector<PyObject*>::iterator iter;
     for(iter = toFree.begin(); iter != toFree.end(); ++iter) {
         Py_XDECREF(*iter);
     }
 }
+*/
 
-static PyObject *ZonalStats_PointValue2SHP(PyObject *self, PyObject *args)
+static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputImage, *pszInputVector, *pszOutputVector;
-    int force;
-    int useBandNames = true;
-    if( !PyArg_ParseTuple(args, "sssi|i:pointValue2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
-                                &force, &useBandNames))
-        return NULL;
-
-    try
-    {
-        rsgis::cmds::executePointValue(pszInputImage, pszInputVector, pszOutputVector, false, force, useBandNames);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *ZonalStats_PointValue2TXT(PyObject *self, PyObject *args)
-{
-    const char *pszInputImage, *pszInputVector, *pszOutputTxt;
-    int useBandNames = true;
-    int shortenBandNames = true;
-    if( !PyArg_ParseTuple(args, "sss|ii:pointValue2TXT", &pszInputImage, &pszInputVector, &pszOutputTxt, 
-                                &useBandNames, &shortenBandNames))
-        return NULL;
-
-    try
-    {
-        rsgis::cmds::executePointValue(pszInputImage, pszInputVector, pszOutputTxt, true, false, useBandNames, shortenBandNames);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *ZonalStats_PixelVals2TXT(PyObject *self, PyObject *args)
-{
-    const char *pszInputImage, *pszInputVector, *pszOutputTextBase, *pzsPolyAttribute;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),
+                             RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("out_h5_file"),
+                             RSGIS_PY_C_TEXT("no_prj_warn"), RSGIS_PY_C_TEXT("pxl_in_poly_method"), nullptr};
+    const char *pszInputImage, *pszInputVector, *pszInputVecLyr, *pszOutputHDF;
     int pixelInPolyMethod = 1;
     int noProjWarning = false;
-    if( !PyArg_ParseTuple(args, "ssss|ii:pixelVals2TXT", &pszInputImage, &pszInputVector, &pszOutputTextBase, &pzsPolyAttribute, &noProjWarning, &pixelInPolyMethod))
-        return NULL;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|ii:image_zone_to_hdf", kwlist, &pszInputImage, &pszInputVector, &pszInputVecLyr, &pszOutputHDF, &noProjWarning, &pixelInPolyMethod))
+        return nullptr;
     try
     {
-        rsgis::cmds::executePixelVals2txt(pszInputImage, pszInputVector, pszOutputTextBase, pzsPolyAttribute, "csv", noProjWarning, pixelInPolyMethod);
+        rsgis::cmds::executeZonesImage2HDF5(std::string(pszInputImage), std::string(pszInputVector), std::string(pszInputVecLyr),
+                                            std::string(pszOutputHDF), (bool)noProjWarning, pixelInPolyMethod);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
-
+    
     Py_RETURN_NONE;
 }
 
-static PyObject *ZonalStats_PixelStats2SHP(PyObject *self, PyObject *args)
+
+static PyObject *ZonalStats_ExtractZoneImageValues2HDF(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputImage, *pszInputVector, *pszOutputVector;
-    int force;
-    int useBandNames = 1;
-    int noProjWarning = 0;
-    int pixelInPolyMethod = 1;
-     PyObject *pBandAttZonalStatsCmds;
-    if( !PyArg_ParseTuple(args, "sssOi|iii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputVector, 
-                                &pBandAttZonalStatsCmds, &force, &useBandNames, &noProjWarning, &pixelInPolyMethod))
-        return NULL;
-    
-    rsgis::cmds::RSGISBandAttZonalStatsCmds *zonalAtts = new rsgis::cmds::RSGISBandAttZonalStatsCmds();   // the c++ struct
+    const char *pszInputImage;
+    const char *pszInputMaskImage;
+    const char *pszOutputFile;
+    float maskValue = 0;
+    int nDataType = 9;
 
-    // declare and initialise pointers for all the attributes of the struct
-    PyObject *pMinThreshold, *pMaxThreshold, *pCalcCount, *pCalcMin, *pCalcMax, *pCalcMean, *pCalcStdDev, *pCalcMode, *pCalcSum;
-    pMinThreshold = pMaxThreshold = pCalcCount = pCalcMin = pCalcMax = pCalcMean = pCalcStdDev = pCalcMode = pCalcSum = NULL;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("in_msk_img"),
+                             RSGIS_PY_C_TEXT("out_h5_file"), RSGIS_PY_C_TEXT("mask_val"),
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
 
-    std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
-    extractedAttributes.push_back(pBandAttZonalStatsCmds);
-
-    
-    /* Check if values have been set. 
-        If not set assume false.
-        If set, assume true for now - will check the value later
-    */
-    pCalcCount = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcCount");
-    extractedAttributes.push_back(pCalcCount);
-    zonalAtts->calcCount = !(pCalcCount == NULL || !RSGISPY_CHECK_INT(pCalcCount));
-    
-    pCalcMin = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMin");
-    extractedAttributes.push_back(pCalcMin);
-    zonalAtts->calcMin = !(pCalcMin == NULL || !RSGISPY_CHECK_INT(pCalcMin));
-
-    pCalcMax = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMax");
-    extractedAttributes.push_back(pCalcMax);
-    zonalAtts->calcMax = !(pCalcMax == NULL || !RSGISPY_CHECK_INT(pCalcMax));
-    
-    pCalcMean = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMean");
-    extractedAttributes.push_back(pCalcMean);
-    zonalAtts->calcMean = !(pCalcMean == NULL || !RSGISPY_CHECK_INT(pCalcMean));
-    
-    pCalcStdDev = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcStdDev");
-    extractedAttributes.push_back(pCalcStdDev);
-    zonalAtts->calcStdDev= !(pCalcStdDev == NULL || !RSGISPY_CHECK_INT(pCalcStdDev));
-    
-    pCalcMode = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMode");
-    extractedAttributes.push_back(pCalcMode);
-    zonalAtts->calcMode = !(pCalcMode == NULL || !RSGISPY_CHECK_INT(pCalcMode));
-    
-    pCalcSum = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcSum");
-    extractedAttributes.push_back(pCalcSum);
-    zonalAtts->calcSum = !(pCalcSum == NULL || !RSGISPY_CHECK_INT(pCalcSum));
-
-    // check the calcValue and extract fields if required
-    if(zonalAtts->calcCount) {zonalAtts->calcCount = RSGISPY_INT_EXTRACT(pCalcCount);}
-    if(zonalAtts->calcMin) {zonalAtts->calcMin = RSGISPY_INT_EXTRACT(pCalcMin);}
-    if(zonalAtts->calcMax) {zonalAtts->calcMax = RSGISPY_INT_EXTRACT(pCalcMax);}
-    if(zonalAtts->calcMean) {zonalAtts->calcMean = RSGISPY_INT_EXTRACT(pCalcMean);}
-    if(zonalAtts->calcStdDev) {zonalAtts->calcStdDev = RSGISPY_INT_EXTRACT(pCalcStdDev);}
-    if(zonalAtts->calcMode) {zonalAtts->calcMode = RSGISPY_INT_EXTRACT(pCalcMode);}
-    if(zonalAtts->calcSum) {zonalAtts->calcSum = RSGISPY_INT_EXTRACT(pCalcSum);}
-    
-    // Check if thresholds have been set - use default values (+/- Inf) if not.
-    // Check for float or int (want float but don't complain if we get int.)
-    pMinThreshold = PyObject_GetAttrString(pBandAttZonalStatsCmds, "minThreshold");
-    extractedAttributes.push_back(pMinThreshold);
-    if( ( pMinThreshold == NULL ) || ( pMinThreshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(pMinThreshold) || RSGISPY_CHECK_INT(pMinThreshold))) 
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssf|i:extract_zone_img_values_to_hdf", kwlist, &pszInputImage, &pszInputMaskImage, &pszOutputFile, &maskValue, &nDataType))
     {
-        zonalAtts->minThreshold = -std::numeric_limits<double>::infinity();
+        return nullptr;
     }
-    else{zonalAtts->minThreshold = RSGISPY_FLOAT_EXTRACT(pMinThreshold);}
-    
-    pMaxThreshold = PyObject_GetAttrString(pBandAttZonalStatsCmds, "maxThreshold");
-    extractedAttributes.push_back(pMaxThreshold);
-    if( ( pMaxThreshold == NULL ) || ( pMaxThreshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(pMaxThreshold) || RSGISPY_CHECK_INT(pMaxThreshold)))
-    {
-        zonalAtts->maxThreshold = +std::numeric_limits<double>::infinity();
-    }
-    else{zonalAtts->maxThreshold = RSGISPY_FLOAT_EXTRACT(pMaxThreshold);}
-    
-    FreePythonObjects(extractedAttributes);
-  
+
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+
     try
     {
-        rsgis::cmds::executePixelStats(pszInputImage, pszInputVector, pszOutputVector, zonalAtts, 
-            "", false, force, useBandNames, noProjWarning, pixelInPolyMethod);
+        rsgis::cmds::executeImageRasterZone2HDF(std::string(pszInputImage), std::string(pszInputMaskImage),
+                                                std::string(pszOutputFile), maskValue, type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
 }
 
-static PyObject *ZonalStats_PolyPixelStatsVecLyr(PyObject *self, PyObject *args, PyObject *keywds)
+static PyObject *ZonalStats_ExtractZoneImageBandValues2HDF(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputimg", "vecfile", "veclyr", "bandatts", "pixpolymeth", "noprojwarn", NULL};
-    const char *pszInputImage, *pszVector, *pszVectorLyr;
-    int noProjWarning = 0;
-    int pixelInPolyMethod = 1;
-    PyObject *pBandAttZonalStatsObj;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOi|i:polyPixelStatsVecLyr", kwlist, &pszInputImage, &pszVector, &pszVectorLyr,
-                                     &pBandAttZonalStatsObj, &pixelInPolyMethod, &noProjWarning))
+    PyObject *inputImageFileInfoObj;
+    const char *pszInputMaskImage;
+    const char *pszOutputFile;
+    float maskValue = 0;
+    int nDataType = 9;
+
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_img_info"), RSGIS_PY_C_TEXT("in_msk_img"),
+                             RSGIS_PY_C_TEXT("out_h5_file"), RSGIS_PY_C_TEXT("mask_val"),
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Ossf|i:extract_zone_img_band_values_to_hdf", kwlist, &inputImageFileInfoObj, &pszInputMaskImage, &pszOutputFile, &maskValue, &nDataType))
     {
-        return NULL;
+        return nullptr;
     }
 
-    if( !PySequence_Check(pBandAttZonalStatsObj))
+    if( !PySequence_Check(inputImageFileInfoObj))
     {
-        PyErr_SetString(GETSTATE(self)->error, "bandatts argument must be a sequence");
-        return NULL;
+        PyErr_SetString(GETSTATE(self)->error, "First argument (imageFileInfo) must be a sequence");
+        return nullptr;
     }
 
-    Py_ssize_t nBandZonAtts = PySequence_Size(pBandAttZonalStatsObj);
-    std::vector<rsgis::cmds::RSGISZonalBandAttrsCmds> *bandZonalAttsVec = new std::vector<rsgis::cmds::RSGISZonalBandAttrsCmds>();
-    bandZonalAttsVec->reserve(nBandZonAtts);
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
 
-    for(int i = 0; i < nBandZonAtts; ++i)
+    Py_ssize_t nFileInfo = PySequence_Size(inputImageFileInfoObj);
+    std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFilesInfo;
+    imageFilesInfo.reserve(nFileInfo);
+    std::string tmpFileName = "";
+
+    for( Py_ssize_t n = 0; n < nFileInfo; n++ )
     {
-        PyObject *o = PySequence_GetItem(pBandAttZonalStatsObj, i);
+        PyObject *o = PySequence_GetItem(inputImageFileInfoObj, n);
 
-        PyObject *pBand = PyObject_GetAttrString(o, "band");
-        if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+        PyObject *pFileName = PyObject_GetAttrString(o, "file_name");
+        if( ( pFileName == nullptr ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find integer attribute \'band\'" );
-            Py_XDECREF(pBand);
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'file_name\'" );
+            Py_XDECREF(pFileName);
             Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
+            return nullptr;
         }
 
-        PyObject *pBaseName = PyObject_GetAttrString(o, "basename");
-        if( ( pBaseName == NULL ) || ( pBaseName == Py_None ) || !RSGISPY_CHECK_STRING(pBaseName) )
+        PyObject *pBands = PyObject_GetAttrString(o, "bands");
+        if( ( pBands == nullptr ) || ( pBands == Py_None ) || !PySequence_Check(pBands) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'bandName\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
+            PyErr_SetString(GETSTATE(self)->error, "Could not find sequence attribute \'bands\'" );
+            Py_DECREF(pFileName);
+            Py_XDECREF(pBands);
             Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
+            return nullptr;
         }
 
-        PyObject *pMinThres = PyObject_GetAttrString(o, "minThres");
-        if( ( pMinThres == NULL ) || ( pMinThres == Py_None ) || !RSGISPY_CHECK_FLOAT(pMinThres) )
+        Py_ssize_t nBands = PySequence_Size(pBands);
+        if(nBands == 0)
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'minThres\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
+            PyErr_SetString(GETSTATE(self)->error, "Sequence attribute \'bands\' is empty." );
+            Py_DECREF(pFileName);
+            Py_DECREF(pBands);
             Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
+            return nullptr;
+        }
+        std::vector<unsigned int> bandsVec = std::vector<unsigned int>();
+        bandsVec.reserve(nBands);
+        for( Py_ssize_t i = 0; i < nBands; i++ )
+        {
+            PyObject *bO = PySequence_GetItem(pBands, i);
+            if( ( bO == nullptr ) || ( bO == Py_None ) || !RSGISPY_CHECK_INT(bO) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Element of 'bands' list was not an integer." );
+                Py_XDECREF(bO);
+
+                Py_DECREF(pFileName);
+                Py_DECREF(pBands);
+                Py_DECREF(o);
+                return nullptr;
+            }
+            bandsVec.push_back(RSGISPY_INT_EXTRACT(bO));
         }
 
-        PyObject *pMaxThres = PyObject_GetAttrString(o, "maxThres");
-        if( ( pMaxThres == NULL ) || ( pMaxThres == Py_None ) || !RSGISPY_CHECK_FLOAT(pMaxThres) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'maxThres\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
-            Py_XDECREF(pMaxThres);
-            Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
-        }
-
-        PyObject *pCalcCount = PyObject_GetAttrString(o, "calcCount");
-        if( ( pCalcCount == NULL ) || ( pCalcCount == Py_None ) || !RSGISPY_CHECK_INT(pCalcCount) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcCount\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
-            Py_XDECREF(pMaxThres);
-            Py_XDECREF(pCalcCount);
-            Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
-        }
-
-        PyObject *pCalcMin = PyObject_GetAttrString(o, "calcMin");
-        if( ( pCalcMin == NULL ) || ( pCalcMin == Py_None ) || !RSGISPY_CHECK_INT(pCalcMin) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMin\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
-            Py_XDECREF(pMaxThres);
-            Py_XDECREF(pCalcCount);
-            Py_XDECREF(pCalcMin);
-            Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
-        }
-
-        PyObject *pCalcMax = PyObject_GetAttrString(o, "calcMax");
-        if( ( pCalcMax == NULL ) || ( pCalcMax == Py_None ) || !RSGISPY_CHECK_INT(pCalcMax) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMax\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
-            Py_XDECREF(pMaxThres);
-            Py_XDECREF(pCalcCount);
-            Py_XDECREF(pCalcMin);
-            Py_XDECREF(pCalcMax);
-            Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
-        }
-
-        PyObject *pCalcMean = PyObject_GetAttrString(o, "calcMean");
-        if( ( pCalcMean == NULL ) || ( pCalcMean == Py_None ) || !RSGISPY_CHECK_INT(pCalcMean) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMean\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
-            Py_XDECREF(pMaxThres);
-            Py_XDECREF(pCalcCount);
-            Py_XDECREF(pCalcMin);
-            Py_XDECREF(pCalcMax);
-            Py_XDECREF(pCalcMean);
-            Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
-        }
-
-        PyObject *pCalcStdDev = PyObject_GetAttrString(o, "calcStdDev");
-        if( ( pCalcStdDev == NULL ) || ( pCalcStdDev == Py_None ) || !RSGISPY_CHECK_INT(pCalcStdDev) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcStdDev\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
-            Py_XDECREF(pMaxThres);
-            Py_XDECREF(pCalcCount);
-            Py_XDECREF(pCalcMin);
-            Py_XDECREF(pCalcMax);
-            Py_XDECREF(pCalcMean);
-            Py_XDECREF(pCalcStdDev);
-            Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
-        }
-
-        PyObject *pCalcMode = PyObject_GetAttrString(o, "calcMode");
-        if( ( pCalcMode == NULL ) || ( pCalcMode == Py_None ) || !RSGISPY_CHECK_INT(pCalcMode) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMode\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
-            Py_XDECREF(pMaxThres);
-            Py_XDECREF(pCalcCount);
-            Py_XDECREF(pCalcMin);
-            Py_XDECREF(pCalcMax);
-            Py_XDECREF(pCalcMean);
-            Py_XDECREF(pCalcStdDev);
-            Py_XDECREF(pCalcMode);
-            Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
-        }
-
-        PyObject *pCalcMedian = PyObject_GetAttrString(o, "calcMedian");
-        if( ( pCalcMedian == NULL ) || ( pCalcMedian == Py_None ) || !RSGISPY_CHECK_INT(pCalcMedian) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMedian\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
-            Py_XDECREF(pMaxThres);
-            Py_XDECREF(pCalcCount);
-            Py_XDECREF(pCalcMin);
-            Py_XDECREF(pCalcMax);
-            Py_XDECREF(pCalcMean);
-            Py_XDECREF(pCalcStdDev);
-            Py_XDECREF(pCalcMode);
-            Py_XDECREF(pCalcMedian);
-            Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
-        }
-
-        PyObject *pCalcSum = PyObject_GetAttrString(o, "calcSum");
-        if( ( pCalcSum == NULL ) || ( pCalcSum == Py_None ) || !RSGISPY_CHECK_INT(pCalcSum) )
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcSum\'" );
-            Py_XDECREF(pBand);
-            Py_XDECREF(pBaseName);
-            Py_XDECREF(pMinThres);
-            Py_XDECREF(pMaxThres);
-            Py_XDECREF(pCalcCount);
-            Py_XDECREF(pCalcMin);
-            Py_XDECREF(pCalcMax);
-            Py_XDECREF(pCalcMean);
-            Py_XDECREF(pCalcStdDev);
-            Py_XDECREF(pCalcMode);
-            Py_XDECREF(pCalcMedian);
-            Py_XDECREF(pCalcSum);
-            Py_DECREF(o);
-            delete bandZonalAttsVec;
-            return NULL;
-        }
-
-        rsgis::cmds::RSGISZonalBandAttrsCmds zonalBandStatsObj = rsgis::cmds::RSGISZonalBandAttrsCmds();
-        zonalBandStatsObj.band = RSGISPY_INT_EXTRACT(pBand);
-        zonalBandStatsObj.baseName = RSGISPY_STRING_EXTRACT(pBaseName);
-        zonalBandStatsObj.minName = zonalBandStatsObj.baseName+"Min";
-        zonalBandStatsObj.maxName = zonalBandStatsObj.baseName+"Max";
-        zonalBandStatsObj.meanName = zonalBandStatsObj.baseName+"Mean";
-        zonalBandStatsObj.stdName = zonalBandStatsObj.baseName+"StdDev";
-        zonalBandStatsObj.countName = zonalBandStatsObj.baseName+"Count";
-        zonalBandStatsObj.modeName = zonalBandStatsObj.baseName+"Mode";
-        zonalBandStatsObj.medianName = zonalBandStatsObj.baseName+"Median";
-        zonalBandStatsObj.sumName = zonalBandStatsObj.baseName+"Sum";
-        zonalBandStatsObj.outMin = (bool)RSGISPY_INT_EXTRACT(pCalcMin);
-        zonalBandStatsObj.outMax = (bool)RSGISPY_INT_EXTRACT(pCalcMax);
-        zonalBandStatsObj.outMean = (bool)RSGISPY_INT_EXTRACT(pCalcMean);
-        zonalBandStatsObj.outStDev = (bool)RSGISPY_INT_EXTRACT(pCalcStdDev);
-        zonalBandStatsObj.outCount = (bool)RSGISPY_INT_EXTRACT(pCalcCount);
-        zonalBandStatsObj.outMode = (bool)RSGISPY_INT_EXTRACT(pCalcMode);
-        zonalBandStatsObj.outMedian = (bool)RSGISPY_INT_EXTRACT(pCalcMedian);
-        zonalBandStatsObj.outSum = (bool)RSGISPY_INT_EXTRACT(pCalcSum);
-        zonalBandStatsObj.minThres = RSGISPY_FLOAT_EXTRACT(pMinThres);
-        zonalBandStatsObj.maxThres = RSGISPY_FLOAT_EXTRACT(pMaxThres);
-        bandZonalAttsVec->push_back(zonalBandStatsObj);
-
-        Py_XDECREF(pBand);
-        Py_XDECREF(pBaseName);
-        Py_XDECREF(pMinThres);
-        Py_XDECREF(pMaxThres);
-        Py_XDECREF(pCalcCount);
-        Py_XDECREF(pCalcMin);
-        Py_XDECREF(pCalcMax);
-        Py_XDECREF(pCalcMean);
-        Py_XDECREF(pCalcStdDev);
-        Py_XDECREF(pCalcMode);
-        Py_XDECREF(pCalcMedian);
-        Py_XDECREF(pCalcSum);
-        Py_DECREF(o);
+        tmpFileName = std::string(RSGISPY_STRING_EXTRACT(pFileName));
+        imageFilesInfo.push_back(std::pair<std::string, std::vector<unsigned int> >(tmpFileName, bandsVec));
     }
 
     try
     {
-        bool noProjWarningBool = (bool)noProjWarning;
-        rsgis::cmds::executePixelBandStatsVecLyr(std::string(pszInputImage), std::string(pszVector), std::string(pszVectorLyr), bandZonalAttsVec, pixelInPolyMethod, noProjWarningBool);
+        rsgis::cmds::executeImageBandRasterZone2HDF(imageFilesInfo, std::string(pszInputMaskImage),
+                                                    std::string(pszOutputFile), maskValue, type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
 }
 
-static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
+
+static PyObject *ZonalStats_RandomSampleHDF5File(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputImage, *pszInputVector, *pszOutputTxt;
-    int useBandNames = true;
-    int noProjWarning = false;
-    int pixelInPolyMethod = 1;
-    int shortenBandNames = true;
-    PyObject *pBandAttZonalStatsCmds;
-    if( !PyArg_ParseTuple(args, "sssO|iiii:pixelStats2SHP", &pszInputImage, &pszInputVector, &pszOutputTxt, 
-                                &pBandAttZonalStatsCmds, &useBandNames, &noProjWarning, &pixelInPolyMethod,
-                                &shortenBandNames))
-        return NULL;
-    
-    rsgis::cmds::RSGISBandAttZonalStatsCmds *zonalAtts = new rsgis::cmds::RSGISBandAttZonalStatsCmds();   // the c++ struct
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_h5_file"), RSGIS_PY_C_TEXT("out_h5_file"),
+                             RSGIS_PY_C_TEXT("sample"), RSGIS_PY_C_TEXT("rnd_seed"), RSGIS_PY_C_TEXT("datatype"), nullptr};
+    const char *pInputH5 = "";
+    const char *pOutputH5 = "";
+    unsigned int sampleSize = 0;
+    int seed = 0;
+    int nDataType = 9;
 
-    // declare and initialise pointers for all the attributes of the struct
-    PyObject *pMinThreshold, *pMaxThreshold, *pCalcCount, *pCalcMin, *pCalcMax, *pCalcMean, *pCalcStdDev, *pCalcMode, *pCalcSum;
-    pMinThreshold = pMaxThreshold = pCalcCount = pCalcMin = pCalcMax = pCalcMean = pCalcStdDev = pCalcMode = pCalcSum = NULL;
-
-    std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
-    extractedAttributes.push_back(pBandAttZonalStatsCmds);
-
-    
-    /* Check if values have been set. 
-        If not set assume false.
-        If set, assume true for now - will check the value later
-    */
-    pCalcCount = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcCount");
-    extractedAttributes.push_back(pCalcCount);
-    zonalAtts->calcCount = !(pCalcCount == NULL || !RSGISPY_CHECK_INT(pCalcCount));
-    
-    pCalcMin = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMin");
-    extractedAttributes.push_back(pCalcMin);
-    zonalAtts->calcMin = !(pCalcMin == NULL || !RSGISPY_CHECK_INT(pCalcMin));
-
-    pCalcMax = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMax");
-    extractedAttributes.push_back(pCalcMax);
-    zonalAtts->calcMax = !(pCalcMax == NULL || !RSGISPY_CHECK_INT(pCalcMax));
-    
-    pCalcMean = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMean");
-    extractedAttributes.push_back(pCalcMean);
-    zonalAtts->calcMean = !(pCalcMean == NULL || !RSGISPY_CHECK_INT(pCalcMean));
-    
-    pCalcStdDev = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcStdDev");
-    extractedAttributes.push_back(pCalcStdDev);
-    zonalAtts->calcStdDev= !(pCalcStdDev == NULL || !RSGISPY_CHECK_INT(pCalcStdDev));
-    
-    pCalcMode = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcMode");
-    extractedAttributes.push_back(pCalcMode);
-    zonalAtts->calcMode = !(pCalcMode == NULL || !RSGISPY_CHECK_INT(pCalcMode));
-    
-    pCalcSum = PyObject_GetAttrString(pBandAttZonalStatsCmds, "calcSum");
-    extractedAttributes.push_back(pCalcSum);
-    zonalAtts->calcSum = !(pCalcSum == NULL || !RSGISPY_CHECK_INT(pCalcSum));
-
-    // check the calcValue and extract fields if required
-    if(zonalAtts->calcCount) {zonalAtts->calcCount = RSGISPY_INT_EXTRACT(pCalcCount);}
-    if(zonalAtts->calcMin) {zonalAtts->calcMin = RSGISPY_INT_EXTRACT(pCalcMin);}
-    if(zonalAtts->calcMax) {zonalAtts->calcMax = RSGISPY_INT_EXTRACT(pCalcMax);}
-    if(zonalAtts->calcMean) {zonalAtts->calcMean = RSGISPY_INT_EXTRACT(pCalcMean);}
-    if(zonalAtts->calcStdDev) {zonalAtts->calcStdDev = RSGISPY_INT_EXTRACT(pCalcStdDev);}
-    if(zonalAtts->calcMode) {zonalAtts->calcMode = RSGISPY_INT_EXTRACT(pCalcMode);}
-    if(zonalAtts->calcSum) {zonalAtts->calcSum = RSGISPY_INT_EXTRACT(pCalcSum);}
-   
-    // Check if thresholds have been set - use default values (+/- Inf) if not.
-    // Check for float or int (want float but don't complain if we get int.)
-    pMinThreshold = PyObject_GetAttrString(pBandAttZonalStatsCmds, "minThreshold");
-    extractedAttributes.push_back(pMinThreshold);
-    if( ( pMinThreshold == NULL ) || ( pMinThreshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(pMinThreshold) || RSGISPY_CHECK_INT(pMinThreshold))) 
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssIi|i:random_sample_hdf5_file", kwlist, &pInputH5, &pOutputH5, &sampleSize, &seed, &nDataType))
     {
-        zonalAtts->minThreshold = -std::numeric_limits<double>::infinity();
+        return nullptr;
     }
-    else{zonalAtts->minThreshold = RSGISPY_FLOAT_EXTRACT(pMinThreshold);}
-    
-    pMaxThreshold = PyObject_GetAttrString(pBandAttZonalStatsCmds, "maxThreshold");
-    extractedAttributes.push_back(pMaxThreshold);
-    if( ( pMaxThreshold == NULL ) || ( pMaxThreshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(pMaxThreshold) || RSGISPY_CHECK_INT(pMaxThreshold)))
-    {
-        zonalAtts->maxThreshold = +std::numeric_limits<double>::infinity();
-    }
-    else{zonalAtts->maxThreshold = RSGISPY_FLOAT_EXTRACT(pMaxThreshold);}
-    
-    FreePythonObjects(extractedAttributes);
-  
+
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+
     try
     {
-        rsgis::cmds::executePixelStats(pszInputImage, pszInputVector, pszOutputTxt, zonalAtts, 
-            "", true, false, useBandNames, noProjWarning, pixelInPolyMethod, shortenBandNames);
+        rsgis::cmds::executeRandomSampleH5File(std::string(pInputH5), std::string(pOutputH5), sampleSize, seed, type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
 }
 
-
-static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args)
+static PyObject *ZonalStats_SplitSampleHDF5File(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputImage, *pszInputVector, *pszOutputHDF;
-    int pixelInPolyMethod = 1;
-    int noProjWarning = false;
-    if( !PyArg_ParseTuple(args, "sss|ii:imageZoneToHDF", &pszInputImage, &pszInputVector, &pszOutputHDF, &noProjWarning, &pixelInPolyMethod))
-        return NULL;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_h5_file"), RSGIS_PY_C_TEXT("out_h5_p1_file"),
+                             RSGIS_PY_C_TEXT("out_h5_p2_file"), RSGIS_PY_C_TEXT("sample"),
+                             RSGIS_PY_C_TEXT("rnd_seed"), RSGIS_PY_C_TEXT("datatype"), nullptr};
+    const char *pInputH5 = "";
+    const char *pOutputP1H5 = "";
+    const char *pOutputP2H5 = "";
+    unsigned int sampleSize = 0;
+    int seed = 0;
+    int nDataType = 9;
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIi|i:split_sample_hdf5_file", kwlist, &pInputH5, &pOutputP1H5, &pOutputP2H5, &sampleSize, &seed, &nDataType))
+    {
+        return nullptr;
+    }
+
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+
     try
     {
-        rsgis::cmds::executeZonesImage2HDF5(pszInputImage, pszInputVector, pszOutputHDF, noProjWarning, pixelInPolyMethod);
+        rsgis::cmds::executeSplitSampleH5File(std::string(pInputH5), std::string(pOutputP1H5), std::string(pOutputP2H5), sampleSize, seed, type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
-    
+
     Py_RETURN_NONE;
 }
 
-
-static PyObject *ZonalStats_ExtractAvgEndMembers(PyObject *self, PyObject *args)
-{
-    const char *pszInputImage, *pszInputVector, *pszOutputMatrix;
-    int pixelInPolyMethod = 1;
-    if( !PyArg_ParseTuple(args, "sss|i:extractAvgEndMembers", &pszInputImage, &pszInputVector, &pszOutputMatrix, &pixelInPolyMethod))
-    {
-        return NULL;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeExtractAvgEndMembers(pszInputImage, pszInputVector, pszOutputMatrix, pixelInPolyMethod);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
 
 
 // Our list of functions in this module
 static PyMethodDef ZonalStatsMethods[] = {
-    {"pointValue2SHP", ZonalStats_PointValue2SHP, METH_VARARGS, 
-"zonalstats.pointValue2SHP(inputimage, inputvector, outputvector, force, useBandNames=True)\n"
-"Extract pixel value for each point in a shape file and output as a shapefile.\n\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string containing the name of the input image\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param outputvector: is a string containing the name of the output vector\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-":param useBandNames: is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.)\n"
-"\n"
-"Example::\n"
-"\n"
-"	from rsgislib import zonalstats\n"
-"	inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"	inputvector = './Vectors/injune_p142_stem_locations.shp'\n"
-"	outputvector = './TestOutputs/injune_p142_stem_locations_stats.shp'\n"
-"	removeExistingVector = True\n"
-"	useBandNames = True\n"
-"	zonalstats.pointValue2SHP(inputimage, inputvector, outputvector, removeExistingVector, useBandNames)\n"
-"\n"
-},
 
-    {"pointValue2TXT", ZonalStats_PointValue2TXT, METH_VARARGS, 
-"zonalstats.pointValue2TXT(inputimage, inputvector, outputtxt, useBandNames=True,shortenBandNames=True)\n"
-"Extract pixel value for each point in a shape file and output as a CSV.\n\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string containing the name of the input image\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param outputtxt: is a string containing the name of the output text file\n"
-":param useBandNames: is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.)\n"
-"\n"
-"Example::\n"
-"\n"
-"	from rsgislib import zonalstats\n"
-"	inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"	inputvector = './Vectors/injune_p142_stem_locations.shp'\n"
-"	outputtxt = './TestOutputs/injune_p142_stem_locations_stats.csv'\n"
-"	useBandNames = True\n"
-"	zonalstats.pointValue2TXT(inputimage, inputvector, outputtxt, useBandNames)\n"
-"\n"},
-
-
-    {"pixelVals2TXT", ZonalStats_PixelVals2TXT, METH_VARARGS, 
-"zonalstats.pixelVals2TXT(inputimage, inputvector, outputtxtBase, attribute, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
-"Extract pixel value for all pixels within a polygon and save a seperate CSV for each polygon in the shapefile.\n\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string containing the name of the input image.\n"
-":param inputvector: is a string containing the name of the input vector.\n"
-":param outputtxtBase: is a string containing the base name for output text files.\n"
-":param attribute: is a string specifying an identifier for each polygon to be used for the name of each output text file.\n"
-":param noProjWarning: is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
-":param pixelInPolyMethod: is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
-"\n"
-"Example::\n"
-"\n"
-"    from rsgislib import zonalstats\n"
-"    inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"    inputvector = './Vectors/injune_p142_crowns_utm.shp'\n"
-"    outputtxtbase = './TestOutputs/ZonalTXT/injune_p142_casi_sub_utm_txt'\n"
-"    zonalstats.pixelVals2TXT(inputimage, inputvector, outputtxtBase, 'FID', True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
-"\n"},
-
-    {"pixelStats2SHP", ZonalStats_PixelStats2SHP, METH_VARARGS, 
-"zonalstats.pixelStats2SHP(inputimage, inputvector, outputvector, zonalattributes, force, useBandNames, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
-"Calculate statistics for pixels falling within each polygon in a shapefile output as a shapefile.\n\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string containing the name of the input image\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param outputvector: is a string containing the name of the output vector\n"
-":param ZonalAttributes: is an rsgislib.zonalstats.zonalattributes object that has attributes in line with rsgis::cmds::RSGISBandAttZStatsCmds\n"
-"   * minThreshold, a float providing the minimum pixel value to include when calculating statistics.\n"
-"   * maxThreshold, a float providing the maximum pixel value to include when calculating statistics.\n"
-"   * calcCount, a bool specifying whether to report a count of pixels between thresholds.\n"
-"   * calcMin, a bool specifying whether to report the minimum of pixels between thresholds.\n"
-"   * calcMax, a bool specifying whether to report the maximum of pixels between thresholds.\n"
-"   * calcMean, a bool specifying whether to report the mean of pixels between thresholds.\n"
-"   * calcStdDev, a bool specifying whether to report the standard deviation of pixels between thresholds.\n"
-"   * calcMode, a bool specifying whether to report the mode of pixels between thresholds (for integer datasets only).\n"
-"   * calcSum, a bool specifying whether to report the sum of pixels between thresholds.\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-":param noProjWarning: is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
-":param useBandNames: is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.)\n"
-":param pixelInPolyMethod: is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
-"\n"
-"Example::\n"
-"\n"
-"    from rsgislib import zonalstats\n"
-"    inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"    inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"    inputVector = './Vectors/injune_p142_crowns_utm.shp'\n"
-"    outputVector = './TestOutputs/injune_p142_casi_sub_utm_stats.shp'\n"
-"    zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)\n"
-"    zonalstats.pixelStats2SHP(inputImage, inputVector, outputVector, zonalattributes, True, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
-"\n"
-},
-
-{"polyPixelStatsVecLyr", (PyCFunction)ZonalStats_PolyPixelStatsVecLyr, METH_VARARGS | METH_KEYWORDS,
-"zonalstats.polyPixelStatsVecLyr(inputimg=string, vecfile=string, veclyr=string, bandatts=list, pixpolymeth=rsgislib.zonalstats.METHOD_*, noprojwarn=boolean)\n"
-"Calculate statistics for pixels that intersect (defined using the specified method) with a feature in the vector layer.\n\n"
-"Where:\n"
-"\n"
-":param inputimg: is a string containing the name of the input image\n"
-":param vecfile: is a string containing the name of the input vector\n"
-":param veclyr: is a string containing the name of the input vector layer\n"
-":param bandatts: is a list of rsgislib.zonalstats.ZonalBandAttributes objects.\n"
-":param pixpolymeth: is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
-":param noprojwarn: is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
-"\n"
-},
-
-{"pixelStats2TXT", ZonalStats_PixelStats2TXT, METH_VARARGS,
-"zonalstats.pixelStats2TXT(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER, shortenBandNames=True)\n"
-"Calculate statistics for pixels falling within each polygon in a shapefile output as a CSV.\n\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string containing the name of the input image\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param outputtxt: is a string containing the name of the output text file\n"
-":param ZonalAttributes: is an rsgislib.rastergis.zonalattributes object that has attributes in line with rsgis::cmds::RSGISBandAttZStatsCmds\n"
-"   * minThreshold, a float providing the minimum pixel value to include when calculating statistics.\n"
-"   * maxThreshold, a float providing the maximum pixel value to include when calculating statistics.\n"
-"   * calcCount, a bool specifying whether to report a count of pixels between thresholds.\n"
-"   * calcMin, a bool specifying whether to report the minimum of pixels between thresholds.\n"
-"   * calcMax, a bool specifying whether to report the maximum of pixels between thresholds.\n"
-"   * calcMean, a bool specifying whether to report the mean of pixels between thresholds.\n"
-"   * calcStdDev, a bool specifying whether to report the standard deviation of pixels between thresholds.\n"
-"   * calcMode, a bool specifying whether to report the mode of pixels between thresholds (for integer datasets only).\n"
-"   * calcSum, a bool specifying whether to report the sum of pixels between thresholds.\n"
-":param useBandNames: is a bool, specifying whether to use the band names of the input dataset in the output file (if not uses b1, b2, etc.)\n"
-":param noProjWarning: is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
-":param pixelInPolyMethod: is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
-":param shortenBandNames: is a bool to specify whether the band names should be shorted (as with a shapefile) in creating the column name.\n"
-"\n"
-"Example::\n"
-"\n"
-"    from rsgislib import zonalstats\n"
-"    inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"    inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"    inputVector = './Vectors/injune_p142_crowns_utm.shp'\n"
-"    outputtxt = './TestOutputs/injune_p142_casi_sub_utm_stats.txt'\n"
-"    zonalattributes = zonalstats.ZonalAttributes(minThreshold=0, maxThreshold=10000, calcCount=True, calcMin=True, calcMax=True, calcMean=True, calcStdDev=True, calcMode=False, calcSum=True)\n"
-"    zonalstats.pixelStats2SHP(inputImage, inputVector, outputtxt, zonalattributes, True, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER, False)\n"
-"\n"},
-{"imageZoneToHDF", ZonalStats_ImageZoneToHDF, METH_VARARGS,
-"rsgislib.zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
+{"image_zone_to_hdf", (PyCFunction)ZonalStats_ImageZoneToHDF, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.zonalstats.image_zone_to_hdf(input_img, vec_file, vec_lyr, out_h5_file, no_prj_warn=False, pxl_in_poly_method=METHOD_POLYCONTAINSPIXELCENTER)\n"
 "Extract the all the pixel values for regions to a HDF5 file (1 column for each image band).\n\n"
-"Where:\n"
 "\n"
-":param inputimage: is a string containing the name of the input image.\n"
-":param inputvector: is a string containing the name of the input vector.\n"
-":param outputHDF: is a string containing name of the output HDF file.\n"
-":param noProjWarning: is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
-":param pixelInPolyMethod: is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
-"\n"
-"Example::\n"
-"\n"
-"    from rsgislib import zonalstats\n"
-"    inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"    inputvector = './Vectors/injune_p142_crowns_utm.shp'\n"
-"    outputHDF = './TestOutputs/InjuneP142.hdf'\n"
-"    zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
-"\n"},
-
-{"extractAvgEndMembers", ZonalStats_ExtractAvgEndMembers, METH_VARARGS,
-"rsgislib.zonalstats.extractAvgEndMembers(inputimage, inputvector, outputMatrixFile, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
-"Extract the average endmembers per class which are saved as an appropriate \n"
-"matrix file to be used within the linear spectral unmixing commands. \n"
-"Each polygon defined is another endmember in the outputted matric file.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string containing the name of the input image.\n"
-":param inputvector: is a string containing the name of the input vector.\n"
-":param outputMatrixFile: is a string containing name of the output matrix file.\n"
-":param pixelInPolyMethod: is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
+":param input_img: is a string containing the name of the input image.\n"
+":param vec_file: is a string containing the input vector file path.\n"
+":param vec_lyr: is a string containing the name of the input vector layer.\n"
+":param out_h5_file: is a string containing name of the output HDF file.\n"
+":param no_prj_warn: is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
+":param pxl_in_poly_method: is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
 "\n"
 "Example::\n"
 "\n"
 "    from rsgislib import zonalstats\n"
-"    inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"    inputvector = './Vectors/injune_p142_crowns_utm.shp'\n"
-"    outputHDF = './TestOutputs/InjuneP142.hdf'\n"
-"    zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
-"\n"},
+"    input_img = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+"    vec_file = './Vectors/injune_p142_crowns_utm.shp'\n"
+"    vec_lyr = 'injune_p142_crowns_utm'\n"
+"    out_h5_file = './TestOutputs/InjuneP142.hdf'\n"
+"    zonalstats.image_zone_to_hdf(input_img, vec_file, vec_lyr, out_h5_file, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
+"\n\n"},
 
-    {NULL}        /* Sentinel */
+{"extract_zone_img_values_to_hdf", (PyCFunction)ZonalStats_ExtractZoneImageValues2HDF, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.zonalstats.extract_zone_img_values_to_hdf(input_img, in_msk_img, out_h5_file, mask_val, datatype)\n"
+"Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
+"\n"
+":param input_img: is a string containing the name and path of the input file\n"
+":param in_msk_img: is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
+":param out_h5_file: is a string containing the name and path of the output HDF5 file\n"
+":param mask_val: is a float containing the value of the pixel within the mask for which values are to be extracted\n"
+":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+"\n\n"},
+
+{"extract_zone_img_band_values_to_hdf", (PyCFunction)ZonalStats_ExtractZoneImageBandValues2HDF, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.zonalstats.extract_zone_img_band_values_to_hdf(in_img_info, in_msk_img, out_h5_file, mask_val, datatype)\n"
+"Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
+"Multiple input rasters can be provided and the bands extracted selected.\n"
+"\n"
+":param in_img_info: is a list of rsgislib::imageutils::ImageBandInfo objects with the file names and list of image bands within that file to be extracted.\n"
+":param in_msk_img: is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
+":param out_h5_file: is a string containing the name and path of the output HDF5 file\n"
+":param mask_val: is a float containing the value of the pixel within the mask for which values are to be extracted\n"
+":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib.zonalstats\n"
+"   import rsgislib.imageutils\n"
+"   fileInfo = []\n"
+"   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg1.kea', 'Image1', [1,3,4]))\n"
+"   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg2.kea', 'Image2', [2]))\n"
+"   rsgislib.zonalstats.extract_zone_img_band_values_to_hdf(fileInfo, 'ClassMask.kea', 'ForestRefl.h5', 1.0)\n"
+"\n\n"},
+
+{"random_sample_hdf5_file", (PyCFunction)ZonalStats_RandomSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.zonalstats.random_sample_hdf5_file(in_h5_file, out_h5_file, sample, rnd_seed, datatype)\n"
+"A function which randomly samples a HDF5 of extracted values.\n"
+"\n"
+":param in_h5_file: is a string with the path to the input file.\n"
+":param out_h5_file: is a string with the path to the output file.\n"
+":param sample: is an integer with the number values to be sampled from the input file.\n"
+":param rnd_seed: is an integer which seeds the random number generator.\n"
+":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+"\n\n"
+},
+
+{"split_sample_hdf5_file", (PyCFunction)ZonalStats_SplitSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.zonalstats.split_sample_hdf5_file(in_h5_file, out_h5_p1_file, out_h5_p2_file, sample, rnd_seed, datatype)\n"
+"A function which splits samples a HDF5 of extracted values.\n"
+"\n"
+":param in_h5_file: is a string with the path to the input file.\n"
+":param out_h5_p1_file: is a string with the path to the output file.\n"
+":param out_h5_p2_file: is a string with the path to the output file.\n"
+":param sample: is an integer with the number values to be sampled from the input file.\n"
+":param rnd_seed: is an integer which seeds the random number generator.\n"
+":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+"\n\n"
+},
+
+    {nullptr}        /* Sentinel */
 };
 
 
@@ -825,16 +369,16 @@ static int ZonalStats_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_zonalstats",
-        NULL,
+        nullptr,
         sizeof(struct ZonalStatsState),
         ZonalStatsMethods,
-        NULL,
+        nullptr,
         ZonalStats_traverse,
         ZonalStats_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__zonalstats(void)
@@ -851,14 +395,14 @@ init_zonalstats(void)
 #else
     PyObject *pModule = Py_InitModule("_zonalstats", ZonalStatsMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct ZonalStatsState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_zonalstats.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_zonalstats.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;
