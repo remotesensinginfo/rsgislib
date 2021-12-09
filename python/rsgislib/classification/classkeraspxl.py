@@ -71,7 +71,7 @@ def train_keras_pixel_classifer(
     n_classes = len(cls_info_dict)
     for clsname in cls_info_dict:
         if cls_info_dict[clsname].id >= n_classes:
-            raise (
+            raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
                     clsname, cls_info_dict[clsname].id
                 )
@@ -247,7 +247,7 @@ def apply_keras_pixel_classifier(
     cls_id_lut = numpy.zeros(n_classes)
     for clsname in class_train_info:
         if class_train_info[clsname].id >= n_classes:
-            raise (
+            raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
                     clsname, class_train_info[clsname].id
                 )
