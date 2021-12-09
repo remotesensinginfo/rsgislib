@@ -57,7 +57,7 @@ jobs:
           aws-region: AWS_REGION_RSGISLIB_WEB
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY_RSGISLIB_WEB
           from: doc/python/html
-          to: 's3://rsgislib-website/dev'
+          to: 's3://rsgislib.org/dev'
       
 
 # Orchestrate our job run sequence
