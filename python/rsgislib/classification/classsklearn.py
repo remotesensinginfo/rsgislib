@@ -84,8 +84,9 @@ def train_sklearn_classifer_gridsearch(
 
     """
     if len(cls_train_info) < 2:
-        rsgislib.RSGISPyException(
-            "Need at least 2 classes to be worth running findClassifierParametersAndTrain function."
+        raise rsgislib.RSGISPyException(
+            "Need at least 2 classes to be worth running "
+            "findClassifierParametersAndTrain function."
         )
 
     first = True
@@ -177,7 +178,7 @@ def train_sklearn_classifier(cls_train_info, sk_classifier):
 
     """
     if len(cls_train_info) < 2:
-        rsgislib.RSGISPyException(
+        raise rsgislib.RSGISPyException(
             "Need at least 2 classes to be worth running trainClassifier function."
         )
 
