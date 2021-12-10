@@ -412,7 +412,7 @@ def define_grid(
     in_epsg_code,
     out_vec,
     out_vec_lyr,
-    vec_drv="GPKG",
+    out_format="GPKG",
     out_epsg_code=None,
     utm_grid=False,
     utm_hemi=False,
@@ -432,7 +432,7 @@ def define_grid(
     :param in_epsg_code: EPSG code for the projection of the bbox
     :param out_vec: output vector file.
     :param out_vec_lyr: output vector layer name.
-    :param vec_drv: output vector file format (see OGR codes). Default is GPKG.
+    :param out_format: output vector file format (see OGR codes). Default is GPKG.
     :param out_epsg_code: if provided the output grid is reprojected to the projection
                           defined by this EPSG code. (note. the grid size needs to
                           the in the unit of this projection). Default is None.
@@ -500,7 +500,7 @@ def define_grid(
                 in_epsg_code,
                 out_vec,
                 out_vec_lyr,
-                vec_drv=vec_drv,
+                out_format=out_format,
                 out_epsg_code=utm_proj_epsg,
                 utm_grid=False,
                 utm_hemi=False,
@@ -570,7 +570,7 @@ def define_grid(
                 create_poly_vec_bboxs(
                     out_vec,
                     utm_out_vec_lyr,
-                    vec_drv,
+                    out_format,
                     utm_proj_epsg,
                     bboxs,
                     overwrite=first,
@@ -591,9 +591,9 @@ def define_grid(
         bboxs = rsgislib.tools.geometrytools.get_bbox_grid(proj_bbox, x_size, y_size)
 
         if out_epsg_code is None:
-            create_poly_vec_bboxs(out_vec, out_vec_lyr, vec_drv, in_epsg_code, bboxs)
+            create_poly_vec_bboxs(out_vec, out_vec_lyr, out_format, in_epsg_code, bboxs)
         else:
-            create_poly_vec_bboxs(out_vec, out_vec_lyr, vec_drv, out_epsg_code, bboxs)
+            create_poly_vec_bboxs(out_vec, out_vec_lyr, out_format, out_epsg_code, bboxs)
 
 
 def create_poly_vec_bboxs(
