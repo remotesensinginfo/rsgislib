@@ -163,13 +163,13 @@ namespace rsgis{namespace vec{
 				i++;
                 if(((i % 20000) == 0) & inTransaction)
                 {
-                    inputLayer->CommitTransaction();
+                    outputVecLayer->CommitTransaction();
                     inTransaction = false;
                 }
             }
             if(inTransaction)
             {
-                inputLayer->CommitTransaction();
+                outputVecLayer->CommitTransaction();
                 inTransaction = false;
             }
 			std::cout << " Complete.\n";

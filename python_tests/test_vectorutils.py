@@ -680,11 +680,13 @@ def test_vector_maths(tmp_path):
     )
 
     # Check values are correct.
-    in_vals = rsgislib.vectorattrs.get_vec_cols_as_array(vec_file, vec_lyr, ["val"])
+    in_vals_lst = rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, "val")
+    in_vals = numpy.array(in_vals_lst)
     calcd_out_vals = in_vals * in_vals
-    out_vals = rsgislib.vectorattrs.get_vec_cols_as_array(
-        out_vec_file, out_vec_lyr, ["out_vals"]
+    out_vals_lst = rsgislib.vectorattrs.read_vec_column(
+        out_vec_file, out_vec_lyr, "out_vals"
     )
+    out_vals = numpy.array(out_vals_lst)
     diff = numpy.abs(calcd_out_vals - out_vals)
     total = numpy.sum(diff)
     assert os.path.exists(out_vec_file) and (total < 0.01)
