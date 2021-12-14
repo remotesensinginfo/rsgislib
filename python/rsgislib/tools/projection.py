@@ -21,6 +21,7 @@ def get_epsg_code_from_wkt(wkt_str):
         spatRef.ImportFromWkt(wkt_str)
         spatRef.AutoIdentifyEPSG()
         epsg_code = spatRef.GetAuthorityCode(None)
+        epsg_code = int(epsg_code)
     except Exception:
         epsg_code = None
     return epsg_code
