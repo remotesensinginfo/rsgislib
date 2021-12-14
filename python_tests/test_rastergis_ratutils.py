@@ -43,5 +43,3 @@ def test_get_column_data():
 # TODO rsgislib.rastergis.ratutils.find_clumps_within_existing_thresholds
 # TODO rsgislib.rastergis.ratutils.calc_plot_gaussian_histo_model
 # TODO rsgislib.rastergis.ratutils.set_class_names_colours
-
-

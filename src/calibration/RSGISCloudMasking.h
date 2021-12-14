@@ -30,8 +30,6 @@
 
 #include "gdal_priv.h"
 
-#include "geos/geom/Envelope.h"
-
 #include "common/rsgis-tqdm.h"
 #include "common/RSGISException.h"
 

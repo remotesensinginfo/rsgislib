@@ -29,8 +29,6 @@
 
 #include "gdal_priv.h"
 
-#include "geos/geom/Envelope.h"
-
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageUtils.h"

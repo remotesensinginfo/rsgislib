@@ -35,8 +35,6 @@
 #include "math/RSGISMatrices.h"
 #include "math/RSGISnnls.h"
 
-#include <geos/geom/Envelope.h>
-
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_blas.h>

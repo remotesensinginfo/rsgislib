@@ -168,14 +168,19 @@ def test_populate_rat_with_stats(tmp_path):
 def test_pop_rat_img_stats(tmp_path):
     import rsgislib.rastergis
 
-    input_ref_img = os.path.join(RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_nostats.kea")
+    input_ref_img = os.path.join(
+        RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_nostats.kea"
+    )
     clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps_nostats.kea")
     copy2(input_ref_img, clumps_img)
 
-    rsgislib.rastergis.pop_rat_img_stats(clumps_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    rsgislib.rastergis.pop_rat_img_stats(
+        clumps_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+    )
 
 
 # TODO rsgislib.rastergis.collapse_rat
+
 
 def test_calc_border_length(tmp_path):
     import rsgislib.rastergis
@@ -185,6 +190,7 @@ def test_calc_border_length(tmp_path):
     copy2(input_ref_img, clumps_img)
 
     rsgislib.rastergis.calc_border_length(clumps_img, "out_col", True)
+
 
 # TODO rsgislib.rastergis.calc_rel_border
 # TODO rsgislib.rastergis.calc_rel_diff_neigh_stats
@@ -199,7 +205,9 @@ def test_define_border_clumps(tmp_path):
 
     rsgislib.rastergis.define_border_clumps(clumps_img, "out_col")
 
+
 # TODO rsgislib.rastergis.define_clump_tile_positions
+
 
 def test_find_boundary_pixels(tmp_path):
     import rsgislib.rastergis
@@ -213,7 +221,6 @@ def test_find_boundary_pixels(tmp_path):
     rsgislib.rastergis.find_boundary_pixels(clumps_img, output_img, "KEA", 1)
 
     assert os.path.exists(output_img)
-
 
 
 def test_find_neighbours(tmp_path):
@@ -231,6 +238,7 @@ def test_find_neighbours(tmp_path):
 # TODO rsgislib.rastergis.populate_rat_with_meanlit_stats
 # TODO rsgislib.rastergis.select_clumps_on_grid
 
+
 def test_clumps_spatial_location(tmp_path):
     import rsgislib.rastergis
 
@@ -238,7 +246,10 @@ def test_clumps_spatial_location(tmp_path):
     clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     copy2(input_ref_img, clumps_img)
 
-    rsgislib.rastergis.clumps_spatial_location(clumps_img, eastings="eastings", northings="northings")
+    rsgislib.rastergis.clumps_spatial_location(
+        clumps_img, eastings="eastings", northings="northings"
+    )
+
 
 def test_clumps_spatial_extent(tmp_path):
     import rsgislib.rastergis
@@ -247,7 +258,19 @@ def test_clumps_spatial_extent(tmp_path):
     clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     copy2(input_ref_img, clumps_img)
 
-    rsgislib.rastergis.clumps_spatial_extent(clumps_img, min_xx="min_xx", min_xy="min_xy", max_xx="max_xx", max_xy="max_xy", min_yx="min_yx", min_yy="min_yy", max_yx="max_yx", max_yy="max_yy", rat_band=1)
+    rsgislib.rastergis.clumps_spatial_extent(
+        clumps_img,
+        min_xx="min_xx",
+        min_xy="min_xy",
+        max_xx="max_xx",
+        max_xy="max_xy",
+        min_yx="min_yx",
+        min_yy="min_yy",
+        max_yx="max_yx",
+        max_yy="max_yy",
+        rat_band=1,
+    )
+
 
 # TODO rsgislib.rastergis.str_class_majority
 # TODO rsgislib.rastergis.populate_rat_with_mode

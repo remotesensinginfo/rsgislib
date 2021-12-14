@@ -30,7 +30,7 @@ namespace rsgis{namespace vec{
 		this->processFeatures = processFeatures;
 	}
 	
-	void RSGISProcessVector::processVectors(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical, bool newFirst)
+	void RSGISProcessVector::processVectors(OGRLayer *inputLayer, OGRLayer *outputVecLayer, bool copyData, bool outVertical, bool newFirst)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -51,11 +51,11 @@ namespace rsgis{namespace vec{
 			
 			if(copyData)
 			{
-				this->copyFeatureDefn(outputLayer, inFeatureDefn);
+				this->copyFeatureDefn(outputVecLayer, inFeatureDefn);
 			}
-			this->processFeatures->createOutputLayerDefinition(outputLayer, inFeatureDefn);
+			this->processFeatures->createOutputLayerDefinition(outputVecLayer, inFeatureDefn);
 			
-			outFeatureDefn = outputLayer->GetLayerDefn();
+			outFeatureDefn = outputVecLayer->GetLayerDefn();
 			
 			int numFeatures = inputLayer->GetFeatureCount(TRUE);
 			
@@ -93,7 +93,7 @@ namespace rsgis{namespace vec{
 				}
                 if(!inTransaction)
                 {
-                    outputLayer->StartTransaction();
+                    outputVecLayer->StartTransaction();
                     inTransaction = true;
                 }
 				
@@ -152,7 +152,7 @@ namespace rsgis{namespace vec{
 						this->copyFeatureData(inFeature, outFeature, inFeatureDefn, outFeatureDefn);
 					}
 					
-					if( outputLayer->CreateFeature(outFeature) != OGRERR_NONE )
+					if( outputVecLayer->CreateFeature(outFeature) != OGRERR_NONE )
 					{
 						throw RSGISVectorOutputException("Failed to write feature to the output shapefile.");
 					}

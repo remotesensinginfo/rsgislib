@@ -654,10 +654,10 @@ def test_copy_rat_cols_to_vector_lyr(tmp_path):
     )
 
 
-# TODO rsgislib.vectorutils.vector_maths
-"""
 def test_vector_maths(tmp_path):
     import rsgislib.vectorutils
+    import rsgislib.vectorattrs
+    import numpy
 
     vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     vec_lyr = "aber_osgb_multi_polys"
@@ -667,13 +667,69 @@ def test_vector_maths(tmp_path):
 
     vars = list()
     vars.append(rsgislib.vectorutils.VecColVar(name="val", field_name="val"))
+    rsgislib.vectorutils.vector_maths(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        "out_vals",
+        "val * val",
+        vars,
+        True,
+    )
 
-    rsgislib.vectorutils.vector_maths(vec_file, vec_lyr, out_vec_file, out_vec_lyr, "GPKG", "out_vals", "val * val", vars, True)
+    # Check values are correct.
+    in_vals = rsgislib.vectorattrs.get_vec_cols_as_array(vec_file, vec_lyr, ["val"])
+    calcd_out_vals = in_vals * in_vals
+    out_vals = rsgislib.vectorattrs.get_vec_cols_as_array(
+        out_vec_file, out_vec_lyr, ["out_vals"]
+    )
+    diff = numpy.abs(calcd_out_vals - out_vals)
+    total = numpy.sum(diff)
+    assert os.path.exists(out_vec_file) and (total < 0.01)
 
+
+def test_create_lines_of_points(tmp_path):
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "vec_lines_lyr.geojson")
+    vec_lyr = "vec_lines_lyr"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorutils.create_lines_of_points(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+        step=100,
+        del_exist_vec=True,
+    )
     assert os.path.exists(out_vec_file)
-"""
-# TODO rsgislib.vectorutils.create_lines_of_points
-# TODO rsgislib.vectorutils.check_validate_geometries
+
+
+def test_check_validate_geometries(tmp_path):
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_lyr = "aber_osgb_multi_polys"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorutils.check_validate_geometries(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        print_err_geoms=True,
+        del_exist_vec=True,
+    )
+    assert os.path.exists(out_vec_file)
 
 
 @pytest.mark.skipif(

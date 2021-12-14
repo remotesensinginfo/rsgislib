@@ -84,7 +84,7 @@ namespace rsgis{namespace vec{
 				polyOK = false;
 				nullGeometry = false;
 				geometry = inFeature->GetGeometryRef();
-				if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
+				if((geometry != nullptr) && (wkbFlatten(geometry->getGeometryType()) == wkbPolygon))
 				{
 					polygon = (OGRPolygon *) geometry;
 					

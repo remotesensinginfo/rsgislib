@@ -57,7 +57,7 @@ namespace rsgis{namespace vec{
 			RSGISVectorIO();
 			void exportLinesAsShp(std::string outputFile, std::list<double> *x1, std::list<double> *y1, std::list<double> *x2, std::list<double> *y2, bool force);
 			void exportPolygons2Layer(OGRLayer *outLayer, std::list<OGRPolygon*> *polys);
-            void exportOGRPoints2SHP(std::string outputFile, bool deleteIfPresent, std::vector<OGRPoint*> *pts, OGRSpatialReference* spatialRef);
+            void exportOGRPoints2Layer(OGRLayer *outLayer, std::vector<OGRPoint*> *pts);
             ~RSGISVectorIO();
 		};
 }}

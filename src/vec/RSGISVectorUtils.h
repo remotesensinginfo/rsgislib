@@ -49,15 +49,6 @@
 #endif
 
 namespace rsgis{namespace vec{
-
-    /*
-    struct RSGISGEOSGeomFID
-    {
-        OGRGeometry *geom;
-        geos::geom::Envelope *env;
-        unsigned long fid;
-    };
-    */
     
 	class DllExport RSGISVectorUtils
 		{
@@ -76,28 +67,6 @@ namespace rsgis{namespace vec{
             std::vector<OGRPoint*>* getRegularStepPoints(std::vector<OGRLineString*> *lines, double step);
             OGREnvelope* getEnvelope(OGRGeometry *geom);
             OGREnvelope* getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes);
-			/*
-			OGRPolygon* createOGRPolygon(geos::geom::Envelope *env);
-            geos::geom::LineString* convertOGRLineString2GEOSLineString(OGRLineString *line);
-			OGRLineString* convertGEOSLineString2OGRLineString(geos::geom::LineString *line);
-			geos::geom::LinearRing* convertOGRLinearRing2GEOSLinearRing(OGRLinearRing *ring);
-			OGRLinearRing* convertGEOSLineString2OGRLinearRing(geos::geom::LineString *line);
-			geos::geom::Polygon* convertOGRPolygon2GEOSPolygon(OGRPolygon *poly);
-			geos::geom::MultiPolygon* convertOGRMultiPolygonGEOSMultiPolygon(OGRMultiPolygon *mPoly);
-			geos::geom::Point* convertOGRPoint2GEOSPoint(OGRPoint *point);
-			OGRPolygon* convertGEOSPolygon2OGRPolygon(geos::geom::Polygon *poly);
-			OGRMultiPolygon* convertGEOSMultiPolygon2OGRMultiPolygon(geos::geom::MultiPolygon *mPoly);
-			OGRMultiPolygon* convertGEOSPolygons2OGRMultiPolygon(std::list<geos::geom::Polygon*> *polys);
-			geos::geom::MultiPolygon* convertGEOSPolygons2GEOSMultiPolygon(std::vector<geos::geom::Polygon*> *polys);
-			OGRPoint* convertGEOSPoint2OGRPoint(geos::geom::Point *point);
-			OGRPoint* convertGEOSCoordinate2OGRPoint(geos::geom::Coordinate *coord);
-			geos::geom::Envelope* getEnvelope(geos::geom::Geometry *geom);
-			geos::geom::Envelope* getEnvelope(OGRGeometry *geom);
-			geos::geom::Envelope* getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes);
-			geos::geom::Point* createPoint(geos::geom::Coordinate *coord);
-			geos::geom::GeometryCollection* createGeomCollection(std::vector<geos::geom::Polygon*> *polys);
-			geos::geom::Polygon* createPolygon(double tlX, double tlY, double brX, double brY);
-			*/
 		};
 
     

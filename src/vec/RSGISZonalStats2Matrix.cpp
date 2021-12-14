@@ -497,7 +497,7 @@ namespace rsgis{namespace vec{
 		
     }
 	
-	void RSGISPixelVals22Txt::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
+	void RSGISPixelVals22Txt::processFeature(OGRFeature *feature, OGREnvelope *env, long fid)
 	{
 		// Zonal stats - output to text file.
 		try
@@ -508,7 +508,7 @@ namespace rsgis{namespace vec{
             this->nFeatures++;
             
             OGRPolygon *inOGRPoly;
-			geos::geom::Polygon *poly;
+			OGRPolygon *poly;
 			inOGRPoly = (OGRPolygon *) feature->GetGeometryRef();
 			poly = vecUtils.convertOGRPolygon2GEOSPolygon(inOGRPoly);
             
@@ -622,7 +622,7 @@ namespace rsgis{namespace vec{
         this->numInBands = numInBands;
 	}
 	
-	void RSGISCalcPixelValsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
+	void RSGISCalcPixelValsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, OGRPolygon *poly, OGRPoint *pt)
 	{
 		for(int i = 0; i < this->numInBands; i++)
 		{

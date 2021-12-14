@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "vec_lines_lyr",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::27700" } },
+"features": [
+{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 257817.81619144405704, 280559.068034337135032 ], [ 259453.319979989551939, 279933.134485634567682 ], [ 260644.612863004178507, 281144.618773446010891 ], [ 262885.858795455424115, 280054.282914415700361 ] ] } },
+{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 258140.878668193792691, 283062.802229147520848 ], [ 262825.284581064828672, 283143.567848334962036 ] ] } },
+{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 257413.988095506909303, 278903.372840994794387 ], [ 260967.675339753914159, 277025.572194886975922 ] ] } }
+]
+}

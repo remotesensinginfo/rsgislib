@@ -26,7 +26,6 @@
 #include <iostream>
 #include <string>
 #include "img/RSGISImageCalcException.h"
-#include <geos/geom/Envelope.h>
 #include "math/RSGISMatrices.h"
 #include "img/RSGISCalcImageValue.h"
 

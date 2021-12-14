@@ -784,6 +784,8 @@ set(LIB_VEC_ZONALSTATS_CPP
 set(LIB_VEC_UTILS_CPP
 		${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.cpp
 		${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.h
+		${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.cpp
+		${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.h
 		${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h
 		${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.cpp
 		${RSGIS_SRC_VEC_DIR}/RSGISVectorOutputException.cpp
@@ -797,6 +799,7 @@ set(LIB_VEC_H
 		${RSGIS_SRC_VEC_DIR}/RSGISVectorOutputException.h
 		${RSGIS_SRC_VEC_DIR}/RSGISProcessOGRFeature.h
 		${RSGIS_SRC_VEC_DIR}/RSGISProcessVector.h
+		${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.h
 		${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h
 		${RSGIS_SRC_VEC_DIR}/RSGISVectorIO.h
 		${RSGIS_SRC_VEC_DIR}/RSGISZonalStats2Matrix.h

@@ -58,12 +58,12 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISProcessVector(RSGISProcessOGRFeature *processFeatures);
-			void processVectors(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical, bool newFirst);
+			void processVectors(OGRLayer *inputLayer, OGRLayer *outputVecLayer, bool copyData, bool outVertical, bool newFirst);
 			void processVectors(OGRLayer *inputLayer, bool outVertical, bool morefeedback=false);
 			void processVectorsNoOutput(OGRLayer *inputLayer, bool outVertical);
 			~RSGISProcessVector();
 		protected:
-			void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn);
+			void copyFeatureDefn(OGRLayer *outputVecLayer, OGRFeatureDefn *inFeatureDefn);
 			void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
             void printGeometry(OGRGeometry *geometry);
             void printRing(OGRLinearRing *inGeomRing);
