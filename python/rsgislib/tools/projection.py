@@ -4,11 +4,10 @@ The tools.projection module contains some useful tools for working with projecti
 """
 
 import numpy
-import osgeo.gdal as gdal
 import osgeo.osr as osr
 
 
-def get_epsg_code_from_wkt(wkt_str):
+def get_epsg_code_from_wkt(wkt_str: str) -> int:
     """
     Using GDAL to return the EPSG code for inputted WKT string.
 
@@ -27,7 +26,7 @@ def get_epsg_code_from_wkt(wkt_str):
     return epsg_code
 
 
-def get_wkt_from_epsg_code(epsg_code):
+def get_wkt_from_epsg_code(epsg_code: int) -> str:
     """
     Using GDAL to return the WKT string for inputted EPSG Code.
 
@@ -46,7 +45,7 @@ def get_wkt_from_epsg_code(epsg_code):
     return wkt_str
 
 
-def get_osr_prj_obj(epsg_code):
+def get_osr_prj_obj(epsg_code: int) -> osr.SpatialReference():
     """
     A function which returns an OSR SpatialReference object
     for a given EPSG code.
@@ -60,7 +59,9 @@ def get_osr_prj_obj(epsg_code):
     return spat_ref
 
 
-def degrees_to_metres(latitude, lon_size, lat_size):
+def degrees_to_metres(
+    latitude: float, lon_size: float, lat_size: float
+) -> (float, float):
     """
     Convert pixel sizes or distances in degrees to metres.
 
@@ -94,7 +95,7 @@ def degrees_to_metres(latitude, lon_size, lat_size):
     return x_size, y_size
 
 
-def metres_to_degrees(latitude, x_size, y_size):
+def metres_to_degrees(latitude: float, x_size: float, y_size: float) -> (float, float):
     """
     Convert pixel sizes or distances in metres to degrees.
 
@@ -128,7 +129,7 @@ def metres_to_degrees(latitude, x_size, y_size):
     return lon_size, lat_size
 
 
-def get_deg_coord_as_str(lat, lon, n_chars=4):
+def get_deg_coord_as_str(lat: float, lon: float, n_chars: int = 4) -> str:
     """
 
     :param lat:

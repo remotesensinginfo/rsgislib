@@ -572,7 +572,7 @@ static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args, PyObject 
     PyObject *pszInputProjFileObj = Py_None;
     
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|OO:assign_proj", kwlist, &pszInputImage, &pszInputProjObj, &pszInputProjFileObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|OO:assign_wkt_proj", kwlist, &pszInputImage, &pszInputProjObj, &pszInputProjFileObj))
     {
         return nullptr;
     }
@@ -2221,20 +2221,20 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   imageutils.pop_img_stats(inputImage,True,0.,True)\n"
 "\n"},
     
-    {"assign_proj", (PyCFunction)ImageUtils_AssignProj, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.assign_proj(input_img, wkt_str, wkt_file)\n"
+    {"assign_wkt_proj", (PyCFunction)ImageUtils_AssignProj, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.assign_wkt_proj(input_img, wkt_str, wkt_file)\n"
 "Assign a projection to the input GDAL image file.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param wktString: is the wkt string to be assigned to the image. If None then it will be read from the wktStringFile.\n"
-":param wktFile: is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"
+":param input_img: is a string containing the name of the input file\n"
+":param wkt_str: is the wkt string to be assigned to the image. If None then it will be read from the wktStringFile.\n"
+":param wkt_file: is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"
 "\n"
 "Example::\n"
 "\n"
 "   from rsgislib import imageutils\n"
-"   wktString = '''PROJCS[\"WGS 84 / UTM zone 55S\",\n"
+"   wkt_str = '''PROJCS[\"WGS 84 / UTM zone 55S\",\n"
 "    GEOGCS[\"WGS 84\",\n"
 "        DATUM[\"WGS_1984\",\n"
 "            SPHEROID[\"WGS 84\",6378137,298.257223563,\n"
@@ -2252,8 +2252,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 "    UNIT[\"metre\",1,\n"
 "        AUTHORITY[\"EPSG\",\"9001\"]],\n"
 "    AUTHORITY[\"EPSG\",\"32755\"]]'''\n"
-"   inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
-"   imageutils.assign_proj(inputImage, wktString)\n"
+"   input_img = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
+"   imageutils.assign_wkt_proj(input_img, wkt_str)\n"
 "\n"},
     
     {"copy_proj_from_img", (PyCFunction)ImageUtils_CopyProjFromImage, METH_VARARGS | METH_KEYWORDS,

@@ -1003,7 +1003,7 @@ def get_epsg_proj_from_img(input_img: str):
         layerDS = gdal.Open(input_img, gdal.GA_ReadOnly)
         if layerDS == None:
             raise rsgislib.RSGISPyException(
-                "Could not open raster image: '" + input_img + "'"
+                "Could not open raster image: '{}'".format(input_img)
             )
         projStr = layerDS.GetProjection()
         layerDS = None

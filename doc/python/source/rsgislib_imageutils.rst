@@ -32,7 +32,7 @@ Get Image Info
 
 Projection
 -----------
-.. autofunction:: rsgislib.imageutils.assign_proj
+.. autofunction:: rsgislib.imageutils.assign_wkt_proj
 .. autofunction:: rsgislib.imageutils.assign_spatial_info
 .. autofunction:: rsgislib.imageutils.copy_proj_from_img
 .. autofunction:: rsgislib.imageutils.copy_spatial_and_proj_from_img

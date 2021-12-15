@@ -350,7 +350,7 @@ def test_get_wkt_proj_from_img_utm():
     assert "UTM zone 30N" in rsgislib.imageutils.get_wkt_proj_from_img(input_img)
 
 
-def test_assign_proj_file(tmp_path):
+def test_assign_wkt_proj_file(tmp_path):
     import rsgislib.imageutils
 
     input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
@@ -359,12 +359,12 @@ def test_assign_proj_file(tmp_path):
 
     wkt_file = os.path.join(IMGUTILS_DATA_DIR, "utm30n.wkt")
 
-    rsgislib.imageutils.assign_proj(input_img, None, wkt_file)
+    rsgislib.imageutils.assign_wkt_proj(input_img, None, wkt_file)
 
     assert "UTM zone 30N" in rsgislib.imageutils.get_wkt_proj_from_img(input_img)
 
 
-def test_assign_proj_str(tmp_path):
+def test_assign_wkt_proj_str(tmp_path):
     import rsgislib.imageutils
 
     input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
@@ -373,7 +373,7 @@ def test_assign_proj_str(tmp_path):
 
     wkt_str = """PROJCS["WGS 84 / UTM zone 30N",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-3],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","32630"]]"""
 
-    rsgislib.imageutils.assign_proj(input_img, wkt_str, None)
+    rsgislib.imageutils.assign_wkt_proj(input_img, wkt_str, None)
 
     assert "UTM zone 30N" in rsgislib.imageutils.get_wkt_proj_from_img(input_img)
 
