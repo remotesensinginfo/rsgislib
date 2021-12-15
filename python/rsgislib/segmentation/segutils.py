@@ -59,7 +59,7 @@ import os
 import collections
 
 # import the gdal module
-import osgeo.gdal as gdal
+from osgeo import gdal
 
 # Import the python JSON module
 import json

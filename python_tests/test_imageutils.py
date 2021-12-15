@@ -57,7 +57,7 @@ def test_get_rsgislib_datatype_from_img():
 
 
 def test_get_gdal_datatype_from_img():
-    import osgeo.gdal as gdal
+    from osgeo import gdal
     import rsgislib.imageutils
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")

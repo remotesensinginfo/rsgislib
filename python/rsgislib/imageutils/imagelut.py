@@ -39,8 +39,8 @@ RSGISLib.
 import rsgislib
 import os
 
-import osgeo.gdal as gdal
-import osgeo.ogr as ogr
+from osgeo import gdal
+from osgeo import ogr
 
 
 def create_img_extent_lut(

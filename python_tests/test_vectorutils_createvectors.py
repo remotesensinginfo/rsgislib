@@ -187,7 +187,7 @@ def test_define_grid_utm(tmp_path):
 
 def test_create_poly_vec_bboxs(tmp_path):
     import rsgislib.vectorutils.createvectors
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
@@ -218,7 +218,7 @@ def test_create_poly_vec_bboxs(tmp_path):
 
 def test_write_pts_to_vec(tmp_path):
     import rsgislib.vectorutils.createvectors
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"

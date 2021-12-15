@@ -84,7 +84,7 @@ def test_read_vec_columns():
 def test_write_vec_column_Int(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     vec_file = os.path.join(VECTORATTRS_DATA_DIR, "sen2_20210527_aber_att_vals.geojson")
     vec_lyr = "sen2_20210527_aber_att_vals"
@@ -118,7 +118,7 @@ def test_write_vec_column_Int(tmp_path):
 def test_write_vec_column_Float(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     vec_file = os.path.join(VECTORATTRS_DATA_DIR, "sen2_20210527_aber_att_vals.geojson")
     vec_lyr = "sen2_20210527_aber_att_vals"
@@ -152,7 +152,7 @@ def test_write_vec_column_Float(tmp_path):
 def test_write_vec_column_String(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     vec_file = os.path.join(VECTORATTRS_DATA_DIR, "sen2_20210527_aber_att_vals.geojson")
     vec_lyr = "sen2_20210527_aber_att_vals"
@@ -186,7 +186,7 @@ def test_write_vec_column_String(tmp_path):
 def test_write_vec_column_to_layer_Int(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     vec_file = os.path.join(VECTORATTRS_DATA_DIR, "sen2_20210527_aber_att_vals.geojson")
     vec_lyr = "sen2_20210527_aber_att_vals"
@@ -225,7 +225,7 @@ def test_write_vec_column_to_layer_Int(tmp_path):
 def test_write_vec_column_to_layer_Float(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     vec_file = os.path.join(VECTORATTRS_DATA_DIR, "sen2_20210527_aber_att_vals.geojson")
     vec_lyr = "sen2_20210527_aber_att_vals"
@@ -264,7 +264,7 @@ def test_write_vec_column_to_layer_Float(tmp_path):
 def test_write_vec_column_to_layer_String(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     vec_file = os.path.join(VECTORATTRS_DATA_DIR, "sen2_20210527_aber_att_vals.geojson")
     vec_lyr = "sen2_20210527_aber_att_vals"

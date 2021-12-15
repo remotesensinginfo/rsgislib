@@ -52,7 +52,7 @@ def test_get_rat_columns():
 
 def test_get_rat_columns_info():
     import rsgislib.rastergis
-    import osgeo.gdal as gdal
+    from osgeo import gdal
 
     ref_clumps_img = os.path.join(
         RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_attref.kea"

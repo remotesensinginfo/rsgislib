@@ -6,9 +6,9 @@ The vector attributes module performs attribute table operations on vectors.
 import os
 import math
 
-import osgeo.gdal as gdal
+from osgeo import gdal
 import osgeo.ogr
-import osgeo.ogr as ogr
+from osgeo import ogr
 
 
 def write_vec_column(

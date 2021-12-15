@@ -35,7 +35,7 @@
 ###########################################################################
 import os
 
-import osgeo.gdal as gdal
+from osgeo import gdal
 import numpy
 from rios import rat
 

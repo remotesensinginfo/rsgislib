@@ -6,7 +6,7 @@ import rsgislib.tools.projection
 import pprint
 import math
 import numpy
-import osgeo.gdal as gdal
+from osgeo import gdal
 
 
 class StdImgBlockIter:

@@ -69,7 +69,7 @@ from rsgislib import vectorutils
 
 haveGDALPy = True
 try:
-    import osgeo.gdal as gdal, ogr
+    from osgeo import gdal, ogr
 except ImportError as gdalErr:
     haveGDALPy = False
 

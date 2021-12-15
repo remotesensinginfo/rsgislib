@@ -13,9 +13,9 @@ import subprocess
 import warnings
 import math
 
-import osgeo.gdal as gdal
-import osgeo.osr as osr
-import osgeo.ogr as ogr
+from osgeo import gdal
+from osgeo import osr
+from osgeo import ogr
 
 # Import the RSGISLib module
 import rsgislib

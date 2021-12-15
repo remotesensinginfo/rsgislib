@@ -180,7 +180,7 @@ def calc_clear_sky_regions(
     import rsgislib.rastergis
     import rsgislib.imagemorphology
     import os
-    import osgeo.gdal as gdal
+    from osgeo import gdal
     from rios import rat
     import numpy
 

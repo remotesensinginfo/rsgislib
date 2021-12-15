@@ -577,8 +577,8 @@ def test_create_copy_vector_lyr(tmp_path):
 
 def test_get_ogr_vec_col_datatype_from_gdal_rat_col_datatype_int():
     import rsgislib.vectorutils
-    import osgeo.gdal as gdal
-    import osgeo.ogr as ogr
+    from osgeo import gdal
+    from osgeo import ogr
 
     assert (
         rsgislib.vectorutils.get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(
@@ -590,8 +590,8 @@ def test_get_ogr_vec_col_datatype_from_gdal_rat_col_datatype_int():
 
 def test_get_ogr_vec_col_datatype_from_gdal_rat_col_datatype_flt():
     import rsgislib.vectorutils
-    import osgeo.gdal as gdal
-    import osgeo.ogr as ogr
+    from osgeo import gdal
+    from osgeo import ogr
 
     assert (
         rsgislib.vectorutils.get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(
@@ -603,8 +603,8 @@ def test_get_ogr_vec_col_datatype_from_gdal_rat_col_datatype_flt():
 
 def test_get_ogr_vec_col_datatype_from_gdal_rat_col_datatype_str():
     import rsgislib.vectorutils
-    import osgeo.gdal as gdal
-    import osgeo.ogr as ogr
+    from osgeo import gdal
+    from osgeo import ogr
 
     assert (
         rsgislib.vectorutils.get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(

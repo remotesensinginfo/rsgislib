@@ -3,8 +3,8 @@
 The vector conversion tools for converting between raster and vector
 """
 
-import osgeo.gdal as gdal
-import osgeo.ogr as ogr
+from osgeo import gdal
+from osgeo import ogr
 
 import rsgislib
 

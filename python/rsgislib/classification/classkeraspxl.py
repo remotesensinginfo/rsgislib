@@ -42,7 +42,7 @@ import numpy
 
 import h5py
 
-import osgeo.gdal as gdal
+from osgeo import gdal
 
 from rios import applier
 from rios import cuiprogress

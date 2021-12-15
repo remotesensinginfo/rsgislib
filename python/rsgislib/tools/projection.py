@@ -4,7 +4,7 @@ The tools.projection module contains some useful tools for working with projecti
 """
 
 import numpy
-import osgeo.osr as osr
+from osgeo import osr
 
 
 def get_epsg_code_from_wkt(wkt_str: str) -> int:

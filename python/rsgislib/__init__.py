@@ -94,9 +94,9 @@ import datetime
 import math
 import sys
 
-import osgeo.osr as osr
-import osgeo.ogr as ogr
-import osgeo.gdal as gdal
+from osgeo import osr
+from osgeo import ogr
+from osgeo import gdal
 
 gdal.UseExceptions()
 

@@ -15,8 +15,8 @@ import shutil
 
 import numpy
 
-import osgeo.gdal as gdal
-import osgeo.osr as osr
+from osgeo import gdal
+from osgeo import osr
 
 from rios import applier
 
@@ -3675,7 +3675,7 @@ def whiten_image(
     :param gdalformat: the GDAL image file format of the output image file.
 
     """
-    import osgeo.gdal as gdal
+    from osgeo import gdal
     import rsgislib.imageutils
     import tqdm
     import numpy

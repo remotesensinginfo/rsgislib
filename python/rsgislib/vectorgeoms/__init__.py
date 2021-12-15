@@ -6,8 +6,8 @@ The vector geometries module performs geometric operations on vectors.
 import os
 import math
 
-import osgeo.gdal as gdal
-import osgeo.ogr as ogr
+from osgeo import gdal
+from osgeo import ogr
 
 import tqdm
 
@@ -2531,7 +2531,7 @@ def vec_intersects_vec(
     :return: boolean
 
     """
-    import osgeo.gdal as gdal
+    from osgeo import gdal
     import tqdm
 
     gdal.UseExceptions()
@@ -2597,7 +2597,7 @@ def vec_overlaps_vec(
     :return: boolean
 
     """
-    import osgeo.gdal as gdal
+    from osgeo import gdal
     import tqdm
 
     gdal.UseExceptions()
@@ -2663,7 +2663,7 @@ def vec_within_vec(
     :return: boolean
 
     """
-    import osgeo.gdal as gdal
+    from osgeo import gdal
     import tqdm
 
     gdal.UseExceptions()
@@ -2733,7 +2733,7 @@ def vec_contains_vec(
     :return: boolean
 
     """
-    import osgeo.gdal as gdal
+    from osgeo import gdal
     import tqdm
 
     gdal.UseExceptions()
@@ -2803,7 +2803,7 @@ def vec_touches_vec(
     :return: boolean
 
     """
-    import osgeo.gdal as gdal
+    from osgeo import gdal
     import tqdm
 
     gdal.UseExceptions()
@@ -2870,7 +2870,7 @@ def vec_crosses_vec(
     :return: boolean
 
     """
-    import osgeo.gdal as gdal
+    from osgeo import gdal
     import tqdm
 
     gdal.UseExceptions()

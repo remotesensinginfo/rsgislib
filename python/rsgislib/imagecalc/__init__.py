@@ -8,7 +8,7 @@ import math
 import os
 
 import numpy
-import osgeo.gdal as gdal
+from osgeo import gdal
 
 import rsgislib
 

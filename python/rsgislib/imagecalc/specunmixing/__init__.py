@@ -34,7 +34,7 @@
 
 import os
 
-import osgeo.gdal as gdal
+from osgeo import gdal
 import numpy
 
 # import the C++ extension into this level

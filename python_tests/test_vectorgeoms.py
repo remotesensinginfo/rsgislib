@@ -49,7 +49,7 @@ def test_convert_polygon_to_polyline(tmp_path):
 
 def test_get_pt_on_line():
     import rsgislib.vectorgeoms
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     pt1 = ogr.Geometry(ogr.wkbPoint)
     pt1.AddPoint(200, 500)
@@ -63,7 +63,7 @@ def test_get_pt_on_line():
 
 def test_find_pt_to_side_right():
     import rsgislib.vectorgeoms
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     pt_start = ogr.Geometry(ogr.wkbPoint)
     pt_start.AddPoint(200, 500)
@@ -83,7 +83,7 @@ def test_find_pt_to_side_right():
 
 def test_find_pt_to_side_left():
     import rsgislib.vectorgeoms
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     pt_start = ogr.Geometry(ogr.wkbPoint)
     pt_start.AddPoint(200, 500)
@@ -652,7 +652,7 @@ def test_clip_vec_lyr(tmp_path):
 
 def test_get_geom_pts():
     import rsgislib.vectorgeoms
-    import osgeo.ogr as ogr
+    from osgeo import ogr
 
     # Create ring
     ring = ogr.Geometry(ogr.wkbLinearRing)

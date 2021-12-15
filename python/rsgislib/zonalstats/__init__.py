@@ -30,9 +30,9 @@ from ._zonalstats import *
 import math
 import sys
 
-import osgeo.gdal as gdal
-import osgeo.ogr as ogr
-import osgeo.osr as osr
+from osgeo import gdal
+from osgeo import ogr
+from osgeo import osr
 import numpy
 import tqdm
 

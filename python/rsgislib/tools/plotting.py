@@ -20,7 +20,7 @@ import os
 
 haveGDALPy = True
 try:
-    import osgeo.gdal as gdal
+    from osgeo import gdal
 except ImportError as gdalErr:
     haveGDALPy = False
 

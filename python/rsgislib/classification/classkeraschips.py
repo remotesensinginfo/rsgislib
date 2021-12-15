@@ -45,7 +45,7 @@ import numpy
 
 import h5py
 
-import osgeo.gdal as gdal
+from osgeo import gdal
 
 from rios.imagereader import ImageReader
 from rios.imagewriter import ImageWriter

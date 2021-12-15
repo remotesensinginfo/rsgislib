@@ -4,7 +4,7 @@ The tools.geometrytool module contains functions for manipulating and moving fil
 """
 
 import math
-import osgeo.ogr as ogr
+from osgeo import ogr
 
 
 def reproj_bbox(bbox, in_osr_proj_obj, out_osr_proj_obj):
@@ -61,7 +61,7 @@ def reproj_bbox_epsg(bbox, in_epsg, out_epsg):
     :return: (MinX, MaxX, MinY, MaxY)
 
     """
-    import osgeo.osr as osr
+    from osgeo import osr
 
     in_osr_proj_obj = osr.SpatialReference()
     in_osr_proj_obj.ImportFromEPSG(int(in_epsg))

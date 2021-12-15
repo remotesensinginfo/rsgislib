@@ -42,7 +42,7 @@ import tqdm
 
 import numpy
 
-import osgeo.gdal as gdal
+from osgeo import gdal
 
 from sklearn.cluster import MiniBatchKMeans
 

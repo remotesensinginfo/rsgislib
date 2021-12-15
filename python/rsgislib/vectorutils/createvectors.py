@@ -5,9 +5,9 @@ Tools for creating vector layers.
 
 import os
 
-import osgeo.gdal as gdal
-import osgeo.ogr as ogr
-import osgeo.osr as osr
+from osgeo import gdal
+from osgeo import ogr
+from osgeo import osr
 
 import tqdm
 
@@ -761,9 +761,9 @@ def write_pts_to_vec(
                      might be ["OVERWRITE=YES"]
     """
     import rsgislib.vectorutils
-    import osgeo.ogr as ogr
-    import osgeo.gdal as gdal
-    import osgeo.osr as osr
+    from osgeo import ogr
+    from osgeo import gdal
+    from osgeo import osr
 
     try:
         if len(pts_x) != len(pts_y):
