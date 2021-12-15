@@ -15,7 +15,7 @@ CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
 def test_populate_clumps_with_class_training(tmp_path):
     import rsgislib.classification
     import rsgislib.classification.classratutils
-    import rsgislib.rastergis.ratutils
+    import rsgislib.rastergis
     import numpy
 
     cls_vec_smpls = os.path.join(CLASSIFICATION_DATA_DIR, "cls_poly_smpls.gpkg")
@@ -77,8 +77,8 @@ def test_populate_clumps_with_class_training(tmp_path):
     for var in vars_to_test:
         print("Testing: {}".format(var))
 
-        ref_vals = rsgislib.rastergis.ratutils.get_column_data(clumps_cls_img, var)
-        calcd_vals = rsgislib.rastergis.ratutils.get_column_data(clumps_img, var)
+        ref_vals = rsgislib.rastergis.get_column_data(clumps_cls_img, var)
+        calcd_vals = rsgislib.rastergis.get_column_data(clumps_img, var)
         if not numpy.array_equal(ref_vals, calcd_vals):
             vars_eq_vals = False
             break

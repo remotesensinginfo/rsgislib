@@ -81,7 +81,6 @@ def test_get_rat_columns_info():
 
 def test_populate_rat_with_stats(tmp_path):
     import rsgislib.rastergis
-    import rsgislib.rastergis.ratutils
     import numpy
 
     base_clumps_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
@@ -153,8 +152,8 @@ def test_populate_rat_with_stats(tmp_path):
     for var in vars_to_test:
         print("Testing: {}".format(var))
 
-        ref_vals = rsgislib.rastergis.ratutils.get_column_data(ref_clumps_img, var)
-        calcd_vals = rsgislib.rastergis.ratutils.get_column_data(clumps_img, var)
+        ref_vals = rsgislib.rastergis.get_column_data(ref_clumps_img, var)
+        calcd_vals = rsgislib.rastergis.get_column_data(clumps_img, var)
         if calcd_vals.shape[0] != ref_vals.shape[0]:
             vars_eq_vals = False
             break

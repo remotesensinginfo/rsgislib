@@ -568,7 +568,7 @@ def test_apply_xgboost_multiclass_classifier(tmp_path):
 )
 def test_apply_xgboost_multiclass_classifier_rat(tmp_path):
     import rsgislib.classification.classxgboost
-    import rsgislib.rastergis.ratutils
+    import rsgislib.rastergis
 
     ref_clumps_img = os.path.join(
         CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means_cls.kea"
@@ -674,7 +674,7 @@ def test_apply_xgboost_multiclass_classifier_rat(tmp_path):
 
     read_out_cls = False
     try:
-        cls_col_vals = rsgislib.rastergis.ratutils.get_column_data(
+        cls_col_vals = rsgislib.rastergis.get_column_data(
             clumps_img, "OutClass"
         )
         read_out_cls = True

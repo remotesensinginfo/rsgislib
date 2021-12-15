@@ -46,9 +46,9 @@ To populate the clumps (i.e., segments or objects) with the attribute informatio
     rsgislib.rastergis.populateRATWithStats(input_img, clumps_img, bandinfo)
 
 
-To train the classifier you need to create a column within the clump raster attribute table (RAT) specifying the class for the clumps being used for training. Training is often provided as vector layers, using a ratutils helper function you can generate the training data::
+To train the classifier you need to create a column within the clump raster attribute table (RAT) specifying the class for the clumps being used for training. Training is often provided as vector layers, using a rastergis helper function you can generate the training data::
 
-    import rsgislib.rastergis.ratutils
+    import rsgislib.rastergis
 
     classes_dict = dict()
     classes_dict['Mangroves'] = [1, 'Mangroves.shp']
@@ -56,7 +56,7 @@ To train the classifier you need to create a column within the clump raster attr
     tmp_path = './tmp'
     classes_int_col_in = 'ClassInt'
     classes_name_col = 'ClassStr'
-    rsgislib.rastergis.ratutils.populateClumpsWithClassTraining(clumps_img, classes_dict, tmp_path, classes_int_col_in, classes_name_col)
+    rsgislib.rastergis.populateClumpsWithClassTraining(clumps_img, classes_dict, tmp_path, classes_int_col_in, classes_name_col)
 
 
 
