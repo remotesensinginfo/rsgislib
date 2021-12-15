@@ -68,7 +68,6 @@ def populate_clumps_with_class_training(
     """
     import rsgislib.imageutils
     import rsgislib.rastergis
-    import rsgislib.rastergis.ratutils
     import rsgislib.vectorutils.createrasters
     import rsgislib.tools.utils
     import rsgislib.tools.filetools
@@ -117,7 +116,7 @@ def populate_clumps_with_class_training(
         mode_band=1,
         rat_band=rat_band,
     )
-    rsgislib.rastergis.ratutils.define_class_names(
+    rsgislib.rastergis.define_class_names(
         clumps_img, classes_int_col, classes_name_col, classNamesDict
     )
 

@@ -353,7 +353,6 @@ def calc_acc_metrics_vecsamples(
     import rsgislib.tools.utils
     import rsgislib.vectorattrs
     import rsgislib.rastergis
-    import rsgislib.rastergis.ratutils
     import rsgislib.imageutils
 
     # Read columns from vector file.
@@ -401,8 +400,8 @@ def calc_acc_metrics_vecsamples(
             )
         )
 
-    img_hist_data = rsgislib.rastergis.ratutils.getColumnData(cls_img, img_hist_col)
-    img_clsname_data = rsgislib.rastergis.ratutils.getColumnData(
+    img_hist_data = rsgislib.rastergis.getColumnData(cls_img, img_hist_col)
+    img_clsname_data = rsgislib.rastergis.getColumnData(
         cls_img, img_cls_name_col
     )
     img_clsname_data[0] = ""

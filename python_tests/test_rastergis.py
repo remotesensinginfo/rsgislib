@@ -3,7 +3,7 @@ from shutil import copy2
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 RASTERGIS_DATA_DIR = os.path.join(DATA_DIR, "rastergis")
-
+CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
 
 def test_get_rat_length():
     import rsgislib.rastergis
@@ -271,10 +271,96 @@ def test_clumps_spatial_extent(tmp_path):
         rat_band=1,
     )
 
+def test_populate_rat_with_mode(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    in_cls_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
+
+    rsgislib.rastergis.populate_rat_with_mode(in_cls_img, clumps_img, out_cols_name="cls_val", use_no_data=True, no_data_val=0, out_no_data=0, mode_band=1, rat_band=1)
+
+def test_populate_rat_with_prop_valid_pxls(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    in_cls_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
+
+    rsgislib.rastergis.populate_rat_with_prop_valid_pxls(in_cls_img, clumps_img, out_col="cls_val", no_data_val=0, rat_band=1)
+
+
+def test_export_col_to_gdal_img(tmp_path):
+    import rsgislib.rastergis
+
+    clumps_img = os.path.join(CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means.kea")
+
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.rastergis.export_col_to_gdal_img(clumps_img, output_img, "KEA", rsgislib.TYPE_32FLOAT, "b6Mean", rat_band=1)
+
+    assert os.path.exists(output_img)
+
+
+def test_export_cols_to_gdal_img(tmp_path):
+    import rsgislib.rastergis
+
+    clumps_img = os.path.join(CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means.kea")
+
+    output_img = os.path.join(tmp_path, "out_img.kea")
+    rsgislib.rastergis.export_cols_to_gdal_img(clumps_img, output_img, "KEA", rsgislib.TYPE_32FLOAT, ["b1Mean", "b2Mean", "b3Mean"], rat_band=1)
+
+    assert os.path.exists(output_img)
+
+def test_export_rat_cols_to_ascii(tmp_path):
+    import rsgislib.rastergis
+
+    clumps_img = os.path.join(CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means.kea")
+
+    out_file = os.path.join(tmp_path, "out_data.txt")
+    rsgislib.rastergis.export_rat_cols_to_ascii(clumps_img, out_file, ["b1Mean", "b2Mean", "b3Mean"], rat_band=1)
+
+    assert os.path.exists(out_file)
+
+def test_export_clumps_to_images(tmp_path):
+    import rsgislib.rastergis
+    import glob
+
+    clumps_img = os.path.join(RASTERGIS_DATA_DIR, "sen2_grid_clumps.kea")
+    out_img_base = os.path.join(tmp_path, "out_img_")
+
+    rsgislib.rastergis.export_clumps_to_images(clumps_img, out_img_base, True, "kea", "KEA", rat_band=1)
+
+    assert len(glob.glob("{}*.kea".format(out_img_base))) == 4
+
+
+def test_get_column_data():
+    import rsgislib.rastergis
+    import numpy
+
+    ref_clumps_img = os.path.join(
+        RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_attref.kea"
+    )
+
+    hist_col_vals = rsgislib.rastergis.get_column_data(
+        ref_clumps_img, "Histogram"
+    )
+
+    hist_vals_range_ok = False
+    if (
+        (numpy.min(hist_col_vals) >= 0)
+        and (numpy.max(hist_col_vals) <= 80174)
+        and (hist_col_vals.shape[0] == 11949)
+    ):
+        hist_col_vals = True
+
+    assert hist_col_vals
+
 
 # TODO rsgislib.rastergis.str_class_majority
-# TODO rsgislib.rastergis.populate_rat_with_mode
-# TODO rsgislib.rastergis.populate_rat_with_prop_valid_pxls
 # TODO rsgislib.rastergis.histo_sampling
 # TODO rsgislib.rastergis.class_split_fit_hist_gausian_mixture_model
 # TODO rsgislib.rastergis.apply_rat_knn
@@ -283,11 +369,19 @@ def test_clumps_spatial_extent(tmp_path):
 # TODO rsgislib.rastergis.calc_1d_jm_distance
 # TODO rsgislib.rastergis.calc_2d_jm_distance
 # TODO rsgislib.rastergis.calc_bhattacharyya_distance
-# TODO rsgislib.rastergis.export_rat_cols_to_ascii
-# TODO rsgislib.rastergis.export_col_to_gdal_img
-# TODO rsgislib.rastergis.export_cols_to_gdal_img
-# TODO rsgislib.rastergis.export_clumps_to_images
 # TODO rsgislib.rastergis.copy_gdal_rat_columns
 # TODO rsgislib.rastergis.copy_rat
 # TODO rsgislib.rastergis.import_vec_atts
 # TODO rsgislib.rastergis.colour_rat_classes
+# TODO rsgislib.rastergis.define_class_names
+# TODO rsgislib.rastergis.set_column_data
+# TODO rsgislib.rastergis.create_uid_col
+# TODO rsgislib.rastergis.take_random_sample
+# TODO rsgislib.rastergis.set_class_names_colours
+# TODO rsgislib.rastergis.calc_dist_between_clumps
+# TODO rsgislib.rastergis.calc_dist_to_large_clumps
+# TODO rsgislib.rastergis.calc_dist_to_classes
+# TODO rsgislib.rastergis.identify_small_units
+
+
+
