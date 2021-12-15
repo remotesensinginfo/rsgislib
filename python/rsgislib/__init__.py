@@ -55,8 +55,8 @@ Methods of initialising KMEANS:
     * INITCLUSTER_DIAGONAL_FULL_ATTACH = 3
     * INITCLUSTER_DIAGONAL_STDDEV_ATTACH = 4
     * INITCLUSTER_KPP = 5
-    
-    
+
+
 Methods of calculating distance:
 
     * DIST_UNDEFINED = 0
@@ -66,7 +66,7 @@ Methods of calculating distance:
     * DIST_MINKOWSKI = 4
     * DIST_CHEBYSHEV = 5
     * DIST_MUTUALINFO = 6
-    
+
 Methods of summarising data:
 
     * SUMTYPE_UNDEFINED = 0
@@ -79,8 +79,10 @@ Methods of summarising data:
     * SUMTYPE_COUNT = 7
     * SUMTYPE_RANGE = 8
     * SUMTYPE_SUM = 9
-    
-Constants specifying how bands should be treated when sharpening (see rsgislib.imageutils)
+
+Constants specifying how bands should be treated when sharpening
+(see rsgislib.imageutils)
+
     * SHARP_RES_IGNORE = 0
     * SHARP_RES_LOW = 1
     * SHARP_RES_HIGH = 2
@@ -88,14 +90,10 @@ Constants specifying how bands should be treated when sharpening (see rsgislib.i
 """
 from __future__ import print_function
 
-import os
 import time
 import datetime
-import math
 import sys
 
-from osgeo import osr
-from osgeo import ogr
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -131,11 +129,11 @@ SUMTYPE_COUNT = 7
 SUMTYPE_RANGE = 8
 SUMTYPE_SUM = 9
 
-METHOD_SAMPLES = 0      # as calculated by ML
-METHOD_AREA = 1         # priors set by the relative area
-METHOD_EQUAL = 2        # priors all equal
+METHOD_SAMPLES = 0  # as calculated by ML
+METHOD_AREA = 1  # priors set by the relative area
+METHOD_EQUAL = 2  # priors all equal
 METHOD_USERDEFINED = 3  # priors passed in to function
-METHOD_WEIGHTED = 4     # priors by area but with a weight applied
+METHOD_WEIGHTED = 4  # priors by area but with a weight applied
 
 SHAPE_SHAPENA = 0
 SHAPE_SHAPEAREA = 1
@@ -175,23 +173,32 @@ INTERP_AVERAGE = 5
 INTERP_MODE = 6
 
 
-def get_rsgislib_version():
-    """ Calls rsgis-config to get the version number. """
+def get_rsgislib_version() -> str:
+    """Calls rsgis-config to get the version number."""
 
     # Try calling rsgis-config to get minor version number
     try:
         import distutils.spawn
+
         if distutils.spawn.find_executable("rsgis-config") is not None:
             import subprocess
-            out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            out = subprocess.Popen(
+                "rsgis-config --version",
+                shell=True,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
             (stdout, stderr) = out.communicate()
             version_str = stdout.decode()
-            version_str = version_str.split('\n')[0]
+            version_str = version_str.split("\n")[0]
         else:
-            version_str = 'NA.NA'
+            version_str = "NA.NA"
     except Exception:
-        version_str = 'NA.NA'
-    return(version_str)
+        version_str = "NA.NA"
+    return version_str
+
 
 __version__ = get_rsgislib_version()
 
@@ -201,15 +208,15 @@ py_sys_version_flt = float(py_sys_version_str)
 
 class RSGISPyException(Exception):
     """
-    A class representing the RSGIS exception.
+    A class representing the RSGISLib exception.
     """
-    
-    def __init__(self, value):
+
+    def __init__(self, value: str):
         """
         Init for the RSGISPyException class
         """
         self.value = value
-        
+
     def __str__(self):
         """
         Return a string representation of the exception
@@ -217,7 +224,7 @@ class RSGISPyException(Exception):
         return repr(self.value)
 
 
-class RSGISGDALErrorHandler(object):
+class RSGISGDALErrorHandler:
     """
     A class representing a generic GDAL Error Handler which
     can be used to pick up GDAL warnings rather than just
@@ -226,13 +233,13 @@ class RSGISGDALErrorHandler(object):
 
     def __init__(self):
         """
-        Init for RSGISGDALErrorHandler. Class attributes are err_level, err_no and err_msg
+        Init for RSGISGDALErrorHandler. Class attributes are
+        err_level, err_no and err_msg
 
         """
-        from osgeo import gdal
         self.err_level = gdal.CE_None
         self.err_no = 0
-        self.err_msg = ''
+        self.err_msg = ""
 
     def handler(self, err_level, err_no, err_msg):
         """
@@ -248,38 +255,42 @@ class RSGISGDALErrorHandler(object):
         self.err_msg = err_msg
 
 
-def get_rsgislib_datatype(gdaltype):
+def get_rsgislib_datatype(gdal_type: int) -> int:
     """
     Convert from GDAL data type string to RSGISLib data type int.
 
     :return: int
 
     """
-    gdaltype = gdaltype.lower()
-    if gdaltype == 'int8':
-        return TYPE_8INT
-    elif gdaltype == 'int16':
-        return TYPE_16INT
-    elif gdaltype == 'int32':
-        return TYPE_32INT
-    elif gdaltype == 'int64':
-        return TYPE_64INT
-    elif gdaltype == 'byte' or gdaltype == 'uint8':
-        return TYPE_8UINT
-    elif gdaltype == 'uint16':
-        return TYPE_16UINT
-    elif gdaltype == 'uint32':
-        return TYPE_32UINT
-    elif gdaltype == 'uint64':
-        return TYPE_64UINT
-    elif gdaltype == 'float32':
-        return TYPE_32FLOAT
-    elif gdaltype == 'float64':
-        return TYPE_64FLOAT
+    gdal_type = gdal_type.lower()
+    if gdal_type == "int8":
+        out_dt = TYPE_8INT
+    elif gdal_type == "int16":
+        out_dt = TYPE_16INT
+    elif gdal_type == "int32":
+        out_dt = TYPE_32INT
+    elif gdal_type == "int64":
+        out_dt = TYPE_64INT
+    elif gdal_type == "byte" or gdal_type == "uint8":
+        out_dt = TYPE_8UINT
+    elif gdal_type == "uint16":
+        out_dt = TYPE_16UINT
+    elif gdal_type == "uint32":
+        out_dt = TYPE_32UINT
+    elif gdal_type == "uint64":
+        out_dt = TYPE_64UINT
+    elif gdal_type == "float32":
+        out_dt = TYPE_32FLOAT
+    elif gdal_type == "float64":
+        out_dt = TYPE_64FLOAT
     else:
-        raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
+        raise RSGISPyException(
+            f"The data type '{gdal_type}' is " f"unknown / not supported."
+        )
+    return out_dt
 
-def get_gdal_datatype(rsgislib_datatype):
+
+def get_gdal_datatype(rsgislib_datatype: int) -> int:
     """
     Convert from RSGIS data type to GDAL data type int.
 
@@ -287,138 +298,149 @@ def get_gdal_datatype(rsgislib_datatype):
 
     """
     if rsgislib_datatype == TYPE_16INT:
-        return gdal.GDT_Int16
+        out_dt = gdal.GDT_Int16
     elif rsgislib_datatype == TYPE_32INT:
-        return gdal.GDT_Int32
+        out_dt = gdal.GDT_Int32
     elif rsgislib_datatype == TYPE_8UINT:
-        return gdal.GDT_Byte
+        out_dt = gdal.GDT_Byte
     elif rsgislib_datatype == TYPE_16UINT:
-        return gdal.GDT_UInt16
+        out_dt = gdal.GDT_UInt16
     elif rsgislib_datatype == TYPE_32UINT:
-        return gdal.GDT_UInt32
+        out_dt = gdal.GDT_UInt32
     elif rsgislib_datatype == TYPE_32FLOAT:
-        return gdal.GDT_Float32
+        out_dt = gdal.GDT_Float32
     elif rsgislib_datatype == TYPE_64FLOAT:
-        return gdal.GDT_Float64
+        out_dt = gdal.GDT_Float64
     else:
-        raise RSGISPyException("The data type '" + str(rsgislib_datatype) + "' is unknown / not supported.")
+        raise RSGISPyException(
+            f"The data type '{rsgislib_datatype}' is " f"unknown / not supported."
+        )
+    return out_dt
 
-def get_numpy_datatype(rsgislib_datatype):
+
+def get_numpy_datatype(rsgislib_datatype: int) -> int:
     """
     Convert from RSGISLib data type to numpy datatype
 
     :param rsgis_datatype:
     :return: numpy datatype
+
     """
     import numpy
-    numpyDT = numpy.float32
-    if rsgislib_datatype == TYPE_8INT:
-        numpyDT = numpy.int8
-    elif rsgislib_datatype == TYPE_16INT:
-        numpyDT = numpy.int16
-    elif rsgislib_datatype == TYPE_32INT:
-        numpyDT = numpy.int32
-    elif rsgislib_datatype == TYPE_64INT:
-        numpyDT = numpy.int64
-    elif rsgislib_datatype == TYPE_8UINT:
-        numpyDT = numpy.uint8
-    elif rsgislib_datatype == TYPE_16UINT:
-        numpyDT = numpy.uint16
-    elif rsgislib_datatype == TYPE_32UINT:
-        numpyDT = numpy.uint32
-    elif rsgislib_datatype == TYPE_64UINT:
-        numpyDT = numpy.uint64
-    elif rsgislib_datatype == TYPE_32FLOAT:
-        numpyDT = numpy.float32
-    elif rsgislib_datatype == TYPE_64FLOAT:
-        numpyDT = numpy.float64
-    else:
-        raise Exception('Datatype was not recognised.')
-    return numpyDT
 
-def get_numpy_char_codes_datatype(rsgislib_datatype):
+    if rsgislib_datatype == TYPE_8INT:
+        numpy_dt = numpy.int8
+    elif rsgislib_datatype == TYPE_16INT:
+        numpy_dt = numpy.int16
+    elif rsgislib_datatype == TYPE_32INT:
+        numpy_dt = numpy.int32
+    elif rsgislib_datatype == TYPE_64INT:
+        numpy_dt = numpy.int64
+    elif rsgislib_datatype == TYPE_8UINT:
+        numpy_dt = numpy.uint8
+    elif rsgislib_datatype == TYPE_16UINT:
+        numpy_dt = numpy.uint16
+    elif rsgislib_datatype == TYPE_32UINT:
+        numpy_dt = numpy.uint32
+    elif rsgislib_datatype == TYPE_64UINT:
+        numpy_dt = numpy.uint64
+    elif rsgislib_datatype == TYPE_32FLOAT:
+        numpy_dt = numpy.float32
+    elif rsgislib_datatype == TYPE_64FLOAT:
+        numpy_dt = numpy.float64
+    else:
+        raise Exception("Datatype was not recognised.")
+    return numpy_dt
+
+
+def get_numpy_char_codes_datatype(rsgislib_datatype: int) -> str:
     """
     Convert from RSGISLib data type to numpy datatype
 
     :param rsgis_datatype:
     :return: numpy character code datatype
+
     """
     import numpy
-    numpyDT = numpy.dtype(numpy.float32).char
+
     if rsgislib_datatype == TYPE_8INT:
-        numpyDT = numpy.dtype(numpy.int8).char
+        numpy_dt = numpy.dtype(numpy.int8).char
     elif rsgislib_datatype == TYPE_16INT:
-        numpyDT = numpy.dtype(numpy.int16).char
+        numpy_dt = numpy.dtype(numpy.int16).char
     elif rsgislib_datatype == TYPE_32INT:
-        numpyDT = numpy.dtype(numpy.int32).char
+        numpy_dt = numpy.dtype(numpy.int32).char
     elif rsgislib_datatype == TYPE_64INT:
-        numpyDT = numpy.dtype(numpy.int64).char
+        numpy_dt = numpy.dtype(numpy.int64).char
     elif rsgislib_datatype == TYPE_8UINT:
-        numpyDT = numpy.dtype(numpy.uint8).char
+        numpy_dt = numpy.dtype(numpy.uint8).char
     elif rsgislib_datatype == TYPE_16UINT:
-        numpyDT = numpy.dtype(numpy.uint16).char
+        numpy_dt = numpy.dtype(numpy.uint16).char
     elif rsgislib_datatype == TYPE_32UINT:
-        numpyDT = numpy.dtype(numpy.uint32).char
+        numpy_dt = numpy.dtype(numpy.uint32).char
     elif rsgislib_datatype == TYPE_64UINT:
-        numpyDT = numpy.dtype(numpy.uint64).char
+        numpy_dt = numpy.dtype(numpy.uint64).char
     elif rsgislib_datatype == TYPE_32FLOAT:
-        numpyDT = numpy.dtype(numpy.float32).char
+        numpy_dt = numpy.dtype(numpy.float32).char
     elif rsgislib_datatype == TYPE_64FLOAT:
-        numpyDT = numpy.dtype(numpy.float64).char
+        numpy_dt = numpy.dtype(numpy.float64).char
     else:
-        raise Exception('Datatype was not recognised.')
-    return numpyDT
+        raise Exception("Datatype was not recognised.")
+    return numpy_dt
 
 
-class RSGISTime (object):
+class RSGISTime:
     """
-    Class to calculate run time for a function, format and print out (similar to for XML interface).
+    Class to calculate run time for a function, format and print out.
 
     Need to call start before running function and end immediately after.
     Example::
 
         t = RSGISTime()
         t.start()
-        rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, False, 0)
+        rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile,
+                                    gdalformat, False, 0)
         t.end()
 
-    Note, this is only designed to provide some general feedback, for benchmarking the timeit module
-    is better suited.
+    Note, this is only designed to provide some general feedback, for
+    benchmarking the timeit module is better suited.
 
     """
 
     def __init__(self):
-        self.startTime = time.time()
-        self.endTime = time.time()
+        self.start_time = time.time()
+        self.end_time = time.time()
 
-    def start(self, print_start_time=False):
+    def start(self, print_start_time: bool = False):
         """
         Start timer, optionally printing start time
 
-        :param print_start_time: A boolean specifying whether the start time should be printed to console.
+        :param print_start_time: A boolean specifying whether the start time
+                                 should be printed to console.
 
         """
-        self.startTime = time.time()
+        self.start_time = time.time()
         if print_start_time:
-            print(time.strftime('Start Time: %H:%M:%S, %a %b %m %Y.'))
+            print(time.strftime("Start Time: %H:%M:%S, %a %b %m %Y."))
 
-    def end(self, report_diff=True, precede_str="", post_str=""):
-        """ 
+    def end(self, report_diff: bool = True, precede_str: str = "", post_str: str = ""):
+        """
         End timer and optionally print difference.
-        If precedeStr or postStr have a value then they will be used instead of the generic wording around the time.
-        
-        precede_str + " " + time + " " + postStr
+        If precedeStr or postStr have a value then they will be used instead
+        of the generic wording around the time.
 
-        :param report_diff: A boolean specifiying whether time difference should be printed to console.
+        "{precede_str} {time} {post_str}"
+
+        :param report_diff: A boolean specifying whether time difference should
+                            be printed to console.
         :param precede_str: A string which is printed ahead of time difference
         :param post_str: A string which is printed after the time difference
 
         """
-        self.endTime = time.time()
+        self.end_time = time.time()
         if report_diff:
             self.calc_diff(precede_str, post_str)
 
-    def calc_diff(self, precede_str="", post_str=""):
+    def calc_diff(self, precede_str: str = "", post_str: str = ""):
         """
         Calculate time difference, format and print.
 
@@ -426,39 +448,41 @@ class RSGISTime (object):
         :param post_str: A string which is printed after the time difference
 
         """
-        timeDiff = self.endTime - self.startTime
-        
-        useCustomMss = False
+        time_diff = self.end_time - self.start_time
+
+        use_custom_mss = False
         if (len(precede_str) > 0) or (len(post_str) > 0):
-            useCustomMss = True
-        
-        if timeDiff <= 1:
-            if useCustomMss:
-                outStr = "{} in less than a second {}".format(precede_str, post_str)
-                print(outStr)
+            use_custom_mss = True
+
+        if time_diff <= 1:
+            if use_custom_mss:
+                print(f"{precede_str} in less than a second {post_str}")
             else:
                 print("Algorithm Completed in less than a second.")
         else:
-            timeObj = datetime.datetime.utcfromtimestamp(timeDiff)
-            timeDiffStr = timeObj.strftime('%H:%M:%S')
-            if useCustomMss:
-                print("{} {} {}".format(precede_str, timeDiffStr, post_str))
+            time_obj = datetime.datetime.utcfromtimestamp(time_diff)
+            time_diff_str = time_obj.strftime("%H:%M:%S")
+            if use_custom_mss:
+                print(f"{precede_str} {time_diff_str} {post_str}")
             else:
-                print('Algorithm Completed in {}.'.format(timeDiffStr))
-        
-class TQDMProgressBar(object):
+                print(f"Algorithm Completed in {time_diff_str}.")
+
+
+class TQDMProgressBar:
     """
     Uses TQDM TermProgress to print a progress bar to the terminal
     """
+
     def __init__(self):
         self.lprogress = 0
 
-    def setTotalSteps(self, steps):
+    def setTotalSteps(self, steps: int):
         import tqdm
+
         self.pbar = tqdm.tqdm(total=steps)
         self.lprogress = 0
 
-    def setProgress(self, progress):
+    def setProgress(self, progress: int):
         step = progress - self.lprogress
         self.pbar.update(step)
         self.lprogress = progress
@@ -466,11 +490,12 @@ class TQDMProgressBar(object):
     def reset(self):
         self.pbar.close()
         import tqdm
+
         self.pbar = tqdm.tqdm(total=100)
         self.lprogress = 0
 
-    def setLabelText(self, text):
-        sys.stdout.write('\n%s\n' % text)
+    def setLabelText(self, text: str):
+        sys.stdout.write("\n%s\n" % text)
 
     def wasCancelled(self):
         return False
@@ -478,11 +503,11 @@ class TQDMProgressBar(object):
     def displayException(self, trace):
         sys.stdout.write(trace)
 
-    def displayWarning(self, text):
+    def displayWarning(self, text: str):
         sys.stdout.write("Warning: %s\n" % text)
 
-    def displayError(self, text):
+    def displayError(self, text: str):
         sys.stdout.write("Error: %s\n" % text)
 
-    def displayInfo(self, text):
+    def displayInfo(self, text: str):
         sys.stdout.write("Info: %s\n" % text)
