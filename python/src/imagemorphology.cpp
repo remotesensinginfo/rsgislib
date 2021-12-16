@@ -511,10 +511,9 @@ static PyObject *ImageMorphology_ImageWhiteTopHat(PyObject *self, PyObject *args
 // Our list of functions in this module
 static PyMethodDef ImageMorphologyMethods[] = {
 {"create_circular_op", (PyCFunction)ImageMorphology_CreateCircularOp, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.create_circular_op(output_file=string, op_size=int)\n"
+"rsgislib.imagemorphology.create_circular_op(output_file:str, op_size:int)\n"
 "Performs an image morphology dilate operation. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param output_file: is a string specifying the name and path of the output matrix file.\n"
 ":param op_size: is a integer specifying the size of the operator.\n"
@@ -528,10 +527,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
     
     
 {"image_dilate", (PyCFunction)ImageMorphology_ImageDilate, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_dilate(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_dilate(input_img:str, output_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Performs an image morphology dilate operation.\n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -553,10 +551,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
     
 {"image_erode", (PyCFunction)ImageMorphology_ImageErode, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_erode(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_erode(input_img:str, output_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Performs an image morphology erode operation. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -568,10 +565,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
 
 {"image_gradiant", (PyCFunction)ImageMorphology_ImageGradiant, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_gradiant(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_gradiant(input_img:str, output_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Performs an image morphology gradiant operation. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -583,10 +579,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
     
 {"image_dilate_combined_out", (PyCFunction)ImageMorphology_ImageDilateCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_dilate_combined_out(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_dilate_combined_out(input_img:str, output_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Performs an image morphology dilate operation, where the outputs will be combined into a single image. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -598,10 +593,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
 
 {"image_erode_combined_out", (PyCFunction)ImageMorphology_ImageErodeCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_erode_combined_out(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_erode_combined_out(input_img:str, output_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Performs an image morphology erode operation, where the outputs will be combined into a single image. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -613,10 +607,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
 
 {"image_gradiant_combined_out", (PyCFunction)ImageMorphology_ImageGradiantCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_gradiant_combined_out(input_img=string, output_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_gradiant_combined_out(input_img:str, output_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Performs an image morphology gradiant operation, where the outputs will be combined into a single image. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -628,10 +621,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
     
 {"image_local_minima", (PyCFunction)ImageMorphology_ImageLocalMinima, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_local_minima(input_img=string, output_img=string, sequencial_out=boolean, allow_equal=boolean, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_local_minima(input_img:str, output_img:str, sequencial_out:bool, allow_equal:bool, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Uses image morphology to find local minima. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -645,10 +637,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
     
 {"image_local_minima_combined_out", (PyCFunction)ImageMorphology_ImageLocalMinimaCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_local_minima_combined_out(input_img=string, output_img=string, sequencial_out=boolean, allow_equal=boolean, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_local_minima_combined_out(input_img:str, output_img:str, sequencial_out:bool, allow_equal:bool, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Uses image morphology to find local minima, where the outputs will be combined into a single image.\n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -662,10 +653,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
 
 {"image_opening", (PyCFunction)ImageMorphology_ImageOpening, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_opening(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int, niters=int)\n"
+"rsgislib.imagemorphology.image_opening(input_img:str, output_img:str, tmp_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int, niters:int)\n"
 "Performs an image morphology opening operation. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -679,10 +669,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
 
 {"image_closing", (PyCFunction)ImageMorphology_ImageClosing, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_closing(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int, niters=int)\n"
+"rsgislib.imagemorphology.image_closing(input_img:str, output_img:str, tmp_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int, niters:int)\n"
 "Performs an image morphology closing operation. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -696,10 +685,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
 
 {"image_black_top_hat", (PyCFunction)ImageMorphology_ImageBlackTopHat, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_black_top_hat(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_black_top_hat(input_img:str, output_img:str, tmp_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Performs an image morphology black top hat operation. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
@@ -712,10 +700,9 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
 
 {"image_white_top_hat", (PyCFunction)ImageMorphology_ImageWhiteTopHat, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.image_white_top_hat(input_img=string, output_img=string, tmp_img=string, morph_op_file=string, use_op_file=boolean, op_size=int, gdalformat=string, datatype=int)\n"
+"rsgislib.imagemorphology.image_white_top_hat(input_img:str, output_img:str, tmp_img:str, morph_op_file:str, use_op_file:bool, op_size:int, gdalformat:str, datatype:int)\n"
 "Performs an image morphology white top hat operation. \n"
 "\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string specifying the name and path of the input file.\n"
 ":param output_img: is a string specifying the name and path of the output file.\n"
