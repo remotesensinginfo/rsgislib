@@ -262,7 +262,7 @@ static PyMethodDef ImageRegistrationMethods[] = {
 },
 
 {"basic_registration", (PyCFunction)ImageRegistration_BasicRegistration, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.basic_registration(in_ref_img, in_float_img, out_gcp_file, pixel_gap, threshold, win_size, search_area, sd_ref_thres, sd_flt_thres, sub_pxl_res, metric_type, output_type)\n"
+"imageregistration.basic_registration(in_ref_img:str, in_float_img:str, out_gcp_file:str, pixel_gap:int, threshold:float, win_size:int, search_area:int, sd_ref_thres:float, sd_flt_thres:float, sub_pxl_res:float, metric_type:int, output_type:int)\n"
 "Generate tie points between floating and reference image using basic algorithm.\n"
 "\n"
 ":param in_ref_img: is a string providing reference image which to which the floating image is to be registered.n"
@@ -297,7 +297,7 @@ static PyMethodDef ImageRegistrationMethods[] = {
 },
 
     {"single_layer_registration", (PyCFunction)ImageRegistration_SingleLayerRegistration, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.single_layer_registration(in_ref_img, in_float_img, out_gcp_file, pixel_gap, threshold, win_size, search_area, sd_ref_thres, sd_flt_thres, sub_pxl_res, dist_threshold, max_n_iters, move_chng_thres, p_smooth, metric_type, output_type)\n"
+"imageregistration.single_layer_registration(in_ref_img:str, in_float_img:str, out_gcp_file:str, pixel_gap:int, threshold:float, win_size:int, search_area:int, sd_ref_thres:float, sd_flt_thres:float, sub_pxl_res:float, dist_threshold:float, max_n_iters:int, move_chng_thres:float, p_smooth:float, metric_type:int, output_type:int)\n"
 "Generate tie points between floating and reference image using a single connected layer of tie points.\n"
 "\n"
 "Where:\n"
@@ -340,7 +340,7 @@ static PyMethodDef ImageRegistrationMethods[] = {
 
 
     {"gcp_to_gdal", (PyCFunction)ImageRegistration_GCP2GDAL, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.gcp_to_gdal(input_img, in_gcp_file, output_img, gdalformat, datatype)\n"
+"imageregistration.gcp_to_gdal(input_img:str, in_gcp_file:str, output_img:str, gdalformat:str, datatype:int)\n"
 "Adds tie points to GDAL file, suitable for warping using the gdalwarp command.\n"
 "\n"
 "Where:\n"
@@ -364,7 +364,7 @@ static PyMethodDef ImageRegistrationMethods[] = {
 },
     
 {"apply_offset_to_image", (PyCFunction)ImageRegistration_ApplyOffset2Image, METH_VARARGS | METH_KEYWORDS,
-"imageregistration.apply_offset_to_image(input_img, output_img, gdalformat, datatype, x_offset, y_offset)\n"
+"imageregistration.apply_offset_to_image(input_img:str, output_img:str, gdalformat:str, datatype:int, x_offset:float, y_offset:float)\n"
 "Apply a linear X,Y offset to the image header - does not change the pixel values.\n"
 "\n"
 "Where:\n"
