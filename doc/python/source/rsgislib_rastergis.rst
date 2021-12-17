@@ -34,6 +34,7 @@ Attribute Clumps
 .. autofunction:: rsgislib.rastergis.define_class_names
 .. autofunction:: rsgislib.rastergis.calc_dist_to_classes
 .. autofunction:: rsgislib.rastergis.set_column_data
+.. autofunction:: rsgislib.rastergis.create_uid_col
 
 
 Sampling

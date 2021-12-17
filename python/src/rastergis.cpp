@@ -921,11 +921,11 @@ static PyObject *RasterGIS_GetGlobalClassStats(PyObject *self, PyObject *args, P
         std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference later
         extractedAttributes.push_back(o);
 
-        name = PyObject_GetAttrString(o, "name");
+        name = PyObject_GetAttrString(o, "cls_name");
         extractedAttributes.push_back(name);
         if( ( name == nullptr ) || ( name == Py_None ) || !RSGISPY_CHECK_STRING(name))
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'name\'" );
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'cls_name\'" );
             FreePythonObjects(extractedAttributes);
             return nullptr;
         }
@@ -1774,7 +1774,7 @@ static PyMethodDef RasterGISMethods[] = {
 ":param img_band: is an int which specifies the image band (from valsimage) for which the stats are to be calculated\n"
 ":param band_stats: is a sequence of objects that have attributes matching rsgislib.rastergis.BandAttPercentiles\n"
 "        * percentile: float defining the percentile to calculate (Valid range is 0 - 100)\n"
-"        * fieldName: string defining the name of the field to use for this percentile\n"
+"        * field_name: string defining the name of the field to use for this percentile\n"
 ":param n_hist_bins: is an optional (default = 200) integer specifying the number of bins within the histogram (note this governs the accuracy to which percentile can be calculated).\n"
 ":param rat_band: is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
 "\n"
@@ -1784,9 +1784,9 @@ static PyMethodDef RasterGISMethods[] = {
 "   clumpsImage = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea'\n"
 "   band=1\n"
 "   bandPercentiles = []\n"
-"   bandPercentiles.append(rastergis.BandAttPercentiles(percentile=25.0, fieldName='B1Per25'))\n"
-"   bandPercentiles.append(rastergis.BandAttPercentiles(percentile=50.0, fieldName='B1Per50'))\n"
-"   bandPercentiles.append(rastergis.BandAttPercentiles(percentile=75.0, fieldName='B1Per75'))\n"
+"   bandPercentiles.append(rastergis.BandAttPercentiles(percentile=25.0, field_name='B1Per25'))\n"
+"   bandPercentiles.append(rastergis.BandAttPercentiles(percentile=50.0, field_name='B1Per50'))\n"
+"   bandPercentiles.append(rastergis.BandAttPercentiles(percentile=75.0, field_name='B1Per75'))\n"
 "   rastergis.populate_rat_with_percentiles(inputImage, clumpsImage, band, bandPercentiles)\n"
 "\n"},
 
@@ -1972,18 +1972,16 @@ static PyMethodDef RasterGISMethods[] = {
 ":param class_field: is a string providing the name of the column containing classes.\n"
 ":param attributes: is a sequence of strings containing the columns to use when detecting change.\n"
 ":param cls_chg_cols: is a sequence of python objects having the following attributes:\n"
-"   * name - The class name in which change is going to be search for\n"
+"   * cls_name - The class name in which change is going to be search for\n"
 ":param rat_band: is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\n"
 "Example::\n"
 "\n"
-"   import collections"
 "   from rsgislib import rastergis\n"
 "   clumpsImage='injune_p142_casi_sub_utm_segs_popstats.kea'\n"
-"   ChangeFeat = collections.namedtuple('ChangeFeats', ['name', 'outName', 'threshold'])\n"
 "   changeFeatVals = []\n"
-"   changeFeatVals.append(ChangeFeat(name='Forest'))\n"
-"   changeFeatVals.append(ChangeFeat(name='Scrub-Shrub))\n"
+"   changeFeatVals.append(rastergis.ChangeFeat(cls_name='Forest'))\n"
+"   changeFeatVals.append(rastergis.ChangeFeat(cls_name='Scrub-Shrub))\n"
 "   rastergis.get_global_class_stats(clumpsImage, 'ClassName', ['NDVI'], changeFeatVals)\n"
 "\n"},
 

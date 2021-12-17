@@ -44,7 +44,7 @@ def test_run_shepherd_segmentation_pre_calcd_stats(tmp_path):
     kmeans_centres = os.path.join(SEGMENT_DATA_DIR, "kmeans_centres.gmtxt")
     img_stretch_stats = os.path.join(SEGMENT_DATA_DIR, "img_stch_stats.txt")
 
-    rsgislib.segmentation.shepherdseg(
+    rsgislib.segmentation.shepherdseg.run_shepherd_segmentation_pre_calcd_stats(
         input_img,
         out_clumps_img,
         kmeans_centres,
@@ -74,7 +74,7 @@ def test_run_shepherd_segmentation_pre_calcd_stats_sub_bands(tmp_path):
     kmeans_centres = os.path.join(SEGMENT_DATA_DIR, "kmeans_centres_bandsub.gmtxt")
     img_stretch_stats = os.path.join(SEGMENT_DATA_DIR, "img_stch_stats_bandsub.txt")
 
-    rsgislib.segmentation.shepherdseg(
+    rsgislib.segmentation.shepherdseg.run_shepherd_segmentation_pre_calcd_stats(
         input_img,
         out_clumps_img,
         kmeans_centres,

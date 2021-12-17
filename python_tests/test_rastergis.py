@@ -4,6 +4,8 @@ from shutil import copy2
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 RASTERGIS_DATA_DIR = os.path.join(DATA_DIR, "rastergis")
 CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
+IMGCALC_DATA_DIR = os.path.join(DATA_DIR, "imagecalc")
+
 
 def test_get_rat_length():
     import rsgislib.rastergis
@@ -178,7 +180,17 @@ def test_pop_rat_img_stats(tmp_path):
     )
 
 
-# TODO rsgislib.rastergis.collapse_rat
+def test_collapse_rat(tmp_path):
+    import rsgislib.rastergis
+
+    clumps_img = os.path.join(
+        RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_cls_out.kea"
+    )
+    output_img = os.path.join(tmp_path, "out_img.kea")
+
+    rsgislib.rastergis.collapse_rat(clumps_img, "OutClassName", output_img, "KEA")
+
+    assert os.path.exists(output_img)
 
 
 def test_calc_border_length(tmp_path):
@@ -191,8 +203,35 @@ def test_calc_border_length(tmp_path):
     rsgislib.rastergis.calc_border_length(clumps_img, "out_col", True)
 
 
-# TODO rsgislib.rastergis.calc_rel_border
-# TODO rsgislib.rastergis.calc_rel_diff_neigh_stats
+def test_calc_rel_border(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(
+        RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_cls_out.kea"
+    )
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps_cls_out.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.calc_rel_border(
+        clumps_img, "rel_border_forest", "OutClassName", "Forest", True
+    )
+
+
+def test_calc_rel_diff_neigh_stats(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(
+        RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_cls_out.kea"
+    )
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps_cls_out.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.find_neighbours(clumps_img, 1)
+
+    fieldInfo = rsgislib.rastergis.FieldAttStats(
+        field="b8_mean", min_field="MinNIRMeanDiff", max_field="MaxNIRMeanDiff"
+    )
+    rsgislib.rastergis.calc_rel_diff_neigh_stats(clumps_img, fieldInfo, False, 1)
 
 
 def test_define_border_clumps(tmp_path):
@@ -233,8 +272,69 @@ def test_find_neighbours(tmp_path):
 
 
 # TODO rsgislib.rastergis.populate_rat_with_cat_proportions
-# TODO rsgislib.rastergis.populate_rat_with_percentiles
-# TODO rsgislib.rastergis.populate_rat_with_meanlit_stats
+
+
+def test_populate_rat_with_percentiles(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+
+    band_percents = []
+    band_percents.append(
+        rsgislib.rastergis.BandAttPercentiles(percentile=25.0, field_name="B1Per25")
+    )
+    band_percents.append(
+        rsgislib.rastergis.BandAttPercentiles(percentile=50.0, field_name="B1Per50")
+    )
+    band_percents.append(
+        rsgislib.rastergis.BandAttPercentiles(percentile=75.0, field_name="B1Per75")
+    )
+    rsgislib.rastergis.populate_rat_with_percentiles(
+        input_img, clumps_img, 1, band_percents
+    )
+
+
+def test_populate_rat_with_meanlit_stats(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(
+        RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_cls_out.kea"
+    )
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps_cls_out.kea")
+    copy2(input_ref_img, clumps_img)
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+
+    band_stats = list()
+    band_stats.append(rsgislib.rastergis.BandAttStats(band=1, mean_field="b1_meanlit"))
+    band_stats.append(rsgislib.rastergis.BandAttStats(band=2, mean_field="b2_meanlit"))
+    band_stats.append(rsgislib.rastergis.BandAttStats(band=3, mean_field="b3_meanlit"))
+    band_stats.append(rsgislib.rastergis.BandAttStats(band=4, mean_field="b4_meanlit"))
+    band_stats.append(rsgislib.rastergis.BandAttStats(band=5, mean_field="b5_meanlit"))
+    band_stats.append(rsgislib.rastergis.BandAttStats(band=6, mean_field="b6_meanlit"))
+    band_stats.append(rsgislib.rastergis.BandAttStats(band=7, mean_field="b7_meanlit"))
+    band_stats.append(rsgislib.rastergis.BandAttStats(band=8, mean_field="b8_meanlit"))
+    band_stats.append(rsgislib.rastergis.BandAttStats(band=9, mean_field="b9_meanlit"))
+    band_stats.append(
+        rsgislib.rastergis.BandAttStats(band=10, mean_field="b10_meanlit")
+    )
+
+    rsgislib.rastergis.populate_rat_with_meanlit_stats(
+        input_img,
+        clumps_img,
+        input_ndvi_img,
+        1,
+        "ndvi_mean",
+        "meanlit_pxl_ct",
+        band_stats,
+    )
+
+
 # TODO rsgislib.rastergis.select_clumps_on_grid
 
 
@@ -270,6 +370,7 @@ def test_clumps_spatial_extent(tmp_path):
         rat_band=1,
     )
 
+
 def test_populate_rat_with_mode(tmp_path):
     import rsgislib.rastergis
 
@@ -279,7 +380,17 @@ def test_populate_rat_with_mode(tmp_path):
 
     in_cls_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
 
-    rsgislib.rastergis.populate_rat_with_mode(in_cls_img, clumps_img, out_cols_name="cls_val", use_no_data=True, no_data_val=0, out_no_data=0, mode_band=1, rat_band=1)
+    rsgislib.rastergis.populate_rat_with_mode(
+        in_cls_img,
+        clumps_img,
+        out_cols_name="cls_val",
+        use_no_data=True,
+        no_data_val=0,
+        out_no_data=0,
+        mode_band=1,
+        rat_band=1,
+    )
+
 
 def test_populate_rat_with_prop_valid_pxls(tmp_path):
     import rsgislib.rastergis
@@ -290,16 +401,22 @@ def test_populate_rat_with_prop_valid_pxls(tmp_path):
 
     in_cls_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
 
-    rsgislib.rastergis.populate_rat_with_prop_valid_pxls(in_cls_img, clumps_img, out_col="cls_val", no_data_val=0, rat_band=1)
+    rsgislib.rastergis.populate_rat_with_prop_valid_pxls(
+        in_cls_img, clumps_img, out_col="cls_val", no_data_val=0, rat_band=1
+    )
 
 
 def test_export_col_to_gdal_img(tmp_path):
     import rsgislib.rastergis
 
-    clumps_img = os.path.join(CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means.kea")
+    clumps_img = os.path.join(
+        CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means.kea"
+    )
 
     output_img = os.path.join(tmp_path, "out_img.kea")
-    rsgislib.rastergis.export_col_to_gdal_img(clumps_img, output_img, "KEA", rsgislib.TYPE_32FLOAT, "b6Mean", rat_band=1)
+    rsgislib.rastergis.export_col_to_gdal_img(
+        clumps_img, output_img, "KEA", rsgislib.TYPE_32FLOAT, "b6Mean", rat_band=1
+    )
 
     assert os.path.exists(output_img)
 
@@ -307,22 +424,37 @@ def test_export_col_to_gdal_img(tmp_path):
 def test_export_cols_to_gdal_img(tmp_path):
     import rsgislib.rastergis
 
-    clumps_img = os.path.join(CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means.kea")
+    clumps_img = os.path.join(
+        CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means.kea"
+    )
 
     output_img = os.path.join(tmp_path, "out_img.kea")
-    rsgislib.rastergis.export_cols_to_gdal_img(clumps_img, output_img, "KEA", rsgislib.TYPE_32FLOAT, ["b1Mean", "b2Mean", "b3Mean"], rat_band=1)
+    rsgislib.rastergis.export_cols_to_gdal_img(
+        clumps_img,
+        output_img,
+        "KEA",
+        rsgislib.TYPE_32FLOAT,
+        ["b1Mean", "b2Mean", "b3Mean"],
+        rat_band=1,
+    )
 
     assert os.path.exists(output_img)
+
 
 def test_export_rat_cols_to_ascii(tmp_path):
     import rsgislib.rastergis
 
-    clumps_img = os.path.join(CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means.kea")
+    clumps_img = os.path.join(
+        CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means.kea"
+    )
 
     out_file = os.path.join(tmp_path, "out_data.txt")
-    rsgislib.rastergis.export_rat_cols_to_ascii(clumps_img, out_file, ["b1Mean", "b2Mean", "b3Mean"], rat_band=1)
+    rsgislib.rastergis.export_rat_cols_to_ascii(
+        clumps_img, out_file, ["b1Mean", "b2Mean", "b3Mean"], rat_band=1
+    )
 
     assert os.path.exists(out_file)
+
 
 def test_export_clumps_to_images(tmp_path):
     import rsgislib.rastergis
@@ -331,7 +463,9 @@ def test_export_clumps_to_images(tmp_path):
     clumps_img = os.path.join(RASTERGIS_DATA_DIR, "sen2_grid_clumps.kea")
     out_img_base = os.path.join(tmp_path, "out_img_")
 
-    rsgislib.rastergis.export_clumps_to_images(clumps_img, out_img_base, True, "kea", "KEA", rat_band=1)
+    rsgislib.rastergis.export_clumps_to_images(
+        clumps_img, out_img_base, True, "kea", "KEA", rat_band=1
+    )
 
     assert len(glob.glob("{}*.kea".format(out_img_base))) == 4
 
@@ -344,9 +478,7 @@ def test_get_column_data():
         RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_attref.kea"
     )
 
-    hist_col_vals = rsgislib.rastergis.get_column_data(
-        ref_clumps_img, "Histogram"
-    )
+    hist_col_vals = rsgislib.rastergis.get_column_data(ref_clumps_img, "Histogram")
 
     hist_vals_range_ok = False
     if (
@@ -357,6 +489,50 @@ def test_get_column_data():
         hist_col_vals = True
 
     assert hist_col_vals
+
+
+def test_set_column_data(tmp_path):
+    import rsgislib.rastergis
+    import numpy
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    n_rows = rsgislib.rastergis.get_rat_length(clumps_img)
+    uid_col = numpy.arange(0, n_rows, 1, dtype=numpy.uint32)
+    rsgislib.rastergis.set_column_data(clumps_img, "test_col", uid_col)
+
+    read_col_vals = rsgislib.rastergis.get_column_data(clumps_img, "test_col")
+    assert numpy.array_equal(read_col_vals, uid_col)
+
+
+def test_create_uid_col(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_clumps.kea")
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.create_uid_col(clumps_img)
+
+
+def test_get_global_class_stats(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(
+        RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_cls_out.kea"
+    )
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps_cls_out.kea")
+    copy2(input_ref_img, clumps_img)
+
+    change_feat_vals = list()
+    change_feat_vals.append(rsgislib.rastergis.ChangeFeats(cls_name="Forest"))
+    change_feat_vals.append(rsgislib.rastergis.ChangeFeats(cls_name="Grass"))
+
+    rsgislib.rastergis.get_global_class_stats(
+        clumps_img, "OutClassName", ["ndvi_mean"], change_feat_vals
+    )
 
 
 # TODO rsgislib.rastergis.str_class_majority
@@ -373,14 +549,9 @@ def test_get_column_data():
 # TODO rsgislib.rastergis.import_vec_atts
 # TODO rsgislib.rastergis.colour_rat_classes
 # TODO rsgislib.rastergis.define_class_names
-# TODO rsgislib.rastergis.set_column_data
-# TODO rsgislib.rastergis.create_uid_col
 # TODO rsgislib.rastergis.take_random_sample
 # TODO rsgislib.rastergis.set_class_names_colours
 # TODO rsgislib.rastergis.calc_dist_between_clumps
 # TODO rsgislib.rastergis.calc_dist_to_large_clumps
 # TODO rsgislib.rastergis.calc_dist_to_classes
 # TODO rsgislib.rastergis.identify_small_units
-
-
-

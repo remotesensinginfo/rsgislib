@@ -674,9 +674,7 @@ def test_apply_xgboost_multiclass_classifier_rat(tmp_path):
 
     read_out_cls = False
     try:
-        cls_col_vals = rsgislib.rastergis.get_column_data(
-            clumps_img, "OutClass"
-        )
+        cls_col_vals = rsgislib.rastergis.get_column_data(clumps_img, "OutClass")
         read_out_cls = True
     except:
         read_out_cls = False
