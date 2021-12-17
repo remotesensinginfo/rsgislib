@@ -1,0 +1,14 @@
+{
+    "BBOX": {
+        "XMAX": 266370.59483340546,
+        "XMIN": 257060.59483340546,
+        "YMAX": 285728.7167059921,
+        "YMIN": 276258.7167059921
+    },
+    "CENTRE_PT": {
+        "X": 261715.59483340546,
+        "Y": 280993.7167059921
+    },
+    "KCENTRES": "./kmeans_centres_bandsub.gmtxt",
+    "STRETCHSTATS": "./img_stch_stats_bandsub.txt"
+}

@@ -5,9 +5,9 @@ Commands to perform a series of segmentations on input imagery
 
 Utilities
 ---------
-.. autofunction:: rsgislib.segmentation.segutils.run_shepherd_segmentation
+.. autofunction:: rsgislib.segmentation.shepherdseg.run_shepherd_segmentation
 .. autofunction:: rsgislib.segmentation.tiledsegsingle.perform_tiled_segmentation
-.. autofunction:: rsgislib.segmentation.segutils.run_shepherd_segmentation_pre_calcd_stats
+.. autofunction:: rsgislib.segmentation.shepherdseg.run_shepherd_segmentation_pre_calcd_stats
 
 
 Clump

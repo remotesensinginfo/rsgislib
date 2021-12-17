@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 ############################################################################
-#  segutils.py
+#  shepherdseg.py
 #
 #  Copyright 2013 RSGISLib.
 #
@@ -59,7 +59,7 @@ import os
 import collections
 
 # import the gdal module
-from osgeo import gdal
+import osgeo.gdal as gdal
 
 # Import the python JSON module
 import json
@@ -89,40 +89,63 @@ def run_shepherd_segmentation(
     """
     Utility function to call the segmentation algorithm of Shepherd et al. (2019).
 
-    Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale Segmentation of Imagery Based on Iterative Elimination. Remote Sensing, 11(6), 658. http://doi.org/10.3390/rs11060658
+    Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale
+    Segmentation of Imagery Based on Iterative Elimination. Remote Sensing, 11(6), 658.
+    http://doi.org/10.3390/rs11060658
 
     Where:
 
     :param input_img: is a string containing the name of the input file.
     :param out_clumps_img: is a string containing the name of the output clump file.
-    :param out_mean_img: is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
-    :param tmp_dir: is a file path for intermediate files (default is current directory).
-    :param gdalformat: is a string containing the GDAL format for the output file (default = KEA).
-    :param calc_stats: is a bool which specifies that image statistics and pyramids should be built for the output images (default = True)/
-    :param no_stretch: is a bool which specifies that the input image bands should not be stretched (default = False).
-    :param no_delete: is a bool which specifies that the temporary images created during processing should not be deleted once processing has been completed (default = False).
-    :param num_clusters: is an int which specifies the number of clusters within the KMeans clustering (default = 60).
-    :param min_n_pxls: is an int which specifies the minimum number pixels within a segments (default = 100).
-    :param dist_thres: specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
-    :param bands: is an array providing a subset of image bands to use (default is None to use all bands).
-    :param sampling: specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
+    :param out_mean_img: is the output mean image file (clumps attributed with pixel
+                         mean from input image) - pass 'None' to skip creating.
+    :param tmp_dir: is a file path for intermediate files (default is current
+                    directory).
+    :param gdalformat: is a string containing the GDAL format for the output file
+                       (default = KEA).
+    :param calc_stats: is a bool which specifies that image statistics and pyramids
+                       should be built for the output images (default = True)
+    :param no_stretch: is a bool which specifies that the input image bands should
+                       not be stretched (default = False).
+    :param no_delete: is a bool which specifies that the temporary images created
+                      during processing should not be deleted once processing has
+                      been completed (default = False).
+    :param num_clusters: is an int which specifies the number of clusters within the
+                         KMeans clustering (default = 60).
+    :param min_n_pxls: is an int which specifies the minimum number pixels within a
+                       segments (default = 100).
+    :param dist_thres: specifies the distance threshold for joining the segments
+                       (default = 100, set to large number to turn off this option).
+    :param bands: is an array providing a subset of image bands to use (default
+                  is None to use all bands).
+    :param sampling: specify the subsampling of the image for the data used within
+                     the KMeans (default = 100; 1 == no subsampling).
     :param km_max_iter: maximum iterations for KMeans.
-    :param process_in_mem: where functions allow it perform processing in memory rather than on disk.
-    :param save_process_stats: is a bool which specifies that the image stretch stats and the kMeans centre stats should be saved along with a header.
-    :param img_stretch_stats: is a string providing the file name and path for the image stretch stats (Output).
-    :param kmeans_centres: is a string providing the file name and path for the KMeans clusters centres (don't include file extension; .gmtxt will be added to the end) (Output).
-    :param img_stats_json_file: is a string providing the name and path of a JSON file storing the image spatial extent and img_stretch_stats and kmeans_centres file paths for use by other commands (Output).
+    :param process_in_mem: where functions allow it perform processing in memory
+                           rather than on disk.
+    :param save_process_stats: is a bool which specifies that the image stretch
+                               stats and the kMeans centre stats should be saved
+                               along with a header.
+    :param img_stretch_stats: is a string providing the file name and path for the
+                              image stretch stats (Output).
+    :param kmeans_centres: is a string providing the file name and path for the
+                           KMeans clusters centres (don't include file extension;
+                           .gmtxt will be added to the end) (Output).
+    :param img_stats_json_file: is a string providing the name and path of a JSON
+                                file storing the image spatial extent and
+                                img_stretch_stats and kmeans_centres file paths
+                                for use by other commands (Output).
 
     Example::
 
-        from rsgislib.segmentation import segutils
+        from rsgislib.segmentation import shepherdseg
 
         input_img = 'jers1palsar_stack.kea'
         out_clumps_img = 'jers1palsar_stack_clumps_elim_final.kea'
         out_mean_img = 'jers1palsar_stack_clumps_elim_final_mean.kea'
 
-        segutils.run_shepherd_segmentation(input_img, out_clumps_img, out_mean_img, min_n_pxls=100)
-
+        shepherdseg.run_shepherd_segmentation(input_img, out_clumps_img,
+                                              out_mean_img, min_n_pxls=100)
 
     """
     import rsgislib.tools.filetools
@@ -134,7 +157,9 @@ def run_shepherd_segmentation(
             or (img_stats_json_file == "")
         ):
             raise rsgislib.RSGISPyException(
-                "if image stretch and kmeans centres are to be saved then all file names (img_stretch_stats, kmeans_centres, img_stats_json_file) need to be provided."
+                "if image stretch and kmeans centres are to be saved then all "
+                "file names (img_stretch_stats, kmeans_centres, img_stats_json_file) "
+                "need to be provided."
             )
 
     basefile = os.path.basename(input_img)
@@ -194,7 +219,8 @@ def run_shepherd_segmentation(
         )
 
         print(
-            "Add 1 to stretched file to ensure there are no all zeros (i.e., no data) regions created."
+            "Add 1 to stretched file to ensure there are no all "
+            "zeros (i.e., no data) regions created."
         )
         rsgislib.imagecalc.image_math(
             strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT
@@ -390,31 +416,48 @@ def run_shepherd_segmentation_pre_calcd_stats(
     process_in_mem=False,
 ):
     """
-    Utility function to call the segmentation algorithm of Shepherd et al. (2019) using pre-calculated stretch stats and KMeans cluster centres.
+    Utility function to call the segmentation algorithm of Shepherd et al. (2019)
+    using pre-calculated stretch stats and KMeans cluster centres.
 
-    Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale Segmentation of Imagery Based on Iterative Elimination. Remote Sensing, 11(6), 658. http://doi.org/10.3390/rs11060658
+    Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale
+    Segmentation of Imagery Based on Iterative Elimination. Remote Sensing, 11(6),
+    658. http://doi.org/10.3390/rs11060658
 
-    Where:
 
     :param input_img: is a string containing the name of the input file.
     :param out_clumps_img: is a string containing the name of the output clump file.
-    :param kmeans_centres: is a string providing the file name and path for the KMeans clusters centres (Input)
-    :param img_stretch_stats: is a string providing the file name and path for the image stretch stats (Input - not required if no_stretch=True)
-    :param out_mean_img: is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
-    :param tmp_dir: is a file path for intermediate files (default is current directory).
-    :param gdalformat: is a string containing the GDAL format for the output file (default = KEA).
-    :param calc_stats: is a bool which specifies that image statistics and pyramids should be built for the output images (default = True)/
-    :param no_stretch: is a bool which specifies that the input image bands should not be stretched (default = False).
-    :param no_delete: is a bool which specifies that the temporary images created during processing should not be deleted once processing has been completed (default = False).
-    :param min_n_pxls: is an int which specifies the minimum number pixels within a segments (default = 100).
-    :param dist_thres: specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
-    :param bands: is an array providing a subset of image bands to use (default is None to use all bands).
-    :param sampling: specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
-    :param process_in_mem: where functions allow it perform processing in memory rather than on disk.
+    :param kmeans_centres: is a string providing the file name and path for the
+                           KMeans clusters centres (Input)
+    :param img_stretch_stats: is a string providing the file name and path for the
+                              image stretch stats (Input - not required if
+                              no_stretch=True)
+    :param out_mean_img: is the output mean image file (clumps attributed with pixel
+                         mean from input image) - pass 'None' to skip creating.
+    :param tmp_dir: is a file path for intermediate files (default is current
+                    directory).
+    :param gdalformat: is a string containing the GDAL format for the output file
+                       (default = KEA).
+    :param calc_stats: is a bool which specifies that image statistics and pyramids
+                       should be built for the output images (default = True)
+    :param no_stretch: is a bool which specifies that the input image bands should
+                       not be stretched (default = False).
+    :param no_delete: is a bool which specifies that the temporary images created
+                      during processing should not be deleted once processing has
+                      been completed (default = False).
+    :param min_n_pxls: is an int which specifies the minimum number pixels within
+                       a segments (default = 100).
+    :param dist_thres: specifies the distance threshold for joining the segments
+                       (default = 100, set to large number to turn off this option).
+    :param bands: is an array providing a subset of image bands to use (default is
+                  None to use all bands).
+    :param sampling: specify the subsampling of the image for the data used within
+                     the KMeans (default = 100; 1 == no subsampling).
+    :param process_in_mem: where functions allow it perform processing in memory
+                           rather than on disk.
 
     Example::
 
-        from rsgislib.segmentation import segutils
+        from rsgislib.segmentation import shepherdseg
 
         input_img = 'jers1palsar_stack.kea'
         out_clumps_img = 'jers1palsar_stack_clumps_elim_final.kea'
@@ -422,7 +465,11 @@ def run_shepherd_segmentation_pre_calcd_stats(
         kmeans_centres = 'jers1palsar_stack_kcentres.gmtxt'
         img_stretch_stats = 'jers1palsar_stack_stchstats.txt'
 
-        segutils.run_shepherd_segmentation_pre_calcd_stats(input_img, out_clumps_img, kmeans_centres, img_stretch_stats, out_mean_img, min_n_pxls=100)
+        shepherdseg.run_shepherd_segmentation_pre_calcd_stats(input_img, out_clumps_img,
+                                                              kmeans_centres,
+                                                              img_stretch_stats,
+                                                              out_mean_img,
+                                                              min_n_pxls=100)
 
     """
     import rsgislib.tools.filetools
@@ -489,7 +536,8 @@ def run_shepherd_segmentation_pre_calcd_stats(
         )
 
         print(
-            "Add 1 to stretched file to ensure there are no all zeros (i.e., no data) regions created."
+            "Add 1 to stretched file to ensure there are no "
+            "all zeros (i.e., no data) regions created."
         )
         rsgislib.imagecalc.image_math(
             strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT
