@@ -35,8 +35,9 @@
 #############################################################################
 
 import argparse
-from rsgislib import imageutils
-from rsgislib import rastergis
+import os
+import rsgislib.imageutils
+import rsgislib.rastergis
 
 
 if __name__ == '__main__':
@@ -54,7 +55,7 @@ if __name__ == '__main__':
     # Call the parser to parse the arguments.
     args = parser.parse_args()
     
-    inImage = args.image
+    input_img = args.image
     pyramids = not args.nopyramids        
     
     if args.thematic:
@@ -62,7 +63,10 @@ if __name__ == '__main__':
         ignoreZeros = False
         if args.nodata == 0.0:
             ignoreZeros = True
-        rastergis.populateStats(clumps=inImage, addclrtab=clrTab, calcpyramids=pyramids, ignorezero=ignoreZeros)
+        if os.path.splitext(input_img)[1].lower() == "kea":
+            rsgislib.rastergis.pop_rat_img_stats(clumps_img=input_img, add_clr_tab=clrTab, calc_pyramids=pyramids, ignore_zero=ignoreZeros)
+        else:
+            rsgislib.imageutils.pop_thmt_img_stats(input_img, add_clr_tab=clrTab, calc_pyramids=pyramids, ignore_zero=ignoreZeros)
     else:
-        imageutils.popImageStats(inImage, usenodataval=True, nodataval=args.nodata, calcpyramids=pyramids)
+        rsgislib.imageutils.pop_img_stats(input_img, use_no_data=True, no_data_val=args.nodata, calc_pyramids=pyramids)
 

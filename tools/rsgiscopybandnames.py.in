@@ -37,9 +37,9 @@ import rsgislib.imageutils
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-r", "--reference", dest="refFile", type=str, required=True, help="Input image")
-parser.add_argument("-f", "--imagefile", dest="imageFile", type=str, required=True, help="Output image.")
+parser.add_argument("-r", "--refimg", dest="ref_img", type=str, required=True, help="Input reference image")
+parser.add_argument("-o", "--outimg", dest="out_img", type=str, required=True, help="Output image.")
 args = parser.parse_args() 
 
-bandNames = rsgislib.imageutils.getBandNames(args.refFile)
-rsgislib.imageutils.setBandNames(args.imageFile, bandNames)
+band_names = rsgislib.imageutils.get_band_names(args.ref_img)
+rsgislib.imageutils.set_band_names(args.out_img, band_names)

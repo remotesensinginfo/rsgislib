@@ -30,10 +30,11 @@
 # 
 #############################################
 
-import rsgislib.vectorutils
 import glob
 import os.path
 import argparse
+
+import rsgislib.imageutils.imagelut
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -54,6 +55,6 @@ if __name__ == "__main__":
     else:
         vec_lyr_name = args.veclyr
     
-    imgList = glob.glob(args.imgsearch)
-    rsgislib.vectorutils.createImgExtentLUT(imgList, args.output, vec_lyr_name, args.vecformat, ignore_none_imgs=args.ignore_noproj, out_proj_wgs84=args.wgs84, overwrite_lut_file=args.overwrite)
+    img_list = glob.glob(args.imgsearch)
+    rsgislib.rsgislib.imageutils.imagelut.create_img_extent_lut(img_list, args.output, vec_lyr_name, args.vecformat, ignore_none_imgs=args.ignore_noproj, out_proj_wgs84=args.wgs84, overwrite_lut_file=args.overwrite)
     print("Finished Creating LUT.")

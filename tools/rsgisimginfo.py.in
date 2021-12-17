@@ -30,8 +30,7 @@
 #############################################
 
 import argparse
-import osgeo.gdal as gdal
-from rios import rat
+import rsgislib.rastergis
 
 def listRATColumns(imgFile, band=1):
     dataset = gdal.Open(imgFile, gdal.GA_ReadOnly)
@@ -54,16 +53,18 @@ if __name__ == "__main__":
                         action='store_true', 
                         default=False, 
                         help="List the columns in a RAT.")
-    parser.add_argument("-i", "--imgfile",
+    parser.add_argument("-i", "--img",
                         type=str,
                         required=True,
                         help="image file")
-    parser.add_argument("-b", "--imgband",
+    parser.add_argument("-b", "--band",
                         type=int,
                         default=1,
                         help="image band")
     args = parser.parse_args()
     
     if args.ratcols:
-        listRATColumns(args.imgfile, args.imgband)
+        rat_cols = rsgislib.rastergis.get_rat_columns(args.imgfile, rat_band=args.imgband)
+        for col in rat_cols:
+            print(f"\t{col}")
 

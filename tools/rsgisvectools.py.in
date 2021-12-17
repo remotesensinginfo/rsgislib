@@ -39,17 +39,19 @@ if __name__ == "__main__":
     parser.add_argument("--veclyr", type=str, required=False, help="Input vector file layer.")
     parser.add_argument("--lyrs", action='store_true', default=False, help="List the layers in vector file.")
     parser.add_argument("--cols", action='store_true', default=False, help="List the columns in vector layer.")
+    parser.add_argument("--nfeats", action='store_true', default=False, help="Count for the number of feats in layer.")
     args = parser.parse_args()
     
     if args.lyrs:
-        veclyrs = rsgislib.vectorutils.getVecLyrsLst(args.vecfile)
-        i = 1
-        for lyr in veclyrs:
-            print("{0}: {1}".format(i, lyr))
-            i = i + 1
+        vec_lyrs = rsgislib.vectorutils.get_vec_lyrs_lst(args.vecfile)
+        for i, lyr in enumerate(vec_lyrs):
+            print(f"{i + 1}: f{lyr}")
+
     if args.cols:
-        veccols = rsgislib.vectorutils.lstveclyrcols(args.vecfile, args.veclyr)
-        i = 1
-        for col in veccols:
-            print("{0}: {1}".format(i, col))
-            i = i + 1
+        vec_cols = rsgislib.vectorutils.get_vec_lyr_cols(args.vecfile, args.veclyr)
+        for i, col in enumerate(vec_cols):
+            print(f"{i+1}: f{col}")
+
+    if args.nfeats:
+        n_lyr_feats = rsgislib.vectorutils.get_vec_feat_count(args.vecfile, args.veclyr)
+        print(f"N Features in {args.veclyr}: {n_lyr_feats}")

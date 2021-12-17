@@ -37,7 +37,7 @@
 # Import the python Argument parser
 import argparse
 # Import the image segmentation utilites module from rsgislib
-import rsgislib.segmentation.segutils
+import rsgislib.segmentation.shepherdseg
         
 if __name__ == '__main__':
     """
@@ -118,4 +118,4 @@ if __name__ == '__main__':
     print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
     print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
     
-    rsgislib.segmentation.segutils.runShepherdSegmentation(args.input, args.output, args.outmeanimg, args.tmpath, args.format, args.nostats, args.nostretch, args.nodelete, args.numclusters, args.minpxls, args.distthres, args.band, args.sampling, args.maxiter, args.inmem)
+    rsgislib.segmentation.shepherdseg.run_shepherd_segmentation(args.input, args.output, args.outmeanimg, args.tmpath, args.format, args.nostats, args.nostretch, args.nodelete, args.numclusters, args.minpxls, args.distthres, args.band, args.sampling, args.maxiter, args.inmem)
