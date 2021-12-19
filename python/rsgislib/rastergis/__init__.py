@@ -71,7 +71,7 @@ class ShapeIndex:
 
 class ChangeFeats:
 
-    def __init__(self, cls_name: str, cls_out_name: str, threshold: float = 0):
+    def __init__(self, cls_name: str, cls_out_name: str = None, threshold: float = 0):
         self.cls_name = cls_name
         self.cls_out_name = cls_out_name
         self.threshold = threshold
