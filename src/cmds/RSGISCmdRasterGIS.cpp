@@ -1371,7 +1371,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds *fieldStatsCmds, bool useAbsDiff, unsigned int ratBand)
+    void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds fieldStatsCmds, bool useAbsDiff, unsigned int ratBand)
     {
         try
         {
@@ -1385,25 +1385,22 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
-            rsgis::rastergis::RSGISFieldAttStats *fieldStats = new rsgis::rastergis::RSGISFieldAttStats();
-            fieldStats->field = fieldStatsCmds->field;
-            fieldStats->calcMin = fieldStatsCmds->calcMin;
-            fieldStats->minField = fieldStatsCmds->minField;
-            fieldStats->calcMax = fieldStatsCmds->calcMax;
-            fieldStats->maxField = fieldStatsCmds->maxField;
-            fieldStats->calcMean = fieldStatsCmds->calcMean;
-            fieldStats->meanField = fieldStatsCmds->meanField;
-            fieldStats->calcStdDev = fieldStatsCmds->calcStdDev;
-            fieldStats->stdDevField = fieldStatsCmds->stdDevField;
-            fieldStats->calcSum = fieldStatsCmds->calcSum;
-            fieldStats->sumField = fieldStatsCmds->sumField;
+            rsgis::rastergis::RSGISFieldAttStats fieldStats;
+            fieldStats.field = fieldStatsCmds.field;
+            fieldStats.calcMin = fieldStatsCmds.calcMin;
+            fieldStats.minField = fieldStatsCmds.minField;
+            fieldStats.calcMax = fieldStatsCmds.calcMax;
+            fieldStats.maxField = fieldStatsCmds.maxField;
+            fieldStats.calcMean = fieldStatsCmds.calcMean;
+            fieldStats.meanField = fieldStatsCmds.meanField;
+            fieldStats.calcStdDev = fieldStatsCmds.calcStdDev;
+            fieldStats.stdDevField = fieldStatsCmds.stdDevField;
+            fieldStats.calcSum = fieldStatsCmds.calcSum;
+            fieldStats.sumField = fieldStatsCmds.sumField;
             
             rsgis::rastergis::RSGISCalcNeighbourStats calcNeighStats;
             calcNeighStats.populateStatsDiff2Neighbours(clumpsDataset, fieldStats, useAbsDiff, ratBand);
-            
-            delete fieldStatsCmds;
-            delete fieldStats;
-                
+
             GDALClose(clumpsDataset);
         }
         catch(rsgis::RSGISAttributeTableException &e)

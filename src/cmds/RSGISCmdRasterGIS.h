@@ -289,7 +289,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField);
 
     /** Function to calculate relative difference statistic to neighbouring clumps. */
-    DllExport void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds *fieldStatsCmds, bool useAbsDiff, unsigned int ratBand);
+    DllExport void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds fieldStatsCmds, bool useAbsDiff, unsigned int ratBand);
 
        /** Function for populating an attribute table from an image with 'mean-lit' values. */
     DllExport void executePopulateRATWithMeanLitStats(std::string inputImage, std::string clumpsImage, std::string inputMeanLitImage, unsigned int meanlitBand, std::string meanLitColumn, std::string pxlCountCol, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand);

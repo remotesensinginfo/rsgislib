@@ -233,6 +233,23 @@ def test_calc_rel_diff_neigh_stats(tmp_path):
     )
     rsgislib.rastergis.calc_rel_diff_neigh_stats(clumps_img, fieldInfo, False, 1)
 
+def test_calc_rel_diff_neigh_stats_abs(tmp_path):
+    import rsgislib.rastergis
+
+    input_ref_img = os.path.join(
+        RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_cls_out.kea"
+    )
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps_cls_out.kea")
+    copy2(input_ref_img, clumps_img)
+
+    rsgislib.rastergis.find_neighbours(clumps_img, 1)
+
+    fieldInfo = rsgislib.rastergis.FieldAttStats(
+        field="b8_mean", min_field="MinNIRMeanDiff", max_field="MaxNIRMeanDiff"
+    )
+    rsgislib.rastergis.calc_rel_diff_neigh_stats(clumps_img, fieldInfo, True, 1)
+
+
 
 def test_define_border_clumps(tmp_path):
     import rsgislib.rastergis

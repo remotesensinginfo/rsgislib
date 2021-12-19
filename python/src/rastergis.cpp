@@ -987,7 +987,7 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
     const char *clumpsImage;
     PyObject *fieldObj;
     int useAbsDiff;
-    useAbsDiff = 0;
+    useAbsDiff = false;
     int ratBand;
     ratBand = 1;
 
@@ -1003,7 +1003,7 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
     PyObject *pField, *pMinField, *pMaxField, *pStdDevField, *pSumField, *pMeanField;
     pField = pMinField = pMaxField = pMeanField = pStdDevField = pSumField = nullptr;
     
-    rsgis::cmds::RSGISFieldAttStatsCmds *cmdObj = new rsgis::cmds::RSGISFieldAttStatsCmds();
+    rsgis::cmds::RSGISFieldAttStatsCmds cmdObj;
     
     std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
     extractedAttributes.push_back(fieldObj);
@@ -1019,53 +1019,52 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
     
     pMinField = PyObject_GetAttrString(fieldObj, "min_field");
     extractedAttributes.push_back(pMinField);
-    cmdObj->calcMin =  !(pMinField == nullptr || !RSGISPY_CHECK_STRING(pMinField));
+    cmdObj.calcMin =  !(pMinField == nullptr || !RSGISPY_CHECK_STRING(pMinField));
     
     pMaxField = PyObject_GetAttrString(fieldObj, "max_field");
     extractedAttributes.push_back(pMaxField);
-    cmdObj->calcMax = !(pMaxField == nullptr || !RSGISPY_CHECK_STRING(pMaxField));
+    cmdObj.calcMax = !(pMaxField == nullptr || !RSGISPY_CHECK_STRING(pMaxField));
     
     pMeanField = PyObject_GetAttrString(fieldObj, "mean_field");
     extractedAttributes.push_back(pMeanField);
-    cmdObj->calcMean = !(pMeanField == nullptr || !RSGISPY_CHECK_STRING(pMeanField));
+    cmdObj.calcMean = !(pMeanField == nullptr || !RSGISPY_CHECK_STRING(pMeanField));
     
     pStdDevField = PyObject_GetAttrString(fieldObj, "std_dev_field");
     extractedAttributes.push_back(pStdDevField);
-    cmdObj->calcStdDev = !(pStdDevField == nullptr || !RSGISPY_CHECK_STRING(pStdDevField));
+    cmdObj.calcStdDev = !(pStdDevField == nullptr || !RSGISPY_CHECK_STRING(pStdDevField));
     
     pSumField = PyObject_GetAttrString(fieldObj, "sum_field");
     extractedAttributes.push_back(pSumField);
-    cmdObj->calcSum = !(pSumField == nullptr || !RSGISPY_CHECK_STRING(pSumField));
+    cmdObj.calcSum = !(pSumField == nullptr || !RSGISPY_CHECK_STRING(pSumField));
     
     // extract the values from the objects
-    cmdObj->field = RSGISPY_STRING_EXTRACT(pField);
+    cmdObj.field = RSGISPY_STRING_EXTRACT(pField);
     // check the calcValue and extract fields if required
-    if(cmdObj->calcMax)
+    if(cmdObj.calcMax)
     {
-        cmdObj->maxField = RSGISPY_STRING_EXTRACT(pMaxField);
+        cmdObj.maxField = RSGISPY_STRING_EXTRACT(pMaxField);
     }
-    if(cmdObj->calcMean)
+    if(cmdObj.calcMean)
     {
-        cmdObj->meanField = RSGISPY_STRING_EXTRACT(pMeanField);
+        cmdObj.meanField = RSGISPY_STRING_EXTRACT(pMeanField);
     }
-    if(cmdObj->calcMin)
+    if(cmdObj.calcMin)
     {
-        cmdObj->minField = RSGISPY_STRING_EXTRACT(pMinField);
+        cmdObj.minField = RSGISPY_STRING_EXTRACT(pMinField);
     }
-    if(cmdObj->calcStdDev)
+    if(cmdObj.calcStdDev)
     {
-        cmdObj->stdDevField = RSGISPY_STRING_EXTRACT(pStdDevField);
+        cmdObj.stdDevField = RSGISPY_STRING_EXTRACT(pStdDevField);
     }
-    if(cmdObj->calcSum)
+    if(cmdObj.calcSum)
     {
-        cmdObj->sumField = RSGISPY_STRING_EXTRACT(pSumField);
+        cmdObj.sumField = RSGISPY_STRING_EXTRACT(pSumField);
     }
-    
-    FreePythonObjects(extractedAttributes);
     
     try
     {
-        rsgis::cmds::executeCalcRelDiffNeighbourStats(std::string(clumpsImage), cmdObj, (useAbsDiff != 0), ratBand);
+        bool useAbsDiffBool = (bool)useAbsDiff;
+        rsgis::cmds::executeCalcRelDiffNeighbourStats(std::string(clumpsImage), cmdObj, useAbsDiffBool, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {

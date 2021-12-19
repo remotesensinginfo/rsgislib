@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISCalcNeighbourStats::populateStatsDiff2Neighbours(GDALDataset *inputClumps, RSGISFieldAttStats *fieldStats, bool useAbsDiff, unsigned int ratBand)
+    void RSGISCalcNeighbourStats::populateStatsDiff2Neighbours(GDALDataset *inputClumps, RSGISFieldAttStats fieldStats, bool useAbsDiff, unsigned int ratBand)
     {
         try
         {
@@ -49,7 +49,7 @@ namespace rsgis{namespace rastergis{
             {
                 throw rsgis::RSGISAttributeTableException("RAT Band is larger than the number of bands within the image.");
             }
-            
+
             GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
             
             size_t numRows = rat->GetRowCount();
@@ -58,13 +58,13 @@ namespace rsgis{namespace rastergis{
                 throw rsgis::RSGISAttributeTableException("RAT has no rows, i.e., it is empty!");
             }
             
-            fieldStats->fieldIdx = attUtils.findColumnIndex(rat, fieldStats->field);
+            fieldStats.fieldIdx = attUtils.findColumnIndex(rat, fieldStats.field);
             
             std::vector<std::vector<size_t>* > *neighbours = attUtils.getRATNeighbours(inputClumps, ratBand);
             
             if(numRows != neighbours->size())
             {
-                for(std::vector<std::vector<size_t>* >::iterator iterNeigh = neighbours->begin(); iterNeigh != neighbours->end(); ++iterNeigh)
+                for(auto iterNeigh = neighbours->begin(); iterNeigh != neighbours->end(); ++iterNeigh)
                 {
                     delete *iterNeigh;
                 }
@@ -74,11 +74,11 @@ namespace rsgis{namespace rastergis{
             }
             
             size_t colLen = 0;
-            double *dataVals = attUtils.readDoubleColumn(rat, fieldStats->field, &colLen);
+            double *dataVals = attUtils.readDoubleColumn(rat, fieldStats.field, &colLen);
             
             if(colLen != numRows)
             {
-                for(std::vector<std::vector<size_t>* >::iterator iterNeigh = neighbours->begin(); iterNeigh != neighbours->end(); ++iterNeigh)
+                for(auto iterNeigh = neighbours->begin(); iterNeigh != neighbours->end(); ++iterNeigh)
                 {
                     delete *iterNeigh;
                 }
@@ -86,41 +86,41 @@ namespace rsgis{namespace rastergis{
                 delete[] dataVals;
                 throw rsgis::RSGISAttributeTableException("The column does not have enough values ");
             }
-            
+
             std::vector<double> *diffClumpVals = new std::vector<double>();
             rsgis::math::RSGISStatsSummary *stats2Calc = new rsgis::math::RSGISStatsSummary();
-            
-            if(fieldStats->calcMin)
+
+            if(fieldStats.calcMin)
             {
                 stats2Calc->calcMin = true;
-                fieldStats->minFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats->minField, GFT_Real);
+                fieldStats.minFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats.minField, GFT_Real);
                 minDiffCol = new double[numRows];
             }
-            if(fieldStats->calcMax)
+            if(fieldStats.calcMax)
             {
                 stats2Calc->calcMax = true;
-                fieldStats->maxFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats->maxField, GFT_Real);
+                fieldStats.maxFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats.maxField, GFT_Real);
                 maxDiffCol = new double[numRows];
             }
-            if(fieldStats->calcMean)
+            if(fieldStats.calcMean)
             {
                 stats2Calc->calcMean = true;
-                fieldStats->meanFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats->meanField, GFT_Real);
+                fieldStats.meanFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats.meanField, GFT_Real);
                 meanDiffCol = new double[numRows];
             }
-            if(fieldStats->calcStdDev)
+            if(fieldStats.calcStdDev)
             {
                 stats2Calc->calcStdDev = true;
-                fieldStats->stdDevFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats->stdDevField, GFT_Real);
+                fieldStats.stdDevFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats.stdDevField, GFT_Real);
                 stddevDiffCol = new double[numRows];
             }
-            if(fieldStats->calcSum)
+            if(fieldStats.calcSum)
             {
                 stats2Calc->calcSum = true;
-                fieldStats->sumFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats->sumField, GFT_Real);
+                fieldStats.sumFieldIdx = attUtils.findColumnIndexOrCreate(rat, fieldStats.sumField, GFT_Real);
                 sumDiffCol = new double[numRows];
             }
-            
+
             for(size_t i  = 0; i <  numRows; ++i)
             {
                 diffClumpVals->clear();
@@ -131,6 +131,7 @@ namespace rsgis{namespace rastergis{
                 stats2Calc->mean = 0.0;
                 stats2Calc->stdDev = 0.0;
                 stats2Calc->sum = 0.0;
+
                 for(std::vector<size_t>::iterator iterNeigh = clumpNeigh->begin(); iterNeigh != clumpNeigh->end(); ++iterNeigh)
                 {
                     if(useAbsDiff)
@@ -142,7 +143,7 @@ namespace rsgis{namespace rastergis{
                         diffClumpVals->push_back((dataVals[i] - dataVals[*iterNeigh]));
                     }
                 }
-                
+
                 mathUtils.generateStats(diffClumpVals, stats2Calc);
                 if(stats2Calc->calcMin)
                 {
@@ -165,35 +166,36 @@ namespace rsgis{namespace rastergis{
                     sumDiffCol[i] = stats2Calc->sum;
                 }
             }
-            
-            if(fieldStats->calcMin)
+
+            if(fieldStats.calcMin)
             {
-                rat->ValuesIO(GF_Write, fieldStats->minFieldIdx, 0, numRows, minDiffCol);
+                rat->ValuesIO(GF_Write, fieldStats.minFieldIdx, 0, numRows, minDiffCol);
                 delete[] minDiffCol;
             }
-            if(fieldStats->calcMax)
+            if(fieldStats.calcMax)
             {
-                rat->ValuesIO(GF_Write, fieldStats->maxFieldIdx, 0, numRows, maxDiffCol);
+                rat->ValuesIO(GF_Write, fieldStats.maxFieldIdx, 0, numRows, maxDiffCol);
                 delete[] maxDiffCol;
             }
-            if(fieldStats->calcMean)
+            if(fieldStats.calcMean)
             {
-                rat->ValuesIO(GF_Write, fieldStats->meanFieldIdx, 0, numRows, meanDiffCol);
+                rat->ValuesIO(GF_Write, fieldStats.meanFieldIdx, 0, numRows, meanDiffCol);
                 delete[] meanDiffCol;
             }
-            if(fieldStats->calcStdDev)
+            if(fieldStats.calcStdDev)
             {
-                rat->ValuesIO(GF_Write, fieldStats->stdDevFieldIdx, 0, numRows, stddevDiffCol);
+                rat->ValuesIO(GF_Write, fieldStats.stdDevFieldIdx, 0, numRows, stddevDiffCol);
                 delete[] stddevDiffCol;
             }
-            if(fieldStats->calcSum)
+            if(fieldStats.calcSum)
             {
-                rat->ValuesIO(GF_Write, fieldStats->sumFieldIdx, 0, numRows, sumDiffCol);
+                rat->ValuesIO(GF_Write, fieldStats.sumFieldIdx, 0, numRows, sumDiffCol);
                 delete[] sumDiffCol;
             }
             delete stats2Calc;
-            
-            for(std::vector<std::vector<size_t>* >::iterator iterNeigh = neighbours->begin(); iterNeigh != neighbours->end(); ++iterNeigh)
+            delete diffClumpVals;
+
+            for(auto iterNeigh = neighbours->begin(); iterNeigh != neighbours->end(); ++iterNeigh)
             {
                 delete *iterNeigh;
             }
