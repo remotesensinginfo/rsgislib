@@ -296,14 +296,12 @@ def extract_image_footprint(
         if os.path.exists(out_vec_file):
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
 
-        cmd = 'ogr2ogr -f "{}" -t_srs {} {} {}'.format(
-            out_format, reproj_to, out_vec_file, outVecTmpFile
-        )
+        cmd = ["ogr2ogr", "-f", out_format, "-t_srs", reproj_to, out_vec_file, outVecTmpFile]
         print(cmd)
         try:
             import subprocess
 
-            subprocess.check_call(cmd, shell=True)
+            subprocess.run(cmd)
         except OSError as e:
             raise Exception("Could not re-projection vector file: " + cmd)
 

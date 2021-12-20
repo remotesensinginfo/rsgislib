@@ -650,24 +650,24 @@ def create_directory_archive(in_dir: str, out_arch: str, arch_format: str):
 
     if arch_format == "zip":
         out_arch_file = "{}.zip".format(out_arch.strip())
-        cmd = "zip -r {} {}".format(out_arch_file, dir_name)
-        subprocess.call(cmd, shell=True)
+        cmd = ["zip", "-r", out_arch_file, dir_name]
+        subprocess.run(cmd)
     elif arch_format == "tar":
         out_arch_file = "{}.tar".format(out_arch.strip())
-        cmd = "tar -cvf {} {}".format(out_arch_file, dir_name)
-        subprocess.call(cmd, shell=True)
+        cmd = ["tar", "-cvf", out_arch_file, dir_name]
+        subprocess.run(cmd)
     elif arch_format == "gztar":
         out_arch_file = "{}.tar.gz".format(out_arch.strip())
-        cmd = "tar -cvzf {} {}".format(out_arch_file, dir_name)
-        subprocess.call(cmd, shell=True)
+        cmd = ["tar", "-cvzf", out_arch_file, dir_name]
+        subprocess.run(cmd)
     elif arch_format == "bztar":
         out_arch_file = "{}.tar.bz2".format(out_arch.strip())
-        cmd = "tar -cvjSf {} {}".format(out_arch_file, dir_name)
-        subprocess.call(cmd, shell=True)
+        cmd = ["tar", "-cvjSf", out_arch_file, dir_name]
+        subprocess.run(cmd)
     elif arch_format == "xztar":
         out_arch_file = "{}.tar.xz".format(out_arch.strip())
-        cmd = "tar -cvJf {} {}".format(out_arch_file, dir_name)
-        subprocess.call(cmd, shell=True)
+        cmd = ["tar", "-cvJf", out_arch_file, dir_name]
+        subprocess.run(cmd)
     else:
         raise Exception("Do not recognise the archive format specifed.")
 
@@ -950,14 +950,13 @@ def untar_file(
     if verbose:
         print("Extracting: {}".format(in_file))
         print("Output to: {}".format(process_dir))
-        cmd = 'tar -xvf "{}"'.format(in_file)
-        print(cmd)
+        cmd = ['tar', '-xvf', in_file]
     else:
-        cmd = 'tar -xf "{}"'.format(in_file)
+        cmd = ['tar', '-xf', in_file]
     try:
         import subprocess
 
-        subprocess.call(cmd, shell=True)
+        subprocess.run(cmd)
     except OSError as e:
         os.chdir(c_dir)
         raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
@@ -1000,14 +999,14 @@ def untar_gz_file(
     if verbose:
         print("Extracting: {}".format(in_file))
         print("Output to: {}".format(process_dir))
-        cmd = 'tar -xvzf "{}"'.format(in_file)
+        cmd = ['tar', '-xvzf', in_file]
         print(cmd)
     else:
-        cmd = 'tar -xzf "{}"'.format(in_file)
+        cmd = ['tar', '-xzf', in_file]
     try:
         import subprocess
 
-        subprocess.call(cmd, shell=True)
+        subprocess.run(cmd)
     except OSError as e:
         os.chdir(c_dir)
         raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
@@ -1047,7 +1046,7 @@ def unzip_file(
         os.makedirs(process_dir)
     c_dir = os.getcwd()
     os.chdir(process_dir)
-    cmd = 'unzip "{}"'.format(in_file)
+    cmd = ['unzip', in_file]
     if verbose:
         print("Extracting: {}".format(in_file))
         print("Output to: {}".format(process_dir))
@@ -1055,7 +1054,7 @@ def unzip_file(
     try:
         import subprocess
 
-        subprocess.call(cmd, shell=True)
+        subprocess.run(cmd)
     except OSError as e:
         os.chdir(c_dir)
         raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
@@ -1098,14 +1097,14 @@ def untar_bz_file(
     if verbose:
         print("Extracting: {}".format(in_file))
         print("Output to: {}".format(process_dir))
-        cmd = 'tar -xvjf "{}"'.format(in_file)
+        cmd = ['tar', '-xvjf', in_file]
         print(cmd)
     else:
-        cmd = 'tar -xjf "{}"'.format(in_file)
+        cmd = ['tar', '-xjf', in_file]
     try:
         import subprocess
 
-        subprocess.call(cmd, shell=True)
+        subprocess.run(cmd)
     except OSError as e:
         os.chdir(c_dir)
         raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))

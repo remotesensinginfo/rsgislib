@@ -183,15 +183,9 @@ def get_rsgislib_version() -> str:
         if distutils.spawn.find_executable("rsgis-config") is not None:
             import subprocess
 
-            out = subprocess.Popen(
-                "rsgis-config --version",
-                shell=True,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            (stdout, stderr) = out.communicate()
-            version_str = stdout.decode()
+            out = subprocess.run(["rsgis-config",
+                                  "--version"], capture_output=True, text=True)
+            version_str = out.stdout
             version_str = version_str.split("\n")[0]
         else:
             version_str = "NA.NA"

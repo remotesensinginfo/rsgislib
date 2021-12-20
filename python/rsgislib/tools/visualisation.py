@@ -124,7 +124,7 @@ def create_kmz_img(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fa
     cmd = "gdal_translate -of KMLSUPEROVERLAY " + gdalInFile + " " + outputFile
     print(cmd)
     try:
-        subprocess.check_call(cmd, shell=True)
+        subprocess.run(cmd, shell=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
 
@@ -235,7 +235,7 @@ def create_webtiles_img_no_stats_msk(
     )
     print(cmd)
     try:
-        subprocess.check_call(cmd, shell=True)
+        subprocess.run(cmd, shell=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
 
@@ -386,7 +386,7 @@ def create_webtiles_img(
     )
     print(cmd)
     try:
-        subprocess.check_call(cmd, shell=True)
+        subprocess.run(cmd, shell=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
     shutil.rmtree(tmpDIR)
@@ -575,7 +575,7 @@ def create_quicklook_imgs(
         )
         print(cmd)
         try:
-            subprocess.check_call(cmd, shell=True)
+            subprocess.run(cmd, shell=True)
         except OSError as e:
             raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
 
@@ -593,7 +593,7 @@ def create_quicklook_imgs(
             )
             print(cmd)
             try:
-                subprocess.check_call(cmd, shell=True)
+                subprocess.run(cmd, shell=True)
             except OSError as e:
                 raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
     shutil.rmtree(tmpDIR)
@@ -910,7 +910,7 @@ def create_webtiles_vis_gtiff_img(
     )
     print(cmd)
     try:
-        subprocess.check_call(cmd, shell=True)
+        subprocess.run(cmd, shell=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
 
@@ -929,7 +929,7 @@ def create_webtiles_vis_gtiff_img(
         )
 
     try:
-        subprocess.check_call(cmd, shell=True)
+        subprocess.run(cmd, shell=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
     rsgislib.imageutils.pop_img_stats(
@@ -1104,7 +1104,7 @@ def create_quicklook_overview_imgs(
         )
         print(cmd)
         try:
-            subprocess.check_call(cmd, shell=True)
+            subprocess.run(cmd, shell=True)
         except OSError as e:
             raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
 
@@ -1122,7 +1122,7 @@ def create_quicklook_overview_imgs(
             )
             print(cmd)
             try:
-                subprocess.check_call(cmd, shell=True)
+                subprocess.run(cmd, shell=True)
             except OSError as e:
                 raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
     shutil.rmtree(usr_tmp_dir)
@@ -1376,7 +1376,7 @@ def create_quicklook_overview_imgs_vec_overlay(
         )
         print(cmd)
         try:
-            subprocess.check_call(cmd, shell=True)
+            subprocess.run(cmd, shell=True)
         except OSError as e:
             raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
         # Rasterise the overlay vector to the output raster grid.
@@ -1428,7 +1428,7 @@ def create_quicklook_overview_imgs_vec_overlay(
             )
             print(cmd)
             try:
-                subprocess.check_call(cmd, shell=True)
+                subprocess.run(cmd, shell=True)
             except OSError as e:
                 raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
             # Rasterise the overlay vector to the output raster grid.
@@ -1655,7 +1655,7 @@ def create_visual_overview_imgs_vec_extent(
         )
         print(cmd)
         try:
-            subprocess.check_call(cmd, shell=True)
+            subprocess.run(cmd, shell=True)
         except OSError as e:
             raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
     else:
@@ -1673,7 +1673,7 @@ def create_visual_overview_imgs_vec_extent(
             )
             print(cmd)
             try:
-                subprocess.check_call(cmd, shell=True)
+                subprocess.run(cmd, shell=True)
             except OSError as e:
                 raise rsgislib.RSGISPyException("Could not execute command: " + cmd)
     shutil.rmtree(usr_tmp_dir)

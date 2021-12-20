@@ -398,31 +398,29 @@ def create_max_ndvi_ndwi_composite_landsat(
         )
 
 
-def check_build_ls8_vrts(in_imgs, outdir):
+def check_build_ls8_vrts(input_imgs, output_dir):
     """
     A function which checks for Landsat 8 (LS8) images in the input list and creates
     a band subset (i.e., removes the coastal (1) band). This function should be used
-    ahead of create_max_ndvi_ndwi_composite when combining LS8 with earlier landsat (i.e.,
-    LS5 and LS7) data. Note, files who's file name contain 'LS8' are considered to be
-    Landsat 8 images.
+    ahead of create_max_ndvi_ndwi_composite when combining LS8 with earlier landsat
+    (i.e., LS5 and LS7) data. Note, files who's file name contain 'LS8' are considered
+    to be Landsat 8 images.
 
-    :param in_imgs: input list of image file paths.
-    :param outdir: output directory for the VRT images (Note. an absolute path to the input image is used when building the VRT.)
+    :param input_imgs: input list of image file paths.
+    :param output_dir: output directory for the VRT images (Note. an absolute path to
+                   the input image is used when building the VRT.)
     """
-    import subprocess
+    import rsgislib.tools.filetools
 
+    img_bands = [2, 3, 4, 5, 6, 7]
     out_imgs = []
-    for img in in_imgs:
+    for img in input_imgs:
         if "LS8" in os.path.basename(img):
             abs_img = os.path.abspath(img)
-            vrt_img = os.path.join(
-                outdir, os.path.splitext(os.path.basename(img))[0] + "_bsub.vrt"
-            )
-            cmd = "gdalbuildvrt -b 2 -b 3 -b 4 -b 5 -b 6 -b 7 {0} {1}".format(
-                vrt_img, abs_img
-            )
-            subprocess.check_call(cmd, shell=True)
-            out_imgs.append(vrt_img)
+            basename = rsgislib.tools.filetools.get_file_basename(img)
+            out_vrt_img = os.path.join(output_dir, f"{basename}_bsub.vrt")
+            rsgislib.imageutils.create_vrt_band_subset(abs_img, img_bands, out_vrt_img)
+            out_imgs.append(out_vrt_img)
         else:
             out_imgs.append(img)
     return out_imgs

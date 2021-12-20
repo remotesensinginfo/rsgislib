@@ -2984,7 +2984,7 @@ def create_mosaic_images_vrt(
     gdal.BuildVRT(out_vrt_file, input_imgs, options=build_vrt_opt)
 
 
-def create_vrt_band_subset(input_img: str, img_bands: list, out_vrt_img: str):
+def create_vrt_band_subset(input_img: str, img_bands: list[int], out_vrt_img: str):
     """
     A function which creates a GDAL VRT for the input image with the bands selected in
     the input list.

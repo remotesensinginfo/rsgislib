@@ -203,7 +203,6 @@ def merge_vectors_to_gpkg(
     """
     Function which will merge a list of vector files into an single output GeoPackage (GPKG) file using ogr2ogr.
 
-    Where:
 
     :param in_vec_files: is a list of input files.
     :param out_vec_file: is the output GPKG database (\*.gpkg)
@@ -217,48 +216,24 @@ def merge_vectors_to_gpkg(
         if nFeat > 0:
             if first:
                 if not exists:
-                    cmd = (
-                        'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln '
-                        + out_vec_lyr
-                        + ' "'
-                        + out_vec_file
-                        + '" "'
-                        + inFile
-                        + '"'
-                    )
+                    cmd = ["ogr2ogr", "-f", "GPKG",  "-lco",  "SPATIAL_INDEX=YES",  "-nln", out_vec_lyr, out_vec_file, inFile]
                     try:
-                        subprocess.check_call(cmd, shell=True)
+                        subprocess.run(cmd)
                     except OSError as e:
-                        raise Exception("Error running ogr2ogr: " + cmd)
+                        raise Exception("Error running ogr2ogr: {}".format(cmd))
                 else:
-                    cmd = (
-                        'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln '
-                        + out_vec_lyr
-                        + ' "'
-                        + out_vec_file
-                        + '" "'
-                        + inFile
-                        + '"'
-                    )
+                    cmd = ["ogr2ogr", "-update", "-f", "GPKG", "-lco", "SPATIAL_INDEX=YES", "-nln", out_vec_lyr, out_vec_file, inFile]
                     try:
-                        subprocess.check_call(cmd, shell=True)
+                        subprocess.run(cmd)
                     except OSError as e:
-                        raise Exception("Error running ogr2ogr: " + cmd)
+                        raise Exception("Error running ogr2ogr: {}".format(cmd))
                 first = False
             else:
-                cmd = (
-                    'ogr2ogr -update -append -f "GPKG" -nln '
-                    + out_vec_lyr
-                    + ' "'
-                    + out_vec_file
-                    + '" "'
-                    + inFile
-                    + '"'
-                )
+                cmd = ["ogr2ogr", "-update", "-append", "-f", "GPKG", "-nln", out_vec_lyr, out_vec_file, inFile]
                 try:
-                    subprocess.check_call(cmd, shell=True)
+                    subprocess.run(cmd)
                 except OSError as e:
-                    raise Exception("Error running ogr2ogr: " + cmd)
+                    raise Exception("Error running ogr2ogr: {}".format(cmd))
 
 
 def merge_vector_lyrs_to_gpkg(
@@ -268,7 +243,6 @@ def merge_vector_lyrs_to_gpkg(
     Function which will merge all the layers in the input vector file into an
     single output GeoPackage (GPKG) file using ogr2ogr.
 
-    Where:
 
     :param vec_file: is a vector file which contains multiple layers which
                      are to be merged
@@ -286,54 +260,24 @@ def merge_vector_lyrs_to_gpkg(
         if nFeat > 0:
             if first:
                 if not exists:
-                    cmd = (
-                        'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln '
-                        + out_vec_lyr
-                        + ' "'
-                        + out_vec_file
-                        + '" "'
-                        + vec_file
-                        + '" "'
-                        + lyr
-                        + '"'
-                    )
+                    cmd = ["ogr2ogr", "-f", "GPKG", "-lco",  "SPATIAL_INDEX=YES", "-nln", out_vec_lyr, out_vec_file, vec_file, lyr]
                     try:
-                        subprocess.check_call(cmd, shell=True)
+                        subprocess.run(cmd)
                     except OSError as e:
-                        raise Exception("Error running ogr2ogr: " + cmd)
+                        raise Exception("Error running ogr2ogr: {}".format(cmd))
                 else:
-                    cmd = (
-                        'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln '
-                        + out_vec_lyr
-                        + ' "'
-                        + out_vec_file
-                        + '" "'
-                        + vec_file
-                        + '" "'
-                        + lyr
-                        + '"'
-                    )
+                    cmd = ["ogr2ogr", "-update", "-f", "GPKG", "-lco", "SPATIAL_INDEX=YES", "-nln", out_vec_lyr, out_vec_file, vec_file, lyr]
                     try:
-                        subprocess.check_call(cmd, shell=True)
+                        subprocess.run(cmd)
                     except OSError as e:
-                        raise Exception("Error running ogr2ogr: " + cmd)
+                        raise Exception("Error running ogr2ogr: {}".format(cmd))
                 first = False
             else:
-                cmd = (
-                    'ogr2ogr -update -append -f "GPKG" -nln '
-                    + out_vec_lyr
-                    + ' "'
-                    + out_vec_file
-                    + '" "'
-                    + vec_file
-                    + '" "'
-                    + lyr
-                    + '"'
-                )
+                cmd = ["ogr2ogr", "-update", "-append", "-f", "GPKG", "-nln", out_vec_lyr, out_vec_file, vec_file, lyr]
                 try:
-                    subprocess.check_call(cmd, shell=True)
+                    subprocess.run(cmd)
                 except OSError as e:
-                    raise Exception("Error running ogr2ogr: " + cmd)
+                    raise Exception("Error running ogr2ogr: {}".format(cmd))
 
 
 def merge_vectors_to_gpkg_ind_lyrs(
@@ -387,16 +331,11 @@ def merge_vectors_to_gpkg_ind_lyrs(
                 "copy - output layer name: {2}".format(lyr, nFeat, out_lyr)
             )
             if nFeat > 0:
-                cmd = (
-                    'ogr2ogr -overwrite -f "GPKG" {4} -lco '
-                    'SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {3}'.format(
-                        out_lyr, out_vec_file, inFile, lyr, out_geom_type
-                    )
-                )
+                cmd = ["ogr2ogr", "-overwrite", "-f", "GPKG", "-nlt", out_geom_type, "-lco", "SPATIAL_INDEX=YES",  "-nln", out_lyr, out_vec_file, inFile, lyr]
                 try:
-                    subprocess.check_call(cmd, shell=True)
+                    subprocess.run(cmd)
                 except OSError as e:
-                    raise Exception("Error running ogr2ogr: " + cmd)
+                    raise Exception("Error running ogr2ogr: {}".format(cmd))
                 out_lyr_names.append(out_lyr)
 
 
