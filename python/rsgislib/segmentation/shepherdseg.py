@@ -213,7 +213,7 @@ def run_shepherd_segmentation(
             True,
             False,
             gdalformat,
-            rsgislib.TYPE_8INT,
+            rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
         )
@@ -223,7 +223,7 @@ def run_shepherd_segmentation(
             "zeros (i.e., no data) regions created."
         )
         rsgislib.imagecalc.image_math(
-            strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT
+            strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8UINT
         )
 
         print("Create Input Image Mask.")
@@ -233,7 +233,7 @@ def run_shepherd_segmentation(
             )
         ]
         rsgislib.imagecalc.band_math(
-            strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_8INT, bandMathBands
+            strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_8UINT, bandMathBands
         )
 
         print("Mask stretched Image.")
@@ -242,7 +242,7 @@ def run_shepherd_segmentation(
             strchMaskFile,
             segmentFile,
             gdalformat,
-            rsgislib.TYPE_8INT,
+            rsgislib.TYPE_8UINT,
             0,
             1,
         )
@@ -530,7 +530,8 @@ def run_shepherd_segmentation_pre_calcd_stats(
             strchFile,
             img_stretch_stats,
             gdalformat,
-            rsgislib.TYPE_8INT,
+            rsgislib.TYPE_8UINT,
+            0,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
             2,
         )
@@ -540,7 +541,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
             "all zeros (i.e., no data) regions created."
         )
         rsgislib.imagecalc.image_math(
-            strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT
+            strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8UINT
         )
 
         print("Create Input Image Mask.")
@@ -550,7 +551,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
             )
         ]
         rsgislib.imagecalc.band_math(
-            strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_8INT, bandMathBands
+            strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_8UINT, bandMathBands
         )
 
         print("Mask stretched Image.")
@@ -559,7 +560,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
             strchMaskFile,
             segmentFile,
             gdalformat,
-            rsgislib.TYPE_8INT,
+            rsgislib.TYPE_8UINT,
             0,
             1,
         )

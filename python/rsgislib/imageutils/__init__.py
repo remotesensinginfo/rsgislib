@@ -393,7 +393,7 @@ def define_colour_table(input_img: str, clr_lut: dict, img_band: int = 1):
 
 def get_rsgislib_datatype_from_img(input_img: str):
     """
-    Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT)
+    Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8UINT)
     for the inputted raster file
 
     :param input_img: input image file.
