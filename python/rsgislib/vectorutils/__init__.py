@@ -491,8 +491,9 @@ def get_vec_layer_extent(
     else:
         in_layer = in_data_source.GetLayer()
     if in_layer is None:
-        raise rsgislib.RSGISPyException(f"Could not open vector layer ({vec_lyr}) "
-                                        f"in vector file {vec_file}")
+        raise rsgislib.RSGISPyException(
+            f"Could not open vector layer ({vec_lyr}) in vector file {vec_file}"
+        )
     extent = in_layer.GetExtent(compute_if_exp)
     return extent
 

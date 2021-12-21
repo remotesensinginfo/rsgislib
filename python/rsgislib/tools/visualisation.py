@@ -16,7 +16,15 @@ import rsgislib.tools.filetools
 import rsgislib.tools.projection
 import rsgislib.tools.tilecacheutils
 
-def create_kmz_img(input_img:str, output_file:str, bands:str, reproj_wgs84:bool=True, finite_msk:bool=False, tmp_dir:str=None):
+
+def create_kmz_img(
+    input_img: str,
+    output_file: str,
+    bands: str,
+    reproj_wgs84: bool = True,
+    finite_msk: bool = False,
+    tmp_dir: str = None,
+):
     """
     A function to convert an input image to a KML/KMZ file, where the input image
     is stretched and bands sub-selected / ordered as required for visualisation.
@@ -41,8 +49,9 @@ def create_kmz_img(input_img:str, output_file:str, bands:str, reproj_wgs84:bool=
     elif len(band_lst) == 1:
         multi_band = False
     else:
-        raise rsgislib.RSGISPyException("You need to either "
-                                        "provide 1 or 3 bands: ".format(band_lst))
+        raise rsgislib.RSGISPyException(
+            "You need to either " "provide 1 or 3 bands: ".format(band_lst)
+        )
 
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
 
@@ -138,13 +147,13 @@ def create_kmz_img(input_img:str, output_file:str, bands:str, reproj_wgs84:bool=
 
 
 def create_webtiles_img_no_stats_msk(
-    input_img:str,
-    out_dir:str,
-    bands:str,
-    zoom_levels:str="2-10",
+    input_img: str,
+    out_dir: str,
+    bands: str,
+    zoom_levels: str = "2-10",
     resample="average",
-    finite_msk:bool=False,
-    tms:bool=True,
+    finite_msk: bool = False,
+    tms: bool = True,
     tmp_dir=None,
 ):
     """
@@ -173,11 +182,12 @@ def create_webtiles_img_no_stats_msk(
     elif len(band_lst) == 1:
         multi_band = False
     else:
-        raise rsgislib.RSGISPyException("You need to either provide "
-                                        "1 or 3 bands: {}".format(band_lst))
+        raise rsgislib.RSGISPyException(
+            "You need to either provide " "1 or 3 bands: {}".format(band_lst)
+        )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
 
-    uid_str =  rsgislib.tools.utils.uid_generator()
+    uid_str = rsgislib.tools.utils.uid_generator()
 
     if tmp_dir is None:
         tmp_dir = os.path.join(os.path.dirname(input_img), uid_str)
@@ -239,7 +249,17 @@ def create_webtiles_img_no_stats_msk(
         2,
     )
 
-    cmd = ["gdal2tiles.py", "-r", resample, "-z", zoom_levels, "-a", "0", stretch_img, out_dir]
+    cmd = [
+        "gdal2tiles.py",
+        "-r",
+        resample,
+        "-z",
+        zoom_levels,
+        "-a",
+        "0",
+        stretch_img,
+        out_dir,
+    ]
     print(cmd)
     try:
         subprocess.run(cmd)
@@ -253,16 +273,16 @@ def create_webtiles_img_no_stats_msk(
 
 
 def create_webtiles_img(
-    input_img:str,
-    bands:str,
-    out_dir:str,
-    zoom_levels:str="2-10",
-    img_stats_msk:str=None,
-    img_msk_vals:int=1,
-    tmp_dir:str=None,
-    webview:bool=True,
-    tms:bool=True,
-    no_data_val:float = None,
+    input_img: str,
+    bands: str,
+    out_dir: str,
+    zoom_levels: str = "2-10",
+    img_stats_msk: str = None,
+    img_msk_vals: int = 1,
+    tmp_dir: str = None,
+    webview: bool = True,
+    tms: bool = True,
+    no_data_val: float = None,
 ):
     """
     A function to produce a web cache for the input image.
@@ -295,8 +315,9 @@ def create_webtiles_img(
     elif len(band_lst) == 1:
         multi_band = False
     else:
-        raise rsgislib.RSGISPyException("You need to either provide "
-                                        "1 or 3 bands. {}".format(band_lst))
+        raise rsgislib.RSGISPyException(
+            "You need to either provide " "1 or 3 bands. {}".format(band_lst)
+        )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if no_data_val is None:
         no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
@@ -392,7 +413,19 @@ def create_webtiles_img(
     if webview:
         webview_opt = "leaflet"
 
-    cmd = ["gdal2tiles.py", "-r", "average", "-z", zoom_levels, "-a", "0", "-w", webview_opt, stretch_img, out_dir]
+    cmd = [
+        "gdal2tiles.py",
+        "-r",
+        "average",
+        "-z",
+        zoom_levels,
+        "-a",
+        "0",
+        "-w",
+        webview_opt,
+        stretch_img,
+        out_dir,
+    ]
     print(cmd)
     try:
         subprocess.run(cmd)
@@ -405,16 +438,16 @@ def create_webtiles_img(
 
 
 def create_quicklook_imgs(
-    input_img:str,
-    bands:str,
-    output_imgs:Union[str, list[str]]="quicklook.jpg",
-    output_img_sizes:Union[int, list[int]]=250,
-    scale_axis:str="auto",
-    img_stats_msk:str=None,
-    img_msk_vals:int=1,
-    stretch_file:str=None,
-    tmp_dir:str=None,
-    no_data_val:float = None,
+    input_img: str,
+    bands: str,
+    output_imgs: Union[str, list[str]] = "quicklook.jpg",
+    output_img_sizes: Union[int, list[int]] = 250,
+    scale_axis: str = "auto",
+    img_stats_msk: str = None,
+    img_msk_vals: int = 1,
+    stretch_file: str = None,
+    tmp_dir: str = None,
+    no_data_val: float = None,
 ):
     """
     A function to produce a quicklook image(s).
@@ -473,8 +506,9 @@ def create_quicklook_imgs(
     elif len(band_lst) == 1:
         multi_band = False
     else:
-        raise rsgislib.RSGISPyException("You need to either provide "
-                                        "1 or 3 bands: ".format(band_lst))
+        raise rsgislib.RSGISPyException(
+            "You need to either provide " "1 or 3 bands: ".format(band_lst)
+        )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if no_data_val is None:
         no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
@@ -625,20 +659,22 @@ def create_quicklook_imgs(
             try:
                 subprocess.run(cmd)
             except OSError as e:
-                raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
+                raise rsgislib.RSGISPyException(
+                    "Could not execute command: {}".format(cmd)
+                )
     shutil.rmtree(tmp_dir)
 
 
 def create_mbtile_file(
-    input_img:str,
-    bands:str,
-    output_mbtiles:str,
-    scale_input_img:int=50,
-    img_stats_msk:str=None,
-    img_msk_vals:int=1,
-    tmp_dir:str=None,
-    tile_format:str="PNG",
-    no_data_val:float=None
+    input_img: str,
+    bands: str,
+    output_mbtiles: str,
+    scale_input_img: int = 50,
+    img_stats_msk: str = None,
+    img_msk_vals: int = 1,
+    tmp_dir: str = None,
+    tile_format: str = "PNG",
+    no_data_val: float = None,
 ):
     """
     A function to produce an MBTile file for visualisation.
@@ -671,8 +707,9 @@ def create_mbtile_file(
     elif len(band_lst) == 1:
         multi_band = False
     else:
-        raise rsgislib.RSGISPyException("You need to either provide "
-                                        "1 or 3 bands: {}".format(band_lst))
+        raise rsgislib.RSGISPyException(
+            "You need to either provide " "1 or 3 bands: {}".format(band_lst)
+        )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if no_data_val is None:
         no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
@@ -765,7 +802,12 @@ def create_mbtile_file(
 
     stretch_img_re_proj = os.path.join(tmp_dir, f"{base_name}_stretch_epsg3857.kea")
     rsgislib.imageutils.gdal_warp(
-        stretch_img, stretch_img_re_proj, 3857, interp_method=rsgislib.INTERP_NEAREST_NEIGHBOUR, gdalformat="KEA", options=[]
+        stretch_img,
+        stretch_img_re_proj,
+        3857,
+        interp_method=rsgislib.INTERP_NEAREST_NEIGHBOUR,
+        gdalformat="KEA",
+        options=[],
     )
 
     try:
@@ -792,19 +834,19 @@ def create_mbtile_file(
 
 
 def create_webtiles_vis_gtiff_img(
-    input_img:str,
-    bands:str,
-    output_dir:str,
-    scaled_gtiff_img:str,
-    zoom_levels:str="2-10",
-    img_stats_msk:str=None,
-    img_msk_vals:int=1,
-    stretch_file:str=None,
-    tmp_dir:str=None,
-    webview:bool=True,
-    scale:float=0,
-    tms:bool=True,
-    no_data_val:float=None,
+    input_img: str,
+    bands: str,
+    output_dir: str,
+    scaled_gtiff_img: str,
+    zoom_levels: str = "2-10",
+    img_stats_msk: str = None,
+    img_msk_vals: int = 1,
+    stretch_file: str = None,
+    tmp_dir: str = None,
+    webview: bool = True,
+    scale: float = 0,
+    tms: bool = True,
+    no_data_val: float = None,
 ):
     """
     A function to produce web cache and scaled and stretched geotiff.
@@ -842,8 +884,9 @@ def create_webtiles_vis_gtiff_img(
     elif len(band_lst) == 1:
         multi_band = False
     else:
-        raise rsgislib.RSGISPyException("You need to either provide "
-                                        "1 or 3 bands: {}".format(band_lst))
+        raise rsgislib.RSGISPyException(
+            "You need to either provide " "1 or 3 bands: {}".format(band_lst)
+        )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if no_data_val is None:
         no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
@@ -950,7 +993,19 @@ def create_webtiles_vis_gtiff_img(
     if webview:
         webview_opt = "leaflet"
 
-    cmd = ["gdal2tiles.py", "-r", "average", "-z", zoom_levels, "-a", "0", "-w", webview_opt, stretch_img, output_dir]
+    cmd = [
+        "gdal2tiles.py",
+        "-r",
+        "average",
+        "-z",
+        zoom_levels,
+        "-a",
+        "0",
+        "-w",
+        webview_opt,
+        stretch_img,
+        output_dir,
+    ]
     print(cmd)
     try:
         subprocess.run(cmd)
@@ -961,9 +1016,44 @@ def create_webtiles_vis_gtiff_img(
         rsgislib.tools.tilecacheutils.convert_between_tms_xyz(output_dir)
 
     if scale > 0:
-        cmd = ["gdal_translate", "-of", "GTIFF", "-co", "TILED=YES", "-co", "COMPRESS=JPEG", "-co", "BIGTIFF=NO", "-ot", "Byte", "-outsize", f"{scale}%", "0", "-r", "average", stretch_img, scaled_gtiff_img]
+        cmd = [
+            "gdal_translate",
+            "-of",
+            "GTIFF",
+            "-co",
+            "TILED=YES",
+            "-co",
+            "COMPRESS=JPEG",
+            "-co",
+            "BIGTIFF=NO",
+            "-ot",
+            "Byte",
+            "-outsize",
+            f"{scale}%",
+            "0",
+            "-r",
+            "average",
+            stretch_img,
+            scaled_gtiff_img,
+        ]
     else:
-        cmd = ["gdal_translate", "-of", "GTIFF", "-co", "TILED=YES", "-co",  "COMPRESS=JPEG", "-co", "BIGTIFF=NO", "-ot", "Byte", "-r", "average", stretch_img, scaled_gtiff_img]
+        cmd = [
+            "gdal_translate",
+            "-of",
+            "GTIFF",
+            "-co",
+            "TILED=YES",
+            "-co",
+            "COMPRESS=JPEG",
+            "-co",
+            "BIGTIFF=NO",
+            "-ot",
+            "Byte",
+            "-r",
+            "average",
+            stretch_img,
+            scaled_gtiff_img,
+        ]
 
     try:
         subprocess.run(cmd)
@@ -976,14 +1066,14 @@ def create_webtiles_vis_gtiff_img(
 
 
 def create_quicklook_overview_imgs(
-    input_imgs:list[str],
-    bands:str,
-    tmp_dir:str,
-    output_imgs:Union[str, list[str]]= "quicklook.jpg",
-    output_img_sizes:Union[int, list[int]]=250,
-    scale_axis:str="auto",
-    stretch_file:str=None,
-    no_data_val:float = None,
+    input_imgs: list[str],
+    bands: str,
+    tmp_dir: str,
+    output_imgs: Union[str, list[str]] = "quicklook.jpg",
+    output_img_sizes: Union[int, list[int]] = 250,
+    scale_axis: str = "auto",
+    stretch_file: str = None,
+    no_data_val: float = None,
 ):
     """
     A function to produce an overview quicklook for a number of input images.
@@ -1048,8 +1138,9 @@ def create_quicklook_overview_imgs(
     elif len(band_lst) == 1:
         multi_band = False
     else:
-        raise rsgislib.RSGISPyException("You need to either provide "
-                                        "1 or 3 bands: {}".format(band_lst))
+        raise rsgislib.RSGISPyException(
+            "You need to either provide " "1 or 3 bands: {}".format(band_lst)
+        )
 
     s_bands = []
     for str_band in band_lst:
@@ -1187,11 +1278,15 @@ def create_quicklook_overview_imgs(
             try:
                 subprocess.run(cmd)
             except OSError as e:
-                raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
+                raise rsgislib.RSGISPyException(
+                    "Could not execute command: {}".format(cmd)
+                )
     shutil.rmtree(usr_tmp_dir)
 
 
-def burn_in_binary_msk(base_image:str, mask_img:str, output_img:str, gdalformat:str, msk_colour=None):
+def burn_in_binary_msk(
+    base_image: str, mask_img: str, output_img: str, gdalformat: str, msk_colour=None
+):
     """
     A function which is used for visualisation applications where a rasterised
     binary mask is 'burnt' into a base image with a user selected colour.
@@ -1257,18 +1352,18 @@ def burn_in_binary_msk(base_image:str, mask_img:str, output_img:str, gdalformat:
 
 
 def create_quicklook_overview_imgs_vec_overlay(
-    input_imgs:list[str],
-    bands:str,
-    tmp_dir:str,
-    vec_overlay_file:str,
-    vec_overlay_lyr:str,
-    output_imgs:Union[str, list[str]]="quicklook.jpg",
-    output_img_sizes:Union[int, list[int]]=250,
-    gdalformat:str="JPEG",
-    scale_axis:str="auto",
-    stretch_file:str=None,
-    overlay_clrs:list[int]=None,
-    no_data_val:float = None,
+    input_imgs: list[str],
+    bands: str,
+    tmp_dir: str,
+    vec_overlay_file: str,
+    vec_overlay_lyr: str,
+    output_imgs: Union[str, list[str]] = "quicklook.jpg",
+    output_img_sizes: Union[int, list[int]] = 250,
+    gdalformat: str = "JPEG",
+    scale_axis: str = "auto",
+    stretch_file: str = None,
+    overlay_clrs: list[int] = None,
+    no_data_val: float = None,
 ):
     """
     A function to produce an overview quicklook with a vector overlain for
@@ -1530,7 +1625,9 @@ def create_quicklook_overview_imgs_vec_overlay(
             try:
                 subprocess.run(cmd)
             except OSError as e:
-                raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
+                raise rsgislib.RSGISPyException(
+                    "Could not execute command: {}".format(cmd)
+                )
             # Rasterise the overlay vector to the output raster grid.
             tmp_vec_overlay_img = os.path.join(
                 usr_tmp_dir, "{}_vec_overlay.kea".format(lcl_img_basename)
@@ -1562,18 +1659,18 @@ def create_quicklook_overview_imgs_vec_overlay(
 
 
 def create_visual_overview_imgs_vec_extent(
-    input_imgs:list[str],
-    bands:str,
-    tmp_dir:str,
-    vec_extent_file:str=None,
-    vec_extent_lyr:str=None,
-    output_imgs:Union[str, list[str]]="quicklook.tif",
-    output_img_sizes:Union[int, list[int]]=500,
-    gdalformat:str="GTIFF",
-    scale_axis:str="auto",
-    stretch_file:str=None,
-    export_stretch_file:bool=False,
-    no_data_val:float = None,
+    input_imgs: list[str],
+    bands: str,
+    tmp_dir: str,
+    vec_extent_file: str = None,
+    vec_extent_lyr: str = None,
+    output_imgs: Union[str, list[str]] = "quicklook.tif",
+    output_img_sizes: Union[int, list[int]] = 500,
+    gdalformat: str = "GTIFF",
+    scale_axis: str = "auto",
+    stretch_file: str = None,
+    export_stretch_file: bool = False,
+    no_data_val: float = None,
 ):
     """
     A function to produce an 8bit overview image (i.e., stretched visualisation)
@@ -1607,9 +1704,11 @@ def create_visual_overview_imgs_vec_extent(
     import rsgislib.vectorutils.createvectors
 
     if (vec_extent_file is not None) and (vec_extent_lyr is None):
-        raise rsgislib.RSGISPyException("If a vec_extent_file is given (i.e., "
-                                        "not None) then a vec_extent_lyr must also "
-                                        "be provided.")
+        raise rsgislib.RSGISPyException(
+            "If a vec_extent_file is given (i.e., "
+            "not None) then a vec_extent_lyr must also "
+            "be provided."
+        )
 
     if scale_axis not in ["width", "height", "auto"]:
         raise rsgislib.RSGISPyException(
@@ -1731,7 +1830,9 @@ def create_visual_overview_imgs_vec_extent(
             vec_extent_bbox[1],
             vec_extent_bbox[3],
         ]
-        rsgislib.imageutils.create_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img, vrt_extent)
+        rsgislib.imageutils.create_mosaic_images_vrt(
+            b_sel_imgs, tmp_vrt_img, vrt_extent
+        )
 
     stretch_img = os.path.join(usr_tmp_dir, "{}_stretch.kea".format(img_basename))
     if (stretch_file is not None) and (export_stretch_file == False):
@@ -1807,18 +1908,20 @@ def create_visual_overview_imgs_vec_extent(
             try:
                 subprocess.run(cmd)
             except OSError as e:
-                raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
+                raise rsgislib.RSGISPyException(
+                    "Could not execute command: {}".format(cmd)
+                )
     shutil.rmtree(usr_tmp_dir)
 
 
 def overlay_vec_on_img(
-    input_img:str,
-    output_img:str,
-    vec_overlay_file:str,
-    vec_overlay_lyr:str,
-    tmp_dir:str,
-    gdalformat:str="PNG",
-    overlay_clrs:list[int]=None,
+    input_img: str,
+    output_img: str,
+    vec_overlay_file: str,
+    vec_overlay_lyr: str,
+    tmp_dir: str,
+    gdalformat: str = "PNG",
+    overlay_clrs: list[int] = None,
 ):
     """
     A function to overlay a vector layer on to a raster image 'burning' in the vector
@@ -1887,9 +1990,7 @@ def overlay_vec_on_img(
     )
 
     # Convert to final format (e.g., JPG, TIFF or PNG)
-    rsgislib.imageutils.gdal_translate(
-        tmp_final_img, output_img, gdalformat=gdalformat
-    )
+    rsgislib.imageutils.gdal_translate(tmp_final_img, output_img, gdalformat=gdalformat)
 
     # Remove the temporary directory.
     shutil.rmtree(usr_tmp_dir)

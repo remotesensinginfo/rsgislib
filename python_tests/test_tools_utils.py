@@ -6,6 +6,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TOOLS_UTILS_DATA_DIR = os.path.join(DATA_DIR, "tools", "utils")
 IMGREG_DATA_DIR = os.path.join(DATA_DIR, "imageregistration")
 
+
 def test_uid_generator_len4():
     import rsgislib.tools.utils
 

@@ -278,6 +278,7 @@ def test_get_vec_layer_extent():
         and (abs(bbox[3] - 282311.96875) < 1)
     )
 
+
 def test_get_vec_layer_extent_file_excp():
     import rsgislib.vectorutils
 
@@ -285,6 +286,7 @@ def test_get_vec_layer_extent_file_excp():
     vec_lyr = "err_lyr"
     with pytest.raises(rsgislib.RSGISPyException):
         rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
+
 
 def test_get_vec_layer_extent_lyr_excp():
     import rsgislib.vectorutils
