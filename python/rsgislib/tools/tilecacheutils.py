@@ -242,7 +242,9 @@ def get_tile_path_from_quadkey(quadkey, tms=True):
             tile_x = tile_x | mask
             tile_y = tile_y | mask
         elif digit != "0":
-            raise rsgislib.RSGISPyException("Unexpected quadkey digit: {}".format(digit))
+            raise rsgislib.RSGISPyException(
+                "Unexpected quadkey digit: {}".format(digit)
+            )
     zoom = i + 1
     if tms:
         tile_y = (2 ** zoom - 1) - tile_y

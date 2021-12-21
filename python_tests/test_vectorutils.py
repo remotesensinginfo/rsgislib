@@ -140,6 +140,7 @@ def test_merge_vectors_to_gpkg_ind_lyrs(tmp_path):
 
     assert os.path.exists(out_vec_file)
 
+
 def test_merge_vectors_to_gpkg_ind_lyrs_geom_type(tmp_path):
     import rsgislib.vectorutils
 
@@ -151,9 +152,12 @@ def test_merge_vectors_to_gpkg_ind_lyrs_geom_type(tmp_path):
     in_vec_files = [vec_file_1, vec_file_2, vec_file_3, vec_file_4]
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
-    rsgislib.vectorutils.merge_vectors_to_gpkg_ind_lyrs(in_vec_files, out_vec_file, geom_type="POLYGON")
+    rsgislib.vectorutils.merge_vectors_to_gpkg_ind_lyrs(
+        in_vec_files, out_vec_file, geom_type="POLYGON"
+    )
 
     assert os.path.exists(out_vec_file)
+
 
 def test_merge_vectors_to_gpkg_ind_lyrs_geom_type_excp(tmp_path):
     import rsgislib
@@ -168,7 +172,9 @@ def test_merge_vectors_to_gpkg_ind_lyrs_geom_type_excp(tmp_path):
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     with pytest.raises(rsgislib.RSGISPyException):
-        rsgislib.vectorutils.merge_vectors_to_gpkg_ind_lyrs(in_vec_files, out_vec_file, geom_type="ERR")
+        rsgislib.vectorutils.merge_vectors_to_gpkg_ind_lyrs(
+            in_vec_files, out_vec_file, geom_type="ERR"
+        )
 
 
 def test_merge_to_multi_layer_vec(tmp_path):

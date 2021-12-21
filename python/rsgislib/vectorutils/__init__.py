@@ -216,20 +216,51 @@ def merge_vectors_to_gpkg(
         if nFeat > 0:
             if first:
                 if not exists:
-                    cmd = ["ogr2ogr", "-f", "GPKG",  "-lco",  "SPATIAL_INDEX=YES",  "-nln", out_vec_lyr, out_vec_file, inFile]
+                    cmd = [
+                        "ogr2ogr",
+                        "-f",
+                        "GPKG",
+                        "-lco",
+                        "SPATIAL_INDEX=YES",
+                        "-nln",
+                        out_vec_lyr,
+                        out_vec_file,
+                        inFile,
+                    ]
                     try:
                         subprocess.run(cmd)
                     except OSError as e:
                         raise Exception("Error running ogr2ogr: {}".format(cmd))
                 else:
-                    cmd = ["ogr2ogr", "-update", "-f", "GPKG", "-lco", "SPATIAL_INDEX=YES", "-nln", out_vec_lyr, out_vec_file, inFile]
+                    cmd = [
+                        "ogr2ogr",
+                        "-update",
+                        "-f",
+                        "GPKG",
+                        "-lco",
+                        "SPATIAL_INDEX=YES",
+                        "-nln",
+                        out_vec_lyr,
+                        out_vec_file,
+                        inFile,
+                    ]
                     try:
                         subprocess.run(cmd)
                     except OSError as e:
                         raise Exception("Error running ogr2ogr: {}".format(cmd))
                 first = False
             else:
-                cmd = ["ogr2ogr", "-update", "-append", "-f", "GPKG", "-nln", out_vec_lyr, out_vec_file, inFile]
+                cmd = [
+                    "ogr2ogr",
+                    "-update",
+                    "-append",
+                    "-f",
+                    "GPKG",
+                    "-nln",
+                    out_vec_lyr,
+                    out_vec_file,
+                    inFile,
+                ]
                 try:
                     subprocess.run(cmd)
                 except OSError as e:
@@ -260,20 +291,54 @@ def merge_vector_lyrs_to_gpkg(
         if nFeat > 0:
             if first:
                 if not exists:
-                    cmd = ["ogr2ogr", "-f", "GPKG", "-lco",  "SPATIAL_INDEX=YES", "-nln", out_vec_lyr, out_vec_file, vec_file, lyr]
+                    cmd = [
+                        "ogr2ogr",
+                        "-f",
+                        "GPKG",
+                        "-lco",
+                        "SPATIAL_INDEX=YES",
+                        "-nln",
+                        out_vec_lyr,
+                        out_vec_file,
+                        vec_file,
+                        lyr,
+                    ]
                     try:
                         subprocess.run(cmd)
                     except OSError as e:
                         raise Exception("Error running ogr2ogr: {}".format(cmd))
                 else:
-                    cmd = ["ogr2ogr", "-update", "-f", "GPKG", "-lco", "SPATIAL_INDEX=YES", "-nln", out_vec_lyr, out_vec_file, vec_file, lyr]
+                    cmd = [
+                        "ogr2ogr",
+                        "-update",
+                        "-f",
+                        "GPKG",
+                        "-lco",
+                        "SPATIAL_INDEX=YES",
+                        "-nln",
+                        out_vec_lyr,
+                        out_vec_file,
+                        vec_file,
+                        lyr,
+                    ]
                     try:
                         subprocess.run(cmd)
                     except OSError as e:
                         raise Exception("Error running ogr2ogr: {}".format(cmd))
                 first = False
             else:
-                cmd = ["ogr2ogr", "-update", "-append", "-f", "GPKG", "-nln", out_vec_lyr, out_vec_file, vec_file, lyr]
+                cmd = [
+                    "ogr2ogr",
+                    "-update",
+                    "-append",
+                    "-f",
+                    "GPKG",
+                    "-nln",
+                    out_vec_lyr,
+                    out_vec_file,
+                    vec_file,
+                    lyr,
+                ]
                 try:
                     subprocess.run(cmd)
                 except OSError as e:
@@ -305,7 +370,17 @@ def merge_vectors_to_gpkg_ind_lyrs(
     import rsgislib.tools.utils
 
     if geom_type is not None:
-        if geom_type not in ["GEOMETRY", "POINT", "LINESTRING", "POLYGON", "GEOMETRYCOLLECTION", "MULTIPOINT", "MULTIPOLYGON", "MULTILINESTRING", "PROMOTE_TO_MULTI" "CONVERT_TO_LINEAR"]:
+        if geom_type not in [
+            "GEOMETRY",
+            "POINT",
+            "LINESTRING",
+            "POLYGON",
+            "GEOMETRYCOLLECTION",
+            "MULTIPOINT",
+            "MULTIPOLYGON",
+            "MULTILINESTRING",
+            "PROMOTE_TO_MULTI" "CONVERT_TO_LINEAR",
+        ]:
             raise rsgislib.RSGISPyException("The geom_type is not valid.")
 
     out_lyr_names = []
@@ -331,9 +406,35 @@ def merge_vectors_to_gpkg_ind_lyrs(
             )
             if nFeat > 0:
                 if geom_type is None:
-                    cmd = ["ogr2ogr", "-overwrite", "-f", "GPKG", "-lco", "SPATIAL_INDEX=YES", "-nln", out_lyr, out_vec_file, inFile, lyr]
+                    cmd = [
+                        "ogr2ogr",
+                        "-overwrite",
+                        "-f",
+                        "GPKG",
+                        "-lco",
+                        "SPATIAL_INDEX=YES",
+                        "-nln",
+                        out_lyr,
+                        out_vec_file,
+                        inFile,
+                        lyr,
+                    ]
                 else:
-                    cmd = ["ogr2ogr", "-overwrite", "-f", "GPKG", "-lco", "SPATIAL_INDEX=YES", "-nlt", geom_type, "-nln", out_lyr, out_vec_file, inFile, lyr]
+                    cmd = [
+                        "ogr2ogr",
+                        "-overwrite",
+                        "-f",
+                        "GPKG",
+                        "-lco",
+                        "SPATIAL_INDEX=YES",
+                        "-nlt",
+                        geom_type,
+                        "-nln",
+                        out_lyr,
+                        out_vec_file,
+                        inFile,
+                        lyr,
+                    ]
                 print(cmd)
                 try:
                     subprocess.run(cmd)

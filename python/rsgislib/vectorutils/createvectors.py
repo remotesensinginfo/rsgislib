@@ -296,7 +296,15 @@ def extract_image_footprint(
         if os.path.exists(out_vec_file):
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
 
-        cmd = ["ogr2ogr", "-f", out_format, "-t_srs", reproj_to, out_vec_file, outVecTmpFile]
+        cmd = [
+            "ogr2ogr",
+            "-f",
+            out_format,
+            "-t_srs",
+            reproj_to,
+            out_vec_file,
+            outVecTmpFile,
+        ]
         print(cmd)
         try:
             import subprocess
@@ -591,7 +599,9 @@ def define_grid(
         if out_epsg_code is None:
             create_poly_vec_bboxs(out_vec, out_vec_lyr, out_format, in_epsg_code, bboxs)
         else:
-            create_poly_vec_bboxs(out_vec, out_vec_lyr, out_format, out_epsg_code, bboxs)
+            create_poly_vec_bboxs(
+                out_vec, out_vec_lyr, out_format, out_epsg_code, bboxs
+            )
 
 
 def create_poly_vec_bboxs(

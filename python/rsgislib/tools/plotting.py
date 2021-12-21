@@ -95,7 +95,9 @@ def plot_image_spectra(
         dataset = None
 
         if not len(wavelengths) == numBands:
-            raise rsgislib.RSGISPyException("The number of wavelengths and image bands must be equal.")
+            raise rsgislib.RSGISPyException(
+                "The number of wavelengths and image bands must be equal."
+            )
 
         tmpOutFile = os.path.splitext(output_plot_file)[0] + "_statstmp.txt"
         zonalattributes = zonalstats.ZonalAttributes(

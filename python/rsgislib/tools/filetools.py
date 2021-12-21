@@ -307,7 +307,9 @@ def get_files_mod_time(
 
     """
     if (dt_before is None) and (dt_after is None):
-        raise rsgislib.RSGISPyException("You must define at least one of dt_before or dt_after")
+        raise rsgislib.RSGISPyException(
+            "You must define at least one of dt_before or dt_after"
+        )
     out_file_lst = list()
     for cfile in file_lst:
         if os.path.exists(cfile):
@@ -428,11 +430,15 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str):
     """
     in_unit = in_unit.lower()
     if in_unit not in ["bytes", "kb", "mb", "gb", "tb"]:
-        raise rsgislib.RSGISPyException("Input unit must be one of: bytes, kb, mb, gb, tb")
+        raise rsgislib.RSGISPyException(
+            "Input unit must be one of: bytes, kb, mb, gb, tb"
+        )
 
     out_unit = out_unit.lower()
     if out_unit not in ["bytes", "kb", "mb", "gb", "tb"]:
-        raise rsgislib.RSGISPyException("Output unit must be one of: bytes, kb, mb, gb, tb")
+        raise rsgislib.RSGISPyException(
+            "Output unit must be one of: bytes, kb, mb, gb, tb"
+        )
 
     if in_unit == "bytes":
         file_size_bytes = in_size
@@ -550,7 +556,9 @@ def get_file_lock(
         f.flush()
         f.close()
     elif use_except:
-        raise rsgislib.RSGISPyException("Lock could not be gained for file: {}".format(input_file))
+        raise rsgislib.RSGISPyException(
+            "Lock could not be gained for file: {}".format(input_file)
+        )
 
     return got_lock
 
@@ -950,9 +958,9 @@ def untar_file(
     if verbose:
         print("Extracting: {}".format(in_file))
         print("Output to: {}".format(process_dir))
-        cmd = ['tar', '-xvf', in_file]
+        cmd = ["tar", "-xvf", in_file]
     else:
-        cmd = ['tar', '-xf', in_file]
+        cmd = ["tar", "-xf", in_file]
     try:
         import subprocess
 
@@ -999,10 +1007,10 @@ def untar_gz_file(
     if verbose:
         print("Extracting: {}".format(in_file))
         print("Output to: {}".format(process_dir))
-        cmd = ['tar', '-xvzf', in_file]
+        cmd = ["tar", "-xvzf", in_file]
         print(cmd)
     else:
-        cmd = ['tar', '-xzf', in_file]
+        cmd = ["tar", "-xzf", in_file]
     try:
         import subprocess
 
@@ -1046,7 +1054,7 @@ def unzip_file(
         os.makedirs(process_dir)
     c_dir = os.getcwd()
     os.chdir(process_dir)
-    cmd = ['unzip', in_file]
+    cmd = ["unzip", in_file]
     if verbose:
         print("Extracting: {}".format(in_file))
         print("Output to: {}".format(process_dir))
@@ -1097,10 +1105,10 @@ def untar_bz_file(
     if verbose:
         print("Extracting: {}".format(in_file))
         print("Output to: {}".format(process_dir))
-        cmd = ['tar', '-xvjf', in_file]
+        cmd = ["tar", "-xvjf", in_file]
         print(cmd)
     else:
-        cmd = ['tar', '-xjf', in_file]
+        cmd = ["tar", "-xjf", in_file]
     try:
         import subprocess
 

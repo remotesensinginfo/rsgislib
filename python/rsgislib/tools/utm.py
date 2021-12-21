@@ -38,7 +38,7 @@ R = 6378137
 ZONE_LETTERS = "CDEFGHJKLMNPQRSTUVWXX"
 
 
-def min_max_eastings_for_lat(latitude:float, zone:int=1)->(float, float):
+def min_max_eastings_for_lat(latitude: float, zone: int = 1) -> (float, float):
     """
     Find the minimum and maximum Eastings for a specified latitude within a specific zone.
     This should be the same for all zones.
@@ -60,7 +60,7 @@ def min_max_eastings_for_lat(latitude:float, zone:int=1)->(float, float):
     return min_utm[0], max_utm[0]
 
 
-def epsg_for_utm(zone:int, hemisphere:str)->int:
+def epsg_for_utm(zone: int, hemisphere: str) -> int:
     """
     Return EPSG code for given UTM zone and hemisphere using WGS84 datum.
 
@@ -85,7 +85,7 @@ def epsg_for_utm(zone:int, hemisphere:str)->int:
     return int(32000 + ns + zone)
 
 
-def utm_from_epsg(epsg_code:int)->(int,str):
+def utm_from_epsg(epsg_code: int) -> (int, str):
     """
     Return UTM zone and hemisphere from a EPSG code using WGS84 datum.
 
@@ -146,7 +146,9 @@ def split_wgs84_bbox_utm_zones(wgs84_bbox):
     return out_bboxs
 
 
-def check_valid_zone(zone_number:int, zone_letter:str=None, use_exp:bool=False)->bool:
+def check_valid_zone(
+    zone_number: int, zone_letter: str = None, use_exp: bool = False
+) -> bool:
     """
     Check that the UTM zone is valid.
 
@@ -161,7 +163,9 @@ def check_valid_zone(zone_number:int, zone_letter:str=None, use_exp:bool=False)-
     valid_zone = True
     if not 1 <= zone_number <= 60:
         if use_exp:
-            raise rsgislib.RSGISPyException("zone number out of range (must be between 1 and 60)")
+            raise rsgislib.RSGISPyException(
+                "zone number out of range (must be between 1 and 60)"
+            )
         valid_zone = False
 
     if zone_letter:
@@ -169,7 +173,9 @@ def check_valid_zone(zone_number:int, zone_letter:str=None, use_exp:bool=False)-
 
         if not "C" <= zone_letter <= "X" or zone_letter in ["I", "O"]:
             if use_exp:
-                raise rsgislib.RSGISPyException("zone letter out of range (must be between C and X)")
+                raise rsgislib.RSGISPyException(
+                    "zone letter out of range (must be between C and X)"
+                )
             valid_zone = False
 
     return valid_zone
@@ -276,7 +282,12 @@ def to_latlon(
     )
 
 
-def from_latlon(latitude:numpy.array, longitude:numpy.array, force_zone_number:int=None, force_zone_letter:str=None)->(numpy.array, numpy.array, numpy.array, numpy.array):
+def from_latlon(
+    latitude: numpy.array,
+    longitude: numpy.array,
+    force_zone_number: int = None,
+    force_zone_letter: str = None,
+) -> (numpy.array, numpy.array, numpy.array, numpy.array):
     """
     This function convert Latitude and Longitude to UTM coordinate
 
@@ -290,7 +301,9 @@ def from_latlon(latitude:numpy.array, longitude:numpy.array, force_zone_number:i
     import rsgislib.tools.utils
 
     if not rsgislib.tools.utils.in_bounds(latitude, -80.0, 84.0):
-        raise rsgislib.RSGISPyException("latitude out of range (must be between 80 deg S and 84 deg N)")
+        raise rsgislib.RSGISPyException(
+            "latitude out of range (must be between 80 deg S and 84 deg N)"
+        )
     if not rsgislib.tools.utils.in_bounds(longitude, -180.0, 180.0):
         raise rsgislib.RSGISPyException(
             "longitude out of range (must be between 180 deg W and 180 deg E)"
@@ -415,7 +428,9 @@ def latlon_to_zone_number(latitude, longitude):
     return int((longitude + 180) / 6) + 1
 
 
-def latlon_arr_to_utm_zone_number(latitude:numpy.array, longitude:numpy.array)->numpy.array:
+def latlon_arr_to_utm_zone_number(
+    latitude: numpy.array, longitude: numpy.array
+) -> numpy.array:
     """
     Find the UTM zone number for a give latitude and longitude. UTM zone will be
     returned for all the lat/longs within the input arrays, which must be of the same
@@ -450,7 +465,9 @@ def latlon_arr_to_utm_zone_number(latitude:numpy.array, longitude:numpy.array)->
     return utm_zones
 
 
-def latlon_to_mode_utm_zone_number(latitude:numpy.array, longitude:numpy.array)->int:
+def latlon_to_mode_utm_zone_number(
+    latitude: numpy.array, longitude: numpy.array
+) -> int:
     """
     Find the mode UTM zone for a list of lat/lon values.
 
@@ -466,7 +483,7 @@ def latlon_to_mode_utm_zone_number(latitude:numpy.array, longitude:numpy.array)-
     return mode[0]
 
 
-def zone_number_to_central_longitude(zone_number:int)->int:
+def zone_number_to_central_longitude(zone_number: int) -> int:
     """
     Find the central longitude for the given zone.
 

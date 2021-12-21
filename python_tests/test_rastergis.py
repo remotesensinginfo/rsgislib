@@ -218,7 +218,10 @@ def test_calc_rel_border(tmp_path):
     )
 
 
-@pytest.mark.skipif(True, reason="Sometimes a seg fault with calc_rel_diff_neigh_stats which haven't found fix for yet.")
+@pytest.mark.skipif(
+    True,
+    reason="Sometimes a seg fault with calc_rel_diff_neigh_stats which haven't found fix for yet.",
+)
 def test_calc_rel_diff_neigh_stats(tmp_path):
     import rsgislib.rastergis
 
@@ -235,7 +238,11 @@ def test_calc_rel_diff_neigh_stats(tmp_path):
     )
     rsgislib.rastergis.calc_rel_diff_neigh_stats(clumps_img, fieldInfo, False, 1)
 
-@pytest.mark.skipif(True, reason="Sometimes a seg fault with calc_rel_diff_neigh_stats which haven't found fix for yet.")
+
+@pytest.mark.skipif(
+    True,
+    reason="Sometimes a seg fault with calc_rel_diff_neigh_stats which haven't found fix for yet.",
+)
 def test_calc_rel_diff_neigh_stats_abs(tmp_path):
     import rsgislib.rastergis
 
@@ -251,7 +258,6 @@ def test_calc_rel_diff_neigh_stats_abs(tmp_path):
         field="b8_mean", min_field="MinNIRMeanDiff", max_field="MaxNIRMeanDiff"
     )
     rsgislib.rastergis.calc_rel_diff_neigh_stats(clumps_img, fieldInfo, True, 1)
-
 
 
 def test_define_border_clumps(tmp_path):

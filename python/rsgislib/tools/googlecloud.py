@@ -6,6 +6,7 @@ import os
 
 import rsgislib
 
+
 def blob_exists(goog_cred, bucket_name, filename):
     """
     A function to test whether a file .

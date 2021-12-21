@@ -7,6 +7,7 @@ import numpy
 
 import rsgislib
 
+
 def calc_pandas_vif(df, cols=None):
     """
     A function to calculate variance inflation factors to
@@ -41,7 +42,9 @@ def calc_pandas_vif(df, cols=None):
 
     # If there is less than 2 columns product error message.
     if len(cols) < 2:
-        raise rsgislib.RSGISPyException("The list of columns must be have a length of at least 2.")
+        raise rsgislib.RSGISPyException(
+            "The list of columns must be have a length of at least 2."
+        )
 
     print("Calculating VIF for {} predictors variables...".format(len(cols)))
 
@@ -107,7 +110,9 @@ def cqv_threshold(df, cols=None, lowthreshold=0.25, highthreshold=0.75):
 
     # If there is less than 2 columns product error message.
     if len(cols) < 2:
-        raise rsgislib.RSGISPyException("The list of columns must be have a length of at least 2.")
+        raise rsgislib.RSGISPyException(
+            "The list of columns must be have a length of at least 2."
+        )
 
     # Create numpy array from the list columns
     x = df[cols].values

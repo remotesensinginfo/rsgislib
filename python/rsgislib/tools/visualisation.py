@@ -12,7 +12,6 @@ import rsgislib
 import rsgislib.imageutils
 
 
-
 def create_kmz_img(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=False):
     """
     A function to convert an input image to a KML/KMZ file, where the input image
