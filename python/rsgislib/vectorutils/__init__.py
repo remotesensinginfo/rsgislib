@@ -480,12 +480,20 @@ def get_vec_layer_extent(
     """
 
     # Get a Layer's Extent
-    inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    try:
+        in_data_source = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    except Exception as e:
+        raise rsgislib.RSGISPyException(f"Could not open vector file: {vec_file}")
+    if in_data_source is None:
+        raise rsgislib.RSGISPyException(f"Could not open vector file: {vec_file}")
     if vec_lyr is not None:
-        inLayer = inDataSource.GetLayer(vec_lyr)
+        in_layer = in_data_source.GetLayer(vec_lyr)
     else:
-        inLayer = inDataSource.GetLayer()
-    extent = inLayer.GetExtent(compute_if_exp)
+        in_layer = in_data_source.GetLayer()
+    if in_layer is None:
+        raise rsgislib.RSGISPyException(f"Could not open vector layer ({vec_lyr}) "
+                                        f"in vector file {vec_file}")
+    extent = in_layer.GetExtent(compute_if_exp)
     return extent
 
 

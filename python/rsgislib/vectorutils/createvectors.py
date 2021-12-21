@@ -245,51 +245,51 @@ def extract_image_footprint(
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    uidStr = rsgislib.tools.utils.uid_generator()
+    uid_str = rsgislib.tools.utils.uid_generator()
 
-    createdTmp = False
+    created_tmp = False
     if not os.path.exists(tmp_dir):
         os.makedirs(tmp_dir)
-        createdTmp = True
+        created_tmp = True
 
-    inImgBase = os.path.splitext(os.path.basename(input_img))[0]
+    in_img_base = os.path.splitext(os.path.basename(input_img))[0]
 
-    validOutImg = os.path.join(tmp_dir, inImgBase + "_" + uidStr + "_validimg.kea")
+    valid_out_img = os.path.join(tmp_dir, in_img_base + "_" + uid_str + "_validimg.kea")
     if no_data_val is None:
         no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
 
     if no_data_val is None:
         raise rsgislib.RSGISPyException("A no data value has not been specified.")
     rsgislib.imageutils.gen_valid_mask(
-        input_img, validOutImg, gdalformat="KEA", no_data_val=no_data_val
+        input_img, valid_out_img, gdalformat="KEA", no_data_val=no_data_val
     )
 
-    outVecTmpFile = out_vec_file
+    out_vec_tmp_file = out_vec_file
     if not (reproj_to is None):
-        outVecTmpFile = os.path.join(
-            tmp_dir, inImgBase + "_" + uidStr + "_initVecOut.gpkg"
+        out_vec_tmp_file = os.path.join(
+            tmp_dir, in_img_base + "_" + uid_str + "_initVecOut.gpkg"
         )
 
     polygonise_raster_to_vec_lyr(
-        outVecTmpFile, out_vec_lyr, out_format, validOutImg, 1, validOutImg, 1
+        out_vec_tmp_file, out_vec_lyr, out_format, valid_out_img, 1, valid_out_img, 1
     )
 
-    ds = gdal.OpenEx(outVecTmpFile, gdal.OF_READONLY)
+    ds = gdal.OpenEx(out_vec_tmp_file, gdal.OF_READONLY)
     if ds is None:
-        raise Exception("Could not open '" + outVecTmpFile + "'")
+        raise Exception("Could not open '" + out_vec_tmp_file + "'")
 
     lyr = ds.GetLayerByName(out_vec_lyr)
     if lyr is None:
         raise Exception("Could not find layer '" + out_vec_lyr + "'")
-    numFeats = lyr.GetFeatureCount()
+    num_feats = lyr.GetFeatureCount()
     lyr = None
     ds = None
 
-    fileName = []
-    for i in range(numFeats):
-        fileName.append(os.path.basename(input_img))
+    file_name = []
+    for i in range(num_feats):
+        file_name.append(os.path.basename(input_img))
     rsgislib.vectorattrs.write_vec_column(
-        outVecTmpFile, out_vec_lyr, "FileName", ogr.OFTString, fileName
+        out_vec_tmp_file, out_vec_lyr, "FileName", ogr.OFTString, file_name
     )
 
     if not (reproj_to is None):
@@ -303,7 +303,7 @@ def extract_image_footprint(
             "-t_srs",
             reproj_to,
             out_vec_file,
-            outVecTmpFile,
+            out_vec_tmp_file,
         ]
         print(cmd)
         try:
@@ -311,16 +311,16 @@ def extract_image_footprint(
 
             subprocess.run(cmd)
         except OSError as e:
-            raise Exception("Could not re-projection vector file: " + cmd)
+            raise Exception("Could not re-projection vector file: {}".format(cmd))
 
-    if createdTmp:
+    if created_tmp:
         import shutil
 
         shutil.rmtree(tmp_dir)
     else:
         if not (reproj_to is None):
             driver = ogr.GetDriverByName("ESRI Shapefile")
-            driver.DeleteDataSource(outVecTmpFile)
+            driver.DeleteDataSource(out_vec_tmp_file)
 
 
 def create_poly_vec_for_lst_bboxs(

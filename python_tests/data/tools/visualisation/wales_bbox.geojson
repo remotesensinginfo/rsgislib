@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "wales_bbox",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::27700" } },
+"features": [
+{ "type": "Feature", "properties": { "location": "/Users/carole/Documents/Boundary_files/WALES_EODESM_extent/canopyht.kea" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 120000.0, 420000.0001 ], [ 390000.0, 420000.0001 ], [ 390000.0, 150000.0001 ], [ 120000.0, 150000.0001 ], [ 120000.0, 420000.0001 ] ] ] } }
+]
+}

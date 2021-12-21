@@ -3,8 +3,8 @@ import os
 import pytest
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-TOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools", "utils")
-
+TOOLS_UTILS_DATA_DIR = os.path.join(DATA_DIR, "tools", "utils")
+IMGREG_DATA_DIR = os.path.join(DATA_DIR, "imageregistration")
 
 def test_uid_generator_len4():
     import rsgislib.tools.utils
@@ -179,7 +179,7 @@ def test_powerset_lst_min2():
 def test_read_text_file_no_new_lines_str():
     import rsgislib.tools.utils
 
-    input_file = os.path.join(TOOLS_DATA_DIR, "basic_str.txt")
+    input_file = os.path.join(TOOLS_UTILS_DATA_DIR, "basic_str.txt")
     in_data = rsgislib.tools.utils.read_text_file_no_new_lines(input_file)
     assert in_data == "Hello"
 
@@ -187,7 +187,7 @@ def test_read_text_file_no_new_lines_str():
 def test_read_text_file_no_new_lines_str_mline():
     import rsgislib.tools.utils
 
-    input_file = os.path.join(TOOLS_DATA_DIR, "basic_str_mline.txt")
+    input_file = os.path.join(TOOLS_UTILS_DATA_DIR, "basic_str_mline.txt")
     in_data = rsgislib.tools.utils.read_text_file_no_new_lines(input_file)
     assert in_data == "HelloWorld"
 
@@ -195,7 +195,7 @@ def test_read_text_file_no_new_lines_str_mline():
 def test_read_text_file_no_new_lines_int():
     import rsgislib.tools.utils
 
-    input_file = os.path.join(TOOLS_DATA_DIR, "basic_int.txt")
+    input_file = os.path.join(TOOLS_UTILS_DATA_DIR, "basic_int.txt")
     in_data = rsgislib.tools.utils.read_text_file_no_new_lines(input_file)
     assert int(in_data) == 100
 
@@ -203,7 +203,7 @@ def test_read_text_file_no_new_lines_int():
 def test_read_text_file_to_list_strs():
     import rsgislib.tools.utils
 
-    input_file = os.path.join(TOOLS_DATA_DIR, "basic_str_mline.txt")
+    input_file = os.path.join(TOOLS_UTILS_DATA_DIR, "basic_str_mline.txt")
     in_data = rsgislib.tools.utils.read_text_file_to_list(input_file)
     ref_data = ["Hello", "World"]
     if len(in_data) != len(ref_data):
@@ -246,7 +246,7 @@ def test_write_data_to_file_int_chkcontent(tmp_path):
 def test_read_json_to_dict_basic():
     import rsgislib.tools.utils
 
-    input_file = os.path.join(TOOLS_DATA_DIR, "basic_dict.json")
+    input_file = os.path.join(TOOLS_UTILS_DATA_DIR, "basic_dict.json")
     out_data = dict()
     out_data["Hello"] = "World"
     out_data["ten"] = 10

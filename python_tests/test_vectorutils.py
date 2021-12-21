@@ -278,6 +278,22 @@ def test_get_vec_layer_extent():
         and (abs(bbox[3] - 282311.96875) < 1)
     )
 
+def test_get_vec_layer_extent_file_excp():
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./err_file.gpkg")
+    vec_lyr = "err_lyr"
+    with pytest.raises(rsgislib.RSGISPyException):
+        rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
+
+def test_get_vec_layer_extent_lyr_excp():
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_lyr = "err_lyr"
+    with pytest.raises(rsgislib.RSGISPyException):
+        rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
+
 
 def test_split_vec_lyr(tmp_path):
     import rsgislib.vectorutils
