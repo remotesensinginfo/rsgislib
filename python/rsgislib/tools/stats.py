@@ -5,6 +5,7 @@ easily available else where.
 """
 import numpy
 
+import rsgislib
 
 def calc_pandas_vif(df, cols=None):
     """
@@ -40,7 +41,7 @@ def calc_pandas_vif(df, cols=None):
 
     # If there is less than 2 columns product error message.
     if len(cols) < 2:
-        raise Exception("The list of columns must be have a length of at least 2.")
+        raise rsgislib.RSGISPyException("The list of columns must be have a length of at least 2.")
 
     print("Calculating VIF for {} predictors variables...".format(len(cols)))
 
@@ -106,7 +107,7 @@ def cqv_threshold(df, cols=None, lowthreshold=0.25, highthreshold=0.75):
 
     # If there is less than 2 columns product error message.
     if len(cols) < 2:
-        raise Exception("The list of columns must be have a length of at least 2.")
+        raise rsgislib.RSGISPyException("The list of columns must be have a length of at least 2.")
 
     # Create numpy array from the list columns
     x = df[cols].values
@@ -180,7 +181,7 @@ def corr_feature_selection(df, dep_vars, ind_vars, n_min_clusters=3, n_max_clust
         """
         # check inputs:
         if X.ndim != 2:
-            raise Exception("Error: the input array must be 2D.")
+            raise rsgislib.RSGISPyException("Error: the input array must be 2D.")
 
         def _pearson_affinity(a):
             """An utility function to generate an affinity matrix based on Pearson correlation."""
@@ -915,10 +916,10 @@ def calc_kurt_skew_threshold(
     import scipy.stats
 
     if len(data.shape) > 1:
-        raise Exception("Expecting a single variable.")
+        raise rsgislib.RSGISPyException("Expecting a single variable.")
 
     if (contamination < 1) or (contamination > 100):
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "contamination parameter should have a value between 1 and 100."
         )
 
@@ -940,11 +941,11 @@ def calc_kurt_skew_threshold(
     if min_val == max_val:
         print("Min: {}".format(min_val))
         print("Max: {}".format(max_val))
-        raise Exception("Min and Max values are the same.")
+        raise rsgislib.RSGISPyException("Min and Max values are the same.")
     elif min_val > max_val:
         print("Min: {}".format(min_val))
         print("Max: {}".format(max_val))
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Min value is greater than max - note this can happened if the "
             "contamination parameter caused threshold to be changed."
         )
@@ -980,7 +981,7 @@ def calc_kurt_skew_threshold(
     if opt_rslt.success:
         out_thres = opt_rslt.x[0]
     else:
-        raise Exception("Optimisation failed, no threshold found.")
+        raise rsgislib.RSGISPyException("Optimisation failed, no threshold found.")
 
     return out_thres
 
@@ -1022,9 +1023,9 @@ def bias_score(y_true, y_pred):
     if not isinstance(y_pred, numpy.ndarray):
         y_pred = numpy.array(y_pred)
     if y_true.ndim != y_pred.ndim:
-        raise Exception("Error: y_true dimensions != y_pred.")
+        raise rsgislib.RSGISPyException("Error: y_true dimensions != y_pred.")
     if y_true.size != y_pred.size:
-        raise Exception("Error: y_true size != y_pred.")
+        raise rsgislib.RSGISPyException("Error: y_true size != y_pred.")
 
     bias = numpy.mean(y_pred - y_true, axis=0)
     norm_bias = (bias / numpy.mean(y_true, axis=0)) * 100

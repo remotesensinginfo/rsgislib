@@ -79,13 +79,13 @@ def plot_image_spectra(
     try:
         # Check gdal is available
         if not haveGDALPy:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The GDAL python bindings required for this function could not be imported\n\t"
                 + gdalErr
             )
         # Check matplotlib is available
         if not haveMatPlotLib:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The matplotlib module is required for this function could not be imported\n\t"
                 + pltErr
             )
@@ -95,7 +95,7 @@ def plot_image_spectra(
         dataset = None
 
         if not len(wavelengths) == numBands:
-            raise Exception("The number of wavelengths and image bands must be equal.")
+            raise rsgislib.RSGISPyException("The number of wavelengths and image bands must be equal.")
 
         tmpOutFile = os.path.splitext(output_plot_file)[0] + "_statstmp.txt"
         zonalattributes = zonalstats.ZonalAttributes(
@@ -132,7 +132,7 @@ def plot_image_spectra(
                 data = statsRow.split(",")
 
                 if not len(data) == (numBands * 2) + 2:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "The number of outputted stats values is incorrect!"
                     )
                 for band in range(numBands):
@@ -247,19 +247,19 @@ def plot_image_comparison(
     try:
         # Check gdal is available
         if not haveGDALPy:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The GDAL python bindings required for this function could not be imported\n\t"
                 + gdalErr
             )
         # Check matplotlib is available
         if not haveMatPlotLib:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The matplotlib module is required for this function could not be imported\n\t"
                 + pltErr
             )
         # Check matplotlib is available
         if not haveNumpy:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The numpy module is required for this function could not be imported\n\t"
                 + numErr
             )
@@ -411,19 +411,19 @@ def plot_image_histogram(
     try:
         # Check gdal is available
         if not haveGDALPy:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The GDAL python bindings required for this function could not be imported\n\t"
                 + gdalErr
             )
         # Check matplotlib is available
         if not haveMatPlotLib:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The matplotlib module is required for this function could not be imported\n\t"
                 + pltErr
             )
         # Check matplotlib is available
         if not haveNumpy:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The numpy module is required for this function could not be imported\n\t"
                 + numErr
             )
@@ -496,11 +496,11 @@ def residual_plot(y_true, residuals, out_file, out_format="PNG", title=None):
     if not isinstance(y_true, numpy.ndarray):
         y_true = numpy.array(y_true)
     if y_true.ndim != 1:
-        raise Exception("y_true has more than 1 dimension.")
+        raise rsgislib.RSGISPyException("y_true has more than 1 dimension.")
     if residuals.ndim != 1:
-        raise Exception("Residuals has more than 1 dimension.")
+        raise rsgislib.RSGISPyException("Residuals has more than 1 dimension.")
     if residuals.size != y_true.size:
-        raise Exception("y_true.size != residuals.size.")
+        raise rsgislib.RSGISPyException("y_true.size != residuals.size.")
 
     # setup plot:
     # rcParams.update({'font.family': 'cmr10'})  # use latex fonts.

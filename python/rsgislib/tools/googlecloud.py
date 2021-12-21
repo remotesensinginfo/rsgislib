@@ -4,6 +4,7 @@ The tools.google_cloud module contains functions for manipulating
 """
 import os
 
+import rsgislib
 
 def blob_exists(goog_cred, bucket_name, filename):
     """
@@ -67,7 +68,7 @@ def upload_to_google_bucket(file_to_upload, goog_cred, bucket_name, bucket_dir):
     blob_obj = bucket_obj.blob(bucket_file_path)
     blob_obj.upload_from_filename(file_to_upload)
     if not blob_exists(goog_cred, bucket_name, bucket_file_path):
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "File was not successfully uploaded to Google Cloud: '{}'".format(
                 file_to_upload
             )

@@ -4,11 +4,13 @@ The tools.visualisation module contains functions for aiding visualisation of da
 """
 
 # Import modules
-import rsgislib
-import rsgislib.imageutils
 import os
 import shutil
 import subprocess
+
+import rsgislib
+import rsgislib.imageutils
+
 
 
 def create_kmz_img(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=False):
@@ -1715,7 +1717,7 @@ def overlay_vec_on_img(
         for i in range(n_img_bands):
             overlay_clr.append(255)
     elif len(overlay_clr) != n_img_bands:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The overlay colour does not have the same number of "
             "values as the number of bands within the input image."
         )

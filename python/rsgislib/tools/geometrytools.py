@@ -6,6 +6,7 @@ The tools.geometrytool module contains functions for manipulating and moving fil
 import math
 from osgeo import ogr
 
+import rsgislib
 
 def reproj_bbox(bbox, in_osr_proj_obj, out_osr_proj_obj):
     """
@@ -159,7 +160,7 @@ def bbox_intersection(bbox1, bbox2):
 
     """
     if not do_bboxes_intersect(bbox1, bbox2):
-        raise Exception("Bounding Boxes do not intersect.")
+        raise rsgislib.RSGISPyException("Bounding Boxes do not intersect.")
 
     xMinOverlap = bbox1[0]
     xMaxOverlap = bbox1[1]

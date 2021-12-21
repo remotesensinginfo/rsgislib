@@ -452,7 +452,7 @@ def remove_repeated_chars(str_val: str, repeat_char: str):
 
     """
     if len(repeat_char) != 1:
-        raise Exception("The repeat character has multiple characters.")
+        raise rsgislib.RSGISPyException("The repeat character has multiple characters.")
     out_str = ""
     p = ""
     for c in str_val:
@@ -529,7 +529,7 @@ def get_days_since(year: int, day_of_year: int, base_date: datetime.date):
 
     """
     if year < base_date.year:
-        raise Exception("The year specified is before the base date.")
+        raise rsgislib.RSGISPyException("The year specified is before the base date.")
     date_val = datetime.date(year=int(year), month=1, day=1)
     date_val = date_val + datetime.timedelta(days=int(day_of_year - 1))
     return (date_val - base_date).days
@@ -547,7 +547,7 @@ def get_days_since_date(year: int, month: int, day, base_date: datetime.date):
 
     """
     if year < base_date.year:
-        raise Exception("The year specified is before the base date.")
+        raise rsgislib.RSGISPyException("The year specified is before the base date.")
     date_val = datetime.date(year=int(year), month=int(month), day=int(day))
     return (date_val - base_date).days
 

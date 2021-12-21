@@ -304,12 +304,11 @@ def merge_vectors_to_gpkg_ind_lyrs(
     """
     import rsgislib.tools.utils
 
-    out_lyr_names = []
-
-    out_geom_type = ""
     if geom_type is not None:
-        out_geom_type = " -nlt {} ".format(geom_type)
+        if geom_type not in ["GEOMETRY", "POINT", "LINESTRING", "POLYGON", "GEOMETRYCOLLECTION", "MULTIPOINT", "MULTIPOLYGON", "MULTILINESTRING", "PROMOTE_TO_MULTI" "CONVERT_TO_LINEAR"]:
+            raise rsgislib.RSGISPyException("The geom_type is not valid.")
 
+    out_lyr_names = []
     for inFile in in_vec_files:
         inlyrs = get_vec_lyrs_lst(inFile)
         print(
@@ -331,7 +330,11 @@ def merge_vectors_to_gpkg_ind_lyrs(
                 "copy - output layer name: {2}".format(lyr, nFeat, out_lyr)
             )
             if nFeat > 0:
-                cmd = ["ogr2ogr", "-overwrite", "-f", "GPKG", "-nlt", out_geom_type, "-lco", "SPATIAL_INDEX=YES",  "-nln", out_lyr, out_vec_file, inFile, lyr]
+                if geom_type is None:
+                    cmd = ["ogr2ogr", "-overwrite", "-f", "GPKG", "-lco", "SPATIAL_INDEX=YES", "-nln", out_lyr, out_vec_file, inFile, lyr]
+                else:
+                    cmd = ["ogr2ogr", "-overwrite", "-f", "GPKG", "-lco", "SPATIAL_INDEX=YES", "-nlt", geom_type, "-nln", out_lyr, out_vec_file, inFile, lyr]
+                print(cmd)
                 try:
                     subprocess.run(cmd)
                 except OSError as e:

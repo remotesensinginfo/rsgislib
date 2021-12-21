@@ -452,7 +452,7 @@ def check_gdal_vector_file(
                     if file_ok and chk_proj:
                         vec_lyr = vec_ds.GetLayer()
                         if vec_lyr is None:
-                            raise Exception(
+                            raise rsgislib.RSGISPyException(
                                 "Something has gone wrong "
                                 "checking projection - layer not present"
                             )

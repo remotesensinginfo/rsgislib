@@ -270,7 +270,7 @@ def find_first_file(dir_path: str, file_search: str, rtn_except: bool = True):
     if (files is not None) and (len(files) == 1):
         out_file = files[0]
     elif rtn_except:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Could not find a single file ({0}) in {1}; "
             "found {2} files.".format(file_search, dir_path, len(files))
         )
@@ -307,7 +307,7 @@ def get_files_mod_time(
 
     """
     if (dt_before is None) and (dt_after is None):
-        raise Exception("You must define at least one of dt_before or dt_after")
+        raise rsgislib.RSGISPyException("You must define at least one of dt_before or dt_after")
     out_file_lst = list()
     for cfile in file_lst:
         if os.path.exists(cfile):
@@ -428,11 +428,11 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str):
     """
     in_unit = in_unit.lower()
     if in_unit not in ["bytes", "kb", "mb", "gb", "tb"]:
-        raise Exception("Input unit must be one of: bytes, kb, mb, gb, tb")
+        raise rsgislib.RSGISPyException("Input unit must be one of: bytes, kb, mb, gb, tb")
 
     out_unit = out_unit.lower()
     if out_unit not in ["bytes", "kb", "mb", "gb", "tb"]:
-        raise Exception("Output unit must be one of: bytes, kb, mb, gb, tb")
+        raise rsgislib.RSGISPyException("Output unit must be one of: bytes, kb, mb, gb, tb")
 
     if in_unit == "bytes":
         file_size_bytes = in_size
@@ -445,7 +445,7 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str):
     elif in_unit == "tb":
         file_size_bytes = in_size * (1024.0 ** 4)
     else:
-        raise Exception("Input unit it not recognised.")
+        raise rsgislib.RSGISPyException("Input unit it not recognised.")
 
     if out_unit == "bytes":
         out_file_size = file_size_bytes
@@ -458,7 +458,7 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str):
     elif out_unit == "tb":
         out_file_size = file_size_bytes / (1024.0 ** 4)
     else:
-        raise Exception("Output unit it not recognised.")
+        raise rsgislib.RSGISPyException("Output unit it not recognised.")
 
     return out_file_size
 
@@ -483,7 +483,7 @@ def get_file_size(file_path: str, unit: str = "bytes"):
 
     unit = unit.lower()
     if unit not in ["bytes", "kb", "mb", "gb", "tb"]:
-        raise Exception("Unit must be one of: bytes, kb, mb, gb, tb")
+        raise rsgislib.RSGISPyException("Unit must be one of: bytes, kb, mb, gb, tb")
 
     p = pathlib.Path(file_path)
     if p.exists() and p.is_file():
@@ -550,7 +550,7 @@ def get_file_lock(
         f.flush()
         f.close()
     elif use_except:
-        raise Exception("Lock could not be gained for file: {}".format(input_file))
+        raise rsgislib.RSGISPyException("Lock could not be gained for file: {}".format(input_file))
 
     return got_lock
 
@@ -669,7 +669,7 @@ def create_directory_archive(in_dir: str, out_arch: str, arch_format: str):
         cmd = ["tar", "-cvJf", out_arch_file, dir_name]
         subprocess.run(cmd)
     else:
-        raise Exception("Do not recognise the archive format specifed.")
+        raise rsgislib.RSGISPyException("Do not recognise the archive format specifed.")
 
     os.chdir(c_pwd)
     return out_arch_file

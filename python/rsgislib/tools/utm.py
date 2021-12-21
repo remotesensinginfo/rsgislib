@@ -7,6 +7,8 @@ This code has been adapted from https://github.com/Turbo87/utm/blob/master/utm/c
 """
 import numpy
 
+import rsgislib
+
 K0 = 0.9996
 
 E = 0.00669438
@@ -46,7 +48,7 @@ def min_max_eastings_for_lat(latitude:float, zone:int=1)->(float, float):
     :return: tuple [min, max]
     """
     if isinstance(latitude, numpy.ndarray):
-        raise Exception("Don't input an array.")
+        raise rsgislib.RSGISPyException("Don't input an array.")
 
     central_long = zone_number_to_central_longitude(zone)
     min_long = central_long - 3.0
@@ -67,10 +69,10 @@ def epsg_for_utm(zone:int, hemisphere:str)->int:
     :return: corresponding EPSG code
     """
     if hemisphere not in ["N", "S"]:
-        raise Exception('Invalid hemisphere ("N" or "S").')
+        raise rsgislib.RSGISPyException('Invalid hemisphere ("N" or "S").')
 
     if zone < 0 or zone > 60:
-        raise Exception("UTM zone ouside valid range.")
+        raise rsgislib.RSGISPyException("UTM zone ouside valid range.")
 
     if hemisphere == "N":
         ns = 600
@@ -159,7 +161,7 @@ def check_valid_zone(zone_number:int, zone_letter:str=None, use_exp:bool=False)-
     valid_zone = True
     if not 1 <= zone_number <= 60:
         if use_exp:
-            raise Exception("zone number out of range (must be between 1 and 60)")
+            raise rsgislib.RSGISPyException("zone number out of range (must be between 1 and 60)")
         valid_zone = False
 
     if zone_letter:
@@ -167,7 +169,7 @@ def check_valid_zone(zone_number:int, zone_letter:str=None, use_exp:bool=False)-
 
         if not "C" <= zone_letter <= "X" or zone_letter in ["I", "O"]:
             if use_exp:
-                raise Exception("zone letter out of range (must be between C and X)")
+                raise rsgislib.RSGISPyException("zone letter out of range (must be between C and X)")
             valid_zone = False
 
     return valid_zone
@@ -199,11 +201,11 @@ def to_latlon(
         if not rsgislib.tools.utils.in_bounds(
             easting, 100000, 1000000, upper_strict=True
         ):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "easting out of range (must be between 100.000 m and 999.999 m)"
             )
         if not rsgislib.tools.utils.in_bounds(northing, 0, 10000000):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "northing out of range (must be between 0 m and 10.000.000 m)"
             )
 
@@ -288,9 +290,9 @@ def from_latlon(latitude:numpy.array, longitude:numpy.array, force_zone_number:i
     import rsgislib.tools.utils
 
     if not rsgislib.tools.utils.in_bounds(latitude, -80.0, 84.0):
-        raise Exception("latitude out of range (must be between 80 deg S and 84 deg N)")
+        raise rsgislib.RSGISPyException("latitude out of range (must be between 80 deg S and 84 deg N)")
     if not rsgislib.tools.utils.in_bounds(longitude, -180.0, 180.0):
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "longitude out of range (must be between 180 deg W and 180 deg E)"
         )
     if force_zone_number is not None:
