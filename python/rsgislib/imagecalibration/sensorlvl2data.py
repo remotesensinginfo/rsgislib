@@ -33,6 +33,8 @@
 #
 ############################################################################
 
+import rsgislib
+
 
 def create_stacked_ls8_cl2_lv2_img(
     input_file,

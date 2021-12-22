@@ -6,6 +6,8 @@ The classification module provides classification functionality within RSGISLib.
 # import the C++ extension into this level
 from ._classification import *
 
+import rsgislib
+
 
 class ClassSimpleInfoObj(object):
     """
@@ -427,7 +429,9 @@ def create_train_valid_test_sets(
 
     """
     if cls_in_info.keys() != cls_out_info.keys():
-        raise rsgislib.RSGISPyException("The dict keys for the input and output info do not match.")
+        raise rsgislib.RSGISPyException(
+            "The dict keys for the input and output info do not match."
+        )
 
     for cls_name in cls_in_info:
         split_sample_train_valid_test(
@@ -1044,7 +1048,9 @@ def plot_train_data(
     cls2_n_vars = cls2_data.shape[1]
 
     if cls1_n_vars != cls2_n_vars:
-        raise rsgislib.RSGISPyException("The number of variables must be the same for the two classes.")
+        raise rsgislib.RSGISPyException(
+            "The number of variables must be the same for the two classes."
+        )
 
     if var_names is not None:
         if len(var_names) != cls1_n_vars:

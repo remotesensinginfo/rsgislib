@@ -50,7 +50,6 @@ from rios import applier
 
 
 class RLMRemoveOutliers(object):
-
     def __init__(self, toa_data, results):
 
         self.T = 365.25
@@ -80,9 +79,15 @@ class RLMRemoveOutliers(object):
 
         try:
             # Get coefficients for the three models
-            self.green_model, self.b2_delta = self.makeRLMModel(rescaled, self.toa_data[:, 1])
-            self.nir_model, self.b4_delta = self.makeRLMModel(rescaled, self.toa_data[:, 2])
-            self.swir_model, self.b5_delta = self.makeRLMModel(rescaled, self.toa_data[:, 3])
+            self.green_model, self.b2_delta = self.makeRLMModel(
+                rescaled, self.toa_data[:, 1]
+            )
+            self.nir_model, self.b4_delta = self.makeRLMModel(
+                rescaled, self.toa_data[:, 2]
+            )
+            self.swir_model, self.b5_delta = self.makeRLMModel(
+                rescaled, self.toa_data[:, 3]
+            )
 
             self.toa_data = numpy.hstack((self.toa_data, self.b2_delta.reshape(-1, 1)))
             self.toa_data = numpy.hstack((self.toa_data, self.b4_delta.reshape(-1, 1)))
@@ -102,13 +107,19 @@ class RLMRemoveOutliers(object):
         :return:
 
         """
-        x = numpy.array([numpy.ones_like(datetimes),  # Add constant
-                         numpy.cos(self.pi_val * datetimes),
-                         numpy.sin(self.pi_val * datetimes),
-                         numpy.cos(self.pi_val_change * datetimes),
-                         numpy.sin(self.pi_val_change * datetimes)]).T
+        x = numpy.array(
+            [
+                numpy.ones_like(datetimes),  # Add constant
+                numpy.cos(self.pi_val * datetimes),
+                numpy.sin(self.pi_val * datetimes),
+                numpy.cos(self.pi_val_change * datetimes),
+                numpy.sin(self.pi_val_change * datetimes),
+            ]
+        ).T
 
-        rlm_model = statsmodels.api.RLM(band_data, x, M=statsmodels.api.robust.norms.TukeyBiweight(c=0.4685))
+        rlm_model = statsmodels.api.RLM(
+            band_data, x, M=statsmodels.api.robust.norms.TukeyBiweight(c=0.4685)
+        )
         rlm_result = rlm_model.fit(maxiter=5)
         delta = band_data - rlm_result.predict(x)
         return rlm_result, delta
@@ -119,9 +130,17 @@ class RLMRemoveOutliers(object):
         :param threshold:
 
         """
-        self.results = numpy.where(((self.toa_data[:, 4] < threshold) & (
-                    (self.toa_data[:, 5] > -threshold) | (self.toa_data[:, 6] > -threshold))), self.results,
-                                   self.results + 1)
+        self.results = numpy.where(
+            (
+                (self.toa_data[:, 4] < threshold)
+                & (
+                    (self.toa_data[:, 5] > -threshold)
+                    | (self.toa_data[:, 6] > -threshold)
+                )
+            ),
+            self.results,
+            self.results + 1,
+        )
 
 
 def _gen_tmask(info, inputs, outputs, other_args):
@@ -137,11 +156,17 @@ def _gen_tmask(info, inputs, outputs, other_args):
 
     # Set up default output
     # Assumes all pixels are clear
-    results = numpy.zeros(len(inputs.images), dtype='uint8')
+    results = numpy.zeros(len(inputs.images), dtype="uint8")
 
-    green_vals = numpy.array([[inputs.images[t][0][0][0]] for t in range(0, len(inputs.images))])
-    nir_vals = numpy.array([[inputs.images[t][1][0][0]] for t in range(0, len(inputs.images))])
-    swir1_vals = numpy.array([[inputs.images[t][2][0][0]] for t in range(0, len(inputs.images))])
+    green_vals = numpy.array(
+        [[inputs.images[t][0][0][0]] for t in range(0, len(inputs.images))]
+    )
+    nir_vals = numpy.array(
+        [[inputs.images[t][1][0][0]] for t in range(0, len(inputs.images))]
+    )
+    swir1_vals = numpy.array(
+        [[inputs.images[t][2][0][0]] for t in range(0, len(inputs.images))]
+    )
 
     model_inputs = numpy.hstack((other_args.dates, green_vals, nir_vals, swir1_vals))
     drop_indices = numpy.where(numpy.any(model_inputs == nodata, axis=1))
@@ -151,19 +176,29 @@ def _gen_tmask(info, inputs, outputs, other_args):
     model_inputs = model_inputs[numpy.all(model_inputs != nodata, axis=1)]
 
     # Need a minimum of 12 observations
-    if (len(model_inputs) >= 12):
+    if len(model_inputs) >= 12:
         # Output array needs to be matched in size to input array
         output_arr = numpy.delete(results, drop_indices)
         tmask = RLMRemoveOutliers(model_inputs, output_arr)
         num_years = numpy.ceil((numpy.max(dates) - numpy.min(dates)) / 365)
         output_arr = tmask.cleanData(num_years, other_args.threshold)
-        results = numpy.insert(output_arr, numpy.array(drop_indices), numpy.zeros(len(drop_indices)))
+        results = numpy.insert(
+            output_arr, numpy.array(drop_indices), numpy.zeros(len(drop_indices))
+        )
 
     results = results.reshape(len(results), 1, 1, 1)
     outputs.outimage = results
 
 
-def run_tmask(json_fp, gdal_format='KEA', num_processes=1, green_band=2, nir_band=4, swir_band=5, threshold=40):
+def run_tmask(
+    json_fp,
+    gdal_format="KEA",
+    num_processes=1,
+    green_band=2,
+    nir_band=4,
+    swir_band=5,
+    threshold=40,
+):
     """
     Main function to run to generate the output masks. Given an input JSON file,
     generates a mask for each date where 1=cloud/cloud shadow/snow and 0=clear.
@@ -193,14 +228,14 @@ def run_tmask(json_fp, gdal_format='KEA', num_processes=1, green_band=2, nir_ban
             image_list = json.load(json_file)
 
             for date in image_list.items():
-                dates.append([datetime.strptime(date[0], '%Y-%m-%d').toordinal()])
-                ip_paths.append(date[1]['input'])
-                op_paths.append(date[1]['output'])
+                dates.append([datetime.strptime(date[0], "%Y-%m-%d").toordinal()])
+                ip_paths.append(date[1]["input"])
+                op_paths.append(date[1]["output"])
     except FileNotFoundError:
-        print('Could not find the provided JSON file.')
+        print("Could not find the provided JSON file.")
         sys.exit()
     except json.decoder.JSONDecodeError as e:
-        print('There is an error in the provided JSON file: {}'.format(e))
+        print("There is an error in the provided JSON file: {}".format(e))
         sys.exit()
 
     # Create object to hold input files
@@ -222,7 +257,7 @@ def run_tmask(json_fp, gdal_format='KEA', num_processes=1, green_band=2, nir_ban
     app.setOutputDriverName(gdal_format)
 
     # Use Python's multiprocessing module
-    app.setJobManagerType('multiprocessing')
+    app.setJobManagerType("multiprocessing")
     app.setNumThreads(num_processes)
 
     # Open first image in list to use as a template
@@ -235,7 +270,7 @@ def run_tmask(json_fp, gdal_format='KEA', num_processes=1, green_band=2, nir_ban
     app.selectInputImageLayers([green_band, nir_band, swir_band])
 
     # Set up output layer name
-    app.setLayerNames(['tmask'])
+    app.setLayerNames(["tmask"])
 
     # Additional arguments - have to be passed as a single object
     other_args = applier.OtherInputs()
@@ -246,6 +281,5 @@ def run_tmask(json_fp, gdal_format='KEA', num_processes=1, green_band=2, nir_ban
     try:
         applier.apply(_gen_tmask, infiles, outfiles, otherArgs=other_args, controls=app)
     except RuntimeError as e:
-        print('There was an error processing the images: {}'.format(e))
-        print('Do all images in the JSON file exist?')
-
+        print("There was an error processing the images: {}".format(e))
+        print("Do all images in the JSON file exist?")

@@ -74,7 +74,9 @@ def polygonise_raster_to_vec_lyr(
         vecDS = outdriver.CreateDataSource(out_vec_file)
 
     if vecDS is None:
-        raise rsgislib.RSGISPyException("Could not open or create '{}'".format(out_vec_file))
+        raise rsgislib.RSGISPyException(
+            "Could not open or create '{}'".format(out_vec_file)
+        )
 
     lcl_options = []
     if replace_lyr:
@@ -82,7 +84,9 @@ def polygonise_raster_to_vec_lyr(
 
     out_lyr_obj = vecDS.CreateLayer(out_vec_lyr, srs=imgsrs, options=lcl_options)
     if out_lyr_obj is None:
-        raise rsgislib.RSGISPyException("Could not create layer: {}".format(out_vec_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not create layer: {}".format(out_vec_lyr)
+        )
 
     newField = ogr.FieldDefn(pxl_val_fieldname, ogr.OFTInteger)
     out_lyr_obj.CreateField(newField)
@@ -247,7 +251,9 @@ def extract_image_footprint(
     import rsgislib.vectorattrs
 
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_vec_file):
-        rsgislib.RSGISPyException(f"Output file path is not creatable: {out_vec_file}")
+        raise rsgislib.RSGISPyException(
+            f"Output file path is not creatable: {out_vec_file}"
+        )
 
     uid_str = rsgislib.tools.utils.uid_generator()
 
@@ -315,7 +321,9 @@ def extract_image_footprint(
 
             subprocess.run(cmd, check=True)
         except OSError as e:
-            raise rsgislib.RSGISPyException("Could not re-projection vector file: {}".format(cmd))
+            raise rsgislib.RSGISPyException(
+                "Could not re-projection vector file: {}".format(cmd)
+            )
 
     if created_tmp:
         import shutil
@@ -458,7 +466,9 @@ def define_grid(
     import rsgislib.tools.geometrytools
 
     if (out_epsg_code is not None) and utm_grid:
-        raise rsgislib.RSGISPyException("Cannot specify both new output projection and UTM grid.")
+        raise rsgislib.RSGISPyException(
+            "Cannot specify both new output projection and UTM grid."
+        )
     elif utm_grid:
         wgs84_bbox = bbox
         if in_epsg_code != 4326:
@@ -659,10 +669,14 @@ def create_poly_vec_bboxs(
         if (atts is not None) and (att_types is not None):
             nAtts = 0
             if not "names" in att_types:
-                raise rsgislib.RSGISPyException('attTypes must include a list for "names"')
+                raise rsgislib.RSGISPyException(
+                    'attTypes must include a list for "names"'
+                )
             nAtts = len(att_types["names"])
             if not "types" in att_types:
-                raise rsgislib.RSGISPyException('attTypes must include a list for "types"')
+                raise rsgislib.RSGISPyException(
+                    'attTypes must include a list for "types"'
+                )
             if nAtts != len(att_types["types"]):
                 raise rsgislib.RSGISPyException(
                     'attTypes "names" and "types" lists must be the same length.'
@@ -779,7 +793,9 @@ def write_pts_to_vec(
 
     try:
         if len(pts_x) != len(pts_y):
-            raise rsgislib.RSGISPyException("The X and Y coordinates lists are not the same length.")
+            raise rsgislib.RSGISPyException(
+                "The X and Y coordinates lists are not the same length."
+            )
         nPts = len(pts_x)
 
         gdal.UseExceptions()
@@ -802,10 +818,14 @@ def write_pts_to_vec(
         if (atts is not None) and (att_types is not None):
             nAtts = 0
             if not "names" in att_types:
-                raise rsgislib.RSGISPyException('attTypes must include a list for "names"')
+                raise rsgislib.RSGISPyException(
+                    'attTypes must include a list for "names"'
+                )
             nAtts = len(att_types["names"])
             if not "types" in att_types:
-                raise rsgislib.RSGISPyException('attTypes must include a list for "types"')
+                raise rsgislib.RSGISPyException(
+                    'attTypes must include a list for "types"'
+                )
             if nAtts != len(att_types["types"]):
                 raise rsgislib.RSGISPyException(
                     'attTypes "names" and "types" lists must be the same length.'

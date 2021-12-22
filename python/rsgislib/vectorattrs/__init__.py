@@ -10,6 +10,8 @@ from osgeo import gdal
 import osgeo.ogr
 from osgeo import ogr
 
+import rsgislib
+
 
 def write_vec_column(
     out_vec_file: str,
@@ -325,22 +327,30 @@ def pop_bbox_cols(
     if not xminCol_exists:
         xmin_field_defn = ogr.FieldDefn(x_min_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(xmin_field_defn) != 0:
-            raise rsgislib.RSGISPyException("Creating '{}' field failed.".format(x_min_col))
+            raise rsgislib.RSGISPyException(
+                "Creating '{}' field failed.".format(x_min_col)
+            )
 
     if not xmaxCol_exists:
         xmax_field_defn = ogr.FieldDefn(x_max_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(xmax_field_defn) != 0:
-            raise rsgislib.RSGISPyException("Creating '{}' field failed.".format(x_max_col))
+            raise rsgislib.RSGISPyException(
+                "Creating '{}' field failed.".format(x_max_col)
+            )
 
     if not yminCol_exists:
         ymin_field_defn = ogr.FieldDefn(y_min_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(ymin_field_defn) != 0:
-            raise rsgislib.RSGISPyException("Creating '{}' field failed.".format(y_min_col))
+            raise rsgislib.RSGISPyException(
+                "Creating '{}' field failed.".format(y_min_col)
+            )
 
     if not ymaxCol_exists:
         ymax_field_defn = ogr.FieldDefn(y_max_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(ymax_field_defn) != 0:
-            raise rsgislib.RSGISPyException("Creating '{}' field failed.".format(y_max_col))
+            raise rsgislib.RSGISPyException(
+                "Creating '{}' field failed.".format(y_max_col)
+            )
 
     # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
     fids = []
@@ -381,7 +391,9 @@ def pop_bbox_cols(
             feat.SetField(y_max_col, 0.0)
         rtn_val = vec_lyr_obj.SetFeature(feat)
         if rtn_val != ogr.OGRERR_NONE:
-            raise rsgislib.RSGISPyException("An error has occurred setting a feature on a layer.")
+            raise rsgislib.RSGISPyException(
+                "An error has occurred setting a feature on a layer."
+            )
         if ((counter % 20000) == 0) and openTransaction:
             vec_lyr_obj.CommitTransaction()
             openTransaction = False

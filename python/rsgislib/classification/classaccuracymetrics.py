@@ -38,6 +38,8 @@ import os
 
 import numpy
 
+import rsgislib
+
 
 def cls_quantity_accuracy(
     y_true: numpy.array, y_pred: numpy.array, cls_area: numpy.array
@@ -401,9 +403,7 @@ def calc_acc_metrics_vecsamples(
         )
 
     img_hist_data = rsgislib.rastergis.getColumnData(cls_img, img_hist_col)
-    img_clsname_data = rsgislib.rastergis.getColumnData(
-        cls_img, img_cls_name_col
-    )
+    img_clsname_data = rsgislib.rastergis.getColumnData(cls_img, img_cls_name_col)
     img_clsname_data[0] = ""
 
     pxl_size_x, pxl_size_y = rsgislib.imageutils.get_img_res(cls_img)
@@ -1330,7 +1330,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
 
     if len(vec_files) != len(vec_lyrs):
         raise rsgislib.RSGISPyException(
-            "vec_files and vec_lyrs have different " "lengths and must be the same."
+            "vec_files and vec_lyrs have different lengths and must be the same."
         )
 
     f1_scores = list()

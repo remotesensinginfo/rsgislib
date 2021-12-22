@@ -32,12 +32,6 @@
 #
 ############################################################################
 
-import rsgislib
-import rsgislib.imagecalc
-import rsgislib.imagecalc.calcindices
-import rsgislib.imageutils
-import rsgislib.rastergis
-
 import glob
 import os
 import os.path
@@ -46,6 +40,12 @@ import shutil
 
 import osgeo.gdal
 import rios.rat
+
+import rsgislib
+import rsgislib.imagecalc
+import rsgislib.imagecalc.calcindices
+import rsgislib.imageutils
+import rsgislib.rastergis
 
 
 def create_max_ndvi_composite(

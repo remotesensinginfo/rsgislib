@@ -184,7 +184,10 @@ def get_rsgislib_version() -> str:
             import subprocess
 
             out = subprocess.run(
-                ["rsgis-config", "--version"], capture_output=True, text=True, check=True,
+                ["rsgis-config", "--version"],
+                capture_output=True,
+                text=True,
+                check=True,
             )
             version_str = out.stdout
             version_str = version_str.split("\n")[0]
@@ -280,7 +283,7 @@ def get_rsgislib_datatype(gdal_type: int) -> int:
         out_dt = TYPE_64FLOAT
     else:
         raise RSGISPyException(
-            f"The data type '{gdal_type}' is " f"unknown / not supported."
+            f"The data type '{gdal_type}' is unknown / not supported."
         )
     return out_dt
 
@@ -308,7 +311,7 @@ def get_gdal_datatype(rsgislib_datatype: int) -> int:
         out_dt = gdal.GDT_Float64
     else:
         raise RSGISPyException(
-            f"The data type '{rsgislib_datatype}' is " f"unknown / not supported."
+            f"The data type '{rsgislib_datatype}' is unknown / not supported."
         )
     return out_dt
 

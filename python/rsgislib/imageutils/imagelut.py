@@ -36,11 +36,12 @@ RSGISLib.
 #
 ############################################################################
 
-import rsgislib
 import os
 
 from osgeo import gdal
 from osgeo import ogr
+
+import rsgislib
 
 
 def create_img_extent_lut(
@@ -103,7 +104,9 @@ def create_img_extent_lut(
         if epsgCodeTmp is None:
             epsg_found = False
             if not ignore_none_imgs:
-                raise rsgislib.RSGISPyException("The EPSG code is None: '{}'".format(img))
+                raise rsgislib.RSGISPyException(
+                    "The EPSG code is None: '{}'".format(img)
+                )
         if epsg_found:
             if out_proj_wgs84:
                 epsgCode = 4326

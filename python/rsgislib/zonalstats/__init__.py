@@ -36,6 +36,8 @@ from osgeo import osr
 import numpy
 import tqdm
 
+import rsgislib
+
 gdal.UseExceptions()
 
 """
@@ -243,7 +245,9 @@ def calc_zonal_band_stats(
             raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
         img_band_obj = imgDS.GetRasterBand(img_band)
         if img_band_obj is None:
-            raise rsgislib.RSGISPyException("Could not find image band '{}'".format(img_band))
+            raise rsgislib.RSGISPyException(
+                "Could not find image band '{}'".format(img_band)
+            )
         imgGeoTrans = imgDS.GetGeoTransform()
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
@@ -589,7 +593,9 @@ def calc_zonal_poly_pts_band_stats(
             raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
         img_band_obj = imgDS.GetRasterBand(img_band)
         if img_band_obj is None:
-            raise rsgislib.RSGISPyException("Could not find image band '{}'".format(img_band))
+            raise rsgislib.RSGISPyException(
+                "Could not find image band '{}'".format(img_band)
+            )
         imgGeoTrans = imgDS.GetGeoTransform()
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
@@ -961,7 +967,9 @@ def calc_zonal_band_stats_test_poly_pts(
             raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
         img_band_obj = imgDS.GetRasterBand(img_band)
         if img_band_obj is None:
-            raise rsgislib.RSGISPyException("Could not find image band '{}'".format(img_band))
+            raise rsgislib.RSGISPyException(
+                "Could not find image band '{}'".format(img_band)
+            )
         imgGeoTrans = imgDS.GetGeoTransform()
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
@@ -1422,7 +1430,9 @@ def ext_point_band_values(
             raise rsgislib.RSGISPyException("The inputted vector layer was None")
 
         if out_field is None:
-            raise rsgislib.RSGISPyException("Output field specified as none, a name needs to be given.")
+            raise rsgislib.RSGISPyException(
+                "Output field specified as none, a name needs to be given."
+            )
         elif out_field == "":
             raise rsgislib.RSGISPyException(
                 "Output field specified as an empty string, a name needs to be given."
@@ -1438,7 +1448,9 @@ def ext_point_band_values(
             raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
         img_band_obj = imgDS.GetRasterBand(img_band)
         if img_band_obj is None:
-            raise rsgislib.RSGISPyException("Could not find image band '{}'".format(img_band))
+            raise rsgislib.RSGISPyException(
+                "Could not find image band '{}'".format(img_band)
+            )
         imgGeoTrans = imgDS.GetGeoTransform()
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()

@@ -1153,7 +1153,9 @@ def get_band_names(input_img: str):
         if not imgBand is None:
             bandNames.append(imgBand.GetDescription())
         else:
-            raise rsgislib.RSGISPyException("Could not open the image band: {}".format(imgBand))
+            raise rsgislib.RSGISPyException(
+                "Could not open the image band: {}".format(imgBand)
+            )
     return bandNames
 
 
@@ -1277,7 +1279,9 @@ def set_img_band_metadata(
 
     ds = gdal.Open(input_img, gdal.GA_Update)
     if ds == None:
-        raise rsgislib.RSGISPyException("Could not open the image file: {}".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the image file: {}".format(input_img)
+        )
 
     n_bands = ds.RasterCount
     if img_band > n_bands:
@@ -1308,7 +1312,9 @@ def get_img_band_metadata(input_img: str, img_band: int, meta_field_name: str):
 
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
     if ds == None:
-        raise rsgislib.RSGISPyException("Could not open the image file: {}".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the image file: {}".format(input_img)
+        )
 
     n_bands = ds.RasterCount
     if img_band > n_bands:
@@ -1340,7 +1346,9 @@ def get_img_band_metadata_fields(input_img: str, img_band: int):
 
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
     if ds == None:
-        raise rsgislib.RSGISPyException("Could not open the image file: {}".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the image file: {}".format(input_img)
+        )
 
     n_bands = ds.RasterCount
     if img_band > n_bands:
@@ -1372,7 +1380,9 @@ def get_img_band_metadata_fields_dict(input_img: str, img_band: int):
 
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
     if ds == None:
-        raise rsgislib.RSGISPyException("Could not open the image file: {}".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the image file: {}".format(input_img)
+        )
 
     n_bands = ds.RasterCount
     if img_band > n_bands:
@@ -1400,7 +1410,9 @@ def set_img_metadata(input_img: str, meta_field_name: str, meta_field_value: str
     """
     ds = gdal.Open(input_img, gdal.GA_Update)
     if ds == None:
-        raise rsgislib.RSGISPyException("Could not open the image file: {}".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the image file: {}".format(input_img)
+        )
 
     ds.SetMetadataItem(meta_field_name, "{}".format(meta_field_value))
     ds = None
@@ -1416,7 +1428,9 @@ def get_img_metadata(input_img: str, meta_field_name: str):
     """
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
     if ds == None:
-        raise rsgislib.RSGISPyException("Could not open the image file: {}".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the image file: {}".format(input_img)
+        )
 
     meta_field_value = ds.GetMetadataItem(meta_field_name)
     ds = None
@@ -1433,7 +1447,9 @@ def get_img_metadata_fields(input_img: str):
     """
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
     if ds == None:
-        raise rsgislib.RSGISPyException("Could not open the image file: {}".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the image file: {}".format(input_img)
+        )
 
     meta_data_dict = ds.GetMetadata_Dict()
     ds = None
@@ -1450,7 +1466,9 @@ def get_img_metadata_fields_dict(input_img: str):
     """
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
     if ds == None:
-        raise rsgislib.RSGISPyException("Could not open the image file: {}".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the image file: {}".format(input_img)
+        )
 
     meta_data_dict = ds.GetMetadata_Dict()
     ds = None
@@ -1541,10 +1559,14 @@ def create_blank_buf_img_from_ref_img(
 
     """
     if (buf_pxl_ext is None) and (buf_spt_ext is None):
-        raise rsgislib.RSGISPyException("You must specify either the buf_pxl_ext or buf_spt_ext value.")
+        raise rsgislib.RSGISPyException(
+            "You must specify either the buf_pxl_ext or buf_spt_ext value."
+        )
 
     if (buf_pxl_ext is not None) and (buf_spt_ext is not None):
-        raise rsgislib.RSGISPyException("You cannot specify both the buf_pxl_ext or buf_spt_ext value.")
+        raise rsgislib.RSGISPyException(
+            "You cannot specify both the buf_pxl_ext or buf_spt_ext value."
+        )
 
     if no_data_val is None:
         no_data_val = get_img_no_data_value(input_img)
@@ -1925,7 +1947,9 @@ def resample_img_to_match(
     elif interp_method == rsgislib.INTERP_MODE:
         interpolationMethod = gdal.GRA_Mode
     else:
-        raise rsgislib.RSGISPyException("Interpolation method was not recognised or known.")
+        raise rsgislib.RSGISPyException(
+            "Interpolation method was not recognised or known."
+        )
 
     backVal = 0.0
     haveNoData = False
@@ -2041,26 +2065,36 @@ def reproject_image(
     elif interp_method == rsgislib.INTERP_MODE:
         eResampleAlg = gdal.GRA_Mode
     else:
-        raise rsgislib.RSGISPyException("Interpolation method was not recognised or known.")
+        raise rsgislib.RSGISPyException(
+            "Interpolation method was not recognised or known."
+        )
 
     if not os.path.exists(input_img):
-        raise rsgislib.RSGISPyException("The input image file does not exist: '" + input_img + "'")
+        raise rsgislib.RSGISPyException(
+            "The input image file does not exist: '" + input_img + "'"
+        )
 
     inImgDS = gdal.Open(input_img, gdal.GA_ReadOnly)
     if inImgDS is None:
-        raise rsgislib.RSGISPyException("Could not open the Input Image: '" + input_img + "'")
+        raise rsgislib.RSGISPyException(
+            "Could not open the Input Image: '" + input_img + "'"
+        )
 
     inImgProj = osr.SpatialReference()
     if not in_wkt is None:
         if not os.path.exists(in_wkt):
-            raise rsgislib.RSGISPyException("The input WKT file does not exist: '" + in_wkt + "'")
+            raise rsgislib.RSGISPyException(
+                "The input WKT file does not exist: '" + in_wkt + "'"
+            )
         inWKTStr = rsgislib.tools.utils.read_text_file_no_new_lines(in_wkt)
         inImgProj.ImportFromWkt(inWKTStr)
     else:
         inImgProj.ImportFromWkt(inImgDS.GetProjectionRef())
 
     if not os.path.exists(out_wkt):
-        raise rsgislib.RSGISPyException("The output WKT file does not exist: '" + out_wkt + "'")
+        raise rsgislib.RSGISPyException(
+            "The output WKT file does not exist: '" + out_wkt + "'"
+        )
     outImgProj = osr.SpatialReference()
     outWKTStr = rsgislib.tools.utils.read_text_file_no_new_lines(out_wkt)
     outImgProj.ImportFromWkt(outWKTStr)
@@ -2261,7 +2295,9 @@ def gdal_warp(
     elif interp_method == rsgislib.INTERP_MODE:
         eResampleAlg = gdal.GRA_Mode
     else:
-        raise rsgislib.RSGISPyException("Interpolation method was not recognised or known.")
+        raise rsgislib.RSGISPyException(
+            "Interpolation method was not recognised or known."
+        )
 
     try:
         import tqdm
@@ -2315,7 +2351,9 @@ def subset_pxl_bbox(
     xSize, ySize = get_img_size(input_img)
 
     if (x_max_pxl > xSize) or (y_max_pxl > ySize):
-        raise rsgislib.RSGISPyException("The pixel extent defined is bigger than the input image.")
+        raise rsgislib.RSGISPyException(
+            "The pixel extent defined is bigger than the input image."
+        )
 
     xMin = bbox[0] + (x_min_pxl * xRes)
     xMax = bbox[0] + (x_max_pxl * xRes)
@@ -3253,7 +3291,9 @@ def mask_img_with_vec(
         mask_img(input_img, roi_img, output_img, gdalformat, datatype, outvalue, 0)
         shutil.rmtree(tmp_file_dir)
     else:
-        raise rsgislib.RSGISPyException("The vector file and image file do not intersect.")
+        raise rsgislib.RSGISPyException(
+            "The vector file and image file do not intersect."
+        )
 
 
 def create_valid_mask(
@@ -3320,11 +3360,15 @@ def get_img_pxl_values(
     import numpy
 
     if x_coords.shape[0] != y_coords.shape[0]:
-        raise rsgislib.RSGISPyException("The X and Y image coordinates are not the same.")
+        raise rsgislib.RSGISPyException(
+            "The X and Y image coordinates are not the same."
+        )
 
     image_ds = gdal.Open(input_img, gdal.GA_Update)
     if image_ds is None:
-        raise rsgislib.RSGISPyException("Could not open the input image file: '{}'".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the input image file: '{}'".format(input_img)
+        )
     image_band = image_ds.GetRasterBand(img_band)
     if image_band is None:
         raise rsgislib.RSGISPyException("The image band wasn't opened")
@@ -3364,11 +3408,15 @@ def set_img_pxl_values(
     import tqdm
 
     if x_coords.shape[0] != y_coords.shape[0]:
-        raise rsgislib.RSGISPyException("The X and Y image coordinates are not the same.")
+        raise rsgislib.RSGISPyException(
+            "The X and Y image coordinates are not the same."
+        )
 
     image_ds = gdal.Open(input_img, gdal.GA_Update)
     if image_ds is None:
-        raise rsgislib.RSGISPyException("Could not open the input image file: '{}'".format(input_img))
+        raise rsgislib.RSGISPyException(
+            "Could not open the input image file: '{}'".format(input_img)
+        )
     image_band = image_ds.GetRasterBand(img_band)
     if image_band is None:
         raise rsgislib.RSGISPyException("The image band wasn't opened")
@@ -3731,7 +3779,9 @@ def whiten_image(
     y_msk_size = imgMskDS.RasterYSize
 
     if n_msk_bands != 1:
-        raise rsgislib.RSGISPyException("Valid mask only expected to have a single band.")
+        raise rsgislib.RSGISPyException(
+            "Valid mask only expected to have a single band."
+        )
 
     imgMskBand = imgMskDS.GetRasterBand(1)
     if imgMskBand is None:
@@ -3748,10 +3798,14 @@ def whiten_image(
     y_size = imgDS.RasterYSize
 
     if x_msk_size != x_size:
-        raise rsgislib.RSGISPyException("Mask and input image size in the x axis do not match.")
+        raise rsgislib.RSGISPyException(
+            "Mask and input image size in the x axis do not match."
+        )
 
     if y_msk_size != y_size:
-        raise rsgislib.RSGISPyException("Mask and input image size in the y axis do not match.")
+        raise rsgislib.RSGISPyException(
+            "Mask and input image size in the y axis do not match."
+        )
 
     img_data = numpy.zeros((n_bands, (x_size * y_size)), dtype=numpy.float32)
 
@@ -3759,7 +3813,9 @@ def whiten_image(
     for n in tqdm.tqdm(range(n_bands)):
         imgBand = imgDS.GetRasterBand(n + 1)
         if imgBand is None:
-            raise rsgislib.RSGISPyException("Could not open image band ({})".format(n + 1))
+            raise rsgislib.RSGISPyException(
+                "Could not open image band ({})".format(n + 1)
+            )
         no_data_val = imgBand.GetNoDataValue()
         band_arr = imgBand.ReadAsArray().flatten()
         band_arr = band_arr.astype(numpy.float32)

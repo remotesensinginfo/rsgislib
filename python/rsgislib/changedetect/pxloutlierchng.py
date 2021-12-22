@@ -21,7 +21,7 @@
 #
 #
 # Purpose:  Provide a set of utilities to perform per-pixel change detection
-#           using outlier methods. These are sometime called map-to-image 
+#           using outlier methods. These are sometime called map-to-image
 #           methods of change detection.
 #
 # Author: Pete Bunting
@@ -46,8 +46,16 @@ import rsgislib.rastergis
 import rsgislib.imageutils
 
 
-def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_scores_img=None, img_mask_val=1, img_bands=None,
-                        gdalformat="KEA"):
+def find_class_outliers(
+    pyod_obj,
+    input_img,
+    in_msk_img,
+    out_lbls_img,
+    out_scores_img=None,
+    img_mask_val=1,
+    img_bands=None,
+    gdalformat="KEA",
+):
     """
     This function uses the pyod (https://github.com/yzhao062/pyod) library to find outliers within a class.
     It is assumed that the input images are from a different date than the mask (classification) and therefore
@@ -66,14 +74,18 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
     """
     if img_bands is not None:
         if not ((type(img_bands) is list) or (type(img_bands) is tuple)):
-            raise rsgislib.RSGISPyException("If provided then img_bands should be a list (or None)")
+            raise rsgislib.RSGISPyException(
+                "If provided then img_bands should be a list (or None)"
+            )
     else:
         n_bands = rsgislib.imageutils.get_img_band_count(input_img)
         img_bands = numpy.arange(1, n_bands + 1)
     num_vars = len(img_bands)
     img_val_no_data = rsgislib.imageutils.get_img_no_data_value(input_img)
 
-    msk_arr_vals = rsgislib.imageutils.extractImgPxlValsInMsk(input_img, img_bands, in_msk_img, img_mask_val, img_val_no_data)
+    msk_arr_vals = rsgislib.imageutils.extractImgPxlValsInMsk(
+        input_img, img_bands, in_msk_img, img_mask_val, img_val_no_data
+    )
     print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))
 
     print("Fitting oulier detector")
@@ -95,21 +107,29 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
             ID = numpy.arange(img_msk_vals.shape[0])
 
             img_shape = inputs.input_img.shape
-            img_bands = inputs.input_img.reshape((img_shape[0], (img_shape[1] * img_shape[2])))
+            img_bands = inputs.input_img.reshape(
+                (img_shape[0], (img_shape[1] * img_shape[2]))
+            )
 
             band_lst = []
             for band in otherargs.img_bands:
                 if (band > 0) and (band <= img_shape[0]):
                     band_lst.append(img_bands[band - 1])
                 else:
-                    raise rsgislib.RSGISPyException("Band ({}) specified is not within the image".format(band))
+                    raise rsgislib.RSGISPyException(
+                        "Band ({}) specified is not within the image".format(band)
+                    )
             img_bands_sel = numpy.stack(band_lst, axis=0)
             img_bands_trans = numpy.transpose(img_bands_sel)
 
             if otherargs.no_data_val is not None:
                 ID = ID[(img_bands_trans != otherargs.no_data_val).all(axis=1)]
-                img_msk_vals = img_msk_vals[(img_bands_trans != otherargs.no_data_val).all(axis=1)]
-                img_bands_trans = img_bands_trans[(img_bands_trans != otherargs.no_data_val).all(axis=1)]
+                img_msk_vals = img_msk_vals[
+                    (img_bands_trans != otherargs.no_data_val).all(axis=1)
+                ]
+                img_bands_trans = img_bands_trans[
+                    (img_bands_trans != otherargs.no_data_val).all(axis=1)
+                ]
 
             ID = ID[img_msk_vals == otherargs.msk_val]
             img_bands_trans = img_bands_trans[img_msk_vals == otherargs.msk_val]
@@ -119,14 +139,24 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
                 pred_lbls = pred_lbls + 1
                 out_lbls_vals[ID] = pred_lbls
             out_lbls_vals = numpy.expand_dims(
-                out_lbls_vals.reshape((inputs.image_mask.shape[1], inputs.image_mask.shape[2])), axis=0)
+                out_lbls_vals.reshape(
+                    (inputs.image_mask.shape[1], inputs.image_mask.shape[2])
+                ),
+                axis=0,
+            )
 
             if otherargs.out_scores:
                 if img_bands_trans.shape[0] > 0:
-                    pred_probs = otherargs.pyod_obj.predict_proba(img_bands_trans, method='unify')
+                    pred_probs = otherargs.pyod_obj.predict_proba(
+                        img_bands_trans, method="unify"
+                    )
                     out_scores_vals[ID] = pred_probs[:, 1]
                 out_scores_vals = numpy.expand_dims(
-                    out_scores_vals.reshape((inputs.image_mask.shape[1], inputs.image_mask.shape[2])), axis=0)
+                    out_scores_vals.reshape(
+                        (inputs.image_mask.shape[1], inputs.image_mask.shape[2])
+                    ),
+                    axis=0,
+                )
 
         outputs.out_lbls_img = out_lbls_vals
         if otherargs.out_scores:
@@ -151,6 +181,7 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
 
     try:
         import tqdm
+
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         progress_bar = cuiprogress.GDALProgressBar()
@@ -164,6 +195,10 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
     applier.apply(_applyPyOB, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
 
-    rsgislib.rastergis.pop_rat_img_stats(clumps_img=out_lbls_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True)
+    rsgislib.rastergis.pop_rat_img_stats(
+        clumps_img=out_lbls_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+    )
     if out_scores_img is not None:
-        rsgislib.imageutils.pop_img_stats(out_scores_img, use_no_data=True, no_data_val=0, calc_pyramids=True)
+        rsgislib.imageutils.pop_img_stats(
+            out_scores_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )

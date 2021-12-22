@@ -105,7 +105,9 @@ def warp_with_gcps_with_gdal(
     elif interp_method == rsgislib.INTERP_MODE:
         interpolationMethod = gdal.GRA_Mode
     else:
-        raise rsgislib.RSGISPyException("Interpolation method was not recognised or known.")
+        raise rsgislib.RSGISPyException(
+            "Interpolation method was not recognised or known."
+        )
 
     rsgislib.imageutils.create_copy_img(
         in_ref_img, output_img, numBands, 0, gdalformat, datatype

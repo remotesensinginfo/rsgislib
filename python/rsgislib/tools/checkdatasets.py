@@ -4,9 +4,11 @@ The tools.validate_datesets module contains functions for checking that datasets
 """
 
 import os
+
 from osgeo import gdal
 from osgeo import osr
 import numpy
+
 import rsgislib
 import rsgislib.tools.filetools
 
@@ -58,7 +60,7 @@ def check_gdal_image_file(
                 err_str = "File size is zero."
             elif file_size_bytes > max_file_size:
                 file_ok = False
-                err_str = "File size is greater than max. " "threshold ({}).".format(
+                err_str = "File size is greater than max. threshold ({}).".format(
                     file_size_bytes
                 )
         if file_ok:

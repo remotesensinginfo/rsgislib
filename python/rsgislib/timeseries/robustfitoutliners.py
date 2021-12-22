@@ -1,15 +1,19 @@
+#!/usr/bin/env python
+
 import json
 import sys
 from datetime import datetime
+
 import numpy
 import statsmodels.api
 from rios import fileinfo
 from rios import applier
 from rios import cuiprogress
+
 import rsgislib
 
-class RobustModel(object):
 
+class RobustModel(object):
     def __init__(self, datetimes, num_years):
         self.T = 365.25
         self.pi_val = (2 * numpy.pi) / self.T
@@ -23,8 +27,9 @@ class RobustModel(object):
     def fitModel(self, band_data):
         x = self.prepareXData(self.datetimes)
 
-        self.robust_model = statsmodels.api.RLM(band_data, x,
-                                                M=statsmodels.api.robust.norms.TukeyBiweight(c=0.4685)).fit()
+        self.robust_model = statsmodels.api.RLM(
+            band_data, x, M=statsmodels.api.robust.norms.TukeyBiweight(c=0.4685)
+        ).fit()
 
         predicted = self.robust_model.predict(x)
         self.residuals = band_data - predicted
@@ -34,12 +39,16 @@ class RobustModel(object):
 
     def prepareXData(self, datetimes):
         rescaled = datetimes - numpy.min(self.datetimes)
-        x = numpy.array([numpy.ones_like(datetimes),  # Add constant
-                         numpy.cos(self.pi_val * rescaled),
-                         numpy.sin(self.pi_val * rescaled),
-                         numpy.cos(self.pi_val_change * rescaled),
-                         numpy.sin(self.pi_val_change * rescaled)]).T
-        return (x)
+        x = numpy.array(
+            [
+                numpy.ones_like(datetimes),  # Add constant
+                numpy.cos(self.pi_val * rescaled),
+                numpy.sin(self.pi_val * rescaled),
+                numpy.cos(self.pi_val_change * rescaled),
+                numpy.sin(self.pi_val_change * rescaled),
+            ]
+        ).T
+        return x
 
 
 def _gen_band_masks(info, inputs, outputs, other_args):
@@ -57,22 +66,24 @@ def _gen_band_masks(info, inputs, outputs, other_args):
     # Set up default output
     # Assumes all pixels are clear
     # Remember this is output for a single pixel through time
-    results = numpy.zeros((len(inputs.images), num_bands, 1, 1), dtype='int16')
+    results = numpy.zeros((len(inputs.images), num_bands, 1, 1), dtype="int16")
     all_band_data = numpy.array(dates)
-    
+
     # Get data for one band at a time
     for b in range(0, num_bands):
-        band_data = numpy.array([[inputs.images[t][b][0][0]] for t in range(0, len(inputs.images))])
+        band_data = numpy.array(
+            [[inputs.images[t][b][0][0]] for t in range(0, len(inputs.images))]
+        )
         all_band_data = numpy.hstack((all_band_data, band_data))
-    
+
     drop_indices = numpy.where(numpy.any(all_band_data == nodata, axis=1))
     drop_indices = numpy.array(drop_indices).reshape(-1)
-        
+
     # Remove any rows where all band values are 0
     all_band_data = all_band_data[numpy.all(all_band_data != nodata, axis=1)]
-    #print(all_band_data.shape)
+    # print(all_band_data.shape)
     # Need a minimum of 12 observations
-    if (len(all_band_data) >= 12):
+    if len(all_band_data) >= 12:
         num_years = numpy.ceil((numpy.max(dates) - numpy.min(dates)) / 365)
         # Output array needs to be matched in size to input array
         output_arr = numpy.delete(results, drop_indices, axis=0)
@@ -90,7 +101,12 @@ def _gen_band_masks(info, inputs, outputs, other_args):
                 # Find high outliers
                 too_high = numpy.where(rm.residuals > rm.RMSE * thresh)
                 output_arr[too_high, i - 1] = 1
-            results = numpy.insert(output_arr, drop_indices, numpy.zeros((len(drop_indices), num_bands, 1, 1)), axis=0)
+            results = numpy.insert(
+                output_arr,
+                drop_indices,
+                numpy.zeros((len(drop_indices), num_bands, 1, 1)),
+                axis=0,
+            )
         except numpy.linalg.LinAlgError as e:
             print("Warning: {}".format(e))
             pass
@@ -98,7 +114,9 @@ def _gen_band_masks(info, inputs, outputs, other_args):
     outputs.outimage = results
 
 
-def get_ST_masks(json_fp, bands=None, roi_img=None, gdal_format='KEA', num_processes=1, threshold=3):
+def get_ST_masks(
+    json_fp, bands=None, roi_img=None, gdal_format="KEA", num_processes=1, threshold=3
+):
     """Main function to run to generate the output masks. Given an input JSON file,
     generates a mask for each date, for each band where 0=Inlier, 1=High outlier,
     -1=Low outlier. Opening/closing of files, generation of blocks and use of
@@ -126,14 +144,14 @@ def get_ST_masks(json_fp, bands=None, roi_img=None, gdal_format='KEA', num_proce
             image_list = json.load(json_file)
 
             for date in image_list.items():
-                dates.append([datetime.strptime(date[0], '%Y-%m-%d').toordinal()])
-                ip_paths.append(date[1]['input'])
-                op_paths.append(date[1]['output'])
+                dates.append([datetime.strptime(date[0], "%Y-%m-%d").toordinal()])
+                ip_paths.append(date[1]["input"])
+                op_paths.append(date[1]["output"])
     except FileNotFoundError:
-        print('Could not find the provided JSON file.')
+        print("Could not find the provided JSON file.")
         sys.exit()
     except json.decoder.JSONDecodeError as e:
-        print('There is an error in the provided JSON file: {}'.format(e))
+        print("There is an error in the provided JSON file: {}".format(e))
         sys.exit()
 
     # Create object to hold input files
@@ -150,10 +168,11 @@ def get_ST_masks(json_fp, bands=None, roi_img=None, gdal_format='KEA', num_proce
     # Set window size to 1 because we are working per-pixel
     app.setWindowXsize(1)
     app.setWindowYsize(1)
-    
+
     # Set progress
     try:
         import tqdm
+
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         progress_bar = cuiprogress.GDALProgressBar()
@@ -161,15 +180,14 @@ def get_ST_masks(json_fp, bands=None, roi_img=None, gdal_format='KEA', num_proce
 
     # Set output file type
     app.setOutputDriverName(gdal_format)
-    
+
     if roi_img is not None:
         app.setReferenceImage(roi_img)
         app.setFootprintType(applier.BOUNDS_FROM_REFERENCE)
-        app.setResampleMethod('near')
-    
+        app.setResampleMethod("near")
 
     # Use Python's multiprocessing module
-    app.setJobManagerType('multiprocessing')
+    app.setJobManagerType("multiprocessing")
     app.setNumThreads(num_processes)
 
     # Open first image in list to use as a template
@@ -200,18 +218,18 @@ def get_ST_masks(json_fp, bands=None, roi_img=None, gdal_format='KEA', num_proce
     template_image = None
 
     try:
-        applier.apply(_gen_band_masks, infiles, outfiles, otherArgs=other_args, controls=app)
+        applier.apply(
+            _gen_band_masks, infiles, outfiles, otherArgs=other_args, controls=app
+        )
     except RuntimeError as e:
-        print('There was an error processing the images: {}'.format(e))
-        print('Do all images in the JSON file exist?')
+        print("There was an error processing the images: {}".format(e))
+        print("Do all images in the JSON file exist?")
 
 
-
-
-def create_datejson_file(image_list, out_msk_dir, out_json_file, gdal_format='KEA'):
+def create_datejson_file(image_list, out_msk_dir, out_json_file, gdal_format="KEA"):
     """
     Assume the date is the second component of the file name (XXX_YYYYMMDD_XXXX.xxx)
-    
+
     """
     import datetime
     import os.path
@@ -221,18 +239,26 @@ def create_datejson_file(image_list, out_msk_dir, out_json_file, gdal_format='KE
     date_imgs = dict()
     for img in image_list:
         basename = rsgislib.tools.filetools.get_file_basename(img)
-        basename_comps = basename.split('_')
+        basename_comps = basename.split("_")
         print(basename_comps)
         if len(basename_comps) < 2:
-            raise rsgislib.RSGISPyException("The filename must have at least two components split by '_'.")
+            raise rsgislib.RSGISPyException(
+                "The filename must have at least two components split by '_'."
+            )
         date_str = basename_comps[1]
         if len(date_str) != 8:
-            raise rsgislib.RSGISPyException("The second component must have 8 characters YYYYMMDD. String provided: '{}'".format(date_str))
-        
+            raise rsgislib.RSGISPyException(
+                "The second component must have 8 characters YYYYMMDD. String provided: '{}'".format(
+                    date_str
+                )
+            )
+
         date_obj = datetime.datetime.strptime(date_str, "%Y%m%d").strftime("%Y-%m-%d")
         date_imgs[date_obj] = dict()
         date_imgs[date_obj]["input"] = img
-        date_imgs[date_obj]["output"] = os.path.join(out_msk_dir, "{}_chngmsk{}".format(basename, out_img_ext))
+        date_imgs[date_obj]["output"] = os.path.join(
+            out_msk_dir, "{}_chngmsk{}".format(basename, out_img_ext)
+        )
 
-    with open(out_json_file, 'w') as out_json_file_obj:
+    with open(out_json_file, "w") as out_json_file_obj:
         json.dump(date_imgs, out_json_file_obj, sort_keys=True, indent=4)

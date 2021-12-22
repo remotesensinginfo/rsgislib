@@ -44,7 +44,9 @@ def create_kmz_img(
 
     """
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_file):
-        rsgislib.RSGISPyException(f"Output file path is not creatable: {output_file}")
+        raise rsgislib.RSGISPyException(
+            f"Output file path is not creatable: {output_file}"
+        )
 
     band_lst = bands.split(",")
     if len(band_lst) == 3:
@@ -53,7 +55,7 @@ def create_kmz_img(
         multi_band = False
     else:
         raise rsgislib.RSGISPyException(
-            "You need to either " "provide 1 or 3 bands: ".format(band_lst)
+            "You need to either provide 1 or 3 bands: {}".format(band_lst)
         )
 
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
@@ -80,8 +82,8 @@ def create_kmz_img(
         sel_img_bands_img = input_img
     else:
         s_bands = []
-        for strBand in band_lst:
-            s_bands.append(int(strBand))
+        for str_band in band_lst:
+            s_bands.append(int(str_band))
         sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.kea")
         rsgislib.imageutils.select_img_bands(
             input_img,
@@ -179,7 +181,7 @@ def create_webtiles_img_no_stats_msk(
 
     """
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_dir):
-        rsgislib.RSGISPyException(f"Output file path is not creatable: {out_dir}")
+        raise rsgislib.RSGISPyException(f"Output file path is not creatable: {out_dir}")
 
     band_lst = bands.split(",")
     multi_band = False
@@ -189,7 +191,7 @@ def create_webtiles_img_no_stats_msk(
         multi_band = False
     else:
         raise rsgislib.RSGISPyException(
-            "You need to either provide " "1 or 3 bands: {}".format(band_lst)
+            "You need to either provide 1 or 3 bands: {}".format(band_lst)
         )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
 
@@ -315,7 +317,7 @@ def create_webtiles_img(
 
     """
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_dir):
-        rsgislib.RSGISPyException(f"Output file path is not creatable: {out_dir}")
+        raise rsgislib.RSGISPyException(f"Output file path is not creatable: {out_dir}")
 
     band_lst = bands.split(",")
     multi_band = False
@@ -325,7 +327,7 @@ def create_webtiles_img(
         multi_band = False
     else:
         raise rsgislib.RSGISPyException(
-            "You need to either provide " "1 or 3 bands. {}".format(band_lst)
+            "You need to either provide 1 or 3 bands. {}".format(band_lst)
         )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if no_data_val is None:
@@ -516,7 +518,7 @@ def create_quicklook_imgs(
         multi_band = False
     else:
         raise rsgislib.RSGISPyException(
-            "You need to either provide " "1 or 3 bands: ".format(band_lst)
+            "You need to either provide 1 or 3 bands: {}".format(band_lst)
         )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if no_data_val is None:
@@ -629,8 +631,8 @@ def create_quicklook_imgs(
 
     if n_out_imgs == 1:
         if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_imgs):
-            rsgislib.RSGISPyException(
-                f"Output file path is not " f"creatable: {output_imgs}"
+            raise rsgislib.RSGISPyException(
+                f"Output file path is not creatable: {output_imgs}"
             )
         cmd = ["gdal_translate", "-of", "JPEG", "-ot", "Byte"]
         if scale_axis == "width":
@@ -657,8 +659,8 @@ def create_quicklook_imgs(
             if not rsgislib.tools.filetools.does_path_exists_or_creatable(
                 output_imgs[i]
             ):
-                rsgislib.RSGISPyException(
-                    f"Output file path is not " f"creatable: {output_imgs}"
+                raise rsgislib.RSGISPyException(
+                    f"Output file path is not creatable: {output_imgs}"
                 )
             cmd = ["gdal_translate", "-of", "JPEG", "-ot", "Byte"]
             if scale_axis == "width":
@@ -727,7 +729,7 @@ def create_mbtile_file(
         multi_band = False
     else:
         raise rsgislib.RSGISPyException(
-            "You need to either provide " "1 or 3 bands: {}".format(band_lst)
+            "You need to either provide 1 or 3 bands: {}".format(band_lst)
         )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if no_data_val is None:
@@ -899,8 +901,8 @@ def create_webtiles_vis_gtiff_img(
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_dir):
         rsgislib.RSGISPyException(f"Output file path is not creatable: {output_dir}")
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(scaled_gtiff_img):
-        rsgislib.RSGISPyException(
-            f"Output file path is not " f"creatable: {scaled_gtiff_img}"
+        raise rsgislib.RSGISPyException(
+            f"Output file path is not creatable: {scaled_gtiff_img}"
         )
 
     band_lst = bands.split(",")
@@ -911,7 +913,7 @@ def create_webtiles_vis_gtiff_img(
         multi_band = False
     else:
         raise rsgislib.RSGISPyException(
-            "You need to either provide " "1 or 3 bands: {}".format(band_lst)
+            "You need to either provide 1 or 3 bands: {}".format(band_lst)
         )
     n_img_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if no_data_val is None:
@@ -1165,7 +1167,7 @@ def create_quicklook_overview_imgs(
         multi_band = False
     else:
         raise rsgislib.RSGISPyException(
-            "You need to either provide " "1 or 3 bands: {}".format(band_lst)
+            "You need to either provide 1 or 3 bands: {}".format(band_lst)
         )
 
     s_bands = []
@@ -1263,8 +1265,8 @@ def create_quicklook_overview_imgs(
 
     if n_out_imgs == 1:
         if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_imgs):
-            rsgislib.RSGISPyException(
-                f"Output file path is not " f"creatable: {output_imgs}"
+            raise rsgislib.RSGISPyException(
+                f"Output file path is not creatable: {output_imgs}"
             )
         cmd = ["gdal_translate", "-of", "JPEG", "-ot", "Byte"]
         if scale_axis == "width":
@@ -1292,8 +1294,8 @@ def create_quicklook_overview_imgs(
             if not rsgislib.tools.filetools.does_path_exists_or_creatable(
                 output_imgs[i]
             ):
-                rsgislib.RSGISPyException(
-                    f"Output file path is not " f"creatable: {output_imgs[i]}"
+                raise rsgislib.RSGISPyException(
+                    f"Output file path is not creatable: {output_imgs[i]}"
                 )
             cmd = ["gdal_translate", "-of", "JPEG", "-ot", "Byte"]
             if scale_axis == "width":
@@ -1630,8 +1632,8 @@ def create_quicklook_overview_imgs_vec_overlay(
         )
         # Convert to final format (e.g., JPG, TIFF or PNG)
         if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_imgs):
-            rsgislib.RSGISPyException(
-                f"Output file path is not " f"creatable: {output_imgs}"
+            raise rsgislib.RSGISPyException(
+                f"Output file path is not creatable: {output_imgs}"
             )
         rsgislib.imageutils.gdal_translate(
             tmp_final_img, output_imgs, gdalformat=gdalformat, options=""
@@ -1695,8 +1697,8 @@ def create_quicklook_overview_imgs_vec_overlay(
             if not rsgislib.tools.filetools.does_path_exists_or_creatable(
                 output_imgs[i]
             ):
-                rsgislib.RSGISPyException(
-                    f"Output file path is not " f"creatable: {output_imgs[i]}"
+                raise rsgislib.RSGISPyException(
+                    f"Output file path is not creatable: {output_imgs[i]}"
                 )
             rsgislib.imageutils.gdal_translate(
                 tmp_final_img, output_imgs[i], gdalformat=gdalformat, options=""
@@ -1914,8 +1916,8 @@ def create_visual_overview_imgs_vec_extent(
 
     if n_out_imgs == 1:
         if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_imgs):
-            rsgislib.RSGISPyException(
-                f"Output file path is not " f"creatable: {output_imgs}"
+            raise rsgislib.RSGISPyException(
+                f"Output file path is not creatable: {output_imgs}"
             )
         cmd = ["gdal_translate", "-of", gdalformat, "-ot", "Byte"]
         if scale_axis == "width":
@@ -1942,8 +1944,8 @@ def create_visual_overview_imgs_vec_extent(
             if not rsgislib.tools.filetools.does_path_exists_or_creatable(
                 output_imgs[i]
             ):
-                rsgislib.RSGISPyException(
-                    f"Output file path is not " f"creatable: {output_imgs[i]}"
+                raise rsgislib.RSGISPyException(
+                    f"Output file path is not creatable: {output_imgs[i]}"
                 )
             cmd = ["gdal_translate", "-of", gdalformat, "-ot", "Byte"]
             if scale_axis == "width":

@@ -167,7 +167,9 @@ def rasterise_vec_lyr_obj(
     """
     try:
         if vec_lyr_obj is None:
-            raise rsgislib.RSGISPyException("The vec_lyr_obj passed to the function was None.")
+            raise rsgislib.RSGISPyException(
+                "The vec_lyr_obj passed to the function was None."
+            )
 
         print("Running Rasterise now...")
         out_img_ds = gdal.Open(output_img, gdal.GA_Update)

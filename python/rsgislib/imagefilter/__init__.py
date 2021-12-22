@@ -5,7 +5,7 @@ Contains image filtering functionality for rsgislib
 
 # import the C++ extension into this level
 from ._imagefilter import *
-import os.path
+import os
 
 
 class FilterParameters:

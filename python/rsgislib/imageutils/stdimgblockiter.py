@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
+import pprint
+import math
+
+import numpy
+from osgeo import gdal
+
 import rsgislib
 import rsgislib.imageutils
 import rsgislib.tools.projection
-import pprint
-import math
-import numpy
-from osgeo import gdal
 
 
 class StdImgBlockIter:
@@ -59,7 +61,9 @@ class StdImgBlockIter:
                 img.file_name, gdal.GA_ReadOnly
             )
             if self.img_info[img.name]["dataset"] is None:
-                raise rsgislib.RSGISPyException("Could not open image file: {}".format(img.file_name))
+                raise rsgislib.RSGISPyException(
+                    "Could not open image file: {}".format(img.file_name)
+                )
             self.img_info[img.name]["bands"] = dict()
             for band in img.bands:
                 self.img_info[img.name]["bands"][band] = self.img_info[img.name][
@@ -332,7 +336,9 @@ class StdImgBlockIter:
                 img.file_name, gdal.GA_Update
             )
             if self.out_imgs_objs[img.name]["dataset"] is None:
-                raise rsgislib.RSGISPyException("Could not open image file: {}".format(img.file_name))
+                raise rsgislib.RSGISPyException(
+                    "Could not open image file: {}".format(img.file_name)
+                )
             self.out_imgs_objs[img.name]["nbands"] = img.nbands
             self.out_imgs_objs[img.name]["bands"] = dict()
             for band in range(img.nbands):

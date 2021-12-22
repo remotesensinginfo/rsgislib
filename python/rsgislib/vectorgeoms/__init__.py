@@ -11,6 +11,7 @@ from osgeo import ogr
 
 import tqdm
 
+import rsgislib
 import rsgislib.vectorutils
 
 gdal.UseExceptions()
@@ -55,7 +56,9 @@ def convert_polygon_to_polyline(
 
     out_vec_drv = gdal.GetDriverByName(out_format)
     if out_vec_drv == None:
-        raise rsgislib.RSGISPyException("Driver ('{}') has not be recognised.".format(out_format))
+        raise rsgislib.RSGISPyException(
+            "Driver ('{}') has not be recognised.".format(out_format)
+        )
 
     out_ds_obj = out_vec_drv.Create(vec_line_file, 0, 0, 0, gdal.GDT_Unknown)
     out_lyr_obj = out_ds_obj.CreateLayer(
@@ -265,15 +268,21 @@ def create_orthg_lines(
     gdal.UseExceptions()
     vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
     if vec_ds_obj is None:
-        raise rsgislib.RSGISPyException("Could not open vector file: {}".format(in_vec_file))
+        raise rsgislib.RSGISPyException(
+            "Could not open vector file: {}".format(in_vec_file)
+        )
     vec_lyr_obj = vec_ds_obj.GetLayer(in_vec_lyr)
     if vec_lyr_obj is None:
-        raise rsgislib.RSGISPyException("Could not open vector layer: {}".format(in_vec_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not open vector layer: {}".format(in_vec_lyr)
+        )
     vec_spat_ref = vec_lyr_obj.GetSpatialRef()
 
     out_vec_drv = gdal.GetDriverByName(out_format)
     if out_vec_drv == None:
-        raise rsgislib.RSGISPyException("Driver ('{}') has not be recognised.".format(out_format))
+        raise rsgislib.RSGISPyException(
+            "Driver ('{}') has not be recognised.".format(out_format)
+        )
 
     out_ds_obj = out_vec_drv.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
     out_lyr_obj = out_ds_obj.CreateLayer(
@@ -432,7 +441,9 @@ def closest_line_intersection(
 
     lyr_line_vec = ds_line_vec.GetLayerByName(vec_line_lyr)
     if lyr_line_vec is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_line_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_line_lyr)
+        )
 
     x_col_exists = False
     y_col_exists = False
@@ -461,7 +472,9 @@ def closest_line_intersection(
 
     lyr_objs_vec = ds_objs_vec.GetLayerByName(vec_objs_lyr)
     if lyr_objs_vec is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_objs_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_objs_lyr)
+        )
 
     ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
         lyr_objs_vec, vec_bbox
@@ -623,7 +636,9 @@ def line_intersection_range(
 
     lyr_line_vec = ds_line_vec.GetLayerByName(vec_line_lyr)
     if lyr_line_vec is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_line_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_line_lyr)
+        )
 
     x_col_exists = False
     y_col_exists = False
@@ -652,7 +667,9 @@ def line_intersection_range(
 
     lyr_objs_vec = ds_objs_vec.GetLayerByName(vec_objs_lyr)
     if lyr_objs_vec is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_objs_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_objs_lyr)
+        )
 
     ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
         lyr_objs_vec, vec_bbox
@@ -826,7 +843,9 @@ def scnd_line_intersection_range(
 
     lyr_line_vec = ds_line_vec.GetLayerByName(vec_line_lyr)
     if lyr_line_vec is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_line_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_line_lyr)
+        )
 
     x_col_exists = False
     y_col_exists = False
@@ -855,7 +874,9 @@ def scnd_line_intersection_range(
 
     lyr_objs_vec = ds_objs_vec.GetLayerByName(vec_objs_lyr)
     if lyr_objs_vec is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_objs_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_objs_lyr)
+        )
 
     ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
         lyr_objs_vec, vec_bbox
@@ -1538,7 +1559,9 @@ def create_alpha_shape(
             out_vec_lyr, lyr_spat_ref, geom_type=ogr_geom_type
         )
         if result_lyr is None:
-            raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
+            raise rsgislib.RSGISPyException(
+                "Could not open layer '{}'".format(out_vec_lyr)
+            )
 
         # Get the output Layer's Feature Definition
         featureDefn = result_lyr.GetLayerDefn()
@@ -1877,7 +1900,9 @@ def delete_polygon_holes(
 
     def _remove_holes_polygon(polygon, area_thres=None):
         if polygon.GetGeometryName().lower() != "polygon":
-            raise rsgislib.RSGISPyException("Can only remove holes from polygon geometry.")
+            raise rsgislib.RSGISPyException(
+                "Can only remove holes from polygon geometry."
+            )
         if polygon.GetGeometryCount() == 1:
             return polygon
 
@@ -1981,7 +2006,9 @@ def get_poly_hole_area(vec_file: str, vec_lyr: str):
 
     def _calc_hole_area(polygon):
         if polygon.GetGeometryName().lower() != "polygon":
-            raise rsgislib.RSGISPyException("Can only remove holes from polygon geometry.")
+            raise rsgislib.RSGISPyException(
+                "Can only remove holes from polygon geometry."
+            )
         if polygon.GetGeometryCount() == 1:
             return []
         else:
@@ -2197,7 +2224,9 @@ def vec_lyr_intersection(
 
     lyr_over_vec = ds_over_vec.GetLayerByName(vec_over_lyr)
     if lyr_over_vec is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_over_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_over_lyr)
+        )
 
     out_driver = ogr.GetDriverByName(out_format)
     out_ds_obj = out_driver.CreateDataSource(out_vec_file)
@@ -2349,7 +2378,9 @@ def vec_lyr_difference(
 
     lyr_over_vec = ds_over_vec.GetLayerByName(vec_over_lyr)
     if lyr_over_vec is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_over_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_over_lyr)
+        )
 
     out_driver = ogr.GetDriverByName(out_format)
     out_ds_obj = out_driver.CreateDataSource(out_vec_file)
@@ -2542,7 +2573,9 @@ def vec_intersects_vec(
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_base_lyr)
+        )
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
@@ -2550,7 +2583,9 @@ def vec_intersects_vec(
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_comp_lyr)
+        )
 
     n_feats = lyrVecBaseObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2608,7 +2643,9 @@ def vec_overlaps_vec(
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_base_lyr)
+        )
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
@@ -2616,7 +2653,9 @@ def vec_overlaps_vec(
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_comp_lyr)
+        )
 
     n_feats = lyrVecBaseObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2674,7 +2713,9 @@ def vec_within_vec(
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_base_lyr)
+        )
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
@@ -2682,7 +2723,9 @@ def vec_within_vec(
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_comp_lyr)
+        )
 
     n_feats = lyrVecCompObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2744,7 +2787,9 @@ def vec_contains_vec(
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_base_lyr)
+        )
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
@@ -2752,7 +2797,9 @@ def vec_contains_vec(
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_comp_lyr)
+        )
 
     n_feats = lyrVecCompObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2814,7 +2861,9 @@ def vec_touches_vec(
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_base_lyr)
+        )
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
@@ -2822,7 +2871,9 @@ def vec_touches_vec(
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_comp_lyr)
+        )
 
     n_feats = lyrVecBaseObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2881,7 +2932,9 @@ def vec_crosses_vec(
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_base_lyr)
+        )
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
@@ -2889,7 +2942,9 @@ def vec_crosses_vec(
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException(
+            "Could not find layer '{}'".format(vec_comp_lyr)
+        )
 
     n_feats = lyrVecBaseObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)

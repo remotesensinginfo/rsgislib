@@ -509,7 +509,9 @@ def perform_watershed_segmentation(
     gdalMarkersDS = gdal.Open(in_markers_img, gdal.GA_ReadOnly)
     if gdalMarkersDS.RasterCount != 1:
         gdalMarkersDS = None
-        raise rsgislib.RSGISPyException("Markers image should only have one image band.")
+        raise rsgislib.RSGISPyException(
+            "Markers image should only have one image band."
+        )
 
     gdalMarkerBand = gdalMarkersDS.GetRasterBand(1)
     markerArr = gdalMarkerBand.ReadAsArray()
@@ -668,7 +670,9 @@ def perform_random_walker_segmentation(
     gdalMarkersDS = gdal.Open(in_markers_img, gdal.GA_ReadOnly)
     if gdalMarkersDS.RasterCount != 1:
         gdalMarkersDS = None
-        raise rsgislib.RSGISPyException("Markers image should only have one image band.")
+        raise rsgislib.RSGISPyException(
+            "Markers image should only have one image band."
+        )
 
     gdalMarkerBand = gdalMarkersDS.GetRasterBand(1)
     markerArr = gdalMarkerBand.ReadAsArray()

@@ -9,6 +9,8 @@ import sys
 import numpy
 from osgeo import gdal
 
+import rsgislib
+
 # import the C++ extension into this level
 from ._rastergis import *
 
@@ -69,8 +71,8 @@ class ShapeIndex:
         self.col_idx = col_idx
         self.idx = idx
 
-class ChangeFeats:
 
+class ChangeFeats:
     def __init__(self, cls_name: str, cls_out_name: str = None, threshold: float = 0):
         self.cls_name = cls_name
         self.cls_out_name = cls_out_name
@@ -125,11 +127,11 @@ def export_cols_to_gdal_img(
     # Export each field
     for field in fields:
         print("Exporting: " + field)
-        outTempFile = os.path.join(tmp_dir, field + out_ext)
+        out_temp_file = os.path.join(tmp_dir, field + out_ext)
         export_col_to_gdal_img(
-            clumps_img, outTempFile, gdalformat, datatype, field, rat_band
+            clumps_img, out_temp_file, gdalformat, datatype, field, rat_band
         )
-        tmp_file_list.append(outTempFile)
+        tmp_file_list.append(out_temp_file)
 
     # Stack Bands
     print("Stacking Bands")
@@ -159,11 +161,15 @@ def get_rat_length(clumps_img: str, rat_band: int = 1) -> int:
 
     clumps_img_band = clumps_img_ds.GetRasterBand(rat_band)
     if clumps_img_band is None:
-        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band.")
+        raise rsgislib.RSGISPyException(
+            "Could not open the inputted clumps image band."
+        )
 
     clumps_img_rat = clumps_img_band.GetDefaultRAT()
     if clumps_img_rat is None:
-        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band RAT.")
+        raise rsgislib.RSGISPyException(
+            "Could not open the inputted clumps image band RAT."
+        )
 
     nrows = clumps_img_rat.GetRowCount()
 
@@ -187,11 +193,15 @@ def get_rat_columns(clumps_img: str, rat_band: int = 1) -> list[str]:
 
     clumps_img_band = clumps_img_ds.GetRasterBand(rat_band)
     if clumps_img_band is None:
-        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band.")
+        raise rsgislib.RSGISPyException(
+            "Could not open the inputted clumps image band."
+        )
 
     clumps_img_rat = clumps_img_band.GetDefaultRAT()
     if clumps_img_rat is None:
-        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band RAT.")
+        raise rsgislib.RSGISPyException(
+            "Could not open the inputted clumps image band RAT."
+        )
 
     ncols = clumps_img_rat.GetColumnCount()
     col_names = []
@@ -220,11 +230,15 @@ def get_rat_columns_info(clumps_img: str, rat_band: int = 1):
 
     clumps_img_band = clumps_img_ds.GetRasterBand(rat_band)
     if clumps_img_band is None:
-        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band.")
+        raise rsgislib.RSGISPyException(
+            "Could not open the inputted clumps image band."
+        )
 
     clumps_img_rat = clumps_img_band.GetDefaultRAT()
     if clumps_img_rat is None:
-        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band RAT.")
+        raise rsgislib.RSGISPyException(
+            "Could not open the inputted clumps image band RAT."
+        )
 
     ncols = clumps_img_rat.GetColumnCount()
     col_info = dict()
@@ -501,7 +515,9 @@ def set_column_data(clumps_img: str, col_name: str, col_data: numpy.array):
 
     rat_length = get_rat_length(clumps_img)
     if rat_length != (col_data.shape[0]):
-        raise rsgislib.RSGISPyException("The input data array is not the same length as the RAT.")
+        raise rsgislib.RSGISPyException(
+            "The input data array is not the same length as the RAT."
+        )
 
     rat_dataset = gdal.Open(clumps_img, gdal.GA_Update)
     if rat_dataset is None:

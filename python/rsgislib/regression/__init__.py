@@ -4,6 +4,8 @@ Tools for developing and applying regression models.
 
 """
 
+import rsgislib
+
 
 def get_regression_stats(ref_data, pred_data, n_vars=1):
     """

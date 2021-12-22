@@ -35,18 +35,19 @@
 ###########################################################################
 
 import glob
-import os.path
 import os
+import json
+import shutil
+
+from osgeo import gdal
+from rios import rat
+
 import rsgislib
 from rsgislib.imageutils import tilingutils
 from rsgislib.segmentation import segutils
 from rsgislib import rastergis
 from rsgislib import imageutils
 from rsgislib import segmentation
-from osgeo import gdal
-from rios import rat
-import json
-import shutil
 
 
 class RSGISTiledShepherdSegmentationSingleThread(object):

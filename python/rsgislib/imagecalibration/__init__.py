@@ -10,6 +10,8 @@ More details on ARCSI are avaialble from https://remotesensing.info/arcsi
 # import the C++ extension into this level
 from ._imagecalibration import *
 
+import rsgislib
+
 
 class ElevLUTFeat(object):
     """

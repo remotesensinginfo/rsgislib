@@ -146,7 +146,9 @@ def plot_endmembers(
             "the number of endmembers in the input file."
         )
     if (wavelengths is not None) and (not isinstance(wavelengths, list)):
-        raise rsgislib.RSGISPyException("If provided the wavelength variable must be a list")
+        raise rsgislib.RSGISPyException(
+            "If provided the wavelength variable must be a list"
+        )
     elif (wavelengths is not None) and (len(wavelengths) != n_bands):
         raise rsgislib.RSGISPyException(
             "The number of wavelengths provided is not equal"
@@ -1098,7 +1100,9 @@ def summarise_multi_endmember_linear_unmixing(
                 "ImageEndmemberInfo instances."
             )
         if not isinstance(unmixed_dataset.endmember_names, list):
-            raise rsgislib.RSGISPyException("unmixed_dataset.endmember_names must be a list")
+            raise rsgislib.RSGISPyException(
+                "unmixed_dataset.endmember_names must be a list"
+            )
 
         if rsgislib.imageutils.get_img_band_count(unmixed_dataset.in_unmix_img) != len(
             unmixed_dataset.endmember_names
@@ -1232,11 +1236,12 @@ def summarise_multi_endmember_linear_unmixing(
     )
 
     if calc_stats:
-        rsgislib.imageutils.set_band_names(out_unmix_img, endmember_names, feedback=False)
+        rsgislib.imageutils.set_band_names(
+            out_unmix_img, endmember_names, feedback=False
+        )
         rsgislib.imageutils.pop_img_stats(
             out_unmix_img, use_no_data=True, no_data_val=999, calc_pyramids=True
         )
-
 
 
 def calc_ppi(
@@ -1295,7 +1300,9 @@ def calc_ppi(
     for n in tqdm.tqdm(range(n_bands)):
         imgBand = imgDS.GetRasterBand(n + 1)
         if imgBand is None:
-            raise rsgislib.RSGISPyException("Could not open image band ({})".format(n + 1))
+            raise rsgislib.RSGISPyException(
+                "Could not open image band ({})".format(n + 1)
+            )
         no_data_val = imgBand.GetNoDataValue()
         band_arr = imgBand.ReadAsArray().flatten()
         band_arr = band_arr.astype(numpy.float32)
@@ -1369,4 +1376,3 @@ def calc_ppi(
         rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
-

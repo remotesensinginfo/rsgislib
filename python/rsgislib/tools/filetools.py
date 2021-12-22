@@ -798,40 +798,40 @@ def create_directory_archive(in_dir: str, out_arch: str, arch_format: str) -> st
     if arch_format == "zip":
         out_arch_file = "{}.zip".format(out_arch.strip())
         if not does_path_exists_or_creatable(out_arch_file):
-            rsgislib.RSGISPyException(
-                f"Output file path is " f"not creatable: {out_arch_file}"
+            raise rsgislib.RSGISPyException(
+                f"Output file path is not creatable: {out_arch_file}"
             )
         cmd = ["zip", "-r", out_arch_file, dir_name]
         subprocess.run(cmd, check=True)
     elif arch_format == "tar":
         out_arch_file = "{}.tar".format(out_arch.strip())
         if not does_path_exists_or_creatable(out_arch_file):
-            rsgislib.RSGISPyException(
-                f"Output file path is " f"not creatable: {out_arch_file}"
+            raise rsgislib.RSGISPyException(
+                f"Output file path is not creatable: {out_arch_file}"
             )
         cmd = ["tar", "-cvf", out_arch_file, dir_name]
         subprocess.run(cmd, check=True)
     elif arch_format == "gztar":
         out_arch_file = "{}.tar.gz".format(out_arch.strip())
         if not does_path_exists_or_creatable(out_arch_file):
-            rsgislib.RSGISPyException(
-                f"Output file path is " f"not creatable: {out_arch_file}"
+            raise rsgislib.RSGISPyException(
+                f"Output file path is not creatable: {out_arch_file}"
             )
         cmd = ["tar", "-cvzf", out_arch_file, dir_name]
         subprocess.run(cmd, check=True)
     elif arch_format == "bztar":
         out_arch_file = "{}.tar.bz2".format(out_arch.strip())
         if not does_path_exists_or_creatable(out_arch_file):
-            rsgislib.RSGISPyException(
-                f"Output file path is " f"not creatable: {out_arch_file}"
+            raise rsgislib.RSGISPyException(
+                f"Output file path is not creatable: {out_arch_file}"
             )
         cmd = ["tar", "-cvjSf", out_arch_file, dir_name]
         subprocess.run(cmd, check=True)
     elif arch_format == "xztar":
         out_arch_file = "{}.tar.xz".format(out_arch.strip())
         if not does_path_exists_or_creatable(out_arch_file):
-            rsgislib.RSGISPyException(
-                f"Output file path is " f"not creatable: {out_arch_file}"
+            raise rsgislib.RSGISPyException(
+                f"Output file path is not creatable: {out_arch_file}"
             )
         cmd = ["tar", "-cvJf", out_arch_file, dir_name]
         subprocess.run(cmd, check=True)

@@ -148,7 +148,9 @@ def train_sklearn_classifer_gridsearch(
 
     grid_search.fit(dataArrSamp, classArrSamp)
     if not grid_search.refit:
-        raise rsgislib.RSGISPyException("Grid Search did no find a fit therefore failed...")
+        raise rsgislib.RSGISPyException(
+            "Grid Search did no find a fit therefore failed..."
+        )
 
     print(
         "Best score was {} and has parameters {}.".format(

@@ -459,7 +459,9 @@ def count_pxls_of_val(input_img, vals, img_band=None):
         )
     n_bands = rsgislib.imageutils.get_img_band_count(input_img)
     if (img_band is not None) and ((img_band < 1) or (img_band > n_bands)):
-        raise rsgislib.RSGISPyException("The specified input image band is not within the input image.")
+        raise rsgislib.RSGISPyException(
+            "The specified input image band is not within the input image."
+        )
     if img_band is not None:
         img_band_idx = img_band - 1
 
@@ -501,7 +503,9 @@ def get_unique_values(input_img, img_band=1):
         raise rsgislib.RSGISPyException("Could not open output image")
     imgBand = imgDS.GetRasterBand(img_band)
     if imgBand is None:
-        raise rsgislib.RSGISPyException("Could not open output image band ({})".format(img_band))
+        raise rsgislib.RSGISPyException(
+            "Could not open output image band ({})".format(img_band)
+        )
     valsArr = imgBand.ReadAsArray()
     imgDS = None
 
@@ -670,7 +674,9 @@ def perform_image_mnf(
     if in_img_no_data is None:
         in_img_no_data = rsgislib.imageutils.get_img_no_data_value(input_img)
         if in_img_no_data is None:
-            raise rsgislib.RSGISPyException("A no data value for the input image must be provided.")
+            raise rsgislib.RSGISPyException(
+                "A no data value for the input image must be provided."
+            )
 
     valid_msk_img = os.path.join(tmp_dir, "{}_vld_msk.kea".format(img_basename))
     rsgislib.imageutils.gen_valid_mask(input_img, valid_msk_img, "KEA", in_img_no_data)
@@ -1311,7 +1317,9 @@ def calc_fill_regions_knn(
                     elif summary == rsgislib.SUMTYPE_RANGE:
                         out_arr[i, j] = numpy.amax(int_vals) - numpy.amin(int_vals)
                     else:
-                        raise rsgislib.RSGISPyException("Summary method not recognised/available.")
+                        raise rsgislib.RSGISPyException(
+                            "Summary method not recognised/available."
+                        )
 
         outputs.outimage = numpy.expand_dims(out_arr, axis=0)
 
@@ -1417,10 +1425,14 @@ def are_img_bands_equal(
     n_cmp_bands = rsgislib.imageutils.get_img_band_count(in_cmp_img)
 
     if (img_ref_band < 1) or (img_ref_band > n_ref_bands):
-        raise rsgislib.RSGISPyException("The specified band is not within the reference image.")
+        raise rsgislib.RSGISPyException(
+            "The specified band is not within the reference image."
+        )
 
     if (img_cmp_band < 1) or (img_cmp_band > n_cmp_bands):
-        raise rsgislib.RSGISPyException("The specified band is not within the comparison image.")
+        raise rsgislib.RSGISPyException(
+            "The specified band is not within the comparison image."
+        )
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
