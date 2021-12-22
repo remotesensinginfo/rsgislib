@@ -242,10 +242,10 @@ def pop_thmt_img_stats(
                 else:
                     raise e
 
-            tmp_meta["STATISTICS_MINIMUM"] = "".format(min_val)
-            tmp_meta["STATISTICS_MAXIMUM"] = "".format(max_val)
-            tmp_meta["STATISTICS_MEAN"] = "".format(mean_val)
-            tmp_meta["STATISTICS_STDDEV"] = "".format(stddev_val)
+            tmp_meta["STATISTICS_MINIMUM"] = f"{min_val}"
+            tmp_meta["STATISTICS_MAXIMUM"] = f"{max_val}"
+            tmp_meta["STATISTICS_MEAN"] = f"{mean_val}"
+            tmp_meta["STATISTICS_STDDEV"] = f"{stddev_val}"
             tmp_meta["STATISTICS_SKIPFACTORX"] = "1"
             tmp_meta["STATISTICS_SKIPFACTORY"] = "1"
 
@@ -279,11 +279,11 @@ def pop_thmt_img_stats(
                 # do the mode - bin with the highest count
                 mode_bin = numpy.argmax(hist)
                 mode_val = mode_bin * hist_step + hist_min
-                tmp_meta["STATISTICS_MODE"] = "{}".format(int(round(mode_val)))
+                tmp_meta["STATISTICS_MODE"] = f"{int(round(mode_val))}"
                 tmp_meta["STATISTICS_HISTOBINVALUES"] = "|".join(map(repr, hist)) + "|"
-                tmp_meta["STATISTICS_HISTOMIN"] = "{}".format(hist_min)
-                tmp_meta["STATISTICS_HISTOMAX"] = "{}".format(hist_max)
-                tmp_meta["STATISTICS_HISTONUMBINS"] = "{}".format(hist_n_bins)
+                tmp_meta["STATISTICS_HISTOMIN"] = f"{hist_min}"
+                tmp_meta["STATISTICS_HISTOMAX"] = f"{hist_max}"
+                tmp_meta["STATISTICS_HISTONUMBINS"] = f"{hist_n_bins}"
 
                 # estimate the median
                 mid_num = hist.sum() / 2
@@ -2684,9 +2684,7 @@ def do_images_overlap(in_a_img: str, in_b_img: str, over_thres: int = 0.0):
     if img2TLY < yMax:
         yMax = img2TLY
 
-    if xMax - xMin <= over_thres:
-        overlap = False
-    elif yMax - yMin <= over_thres:
+    if (xMax - xMin <= over_thres) or (yMax - yMin <= over_thres):
         overlap = False
 
     return overlap

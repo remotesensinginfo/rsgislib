@@ -96,7 +96,7 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
         os.remove(cfile)
 
 
-def check_format_name(format: str) -> str:
+def check_format_name(vec_file_format: str) -> str:
     """
     A function which checks the format string for vector formats
     as functions which use Geopandas rather than GDAL directly as
@@ -109,14 +109,15 @@ def check_format_name(format: str) -> str:
     passed back. Edits for more formats can be included in the future
     if they are found to be needed for Geopandas.
 
-    :param format: the input format string (e.g. GEOJSON, GPKG, ESRI Shapefile, etc.)
+    :param vec_file_format: the input format string (e.g. GEOJSON, GPKG, ESRI Shapefile, etc.)
     :return: the format string, if the format is GEOJSON then it will be changes to
              GeoJSON.
 
     """
-    if format.lower() == "geojson":
-        format = "GeoJSON"
-    return format
+    out_format = vec_file_format
+    if vec_file_format.lower() == "geojson":
+        out_format = "GeoJSON"
+    return out_format
 
 
 def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None) -> str:

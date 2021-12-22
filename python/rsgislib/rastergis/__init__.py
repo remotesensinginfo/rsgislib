@@ -656,7 +656,7 @@ def identify_small_units(
     import rsgislib.tools.filetools
     import rsgislib.segmentation
 
-    if len(out_col_name) is not len(small_clumps_thres):
+    if len(out_col_name) != len(small_clumps_thres):
         raise rsgislib.RSGISPyException(
             "The number of threshold values and output "
             "column names should be the same."
