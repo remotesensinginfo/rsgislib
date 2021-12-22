@@ -899,7 +899,9 @@ def create_webtiles_vis_gtiff_img(
 
     """
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_dir):
-        rsgislib.RSGISPyException(f"Output file path is not creatable: {output_dir}")
+        raise rsgislib.RSGISPyException(
+            f"Output file path is not creatable: {output_dir}"
+        )
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(scaled_gtiff_img):
         raise rsgislib.RSGISPyException(
             f"Output file path is not creatable: {scaled_gtiff_img}"
