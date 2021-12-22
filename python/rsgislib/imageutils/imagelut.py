@@ -41,17 +41,19 @@ import os
 from osgeo import gdal
 from osgeo import ogr
 
-import rsgislib
+gdal.UseExceptions()
 
+import rsgislib
+import rsgislib.vectorutils
 
 def create_img_extent_lut(
-    input_imgs,
-    vec_file,
-    vec_lyr,
-    out_format,
-    ignore_none_imgs=False,
-    out_proj_wgs84=False,
-    overwrite_lut_file=False,
+    input_imgs:list[str],
+    vec_file:str,
+    vec_lyr:str,
+    out_format:str,
+    ignore_none_imgs:bool=False,
+    out_proj_wgs84:bool=False,
+    overwrite_lut_file:bool=False,
 ):
     """
     Create a vector layer look up table (LUT) for a directory of images.
@@ -80,10 +82,7 @@ def create_img_extent_lut(
     """
     import tqdm
     import rsgislib.imageutils
-    import rsgislib.vectorutils
     import rsgislib.vectorutils.createvectors
-
-    gdal.UseExceptions()
 
     bboxs = []
     atts = dict()
@@ -148,7 +147,7 @@ def create_img_extent_lut(
     )
 
 
-def query_img_lut(scn_bbox, lut_db_file, lyr_name) -> list:
+def query_img_lut(scn_bbox:list[float], lut_db_file:str, lyr_name:str) -> list:
     """
     A function for querying the LUT DB spatially filtering using a BBOX
 
@@ -159,18 +158,16 @@ def query_img_lut(scn_bbox, lut_db_file, lyr_name) -> list:
     :return: a list of files from the LUT
 
     """
-    import rsgislib.vectorutils
-
-    fileListLUT = rsgislib.vectorutils.get_att_lst_select_bbox_feats(
+    file_list_lut = rsgislib.vectorutils.get_att_lst_select_bbox_feats(
         lut_db_file, lyr_name, ["path", "filename"], scn_bbox
     )
     imgs = []
-    for item in fileListLUT:
+    for item in file_list_lut:
         imgs.append(os.path.join(item["path"], item["filename"]))
     return imgs
 
 
-def get_all_lut_imgs(lut_db_file, lyr_name) -> list:
+def get_all_lut_imgs(lut_db_file:str, lyr_name:str) -> list:
     """
     Get a list of all the images within the LUT.
 
@@ -181,16 +178,16 @@ def get_all_lut_imgs(lut_db_file, lyr_name) -> list:
     """
     import rsgislib.vectorattrs
 
-    fileListLUT = rsgislib.vectorattrs.read_vec_columns(
+    file_list_lut = rsgislib.vectorattrs.read_vec_columns(
         lut_db_file, lyr_name, ["path", "filename"]
     )
     imgs = []
-    for item in fileListLUT:
+    for item in file_list_lut:
         imgs.append(os.path.join(item["path"], item["filename"]))
     return imgs
 
 
-def get_raster_lyr(scn_bbox, lut_db_file, lyr_name, tmp_dir) -> str:
+def get_raster_lyr(scn_bbox:list[float], lut_db_file:str, lyr_name:str, tmp_dir:str) -> str:
     """
     This function provides a single raster layer using the LUT file provided. If
     a single image file intersecting with the BBOX is not within the LUT then a
@@ -207,30 +204,29 @@ def get_raster_lyr(scn_bbox, lut_db_file, lyr_name, tmp_dir) -> str:
              then None is returned.
 
     """
-    import rsgislib.vectorutils
     import rsgislib.tools.utils
 
-    fileListLUT = rsgislib.vectorutils.get_att_lst_select_bbox_feats(
+    file_list_lut = rsgislib.vectorutils.get_att_lst_select_bbox_feats(
         lut_db_file, lyr_name, ["path", "filename"], scn_bbox
     )
 
-    imgbase = "imglyr_{}".format(rsgislib.tools.utils.uid_generator())
+    img_base = "imglyr_{}".format(rsgislib.tools.utils.uid_generator())
     # if number of scenes available is > 0 then create VRT
-    if len(fileListLUT) > 1:
+    if len(file_list_lut) > 1:
         imgs = []
-        for item in fileListLUT:
+        for item in file_list_lut:
             imgs.append(os.path.join(item["path"], item["filename"]))
-        outimgfile = os.path.join(tmp_dir, "{}_tmp.vrt".format(imgbase))
-        gdal.BuildVRT(outimgfile, imgs)
-    elif len(fileListLUT) == 1:
-        outimgfile = os.path.join(fileListLUT[0]["path"], fileListLUT[0]["filename"])
+        out_img_file = os.path.join(tmp_dir, "{}_tmp.vrt".format(img_base))
+        gdal.BuildVRT(out_img_file, imgs)
+    elif len(file_list_lut) == 1:
+        out_img_file = os.path.join(file_list_lut[0]["path"], file_list_lut[0]["filename"])
     else:
-        outimgfile = None
-    return outimgfile
+        out_img_file = None
+    return out_img_file
 
 
 def query_file_lut(
-    lut_db_file, lyr_name, roi_file, roi_lyr, out_dest, targz_out, cp_cmds
+    lut_db_file:str, lyr_name:str, roi_file:str, roi_lyr:str, out_dest:str, targz_out:bool, cp_cmds:bool
 ) -> list:
     """
     A function which allows the file LUT to be queried (intersection) and commands
@@ -252,7 +248,6 @@ def query_file_lut(
     :return: returns a list of commands to be executed.
 
     """
-
     if lyr_name is None:
         lyr_name = os.path.splitext(os.path.basename(lut_db_file))[0]
 
@@ -269,24 +264,24 @@ def query_file_lut(
         lut_db_file, lyr_name, roi_bbox
     )
 
-    fileListDict = rsgislib.vectorutils.get_att_lst_select_feats_lyr_objs(
+    file_list_dict = rsgislib.vectorutils.get_att_lst_select_feats_lyr_objs(
         lut_mem_lyr, ["path", "filename"], roi_mem_lyr
     )
 
     out_cmds = []
     if targz_out:
         cmd = "tar -czf {}".format(out_dest)
-        for fileItem in fileListDict:
-            filepath = os.path.join(fileItem["path"], fileItem["filename"])
-            cmd = "{} {}".format(cmd, filepath)
+        for file_item in file_list_dict:
+            file_path = os.path.join(file_item["path"], file_item["filename"])
+            cmd = "{} {}".format(cmd, file_path)
         out_cmds.append(cmd)
     elif cp_cmds:
-        for fileItem in fileListDict:
-            filepath = os.path.join(fileItem["path"], fileItem["filename"])
-            out_cmds.append("cp {0} {1}".format(filepath, out_dest))
+        for file_item in file_list_dict:
+            file_path = os.path.join(file_item["path"], file_item["filename"])
+            out_cmds.append("cp {0} {1}".format(file_path, out_dest))
     else:
-        for fileItem in fileListDict:
-            filepath = os.path.join(fileItem["path"], fileItem["filename"])
-            out_cmds.append(filepath)
+        for file_item in file_list_dict:
+            file_path = os.path.join(file_item["path"], file_item["filename"])
+            out_cmds.append(file_path)
 
     return out_cmds

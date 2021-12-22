@@ -31,40 +31,29 @@
 
 import argparse
 import rsgislib.rastergis
-
-def listRATColumns(imgFile, band=1):
-    dataset = gdal.Open(imgFile, gdal.GA_ReadOnly)
-    nBands = dataset.RasterCount
-    if (band == 0) or (band > nBands):
-        raise Exception("Specified band is within the image.")
-    bandObj = dataset.GetRasterBand(band)
-    colNames = rat.getColumnNamesFromBand(bandObj)
-    i = 1
-    for col in colNames:
-        print("{0}: {1}".format(i, col))
-        i = i + 1
+import rsgislib.imageutils
 
 if __name__ == "__main__":
 
-    # Read in config file
-    parser = argparse.ArgumentParser(description="Obtain image info.")
-    
-    parser.add_argument("--ratcols", 
-                        action='store_true', 
-                        default=False, 
-                        help="List the columns in a RAT.")
-    parser.add_argument("-i", "--img",
-                        type=str,
-                        required=True,
-                        help="image file")
-    parser.add_argument("-b", "--band",
-                        type=int,
-                        default=1,
-                        help="image band")
+    parser = argparse.ArgumentParser(description="Print image info to console.")
+    parser.add_argument("-i", "--img", type=str, required=True, help="image file")
     args = parser.parse_args()
-    
-    if args.ratcols:
-        rat_cols = rsgislib.rastergis.get_rat_columns(args.imgfile, rat_band=args.imgband)
-        for col in rat_cols:
-            print(f"\t{col}")
+
+    print(f"Image: {args.img}")
+    img_size = rsgislib.imageutils.get_img_size(args.img)
+    print(f"Size: {img_size[0]} x {img_size[1]}")
+    img_pxl_res = rsgislib.imageutils.get_img_res(args.img)
+    print(f"Pixel Size: {img_pxl_res[0]} x {img_pxl_res[1]}")
+    img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(args.img)
+    print(f"Image EPSG: {img_epsg}")
+    n_bands = rsgislib.imageutils.get_img_band_count(args.img)
+    print(f"N Bands: {n_bands}")
+
+    band_names = rsgislib.imageutils.get_band_names(args.img)
+    for band, band_name in enumerate(band_names):
+        print(f"\tBand {band+1}: {band_name}")
+        if rsgislib.imageutils.is_img_thematic(args.img, band+1):
+            rat_cols = rsgislib.rastergis.get_rat_columns(args.img, band+1)
+            print(f"\t RAT cols: {rat_cols}")
+
 

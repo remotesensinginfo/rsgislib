@@ -31,7 +31,6 @@
 
 import rsgislib
 import os
-import os.path
 import elevation
 import argparse
 

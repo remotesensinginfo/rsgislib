@@ -45,12 +45,12 @@ if __name__ == "__main__":
     if args.lyrs:
         vec_lyrs = rsgislib.vectorutils.get_vec_lyrs_lst(args.vecfile)
         for i, lyr in enumerate(vec_lyrs):
-            print(f"{i + 1}: f{lyr}")
+            print(f"{i + 1}: {lyr}")
 
     if args.cols:
         vec_cols = rsgislib.vectorutils.get_vec_lyr_cols(args.vecfile, args.veclyr)
         for i, col in enumerate(vec_cols):
-            print(f"{i+1}: f{col}")
+            print(f"{i+1}: {col}")
 
     if args.nfeats:
         n_lyr_feats = rsgislib.vectorutils.get_vec_feat_count(args.vecfile, args.veclyr)

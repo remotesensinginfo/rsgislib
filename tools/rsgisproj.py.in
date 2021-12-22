@@ -34,31 +34,11 @@
 #############################################################################
 
 import argparse
-import os.path
+import os
 import osgeo.gdal as gdal
 import osgeo.osr as osr
 
-def readTextFileNoNewLines(file):
-    """
-    Read a text file into a single string
-    removing new lines.
-
-    :return: string
-
-    """
-    if not os.path.exists(file):
-        raise Exception("The input file does not exist, please check path: '{}'".format(file))
-    
-    txtStr = ""
-    try:
-        dataFile = open(file, 'r')
-        for line in dataFile:
-            txtStr += line.strip()
-        dataFile.close()
-    except Exception as e:
-        raise e
-    return txtStr
-
+import rsgislib.tools.utils
 
 if __name__ == '__main__':
     """
@@ -87,7 +67,8 @@ if __name__ == '__main__':
 
     # Call the parser to parse the arguments.
     args = parser.parse_args()
-    
+
+
     spat_ref_obj = None
     
     if args.image is not None:       
@@ -122,30 +103,32 @@ if __name__ == '__main__':
         spat_ref_obj = osr.SpatialReference()
         spat_ref_obj.ImportFromEPSGA(epsga_code)
     elif args.wktfile is not None:
-        wkt_str = readTextFileNoNewLines(args.wktfile)
+        wkt_str = rsgislib.tools.utils.read_text_file_no_new_lines(args.wktfile)
         spat_ref_obj = osr.SpatialReference()
         spat_ref_obj.ImportFromWkt(wkt_str)
     elif args.wkt is not None:
         spat_ref_obj = osr.SpatialReference()
         spat_ref_obj.ImportFromWkt(args.wkt)
     elif args.proj4file is not None:
-        proj4_str = readTextFileNoNewLines(args.proj4file)
+        proj4_str = rsgislib.tools.utils.read_text_file_no_new_lines(args.proj4file)
         spat_ref_obj = osr.SpatialReference()
         spat_ref_obj.ImportFromProj4(proj4_str)
     elif args.proj4 is not None:
         spat_ref_obj = osr.SpatialReference()
         spat_ref_obj.ImportFromProj4(args.proj4)
     elif args.esrifile is not None:
-        esri_prj_str = readTextFileNoNewLines(args.esrifile)
+        esri_prj_str = rsgislib.tools.utils.read_text_file_no_new_lines(args.esrifile)
         spat_ref_obj = osr.SpatialReference()
         spat_ref_obj.ImportFromESRI(esri_prj_str)
     elif args.utm is not None:
         utm_str = args.utm
-        if utm_str.len() == 3:
+        if len(utm_str) == 3:
             try:
-                utm_zone = int(utm_str[0:1])
+                utm_zone = int(utm_str[0:2])
+                if (utm_zone < 1) or (utm_zone > 60):
+                    raise Exception("UTM zone is out of range.")
                 utm_hemi = utm_str[2]
-            except e:
+            except Exception as e:
                 print("Could not retrieve UTM zone from UTM string: '{0}'. Zone = {1}, Hemispher = {2}".format(utm_str, utm_str[0:1], utm_str[2]))
                 raise e
             hemi_north = True
@@ -161,17 +144,16 @@ if __name__ == '__main__':
     
 
     if spat_ref_obj is not None:
-        print("")
         for out_format in args.output:
-            if out_format == 'WKT':
-                print("{}\n".format(spat_ref_obj.ExportToWkt()))
-            elif out_format == 'WKTPretty':
-                print("{}\n".format(spat_ref_obj.ExportToPrettyWkt()))
-            elif out_format == 'EPSG':
+            if out_format.upper() == 'WKT':
+                print("{}".format(spat_ref_obj.ExportToWkt()))
+            elif out_format.upper() == 'WKTPRETTY':
+                print("{}".format(spat_ref_obj.ExportToPrettyWkt()))
+            elif out_format.upper() == 'EPSG':
                 spat_ref_obj.AutoIdentifyEPSG()
-                print("EPSG:{}\n".format(spat_ref_obj.GetAuthorityCode(None)))
-            elif out_format == 'PROJ4':
-                print("{}\n".format(spat_ref_obj.ExportToProj4()))
+                print("EPSG:{}".format(spat_ref_obj.GetAuthorityCode(None)))
+            elif out_format.upper() == 'PROJ4':
+                print("{}".format(spat_ref_obj.ExportToProj4()))
             else:
                 raise Exception("The output projection format was not recognised.")
     else:

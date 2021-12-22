@@ -24,82 +24,19 @@
 #
 # Author: Pete Bunting
 # Email: petebunting@mac.com
-# Date: 06/05/2021
-# Version: 1.0
+# Date: 22/12/2021
+# Version: 2.0
 # 
 #############################################
 
-import rsgislib
-import os
+import rsgislib.tools.checkdatasets
 import argparse
 import glob
-
-def _run_img_chk(img_params):
-    img = img_params[0]
-    nbands = img_params[1]
-    rmerr = img_params[2]
-    printnames = img_params[3]
-    printerrs = img_params[4]
-    chk_proj = img_params[5]
-    epsg_code = img_params[6]
-    read_img = img_params[7]
-
-    rsgis_utils = rsgislib.RSGISPyUtils()
-
-    if printnames:
-        print(img)
-    try:
-        file_ok, err_str = rsgis_utils.check_gdal_image_file(img, check_bands=True, nbands=nbands, chk_proj=chk_proj,
-                                                             epsg_code=epsg_code, read_img=read_img)
-        if printerrs and (not file_ok):
-            print("Error: '{}'".format(err_str))
-        if not file_ok:
-            if rmerr:
-                os.remove(img)
-                print("Removed {}".format(img))
-            else:
-                print("rm {}".format(img))
-    except:
-        if rmerr:
-            os.remove(img)
-            print("Removed {}".format(img))
-        else:
-            print("rm {}".format(img))
-
-
-def _run_vec_chk(img_params):
-    vec_file = img_params[0]
-    rmerr = img_params[1]
-    printnames = img_params[2]
-    printerrs = img_params[3]
-
-    rsgis_utils = rsgislib.RSGISPyUtils()
-
-    if printnames:
-        print(vec_file)
-    try:
-        file_ok, err_str = rsgis_utils.check_gdal_vector_file(vec_file)
-        if printerrs and (not file_ok):
-            print("Error: '{}'".format(err_str))
-        if not file_ok:
-            if rmerr:
-                os.remove(vec_file)
-                print("Removed {}".format(vec_file))
-            else:
-                print("rm {}".format(vec_file))
-    except:
-        if rmerr:
-            os.remove(vec_file)
-            print("Removed {}".format(vec_file))
-        else:
-            print("rm {}".format(vec_file))
-
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser( description="A utility which can be used to check whether a GDAL "
                                                   "compatible file is valid and if there are any errors or warnings.")
-    parser.add_argument("-i", "--input", type=str, required=True, help="Input file path")
+    parser.add_argument("-i", "--input", type=str, required=True, help="Input file search path (i.e., '/path/to/*.kea')")
     parser.add_argument("--vec", action='store_true', default=False, help="Specify that the input file is a "
                                                                           "vector layer (otherwise assumed "
                                                                           "to be a raster).")
@@ -112,6 +49,8 @@ if __name__ == "__main__":
     parser.add_argument("--epsg", type=int, default=0, help="The EPSG code for the projection of the images.")
     parser.add_argument("--chkproj", action='store_true', default=False, help="Check that a projection is defined")
     parser.add_argument("--readimg", action='store_true', default=False, help="Check the image by reading part of it.")
+    parser.add_argument("--chksum", action='store_true', default=False, help="Check the image by calculating a checksum from the image pixel values.")
+    parser.add_argument("--vecmulti", action='store_true', default=False, help="Specifies that the vector file has multiple files (e.g., shapefile) and they should all be deleted if error and --rmerr is selected.")
 
     args = parser.parse_args()
     print(args.input)
@@ -121,59 +60,10 @@ if __name__ == "__main__":
         chk_projection = True
 
     files = glob.glob(args.input)
-
     print("File Checks ({} Files Found):".format(len(files)))
-
-    from multiprocessing import Pool
-
-    processes_pool = Pool(1)
-    try:
-        for cfile in files:
-            try:
-                if args.vec:
-                    params = [cfile, args.rmerr, args.printnames, args.printerrs]
-                    result = processes_pool.apply_async(_run_vec_chk, args=[params])
-                    result.get(timeout=2)
-                else:
-                    params = [cfile, args.nbands, args.rmerr, args.printnames, args.printerrs, chk_projection, args.epsg, args.readimg]
-                    result = processes_pool.apply_async(_run_img_chk, args=[params])
-                    result.get(timeout=2)
-            except Exception as e:
-                if args.rmerr:
-                    os.remove(cfile)
-                    print("Removed {}".format(cfile))
-                else:
-                    print("rm {}".format(cfile))
-                continue
-        processes_pool.join()
-    except Exception as inst:
-        print("Finished with pool")
-
+    if args.vec:
+        rsgislib.tools.checkdatasets.run_check_gdal_vector_files(files, chk_proj=chk_projection, epsg_code=args.epsg, max_file_size=None, rm_err=args.rmerr, print_err=True, multi_file=args.vecmulti, print_file_names=args.printnames)
+    else:
+        rsgislib.tools.checkdatasets.run_check_gdal_image_files(files, check_bands=True, n_bands=args.nbands, chk_proj=chk_projection, epsg_code=args.epsg, read_img=args.readimg, smpl_n_pxls=10, calc_chk_sum=args.chksum, rm_err=args.rmerr, print_err=args.printnames)
     print("Finish Checks")
 
-
-
-
-
-
-
-
-
-
-
-    args = parser.parse_args()
-
-    rsgis_utils = rsgislib.RSGISPyUtils()
-
-    file_ok = True
-    err_str = ''
-
-    if args.vec:
-        file_ok, err_str = rsgis_utils.check_gdal_vector_file(args.input, (not args.noband))
-    else:
-        file_ok, err_str = rsgis_utils.check_gdal_image_file(args.input)
-
-    if file_ok:
-        print("File is OK: {}".format(args.input))
-    else:
-        print("File has error: '{}': {}".format(err_str, args.input))

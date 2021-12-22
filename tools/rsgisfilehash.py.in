@@ -50,29 +50,29 @@ if not os.path.exists(input_file):
     raise Exception("The input file does not exist.")
 
 if args.outhash == 'SHA1':
-    hash = rsgislib.tools.filetools.createSHA1Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_sha1_hash(input_file, args.blocksize)
 elif args.outhash == 'SHA224':
-    hash = rsgislib.tools.filetools.createSHA224Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_sha224_hash(input_file, args.blocksize)
 elif args.outhash == 'SHA256':
-    hash = rsgislib.tools.filetools.createSHA256Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_sha256_hash(input_file, args.blocksize)
 elif args.outhash == 'SHA384':
-    hash = rsgislib.tools.filetools.createSHA384Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_sha384_hash(input_file, args.blocksize)
 elif args.outhash == 'SHA512':
-    hash = rsgislib.tools.filetools.createSHA512Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_sha512_hash(input_file, args.blocksize)
 elif args.outhash == 'MD5':
-    hash = rsgislib.tools.filetools.createMD5Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_md5_hash(input_file, args.blocksize)
 elif args.outhash == 'Blake2B':
-    hash = rsgislib.tools.filetools.createBlake2BHash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_blake2b_hash(input_file, args.blocksize)
 elif args.outhash == 'Blake2S':
-    hash = rsgislib.tools.filetools.createBlake2SHash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_blake2s_hash(input_file, args.blocksize)
 elif args.outhash == 'SHA3_224':
-    hash = rsgislib.tools.filetools.createSHA3_224Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_sha3_224_hash(input_file, args.blocksize)
 elif args.outhash == 'SHA3_256':
-    hash = rsgislib.tools.filetools.createSHA3_256Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_sha3_256_hash(input_file, args.blocksize)
 elif args.outhash == 'SHA3_384':
-    hash = rsgislib.tools.filetools.createSHA3_384Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_sha3_384_hash(input_file, args.blocksize)
 elif args.outhash == 'SHA3_512':
-    hash = rsgislib.tools.filetools.createSHA3_512Hash(input_file, args.blocksize)
+    hash = rsgislib.tools.filetools.create_sha3_512_hash(input_file, args.blocksize)
 else:
     raise Exception("The hash choice is unknown.")
 

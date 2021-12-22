@@ -34,7 +34,7 @@
 #############################################################################
 
 
-import rsgislib.tools
+import rsgislib.tools.visualisation
 import argparse
 
 parser = argparse.ArgumentParser(prog='rsgisimg2webtiles.py', description='''Create a KMZ file of the input image...''')
@@ -50,4 +50,4 @@ parser.add_argument("--xyz", action='store_true', default=False, help='Output th
 # Call the parser to parse the arguments.
 args = parser.parse_args()
 
-rsgislib.tools.createWebTilesImg(args.input, args.output, args.bands, args.zoom, args.resample, args.finite, tms=(not args.xyz))
+rsgislib.tools.visualisation.create_webtiles_img_no_stats_msk(args.input, args.output, args.bands, args.zoom, args.resample, args.finite, tms=(not args.xyz))

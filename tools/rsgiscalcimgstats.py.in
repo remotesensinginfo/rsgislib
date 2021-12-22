@@ -59,14 +59,14 @@ if __name__ == '__main__':
     pyramids = not args.nopyramids        
     
     if args.thematic:
-        clrTab = not args.noclrtab
-        ignoreZeros = False
+        clr_tab = not args.noclrtab
+        ignore_zeros = False
         if args.nodata == 0.0:
-            ignoreZeros = True
+            ignore_zeros = True
         if os.path.splitext(input_img)[1].lower() == "kea":
-            rsgislib.rastergis.pop_rat_img_stats(clumps_img=input_img, add_clr_tab=clrTab, calc_pyramids=pyramids, ignore_zero=ignoreZeros)
+            rsgislib.rastergis.pop_rat_img_stats(clumps_img=input_img, add_clr_tab=clr_tab, calc_pyramids=pyramids, ignore_zero=ignore_zeros)
         else:
-            rsgislib.imageutils.pop_thmt_img_stats(input_img, add_clr_tab=clrTab, calc_pyramids=pyramids, ignore_zero=ignoreZeros)
+            rsgislib.imageutils.pop_thmt_img_stats(input_img, add_clr_tab=clr_tab, calc_pyramids=pyramids, ignore_zero=ignore_zeros)
     else:
         rsgislib.imageutils.pop_img_stats(input_img, use_no_data=True, no_data_val=args.nodata, calc_pyramids=pyramids)
 

@@ -34,7 +34,7 @@
 #############################################################################
 
 
-import rsgislib.tools
+import rsgislib.tools.visualisation
 import argparse
 
 parser = argparse.ArgumentParser(prog='rsgisimg2kmz.py', description='''Create a KMZ file of the input image...''')
@@ -48,5 +48,5 @@ parser.add_argument("-f", "--finite", action='store_true', default=False, help='
 # Call the parser to parse the arguments.
 args = parser.parse_args()
 
-rsgislib.tools.createKMZImg(args.input, args.output, args.bands, args.noproj, args.finite)
+rsgislib.tools.visualisation.create_kmz_img(args.input, args.output, args.bands, args.noproj, args.finite)
 
