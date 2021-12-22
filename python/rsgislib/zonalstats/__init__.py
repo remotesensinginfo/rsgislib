@@ -130,11 +130,11 @@ def calc_zonal_band_stats_file(
     try:
         vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_UPDATE)
         if vecDS is None:
-            raise Exception("Could not open '{}'".format(vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
         vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not open layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
 
         calc_zonal_band_stats(
             vec_lyr_obj,
@@ -222,7 +222,7 @@ def calc_zonal_band_stats(
 
     try:
         if vec_lyr_obj is None:
-            raise Exception("The inputted vector layer was None")
+            raise rsgislib.RSGISPyException("The inputted vector layer was None")
 
         if (
             (min_field is None)
@@ -234,16 +234,16 @@ def calc_zonal_band_stats(
             and (mode_field is None)
             and (median_field is None)
         ):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "At least one field needs to be specified for there is to an output."
             )
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
         if imgDS is None:
-            raise Exception("Could not open '{}'".format(input_img))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
         img_band_obj = imgDS.GetRasterBand(img_band)
         if img_band_obj is None:
-            raise Exception("Could not find image band '{}'".format(img_band))
+            raise rsgislib.RSGISPyException("Could not find image band '{}'".format(img_band))
         imgGeoTrans = imgDS.GetGeoTransform()
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
@@ -262,7 +262,7 @@ def calc_zonal_band_stats(
         if vec_def_epsg is None:
             veclyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
             if veclyr_spatial_ref is None:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Could not retrieve a projection object from the vector layer - "
                     "projection might not be be defined."
                 )
@@ -275,7 +275,7 @@ def calc_zonal_band_stats(
         if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Inputted raster and vector layers have different "
                 "projections: ('{0}' '{1}') ".format("Vector Layer Provided", input_img)
             )
@@ -542,11 +542,11 @@ def calc_zonal_poly_pts_band_stats_file(
     try:
         vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_UPDATE)
         if vecDS is None:
-            raise Exception("Could not open '{}'".format(vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
         vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not open layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
 
         calc_zonal_poly_pts_band_stats(
             vec_lyr_obj, input_img, img_band, out_field, vec_def_epsg
@@ -582,14 +582,14 @@ def calc_zonal_poly_pts_band_stats(
     """
     try:
         if vec_lyr_obj is None:
-            raise Exception("The inputted vector layer was None")
+            raise rsgislib.RSGISPyException("The inputted vector layer was None")
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
         if imgDS is None:
-            raise Exception("Could not open '{}'".format(input_img))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
         img_band_obj = imgDS.GetRasterBand(img_band)
         if img_band_obj is None:
-            raise Exception("Could not find image band '{}'".format(img_band))
+            raise rsgislib.RSGISPyException("Could not find image band '{}'".format(img_band))
         imgGeoTrans = imgDS.GetGeoTransform()
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
@@ -605,7 +605,7 @@ def calc_zonal_poly_pts_band_stats(
         if vec_def_epsg is None:
             veclyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
             if veclyr_spatial_ref is None:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Could not retrieve a projection object from the vector layer - "
                     "projection not might be be defined."
                 )
@@ -616,7 +616,7 @@ def calc_zonal_poly_pts_band_stats(
         if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Inputted raster and vector layers have different "
                 "projections: ('{0}' '{1}') ".format("Vector Layer Provided", input_img)
             )
@@ -835,11 +835,11 @@ def calc_zonal_band_stats_test_poly_pts_file(
     try:
         vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_UPDATE)
         if vecDS is None:
-            raise Exception("Could not open '{}'".format(vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
         vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not open layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
 
         calc_zonal_band_stats_test_poly_pts(
             vec_lyr_obj,
@@ -939,7 +939,7 @@ def calc_zonal_band_stats_test_poly_pts(
 
     try:
         if vec_lyr_obj is None:
-            raise Exception("The inputted vector layer was None")
+            raise rsgislib.RSGISPyException("The inputted vector layer was None")
 
         if (
             (min_field is None)
@@ -952,16 +952,16 @@ def calc_zonal_band_stats_test_poly_pts(
             and (median_field is None)
             and (percentile_field is None)
         ):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "At least one field needs to be specified for there is to an output."
             )
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
         if imgDS is None:
-            raise Exception("Could not open '{}'".format(input_img))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
         img_band_obj = imgDS.GetRasterBand(img_band)
         if img_band_obj is None:
-            raise Exception("Could not find image band '{}'".format(img_band))
+            raise rsgislib.RSGISPyException("Could not find image band '{}'".format(img_band))
         imgGeoTrans = imgDS.GetGeoTransform()
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
@@ -979,7 +979,7 @@ def calc_zonal_band_stats_test_poly_pts(
         if vec_def_epsg is None:
             veclyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
             if veclyr_spatial_ref is None:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Could not retrieve a projection object from the vector "
                     "layer - projection might be be defined."
                 )
@@ -992,7 +992,7 @@ def calc_zonal_band_stats_test_poly_pts(
         if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Inputted raster and vector layers have different "
                 "projections: ('{0}' '{1}') ".format("Vector Layer Provided", input_img)
             )
@@ -1353,11 +1353,11 @@ def ext_point_band_values_file(
     try:
         vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_UPDATE)
         if vecDS is None:
-            raise Exception("Could not open '{}'".format(vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
         vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not open layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
 
         ext_point_band_values(
             vec_lyr_obj,
@@ -1419,26 +1419,26 @@ def ext_point_band_values(
 
     try:
         if vec_lyr_obj is None:
-            raise Exception("The inputted vector layer was None")
+            raise rsgislib.RSGISPyException("The inputted vector layer was None")
 
         if out_field is None:
-            raise Exception("Output field specified as none, a name needs to be given.")
+            raise rsgislib.RSGISPyException("Output field specified as none, a name needs to be given.")
         elif out_field == "":
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Output field specified as an empty string, a name needs to be given."
             )
 
         veclyrDefn = vec_lyr_obj.GetLayerDefn()
         lyr_geom_type = ogr.GeometryTypeToName(veclyrDefn.GetGeomType())
         if lyr_geom_type.lower() != "point":
-            raise Exception("The layer geometry type must be point.")
+            raise rsgislib.RSGISPyException("The layer geometry type must be point.")
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
         if imgDS is None:
-            raise Exception("Could not open '{}'".format(input_img))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
         img_band_obj = imgDS.GetRasterBand(img_band)
         if img_band_obj is None:
-            raise Exception("Could not find image band '{}'".format(img_band))
+            raise rsgislib.RSGISPyException("Could not find image band '{}'".format(img_band))
         imgGeoTrans = imgDS.GetGeoTransform()
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
@@ -1458,7 +1458,7 @@ def ext_point_band_values(
         if vec_def_epsg is None:
             veclyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
             if veclyr_spatial_ref is None:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Could not retrieve a projection object from the "
                     "vector layer - projection might be be defined."
                 )
@@ -1472,7 +1472,7 @@ def ext_point_band_values(
             if reproj_vec:
                 pt_reprj = True
             else:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Input vector and image datasets are in different "
                     "projections (EPSG:{} / EPSG:{})."
                     "You can select option to reproject.".format(
@@ -1929,7 +1929,7 @@ def split_sample_chip_hdf5_file(
     f.close()
 
     if sample_size > n_rows:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The requested sample is larger than the number samples in the input file."
         )
 
@@ -2145,7 +2145,7 @@ def extract_ref_chip_zone_image_band_values_to_hdf(
         datatype = rsgislib.TYPE_32FLOAT
 
     if (chip_size % 2) != 0:
-        raise Exception("The chip size must be an even number.")
+        raise rsgislib.RSGISPyException("The chip size must be an even number.")
 
     chipHSize = math.floor(chip_size / 2)
 
@@ -2390,7 +2390,7 @@ def split_sample_ref_chip_hdf5_file(
     f.close()
 
     if sample_size > n_rows:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The requested sample is larger than the number samples in the input file."
         )
 

@@ -103,7 +103,7 @@ def create_img_extent_lut(
         if epsgCodeTmp is None:
             epsg_found = False
             if not ignore_none_imgs:
-                raise Exception("The EPSG code is None: '{}'".format(img))
+                raise rsgislib.RSGISPyException("The EPSG code is None: '{}'".format(img))
         if epsg_found:
             if out_proj_wgs84:
                 epsgCode = 4326
@@ -115,7 +115,7 @@ def create_img_extent_lut(
                     first = False
                 else:
                     if epsgCodeTmp != epsgCode:
-                        raise Exception(
+                        raise rsgislib.RSGISPyException(
                             "The EPSG codes ({0} & {1}) do not match. "
                             "(Base: '{2}', Img: '{3}')".format(
                                 epsgCode, epsgCodeTmp, baseImg, img

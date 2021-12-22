@@ -184,7 +184,7 @@ def get_rsgislib_version() -> str:
             import subprocess
 
             out = subprocess.run(
-                ["rsgis-config", "--version"], capture_output=True, text=True
+                ["rsgis-config", "--version"], capture_output=True, text=True, check=True,
             )
             version_str = out.stdout
             version_str = version_str.split("\n")[0]
@@ -344,7 +344,7 @@ def get_numpy_datatype(rsgislib_datatype: int) -> int:
     elif rsgislib_datatype == TYPE_64FLOAT:
         numpy_dt = numpy.float64
     else:
-        raise Exception("Datatype was not recognised.")
+        raise RSGISPyException("Datatype was not recognised.")
     return numpy_dt
 
 
@@ -379,7 +379,7 @@ def get_numpy_char_codes_datatype(rsgislib_datatype: int) -> str:
     elif rsgislib_datatype == TYPE_64FLOAT:
         numpy_dt = numpy.dtype(numpy.float64).char
     else:
-        raise Exception("Datatype was not recognised.")
+        raise RSGISPyException("Datatype was not recognised.")
     return numpy_dt
 
 

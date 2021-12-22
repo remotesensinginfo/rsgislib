@@ -88,7 +88,7 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
     file_lst = ds_in_vec.GetFileList()
     for cfile in file_lst:
         if feedback:
@@ -131,13 +131,13 @@ def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None) -> str:
     """
     dataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if dataset is None:
-        raise Exception("Could not open file: {}".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open file: {}".format(vec_file))
     if vec_lyr is None:
         layer = dataset.GetLayer()
     else:
         layer = dataset.GetLayer(vec_lyr)
     if layer is None:
-        raise Exception("Could not open layer within file: {}".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open layer within file: {}".format(vec_file))
     spatialRef = layer.GetSpatialRef()
     return spatialRef.ExportToWkt()
 
@@ -154,13 +154,13 @@ def get_proj_epsg_from_vec(vec_file: str, vec_lyr: str = None) -> int:
     """
     dataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if dataset is None:
-        raise Exception("Could not open file: {}".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open file: {}".format(vec_file))
     if vec_lyr is None:
         layer = dataset.GetLayer()
     else:
         layer = dataset.GetLayer(vec_lyr)
     if layer is None:
-        raise Exception("Could not open layer within file: {}".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open layer within file: {}".format(vec_file))
     spatialRef = layer.GetSpatialRef()
     spatialRef.AutoIdentifyEPSG()
     epsg_str = spatialRef.GetAuthorityCode(None)
@@ -192,7 +192,7 @@ def get_vec_feat_count(
     else:
         inLayer = inDataSource.GetLayer()
     if inLayer is None:
-        raise Exception("Check layer name as did not open layer.")
+        raise rsgislib.RSGISPyException("Check layer name as did not open layer.")
     nFeats = inLayer.GetFeatureCount(compute_count)
     return nFeats
 
@@ -209,6 +209,9 @@ def merge_vectors_to_gpkg(
     :param out_vec_lyr: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
     :param exists: boolean which specifies whether the database file exists or not.
     """
+    import rsgislib.tools.filetools
+    if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_vec_file):
+        rsgislib.RSGISPyException(f"Output file path is not creatable: {out_vec_file}")
     first = True
     for inFile in in_vec_files:
         nFeat = get_vec_feat_count(inFile)
@@ -228,9 +231,9 @@ def merge_vectors_to_gpkg(
                         inFile,
                     ]
                     try:
-                        subprocess.run(cmd)
+                        subprocess.run(cmd, check=True)
                     except OSError as e:
-                        raise Exception("Error running ogr2ogr: {}".format(cmd))
+                        raise rsgislib.RSGISPyException("Error running ogr2ogr: {}".format(cmd))
                 else:
                     cmd = [
                         "ogr2ogr",
@@ -245,9 +248,9 @@ def merge_vectors_to_gpkg(
                         inFile,
                     ]
                     try:
-                        subprocess.run(cmd)
+                        subprocess.run(cmd, check=True)
                     except OSError as e:
-                        raise Exception("Error running ogr2ogr: {}".format(cmd))
+                        raise rsgislib.RSGISPyException("Error running ogr2ogr: {}".format(cmd))
                 first = False
             else:
                 cmd = [
@@ -262,9 +265,9 @@ def merge_vectors_to_gpkg(
                     inFile,
                 ]
                 try:
-                    subprocess.run(cmd)
+                    subprocess.run(cmd, check=True)
                 except OSError as e:
-                    raise Exception("Error running ogr2ogr: {}".format(cmd))
+                    raise rsgislib.RSGISPyException("Error running ogr2ogr: {}".format(cmd))
 
 
 def merge_vector_lyrs_to_gpkg(
@@ -283,6 +286,10 @@ def merge_vector_lyrs_to_gpkg(
                         to the same database).
     :param exists: boolean which specifies whether the database file exists or not.
     """
+    import rsgislib.tools.filetools
+    if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_vec_file):
+        rsgislib.RSGISPyException(f"Output file path is not creatable: {out_vec_file}")
+
     lyrs = get_vec_lyrs_lst(vec_file)
     first = True
     for lyr in lyrs:
@@ -304,9 +311,9 @@ def merge_vector_lyrs_to_gpkg(
                         lyr,
                     ]
                     try:
-                        subprocess.run(cmd)
+                        subprocess.run(cmd, check=True)
                     except OSError as e:
-                        raise Exception("Error running ogr2ogr: {}".format(cmd))
+                        raise rsgislib.RSGISPyException("Error running ogr2ogr: {}".format(cmd))
                 else:
                     cmd = [
                         "ogr2ogr",
@@ -322,9 +329,9 @@ def merge_vector_lyrs_to_gpkg(
                         lyr,
                     ]
                     try:
-                        subprocess.run(cmd)
+                        subprocess.run(cmd, check=True)
                     except OSError as e:
-                        raise Exception("Error running ogr2ogr: {}".format(cmd))
+                        raise rsgislib.RSGISPyException("Error running ogr2ogr: {}".format(cmd))
                 first = False
             else:
                 cmd = [
@@ -340,9 +347,9 @@ def merge_vector_lyrs_to_gpkg(
                     lyr,
                 ]
                 try:
-                    subprocess.run(cmd)
+                    subprocess.run(cmd, check=True)
                 except OSError as e:
-                    raise Exception("Error running ogr2ogr: {}".format(cmd))
+                    raise rsgislib.RSGISPyException("Error running ogr2ogr: {}".format(cmd))
 
 
 def merge_vectors_to_gpkg_ind_lyrs(
@@ -368,6 +375,9 @@ def merge_vectors_to_gpkg_ind_lyrs(
 
     """
     import rsgislib.tools.utils
+    import rsgislib.tools.filetools
+    if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_vec_file):
+        rsgislib.RSGISPyException(f"Output file path is not creatable: {out_vec_file}")
 
     if geom_type is not None:
         if geom_type not in [
@@ -396,7 +406,7 @@ def merge_vectors_to_gpkg_ind_lyrs(
                 if rename_dup_lyrs:
                     out_lyr = "{}_{}".format(lyr, rsgislib.tools.utils.uid_generator())
                 else:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "Input files have layers with the "
                         "same name, these will be over written."
                     )
@@ -437,9 +447,9 @@ def merge_vectors_to_gpkg_ind_lyrs(
                     ]
                 print(cmd)
                 try:
-                    subprocess.run(cmd)
+                    subprocess.run(cmd, check=True)
                 except OSError as e:
-                    raise Exception("Error running ogr2ogr: {}".format(cmd))
+                    raise rsgislib.RSGISPyException("Error running ogr2ogr: {}".format(cmd))
                 out_lyr_names.append(out_lyr)
 
 
@@ -635,7 +645,7 @@ def reproj_vector_layer(
     # get the input layer
     inDataSet = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if inDataSet is None:
-        raise Exception("Failed to open input vector file: {}".format(vec_file))
+        raise rsgislib.RSGISPyException("Failed to open input vector file: {}".format(vec_file))
     if vec_lyr is None:
         inLayer = inDataSet.GetLayer()
     else:
@@ -664,7 +674,7 @@ def reproj_vector_layer(
             if del_exist_vec:
                 driver.DeleteDataSource(out_vec_file)
             else:
-                raise Exception("Output shapefile already exists - stopping.")
+                raise rsgislib.RSGISPyException("Output shapefile already exists - stopping.")
             outDataSet = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
         else:
             outDataSet = gdal.OpenEx(out_vec_file, gdal.OF_UPDATE)
@@ -791,12 +801,12 @@ def reproj_vec_lyr_obj(
     # Create shapefile driver
     driver = ogr.GetDriverByName(out_format)
     if driver == None:
-        raise Exception("Driver has not be recognised.")
+        raise rsgislib.RSGISPyException("Driver has not be recognised.")
 
     # create the output layer
     result_ds = driver.CreateDataSource(out_vec_file)
     if result_ds == None:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The output vector data source was not created: {}".format(out_vec_file)
         )
     if out_vec_lyr == None:
@@ -842,7 +852,7 @@ def reproj_vec_lyr_obj(
             # reproject the geometry
             trans_err_code = geom.Transform(coord_trans)
             if trans_err_code != ogr.OGRERR_NONE:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Geometry transformation failed... Error Code: {}".format(
                         trans_err_code
                     )
@@ -900,19 +910,19 @@ def get_att_lst_select_feats(
     try:
         dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if dsVecFile is None:
-            raise Exception("Could not open '" + vec_file + "'")
+            raise rsgislib.RSGISPyException("Could not open '" + vec_file + "'")
 
         vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not find layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
         dsSelVecFile = gdal.OpenEx(vec_sel_file, gdal.OF_READONLY)
         if dsSelVecFile is None:
-            raise Exception("Could not open '" + vec_sel_file + "'")
+            raise rsgislib.RSGISPyException("Could not open '" + vec_sel_file + "'")
 
         lyrSelVecObj = dsSelVecFile.GetLayerByName(vec_sel_lyr)
         if lyrSelVecObj is None:
-            raise Exception("Could not find layer '" + vec_sel_lyr + "'")
+            raise rsgislib.RSGISPyException("Could not find layer '" + vec_sel_lyr + "'")
 
         lyrDefn = vec_lyr_obj.GetLayerDefn()
         feat_idxs = dict()
@@ -932,7 +942,7 @@ def get_att_lst_select_feats(
             if not found_atts[attName]:
                 dsSelVecFile = None
                 dsVecFile = None
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Could not find the attribute ({}) specified within "
                     "the vector layer.".format(attName)
                 )
@@ -998,10 +1008,10 @@ def get_att_lst_select_feats_lyr_objs(
     att_vals = []
     try:
         if vec_lyr_obj is None:
-            raise Exception("The vector layer passed into the function was None.")
+            raise rsgislib.RSGISPyException("The vector layer passed into the function was None.")
 
         if vec_sel_lyr_obj is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The select vector layer passed into the function was None."
             )
 
@@ -1021,7 +1031,7 @@ def get_att_lst_select_feats_lyr_objs(
 
         for attName in att_names:
             if not found_atts[attName]:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Could not find the attribute ({}) specified within "
                     "the vector layer.".format(attName)
                 )
@@ -1081,11 +1091,11 @@ def get_att_lst_select_bbox_feats(
     """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
     outvals = get_att_lst_select_bbox_feats_lyr_objs(
         vec_lyr_obj, att_names, bbox, bbox_epsg
@@ -1113,7 +1123,7 @@ def get_att_lst_select_bbox_feats_lyr_objs(
     outvals = []
     try:
         if vec_lyr_obj is None:
-            raise Exception("The vector layer passed into the function was None.")
+            raise rsgislib.RSGISPyException("The vector layer passed into the function was None.")
 
         in_vec_lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
         if bbox_epsg is not None:
@@ -1123,7 +1133,7 @@ def get_att_lst_select_bbox_feats_lyr_objs(
             if (in_vec_lyr_epsg is not None) and (
                 int(in_vec_lyr_epsg) != int(bbox_epsg)
             ):
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "The EPSG codes for the BBOX and input vector "
                     "layer are not the same."
                 )
@@ -1144,7 +1154,7 @@ def get_att_lst_select_bbox_feats_lyr_objs(
 
         for attName in att_names:
             if not found_atts[attName]:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Could not find the attribute ({}) specified within "
                     "the vector layer.".format(attName)
                 )
@@ -1235,21 +1245,21 @@ def select_intersect_feats(
 
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
     in_vec_lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
 
     dsROIVecFile = gdal.OpenEx(vec_roi_file, gdal.OF_READONLY)
     if dsROIVecFile is None:
-        raise Exception("Could not open '" + vec_roi_file + "'")
+        raise rsgislib.RSGISPyException("Could not open '" + vec_roi_file + "'")
 
     lyrROIVecObj = dsROIVecFile.GetLayerByName(vec_roi_lyr)
     if lyrROIVecObj is None:
-        raise Exception("Could not find layer '" + vec_roi_lyr + "'")
+        raise rsgislib.RSGISPyException("Could not find layer '" + vec_roi_lyr + "'")
 
     lyrDefn = vec_lyr_obj.GetLayerDefn()
 
@@ -1299,11 +1309,11 @@ def export_spatial_select_feats(
     try:
         dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if dsVecFile is None:
-            raise Exception("Could not open '{}'".format(vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
         vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not find layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
         lyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
 
@@ -1322,11 +1332,11 @@ def export_spatial_select_feats(
 
         dsSelVecFile = gdal.OpenEx(vec_sel_file, gdal.OF_READONLY)
         if dsSelVecFile is None:
-            raise Exception("Could not open '" + vec_sel_file + "'")
+            raise rsgislib.RSGISPyException("Could not open '" + vec_sel_file + "'")
 
         lyrSelVecObj = dsSelVecFile.GetLayerByName(vec_sel_lyr)
         if lyrSelVecObj is None:
-            raise Exception("Could not find layer '" + vec_sel_lyr + "'")
+            raise rsgislib.RSGISPyException("Could not find layer '" + vec_sel_lyr + "'")
 
         geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
         for feat in lyrSelVecObj:
@@ -1387,11 +1397,11 @@ def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> list[str]:
 
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
     lyrDefn = vec_lyr_obj.GetLayerDefn()
     for i in range(lyrDefn.GetFieldCount()):
@@ -1415,7 +1425,7 @@ def subset_envs_vec_lyr_obj(
     """
 
     if vec_lyr_obj is None:
-        raise Exception("Vector layer object which was provided was None.")
+        raise rsgislib.RSGISPyException("Vector layer object which was provided was None.")
 
     if epsg is not None:
         lyr_spatial_ref = osr.SpatialReference()
@@ -1423,7 +1433,7 @@ def subset_envs_vec_lyr_obj(
     else:
         lyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
     if lyr_spatial_ref is None:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The spatial reference for the layer is None - please provide EPSG code."
         )
     lyrDefn = vec_lyr_obj.GetLayerDefn()
@@ -1550,11 +1560,11 @@ def read_vec_lyr_to_mem(vec_file: str, vec_lyr: str) -> (ogr.DataSource, ogr.Lay
     try:
         vecDS = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if vecDS is None:
-            raise Exception("Could not open '{}'".format(vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
         vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not find layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
         mem_driver = ogr.GetDriverByName("MEMORY")
 
@@ -1588,16 +1598,16 @@ def open_gdal_vec_lyr(
     else:
         vec_obj_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_UPDATE)
     if vec_obj_ds is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     if vec_lyr == None:
         lyr_obj = vec_obj_ds.GetLayer()
         if lyr_obj is None:
-            raise Exception("Could not find a layer.")
+            raise rsgislib.RSGISPyException("Could not find a layer.")
     else:
         lyr_obj = vec_obj_ds.GetLayerByName(vec_lyr)
         if lyr_obj is None:
-            raise Exception("Could not find layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
     return vec_obj_ds, lyr_obj
 
@@ -1619,11 +1629,11 @@ def get_mem_vec_lyr_subset(
     try:
         dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if dsVecFile is None:
-            raise Exception("Could not open '{}'".format(vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
         vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not find layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
         mem_result_ds, mem_result_lyr = subset_envs_vec_lyr_obj(vec_lyr_obj, bbox)
 
@@ -1666,7 +1676,7 @@ def write_vec_lyr_to_file(
             vecDS = outdriver.CreateDataSource(out_vec_file)
 
         if vecDS is None:
-            raise Exception("Could not open or create '{}'".format(out_vec_file))
+            raise rsgislib.RSGISPyException("Could not open or create '{}'".format(out_vec_file))
 
         vecDS_lyr = vecDS.CopyLayer(vec_lyr_obj, out_vec_lyr, options)
         vecDS = None
@@ -1731,7 +1741,7 @@ def get_ogr_vec_col_datatype_from_gdal_rat_col_datatype(rat_datatype: int) -> in
     elif rat_datatype == gdal.GFT_String:
         rtn_type = ogr.OFTString
     else:
-        raise Exception("Do not recognise inputted datatype")
+        raise rsgislib.RSGISPyException("Do not recognise inputted datatype")
     return rtn_type
 
 
@@ -1771,7 +1781,7 @@ def copy_rat_cols_to_vector_lyr(
         out_col_names = ratcols
     else:
         if len(out_col_names) != len(ratcols):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output columns names list is not the same length ({}) as "
                 "the length of the RAT columns list ({}) - they must be "
                 "the same.".format(len(out_col_names), len(ratcols))
@@ -1779,34 +1789,34 @@ def copy_rat_cols_to_vector_lyr(
 
     if out_col_types is not None:
         if len(out_col_names) == len(out_col_types):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Either specify the column types as None or the length of the "
                 "list needs to be the same as the number output columns."
             )
 
     if not os.path.exists(vec_file):
-        raise Exception("Input vector does not exist, check path: {}".format(vec_file))
+        raise rsgislib.RSGISPyException("Input vector does not exist, check path: {}".format(vec_file))
 
     clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
     if clumps_img_ds is None:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Could not open the inputted clumps image: {}".format(clumps_img)
         )
 
     vecDS = gdal.OpenEx(vec_file, gdal.GA_Update)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_file))
 
     rat_cols_all = rsgislib.rastergis.get_rat_columns_info(clumps_img)
 
     cols_exist = []
     for ratcol in ratcols:
         if ratcol not in rat_cols_all:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Column '{}' is not within the clumps image: {}".format(
                     ratcol, clumps_img
                 )
@@ -1828,7 +1838,7 @@ def copy_rat_cols_to_vector_lyr(
             rat_row_col_exists = True
             break
     if not rat_row_col_exists:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Could not find column '{}' within the vector layers.".format(rat_row_col)
         )
 
@@ -1845,7 +1855,7 @@ def copy_rat_cols_to_vector_lyr(
         if not cols_exist[col_n]:
             field_defn = ogr.FieldDefn(att_column, out_col_types[col_n])
             if vec_lyr_obj.CreateField(field_defn) != 0:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Creating '{}' field failed; becareful with case, some drivers "
                     "are case insensitive but column might not be found.".format(
                         att_column
@@ -1948,9 +1958,9 @@ def perform_spatial_join(
     import geopandas
 
     if join_how not in ["left", "right", "inner"]:
-        raise Exception("The join_how specified is not valid.")
+        raise rsgislib.RSGISPyException("The join_how specified is not valid.")
     if join_op not in ["intersects", "within", "contains"]:
-        raise Exception("The join_op specified is not valid.")
+        raise rsgislib.RSGISPyException("The join_op specified is not valid.")
 
     # Try importing rtree to provide useful error message as
     # will be used in sjoin but if not present
@@ -2160,7 +2170,7 @@ def vector_translate(
 
     if access_mode is not None:
         if access_mode not in ["update", "append", "overwrite"]:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "access_mode must be one of: [None (creation), "
                 "'update', 'append', 'overwrite']"
             )
@@ -2253,7 +2263,7 @@ def reproj_wgs84_vec_to_utm(
         if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -2360,7 +2370,7 @@ def spatial_select(
         else:
             base_gpdf.to_file(out_vec_file, driver=out_format)
     else:
-        raise Exception("No output file as no features intersect.")
+        raise rsgislib.RSGISPyException("No output file as no features intersect.")
 
 
 def split_by_attribute(
@@ -2403,13 +2413,13 @@ def split_by_attribute(
 
     if multi_layers:
         if out_vec_file is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "If a multiple layer output is specified then an output "
                 "file needs to be specified to which the layer need to be added."
             )
     if not multi_layers:
         if (out_file_path is None) or (out_file_ext is None):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "If a single layer output is specified then an output file path "
                 "and file extention needs to be specified."
             )
@@ -2488,7 +2498,7 @@ def subset_by_attribute(
 
     match_type = match_type.lower()
     if match_type not in ["equals", "contains", "start"]:
-        raise Exception("The match_type must be either 'equals', 'contains' or 'start'")
+        raise rsgislib.RSGISPyException("The match_type must be either 'equals', 'contains' or 'start'")
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
@@ -2502,7 +2512,7 @@ def subset_by_attribute(
         elif match_type == "start":
             tmp_gpdf = base_gpdf[base_gpdf[sub_col].str.match(val, na=False)]
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The match_type must be either 'equals', 'contains' or 'start'"
             )
 
@@ -2518,7 +2528,7 @@ def subset_by_attribute(
         else:
             out_gpdf.to_file(out_vec_file, driver=out_format)
     else:
-        raise Exception("No output file as no features selected.")
+        raise rsgislib.RSGISPyException("No output file as no features selected.")
 
 
 def merge_vector_files(
@@ -2562,7 +2572,7 @@ def merge_vector_files(
     if not first:
         if out_format == "GPKG":
             if out_vec_lyr is None:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "If output format is GPKG then an output layer is required."
                 )
             data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
@@ -2613,14 +2623,14 @@ def merge_vector_layers(
 
                 data_gdf = data_gdf.append(tmp_data_gdf)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The inputs should be a list of dicts with keys 'file' and 'layer'."
             )
 
     if not first:
         if out_format == "GPKG":
             if out_vec_lyr is None:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "If output format is GPKG then an output layer is required."
                 )
             data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
@@ -2791,7 +2801,7 @@ def merge_utm_vecs_wgs84(
             install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_north.gpkg"
         )
         if n_hemi_utm_file is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "An input is needed for n_hemi_utm_file. The RSGISLib "
                 "installed version was not be found."
             )
@@ -2802,7 +2812,7 @@ def merge_utm_vecs_wgs84(
             install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_south.gpkg"
         )
         if s_hemi_utm_file is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "An input is needed for s_hemi_utm_file. The RSGISLib "
                 "installed version was not be found."
             )
@@ -2868,7 +2878,7 @@ def merge_utm_vecs_wgs84(
     if not first:
         if out_format == "GPKG":
             if out_vec_lyr is None:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "If output format is GPKG then an output layer is required."
                 )
             out_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)

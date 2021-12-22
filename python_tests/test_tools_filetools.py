@@ -55,6 +55,62 @@ def test_get_file_basename_check_valid_2():
     )
 
 
+def test_is_path_valid_true():
+    import rsgislib.tools.filetools
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    assert rsgislib.tools.filetools.is_path_valid(input_img)
+
+
+def test_is_path_valid_false(tmp_path):
+    import rsgislib.tools.filetools
+
+    input_file = os.path.join(tmp_path, "sen2_20210527_aber\x00.kea")
+    assert not rsgislib.tools.filetools.is_path_valid(input_file)
+
+
+def test_is_path_sibling_creatable_true(tmp_path):
+    import rsgislib.tools.filetools
+
+    input_file = os.path.join(tmp_path, "sen2_20210527_aber.kea")
+    assert rsgislib.tools.filetools.is_path_sibling_creatable(input_file)
+
+
+def test_is_path_sibling_creatable_false(tmp_path):
+    import rsgislib.tools.filetools
+
+    input_file = os.path.join(tmp_path, "hello", "world", "sen2_20210527_aber.kea")
+    assert not rsgislib.tools.filetools.is_path_sibling_creatable(input_file)
+
+
+def test_does_path_exists_or_creatable_true(tmp_path):
+    import rsgislib.tools.filetools
+
+    input_file = os.path.join(tmp_path, "sen2_20210527_aber.kea")
+    assert rsgislib.tools.filetools.does_path_exists_or_creatable(input_file)
+
+
+def test_does_path_exists_or_creatable_false_file_name(tmp_path):
+    import rsgislib.tools.filetools
+
+    input_file = os.path.join(tmp_path, "sen2_20210527_aber\x00.kea")
+    assert not rsgislib.tools.filetools.does_path_exists_or_creatable(input_file)
+
+
+def test_does_path_exists_or_creatable_false_path(tmp_path):
+    import rsgislib.tools.filetools
+
+    input_file = os.path.join(tmp_path, "hello", "world", "sen2_20210527_aber.kea")
+    assert not rsgislib.tools.filetools.does_path_exists_or_creatable(input_file)
+
+
+def test_does_path_exists_or_creatable_false_path_and_name(tmp_path):
+    import rsgislib.tools.filetools
+
+    input_file = os.path.join(tmp_path, "hello", "world", "sen2_20210527_aber\x00.kea")
+    assert not rsgislib.tools.filetools.does_path_exists_or_creatable(input_file)
+
+
 def test_get_file_size_bytes():
     import rsgislib.tools.filetools
 

@@ -35,11 +35,11 @@ def imblearn_h5_io_smplr(
     h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     if cls_in_info.keys() != cls_out_info.keys():
-        raise Exception("The dict keys for the input and output info do not match.")
+        raise rsgislib.RSGISPyException("The dict keys for the input and output info do not match.")
 
     for key in cls_in_info:
         if cls_in_info[key].id != cls_out_info[key].id:
-            raise Exception("The input and output class IDs don't match!")
+            raise rsgislib.RSGISPyException("The input and output class IDs don't match!")
 
     first = True
     numVars = 0

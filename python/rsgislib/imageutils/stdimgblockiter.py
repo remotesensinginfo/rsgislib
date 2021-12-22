@@ -59,14 +59,14 @@ class StdImgBlockIter:
                 img.file_name, gdal.GA_ReadOnly
             )
             if self.img_info[img.name]["dataset"] is None:
-                raise Exception("Could not open image file: {}".format(img.file_name))
+                raise rsgislib.RSGISPyException("Could not open image file: {}".format(img.file_name))
             self.img_info[img.name]["bands"] = dict()
             for band in img.bands:
                 self.img_info[img.name]["bands"][band] = self.img_info[img.name][
                     "dataset"
                 ].GetRasterBand(band)
                 if self.img_info[img.name]["bands"][band] is None:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "Could not open band {} within image {}".format(
                             band, img.file_name
                         )
@@ -137,7 +137,7 @@ class StdImgBlockIter:
                 "epsg"
             ] = rsgislib.imageutils.get_epsg_proj_from_img(img.file_name)
             if self.img_info[img.name]["epsg"] is None:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "The input image ({}) does not have a "
                     "defined projection - please correct.".format(img.file_name)
                 )
@@ -145,7 +145,7 @@ class StdImgBlockIter:
                 self.img_epsg = self.img_info[img.name]["epsg"]
             else:
                 if self.img_epsg != self.img_info[img.name]["epsg"]:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "The input images have different input "
                         "projections: EPSG:{} != EPSG:{}".format(
                             self.img_epsg, self.img_info[img.name]["epsg"]
@@ -158,7 +158,7 @@ class StdImgBlockIter:
                 if (self.img_pxl_res[0] != self.img_info[img.name]["res"][0]) and (
                     self.img_pxl_res[1] != self.img_info[img.name]["res"][1]
                 ):
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "The input images have different "
                         "input image resolutions: {} != {}".format(
                             self.img_pxl_res, self.img_info[img.name]["res"]
@@ -197,9 +197,9 @@ class StdImgBlockIter:
                     - self.img_info[img.name]["pxl_bbox"][3]
                 )
                 if self.overlap_width != overlap_width_tmp:
-                    raise Exception("The image widths do not match.")
+                    raise rsgislib.RSGISPyException("The image widths do not match.")
                 if self.overlap_height != overlap_height_tmp:
-                    raise Exception("The image height do not match.")
+                    raise rsgislib.RSGISPyException("The image height do not match.")
 
     def __iter__(self):
         """
@@ -302,13 +302,13 @@ class StdImgBlockIter:
             int(self.img_epsg)
         )
         if out_wkt_str is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Did not have a projection string for the EPSG code: {}".format(
                     self.img_epsg
                 )
             )
         if math.fabs(self.img_pxl_res[0]) != math.fabs(self.img_pxl_res[1]):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Currently limited to only outputting images with square pixels."
             )
         out_img_res = math.fabs(self.img_pxl_res[0])
@@ -332,7 +332,7 @@ class StdImgBlockIter:
                 img.file_name, gdal.GA_Update
             )
             if self.out_imgs_objs[img.name]["dataset"] is None:
-                raise Exception("Could not open image file: {}".format(img.file_name))
+                raise rsgislib.RSGISPyException("Could not open image file: {}".format(img.file_name))
             self.out_imgs_objs[img.name]["nbands"] = img.nbands
             self.out_imgs_objs[img.name]["bands"] = dict()
             for band in range(img.nbands):
@@ -340,7 +340,7 @@ class StdImgBlockIter:
                     img.name
                 ]["dataset"].GetRasterBand(band + 1)
                 if self.out_imgs_objs[img.name]["bands"][band + 1] is None:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "Could not open band {} within image {}".format(
                             band + 1, img.file_name
                         )
@@ -379,7 +379,7 @@ class StdImgBlockIter:
             if img in self.out_imgs_objs:
                 block_shp = img_blocks[img].shape
                 if block_shp[0] != self.out_imgs_objs[img]["nbands"]:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "The number of image bands in the output file "
                         "and returned data block do not match "
                         "(block:{}; image:{})".format(
@@ -389,7 +389,7 @@ class StdImgBlockIter:
                 if (block_shp[1] != self.block_size) and (
                     block_shp[2] != self.block_size
                 ):
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "The block size is either not square or the "
                         "same size as the size expected (block: {} x {}; "
                         "parameterised block: {}).".format(

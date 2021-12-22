@@ -155,15 +155,15 @@ def get_rat_length(clumps_img: str, rat_band: int = 1) -> int:
     # Open input image file
     clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
     if clumps_img_ds is None:
-        raise Exception("Could not open the inputted clumps image.")
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image.")
 
     clumps_img_band = clumps_img_ds.GetRasterBand(rat_band)
     if clumps_img_band is None:
-        raise Exception("Could not open the inputted clumps image band.")
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band.")
 
     clumps_img_rat = clumps_img_band.GetDefaultRAT()
     if clumps_img_rat is None:
-        raise Exception("Could not open the inputted clumps image band RAT.")
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band RAT.")
 
     nrows = clumps_img_rat.GetRowCount()
 
@@ -183,15 +183,15 @@ def get_rat_columns(clumps_img: str, rat_band: int = 1) -> list[str]:
     # Open input image file
     clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
     if clumps_img_ds is None:
-        raise Exception("Could not open the inputted clumps image.")
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image.")
 
     clumps_img_band = clumps_img_ds.GetRasterBand(rat_band)
     if clumps_img_band is None:
-        raise Exception("Could not open the inputted clumps image band.")
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band.")
 
     clumps_img_rat = clumps_img_band.GetDefaultRAT()
     if clumps_img_rat is None:
-        raise Exception("Could not open the inputted clumps image band RAT.")
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band RAT.")
 
     ncols = clumps_img_rat.GetColumnCount()
     col_names = []
@@ -216,15 +216,15 @@ def get_rat_columns_info(clumps_img: str, rat_band: int = 1):
     # Open input image file
     clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
     if clumps_img_ds is None:
-        raise Exception("Could not open the inputted clumps image.")
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image.")
 
     clumps_img_band = clumps_img_ds.GetRasterBand(rat_band)
     if clumps_img_band is None:
-        raise Exception("Could not open the inputted clumps image band.")
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band.")
 
     clumps_img_rat = clumps_img_band.GetDefaultRAT()
     if clumps_img_rat is None:
-        raise Exception("Could not open the inputted clumps image band RAT.")
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image band RAT.")
 
     ncols = clumps_img_rat.GetColumnCount()
     col_info = dict()
@@ -333,11 +333,11 @@ def get_column_data(clumps_img: str, col_name: str) -> numpy.array:
     col_names = get_rat_columns(clumps_img)
 
     if col_name not in col_names:
-        raise Exception("Column specified is not within the RAT.")
+        raise rsgislib.RSGISPyException("Column specified is not within the RAT.")
 
     rat_dataset = gdal.Open(clumps_img, gdal.GA_ReadOnly)
     if rat_dataset is None:
-        raise Exception("The input image could not be opened.")
+        raise rsgislib.RSGISPyException("The input image could not be opened.")
 
     col_data = rat.readColumn(rat_dataset, col_name)
     rat_dataset = None
@@ -366,7 +366,7 @@ def read_rat_neighbours(
     # Check that 'NumNeighbours' column exists
     rat_columns = get_rat_columns(clumps_img, rat_band)
     if "NumNeighbours" not in rat_columns:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Clumps image RAT does not contain 'NumNeighbours' "
             "column - have you populated neightbours?"
         )
@@ -501,11 +501,11 @@ def set_column_data(clumps_img: str, col_name: str, col_data: numpy.array):
 
     rat_length = get_rat_length(clumps_img)
     if rat_length != (col_data.shape[0]):
-        raise Exception("The input data array is not the same length as the RAT.")
+        raise rsgislib.RSGISPyException("The input data array is not the same length as the RAT.")
 
     rat_dataset = gdal.Open(clumps_img, gdal.GA_Update)
     if rat_dataset is None:
-        raise Exception("The input image could not be opened.")
+        raise rsgislib.RSGISPyException("The input image could not be opened.")
 
     rat.writeColumn(rat_dataset, col_name, col_data)
     rat_dataset = None

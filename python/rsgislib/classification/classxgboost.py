@@ -744,7 +744,7 @@ def optimise_xgboost_multiclass_classifer(
     n_classes = len(cls_info_dict)
     for clsname in cls_info_dict:
         if cls_info_dict[clsname].id >= n_classes:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive "
                 "starting from 0.".format(clsname, cls_info_dict[clsname].id)
             )
@@ -912,7 +912,7 @@ def train_xgboost_multiclass_classifer(
     n_classes = len(cls_info_dict)
     for clsname in cls_info_dict:
         if cls_info_dict[clsname].id >= n_classes:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive "
                 "starting from 0.".format(clsname, cls_info_dict[clsname].id)
             )
@@ -986,7 +986,7 @@ def train_xgboost_multiclass_classifer(
         cls_params = json.load(f)
 
     if n_classes != cls_params["num_class"]:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The number of classes used to optimise the "
             "classifer and the number for training are different!"
         )

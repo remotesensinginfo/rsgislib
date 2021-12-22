@@ -102,7 +102,7 @@ def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_score
                 if (band > 0) and (band <= img_shape[0]):
                     band_lst.append(img_bands[band - 1])
                 else:
-                    raise Exception("Band ({}) specified is not within the image".format(band))
+                    raise rsgislib.RSGISPyException("Band ({}) specified is not within the image".format(band))
             img_bands_sel = numpy.stack(band_lst, axis=0)
             img_bands_trans = numpy.transpose(img_bands_sel)
 

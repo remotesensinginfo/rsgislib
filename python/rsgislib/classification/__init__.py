@@ -427,7 +427,7 @@ def create_train_valid_test_sets(
 
     """
     if cls_in_info.keys() != cls_out_info.keys():
-        raise Exception("The dict keys for the input and output info do not match.")
+        raise rsgislib.RSGISPyException("The dict keys for the input and output info do not match.")
 
     for cls_name in cls_in_info:
         split_sample_train_valid_test(
@@ -1029,7 +1029,7 @@ def plot_train_data(
     import rsgislib.tools.utils
 
     if not os.path.exists(out_plots_dir):
-        raise Exception("The output directory does not exist")
+        raise rsgislib.RSGISPyException("The output directory does not exist")
 
     cls1_h5_obj = h5py.File(cls1_h5_file, "r")
     cls2_h5_obj = h5py.File(cls2_h5_file, "r")
@@ -1044,11 +1044,11 @@ def plot_train_data(
     cls2_n_vars = cls2_data.shape[1]
 
     if cls1_n_vars != cls2_n_vars:
-        raise Exception("The number of variables must be the same for the two classes.")
+        raise rsgislib.RSGISPyException("The number of variables must be the same for the two classes.")
 
     if var_names is not None:
         if len(var_names) != cls1_n_vars:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The number of variable names provided is not the same as "
                 "the number of variables within the HDF5 files."
             )
@@ -1172,7 +1172,7 @@ def create_acc_pt_sets(
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
     if cls_col not in base_gpdf.columns:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The specified class column is not within the input vector layer"
         )
 

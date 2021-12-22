@@ -141,14 +141,14 @@ def plot_endmembers(
     x_axis_lbl = "Wavelength"
 
     if len(endmember_names) != n_endmembers:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The list of names provide does not match "
             "the number of endmembers in the input file."
         )
     if (wavelengths is not None) and (not isinstance(wavelengths, list)):
-        raise Exception("If provided the wavelength variable must be a list")
+        raise rsgislib.RSGISPyException("If provided the wavelength variable must be a list")
     elif (wavelengths is not None) and (len(wavelengths) != n_bands):
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The number of wavelengths provided is not equal"
             " to the number of image bands in the endmembers"
         )
@@ -1088,24 +1088,24 @@ def summarise_multi_endmember_linear_unmixing(
         os.mkdir(tmp_dir)
 
     if not isinstance(in_unmixed_datasets, list):
-        raise Exception("in_unmixed_datasets must be a list")
+        raise rsgislib.RSGISPyException("in_unmixed_datasets must be a list")
 
     endmember_names = list()
     for unmixed_dataset in in_unmixed_datasets:
         if not isinstance(unmixed_dataset, ImageEndmemberInfo):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "in_unmixed_datasets must contain a list of "
                 "ImageEndmemberInfo instances."
             )
         if not isinstance(unmixed_dataset.endmember_names, list):
-            raise Exception("unmixed_dataset.endmember_names must be a list")
+            raise rsgislib.RSGISPyException("unmixed_dataset.endmember_names must be a list")
 
         if rsgislib.imageutils.get_img_band_count(unmixed_dataset.in_unmix_img) != len(
             unmixed_dataset.endmember_names
         ):
             print(unmixed_dataset.in_unmix_img)
             print(unmixed_dataset.endmember_names)
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The number of bands in the unmixed_dataset.in_unmix_img "
                 " and the number of endmember names do not match"
             )
@@ -1283,7 +1283,7 @@ def calc_ppi(
 
     imgDS = gdal.Open(input_img)
     if imgDS is None:
-        raise Exception("Could not open input image")
+        raise rsgislib.RSGISPyException("Could not open input image")
     n_bands = imgDS.RasterCount
     x_size = imgDS.RasterXSize
     y_size = imgDS.RasterYSize
@@ -1295,7 +1295,7 @@ def calc_ppi(
     for n in tqdm.tqdm(range(n_bands)):
         imgBand = imgDS.GetRasterBand(n + 1)
         if imgBand is None:
-            raise Exception("Could not open image band ({})".format(n + 1))
+            raise rsgislib.RSGISPyException("Could not open image band ({})".format(n + 1))
         no_data_val = imgBand.GetNoDataValue()
         band_arr = imgBand.ReadAsArray().flatten()
         band_arr = band_arr.astype(numpy.float32)
@@ -1318,10 +1318,10 @@ def calc_ppi(
     # Open output image
     outImgDS = gdal.Open(output_img, gdal.GA_Update)
     if outImgDS is None:
-        raise Exception("Could not open output image")
+        raise rsgislib.RSGISPyException("Could not open output image")
     outImgBand = outImgDS.GetRasterBand(1)
     if outImgBand is None:
-        raise Exception("Could not open output image band (1)")
+        raise rsgislib.RSGISPyException("Could not open output image band (1)")
     out_img_data = outImgBand.ReadAsArray()
 
     # Mask the datasets to obtain just the valid pixel values

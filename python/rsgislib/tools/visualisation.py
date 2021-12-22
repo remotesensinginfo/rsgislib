@@ -43,6 +43,9 @@ def create_kmz_img(
     :param tmp_dir: A temp directory path for processing files.
 
     """
+    if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_file):
+        rsgislib.RSGISPyException(f"Output file path is not creatable: {output_file}")
+
     band_lst = bands.split(",")
     if len(band_lst) == 3:
         multi_band = True
@@ -139,7 +142,7 @@ def create_kmz_img(
     cmd = ["gdal_translate", "-of", "KMLSUPEROVERLAY", gdal_input_img, output_file]
     print(cmd)
     try:
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
 
@@ -175,6 +178,9 @@ def create_webtiles_img_no_stats_msk(
     :param tmp_dir: A temp directory path for processing files.
 
     """
+    if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_dir):
+        rsgislib.RSGISPyException(f"Output file path is not creatable: {out_dir}")
+
     band_lst = bands.split(",")
     multi_band = False
     if len(band_lst) == 3:
@@ -262,7 +268,7 @@ def create_webtiles_img_no_stats_msk(
     ]
     print(cmd)
     try:
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
 
@@ -308,6 +314,9 @@ def create_webtiles_img(
                         it will be read from the input image header.
 
     """
+    if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_dir):
+        rsgislib.RSGISPyException(f"Output file path is not creatable: {out_dir}")
+
     band_lst = bands.split(",")
     multi_band = False
     if len(band_lst) == 3:
@@ -428,7 +437,7 @@ def create_webtiles_img(
     ]
     print(cmd)
     try:
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
     shutil.rmtree(tmp_dir)
@@ -619,15 +628,19 @@ def create_quicklook_imgs(
             scale_axis = "height"
 
     if n_out_imgs == 1:
+        if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_imgs):
+            rsgislib.RSGISPyException(
+                f"Output file path is not " f"creatable: {output_imgs}"
+            )
         cmd = ["gdal_translate", "-of", "JPEG", "-ot", "Byte"]
         if scale_axis == "width":
             cmd.append("-outsize")
-            cmd.append(f"{output_img_sizes}")
+            cmd.append(f"{int(output_img_sizes)}")
             cmd.append("0")
         else:
             cmd.append("-outsize")
             cmd.append("0")
-            cmd.append(f"{output_img_sizes}")
+            cmd.append(f"{int(output_img_sizes)}")
         cmd.append("-r")
         cmd.append("average")
         cmd.append(stretch_img)
@@ -635,21 +648,27 @@ def create_quicklook_imgs(
 
         print(cmd)
         try:
-            subprocess.run(cmd)
+            subprocess.run(cmd, check=True)
         except OSError as e:
             raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
 
     elif n_out_imgs > 1:
         for i in range(n_out_imgs):
+            if not rsgislib.tools.filetools.does_path_exists_or_creatable(
+                output_imgs[i]
+            ):
+                rsgislib.RSGISPyException(
+                    f"Output file path is not " f"creatable: {output_imgs}"
+                )
             cmd = ["gdal_translate", "-of", "JPEG", "-ot", "Byte"]
             if scale_axis == "width":
                 cmd.append("-outsize")
-                cmd.append(f"{output_img_sizes[i]}")
+                cmd.append(f"{int(output_img_sizes[i])}")
                 cmd.append("0")
             else:
                 cmd.append("-outsize")
                 cmd.append("0")
-                cmd.append(f"{output_img_sizes[i]}")
+                cmd.append(f"{int(output_img_sizes[i])}")
             cmd.append("-r")
             cmd.append("average")
             cmd.append(stretch_img)
@@ -657,7 +676,7 @@ def create_quicklook_imgs(
 
             print(cmd)
             try:
-                subprocess.run(cmd)
+                subprocess.run(cmd, check=True)
             except OSError as e:
                 raise rsgislib.RSGISPyException(
                     "Could not execute command: {}".format(cmd)
@@ -877,6 +896,13 @@ def create_webtiles_vis_gtiff_img(
                         it will be read from the input image header.
 
     """
+    if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_dir):
+        rsgislib.RSGISPyException(f"Output file path is not creatable: {output_dir}")
+    if not rsgislib.tools.filetools.does_path_exists_or_creatable(scaled_gtiff_img):
+        rsgislib.RSGISPyException(
+            f"Output file path is not " f"creatable: {scaled_gtiff_img}"
+        )
+
     band_lst = bands.split(",")
     multi_band = False
     if len(band_lst) == 3:
@@ -1008,7 +1034,7 @@ def create_webtiles_vis_gtiff_img(
     ]
     print(cmd)
     try:
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
 
@@ -1056,7 +1082,7 @@ def create_webtiles_vis_gtiff_img(
         ]
 
     try:
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     except OSError as e:
         raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
     rsgislib.imageutils.pop_img_stats(
@@ -1236,15 +1262,19 @@ def create_quicklook_overview_imgs(
             scale_axis = "height"
 
     if n_out_imgs == 1:
+        if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_imgs):
+            rsgislib.RSGISPyException(
+                f"Output file path is not " f"creatable: {output_imgs}"
+            )
         cmd = ["gdal_translate", "-of", "JPEG", "-ot", "Byte"]
         if scale_axis == "width":
             cmd.append("-outsize")
-            cmd.append(f"{output_img_sizes}")
+            cmd.append(f"{int(output_img_sizes)}")
             cmd.append("0")
         else:
             cmd.append("-outsize")
             cmd.append("0")
-            cmd.append(f"{output_img_sizes}")
+            cmd.append(f"{int(output_img_sizes)}")
 
         cmd.append("-r")
         cmd.append("average")
@@ -1253,21 +1283,27 @@ def create_quicklook_overview_imgs(
 
         print(cmd)
         try:
-            subprocess.run(cmd)
+            subprocess.run(cmd, check=True)
         except OSError as e:
             raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
 
     elif n_out_imgs > 1:
         for i in range(n_out_imgs):
+            if not rsgislib.tools.filetools.does_path_exists_or_creatable(
+                output_imgs[i]
+            ):
+                rsgislib.RSGISPyException(
+                    f"Output file path is not " f"creatable: {output_imgs[i]}"
+                )
             cmd = ["gdal_translate", "-of", "JPEG", "-ot", "Byte"]
             if scale_axis == "width":
                 cmd.append("-outsize")
-                cmd.append(f"{output_img_sizes[i]}")
+                cmd.append(f"{int(output_img_sizes[i])}")
                 cmd.append("0")
             else:
                 cmd.append("-outsize")
                 cmd.append("0")
-                cmd.append(f"{output_img_sizes[i]}")
+                cmd.append(f"{int(output_img_sizes[i])}")
 
             cmd.append("-r")
             cmd.append("average")
@@ -1276,7 +1312,7 @@ def create_quicklook_overview_imgs(
 
             print(cmd)
             try:
-                subprocess.run(cmd)
+                subprocess.run(cmd, check=True)
             except OSError as e:
                 raise rsgislib.RSGISPyException(
                     "Could not execute command: {}".format(cmd)
@@ -1544,12 +1580,12 @@ def create_quicklook_overview_imgs_vec_overlay(
         cmd = ["gdal_translate", "-of", "KEA", "-ot", "Byte"]
         if scale_axis == "width":
             cmd.append("-outsize")
-            cmd.append(f"{output_img_sizes}")
+            cmd.append(f"{int(output_img_sizes)}")
             cmd.append("0")
         else:
             cmd.append("-outsize")
             cmd.append("0")
-            cmd.append(f"{output_img_sizes}")
+            cmd.append(f"{int(output_img_sizes)}")
 
         # Create the resized output image.
         lcl_img_basename = rsgislib.tools.filetools.get_file_basename(
@@ -1566,7 +1602,7 @@ def create_quicklook_overview_imgs_vec_overlay(
 
         print(cmd)
         try:
-            subprocess.run(cmd)
+            subprocess.run(cmd, check=True)
         except OSError as e:
             raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
         # Rasterise the overlay vector to the output raster grid.
@@ -1593,6 +1629,10 @@ def create_quicklook_overview_imgs_vec_overlay(
             tmp_resized_img, tmp_vec_overlay_img, tmp_final_img, "KEA", overlay_clrs
         )
         # Convert to final format (e.g., JPG, TIFF or PNG)
+        if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_imgs):
+            rsgislib.RSGISPyException(
+                f"Output file path is not " f"creatable: {output_imgs}"
+            )
         rsgislib.imageutils.gdal_translate(
             tmp_final_img, output_imgs, gdalformat=gdalformat, options=""
         )
@@ -1602,12 +1642,12 @@ def create_quicklook_overview_imgs_vec_overlay(
             cmd = ["gdal_translate", "-of", "KEA", "-ot", "Byte"]
             if scale_axis == "width":
                 cmd.append("-outsize")
-                cmd.append(f"{output_img_sizes[i]}")
+                cmd.append(f"{int(output_img_sizes[i])}")
                 cmd.append("0")
             else:
                 cmd.append("-outsize")
                 cmd.append("0")
-                cmd.append(f"{output_img_sizes[i]}")
+                cmd.append(f"{int(output_img_sizes[i])}")
 
             # Create the resized output image.
             lcl_img_basename = rsgislib.tools.filetools.get_file_basename(
@@ -1623,7 +1663,7 @@ def create_quicklook_overview_imgs_vec_overlay(
 
             print(cmd)
             try:
-                subprocess.run(cmd)
+                subprocess.run(cmd, check=True)
             except OSError as e:
                 raise rsgislib.RSGISPyException(
                     "Could not execute command: {}".format(cmd)
@@ -1652,6 +1692,12 @@ def create_quicklook_overview_imgs_vec_overlay(
                 tmp_resized_img, tmp_vec_overlay_img, tmp_final_img, "KEA", overlay_clrs
             )
             # Convert to final format (e.g., JPG, TIFF or PNG)
+            if not rsgislib.tools.filetools.does_path_exists_or_creatable(
+                output_imgs[i]
+            ):
+                rsgislib.RSGISPyException(
+                    f"Output file path is not " f"creatable: {output_imgs[i]}"
+                )
             rsgislib.imageutils.gdal_translate(
                 tmp_final_img, output_imgs[i], gdalformat=gdalformat, options=""
             )
@@ -1867,15 +1913,19 @@ def create_visual_overview_imgs_vec_extent(
             scale_axis = "height"
 
     if n_out_imgs == 1:
+        if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_imgs):
+            rsgislib.RSGISPyException(
+                f"Output file path is not " f"creatable: {output_imgs}"
+            )
         cmd = ["gdal_translate", "-of", gdalformat, "-ot", "Byte"]
         if scale_axis == "width":
             cmd.append("-outsize")
-            cmd.append(f"{output_img_sizes}")
+            cmd.append(f"{int(output_img_sizes)}")
             cmd.append("0")
         else:
             cmd.append("-outsize")
             cmd.append("0")
-            cmd.append(f"{output_img_sizes}")
+            cmd.append(f"{int(output_img_sizes)}")
 
         cmd.append("-r")
         cmd.append("average")
@@ -1884,20 +1934,26 @@ def create_visual_overview_imgs_vec_extent(
 
         print(cmd)
         try:
-            subprocess.run(cmd)
+            subprocess.run(cmd, check=True)
         except OSError as e:
             raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
     else:
         for i in range(n_out_imgs):
+            if not rsgislib.tools.filetools.does_path_exists_or_creatable(
+                output_imgs[i]
+            ):
+                rsgislib.RSGISPyException(
+                    f"Output file path is not " f"creatable: {output_imgs[i]}"
+                )
             cmd = ["gdal_translate", "-of", gdalformat, "-ot", "Byte"]
             if scale_axis == "width":
                 cmd.append("-outsize")
-                cmd.append(f"{output_img_sizes[i]}")
+                cmd.append(f"{int(output_img_sizes[i])}")
                 cmd.append("0")
             else:
                 cmd.append("-outsize")
                 cmd.append("0")
-                cmd.append(f"{output_img_sizes[i]}")
+                cmd.append(f"{int(output_img_sizes[i])}")
 
             cmd.append("-r")
             cmd.append("average")
@@ -1906,7 +1962,7 @@ def create_visual_overview_imgs_vec_extent(
 
             print(cmd)
             try:
-                subprocess.run(cmd)
+                subprocess.run(cmd, check=True)
             except OSError as e:
                 raise rsgislib.RSGISPyException(
                     "Could not execute command: {}".format(cmd)

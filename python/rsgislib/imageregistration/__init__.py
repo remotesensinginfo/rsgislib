@@ -80,7 +80,7 @@ def warp_with_gcps_with_gdal(
     from osgeo import gdal
 
     if not rsgislib.imageutils.has_gcps(in_process_img):
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Input process image does not have GCPs "
             "within it's header - this is required."
         )
@@ -105,7 +105,7 @@ def warp_with_gcps_with_gdal(
     elif interp_method == rsgislib.INTERP_MODE:
         interpolationMethod = gdal.GRA_Mode
     else:
-        raise Exception("Interpolation method was not recognised or known.")
+        raise rsgislib.RSGISPyException("Interpolation method was not recognised or known.")
 
     rsgislib.imageutils.create_copy_img(
         in_ref_img, output_img, numBands, 0, gdalformat, datatype

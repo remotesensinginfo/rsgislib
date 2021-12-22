@@ -224,10 +224,10 @@ def create_datejson_file(image_list, out_msk_dir, out_json_file, gdal_format='KE
         basename_comps = basename.split('_')
         print(basename_comps)
         if len(basename_comps) < 2:
-            raise Exception("The filename must have at least two components split by '_'.")
+            raise rsgislib.RSGISPyException("The filename must have at least two components split by '_'.")
         date_str = basename_comps[1]
         if len(date_str) != 8:
-            raise Exception("The second component must have 8 characters YYYYMMDD. String provided: '{}'".format(date_str))
+            raise rsgislib.RSGISPyException("The second component must have 8 characters YYYYMMDD. String provided: '{}'".format(date_str))
         
         date_obj = datetime.datetime.strptime(date_str, "%Y%m%d").strftime("%Y-%m-%d")
         date_imgs[date_obj] = dict()

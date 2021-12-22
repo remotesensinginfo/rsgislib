@@ -34,17 +34,17 @@ def write_vec_column(
 
     ds = gdal.OpenEx(out_vec_file, gdal.OF_UPDATE)
     if ds is None:
-        raise Exception("Could not open '{}'".format(out_vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(out_vec_file))
 
     lyr = ds.GetLayerByName(out_vec_lyr)
     if lyr is None:
-        raise Exception("Could not find layer '{}'".format(out_vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(out_vec_lyr))
 
     numFeats = lyr.GetFeatureCount()
     if not len(att_col_data) == numFeats:
         print("Number of Features: {}".format(numFeats))
         print("Length of Data: {}".format(len(att_col_data)))
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The number of features and size of the input data is not equal."
         )
 
@@ -58,7 +58,7 @@ def write_vec_column(
     if not colExists:
         field_defn = ogr.FieldDefn(att_column, att_col_datatype)
         if lyr.CreateField(field_defn) != 0:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Creating '{}' field failed; be careful with case, "
                 "some drivers are case insensitive but column might "
                 "not be found.".format(att_column)
@@ -121,13 +121,13 @@ def write_vec_column_to_layer(
     gdal.UseExceptions()
 
     if out_vec_lyr_obj is None:
-        raise Exception("The layer passed in is None...")
+        raise rsgislib.RSGISPyException("The layer passed in is None...")
 
     numFeats = out_vec_lyr_obj.GetFeatureCount()
     if not len(att_col_data) == numFeats:
         print("Number of Features: {}".format(numFeats))
         print("Length of Data: {}".format(len(att_col_data)))
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The number of features and size of the input data is not equal."
         )
 
@@ -141,7 +141,7 @@ def write_vec_column_to_layer(
     if not colExists:
         field_defn = ogr.FieldDefn(att_column, att_col_datatype)
         if out_vec_lyr_obj.CreateField(field_defn) != 0:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Creating '{}' field failed; be careful with case, some "
                 "drivers are case insensitive but column might not "
                 "be found.".format(att_column)
@@ -188,11 +188,11 @@ def read_vec_column(vec_file: str, vec_lyr: str, att_column: str) -> list:
 
     ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if ds is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     lyr = ds.GetLayerByName(vec_lyr)
     if lyr is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
     colExists = False
     lyrDefn = lyr.GetLayerDefn()
@@ -203,7 +203,7 @@ def read_vec_column(vec_file: str, vec_lyr: str, att_column: str) -> list:
 
     if not colExists:
         ds = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The specified column does not exist in the input layer; "
             "check case as some drivers are case sensitive."
         )
@@ -231,11 +231,11 @@ def read_vec_columns(vec_file: str, vec_lyr: str, att_columns: list) -> list:
 
     ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if ds is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     lyr = ds.GetLayerByName(vec_lyr)
     if lyr is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
     lyrDefn = lyr.GetLayerDefn()
 
@@ -255,7 +255,7 @@ def read_vec_columns(vec_file: str, vec_lyr: str, att_columns: list) -> list:
     for attName in att_columns:
         if not found_atts[attName]:
             ds = None
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "Could not find the attribute ({}) specified "
                 "within the vector layer.".format(attName)
             )
@@ -300,11 +300,11 @@ def pop_bbox_cols(
     """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_UPDATE)
     if dsVecFile is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
     xminCol_exists = False
     xmaxCol_exists = False
@@ -325,22 +325,22 @@ def pop_bbox_cols(
     if not xminCol_exists:
         xmin_field_defn = ogr.FieldDefn(x_min_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(xmin_field_defn) != 0:
-            raise Exception("Creating '{}' field failed.".format(x_min_col))
+            raise rsgislib.RSGISPyException("Creating '{}' field failed.".format(x_min_col))
 
     if not xmaxCol_exists:
         xmax_field_defn = ogr.FieldDefn(x_max_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(xmax_field_defn) != 0:
-            raise Exception("Creating '{}' field failed.".format(x_max_col))
+            raise rsgislib.RSGISPyException("Creating '{}' field failed.".format(x_max_col))
 
     if not yminCol_exists:
         ymin_field_defn = ogr.FieldDefn(y_min_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(ymin_field_defn) != 0:
-            raise Exception("Creating '{}' field failed.".format(y_min_col))
+            raise rsgislib.RSGISPyException("Creating '{}' field failed.".format(y_min_col))
 
     if not ymaxCol_exists:
         ymax_field_defn = ogr.FieldDefn(y_max_col, ogr.OFTReal)
         if vec_lyr_obj.CreateField(ymax_field_defn) != 0:
-            raise Exception("Creating '{}' field failed.".format(y_max_col))
+            raise rsgislib.RSGISPyException("Creating '{}' field failed.".format(y_max_col))
 
     # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
     fids = []
@@ -381,7 +381,7 @@ def pop_bbox_cols(
             feat.SetField(y_max_col, 0.0)
         rtn_val = vec_lyr_obj.SetFeature(feat)
         if rtn_val != ogr.OGRERR_NONE:
-            raise Exception("An error has occurred setting a feature on a layer.")
+            raise rsgislib.RSGISPyException("An error has occurred setting a feature on a layer.")
         if ((counter % 20000) == 0) and openTransaction:
             vec_lyr_obj.CommitTransaction()
             openTransaction = False

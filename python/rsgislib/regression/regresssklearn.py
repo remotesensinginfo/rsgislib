@@ -380,7 +380,7 @@ def apply_regress_sklearn_mdl(
     predictor_img_bands_arr = numpy.array(predictor_img_bands)
     predictor_img_bands_arr = predictor_img_bands_arr - 1
     if numpy.min(predictor_img_bands_arr) < 0:
-        raise Exception("Image band numbering starts at 1; i.e., GDAL convension.")
+        raise rsgislib.RSGISPyException("Image band numbering starts at 1; i.e., GDAL convension.")
 
     infiles = applier.FilenameAssociations()
     infiles.vld_msk_img = vld_msk_img

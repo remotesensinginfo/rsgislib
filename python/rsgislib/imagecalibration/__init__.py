@@ -421,7 +421,7 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
     **WARNING DO NOT USE - THIS FUNCTION IS STILL A WORK IN PROGRESS**
     
     ###
-    raise Exception("This function is not yet ready - needs more thought as how to get a fully working implementation.")
+    raise rsgislib.RSGISPyException("This function is not yet ready - needs more thought as how to get a fully working implementation.")
     import rsgislib
     import rsgislib.imagecalc
     import rsgislib.imageutils

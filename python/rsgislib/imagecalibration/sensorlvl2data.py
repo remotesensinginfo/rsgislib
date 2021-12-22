@@ -83,7 +83,7 @@ def create_stacked_ls8_cl2_lv2_img(
     mtl_header = rsgislib.tools.filetools.find_file_none(raw_dir, "*MTL.txt")
 
     if mtl_header is None:
-        raise Exception("Could not find the MTL header")
+        raise rsgislib.RSGISPyException("Could not find the MTL header")
 
     ls8_head_info = rsgislib.tools.sensors.read_landsat_mtl_to_dict(mtl_header)
 

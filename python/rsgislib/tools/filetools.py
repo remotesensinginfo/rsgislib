@@ -7,16 +7,20 @@ moving files around.
 # Import modules
 import glob
 import os
+import sys
+import errno
+import tempfile
 import shutil
 import datetime
 import time
+from typing import Union
 
 import rsgislib
 
 
 def get_file_basename(
     input_file: str, check_valid: bool = False, n_comps: int = 0, rm_n_exts: int = 0
-):
+) -> str:
     """
     Uses os.path module to return file basename (i.e., path and extension removed)
 
@@ -71,7 +75,150 @@ def get_file_basename(
     return basename
 
 
-def get_dir_name(input_file: str):
+def is_path_valid(file_path_name: str) -> bool:
+    """
+    This function tests whether a file path is valid in terms of the length of
+    each component and the characters used. Should be cross platform.
+
+    This function was adapted from the answer here:
+    https://stackoverflow.com/questions/9532499/check-whether-a-path-is-valid-in-python-without-creating-a-file-at-the-paths-ta
+
+    :param file_path_name: the file path to be tested
+    :return: True if the passed pathname is a valid pathname for the current OS;
+
+    """
+    # Windows-specific error code indicating an invalid pathname.
+    ERROR_INVALID_NAME = 123
+    # See Also
+    # ----------
+    # https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-
+    #    Official listing of all such codes.
+
+    # If this pathname is either not a string or is but is empty, this pathname
+    # is invalid.
+    try:
+        if not isinstance(file_path_name, str) or not file_path_name:
+            return False
+
+        # Strip this pathname's Windows-specific drive specifier (e.g., `C:\`)
+        # if any. Since Windows prohibits path components from containing `:`
+        # characters, failing to strip this `:`-suffixed prefix would
+        # erroneously invalidate all valid absolute Windows pathnames.
+        _, file_path_name = os.path.splitdrive(file_path_name)
+
+        # Directory guaranteed to exist. If the current OS is Windows, this is
+        # the drive to which Windows was installed (e.g., the "%HOMEDRIVE%"
+        # environment variable); else, the typical root directory.
+        root_dirname = (
+            os.environ.get("HOMEDRIVE", "C:")
+            if sys.platform == "win32"
+            else os.path.sep
+        )
+        assert os.path.isdir(root_dirname)  # ...Murphy and her ironclad Law
+
+        # Append a path separator to this directory if needed.
+        root_dirname = root_dirname.rstrip(os.path.sep) + os.path.sep
+
+        # Test whether each path component split from this pathname is valid or
+        # not, ignoring non-existent and non-readable path components.
+        for pathname_part in file_path_name.split(os.path.sep):
+            try:
+                os.lstat(root_dirname + pathname_part)
+            # If an OS-specific exception is raised, its error code
+            # indicates whether this pathname is valid or not. Unless this
+            # is the case, this exception implies an ignorable kernel or
+            # filesystem complaint (e.g., path not found or inaccessible).
+            #
+            # Only the following exceptions indicate invalid pathnames:
+            #
+            # * Instances of the Windows-specific "WindowsError" class
+            #   defining the "winerror" attribute whose value is
+            #   "ERROR_INVALID_NAME". Under Windows, "winerror" is more
+            #   fine-grained and hence useful than the generic "errno"
+            #   attribute. When a too-long pathname is passed, for example,
+            #   "errno" is "ENOENT" (i.e., no such file or directory) rather
+            #   than "ENAMETOOLONG" (i.e., file name too long).
+            # * Instances of the cross-platform "OSError" class defining the
+            #   generic "errno" attribute whose value is either:
+            #   * Under most POSIX-compatible OSes, "ENAMETOOLONG".
+            #   * Under some edge-case OSes (e.g., SunOS, *BSD), "ERANGE".
+            except ValueError as e:
+                return False
+            except OSError as exc:
+                if hasattr(exc, "winerror"):
+                    if exc.winerror == ERROR_INVALID_NAME:
+                        return False
+                elif exc.errno in {errno.ENAMETOOLONG, errno.ERANGE}:
+                    return False
+    # If a "TypeError" exception was raised, it almost certainly has the
+    # error message "embedded NUL character" indicating an invalid pathname.
+    except TypeError as exc:
+        return False
+    # If no exception was raised, all path components and hence this
+    # pathname itself are valid.
+    else:
+        return True
+
+
+def is_path_sibling_creatable(file_path_name: str) -> bool:
+    """
+    A function which checks whether the file path provided would
+    be creatable (i.e., directory exists and you have permission to
+    write to it.
+
+    This function was adapted from the answer here:
+    https://stackoverflow.com/questions/9532499/check-whether-a-path-is-valid-in-python-without-creating-a-file-at-the-paths-ta
+
+    :param file_path_name: the input file path to be checked.
+    :return: True if the current user has sufficient permissions to create **siblings**
+             (i.e., arbitrary files in the parent directory) of the passed pathname
+
+    """
+    # Parent directory of the passed path. If empty, we substitute the current
+    # working directory (CWD) instead.
+    dirname = os.path.dirname(file_path_name) or os.getcwd()
+
+    try:
+        # For safety, explicitly close and hence delete this temporary file
+        # immediately after creating it in the passed path's parent directory.
+        with tempfile.TemporaryFile(dir=dirname):
+            pass
+        return True
+    # While the exact type of exception raised by the above function depends on
+    # the current version of the Python interpreter, all such types subclass the
+    # following exception superclass.
+    except EnvironmentError:
+        return False
+
+
+def does_path_exists_or_creatable(file_path_name: str) -> bool:
+    """
+    A function which checks whether a file path either exists or is
+    creatable if it does not exist.
+
+    This function was adapted from the answer here:
+    https://stackoverflow.com/questions/9532499/check-whether-a-path-is-valid-in-python-without-creating-a-file-at-the-paths-ta
+
+    :param file_path_name: the input file path to be checked.
+    :return: True if the passed pathname is a valid pathname on the current OS _and_
+             either currently exists or is hypothetically creatable in a cross-platform
+             manner optimized for POSIX-unfriendly filesystems
+
+    """
+    try:
+        # To prevent "os" module calls from raising undesirable exceptions on
+        # invalid path names, is_path_valid() is explicitly called first.
+        return is_path_valid(file_path_name) and (
+            os.path.exists(file_path_name) or is_path_sibling_creatable(file_path_name)
+        )
+    # Report failure on non-fatal filesystem complaints (e.g., connection
+    # timeouts, permissions issues) implying this path to be inaccessible. All
+    # other exceptions are unrelated fatal issues and should not be caught here.
+    except OSError:
+        return False
+
+
+def get_dir_name(input_file: str) -> str:
     """
     A function which returns just the name of the directory of the input file
     without the rest of the path.
@@ -118,10 +265,9 @@ def delete_dir(dir_path: str):
         for name in dirs:
             os.rmdir(os.path.join(root, name))
     os.rmdir(dir_path)
-    print("Deleted " + dir_path)
 
 
-def find_file(dir_path: str, file_search: str):
+def find_file(dir_path: str, file_search: str) -> str:
     """
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
@@ -151,7 +297,7 @@ def find_file(dir_path: str, file_search: str):
     return files[0]
 
 
-def find_file_none(dir_path: str, file_search: str):
+def find_file_none(dir_path: str, file_search: str) -> Union[None, str]:
     """
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
@@ -177,7 +323,7 @@ def find_file_none(dir_path: str, file_search: str):
     return files[0]
 
 
-def find_files_ext(dir_path: str, ending: str):
+def find_files_ext(dir_path: str, ending: str) -> dict:
     """
     Find all the files within a directory structure with a specific file ending.
     The files are return as dictionary using the file name as the dictionary key.
@@ -205,7 +351,7 @@ def find_files_ext(dir_path: str, ending: str):
     return out_file_dict
 
 
-def find_files_mpaths_ext(dir_paths: list, ending: str):
+def find_files_mpaths_ext(dir_paths: list, ending: str) -> dict:
     """
     Find all the files within a list of input directories and the structure beneath
     with a specific file ending. The files are return as dictionary using the file
@@ -237,7 +383,7 @@ def find_files_mpaths_ext(dir_paths: list, ending: str):
     return out_file_dict
 
 
-def find_first_file(dir_path: str, file_search: str, rtn_except: bool = True):
+def find_first_file(dir_path: str, file_search: str, rtn_except: bool = True) -> str:
     """
     Search for a single file with a path using glob. Therefore, the file
     path returned is a true path. Within the file_search provide the file
@@ -281,7 +427,7 @@ def get_files_mod_time(
     file_lst: list,
     dt_before: datetime.datetime = None,
     dt_after: datetime.datetime = None,
-):
+) -> list:
     """
     A function which subsets a list of files based on datetime of
     last modification. The function also does a check as to whether
@@ -324,7 +470,7 @@ def get_files_mod_time(
 
 def find_files_size_limits(
     dir_path: str, file_search: str, min_size: int = 0, max_size: int = None
-):
+) -> list:
     """
     Search for files with a path using glob. Therefore, the file
     paths returned is a true path. Within the file_search provide the file
@@ -357,7 +503,7 @@ def find_files_size_limits(
     return out_files
 
 
-def file_is_hidden(dir_path: str):
+def file_is_hidden(dir_path: str) -> bool:
     """
     A function to test whether a file or folder is 'hidden' or not on the
     file system. Should be cross platform between Linux/UNIX and windows.
@@ -388,7 +534,7 @@ def file_is_hidden(dir_path: str):
         return file_name.startswith(".")
 
 
-def get_dir_list(dir_path: str, inc_hidden: bool = False):
+def get_dir_list(dir_path: str, inc_hidden: bool = False) -> list:
     """
     Function which get the list of directories within the specified path.
 
@@ -418,7 +564,7 @@ def get_dir_list(dir_path: str, inc_hidden: bool = False):
     return out_dir_lst
 
 
-def convert_file_size_units(in_size: int, in_unit: str, out_unit: str):
+def convert_file_size_units(in_size: int, in_unit: str, out_unit: str) -> float:
     """
     A function which converts between file size units
 
@@ -469,7 +615,7 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str):
     return out_file_size
 
 
-def get_file_size(file_path: str, unit: str = "bytes"):
+def get_file_size(file_path: str, unit: str = "bytes") -> float:
     """
     A function which returns the file size of a file in the specified unit.
 
@@ -494,17 +640,7 @@ def get_file_size(file_path: str, unit: str = "bytes"):
     p = pathlib.Path(file_path)
     if p.exists() and p.is_file():
         file_size_bytes = p.stat().st_size
-
-        if unit == "kb":
-            out_file_size = file_size_bytes / 1024.0
-        elif unit == "mb":
-            out_file_size = file_size_bytes / 1024.0 ** 2
-        elif unit == "gb":
-            out_file_size = file_size_bytes / 1024.0 ** 3
-        elif unit == "tb":
-            out_file_size = file_size_bytes / 1024.0 ** 4
-        else:
-            out_file_size = file_size_bytes
+        out_file_size = convert_file_size_units(file_size_bytes, "bytes", unit)
     else:
         raise rsgislib.RSGISPyException("Input file path does not exist")
     return out_file_size
@@ -515,7 +651,7 @@ def get_file_lock(
     sleep_period: int = 1,
     wait_iters: int = 120,
     use_except: bool = False,
-):
+) -> bool:
     """
     A function which gets a lock on a file.
 
@@ -616,21 +752,21 @@ def sort_imgs_to_dirs_utm(input_imgs_dir: str, file_search_str: str, out_base_di
     """
     import rsgislib.imageutils
 
-    inFiles = glob.glob(os.path.join(input_imgs_dir, file_search_str))
-    for imgFile in inFiles:
-        utmZone = rsgislib.imageutils.getUTMZone(imgFile)
-        if utmZone is not None:
-            outDIR = os.path.join(out_base_dir, "utm" + utmZone)
-            if not os.path.exists(outDIR):
-                os.makedirs(outDIR)
-            imgFileList = rsgislib.imageutils.getImageFiles(imgFile)
-            for tmpFile in imgFileList:
-                print("Moving: " + tmpFile)
-                outFile = os.path.join(outDIR, os.path.basename(tmpFile))
-                shutil.move(tmpFile, outFile)
+    in_files = glob.glob(os.path.join(input_imgs_dir, file_search_str))
+    for img_file in in_files:
+        utm_zone = rsgislib.imageutils.getUTMZone(img_file)
+        if utm_zone is not None:
+            out_dir = os.path.join(out_base_dir, "utm" + utm_zone)
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+            img_file_list = rsgislib.imageutils.getImageFiles(img_file)
+            for tmp_file in img_file_list:
+                print("Moving: " + tmp_file)
+                outFile = os.path.join(out_dir, os.path.basename(tmp_file))
+                shutil.move(tmp_file, outFile)
 
 
-def create_directory_archive(in_dir: str, out_arch: str, arch_format: str):
+def create_directory_archive(in_dir: str, out_arch: str, arch_format: str) -> str:
     """
     A function which creates an archive from an input directory. This function uses
     subprocess to call the appropriate command line function.
@@ -649,6 +785,9 @@ def create_directory_archive(in_dir: str, out_arch: str, arch_format: str):
     """
     import subprocess
 
+    if not is_path_valid(in_dir):
+        raise rsgislib.RSGISPyException(f"The input directory is not valid: {in_dir}")
+
     c_pwd = os.getcwd()
     out_arch = os.path.abspath(out_arch)
     in_dir = os.path.abspath(in_dir)
@@ -658,24 +797,44 @@ def create_directory_archive(in_dir: str, out_arch: str, arch_format: str):
 
     if arch_format == "zip":
         out_arch_file = "{}.zip".format(out_arch.strip())
+        if not does_path_exists_or_creatable(out_arch_file):
+            rsgislib.RSGISPyException(
+                f"Output file path is " f"not creatable: {out_arch_file}"
+            )
         cmd = ["zip", "-r", out_arch_file, dir_name]
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     elif arch_format == "tar":
         out_arch_file = "{}.tar".format(out_arch.strip())
+        if not does_path_exists_or_creatable(out_arch_file):
+            rsgislib.RSGISPyException(
+                f"Output file path is " f"not creatable: {out_arch_file}"
+            )
         cmd = ["tar", "-cvf", out_arch_file, dir_name]
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     elif arch_format == "gztar":
         out_arch_file = "{}.tar.gz".format(out_arch.strip())
+        if not does_path_exists_or_creatable(out_arch_file):
+            rsgislib.RSGISPyException(
+                f"Output file path is " f"not creatable: {out_arch_file}"
+            )
         cmd = ["tar", "-cvzf", out_arch_file, dir_name]
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     elif arch_format == "bztar":
         out_arch_file = "{}.tar.bz2".format(out_arch.strip())
+        if not does_path_exists_or_creatable(out_arch_file):
+            rsgislib.RSGISPyException(
+                f"Output file path is " f"not creatable: {out_arch_file}"
+            )
         cmd = ["tar", "-cvjSf", out_arch_file, dir_name]
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     elif arch_format == "xztar":
         out_arch_file = "{}.tar.xz".format(out_arch.strip())
+        if not does_path_exists_or_creatable(out_arch_file):
+            rsgislib.RSGISPyException(
+                f"Output file path is " f"not creatable: {out_arch_file}"
+            )
         cmd = ["tar", "-cvJf", out_arch_file, dir_name]
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     else:
         raise rsgislib.RSGISPyException("Do not recognise the archive format specifed.")
 
@@ -683,7 +842,7 @@ def create_directory_archive(in_dir: str, out_arch: str, arch_format: str):
     return out_arch_file
 
 
-def create_sha1_hash(input_file: str, block_size: int = 4096):
+def create_sha1_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the SHA1 hash string of the input file.
 
@@ -703,7 +862,7 @@ def create_sha1_hash(input_file: str, block_size: int = 4096):
     return sha1_hash.hexdigest()
 
 
-def create_sha224_hash(input_file: str, block_size: int = 4096):
+def create_sha224_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the SHA224 hash string of the input file.
 
@@ -723,7 +882,7 @@ def create_sha224_hash(input_file: str, block_size: int = 4096):
     return sha224_hash.hexdigest()
 
 
-def create_sha256_hash(input_file: str, block_size: int = 4096):
+def create_sha256_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the SHA256 hash string of the input file.
 
@@ -743,7 +902,7 @@ def create_sha256_hash(input_file: str, block_size: int = 4096):
     return sha256_hash.hexdigest()
 
 
-def create_sha384_hash(input_file: str, block_size: int = 4096):
+def create_sha384_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the SHA384 hash string of the input file.
 
@@ -763,7 +922,7 @@ def create_sha384_hash(input_file: str, block_size: int = 4096):
     return sha384_hash.hexdigest()
 
 
-def create_sha512_hash(input_file: str, block_size: int = 4096):
+def create_sha512_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the SHA512 hash string of the input file.
 
@@ -783,7 +942,7 @@ def create_sha512_hash(input_file: str, block_size: int = 4096):
     return sha512_hash.hexdigest()
 
 
-def create_md5_hash(input_file: str, block_size: int = 4096):
+def create_md5_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the MD5 hash string of the input file.
 
@@ -803,7 +962,7 @@ def create_md5_hash(input_file: str, block_size: int = 4096):
     return md5_hash.hexdigest()
 
 
-def create_blake2b_hash(input_file: str, block_size: int = 4096):
+def create_blake2b_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the Blake2B hash string of the input file.
 
@@ -823,7 +982,7 @@ def create_blake2b_hash(input_file: str, block_size: int = 4096):
     return blake2b_hash.hexdigest()
 
 
-def create_blake2s_hash(input_file: str, block_size: int = 4096):
+def create_blake2s_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the Blake2S hash string of the input file.
 
@@ -843,7 +1002,7 @@ def create_blake2s_hash(input_file: str, block_size: int = 4096):
     return blake2s_hash.hexdigest()
 
 
-def create_sha3_224_hash(input_file: str, block_size: int = 4096):
+def create_sha3_224_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the SHA3_224 hash string of the input file.
 
@@ -863,7 +1022,7 @@ def create_sha3_224_hash(input_file: str, block_size: int = 4096):
     return sha224_hash.hexdigest()
 
 
-def create_sha3_256_hash(input_file: str, block_size: int = 4096):
+def create_sha3_256_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the SHA3_256 hash string of the input file.
 
@@ -883,7 +1042,7 @@ def create_sha3_256_hash(input_file: str, block_size: int = 4096):
     return sha256_hash.hexdigest()
 
 
-def create_sha3_384_hash(input_file: str, block_size: int = 4096):
+def create_sha3_384_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the SHA3_384 hash string of the input file.
 
@@ -903,7 +1062,7 @@ def create_sha3_384_hash(input_file: str, block_size: int = 4096):
     return sha384_hash.hexdigest()
 
 
-def create_sha3_512_hash(input_file: str, block_size: int = 4096):
+def create_sha3_512_hash(input_file: str, block_size: int = 4096) -> str:
     """
     A function which calculates finds the SHA3_512 hash string of the input file.
 
@@ -925,7 +1084,7 @@ def create_sha3_512_hash(input_file: str, block_size: int = 4096):
 
 def untar_file(
     in_file: str, out_dir: str, gen_arch_dir: bool = True, verbose: bool = False
-):
+) -> str:
     """
     A function which extracts data from a tar file into the specified
     output directory. Optionally, an output directory of the same name
@@ -964,7 +1123,7 @@ def untar_file(
     try:
         import subprocess
 
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     except OSError as e:
         os.chdir(c_dir)
         raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
@@ -974,7 +1133,7 @@ def untar_file(
 
 def untar_gz_file(
     in_file: str, out_dir: str, gen_arch_dir: bool = True, verbose: bool = False
-):
+) -> str:
     """
     A function which extracts data from a tar.gz file into the specified
     output directory. Optionally, an output directory of the same name
@@ -1014,7 +1173,7 @@ def untar_gz_file(
     try:
         import subprocess
 
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     except OSError as e:
         os.chdir(c_dir)
         raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
@@ -1024,7 +1183,7 @@ def untar_gz_file(
 
 def unzip_file(
     in_file: str, out_dir: str, gen_arch_dir: bool = True, verbose: bool = False
-):
+) -> str:
     """
     A function which extracts data from a zip file into the specified
     output directory. Optionally, an output directory of the same name
@@ -1062,7 +1221,7 @@ def unzip_file(
     try:
         import subprocess
 
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     except OSError as e:
         os.chdir(c_dir)
         raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))
@@ -1072,7 +1231,7 @@ def unzip_file(
 
 def untar_bz_file(
     in_file: str, out_dir: str, gen_arch_dir: bool = True, verbose: bool = False
-):
+) -> str:
     """
     A function which extracts data from a tar.bz file into the specified
     output directory. Optionally, an output directory of the same name
@@ -1112,7 +1271,7 @@ def untar_bz_file(
     try:
         import subprocess
 
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
     except OSError as e:
         os.chdir(c_dir)
         raise rsgislib.RSGISPyException("Could not extract data: {}".format(cmd))

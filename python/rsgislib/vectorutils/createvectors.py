@@ -74,7 +74,7 @@ def polygonise_raster_to_vec_lyr(
         vecDS = outdriver.CreateDataSource(out_vec_file)
 
     if vecDS is None:
-        raise Exception("Could not open or create '{}'".format(out_vec_file))
+        raise rsgislib.RSGISPyException("Could not open or create '{}'".format(out_vec_file))
 
     lcl_options = []
     if replace_lyr:
@@ -82,7 +82,7 @@ def polygonise_raster_to_vec_lyr(
 
     out_lyr_obj = vecDS.CreateLayer(out_vec_lyr, srs=imgsrs, options=lcl_options)
     if out_lyr_obj is None:
-        raise Exception("Could not create layer: {}".format(out_vec_lyr))
+        raise rsgislib.RSGISPyException("Could not create layer: {}".format(out_vec_lyr))
 
     newField = ogr.FieldDefn(pxl_val_fieldname, ogr.OFTInteger)
     out_lyr_obj.CreateField(newField)
@@ -156,7 +156,7 @@ def vectorise_pxls_to_pts(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -165,7 +165,7 @@ def vectorise_pxls_to_pts(
         out_epsg_code = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
 
     if out_epsg_code is None:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The output ESPG code is None - tried to read from input image and "
             "returned None. Suggest providing the EPSG code to the function."
         )
@@ -210,7 +210,7 @@ def vectorise_pxls_to_pts(
 
         if out_format == "GPKG":
             if out_vec_lyr is None:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "If output format is GPKG then an output layer is required."
                 )
             gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
@@ -241,9 +241,13 @@ def extract_image_footprint(
     """
     gdal.UseExceptions()
     import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     import rsgislib.imageutils
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
+
+    if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_vec_file):
+        rsgislib.RSGISPyException(f"Output file path is not creatable: {out_vec_file}")
 
     uid_str = rsgislib.tools.utils.uid_generator()
 
@@ -276,11 +280,11 @@ def extract_image_footprint(
 
     ds = gdal.OpenEx(out_vec_tmp_file, gdal.OF_READONLY)
     if ds is None:
-        raise Exception("Could not open '" + out_vec_tmp_file + "'")
+        raise rsgislib.RSGISPyException("Could not open '" + out_vec_tmp_file + "'")
 
     lyr = ds.GetLayerByName(out_vec_lyr)
     if lyr is None:
-        raise Exception("Could not find layer '" + out_vec_lyr + "'")
+        raise rsgislib.RSGISPyException("Could not find layer '" + out_vec_lyr + "'")
     num_feats = lyr.GetFeatureCount()
     lyr = None
     ds = None
@@ -309,9 +313,9 @@ def extract_image_footprint(
         try:
             import subprocess
 
-            subprocess.run(cmd)
+            subprocess.run(cmd, check=True)
         except OSError as e:
-            raise Exception("Could not re-projection vector file: {}".format(cmd))
+            raise rsgislib.RSGISPyException("Could not re-projection vector file: {}".format(cmd))
 
     if created_tmp:
         import shutil
@@ -365,7 +369,7 @@ def create_poly_vec_for_lst_bboxs(
                 driver = ogr.GetDriverByName(out_format)
                 driver.DeleteDataSource(out_vec_file)
             else:
-                raise Exception("Output file already exists")
+                raise rsgislib.RSGISPyException("Output file already exists")
         # Create the output Driver
         outDriver = ogr.GetDriverByName(out_format)
         # create the spatial reference, WGS84
@@ -454,7 +458,7 @@ def define_grid(
     import rsgislib.tools.geometrytools
 
     if (out_epsg_code is not None) and utm_grid:
-        raise Exception("Cannot specify both new output projection and UTM grid.")
+        raise rsgislib.RSGISPyException("Cannot specify both new output projection and UTM grid.")
     elif utm_grid:
         wgs84_bbox = bbox
         if in_epsg_code != 4326:
@@ -655,21 +659,21 @@ def create_poly_vec_bboxs(
         if (atts is not None) and (att_types is not None):
             nAtts = 0
             if not "names" in att_types:
-                raise Exception('attTypes must include a list for "names"')
+                raise rsgislib.RSGISPyException('attTypes must include a list for "names"')
             nAtts = len(att_types["names"])
             if not "types" in att_types:
-                raise Exception('attTypes must include a list for "types"')
+                raise rsgislib.RSGISPyException('attTypes must include a list for "types"')
             if nAtts != len(att_types["types"]):
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     'attTypes "names" and "types" lists must be the same length.'
                 )
             for i in range(nAtts):
                 if att_types["names"][i] not in atts:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         '"{}" is not within atts'.format(att_types["names"][i])
                     )
                 if len(atts[att_types["names"][i]]) != len(bboxs):
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         '"{}" in atts does not have the same len as bboxs'.format(
                             att_types["names"][i]
                         )
@@ -678,12 +682,12 @@ def create_poly_vec_bboxs(
             for i in range(nAtts):
                 field_defn = ogr.FieldDefn(att_types["names"][i], att_types["types"][i])
                 if outLayer.CreateField(field_defn) != 0:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "Creating '" + att_types["names"][i] + "' field failed.\n"
                     )
             addAtts = True
         elif not ((atts is None) and (att_types is None)):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "If atts or attTypes is not None then the other should also not be "
                 "none and equalivent in length."
             )
@@ -775,7 +779,7 @@ def write_pts_to_vec(
 
     try:
         if len(pts_x) != len(pts_y):
-            raise Exception("The X and Y coordinates lists are not the same length.")
+            raise rsgislib.RSGISPyException("The X and Y coordinates lists are not the same length.")
         nPts = len(pts_x)
 
         gdal.UseExceptions()
@@ -798,21 +802,21 @@ def write_pts_to_vec(
         if (atts is not None) and (att_types is not None):
             nAtts = 0
             if not "names" in att_types:
-                raise Exception('attTypes must include a list for "names"')
+                raise rsgislib.RSGISPyException('attTypes must include a list for "names"')
             nAtts = len(att_types["names"])
             if not "types" in att_types:
-                raise Exception('attTypes must include a list for "types"')
+                raise rsgislib.RSGISPyException('attTypes must include a list for "types"')
             if nAtts != len(att_types["types"]):
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     'attTypes "names" and "types" lists must be the same length.'
                 )
             for i in range(nAtts):
                 if att_types["names"][i] not in atts:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         '"{}" is not within atts'.format(att_types["names"][i])
                     )
                 if len(atts[att_types["names"][i]]) != len(pts_x):
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         '"{}" in atts does not have the same len as pts_x'.format(
                             att_types["names"][i]
                         )
@@ -821,12 +825,12 @@ def write_pts_to_vec(
             for i in range(nAtts):
                 field_defn = ogr.FieldDefn(att_types["names"][i], att_types["types"][i])
                 if outLayer.CreateField(field_defn) != 0:
-                    raise Exception(
+                    raise rsgislib.RSGISPyException(
                         "Creating '" + att_types["names"][i] + "' field failed.\n"
                     )
             addAtts = True
         elif not ((atts is None) and (att_types is None)):
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "If atts or attTypes is not None then the other should also "
                 "not be none and equivlent in length."
             )
@@ -897,7 +901,7 @@ def create_bboxs_for_pts(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -907,10 +911,10 @@ def create_bboxs_for_pts(
 
     vec_ds_obj = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vec_ds_obj is None:
-        raise Exception("The input vector file could not be opened.")
+        raise rsgislib.RSGISPyException("The input vector file could not be opened.")
     vec_lyr_obj = vec_ds_obj.GetLayer(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("The input vector layer could not be opened.")
+        raise rsgislib.RSGISPyException("The input vector layer could not be opened.")
     if epsg_code is None:
         epsg_code = rsgislib.vectorutils.get_proj_epsg_from_vec(vec_file, vec_lyr)
 

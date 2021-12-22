@@ -107,13 +107,13 @@ def perform_felsenszwalb_segmentation(
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif use_pca:
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "In the number of bands given the number of principle components."
         )
 
     if not ((gdalDS.RasterCount == 1) or (gdalDS.RasterCount == 3)):
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Input image should have either a single band or three (RGB). Consider performing PCA to reduce."
         )
 
@@ -229,13 +229,13 @@ def perform_quickshift_segmentation(
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif use_pca:
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "In the number of bands given the number of principle components."
         )
 
     if not (gdalDS.RasterCount == 3):
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Input image should have three bands (RGB). Consider performing PCA to reduce."
         )
 
@@ -400,13 +400,13 @@ def perform_slic_segmentation(
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif use_pca:
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "In the number of bands given the number of principle components."
         )
 
     if not ((gdalDS.RasterCount == 1) or (gdalDS.RasterCount == 3)):
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Input image should have either a single band or three (RGB). Consider performing PCA to reduce."
         )
 
@@ -509,7 +509,7 @@ def perform_watershed_segmentation(
     gdalMarkersDS = gdal.Open(in_markers_img, gdal.GA_ReadOnly)
     if gdalMarkersDS.RasterCount != 1:
         gdalMarkersDS = None
-        raise Exception("Markers image should only have one image band.")
+        raise rsgislib.RSGISPyException("Markers image should only have one image band.")
 
     gdalMarkerBand = gdalMarkersDS.GetRasterBand(1)
     markerArr = gdalMarkerBand.ReadAsArray()
@@ -556,13 +556,13 @@ def perform_watershed_segmentation(
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif use_pca:
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "In the number of bands given the number of principle components."
         )
 
     if not ((gdalDS.RasterCount == 1) or (gdalDS.RasterCount == 3)):
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Input image should have either a single band or three (RGB). Consider performing PCA to reduce."
         )
 
@@ -668,7 +668,7 @@ def perform_random_walker_segmentation(
     gdalMarkersDS = gdal.Open(in_markers_img, gdal.GA_ReadOnly)
     if gdalMarkersDS.RasterCount != 1:
         gdalMarkersDS = None
-        raise Exception("Markers image should only have one image band.")
+        raise rsgislib.RSGISPyException("Markers image should only have one image band.")
 
     gdalMarkerBand = gdalMarkersDS.GetRasterBand(1)
     markerArr = gdalMarkerBand.ReadAsArray()
@@ -715,13 +715,13 @@ def perform_random_walker_segmentation(
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif use_pca:
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "In the number of bands given the number of principle components."
         )
 
     if not ((gdalDS.RasterCount == 1) or (gdalDS.RasterCount == 3)):
         gdalDS = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "Input image should have either a single band or three (RGB). Consider performing PCA to reduce."
         )
 

@@ -385,16 +385,16 @@ def calc_acc_metrics_vecsamples(
     try:
         rat_cols = rsgislib.rastergis.get_rat_columns(cls_img)
     except:
-        raise Exception("The input image does not have a RAT...")
+        raise rsgislib.RSGISPyException("The input image does not have a RAT...")
 
     if img_cls_name_col not in rat_cols:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The RAT does not contain the class name column specified ('{}')".format(
                 img_cls_name_col
             )
         )
     if img_hist_col not in rat_cols:
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The RAT does not contain the histogram column specified ('{}')".format(
                 img_hist_col
             )
@@ -419,7 +419,7 @@ def calc_acc_metrics_vecsamples(
         cls_name_str = rsgislib.tools.utils.check_str(cls_name_str, rm_non_ascii=True)
         if (i > 0) and (len(cls_name_str) > 0):
             if cls_name_str not in unq_cls_names:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "Class ('{}') found in image which was "
                     "not in point samples...".format(cls_name_str)
                 )
@@ -1323,13 +1323,13 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
     uid_str = rsgislib.tools.utils.uid_generator()
 
     if conf_inter not in [90, 95, 99]:
-        raise Exception("conf_inter must have a value of 90, 95 or 99.")
+        raise rsgislib.RSGISPyException("conf_inter must have a value of 90, 95 or 99.")
 
     if not os.path.exists(tmp_dir):
-        raise Exception("tmp_dir does not exist")
+        raise rsgislib.RSGISPyException("tmp_dir does not exist")
 
     if len(vec_files) != len(vec_lyrs):
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "vec_files and vec_lyrs have different " "lengths and must be the same."
         )
 

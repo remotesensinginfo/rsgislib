@@ -40,7 +40,7 @@ def convert_polygon_to_polyline(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(vec_line_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(vec_line_file)
             )
@@ -55,7 +55,7 @@ def convert_polygon_to_polyline(
 
     out_vec_drv = gdal.GetDriverByName(out_format)
     if out_vec_drv == None:
-        raise Exception("Driver ('{}') has not be recognised.".format(out_format))
+        raise rsgislib.RSGISPyException("Driver ('{}') has not be recognised.".format(out_format))
 
     out_ds_obj = out_vec_drv.Create(vec_line_file, 0, 0, 0, gdal.GDT_Unknown)
     out_lyr_obj = out_ds_obj.CreateLayer(
@@ -213,7 +213,7 @@ def find_pt_to_side(
         out_pt_x = pt_start.GetX() + localX
         out_pt_y = pt_start.GetY() + localY
     else:
-        raise Exception("Could not resolve find_pt_to_side...")
+        raise rsgislib.RSGISPyException("Could not resolve find_pt_to_side...")
     return out_pt_x, out_pt_y
 
 
@@ -254,7 +254,7 @@ def create_orthg_lines(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -265,15 +265,15 @@ def create_orthg_lines(
     gdal.UseExceptions()
     vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
     if vec_ds_obj is None:
-        raise Exception("Could not open vector file: {}".format(in_vec_file))
+        raise rsgislib.RSGISPyException("Could not open vector file: {}".format(in_vec_file))
     vec_lyr_obj = vec_ds_obj.GetLayer(in_vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not open vector layer: {}".format(in_vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open vector layer: {}".format(in_vec_lyr))
     vec_spat_ref = vec_lyr_obj.GetSpatialRef()
 
     out_vec_drv = gdal.GetDriverByName(out_format)
     if out_vec_drv == None:
-        raise Exception("Driver ('{}') has not be recognised.".format(out_format))
+        raise rsgislib.RSGISPyException("Driver ('{}') has not be recognised.".format(out_format))
 
     out_ds_obj = out_vec_drv.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
     out_lyr_obj = out_ds_obj.CreateLayer(
@@ -415,7 +415,7 @@ def closest_line_intersection(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -428,11 +428,11 @@ def closest_line_intersection(
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
     if ds_line_vec is None:
-        raise Exception("Could not open '{}'".format(vec_line_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_line_file))
 
     lyr_line_vec = ds_line_vec.GetLayerByName(vec_line_lyr)
     if lyr_line_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_line_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_line_lyr))
 
     x_col_exists = False
     y_col_exists = False
@@ -450,18 +450,18 @@ def closest_line_intersection(
 
     if (not x_col_exists) or (not y_col_exists) or (not uid_col_exists):
         ds_line_vec = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The start x and y columns and/or UID column "
             "are not present within the input file."
         )
 
     ds_objs_vec = gdal.OpenEx(vec_objs_file, gdal.OF_READONLY)
     if ds_objs_vec is None:
-        raise Exception("Could not open '{}'".format(vec_objs_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_objs_file))
 
     lyr_objs_vec = ds_objs_vec.GetLayerByName(vec_objs_lyr)
     if lyr_objs_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_objs_lyr))
 
     ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
         lyr_objs_vec, vec_bbox
@@ -606,7 +606,7 @@ def line_intersection_range(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -619,11 +619,11 @@ def line_intersection_range(
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
     if ds_line_vec is None:
-        raise Exception("Could not open '{}'".format(vec_line_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_line_file))
 
     lyr_line_vec = ds_line_vec.GetLayerByName(vec_line_lyr)
     if lyr_line_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_line_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_line_lyr))
 
     x_col_exists = False
     y_col_exists = False
@@ -641,18 +641,18 @@ def line_intersection_range(
 
     if (not x_col_exists) or (not y_col_exists) or (not uid_col_exists):
         ds_line_vec = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The start x and y columns and/or UID column "
             "are not present within the input file."
         )
 
     ds_objs_vec = gdal.OpenEx(vec_objs_file, gdal.OF_READONLY)
     if ds_objs_vec is None:
-        raise Exception("Could not open '{}'".format(vec_objs_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_objs_file))
 
     lyr_objs_vec = ds_objs_vec.GetLayerByName(vec_objs_lyr)
     if lyr_objs_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_objs_lyr))
 
     ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
         lyr_objs_vec, vec_bbox
@@ -809,7 +809,7 @@ def scnd_line_intersection_range(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -822,11 +822,11 @@ def scnd_line_intersection_range(
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
     if ds_line_vec is None:
-        raise Exception("Could not open '{}'".format(vec_line_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_line_file))
 
     lyr_line_vec = ds_line_vec.GetLayerByName(vec_line_lyr)
     if lyr_line_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_line_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_line_lyr))
 
     x_col_exists = False
     y_col_exists = False
@@ -844,18 +844,18 @@ def scnd_line_intersection_range(
 
     if (not x_col_exists) or (not y_col_exists) or (not uid_col_exists):
         ds_line_vec = None
-        raise Exception(
+        raise rsgislib.RSGISPyException(
             "The start x and y columns and/or UID column are "
             "not present within the input file."
         )
 
     ds_objs_vec = gdal.OpenEx(vec_objs_file, gdal.OF_READONLY)
     if ds_objs_vec is None:
-        raise Exception("Could not open '{}'".format(vec_objs_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_objs_file))
 
     lyr_objs_vec = ds_objs_vec.GetLayerByName(vec_objs_lyr)
     if lyr_objs_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_objs_lyr))
 
     ds_objs_sub_vec, lyr_objs_sub_vec = rsgislib.vectorutils.subset_envs_vec_lyr_obj(
         lyr_objs_vec, vec_bbox
@@ -1014,23 +1014,23 @@ def calc_poly_centroids(
     """
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not open layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
     lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
 
     out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(out_vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(out_vec_file))
 
     result_lyr = result_ds.CreateLayer(
         out_vec_lyr, lyr_spat_ref, geom_type=ogr.wkbPoint
     )
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -1100,7 +1100,7 @@ def vec_lyr_intersection_gp(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -1115,7 +1115,7 @@ def vec_lyr_intersection_gp(
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "If output format is GPKG then an output layer is required."
             )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
@@ -1153,7 +1153,7 @@ def vec_lyr_difference_gp(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -1168,7 +1168,7 @@ def vec_lyr_difference_gp(
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "If output format is GPKG then an output layer is required."
             )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
@@ -1206,7 +1206,7 @@ def vec_lyr_sym_difference_gp(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -1223,7 +1223,7 @@ def vec_lyr_sym_difference_gp(
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "If output format is GPKG then an output layer is required."
             )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
@@ -1264,7 +1264,7 @@ def vec_lyr_identity_gp(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -1279,7 +1279,7 @@ def vec_lyr_identity_gp(
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "If output format is GPKG then an output layer is required."
             )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
@@ -1317,7 +1317,7 @@ def vec_lyr_union_gp(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -1332,7 +1332,7 @@ def vec_lyr_union_gp(
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "If output format is GPKG then an output layer is required."
             )
         data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
@@ -1428,7 +1428,7 @@ def create_alpha_shape(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -1522,23 +1522,23 @@ def create_alpha_shape(
     if out_alpha_shape is not None:
         vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
         if vecDS is None:
-            raise Exception("Could not open '{}'".format(vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
         vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not open layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
         lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
         vecDS = None
 
         out_driver = ogr.GetDriverByName(out_format)
         result_ds = out_driver.CreateDataSource(out_vec_file)
         if result_ds is None:
-            raise Exception("Could not open '{}'".format(out_vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(out_vec_file))
 
         result_lyr = result_ds.CreateLayer(
             out_vec_lyr, lyr_spat_ref, geom_type=ogr_geom_type
         )
         if result_lyr is None:
-            raise Exception("Could not open layer '{}'".format(out_vec_lyr))
+            raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
 
         # Get the output Layer's Feature Definition
         featureDefn = result_lyr.GetLayerDefn()
@@ -1650,18 +1650,18 @@ def convert_multi_geoms_to_single(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not open layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
     lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
     geom_type = vec_lyr_obj.GetGeomType()
     if geom_type == ogr.wkbMultiPoint:
@@ -1677,11 +1677,11 @@ def convert_multi_geoms_to_single(
     out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(out_vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(out_vec_file))
 
     result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=geom_type)
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -1777,29 +1777,29 @@ def simplify_geometries(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not open layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
     lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
     geom_type = vec_lyr_obj.GetGeomType()
 
     out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(out_vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(out_vec_file))
 
     result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=geom_type)
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -1870,14 +1870,14 @@ def delete_polygon_holes(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
 
     def _remove_holes_polygon(polygon, area_thres=None):
         if polygon.GetGeometryName().lower() != "polygon":
-            raise Exception("Can only remove holes from polygon geometry.")
+            raise rsgislib.RSGISPyException("Can only remove holes from polygon geometry.")
         if polygon.GetGeometryCount() == 1:
             return polygon
 
@@ -1901,22 +1901,22 @@ def delete_polygon_holes(
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not open layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
     lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
     geom_type = vec_lyr_obj.GetGeomType()
 
     out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(out_vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(out_vec_file))
 
     result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=geom_type)
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -1981,7 +1981,7 @@ def get_poly_hole_area(vec_file: str, vec_lyr: str):
 
     def _calc_hole_area(polygon):
         if polygon.GetGeometryName().lower() != "polygon":
-            raise Exception("Can only remove holes from polygon geometry.")
+            raise rsgislib.RSGISPyException("Can only remove holes from polygon geometry.")
         if polygon.GetGeometryCount() == 1:
             return []
         else:
@@ -1996,11 +1996,11 @@ def get_poly_hole_area(vec_file: str, vec_lyr: str):
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not open layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
 
     vec_lyr_obj.ResetReading()
     n_feats = vec_lyr_obj.GetFeatureCount(True)
@@ -2061,29 +2061,29 @@ def remove_polygon_area(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
 
     vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not open layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
     lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
     geom_type = vec_lyr_obj.GetGeomType()
 
     out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(out_vec_file)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(out_vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(out_vec_file))
 
     result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=geom_type)
     if result_lyr is None:
-        raise Exception("Could not open layer '{}'".format(out_vec_lyr))
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
 
     featDefn = result_lyr.GetLayerDefn()
 
@@ -2170,7 +2170,7 @@ def vec_lyr_intersection(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already exists, "
                 "remove it and re-run.".format(out_vec_file)
             )
@@ -2183,21 +2183,21 @@ def vec_lyr_intersection(
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     lyr_in_vec = ds_in_vec.GetLayerByName(vec_lyr)
     if lyr_in_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
     spat_ref = lyr_in_vec.GetSpatialRef()
     geom_type = lyr_in_vec.GetGeomType()
 
     ds_over_vec = gdal.OpenEx(vec_over_file, gdal.OF_READONLY)
     if ds_over_vec is None:
-        raise Exception("Could not open '{}'".format(vec_over_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_over_file))
 
     lyr_over_vec = ds_over_vec.GetLayerByName(vec_over_lyr)
     if lyr_over_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_over_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_over_lyr))
 
     out_driver = ogr.GetDriverByName(out_format)
     out_ds_obj = out_driver.CreateDataSource(out_vec_file)
@@ -2322,7 +2322,7 @@ def vec_lyr_difference(
         if del_exist_vec:
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
         else:
-            raise Exception(
+            raise rsgislib.RSGISPyException(
                 "The output vector file ({}) already "
                 "exists, remove it and re-run.".format(out_vec_file)
             )
@@ -2335,21 +2335,21 @@ def vec_lyr_difference(
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     lyr_in_vec = ds_in_vec.GetLayerByName(vec_lyr)
     if lyr_in_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
     spat_ref = lyr_in_vec.GetSpatialRef()
     geom_type = lyr_in_vec.GetGeomType()
 
     ds_over_vec = gdal.OpenEx(vec_over_file, gdal.OF_READONLY)
     if ds_over_vec is None:
-        raise Exception("Could not open '{}'".format(vec_over_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_over_file))
 
     lyr_over_vec = ds_over_vec.GetLayerByName(vec_over_lyr)
     if lyr_over_vec is None:
-        raise Exception("Could not find layer '{}'".format(vec_over_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_over_lyr))
 
     out_driver = ogr.GetDriverByName(out_format)
     out_ds_obj = out_driver.CreateDataSource(out_vec_file)
@@ -2538,19 +2538,19 @@ def vec_intersects_vec(
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
-        raise Exception("Could not open '{}'".format(vec_base_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_base_file))
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
-        raise Exception("Could not open '{}'".format(vec_comp_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_comp_file))
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
 
     n_feats = lyrVecBaseObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2604,19 +2604,19 @@ def vec_overlaps_vec(
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
-        raise Exception("Could not open '{}'".format(vec_base_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_base_file))
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
-        raise Exception("Could not open '{}'".format(vec_comp_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_comp_file))
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
 
     n_feats = lyrVecBaseObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2670,19 +2670,19 @@ def vec_within_vec(
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
-        raise Exception("Could not open '{}'".format(vec_base_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_base_file))
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
-        raise Exception("Could not open '{}'".format(vec_comp_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_comp_file))
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
 
     n_feats = lyrVecCompObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2740,19 +2740,19 @@ def vec_contains_vec(
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
-        raise Exception("Could not open '{}'".format(vec_base_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_base_file))
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
-        raise Exception("Could not open '{}'".format(vec_comp_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_comp_file))
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
 
     n_feats = lyrVecCompObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2810,19 +2810,19 @@ def vec_touches_vec(
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
-        raise Exception("Could not open '{}'".format(vec_base_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_base_file))
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
-        raise Exception("Could not open '{}'".format(vec_comp_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_comp_file))
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
 
     n_feats = lyrVecBaseObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2877,19 +2877,19 @@ def vec_crosses_vec(
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
-        raise Exception("Could not open '{}'".format(vec_base_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_base_file))
 
     lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
     if lyrVecBaseObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_base_lyr))
 
     dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
     if dsVecCompObj is None:
-        raise Exception("Could not open '{}'".format(vec_comp_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_comp_file))
 
     lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
     if lyrVecCompObj is None:
-        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_comp_lyr))
 
     n_feats = lyrVecBaseObj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
@@ -2962,11 +2962,11 @@ def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: list) -> bool:
     """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '" + vec_lyr + "'")
+        raise rsgislib.RSGISPyException("Could not find layer '" + vec_lyr + "'")
 
     # Get a geometry collection object for shapefile.
     geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
@@ -3044,11 +3044,11 @@ def create_rtree_index(vec_file: str, vec_lyr: str):
 
     vec_file_obj = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if vec_file_obj is None:
-        raise Exception("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = vec_file_obj.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '{}'".format(vec_lyr))
+        raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
     idx_obj = rtree.index.Index(interleaved=False)
     geom_lst = list()

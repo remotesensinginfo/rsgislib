@@ -1264,7 +1264,7 @@ def apply_lightgbm_multiclass_classifier(
             )
             preds_idxs = numpy.argmax(predClassProbs, axis=1)
             if otherargs.n_classes != predClassProbs.shape[1]:
-                raise Exception(
+                raise rsgislib.RSGISPyException(
                     "The number of classes expected and the number provided by the classifier do not match."
                 )
             outClassVals[ID] = predClassProbs

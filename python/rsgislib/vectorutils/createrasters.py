@@ -94,15 +94,15 @@ def rasterise_vec_lyr(
         print("Running Rasterise now...")
         out_img_ds = gdal.Open(output_img, gdal.GA_Update)
         if out_img_ds is None:
-            raise Exception("Could not open '{}'".format(output_img))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(output_img))
 
         vec_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
         if vec_ds is None:
-            raise Exception("Could not open '{}'".format(vec_file))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
         vec_lyr_obj = vec_ds.GetLayerByName(vec_lyr)
         if vec_lyr_obj is None:
-            raise Exception("Could not find layer '{}'".format(vec_lyr))
+            raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
         # Run the algorithm.
         err = 0
@@ -115,7 +115,7 @@ def rasterise_vec_lyr(
                 out_img_ds, [1], vec_lyr_obj, options=["ATTRIBUTE=" + att_column]
             )
         if err != 0:
-            raise Exception("Rasterisation Error: " + str(err))
+            raise rsgislib.RSGISPyException("Rasterisation Error: " + str(err))
 
         out_img_ds = None
         vec_ds = None
@@ -167,12 +167,12 @@ def rasterise_vec_lyr_obj(
     """
     try:
         if vec_lyr_obj is None:
-            raise Exception("The vec_lyr_obj passed to the function was None.")
+            raise rsgislib.RSGISPyException("The vec_lyr_obj passed to the function was None.")
 
         print("Running Rasterise now...")
         out_img_ds = gdal.Open(output_img, gdal.GA_Update)
         if out_img_ds is None:
-            raise Exception("Could not open '{}'".format(output_img))
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(output_img))
 
         # Run the algorithm.
         err = 0
@@ -185,7 +185,7 @@ def rasterise_vec_lyr_obj(
                 out_img_ds, [1], vec_lyr_obj, options=["ATTRIBUTE=" + att_column]
             )
         if err != 0:
-            raise Exception("Rasterisation Error: {}".format(err))
+            raise rsgislib.RSGISPyException("Rasterisation Error: {}".format(err))
 
         out_img_ds = None
 
