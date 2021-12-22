@@ -11,7 +11,7 @@ The Remote Sensing and GIS software library (RSGISLib) is a collection of tools,
 
 The project is hosted on GitHub and is available to download from https://github.com/remotesensinginfo/rsgislib
 
-The project is jointly led by Pete Bunting (`Earth Observation and Ecosystem Dynamics Group <http://www.aber.ac.uk/en/iges/research-groups/earth-observation-laboratory/>`_ , `Aberystwyth University <http://www.aber.ac.uk/>`_) and Dan Clewley (`Plymouth Marine Laboratory <http://pml.ac.uk>`_).
+The project is led by Pete Bunting (`Earth Observation and Ecosystem Dynamics Group <http://www.aber.ac.uk/en/iges/research-groups/earth-observation-laboratory/>`_ , `Aberystwyth University <http://www.aber.ac.uk/>`_) and supported by Dan Clewley (`Plymouth Marine Laboratory <http://pml.ac.uk>`_) and Nathan Thomas (`NASA Goddard Space Flight Centre <https://www.nasa.gov/goddard>`_).
 
 
 Information
@@ -59,6 +59,6 @@ Python documentation
 * :ref:`modindex`
 * :ref:`search`
 
-.. codeauthor:: Dr Peter Bunting <pfb@aber.ac.uk> and Dr Dan Clewely <dac@pml.ac.uk>
+.. codeauthor:: Dr Peter Bunting <pfb@aber.ac.uk>, Dr Dan Clewely <dac@pml.ac.uk> and Dr Nathan Thomas <nathan.m.thomas@nasa.gov>
 
 

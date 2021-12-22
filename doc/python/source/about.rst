@@ -1,13 +1,15 @@
 About
 ===============
 
-The Remote Sensing and Geographical Information Systems software Library (RSGISLib) was started by `Pete Bunting <http://users.aber.ac.uk/pfb/>`_, a lecturer in the Department of Geography and Earth Sciences (DGES) at Aberystwyth University (Wales, UK) in April 2008 as a means of grouping together code developed as part of his research and to provide a better platform for development of new functions.
+The Remote Sensing and Geographical Information Systems software Library (RSGISLib) was started by `Pete Bunting <https://www.aber.ac.uk/en/dges/staff-profiles/listing/profile/pfb/>`_, a Reader in the Department of Geography and Earth Sciences (DGES) at Aberystwyth University (Wales, UK) in April 2008 as a means of grouping together code developed as part of his research and to provide a better platform for development of new functions.
 
 `Dan Clewley <https://www.pml.ac.uk/People/Science_Staff/Dr_Daniel_Clewley>`_ joined the project in December 2008, shortly after starting his PhD within DGES, at Aberystwyth University (funded by a NERC studentship).
 
-Features were added to RSGISLib, as required by Pete and Dan or requested by other researches and students within Aberystwyth University and collaborators in other institutions. 
+`Nathan Thomas <https://science.gsfc.nasa.gov/sed/bio/nathan.m.thomas>`_ joined the project in around 2015 when undertaking his PhD within DGES, at Aberystwyth University.
 
-The project was released under the GPL license in November 2009 in the hope it would be useful to others working in remote sensing and GIS and has been actively developed since then. Currently there are over 300 commands to perform a number of tasks.
+Features have been added to RSGISLib, as required for our research needs or requested by other researches and students within Aberystwyth University and collaborators in other institutions.
+
+The project was released under the GPL license in November 2009 in the hope it would be useful to others working in remote sensing and GIS and has been actively developed since then. Currently there are over 800 commands to perform a number of tasks.
 
 Frequently Asked Questions
 --------------------------
@@ -111,3 +113,10 @@ See the GDAL pages for the options available for an individual format.
 
 NOTE, some commands use `RIOS <http://www.rioshome.org>`_ and therefore you might also need to set the `environmental variables for RIOS <http://www.rioshome.org/en/latest/environmentvars.html>`_ to ensure all images are outputted within the options you require.
 
+**RSGISLib Version 5 - how different is it?**
+
+In 2021 we have undertaken a significant updated to RSGISLib which as resulted in RSGISLib version 5.0. This version will break existing RSGISLib based code as some function and variables names have change and other functions have moved modules and some deleted.
+
+These changes were required to support the future growth on the library and remove old and redundant code. As part of these change we have implemented unit testing on the RSGISLib function, which should help maintain the code quality going forward. This has also enabled us to implement continuous integration so these tests are run every commit.
+
+The dependencies of RSGISLib has also been reduced which should make future maintenance easier as well.
