@@ -46,14 +46,15 @@ gdal.UseExceptions()
 import rsgislib
 import rsgislib.vectorutils
 
+
 def create_img_extent_lut(
-    input_imgs:list[str],
-    vec_file:str,
-    vec_lyr:str,
-    out_format:str,
-    ignore_none_imgs:bool=False,
-    out_proj_wgs84:bool=False,
-    overwrite_lut_file:bool=False,
+    input_imgs: list[str],
+    vec_file: str,
+    vec_lyr: str,
+    out_format: str,
+    ignore_none_imgs: bool = False,
+    out_proj_wgs84: bool = False,
+    overwrite_lut_file: bool = False,
 ):
     """
     Create a vector layer look up table (LUT) for a directory of images.
@@ -147,7 +148,7 @@ def create_img_extent_lut(
     )
 
 
-def query_img_lut(scn_bbox:list[float], lut_db_file:str, lyr_name:str) -> list:
+def query_img_lut(scn_bbox: list[float], lut_db_file: str, lyr_name: str) -> list:
     """
     A function for querying the LUT DB spatially filtering using a BBOX
 
@@ -167,7 +168,7 @@ def query_img_lut(scn_bbox:list[float], lut_db_file:str, lyr_name:str) -> list:
     return imgs
 
 
-def get_all_lut_imgs(lut_db_file:str, lyr_name:str) -> list:
+def get_all_lut_imgs(lut_db_file: str, lyr_name: str) -> list:
     """
     Get a list of all the images within the LUT.
 
@@ -187,7 +188,9 @@ def get_all_lut_imgs(lut_db_file:str, lyr_name:str) -> list:
     return imgs
 
 
-def get_raster_lyr(scn_bbox:list[float], lut_db_file:str, lyr_name:str, tmp_dir:str) -> str:
+def get_raster_lyr(
+    scn_bbox: list[float], lut_db_file: str, lyr_name: str, tmp_dir: str
+) -> str:
     """
     This function provides a single raster layer using the LUT file provided. If
     a single image file intersecting with the BBOX is not within the LUT then a
@@ -219,14 +222,22 @@ def get_raster_lyr(scn_bbox:list[float], lut_db_file:str, lyr_name:str, tmp_dir:
         out_img_file = os.path.join(tmp_dir, "{}_tmp.vrt".format(img_base))
         gdal.BuildVRT(out_img_file, imgs)
     elif len(file_list_lut) == 1:
-        out_img_file = os.path.join(file_list_lut[0]["path"], file_list_lut[0]["filename"])
+        out_img_file = os.path.join(
+            file_list_lut[0]["path"], file_list_lut[0]["filename"]
+        )
     else:
         out_img_file = None
     return out_img_file
 
 
 def query_file_lut(
-    lut_db_file:str, lyr_name:str, roi_file:str, roi_lyr:str, out_dest:str, targz_out:bool, cp_cmds:bool
+    lut_db_file: str,
+    lyr_name: str,
+    roi_file: str,
+    roi_lyr: str,
+    out_dest: str,
+    targz_out: bool,
+    cp_cmds: bool,
 ) -> list:
     """
     A function which allows the file LUT to be queried (intersection) and commands
