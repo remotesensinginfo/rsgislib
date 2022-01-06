@@ -1060,7 +1060,7 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
     {
         cmdObj.sumField = RSGISPY_STRING_EXTRACT(pSumField);
     }
-    
+
     try
     {
         bool useAbsDiffBool = (bool)useAbsDiff;

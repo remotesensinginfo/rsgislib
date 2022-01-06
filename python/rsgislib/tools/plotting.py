@@ -18,11 +18,7 @@ from rsgislib import imagecalc
 # Import the os module
 import os
 
-haveGDALPy = True
-try:
-    from osgeo import gdal
-except ImportError as gdalErr:
-    haveGDALPy = False
+from osgeo import gdal
 
 
 haveMatPlotLib = True
@@ -32,11 +28,7 @@ try:
 except ImportError as pltErr:
     haveMatPlotLib = False
 
-haveNumpy = True
-try:
-    import numpy
-except ImportError as numErr:
-    haveNumpy = False
+import numpy
 
 
 def plot_image_spectra(
@@ -75,118 +67,107 @@ def plot_image_spectra(
 
         tools.plotting.plot_image_spectra(inputImage, roiFile, outputPlotFile, wavelengths, plotTitle)
     """
-
-    try:
-        # Check gdal is available
-        if not haveGDALPy:
-            raise rsgislib.RSGISPyException(
-                "The GDAL python bindings required for this function could not be imported\n\t"
-                + gdalErr
-            )
-        # Check matplotlib is available
-        if not haveMatPlotLib:
-            raise rsgislib.RSGISPyException(
-                "The matplotlib module is required for this function could not be imported\n\t"
-                + pltErr
-            )
-
-        dataset = gdal.Open(input_img, gdal.GA_ReadOnly)
-        numBands = dataset.RasterCount
-        dataset = None
-
-        if not len(wavelengths) == numBands:
-            raise rsgislib.RSGISPyException(
-                "The number of wavelengths and image bands must be equal."
-            )
-
-        tmpOutFile = os.path.splitext(output_plot_file)[0] + "_statstmp.txt"
-        zonalattributes = zonalstats.ZonalAttributes(
-            minThreshold=0,
-            maxThreshold=10000,
-            calcCount=False,
-            calcMin=False,
-            calcMax=False,
-            calcMean=True,
-            calcStdDev=True,
-            calcMode=False,
-            calcSum=False,
-        )
-        zonalstats.pixelStats2TXT(
-            input_img,
-            vec_file,
-            tmpOutFile,
-            zonalattributes,
-            True,
-            True,
-            zonalstats.METHOD_POLYCONTAINSPIXELCENTER,
-            False,
+    # Check matplotlib is available
+    if not haveMatPlotLib:
+        raise rsgislib.RSGISPyException(
+            "The matplotlib module is required for this function could not be imported\n\t"
+            + pltErr
         )
 
-        meanVals = []
-        stdDevVals = []
-        stats = open(tmpOutFile, "r")
-        row = 0
-        for statsRow in stats:
-            statsRow = statsRow.strip()
-            if row > 0:
-                meanVal = []
-                stdDevVal = []
-                data = statsRow.split(",")
+    dataset = gdal.Open(input_img, gdal.GA_ReadOnly)
+    numBands = dataset.RasterCount
+    dataset = None
 
-                if not len(data) == (numBands * 2) + 2:
-                    raise rsgislib.RSGISPyException(
-                        "The number of outputted stats values is incorrect!"
-                    )
-                for band in range(numBands):
-                    meanVal.append(float(data[(band * 2) + 1]) * scale_factor)
-                    stdDevVal.append(float(data[(band * 2) + 2]) * scale_factor)
-                meanVals.append(meanVal)
-                stdDevVals.append(stdDevVal)
-            row += 1
-        stats.close()
+    if not len(wavelengths) == numBands:
+        raise rsgislib.RSGISPyException(
+            "The number of wavelengths and image bands must be equal."
+        )
 
-        # print("Mean: ", meanVals)
-        # print("Std Dev: ", stdDevVals)
-        print("Creating Plot")
-        fig = plt.figure(figsize=(7, 5), dpi=80)
-        ax1 = fig.add_subplot(111)
-        for feat in range(len(meanVals)):
-            ax1.plot(wavelengths, meanVals[feat], "k-", zorder=10)
-            if show_refl_std:
-                lowerVals = []
-                upperVals = []
-                for band in range(numBands):
-                    lowerVals.append(meanVals[feat][band] - stdDevVals[feat][band])
-                    upperVals.append(meanVals[feat][band] + stdDevVals[feat][band])
-                ax1.fill_between(
-                    wavelengths,
-                    lowerVals,
-                    upperVals,
-                    alpha=0.2,
-                    linewidth=1.0,
-                    facecolor=[0.70, 0.70, 0.70],
-                    edgecolor=[0.70, 0.70, 0.70],
-                    zorder=-1,
+    tmpOutFile = os.path.splitext(output_plot_file)[0] + "_statstmp.txt"
+    zonalattributes = zonalstats.ZonalAttributes(
+        minThreshold=0,
+        maxThreshold=10000,
+        calcCount=False,
+        calcMin=False,
+        calcMax=False,
+        calcMean=True,
+        calcStdDev=True,
+        calcMode=False,
+        calcSum=False,
+    )
+    zonalstats.pixelStats2TXT(
+        input_img,
+        vec_file,
+        tmpOutFile,
+        zonalattributes,
+        True,
+        True,
+        zonalstats.METHOD_POLYCONTAINSPIXELCENTER,
+        False,
+    )
+
+    meanVals = []
+    stdDevVals = []
+    stats = open(tmpOutFile, "r")
+    row = 0
+    for statsRow in stats:
+        statsRow = statsRow.strip()
+        if row > 0:
+            meanVal = []
+            stdDevVal = []
+            data = statsRow.split(",")
+
+            if not len(data) == (numBands * 2) + 2:
+                raise rsgislib.RSGISPyException(
+                    "The number of outputted stats values is incorrect!"
                 )
+            for band in range(numBands):
+                meanVal.append(float(data[(band * 2) + 1]) * scale_factor)
+                stdDevVal.append(float(data[(band * 2) + 2]) * scale_factor)
+            meanVals.append(meanVal)
+            stdDevVals.append(stdDevVal)
+        row += 1
+    stats.close()
 
-        ax1Range = ax1.axis("tight")
+    # print("Mean: ", meanVals)
+    # print("Std Dev: ", stdDevVals)
+    print("Creating Plot")
+    fig = plt.figure(figsize=(7, 5), dpi=80)
+    ax1 = fig.add_subplot(111)
+    for feat in range(len(meanVals)):
+        ax1.plot(wavelengths, meanVals[feat], "k-", zorder=10)
+        if show_refl_std:
+            lowerVals = []
+            upperVals = []
+            for band in range(numBands):
+                lowerVals.append(meanVals[feat][band] - stdDevVals[feat][band])
+                upperVals.append(meanVals[feat][band] + stdDevVals[feat][band])
+            ax1.fill_between(
+                wavelengths,
+                lowerVals,
+                upperVals,
+                alpha=0.2,
+                linewidth=1.0,
+                facecolor=[0.70, 0.70, 0.70],
+                edgecolor=[0.70, 0.70, 0.70],
+                zorder=-1,
+            )
 
-        if refl_max is None:
-            ax1.axis((ax1Range[0], ax1Range[1], 0, ax1Range[3]))
-        else:
-            ax1.axis((ax1Range[0], ax1Range[1], 0, refl_max))
+    ax1Range = ax1.axis("tight")
 
-        plt.grid(color="k", linestyle="--", linewidth=0.5)
-        plt.title(plot_title)
-        plt.xlabel("Wavelength")
-        plt.ylabel("Reflectance (%)")
+    if refl_max is None:
+        ax1.axis((ax1Range[0], ax1Range[1], 0, ax1Range[3]))
+    else:
+        ax1.axis((ax1Range[0], ax1Range[1], 0, refl_max))
 
-        plt.savefig(output_plot_file, format="PDF")
-        os.remove(tmpOutFile)
-        print("Completed.\n")
+    plt.grid(color="k", linestyle="--", linewidth=0.5)
+    plt.title(plot_title)
+    plt.xlabel("Wavelength")
+    plt.ylabel("Reflectance (%)")
 
-    except Exception as e:
-        raise e
+    plt.savefig(output_plot_file, format="PDF")
+    os.remove(tmpOutFile)
+    print("Completed.\n")
 
 
 def plot_image_comparison(
@@ -246,129 +227,113 @@ def plot_image_comparison(
         plotting.plot_image_comparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
 
     """
-    try:
-        # Check gdal is available
-        if not haveGDALPy:
-            raise rsgislib.RSGISPyException(
-                "The GDAL python bindings required for this function could not be imported\n\t"
-                + gdalErr
-            )
-        # Check matplotlib is available
-        if not haveMatPlotLib:
-            raise rsgislib.RSGISPyException(
-                "The matplotlib module is required for this function could not be imported\n\t"
-                + pltErr
-            )
-        # Check matplotlib is available
-        if not haveNumpy:
-            raise rsgislib.RSGISPyException(
-                "The numpy module is required for this function could not be imported\n\t"
-                + numErr
-            )
-
-        gdalformat = "KEA"
-        tmpOutFile = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmp.kea"
-        # tmpOutFileStch = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmpStch.kea"
-
-        if (img1Min is None) or (img1Max is None):
-            # Calculate image 1 stats
-            imgGDALDS = gdal.Open(inputImage1, gdal.GA_ReadOnly)
-            imgGDALBand = imgGDALDS.GetRasterBand(img1Band)
-            min, max = imgGDALBand.ComputeRasterMinMax(False)
-            imgGDALDS = None
-            if img1Min is None:
-                img1Min = min
-            if img1Max is None:
-                img1Max = max
-
-        if (img2Min is None) or (img2Max is None):
-            # Calculate image 2 stats
-            imgGDALDS = gdal.Open(inputImage2, gdal.GA_ReadOnly)
-            imgGDALBand = imgGDALDS.GetRasterBand(img2Band)
-            min, max = imgGDALBand.ComputeRasterMinMax(False)
-            imgGDALDS = None
-            if img2Min is None:
-                img2Min = min
-            if img2Max is None:
-                img2Max = max
-
-        # Images are flipped so axis' come out correctly.
-        outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(
-            inputImage2,
-            inputImage1,
-            tmpOutFile,
-            gdalformat,
-            img2Band,
-            img1Band,
-            numBins,
-            img2Min,
-            img2Max,
-            img1Min,
-            img1Max,
-            img2Scale,
-            img1Scale,
-            img2Off,
-            img1Off,
-            normOutput,
+    # Check matplotlib is available
+    if not haveMatPlotLib:
+        raise rsgislib.RSGISPyException(
+            "The matplotlib module is required for this function could not be imported\n\t"
+            + pltErr
         )
-        print("Image1 Bin Size: ", outBinSizeImg1)
-        print("Image2 Bin Size: ", outBinSizeImg2)
-        print("rSq: ", rSq)
 
-        print("Read Image Data")
-        plotGDALImg = gdal.Open(tmpOutFile, gdal.GA_ReadOnly)
-        plotImgBand = plotGDALImg.GetRasterBand(1)
-        dataArr = plotImgBand.ReadAsArray().astype(float)
-        plotGDALImg = None
+    gdalformat = "KEA"
+    tmpOutFile = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmp.kea"
+    # tmpOutFileStch = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmpStch.kea"
 
-        fig = plt.figure(figsize=(7, 7), dpi=80)
-        ax1 = fig.add_subplot(111)
+    if (img1Min is None) or (img1Max is None):
+        # Calculate image 1 stats
+        imgGDALDS = gdal.Open(inputImage1, gdal.GA_ReadOnly)
+        imgGDALBand = imgGDALDS.GetRasterBand(img1Band)
+        min, max = imgGDALBand.ComputeRasterMinMax(False)
+        imgGDALDS = None
+        if img1Min is None:
+            img1Min = min
+        if img1Max is None:
+            img1Max = max
 
-        img1MinSc = img1Off + (img1Min * img1Scale)
-        img1MaxSc = img1Off + (img1Max * img1Scale)
-        img2MinSc = img2Off + (img2Min * img2Scale)
-        img2MaxSc = img2Off + (img2Max * img2Scale)
+    if (img2Min is None) or (img2Max is None):
+        # Calculate image 2 stats
+        imgGDALDS = gdal.Open(inputImage2, gdal.GA_ReadOnly)
+        imgGDALBand = imgGDALDS.GetRasterBand(img2Band)
+        min, max = imgGDALBand.ComputeRasterMinMax(False)
+        imgGDALDS = None
+        if img2Min is None:
+            img2Min = min
+        if img2Max is None:
+            img2Max = max
 
-        minVal = numpy.min(dataArr[dataArr != 0])
-        maxVal = numpy.max(dataArr)
+    # Images are flipped so axis' come out correctly.
+    outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(
+        inputImage2,
+        inputImage1,
+        tmpOutFile,
+        gdalformat,
+        img2Band,
+        img1Band,
+        numBins,
+        img2Min,
+        img2Max,
+        img1Min,
+        img1Max,
+        img2Scale,
+        img1Scale,
+        img2Off,
+        img1Off,
+        normOutput,
+    )
+    print("Image1 Bin Size: ", outBinSizeImg1)
+    print("Image2 Bin Size: ", outBinSizeImg2)
+    print("rSq: ", rSq)
 
-        print("Min Value: ", minVal)
-        print("Max Value: ", maxVal)
+    print("Read Image Data")
+    plotGDALImg = gdal.Open(tmpOutFile, gdal.GA_ReadOnly)
+    plotImgBand = plotGDALImg.GetRasterBand(1)
+    dataArr = plotImgBand.ReadAsArray().astype(float)
+    plotGDALImg = None
 
-        cmap = plt.get_cmap(ctable)
-        mClrs.Colormap.set_under(cmap, color="white")
-        mClrs.Colormap.set_over(cmap, color="white")
+    fig = plt.figure(figsize=(7, 7), dpi=80)
+    ax1 = fig.add_subplot(111)
 
-        imPlot = plt.imshow(
-            dataArr,
-            cmap=cmap,
-            aspect="equal",
-            interpolation=interp,
-            norm=mClrs.Normalize(vmin=minVal, vmax=maxVal),
-            vmin=minVal,
-            vmax=maxVal,
-            origin=[0, 0],
-            extent=[img1MinSc, img1MaxSc, img2MinSc, img2MaxSc],
-        )
-        plt.grid(color="k", linestyle="--", linewidth=0.5)
-        rSqStr = ""
-        if rSq < 0:
-            rSq = 0.00
-        rSqStr = "$r^2 = " + str(round(rSq, 3)) + "$"
-        plt.text(0.05, 0.95, rSqStr, va="center", transform=ax1.transAxes)
-        fig.colorbar(imPlot)
-        plt.title(plotTitle)
-        plt.xlabel(xLabel)
-        plt.ylabel(yLabel)
+    img1MinSc = img1Off + (img1Min * img1Scale)
+    img1MaxSc = img1Off + (img1Max * img1Scale)
+    img2MinSc = img2Off + (img2Min * img2Scale)
+    img2MaxSc = img2Off + (img2Max * img2Scale)
 
-        plt.savefig(outputPlotFile, format="PDF")
+    minVal = numpy.min(dataArr[dataArr != 0])
+    maxVal = numpy.max(dataArr)
 
-        # Tidy up temporary file.
-        gdalDriver = gdal.GetDriverByName(gdalformat)
-        gdalDriver.Delete(tmpOutFile)
+    print("Min Value: ", minVal)
+    print("Max Value: ", maxVal)
 
-    except Exception as e:
-        raise e
+    cmap = plt.get_cmap(ctable)
+    mClrs.Colormap.set_under(cmap, color="white")
+    mClrs.Colormap.set_over(cmap, color="white")
+
+    imPlot = plt.imshow(
+        dataArr,
+        cmap=cmap,
+        aspect="equal",
+        interpolation=interp,
+        norm=mClrs.Normalize(vmin=minVal, vmax=maxVal),
+        vmin=minVal,
+        vmax=maxVal,
+        origin=[0, 0],
+        extent=[img1MinSc, img1MaxSc, img2MinSc, img2MaxSc],
+    )
+    plt.grid(color="k", linestyle="--", linewidth=0.5)
+    rSqStr = ""
+    if rSq < 0:
+        rSq = 0.00
+    rSqStr = "$r^2 = " + str(round(rSq, 3)) + "$"
+    plt.text(0.05, 0.95, rSqStr, va="center", transform=ax1.transAxes)
+    fig.colorbar(imPlot)
+    plt.title(plotTitle)
+    plt.xlabel(xLabel)
+    plt.ylabel(yLabel)
+
+    plt.savefig(outputPlotFile, format="PDF")
+
+    # Tidy up temporary file.
+    gdalDriver = gdal.GetDriverByName(gdalformat)
+    gdalDriver.Delete(tmpOutFile)
 
 
 def plot_image_histogram(
@@ -410,70 +375,54 @@ def plot_image_histogram(
         plotting.plot_image_histogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
 
     """
-    try:
-        # Check gdal is available
-        if not haveGDALPy:
-            raise rsgislib.RSGISPyException(
-                "The GDAL python bindings required for this function could not be imported\n\t"
-                + gdalErr
-            )
-        # Check matplotlib is available
-        if not haveMatPlotLib:
-            raise rsgislib.RSGISPyException(
-                "The matplotlib module is required for this function could not be imported\n\t"
-                + pltErr
-            )
-        # Check matplotlib is available
-        if not haveNumpy:
-            raise rsgislib.RSGISPyException(
-                "The numpy module is required for this function could not be imported\n\t"
-                + numErr
-            )
-
-        if (imgMin is None) or (imgMax is None):
-            # Calculate image 1 stats
-            imgGDALDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-            imgGDALBand = imgGDALDS.GetRasterBand(imgBand)
-            min, max = imgGDALBand.ComputeRasterMinMax(False)
-            imgGDALDS = None
-            if imgMin is None:
-                imgMin = min
-            if imgMax is None:
-                imgMax = max
-
-        binWidth = (imgMax - imgMin) / numBins
-        print("Bin Size: ", binWidth)
-
-        bins, hMin, hMax = imagecalc.getHistogram(
-            input_img, imgBand, binWidth, False, imgMin, imgMax
+    # Check matplotlib is available
+    if not haveMatPlotLib:
+        raise rsgislib.RSGISPyException(
+            "The matplotlib module is required for this function could not be imported\n\t"
+            + pltErr
         )
 
-        if normOutput:
-            sumBins = numpy.sum(bins)
-            bins = bins / sumBins
+    if (imgMin is None) or (imgMax is None):
+        # Calculate image 1 stats
+        imgGDALDS = gdal.Open(input_img, gdal.GA_ReadOnly)
+        imgGDALBand = imgGDALDS.GetRasterBand(imgBand)
+        min, max = imgGDALBand.ComputeRasterMinMax(False)
+        imgGDALDS = None
+        if imgMin is None:
+            imgMin = min
+        if imgMax is None:
+            imgMax = max
 
-        numBins = len(bins)
-        xLocs = numpy.arange(numBins)
-        xLocs = (xLocs * binWidth) - (binWidth / 2)
+    binWidth = (imgMax - imgMin) / numBins
+    print("Bin Size: ", binWidth)
 
-        fig = plt.figure(figsize=(7, 7), dpi=80)
-        plt.bar(
-            xLocs,
-            bins,
-            width=binWidth,
-            color=colour,
-            edgecolor=edgecolour,
-            linewidth=linewidth,
-        )
-        plt.xlim(imgMin, imgMax)
+    bins, hMin, hMax = imagecalc.getHistogram(
+        input_img, imgBand, binWidth, False, imgMin, imgMax
+    )
 
-        plt.title(plotTitle)
-        plt.xlabel(xLabel)
-        plt.ylabel("Freq.")
-        plt.savefig(outputPlotFile, format="PDF")
+    if normOutput:
+        sumBins = numpy.sum(bins)
+        bins = bins / sumBins
 
-    except Exception as e:
-        raise e
+    numBins = len(bins)
+    xLocs = numpy.arange(numBins)
+    xLocs = (xLocs * binWidth) - (binWidth / 2)
+
+    fig = plt.figure(figsize=(7, 7), dpi=80)
+    plt.bar(
+        xLocs,
+        bins,
+        width=binWidth,
+        color=colour,
+        edgecolor=edgecolour,
+        linewidth=linewidth,
+    )
+    plt.xlim(imgMin, imgMax)
+
+    plt.title(plotTitle)
+    plt.xlabel(xLabel)
+    plt.ylabel("Freq.")
+    plt.savefig(outputPlotFile, format="PDF")
 
 
 def residual_plot(y_true, residuals, out_file, out_format="PNG", title=None):
@@ -488,8 +437,6 @@ def residual_plot(y_true, residuals, out_file, out_format="PNG", title=None):
     :param title: A title for the plot. Optional, if None then ignored. (Default: None)
 
     """
-    import numpy
-    import matplotlib.pyplot as plt
     from matplotlib import rcParams
     from matplotlib import gridspec
 
@@ -548,8 +495,6 @@ def quantile_plot(residuals, ylabel, out_file, out_format="PNG", title=None):
     :param title: A title for the plot. Optional, if None then ignored. (Default: None)
 
     """
-    import numpy
-    import matplotlib.pyplot as plt
     from matplotlib import rcParams
     from scipy.stats import probplot
 
@@ -590,3 +535,88 @@ def quantile_plot(residuals, ylabel, out_file, out_format="PNG", title=None):
     ax.get_lines()[1].set_color("r")
     plt.savefig(out_file, format=out_format, dpi=300, bbox_inches="tight")
     plt.close()
+
+
+def get_gdal_raster_mpl_imshow(
+    input_img: str, bands: list[int] = None, bbox: list[float] = None
+) -> [numpy.array, list[float]]:
+    """
+    A function which retrieves image data as an array in an appropriate structure
+    for use within the matplotlib imshow function. The extent is also returned.
+    Note, this function assumes that the image pixels values are within an appropriate
+    range for display.
+
+    :param input_img: The input image file path.
+    :param bands: Optional list of image bands to be selected and returned. If not
+                  provided then all bands will be read. However, note that only 3
+                  or 1 band(s) are valid for visualisation and an error will be thrown
+                  if the number of bands is not 3 or 1.
+    :param bbox: Optional bbox (xmin, xmax, ymin, ymax) used to subset the
+                 input image so only data for the subset are returned.
+    :return: numpy.array either [n,m,3] or [n,m] and a bbox (xmin, xmax, ymin, ymax)
+             specifying the extent of the image data.
+
+    Example:
+
+    .. code:: python
+
+        img_sub_bbox = [554756, 577168, 9903924, 9944315]
+        input_img = "sen2_img_strch.kea"
+
+        img_data_arr, coords_bbox = get_gdal_raster_mpl_imshow(input_img,
+                                                               bands=[8,9,3],
+                                                               bbox=img_sub_bbox)
+
+
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        im = ax.imshow(img_data_arr, extent=coords_bbox)
+        plt.show()
+
+    """
+    import rsgislib.imageutils
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+    ref_bands = list(range(1, n_bands + 1, 1))
+    if bands is None:
+        bands = ref_bands
+    else:
+        for band in bands:
+            if band not in ref_bands:
+                raise rsgislib.RSGISPyException(
+                    f"Band {band} is not valid (i.e., within the image)"
+                )
+
+    if not (len(bands) == 3 or len(bands) == 1):
+        raise rsgislib.RSGISPyException("The number of bands specified must be 3 or 1.")
+
+    x_size, y_size = rsgislib.imageutils.get_img_size(input_img)
+    pxl_bbox = [0, x_size, 0, y_size]
+    if bbox is not None:
+        pxl_bbox = rsgislib.imageutils.get_img_subset_pxl_bbox(input_img, bbox)
+
+    n_x_pxls = pxl_bbox[1] - pxl_bbox[0]
+    n_y_pxls = pxl_bbox[3] - pxl_bbox[2]
+
+    print(f"Image Data Size: {n_x_pxls} x {n_y_pxls}")
+
+    coords_bbox = rsgislib.imageutils.get_img_pxl_spatial_coords(input_img, pxl_bbox)
+
+    image_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if image_ds is None:
+        raise rsgislib.RSGISPyException(
+            f"Could not open the input image file: '{input_img}'"
+        )
+
+    img_data_arr = image_ds.ReadAsArray(
+        xoff=pxl_bbox[0],
+        yoff=pxl_bbox[2],
+        xsize=n_x_pxls,
+        ysize=n_y_pxls,
+        band_list=bands,
+    )
+    image_ds = None
+    if len(bands) > 1:
+        img_data_arr = numpy.moveaxis(img_data_arr, 0, -1)
+
+    return img_data_arr, coords_bbox

@@ -266,6 +266,13 @@ namespace rsgis{ namespace cmds {
         
         try
         {
+            boost::filesystem::path outPath(outputImageBase);
+            boost::filesystem::path outPathDir = outPath.parent_path();
+            if(!boost::filesystem::exists(outPathDir))
+            {
+                throw RSGISCmdException("Output file path specified does not exist.");
+            }
+
             rsgis::img::RSGISImageUtils imgUtils;
             rsgis::utils::RSGISGeometryUtils geomUtils;
             // Open Image

@@ -25,6 +25,8 @@ Get Image Info
 .. autofunction:: rsgislib.imageutils.get_img_band_count
 .. autofunction:: rsgislib.imageutils.get_img_bbox
 .. autofunction:: rsgislib.imageutils.get_img_bbox_in_proj
+.. autofunction:: rsgislib.imageutils.get_img_subset_pxl_bbox
+.. autofunction:: rsgislib.imageutils.get_img_pxl_spatial_coords
 .. autofunction:: rsgislib.imageutils.get_img_files
 .. autofunction:: rsgislib.imageutils.has_gcps
 .. autofunction:: rsgislib.imageutils.get_gdal_format_name

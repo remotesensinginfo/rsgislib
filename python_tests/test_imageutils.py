@@ -141,6 +141,33 @@ def test_get_img_bbox_in_proj_utm30n():
     )
 
 
+def test_get_img_subset_pxl_bbox():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    sub_bbox = [260000, 264000, 280000, 285000]
+    bbox = rsgislib.imageutils.get_img_subset_pxl_bbox(input_img, sub_bbox=sub_bbox)
+    assert (
+        (bbox[0] == 294) and (bbox[1] == 694) and (bbox[2] == 73) and (bbox[3] == 573)
+    )
+
+
+def test_get_img_pxl_spatial_coords():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    sub_pxl_bbox = [294, 694, 73, 573]
+    bbox = rsgislib.imageutils.get_img_pxl_spatial_coords(
+        input_img, sub_pxl_bbox=sub_pxl_bbox
+    )
+    assert (
+        (abs(bbox[0] - 260000.59) < 1.0)
+        and (abs(bbox[1] - 264000.59) < 1.0)
+        and (abs(bbox[2] - 279998.72) < 1.0)
+        and (abs(bbox[3] - 284998.72) < 1.0)
+    )
+
+
 def test_subset_roi_contained(tmp_path):
     import rsgislib
     import rsgislib.imageutils
@@ -609,6 +636,16 @@ def test_create_tiles(tmp_path):
 
     assert len(glob.glob("{}*.kea".format(out_img_base))) == 25
 
+def test_create_tiles_outpath_exp(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    out_img_base = os.path.join(tmp_path, "output1", "output2", "out_img")
+    with pytest.raises(Exception):
+        rsgislib.imageutils.create_tiles(
+            input_img, out_img_base, 200, 200, 0, False, "KEA", rsgislib.TYPE_16UINT, "kea"
+            )
 
 def test_create_tiles_multi_core(tmp_path):
     import rsgislib
@@ -623,6 +660,17 @@ def test_create_tiles_multi_core(tmp_path):
 
     assert len(glob.glob("{}*.kea".format(out_img_base))) == 25
 
+def test_create_tiles_multi_core_outpath_exp(tmp_path):
+    import rsgislib
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    out_img_base = os.path.join(tmp_path, "output1", "output2", "out_img")
+    print(out_img_base)
+    with pytest.raises(Exception):
+        rsgislib.imageutils.create_tiles_multi_core(
+            input_img, out_img_base, 200, 200, "KEA", rsgislib.TYPE_16UINT, "kea", 1
+        )
 
 def test_stretch_img(tmp_path):
     import rsgislib

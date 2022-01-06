@@ -753,18 +753,81 @@ def get_img_bbox_in_proj(input_img: str, out_epsg: int):
     """
     import rsgislib.tools.geometrytools
 
-    inProjWKT = get_wkt_proj_from_img(input_img)
-    inSpatRef = osr.SpatialReference()
-    inSpatRef.ImportFromWkt(inProjWKT)
+    in_proj_wkt = get_wkt_proj_from_img(input_img)
+    in_spat_ref = osr.SpatialReference()
+    in_spat_ref.ImportFromWkt(in_proj_wkt)
 
-    outSpatRef = osr.SpatialReference()
-    outSpatRef.ImportFromEPSG(int(out_epsg))
+    out_spat_ref = osr.SpatialReference()
+    out_spat_ref.ImportFromEPSG(int(out_epsg))
 
     img_bbox = get_img_bbox(input_img)
     reproj_img_bbox = rsgislib.tools.geometrytools.reproj_bbox(
-        img_bbox, inSpatRef, outSpatRef
+        img_bbox, in_spat_ref, out_spat_ref
     )
     return reproj_img_bbox
+
+
+def get_img_subset_pxl_bbox(input_img: str, sub_bbox: list[float]) -> list[int]:
+    """
+    A function which returns a BBOX (xmin, xmax, ymin, ymax) with the pixel coordinates
+    for an intersecting BBOX in the spatial coordinates of the image. Note, the
+    sub_bbox will be subset to be contained by the input image (if outside the
+    bounds of the input image).
+
+    :param input_img: The input image file path
+    :param sub_bbox: The input bbox (xmin, xmax, ymin, ymax) in the same spatial
+                     coordinate system as the input image specifying the subset
+                     for which the pixel coords are to be calculated.
+    :return: bbox (xmin, xmax, ymin, ymax) in the image pixel coordinates.
+
+    """
+    import math
+    import rsgislib.tools.geometrytools
+
+    img_bbox = get_img_bbox(input_img)
+    x_res, y_res = get_img_res(input_img, abs_vals=True)
+
+    if not rsgislib.tools.geometrytools.do_bboxes_intersect(img_bbox, sub_bbox):
+        raise rsgislib.RSGISPyException(
+            "The subset BBOX does not intersect with the image bbox - "
+            "is the projection of the sub_bbox correct?"
+        )
+
+    sub_inter_bbox = rsgislib.tools.geometrytools.bbox_intersection(img_bbox, sub_bbox)
+
+    min_x_pxl = math.floor(((sub_inter_bbox[0] - img_bbox[0]) / x_res) + 0.5)
+    max_x_pxl = math.floor(((sub_inter_bbox[1] - img_bbox[0]) / x_res) + 0.5)
+
+    # Note the Y axis is from the TL so reversed the Y axis min/max.
+    min_y_pxl = math.floor(((img_bbox[3] - sub_inter_bbox[3]) / y_res) + 0.5)
+    max_y_pxl = math.floor(((img_bbox[3] - sub_inter_bbox[2]) / y_res) + 0.5)
+
+    return [min_x_pxl, max_x_pxl, min_y_pxl, max_y_pxl]
+
+
+def get_img_pxl_spatial_coords(input_img: str, sub_pxl_bbox: list[int]) -> list[float]:
+    """
+    A function which gets the spatial coordinates for a image pixel space
+    BBOX (xmin, xmax, ymin, ymax). The returned BBOX will be within the
+    same coordinate system as the input image.
+
+    :param input_img: The input image file path
+    :param sub_pxl_bbox: The bbox (xmin, xmax, ymin, ymax) in the image pixel
+                         coordinates (e.g., [20, 120, 1000, 1230])
+    :return: bbox (xmin, xmax, ymin, ymax) in the image spatial coordinates.
+
+    """
+    img_bbox = get_img_bbox(input_img)
+    x_res, y_res = get_img_res(input_img, abs_vals=True)
+
+    min_x = (sub_pxl_bbox[0] * x_res) + img_bbox[0]
+    max_x = (sub_pxl_bbox[1] * x_res) + img_bbox[0]
+
+    # Note the Y axis is from the TL so reversed the Y axis min/max.
+    min_y = img_bbox[3] - (sub_pxl_bbox[3] * y_res)
+    max_y = img_bbox[3] - (sub_pxl_bbox[2] * y_res)
+
+    return [min_x, max_x, min_y, max_y]
 
 
 def get_img_band_stats(input_img: str, img_band: int, compute: bool = True):
@@ -2272,9 +2335,6 @@ def gdal_warp(
                     "BIGTIFF=YES"]
 
     """
-    from osgeo import gdal
-
-    gdal.UseExceptions()
     in_no_data_val = get_img_no_data_value(input_img)
     in_epsg = get_epsg_proj_from_img(input_img)
     img_data_type = get_gdal_datatype_from_img(input_img)
@@ -2403,26 +2463,33 @@ def create_tiles_multi_core(
 
     """
     import multiprocessing
+    import rsgislib.tools.filetools
 
-    xSize, ySize = get_img_size(input_img)
+    if not (
+        rsgislib.tools.filetools.does_path_exists_or_creatable(out_img_base)
+        and os.path.exists(os.path.split(out_img_base)[0])
+    ):
+        raise rsgislib.RSGISPyException("Output path is not valid or exist.")
 
-    n_full_xtiles = math.floor(xSize / width)
-    x_remain_width = xSize - (n_full_xtiles * width)
-    n_full_ytiles = math.floor(ySize / height)
-    y_remain_height = ySize - (n_full_ytiles * height)
+    x_size, y_size = get_img_size(input_img)
+
+    n_full_xtiles = math.floor(x_size / width)
+    x_remain_width = x_size - (n_full_xtiles * width)
+    n_full_ytiles = math.floor(y_size / height)
+    y_remain_height = y_size - (n_full_ytiles * height)
 
     tiles = []
 
-    for ytile in range(n_full_ytiles):
-        y_pxl_min = ytile * height
+    for y_tile in range(n_full_ytiles):
+        y_pxl_min = y_tile * height
         y_pxl_max = y_pxl_min + height
 
-        for xtile in range(n_full_xtiles):
-            x_pxl_min = xtile * width
+        for x_tile in range(n_full_xtiles):
+            x_pxl_min = x_tile * width
             x_pxl_max = x_pxl_min + width
             tiles.append(
                 {
-                    "tile": "x{0}y{1}".format(xtile + 1, ytile + 1),
+                    "tile": "x{0}y{1}".format(x_tile + 1, y_tile + 1),
                     "bbox": [x_pxl_min, x_pxl_max, y_pxl_min, y_pxl_max],
                 }
             )
@@ -2432,7 +2499,7 @@ def create_tiles_multi_core(
             x_pxl_max = x_pxl_min + x_remain_width
             tiles.append(
                 {
-                    "tile": "x{0}y{1}".format(n_full_xtiles + 1, ytile + 1),
+                    "tile": "x{0}y{1}".format(n_full_xtiles + 1, y_tile + 1),
                     "bbox": [x_pxl_min, x_pxl_max, y_pxl_min, y_pxl_max],
                 }
             )
@@ -2441,12 +2508,12 @@ def create_tiles_multi_core(
         y_pxl_min = n_full_ytiles * height
         y_pxl_max = y_pxl_min + y_remain_height
 
-        for xtile in range(n_full_xtiles):
-            x_pxl_min = xtile * width
+        for x_tile in range(n_full_xtiles):
+            x_pxl_min = x_tile * width
             x_pxl_max = x_pxl_min + width
             tiles.append(
                 {
-                    "tile": "x{0}y{1}".format(xtile + 1, n_full_ytiles + 1),
+                    "tile": "x{0}y{1}".format(x_tile + 1, n_full_ytiles + 1),
                     "bbox": [x_pxl_min, x_pxl_max, y_pxl_min, y_pxl_max],
                 }
             )
@@ -3338,7 +3405,7 @@ def create_valid_mask(
 
 def get_img_pxl_values(
     input_img: str, img_band: int, x_coords: numpy.array, y_coords: numpy.array
-):
+) -> numpy.array:
     """
     Function which gets pixel values from a image for specified
     image pixels. The coordinate space is image pixels, i.e.,
@@ -3353,16 +3420,14 @@ def get_img_pxl_values(
     :return: An array of image pixel values.
 
     """
-    from osgeo import gdal
     import tqdm
-    import numpy
 
     if x_coords.shape[0] != y_coords.shape[0]:
         raise rsgislib.RSGISPyException(
             "The X and Y image coordinates are not the same."
         )
 
-    image_ds = gdal.Open(input_img, gdal.GA_Update)
+    image_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
     if image_ds is None:
         raise rsgislib.RSGISPyException(
             "Could not open the input image file: '{}'".format(input_img)
@@ -3402,7 +3467,6 @@ def set_img_pxl_values(
                       coordinates)
 
     """
-    from osgeo import gdal
     import tqdm
 
     if x_coords.shape[0] != y_coords.shape[0]:
@@ -3465,7 +3529,6 @@ def assign_random_pxls(
         rsgislib.rastergis.pop_rat_img_stats(output_img, True, True, True)
 
     """
-    import numpy
     import numpy.random
 
     if rnd_seed is not None:
@@ -3721,10 +3784,7 @@ def whiten_image(
     :param gdalformat: the GDAL image file format of the output image file.
 
     """
-    from osgeo import gdal
-    import rsgislib.imageutils
     import tqdm
-    import numpy
 
     def _cov(M):
         """
@@ -3769,31 +3829,31 @@ def whiten_image(
         Aw = numpy.dot(V, numpy.dot(S, V.T))
         return numpy.dot(M, Aw)
 
-    imgMskDS = gdal.Open(valid_msk_img)
-    if imgMskDS is None:
+    img_msk_ds = gdal.Open(valid_msk_img)
+    if img_msk_ds is None:
         raise rsgislib.RSGISPyException("Could not open valid mask image")
-    n_msk_bands = imgMskDS.RasterCount
-    x_msk_size = imgMskDS.RasterXSize
-    y_msk_size = imgMskDS.RasterYSize
+    n_msk_bands = img_msk_ds.RasterCount
+    x_msk_size = img_msk_ds.RasterXSize
+    y_msk_size = img_msk_ds.RasterYSize
 
     if n_msk_bands != 1:
         raise rsgislib.RSGISPyException(
             "Valid mask only expected to have a single band."
         )
 
-    imgMskBand = imgMskDS.GetRasterBand(1)
-    if imgMskBand is None:
+    img_msk_band = img_msk_ds.GetRasterBand(1)
+    if img_msk_band is None:
         raise rsgislib.RSGISPyException("Could not open image band (1) in valid mask")
 
-    vld_msk_band_arr = imgMskBand.ReadAsArray().flatten()
-    imgMskDS = None
+    vld_msk_band_arr = img_msk_band.ReadAsArray().flatten()
+    img_msk_ds = None
 
-    imgDS = gdal.Open(input_img)
-    if imgDS is None:
+    img_ds = gdal.Open(input_img)
+    if img_ds is None:
         raise rsgislib.RSGISPyException("Could not open input image")
-    n_bands = imgDS.RasterCount
-    x_size = imgDS.RasterXSize
-    y_size = imgDS.RasterYSize
+    n_bands = img_ds.RasterCount
+    x_size = img_ds.RasterXSize
+    y_size = img_ds.RasterYSize
 
     if x_msk_size != x_size:
         raise rsgislib.RSGISPyException(
@@ -3809,16 +3869,16 @@ def whiten_image(
 
     print("Importing Bands:")
     for n in tqdm.tqdm(range(n_bands)):
-        imgBand = imgDS.GetRasterBand(n + 1)
-        if imgBand is None:
+        img_band = img_ds.GetRasterBand(n + 1)
+        if img_band is None:
             raise rsgislib.RSGISPyException(
                 "Could not open image band ({})".format(n + 1)
             )
-        no_data_val = imgBand.GetNoDataValue()
-        band_arr = imgBand.ReadAsArray().flatten()
+        no_data_val = img_band.GetNoDataValue()
+        band_arr = img_band.ReadAsArray().flatten()
         band_arr = band_arr.astype(numpy.float32)
         img_data[n] = band_arr
-    imgDS = None
+    img_ds = None
     band_arr = None
 
     img_data = img_data.T
@@ -3834,8 +3894,8 @@ def whiten_image(
     )
 
     # Open output image
-    outImgDS = gdal.Open(output_img, gdal.GA_Update)
-    if outImgDS is None:
+    out_img_ds = gdal.Open(output_img, gdal.GA_Update)
+    if out_img_ds is None:
         raise rsgislib.RSGISPyException("Could not open output image")
 
     out_data_band = numpy.zeros_like(vld_msk_band_arr, dtype=numpy.float32)
@@ -3845,12 +3905,12 @@ def whiten_image(
         out_data_band[...] = 0.0
         out_data_band[pxl_idxs] = img_flat_white[..., n]
         out_img_data = out_data_band.reshape((y_size, x_size))
-        outImgBand = outImgDS.GetRasterBand(n + 1)
-        if outImgBand is None:
+        out_img_band = out_img_ds.GetRasterBand(n + 1)
+        if out_img_band is None:
             raise rsgislib.RSGISPyException("Could not open output image band (1)")
-        outImgBand.WriteArray(out_img_data)
-        outImgBand = None
-    outImgDS = None
+        out_img_band.WriteArray(out_img_data)
+        out_img_band = None
+    out_img_ds = None
 
 
 def spectral_smoothing(
@@ -3882,9 +3942,7 @@ def spectral_smoothing(
 
     """
     from rios import applier
-    import numpy
     import scipy.signal
-    import rsgislib.imageutils
 
     try:
         import tqdm
@@ -3971,7 +4029,6 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
     """
     import rsgislib.tools
     from rios import applier
-    import numpy
 
     try:
         import tqdm
@@ -4037,7 +4094,6 @@ def mask_all_band_zero_vals(
 
     """
     from rios import applier
-    import numpy
 
     try:
         import tqdm

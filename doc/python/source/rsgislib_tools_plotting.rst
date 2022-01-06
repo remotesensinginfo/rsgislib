@@ -14,6 +14,9 @@ Image Plots
 .. autofunction:: rsgislib.tools.plotting.plot_image_histogram
 
 
+Get Data
+---------
+.. autofunction:: rsgislib.tools.plotting.get_gdal_raster_mpl_imshow
 
 * :ref:`genindex`
 * :ref:`modindex`
