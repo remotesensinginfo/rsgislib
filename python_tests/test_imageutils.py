@@ -30,6 +30,23 @@ def test_set_env_vars_lzw_gtiff_outs_bigtiff():
     )
 
 
+def test_set_env_vars_deflate_gtiff_outs():
+    import rsgislib.imageutils
+
+    rsgislib.imageutils.set_env_vars_deflate_gtiff_outs(bigtiff=False)
+    assert os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] == "TILED=YES:COMPRESS=DEFLATE"
+
+
+def test_set_env_vars_deflate_gtiff_outs_bigtiff():
+    import rsgislib.imageutils
+
+    rsgislib.imageutils.set_env_vars_deflate_gtiff_outs(bigtiff=True)
+    assert (
+        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"]
+        == "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+    )
+
+
 def test_get_gdal_img_creation_opts_none():
     import rsgislib.imageutils
 
@@ -636,6 +653,7 @@ def test_create_tiles(tmp_path):
 
     assert len(glob.glob("{}*.kea".format(out_img_base))) == 25
 
+
 def test_create_tiles_outpath_exp(tmp_path):
     import rsgislib
     import rsgislib.imageutils
@@ -644,8 +662,17 @@ def test_create_tiles_outpath_exp(tmp_path):
     out_img_base = os.path.join(tmp_path, "output1", "output2", "out_img")
     with pytest.raises(Exception):
         rsgislib.imageutils.create_tiles(
-            input_img, out_img_base, 200, 200, 0, False, "KEA", rsgislib.TYPE_16UINT, "kea"
-            )
+            input_img,
+            out_img_base,
+            200,
+            200,
+            0,
+            False,
+            "KEA",
+            rsgislib.TYPE_16UINT,
+            "kea",
+        )
+
 
 def test_create_tiles_multi_core(tmp_path):
     import rsgislib
@@ -660,6 +687,7 @@ def test_create_tiles_multi_core(tmp_path):
 
     assert len(glob.glob("{}*.kea".format(out_img_base))) == 25
 
+
 def test_create_tiles_multi_core_outpath_exp(tmp_path):
     import rsgislib
     import rsgislib.imageutils
@@ -671,6 +699,7 @@ def test_create_tiles_multi_core_outpath_exp(tmp_path):
         rsgislib.imageutils.create_tiles_multi_core(
             input_img, out_img_base, 200, 200, "KEA", rsgislib.TYPE_16UINT, "kea", 1
         )
+
 
 def test_stretch_img(tmp_path):
     import rsgislib

@@ -3,6 +3,9 @@
 The tools.plotting module contains functions for extracting and plotting remote sensing data.
 """
 
+# Import the os module
+import os
+
 # Import the RSGISLib module
 import rsgislib
 
@@ -15,11 +18,9 @@ from rsgislib import zonalstats
 # Import the RSGISLib Image Calc module
 from rsgislib import imagecalc
 
-# Import the os module
-import os
 
 from osgeo import gdal
-
+import numpy
 
 haveMatPlotLib = True
 try:
@@ -27,8 +28,6 @@ try:
     import matplotlib.colors as mClrs
 except ImportError as pltErr:
     haveMatPlotLib = False
-
-import numpy
 
 
 def plot_image_spectra(
@@ -620,3 +619,257 @@ def get_gdal_raster_mpl_imshow(
         img_data_arr = numpy.moveaxis(img_data_arr, 0, -1)
 
     return img_data_arr, coords_bbox
+
+
+def linear_stretch_np_arr(
+    arr_data: numpy.array,
+    no_data_val: float = None,
+    out_off: float = 0,
+    out_gain: float = 1,
+    out_int_type=False,
+) -> numpy.array:
+    """
+    A function which performs a linear stretch using the min-max values on a per
+    band basis for a numpy array representing an image dataset. This function
+    is useful in combination with get_gdal_raster_mpl_imshow for displaying
+    raster data from an input image as a plot. By default this function returns
+    values in a range 0 - 1 but if you prefer 0 - 255 then set the out_gain to
+    255 and the out_int_type to be True to get an 8bit unsigned integer value.
+
+    :param arr_data: The numpy array as either [n,m,b] or [n,m] where n and m are
+                     the number of image pixels in the x and y axis' and b is the
+                     number of image bands.
+    :param no_data_val: the no data value for the input data. If there isn't a no
+                        data value then leave as None (default)
+    :param out_off: Output offset value (value * gain) + offset. Default: 0
+    :param out_gain: Output gain value (value * gain) + offset. Default: 1
+    :param out_int_type: False (default) and the output type will be float and
+                         True and the output type with be integers.
+    :return: A number array with the rescaled values but same dimensions as the
+             input numpy array.
+
+    .. code:: python
+
+        img_sub_bbox = [554756, 577168, 9903924, 9944315]
+        input_img = "sen2_img_strch.kea"
+
+        img_data_arr, coords_bbox = get_gdal_raster_mpl_imshow(input_img,
+                                                               bands=[8,9,3],
+                                                               bbox=img_sub_bbox)
+
+        img_data_arr = linear_stretch_np_arr(img_data_arr, no_data_val=0.0)
+
+
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        im = ax.imshow(img_data_arr, extent=coords_bbox)
+        plt.show()
+
+    """
+    arr_shp = arr_data.shape
+
+    if no_data_val is not None:
+        arr_data_out = arr_data.astype(float)
+        arr_data_out[arr_data == no_data_val] = numpy.nan
+    else:
+        arr_data_out = arr_data.copy()
+
+    if len(arr_shp) == 2:
+        min_val = arr_data_out.min()
+        max_val = arr_data_out.max()
+        range_val = max_val - min_val
+
+        arr_data_out = (((arr_data_out - min_val) / range_val) * out_gain) + out_off
+    else:
+        n_bands = arr_shp[2]
+        for n in range(n_bands):
+            min_val = arr_data_out[..., n].min()
+            max_val = arr_data_out[..., n].max()
+            range_val = max_val - min_val
+
+            arr_data_out[..., n] = (
+                ((arr_data_out[..., n] - min_val) / range_val) * out_gain
+            ) + out_off
+
+    if out_int_type:
+        arr_data_out = arr_data_out.astype(int)
+
+    return arr_data_out
+
+
+def cumulative_stretch_np_arr(
+    arr_data: numpy.array,
+    no_data_val: float = None,
+    lower: int = 2,
+    upper: int = 98,
+    out_off: float = 0,
+    out_gain: float = 1,
+    out_int_type=False,
+) -> numpy.array:
+    """
+    A function which performs a cumulative stretch using an upper and lower
+    percentile to define the min-max values. This analysis is on a per
+    band basis for a numpy array representing an image dataset. This function
+    is useful in combination with get_gdal_raster_mpl_imshow for displaying
+    raster data from an input image as a plot. By default this function returns
+    values in a range 0 - 1 but if you prefer 0 - 255 then set the out_gain to
+    255 and the out_int_type to be True to get an 8bit unsigned integer value.
+
+    :param arr_data: The numpy array as either [n,m,b] or [n,m] where n and m are
+                     the number of image pixels in the x and y axis' and b is the
+                     number of image bands.
+    :param no_data_val: the no data value for the input data. If there isn't a no
+                        data value then leave as None (default)
+    :param lower: lower percentile (default: 2)
+    :param upper: upper percentile (default: 98)
+    :param out_off: Output offset value (value * gain) + offset. Default: 0
+    :param out_gain: Output gain value (value * gain) + offset. Default: 1
+    :param out_int_type: False (default) and the output type will be float and
+                         True and the output type with be integers.
+    :return: A number array with the rescaled values but same dimensions as the
+             input numpy array.
+
+    .. code:: python
+
+        img_sub_bbox = [554756, 577168, 9903924, 9944315]
+        input_img = "sen2_img_strch.kea"
+
+        img_data_arr, coords_bbox = get_gdal_raster_mpl_imshow(input_img,
+                                                               bands=[8,9,3],
+                                                               bbox=img_sub_bbox)
+
+        img_data_arr = cumulative_stretch_np_arr(img_data_arr, no_data_val=0.0)
+
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        im = ax.imshow(img_data_arr, extent=coords_bbox)
+        plt.show()
+
+    """
+    arr_shp = arr_data.shape
+
+    if no_data_val is not None:
+        arr_data_out = arr_data.astype(float)
+        arr_data_out[arr_data == no_data_val] = numpy.nan
+    else:
+        arr_data_out = arr_data.copy()
+
+    if len(arr_shp) == 2:
+        min_val, max_val = numpy.percentile(arr_data_out, [lower, upper])
+        range_val = max_val - min_val
+
+        arr_data_out = (((arr_data_out - min_val) / range_val) * out_gain) + out_off
+    else:
+        n_bands = arr_shp[2]
+        for n in range(n_bands):
+            min_val, max_val = numpy.percentile(arr_data_out[..., n], [lower, upper])
+            range_val = max_val - min_val
+
+            arr_data_out[..., n] = (
+                ((arr_data_out[..., n] - min_val) / range_val) * out_gain
+            ) + out_off
+
+    if out_int_type:
+        arr_data_out = arr_data_out.astype(int)
+
+    return arr_data_out
+
+
+def stdev_stretch_np_arr(
+    arr_data: numpy.array,
+    no_data_val: float = None,
+    n_stdevs: float = 2.0,
+    out_off: float = 0,
+    out_gain: float = 1,
+    out_int_type=False,
+) -> numpy.array:
+    """
+    A function which performs a standard deviation stretch using an upper and lower
+    (mean + n*std) and (mean - n*std) to define the min-max values. This analysis
+    is on a per band basis for a numpy array representing an image dataset.
+    This function is useful in combination with get_gdal_raster_mpl_imshow for
+    displaying raster data from an input image as a plot. By default this function
+    returns values in a range 0 - 1 but if you prefer 0 - 255 then set the out_gain
+    to 255 and the out_int_type to be True to get an 8bit unsigned integer value.
+
+    :param arr_data: The numpy array as either [n,m,b] or [n,m] where n and m are
+                     the number of image pixels in the x and y axis' and b is the
+                     number of image bands.
+    :param no_data_val: the no data value for the input data. If there isn't a no
+                        data value then leave as None (default)
+    :param n_stdevs: number of standard deviations to be used for the stretch.
+                     Default: 2.0
+    :param out_off: Output offset value (value * gain) + offset. Default: 0
+    :param out_gain: Output gain value (value * gain) + offset. Default: 1
+    :param out_int_type: False (default) and the output type will be float and
+                         True and the output type with be integers.
+    :return: A number array with the rescaled values but same dimensions as the
+             input numpy array.
+
+    .. code:: python
+
+        img_sub_bbox = [554756, 577168, 9903924, 9944315]
+        input_img = "sen2_img_strch.kea"
+
+        img_data_arr, coords_bbox = get_gdal_raster_mpl_imshow(input_img,
+                                                               bands=[8,9,3],
+                                                               bbox=img_sub_bbox)
+
+        img_data_arr = stdev_stretch_np_arr(img_data_arr, no_data_val=0.0)
+
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        im = ax.imshow(img_data_arr, extent=coords_bbox)
+        plt.show()
+
+    """
+    arr_shp = arr_data.shape
+
+    if no_data_val is not None:
+        arr_data_out = arr_data.astype(float)
+        arr_data_out[arr_data == no_data_val] = numpy.nan
+    else:
+        arr_data_out = arr_data.copy()
+
+    if len(arr_shp) == 2:
+        min_val = arr_data_out.min()
+        max_val = arr_data_out.max()
+        mean_val = numpy.mean(arr_data_out)
+        std_val = numpy.std(arr_data_out)
+        low_val = mean_val - (std_val * n_stdevs)
+        up_val = mean_val + (std_val * n_stdevs)
+        if low_val < min_val:
+            low_val = min_val
+        if up_val > max_val:
+            up_val = max_val
+
+        range_val = up_val - low_val
+
+        arr_data_out = (((arr_data_out - low_val) / range_val) * out_gain) + out_off
+    else:
+        n_bands = arr_shp[2]
+        for n in range(n_bands):
+            min_val = arr_data_out[..., n].min()
+            max_val = arr_data_out[..., n].max()
+            mean_val = numpy.mean(arr_data_out[..., n])
+            std_val = numpy.std(arr_data_out[..., n])
+            low_val = mean_val - (std_val * n_stdevs)
+            up_val = mean_val + (std_val * n_stdevs)
+            if low_val < min_val:
+                low_val = min_val
+            if up_val > max_val:
+                up_val = max_val
+
+            range_val = up_val - low_val
+
+            arr_data_out[..., n] = (
+                ((arr_data_out[..., n] - low_val) / range_val) * out_gain
+            ) + out_off
+
+    arr_data_out[arr_data_out < out_off] = out_off
+    arr_data_out[arr_data_out > (out_gain + out_off)] = out_gain + out_off
+
+    if out_int_type:
+        arr_data_out = arr_data_out.astype(int)
+
+    return arr_data_out

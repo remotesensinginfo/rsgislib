@@ -28,3 +28,63 @@ def test_get_gdal_raster_mpl_imshow_bands_bbox():
     rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[8, 9, 3], bbox=sub_bbox
     )
+
+
+def test_linear_stretch_np_arr_3_bands():
+    import rsgislib.tools.plotting
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[1,2,3], bbox=None
+    )
+    rsgislib.tools.plotting.linear_stretch_np_arr(img_data, no_data_val=0.0)
+
+
+def test_linear_stretch_np_arr_1_band():
+    import rsgislib.tools.plotting
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[1], bbox=None
+    )
+    rsgislib.tools.plotting.linear_stretch_np_arr(img_data, no_data_val=0.0)
+
+
+def test_cumulative_stretch_np_arr_3_bands():
+    import rsgislib.tools.plotting
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[1,2,3], bbox=None
+    )
+    rsgislib.tools.plotting.cumulative_stretch_np_arr(img_data, no_data_val=0.0)
+
+
+def test_cumulative_stretch_np_arr_1_band():
+    import rsgislib.tools.plotting
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[1], bbox=None
+    )
+    rsgislib.tools.plotting.cumulative_stretch_np_arr(img_data, no_data_val=0.0)
+
+
+def test_stdev_stretch_np_arr_3_bands():
+    import rsgislib.tools.plotting
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[1,2,3], bbox=None
+    )
+    rsgislib.tools.plotting.stdev_stretch_np_arr(img_data, no_data_val=0.0)
+
+
+def test_stdev_stretch_np_arr_1_band():
+    import rsgislib.tools.plotting
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[1], bbox=None
+    )
+    rsgislib.tools.plotting.stdev_stretch_np_arr(img_data, no_data_val=0.0)

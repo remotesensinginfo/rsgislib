@@ -149,7 +149,8 @@ class RSGISTimeseriesFillInfo(object):
 def set_env_vars_lzw_gtiff_outs(bigtiff: bool = False):
     """
     Set environmental variables such that outputted
-    GeoTIFF files are outputted as tiled and compressed.
+    GeoTIFF files are outputted as tiled and compressed
+    using the LZW algorithm.
 
     :param bigtiff: If True GTIFF files will be outputted
                     in big tiff format.
@@ -166,6 +167,29 @@ def set_env_vars_lzw_gtiff_outs(bigtiff: bool = False):
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=LZW:BIGTIFF=YES"
     else:
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=LZW"
+
+
+def set_env_vars_deflate_gtiff_outs(bigtiff: bool = False):
+    """
+    Set environmental variables such that outputted
+    GeoTIFF files are outputted as tiled and compressed
+    using the Deflate (zlib) algorithm.
+
+    :param bigtiff: If True GTIFF files will be outputted
+                    in big tiff format.
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        rsgislib.imageutils.set_env_vars_deflate_gtiff_outs()
+
+    """
+    if bigtiff:
+        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+    else:
+        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=DEFLATE"
 
 
 def pop_thmt_img_stats(

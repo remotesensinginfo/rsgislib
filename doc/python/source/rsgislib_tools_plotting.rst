@@ -14,9 +14,14 @@ Image Plots
 .. autofunction:: rsgislib.tools.plotting.plot_image_histogram
 
 
-Get Data
----------
+Visualise Raster Data
+-----------------------
 .. autofunction:: rsgislib.tools.plotting.get_gdal_raster_mpl_imshow
+.. autofunction:: rsgislib.tools.plotting.linear_stretch_np_arr
+.. autofunction:: rsgislib.tools.plotting.cumulative_stretch_np_arr
+.. autofunction:: rsgislib.tools.plotting.stdev_stretch_np_arr
+
+
 
 * :ref:`genindex`
 * :ref:`modindex`

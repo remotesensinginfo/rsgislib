@@ -16,6 +16,7 @@ Image Creation Options
 
 .. autofunction:: rsgislib.imageutils.get_gdal_img_creation_opts
 .. autofunction:: rsgislib.imageutils.set_env_vars_lzw_gtiff_outs
+.. autofunction:: rsgislib.imageutils.set_env_vars_deflate_gtiff_outs
 
 
 Get Image Info
