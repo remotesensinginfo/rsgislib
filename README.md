@@ -3,12 +3,15 @@
 [![<remotesensinginfo>](https://circleci.com/gh/remotesensinginfo/rsgislib/tree/main.svg?style=shield)](https://app.circleci.com/pipelines/github/remotesensinginfo/rsgislib)
 [![codecov](https://codecov.io/gh/remotesensinginfo/rsgislib/branch/main/graph/badge.svg?token=EHTF2G1KCL)](https://codecov.io/gh/remotesensinginfo/rsgislib)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=remotesensinginfo_rsgislib&metric=bugs)](https://sonarcloud.io/summary/new_code?id=remotesensinginfo_rsgislib)
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/petebunting)
-
   
 The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets.
 For more details see the project website: http://rsgislib.org/
 
+## Support the Project ##
+
+We provide updated and support for the project for free as a open source project but if you'd like to support us you can buy a coffee - thank you! :)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/petebunting)
+  
 ## Installing ##
 
 Instructions on installing RSGISLib are provided on the [download](doc/python/source/download.rst) page of the project documentation.
