@@ -14,7 +14,7 @@ def fft_dem_fusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20):
     lower resolution DEM and the high frequency component is taken from
     the higher resolution DEM.
 
-    This is an implemenetation ideas from:
+    This is an implementation ideas from:
 
     Karkee, M., Steward, B. L., & Aziz, S. A. (2008). Improving quality
     of public domain digital elevation models through data fusion.
@@ -25,17 +25,18 @@ def fft_dem_fusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20):
     :param fused_DEM_img: is an output image file for the resulting fused DEM.
     :param c_size: is the threshold (int) defining the high and low frequencies.
 
-    Example::
+    .. code:: python
 
-    import rsgislib
-    from rsgislib import elevation
+        import rsgislib
+        from rsgislib import elevation
 
-    high_res_DEM_img = "N09E009_TDX_12m_EGM08.tif"
-    low_res_DEM_img = "N09E009_SRTM_30m_EGM08.tif"
-    fused_DEM_img = "NO9E009_SRTM_TDX_EGM08_fusion.tif"
-    c_size = 10
+        high_res_DEM_img = "N09E009_TDX_12m_EGM08.tif"
+        low_res_DEM_img = "N09E009_SRTM_30m_EGM08.tif"
+        fused_DEM_img = "NO9E009_SRTM_TDX_EGM08_fusion.tif"
+        c_size = 10
 
-    elevation.fft_dem_fusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20)
+        elevation.fft_dem_fusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20)
+
     """
     # TODO Add checks that images are covering the same geographic area etc. Same number of pixels as well?
     import numpy

@@ -650,7 +650,7 @@ def calc_acc_ptonly_metrics_vecsamples(
     :param out_csv_file: if specified the generated metrics and confusion matrix
                          are written to a CSV file (Default=None).
 
-    Example::
+    .. code:: python
 
         vec_file = "Sonoma_county_classification_refPoints.gpkg"
         vec_lyr = "ref_points"

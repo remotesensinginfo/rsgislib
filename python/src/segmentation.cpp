@@ -662,8 +662,6 @@ static PyMethodDef SegmentationMethods[] = {
 "segmentation.label_pixels_from_cluster_centres(input_img, output_img, cluster_centres_file, ignore_zeros, gdalformat)\n"
 "Labels image pixels with the ID of the nearest cluster centre.\n"
 "\n"
-"Where:\n"
-"\n"
 ":param input_img: is a string containing the name of the input file\n"
 ":param output_img: is a string containing the name of the output file\n"
 ":param cluster_centres_file: is a string containing the name of the cluster centre file\n"
@@ -674,8 +672,6 @@ static PyMethodDef SegmentationMethods[] = {
     {"eliminate_single_pixels", (PyCFunction)Segmentation_eliminateSinglePixels, METH_VARARGS | METH_KEYWORDS,
 "segmentation.eliminate_single_pixels(input_img, clumps_img, output_img, tmp_img, gdalformat, in_memory, ignorezeros)\n"
 "Eliminates single pixels\n"
-"\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string containing the name of the input file\n"
 ":param clumps_img: is a string containing the name of the clump file\n"
@@ -690,8 +686,6 @@ static PyMethodDef SegmentationMethods[] = {
 "segmentation.clump(input_img, output_img, gdalformat, in_memory, no_data_val, add_to_rat)\n"
 "A function which clumps an input image (of int pixel data type) to identify connected independent sets of pixels.\n"
 "\n"
-"Where:\n"
-"\n"
 ":param input_img: is a string containing the name of the input file\n"
 ":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
@@ -702,9 +696,7 @@ static PyMethodDef SegmentationMethods[] = {
 
     {"rm_small_clumps_stepwise", (PyCFunction)Segmentation_RMSmallClumpsStepwise, METH_VARARGS | METH_KEYWORDS,
 "segmentation.rm_small_clumps_stepwise(input_img, clumps_img, output_img, gdalformat, use_stch_stats, stch_stats_file, store_mean, in_memory, min_clump_size, pxl_val_thres)\n"
-"eliminate clumps smaller than a given size from the scene, small clumps will be combined with their spectrally closest neighbouring  clump in a stepwise fashion unless over spectral distance threshold\n"
-"\n"
-"Where:\n"
+"Eliminate clumps smaller than a given size from the scene, small clumps will be combined with their spectrally closest neighbouring  clump in a stepwise fashion unless over spectral distance threshold\n"
 "\n"
 ":param input_img: is a string containing the name of the input file\n"
 ":param clumps_img: is a string containing the name of the clump file\n"
@@ -720,9 +712,7 @@ static PyMethodDef SegmentationMethods[] = {
 
     {"relabel_clumps", (PyCFunction)Segmentation_relabelClumps, METH_VARARGS | METH_KEYWORDS,
 "segmentation.relabel_clumps(input_img, output_img, gdalformat, in_memory)\n"
-"Relabel clumps\n"
-"\n"
-"Where:\n"
+"Relabel clumps so numbering is consecutive with output gaps\n"
 "\n"
 ":param input_img: is a string containing the name of the input file\n"
 ":param output_img: is a string containing the name of the output file\n"
@@ -732,24 +722,19 @@ static PyMethodDef SegmentationMethods[] = {
 
     {"union_of_clumps", (PyCFunction)Segmentation_unionOfClumps, METH_VARARGS | METH_KEYWORDS,
 "segmentation.union_of_clumps(input_imgs, output_img, gdalformat, no_data_val, add_to_rat)\n"
-"The function takes the union of clumps images - combining them so all lines from all clumps are preserved in the new outputted clumps image.\n"
-"\n"
-"Where:\n"
+"The function takes the union of clumps images, combining them so all lines from all clumps are preserved in the new outputted clumps image.\n"
 "\n"
 ":param input_imgs: is a list of input image paths\n"
 ":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param no_data_val: is None or float\n"
-":param add_to_rat: is a boolean specifying whether the pixel values (from inputimagepaths) should be added as a RAT; column names have prefix 'ClumpVal_' with index starting at 1 for each variable.\n"
-"\n"
+":param add_to_rat: is a boolean specifying whether the pixel values (from input_imgs) should be added as a RAT; column names have prefix 'ClumpVal_' with index starting at 1 for each variable.\n"
 "\n"
 },
 
     {"merge_segmentation_tiles", (PyCFunction)Segmentation_mergeSegmentationTiles, METH_VARARGS | METH_KEYWORDS,
 "segmentation.merge_segmentation_tiles(input_imgs, output_img, border_msk_img, tile_boundary, tile_overlap, tile_body, col_name)\n"
-"Merge body clumps from tile segmentations into outputfile\n"
-"\n"
-"Where:\n"
+"Merge body clumps from tile segmentations into output file\n"
 "\n"
 ":param input_imgs: is a list of input image paths\n"
 ":param output_img: is a string containing the name of the output file\n"
@@ -762,9 +747,7 @@ static PyMethodDef SegmentationMethods[] = {
 
     {"merge_clump_images", (PyCFunction)Segmentation_mergeClumpImages, METH_VARARGS | METH_KEYWORDS,
 "segmentation.merge_clump_images(input_imgs, output_img, merge_rats)\n"
-"Merge all clumps from tile segmentations into outputfile\n"
-"\n"
-"Where:\n"
+"Merge all clumps from tile segmentations into output file\n"
 "\n"
 ":param input_imgs: is a list of input image paths\n"
 ":param output_img: is a string containing the name of the output file\n"
@@ -774,8 +757,6 @@ static PyMethodDef SegmentationMethods[] = {
     {"find_tile_borders_mask", (PyCFunction)Segmentation_findTileBordersMask, METH_VARARGS | METH_KEYWORDS,
 "segmentation.find_tile_borders_mask(input_imgs, border_msk_img, tile_boundary, tile_overlap, tile_body, col_name)\n"
 "Mask tile borders\n"
-"\n"
-"Where:\n"
 "\n"
 ":param input_imgs: is a list of input clump image paths\n"
 ":param border_msk_img: is a string containing the name of the border mask file\n"
@@ -790,8 +771,6 @@ static PyMethodDef SegmentationMethods[] = {
 "segmentation.rm_small_clumps(clumps_img, output_img, area_threshold, gdalformat)\n"
 "A function to remove small clumps and set them with a value of 0 (i.e., no data) \n"
 "\n"
-"Where:\n"
-"\n"
 ":param clumps_img: is a string containing the name of the input clumps file - note a column called \'Histogram\'.\n"
 ":param output_img: is a string containing the name of the output clumps file\n"
 ":param area_threshold: is a float containing the area threshold (in pixels)\n"
@@ -801,8 +780,6 @@ static PyMethodDef SegmentationMethods[] = {
     {"mean_image", (PyCFunction)Segmentation_meanImage, METH_VARARGS | METH_KEYWORDS,
 "segmentation.mean_image(input_img, clumps_img, output_img, gdalformat, datatype)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
-"\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string containing the name of the input image file from which the mean is taken.\n"
 ":param clumps_img: is a string containing the name of the input clumps file\n"
@@ -814,8 +791,6 @@ static PyMethodDef SegmentationMethods[] = {
 {"generate_regular_grid", (PyCFunction)Segmentation_GenerateRegularGrid, METH_VARARGS | METH_KEYWORDS,
 "segmentation.generate_regular_grid(input_img, output_img, gdalformat, num_x_pxls, num_y_pxls, offset)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
-"\n"
-"Where:\n"
 "\n"
 ":param input_img: is a string containing the name of the input image file specifying the dimensions of the output image.\n"
 ":param output_img: is a string containing the name and path of the output clumps image\n"
@@ -830,8 +805,6 @@ static PyMethodDef SegmentationMethods[] = {
 "A function to include a set of clumped regions within an existing clumps (i.e., segmentation) image.\n"
 "NOTE. You should run the relabel_clumps function on the output of this command before using further.\n"
 "\n"
-"Where:\n"
-"\n"
 ":param clumps_img: is a string containing the filepath for the input clumps image.\n"
 ":param regions_img: is a string containing the filepath for the input regions image.\n"
 ":param output_img: is a string containing the name and path of the output clumps image\n"
@@ -841,8 +814,6 @@ static PyMethodDef SegmentationMethods[] = {
 {"merge_segments_to_neighbours", (PyCFunction)Segmentation_mergeSegments2Neighbours, METH_VARARGS | METH_KEYWORDS,
 "segmentation.merge_segments_to_neighbours(clumps_img, input_vals_img, output_img, gdalformat, sel_clumps_col, no_data_clumps_col)\n"
 "A function to merge some selected clumps with the neighbours based on colour (spectral) distance where clumps identified as no data are ignored.\n"
-"\n"
-"Where:\n"
 "\n"
 ":param clumps_img: is a string containing the filepath for the input clumps image.\n"
 ":param input_vals_img: is a string containing the filepath for the input image used to define 'distance'.\n"
@@ -856,8 +827,6 @@ static PyMethodDef SegmentationMethods[] = {
 "segmentation.drop_selected_clumps(clumps_img, output_img, gdalformat, sel_clumps_col)\n"
 "A function to drop the selected clumps from the segmentation.\n"
 "\n"
-"Where:\n"
-"\n"
 ":param clumps_img: is a string containing the filepath for the input clumps image.\n"
 ":param output_img: is a string containing the name and path of the output clumps image\n"
 ":param gdalformat: is a string defining the format of the output image.\n"
@@ -867,8 +836,6 @@ static PyMethodDef SegmentationMethods[] = {
 {"merge_equiv_clumps", (PyCFunction)Segmentation_mergeEquivalentClumps, METH_VARARGS | METH_KEYWORDS,
 "segmentation.merge_equiv_clumps(clumps_img, output_img, gdalformat, val_columns)\n"
 "A function to merge neighbouring clumps which have the same value - for example when merging across tile boundaries.\n"
-"\n"
-"Where:\n"
 "\n"
 ":param clumps_img: is a string containing the filepath for the input clumps image.\n"
 ":param output_img: is a string containing the name and path of the output clumps image\n"

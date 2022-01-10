@@ -55,6 +55,7 @@ def perform_felsenszwalb_segmentation(
                   kernel used in preprocessing.'
     :param min_size: scikit-image Felsenszwalb parameter: 'Minimum component
                      size. Enforced using postprocessing.'
+
     """
     if not HAVE_SKI_SEG:
         raise rsgislib.RSGISPyException(
@@ -196,6 +197,7 @@ def perform_quickshift_segmentation(
                            For this purpose, the input is assumed to be RGB.'
     :param random_seed: scikit-image Quickshift parameter: 'Random seed used
                         for breaking ties.'
+
     """
     if not HAVE_SKI_SEG:
         raise rsgislib.RSGISPyException(
@@ -348,6 +350,7 @@ def perform_slic_segmentation(
                             the cases.'
     :param slic_zero: scikit-image Slic parameter: 'Run SLIC-zero, the zero-parameter
                       mode of SLIC.'
+
     """
     if not HAVE_SKI_SEG:
         raise rsgislib.RSGISPyException(
@@ -495,6 +498,7 @@ def perform_watershed_segmentation(
     :param watershed_line: scikit-image Watershed parameter: 'If watershed_line is
                            True, a one-pixel wide line separates the regions obtained
                            by the watershed algorithm. The line has the label 0.'
+
     """
     if not HAVE_SKI_SEG:
         raise rsgislib.RSGISPyException(
@@ -656,6 +660,7 @@ def perform_random_walker_segmentation(
     :param spacing: scikit-image random_walker parameter: 'Spacing between voxels
                     in each spatial dimension. If None, then the spacing between
                     pixels/voxels in each dimension is assumed 1.'
+
     """
     if not HAVE_SKI_SEG:
         raise rsgislib.RSGISPyException(

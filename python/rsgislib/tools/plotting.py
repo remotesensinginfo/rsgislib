@@ -3,21 +3,12 @@
 The tools.plotting module contains functions for extracting and plotting remote sensing data.
 """
 
-# Import the os module
+from typing import Tuple
 import os
 
-# Import the RSGISLib module
 import rsgislib
-
-# Import the RSGISLib Image Utils module
-from rsgislib import imageutils
-
-# Import the RSGISLib Zonal Stats module
 from rsgislib import zonalstats
-
-# Import the RSGISLib Image Calc module
 from rsgislib import imagecalc
-
 
 from osgeo import gdal
 import numpy
@@ -41,8 +32,8 @@ def plot_image_spectra(
     show_refl_std=True,
     refl_max=None,
 ):
-    """A utility function to extract and plot image spectra.
-    Where:
+    """
+    A utility function to extract and plot image spectra.
 
     :param input_img: is the input image
     :param vec_file: is the region of interest file as a vector file - if multiple polygons are defined the spectra for each will be added to the plot.
@@ -54,7 +45,7 @@ def plot_image_spectra(
     :param show_refl_std: is a boolean (default: True) to specify whether a shaded region showing 1 standard deviation from the mean on the plot alongside the mean spectra.
     :param refl_max: is a parameter for setting the maximum reflectance value on the Y axis (if None the maximum value in the dataset is used
 
-    Example::
+    .. code:: python
 
         from rsgislib import tools
 
@@ -65,6 +56,7 @@ def plot_image_spectra(
         plotTitle = "Image Spectral from CASI Image"
 
         tools.plotting.plot_image_spectra(inputImage, roiFile, outputPlotFile, wavelengths, plotTitle)
+
     """
     # Check matplotlib is available
     if not haveMatPlotLib:
@@ -191,8 +183,8 @@ def plot_image_comparison(
     ctable="jet",
     interp="nearest",
 ):
-    """A function to plot two images against each other.
-    Where:
+    """
+    A function to plot two images against each other.
 
     :param inputImage1: is a string with the path to the first image.
     :param inputImage2: is a string with the path to the second image.
@@ -215,7 +207,7 @@ def plot_image_comparison(
     :param ctable: is a string specifying the colour table to be used (Default: jet), list of available colour tables specified by matplotlib: http://matplotlib.org/examples/color/colormaps_reference.html
     :param interp: is a string specifying the interpolation algorithm to be used (Default: 'nearest'). Available values are ‘none’, ‘nearest’, ‘bilinear’, ‘bicubic’, ‘spline16’, ‘spline36’, ‘hanning’, ‘hamming’, ‘hermite’, ‘kaiser’, ‘quadric’, ‘catrom’, ‘gaussian’, ‘bessel’, ‘mitchell’, ‘sinc’, ‘lanczos’.
 
-    Example::
+    .. code:: python
 
         from rsgislib.tools import plotting
 
@@ -352,8 +344,6 @@ def plot_image_histogram(
     """
     A function to plot the histogram of an image.
 
-    Where:
-
     :param input_img: is a string with the path to the image.
     :param imgBand: is an int specifying the band in the image to be plotted.
     :param outputPlotFile: is a string specifying the output PDF for the plot.
@@ -367,7 +357,7 @@ def plot_image_histogram(
     :param edgecolour: is the colour of the edges of the bars
     :param linewidth: is the thickness of the edges of the bars in the plot.
 
-    Example::
+    .. code:: python
 
         from rsgislib.tools import plotting
 
@@ -538,7 +528,7 @@ def quantile_plot(residuals, ylabel, out_file, out_format="PNG", title=None):
 
 def get_gdal_raster_mpl_imshow(
     input_img: str, bands: list[int] = None, bbox: list[float] = None
-) -> [numpy.array, list[float]]:
+) -> Tuple[numpy.array, list[float]]:
     """
     A function which retrieves image data as an array in an appropriate structure
     for use within the matplotlib imshow function. The extent is also returned.
@@ -554,8 +544,6 @@ def get_gdal_raster_mpl_imshow(
                  input image so only data for the subset are returned.
     :return: numpy.array either [n,m,3] or [n,m] and a bbox (xmin, xmax, ymin, ymax)
              specifying the extent of the image data.
-
-    Example:
 
     .. code:: python
 

@@ -1181,15 +1181,15 @@ def do_gdal_layers_have_same_proj(in_a_img: str, in_b_img: str):
 
 
 def set_band_names(input_img: str, band_names: list, feedback: bool = False):
-    """A utility function to set band names.
-    Where:
+    """
+    A utility function to set band names.
 
     :param input_img: input image file.
     :param band_names: is a list of band names
     :param feedback: is a boolean specifying whether feedback will be printed to the
                      console (True= Printed / False (default) Not Printed)
 
-    Example::
+    .. code:: python
 
         from rsgislib import imageutils
 
@@ -1223,7 +1223,7 @@ def get_band_names(input_img: str):
     :param input_img: input image file.
     :return: list of band names
 
-    Example::
+    .. code:: python
 
         from rsgislib import imageutils
 
@@ -2671,7 +2671,7 @@ def do_images_overlap(in_a_img: str, in_b_img: str, over_thres: int = 0.0):
 
     :return: Boolean specifying whether they overlap or not.
 
-    Example::
+    .. code:: python
 
         import rsgislib.imageutils
         overlap = rsgislib.imageutils.do_images_overlap("tile_8.kea", "input.tif")
@@ -2787,8 +2787,6 @@ def generate_random_pxl_vals_img(
     """
     Function which produces a 1 band image with random integer values between
     lowVal and upVal.
-
-    Where:
 
     :param input_img: the input reference image
     :param output_img: the output image file name and path (will be same dimensions
@@ -3541,7 +3539,7 @@ def assign_random_pxls(
     :param rnd_seed: A random seed for generating the pixel locations. If None then a
                  different seed is used each time the system is executed (Default None).
 
-    Example::
+    .. code:: python
 
         input_img = 'LS5TM_20000108_latn531lonw37_r23p204_osgb_clouds_up.kea'
         output_img = 'LS5TM_20000108_latn531lonw37_r23p204_osgb_samples.kea'

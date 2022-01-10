@@ -146,8 +146,6 @@ def calc_dist_to_img_vals(
     A function to calculate the distance to the nearest pixel value with one
     of the specified values.
 
-    Where:
-
     :param input_img: is a string specifying the input image file.
     :param output_img: is a string specfiying the output image file.
     :param pxl_vals: is a number of list of numbers specifying the features to which
@@ -164,7 +162,7 @@ def calc_dist_to_img_vals(
                      True = Geographic units (e.g., metres),
                      False is in Pixels (Default = True).
 
-    Example::
+    .. code:: python
 
         import rsgislib.imagecalc
         cloudsImg = 'LS5TM_20110701_lat52lon421_r24p204_clouds.kea'
@@ -302,7 +300,7 @@ def calc_dist_to_img_vals_tiled(
                     for this processing. If -1 all available cores will be
                     used. (Default: -1)
 
-    Example::
+    .. code:: python
 
         import rsgislib.imagecalc
         cloudsImg = 'LS5TM_20110701_lat52lon421_r24p204_clouds.kea'
@@ -444,8 +442,8 @@ def count_pxls_of_val(input_img, vals, img_band=None):
     :param input_img: the input image
     :param vals: is a list of pixel values to be counted
     :param img_band: specify the image band for which the analysis is to be undertaken.
-                    If None (default) then all bands will be used.
-    :returns list of pixel counts in same order as the vals input list
+                     If None (default) then all bands will be used.
+    :return: list of pixel counts in same order as the vals input list
 
     """
     from rios.imagereader import ImageReader

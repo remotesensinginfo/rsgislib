@@ -907,7 +907,7 @@ def label_pxl_sample_chips(
     :param sample_pxl_img_band: Default 1. The image band in the sample image.
     :param cls_msk_img_band: Default 1. The image band in the sample image.
 
-    Example::
+    .. code:: python
 
         sample_pxls_img = 'LS5TM_20000108_latn531lonw37_r23p204_osgb_samples.kea'
         cls_msk_img = 'LS5TM_20000108_latn531lonw37_r23p204_osgb_clouds_up.kea'

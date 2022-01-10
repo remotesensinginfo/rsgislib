@@ -32,8 +32,6 @@ def polygonise_raster_to_vec_lyr(
     """
     A utility to polygonise a raster to a OGR vector layer.
 
-    Where:
-
     :param out_vec_file: is a string specifying the output vector file path. If it
                          exists it will be deleted and overwritten.
     :param out_vec_lyr: is a string with the name of the vector layer.
@@ -53,6 +51,7 @@ def polygonise_raster_to_vec_lyr(
                               representing the pixel value within the input image.
     :param use_8_conn: is a bool specifying whether 8 connectedness or 4 connectedness
                        should be used (4 is RSGISLib/GDAL default)
+
     """
     gdalImgDS = gdal.Open(input_img)
     imgBand = gdalImgDS.GetRasterBand(img_band)
@@ -130,8 +129,6 @@ def vectorise_pxls_to_pts(
     Function which creates a new output vector file for the pixels within the input
     image file with the value specified. Pixel locations will be the centroid of
     the the pixel
-
-    Where:
 
     :param input_img: the input image
     :param img_band: the band within the image to use

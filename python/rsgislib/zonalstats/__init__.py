@@ -1609,7 +1609,7 @@ def merge_extracted_hdf5_data(h5_files, out_h5_file, datatype=None):
                      (e.g., rsgislib.TYPE_32FLOAT). If None (default)
                      then the output data type will be float32.
 
-    Example::
+    .. code:: python
 
         inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5',
                           'MSS_CloudTrain3.h5']
@@ -2033,7 +2033,7 @@ def merge_extracted_hdf5_chip_data(h5_files, out_h5_file, datatype=None):
                      (e.g., rsgislib.TYPE_32FLOAT). If None (default)
                      then the output data type will be float32.
 
-    Example::
+    .. code:: python
 
         inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5',
                           'MSS_CloudTrain3.h5']
@@ -2512,7 +2512,7 @@ def merge_extracted_hdf5_chip_ref_data(h5_files, out_h5_file, datatype=None):
                      (e.g., rsgislib.TYPE_32FLOAT). If None (default)
                      then the output data type will be float32.
 
-    Example::
+    .. code:: python
 
         inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5',
                           'MSS_CloudTrain3.h5']

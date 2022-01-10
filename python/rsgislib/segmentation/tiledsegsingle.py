@@ -44,7 +44,7 @@ from rios import rat
 
 import rsgislib
 from rsgislib.imageutils import tilingutils
-from rsgislib.segmentation import segutils
+from rsgislib.segmentation import shepherdseg
 from rsgislib import rastergis
 from rsgislib import imageutils
 from rsgislib import segmentation
@@ -167,7 +167,7 @@ class RSGISTiledShepherdSegmentationSingleThread(object):
             strchStatsOutFile = strchStatsBase + "_" + tileID + ".txt"
             kCentresOutFile = kCentresBase + "_" + tileID
             print(clumpsFile)
-            segutils.runShepherdSegmentation(
+            shepherdseg.runShepherdSegmentation(
                 imgTile,
                 clumpsFile,
                 outputMeanImg=None,
@@ -306,7 +306,7 @@ class RSGISTiledShepherdSegmentationSingleThread(object):
             kMeansCentres, imgStretchStats = self.findSegStatsFiles(
                 imgTile, segStatsInfo
             )
-            segutils.runShepherdSegmentationPreCalcdStats(
+            shepherdseg.runShepherdSegmentationPreCalcdStats(
                 imgTile,
                 clumpsFile,
                 kMeansCentres,
@@ -430,7 +430,7 @@ class RSGISTiledShepherdSegmentationSingleThread(object):
             kMeansCentres, imgStretchStats = self.findSegStatsFiles(
                 imgTile, segStatsInfo
             )
-            segutils.runShepherdSegmentationPreCalcdStats(
+            shepherdseg.runShepherdSegmentationPreCalcdStats(
                 imgTile,
                 clumpsFile,
                 kMeansCentres,
@@ -491,7 +491,7 @@ def perform_tiled_segmentation(
     :param sampling: specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
     :param km_max_iter: maximum iterations for KMeans (Default 200).
 
-    Example::
+    .. code:: python
 
         from rsgislib.segmentation import tiledsegsingle
 

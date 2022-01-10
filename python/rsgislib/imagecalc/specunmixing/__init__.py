@@ -71,6 +71,7 @@ class ImageEndmemberInfo(object):
 def read_endmembers_mtxt(endmembers_file, gain=1, weight=None):
     """
     A function to read endmembers mtxt file
+
     :param endmembers_file: File path to the mtxt input file.
     :param gain: A gain for the endmembers (input endmember / gain = output endmember).
                  If 1 then ignored.
@@ -129,7 +130,7 @@ def plot_endmembers(
     :param plot_title: A title for the plot (Optional)
     :param gain: A gain to get the reflectance values as a percentage (Optional)
                  (e.g., if multiplied by 1000 then the gain would be 10
-                        if multiplied by 10,000 then the gain would be 100 )
+                 if multiplied by 10,000 then the gain would be 100 )
     :param wavelengths: A list of wavelengths for the image bands. Optional, if not
                         provided then band numbers will be used.
 

@@ -59,12 +59,6 @@ Internal Utilities
 Calculate Geometry Info
 -------------------------
 .. autofunction:: rsgislib.vectorgeoms.get_poly_hole_area
-.. autofunction:: rsgislib.vectorgeoms.get_feat_envs
-
-
-
-
-
 
 
 

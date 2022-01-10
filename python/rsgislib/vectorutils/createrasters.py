@@ -28,8 +28,6 @@ def rasterise_vec_lyr(
     A utility to rasterise a vector layer to an image covering the same region and at
     the same resolution as the input image.
 
-    Where:
-
     :param vec_file: is a string specifying the input vector file
     :param vec_lyr: is a string specifying the input vector layer name.
     :param input_img: is a string specifying the input image defining the grid, pixel
@@ -53,7 +51,7 @@ def rasterise_vec_lyr(
     :param no_data_val: is a float specifying the no data value associated with a
                         continuous output image.
 
-    Example::
+    .. code:: python
 
         from rsgislib import vectorutils
 
@@ -147,8 +145,6 @@ def rasterise_vec_lyr_obj(
     """
     A utility to rasterise a vector layer to an image covering the same region.
 
-    Where:
-
     :param vec_lyr_obj: is a OGR Vector Layer Object
     :param output_img: is a string specifying the output image, this image must already
                      exist and intersect within the input vector layer.
@@ -217,8 +213,6 @@ def copy_vec_to_rat(
     A utility to create raster copy of a polygon vector layer. The output image is
     a KEA file and the attribute table has the attributes from the vector layer.
 
-    Where:
-
     :param vec_file: is a string specifying the input vector file
     :param vec_lyr: is a string specifying the layer within the input vector file
     :param input_img: is a string specifying the input image defining the grid,
@@ -226,7 +220,7 @@ def copy_vec_to_rat(
     :param output_img: is a string specifying the output KEA image for the
                        rasterised vector layer
 
-    Example::
+    .. code:: python
 
         from rsgislib import vectorutils
 

@@ -2,7 +2,7 @@
 """
 These utilities allow for a more 'intelligent tiling process to be carried out:
 
-Example::
+.. code:: python
 
     import rsgislib
     from rsgislib.imageutils import tilingutils
@@ -101,8 +101,6 @@ def create_min_data_tiles(
 ):
     """
     A function to create a tiling for an input image where each tile has a minimum amount of valid data.
-
-    Where:
 
     :param inputImage: is a string for the image to be tiled
     :param outshp: is a string for the output shapefile the tiling will be written to (if None a shapefile won't be outputted).
@@ -207,8 +205,6 @@ def create_tile_mask_images_from_shp(
     A function to create individual image masks from the tiles shapefile which can be
     individually used to mask (using rsgislib mask function) each tile from the inputimage.
 
-    Where:
-
     :param inputImage: is the input image being tiled.
     :param tileShp: is a shapefile containing the shapefile tiles.
     :param tilesNameBase: is the base file name for the tile masks
@@ -260,8 +256,6 @@ def create_tile_mask_images_from_clumps(
     A function to create individual image masks from the tiles shapefile which can be
     individually used to mask (using rsgislib mask function) each tile from the inputimage.
 
-    Where:
-
     :param clumpsImage: is an image file with RAT where each clump represented a tile region.
     :param tilesNameBase: is the base file name for the tile masks
     :param tilesMaskDIR: is the directory where the output images will be outputted
@@ -282,11 +276,10 @@ def create_tiles_from_masks(
     """
     A function to apply the image tile masks defined in createTileMaskImages to the input image to extract the individual tiles.
 
-    Where:
-
     :param inputImage: is the input image being tiled.
     :param tileMasksBase: is the base path for the tile masks. glob will be used to find them with \*.kea added to the end.
     :param outTilesBase: is the base file name for the tiles.
+
     """
     maskFiles = glob.glob(os.path.join(tilesMetaDIR, tilesBase + "*.kea"))
 

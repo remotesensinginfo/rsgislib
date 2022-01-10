@@ -17,8 +17,6 @@ import os
 import rsgislib
 import datetime
 
-import stanford_theme
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -61,7 +59,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'RSGISLib'
-copyright = u'{}, Pete Bunting and Daniel Clewley'.format(datetime.datetime.now().year)
+copyright = u'{}, Pete Bunting, Daniel Clewley and Nathan Thomas'.format(datetime.datetime.now().year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -120,10 +118,8 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #html_theme = 'default'
-#html_theme = 'python_docs_theme'
-#html_theme = 'karma_sphinx_theme'
-html_theme = 'stanford_theme'
-html_theme_path = [stanford_theme.get_html_theme_path()]
+html_theme = 'sphinx_rtd_theme'
+#html_theme_path = [stanford_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -219,7 +215,7 @@ latex_elements = {
 #  author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'RSGISLib.tex', u'RSGISLib Documentation',
-   u'Pete Bunting and Daniel Clewley', 'manual'),
+   u'Pete Bunting, Daniel Clewley and Nathan Thomas', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -249,7 +245,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'rsgislib', u'RSGISLib Documentation',
-     [u'Pete Bunting and Daniel Clewley'], 1)
+     [u'Pete Bunting, Daniel Clewley and Nathan Thomas'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -263,7 +259,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'RSGISLib', u'RSGISLib Documentation',
-   u'Pete Bunting and Daniel Clewley', 'RSGISLib', 'Tools for processing remote sensing and GIS data.', 'Miscellaneous'),
+   u'Pete Bunting, Daniel Clewley and Nathan Thomas', 'RSGISLib', 'Tools for processing remote sensing and GIS data.', 'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.

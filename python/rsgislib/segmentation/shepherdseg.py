@@ -93,8 +93,6 @@ def run_shepherd_segmentation(
     Segmentation of Imagery Based on Iterative Elimination. Remote Sensing, 11(6), 658.
     http://doi.org/10.3390/rs11060658
 
-    Where:
-
     :param input_img: is a string containing the name of the input file.
     :param out_clumps_img: is a string containing the name of the output clump file.
     :param out_mean_img: is the output mean image file (clumps attributed with pixel
@@ -136,7 +134,7 @@ def run_shepherd_segmentation(
                                 img_stretch_stats and kmeans_centres file paths
                                 for use by other commands (Output).
 
-    Example::
+    .. code:: python
 
         from rsgislib.segmentation import shepherdseg
 
@@ -455,7 +453,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
     :param process_in_mem: where functions allow it perform processing in memory
                            rather than on disk.
 
-    Example::
+    .. code:: python
 
         from rsgislib.segmentation import shepherdseg
 

@@ -277,8 +277,6 @@ def find_file(dir_path: str, file_search: str) -> str:
     :param file_search: string with a * wildcard for the file being searched for.
     :return: string with the path to the file
 
-    Example:
-
     .. code:: python
 
         import rsgislib.tools.filetools
@@ -307,8 +305,6 @@ def find_file_none(dir_path: str, file_search: str) -> Union[None, str]:
     :param file_search: string with a * wildcard for the file being searched for.
     :return: string with the path to the file
 
-    Example:
-
     .. code:: python
 
         import rsgislib.tools.filetools
@@ -332,8 +328,6 @@ def find_files_ext(dir_path: str, ending: str) -> dict:
     :param dir_path: the base directory path within which to search.
     :param ending: the file ending (e.g., .txt, or txt or .kea, kea).
     :return: dict with file name as key
-
-    Example:
 
     .. code:: python
 
@@ -361,8 +355,6 @@ def find_files_mpaths_ext(dir_paths: list, ending: str) -> dict:
     :param dir_paths: a list of base directory paths within which to search.
     :param ending: the file ending (e.g., .txt, or txt or .kea, kea).
     :return: dict with file name as key
-
-    Example:
 
     .. code:: python
 
@@ -398,8 +390,6 @@ def find_first_file(dir_path: str, file_search: str, rtn_except: bool = True) ->
                        files are found (default). If False then None will be returned
                        rather than an exception raised.
     :return: The file found (or None if rtn_except=False)
-
-    Example:
 
     .. code:: python
 

@@ -71,7 +71,7 @@ def create_img_extent_lut(
     :param overwrite_lut_file: if True then output file will be overwritten. If
                                false then not, e.g., can add extra layer to GPKG
 
-    Example::
+    .. code:: python
 
         import glob
         import rsgislib.imageutils.imagelut

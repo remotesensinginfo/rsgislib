@@ -984,7 +984,7 @@ def perform_tiled_img_filter(
                    (Default = 2000).
     :param n_cores: is an int specifying the number of cores to be used for processing.
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib.imagefilter import tiledfilter
@@ -995,7 +995,7 @@ def perform_tiled_img_filter(
 
         medianFilter = tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT)
         tiledfilter.perform_tiled_img_filter(input_img, output_img, medianFilter,
-                                          width=2000, height=2000)
+                                             width=2000, height=2000)
         imageutils.pop_img_stats(output_img, False, 0, True)
 
     """
@@ -1101,7 +1101,7 @@ def perform_tiled_img_multi_filter(
                    (Default = 2000).
     :param n_cores: is an int specifying the number of cores to be used for processing.
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib.imagefilter import tiledfilter
@@ -1113,7 +1113,7 @@ def perform_tiled_img_multi_filter(
         filters = [tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT),
                   tiledfilter.RSGISNormVarFilter(7, "KEA", rsgislib.TYPE_16UINT]
         tiledfilter.perform_tiled_img_multi_filter(input_img, outputImages,
-                                               filters, width=2000, height=2000)
+                                                   filters, width=2000, height=2000)
         imageutils.pop_img_stats(output_img, False, 0, True)
 
     """

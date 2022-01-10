@@ -56,19 +56,19 @@ def calc_ndvi(
     :param gdalformat: is a string specifying the output image file format
                        (Default: KEA)
 
-    Example::
+    .. code:: python
 
-    import rsgislib
-    from rsgislib import imagecalc
+        import rsgislib
+        from rsgislib import imagecalc
 
-    input_image = "L1C_T45RYH_A019936_20201230T044924.tif"
-    red_band = 4
-    nir_band = 5
-    out_image = "L1C_T45RYH_A019936_20201230T044924_NIR.kea:
-    calc_stats = True
-    gdalformat = "KEA"
+        input_image = "L1C_T45RYH_A019936_20201230T044924.tif"
+        red_band = 4
+        nir_band = 5
+        out_image = "L1C_T45RYH_A019936_20201230T044924_NIR.kea:
+        calc_stats = True
+        gdalformat = "KEA"
 
-    calc_ndvi(input_image, red_band, nir_band, out_image, calc_stats, gdalformat)
+        calc_ndvi(input_image, red_band, nir_band, out_image, calc_stats, gdalformat)
 
     """
     expression = "(nir+red)!=0?(nir-red)/(nir+red):-999"

@@ -54,7 +54,6 @@ Merge Vectors
 .. autofunction:: rsgislib.vectorutils.merge_vectors_to_gpkg
 .. autofunction:: rsgislib.vectorutils.merge_vector_lyrs_to_gpkg
 .. autofunction:: rsgislib.vectorutils.merge_vectors_to_gpkg_ind_lyrs
-.. autofunction:: rsgislib.vectorutils.merge_shapefiles
 .. autofunction:: rsgislib.vectorutils.merge_vector_layers
 .. autofunction:: rsgislib.vectorutils.merge_vector_files
 .. autofunction:: rsgislib.vectorutils.merge_utm_vecs_wgs84
@@ -72,7 +71,6 @@ Vector Select / Subset
 .. autofunction:: rsgislib.vectorutils.get_att_lst_select_bbox_feats_lyr_objs
 .. autofunction:: rsgislib.vectorutils.select_intersect_feats
 .. autofunction:: rsgislib.vectorutils.export_spatial_select_feats
-.. autofunction:: rsgislib.vectorutils.bbox_intersects_vec_lyr
 .. autofunction:: rsgislib.vectorutils.subset_envs_vec_lyr_obj
 .. autofunction:: rsgislib.vectorutils.subset_veclyr_to_featboxs
 .. autofunction:: rsgislib.vectorutils.spatial_select

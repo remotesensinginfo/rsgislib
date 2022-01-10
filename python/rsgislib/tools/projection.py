@@ -65,15 +65,12 @@ def degrees_to_metres(
     """
     Convert pixel sizes or distances in degrees to metres.
 
-    Where:
-
     :param latitude: latitude
     :param lon_size: numpy array of x pixel sizes (degrees)
     :param lat_size: numpy array of y pixel sizes (degrees)
-
     :return: x_size (numpy array of x pixel sizes (m)), y_size (numpy array of y pixel sizes (m))
 
-    Example::
+    .. code:: python
 
         from rsgislib import tools
         x_size, y_size = tools.degrees_to_metres(52,1.0,1.0)
@@ -99,15 +96,12 @@ def metres_to_degrees(latitude: float, x_size: float, y_size: float) -> (float, 
     """
     Convert pixel sizes or distances in metres to degrees.
 
-    Where:
-
     :param latitude: latitude
     :param x_size: numpy array of x pixel sizes (m)
     :param y_size: numpy array of y pixel sizes (m)
-
     :return: lon_size (numpy array of x pixel sizes (degrees)), lat_size (numpy array of y pixel sizes (degrees))
 
-    Example::
+    .. code:: python
 
         from rsgislib import tools
         x_size, y_size = tools.metres_to_degrees(52, 1.0, 1.0)

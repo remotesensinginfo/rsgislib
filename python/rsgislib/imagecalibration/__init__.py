@@ -96,10 +96,11 @@ def perform_dos_calc(
     :param copyBandNames: is a boolean specifying that the band names of the input image should be copied to the output image file (Default: True)
     :param calcStatsPyd: is a boolean specifying that the image stats and pyramids should be calculated on the output image (Default: True)
 
-    Example::
+    .. code:: python
 
         import rsgislib.imagecalibration
         rsgislib.imagecalibration.perform_dos_calc("LS5TM_20110701_lat52lon421_r24p204_rad_toa.kea", 'LS5TM_20110701_lat52lon421_r24p204_rad_toa_dos.kea")
+
     """
     import rsgislib
     import rsgislib.imagecalc
@@ -165,7 +166,7 @@ def calc_clear_sky_regions(
     :param finalClearSkyRegionDist: The distance in metres from a cloud/shadow object for the final boundaries of the clear sky regions (Default: 1000)
     :param morphSize: the size of the circular morphological operator used to tidy up the result (Default: 21)
 
-    Example::
+    .. code:: python
 
         import rsgislib.imagecalibration
         cloudsImg = "./Outputs/LS8_20160605_lat52lon261_r24p203_clouds.kea"
@@ -173,6 +174,7 @@ def calc_clear_sky_regions(
         outputMask = "./Outputs/LS8_20160605_lat52lon261_r24p203_openskyvalid.kea"
         tmpPath = "./temp"
         rsgislib.imagecalibration.calc_clear_sky_regions(cloudsImg, validAreaImg, outputMask, 'KEA', tmpPath)
+
     """
 
     import rsgislib

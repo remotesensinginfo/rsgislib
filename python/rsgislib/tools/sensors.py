@@ -12,8 +12,6 @@ def read_landsat_mtl_to_dict(in_mtl_file):
     :param in_mtl_file: the file path to MTL header file (*MTL.txt)
     :return: dict structure.
 
-    Example:
-
     .. code:: python
 
         import pprint

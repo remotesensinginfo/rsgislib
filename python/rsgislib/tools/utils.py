@@ -310,11 +310,8 @@ def create_var_list(in_vals_lsts: dict, val_dict: dict = None):
                      normally not be provided by the user as default is None. Be
                      careful if you set as otherwise you might not get a correct
                      or valid result.
-
     :returns: list of dictionaries with the same keys are the input but only a
               single value will be associate with key rather than a list.
-
-    Example:
 
     .. code:: python
 
@@ -419,8 +416,6 @@ def hex_to_rgb(hex_str: str):
     :param hex_str: Input hex string which can be either 7 or 6 characters long.
                     If 7 characters then the first character will be a #.
     :return: R, G, B tuple
-
-    Example:
 
     .. code:: python
 

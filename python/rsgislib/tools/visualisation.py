@@ -29,8 +29,6 @@ def create_kmz_img(
     A function to convert an input image to a KML/KMZ file, where the input image
     is stretched and bands sub-selected / ordered as required for visualisation.
 
-    Where:
-
     :param input_img: input image file (any format that gdal supports)
     :param output_file: output image file (extension kmz for KMZ output /
                         kml for KML output)
@@ -164,8 +162,6 @@ def create_webtiles_img_no_stats_msk(
     """
     A function to convert an input image to a tile cache for web map servers, where the input image
     is stretched and bands sub-selected / ordered as required for visualisation.
-
-    Where:
 
     :param input_img: input image file (any format that gdal supports)
     :param out_dir: output directory within which the cache will be created.
@@ -886,7 +882,7 @@ def create_webtiles_vis_gtiff_img(
                          a number of input files.
     :param tmp_dir: an input directory which can be used to write temporary files /
                     directories. If not provided (i.e., input is None) then a local
-                     directory will be define in the same folder as the input image.
+                    directory will be define in the same folder as the input image.
     :param webview: Provide default GDAL leaflet web viewer.
     :param scale: the scale output geotiff. Input is percentage in the x-axis.
                   If zero (default) then no scaling will be applied.

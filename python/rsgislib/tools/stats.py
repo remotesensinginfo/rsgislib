@@ -23,7 +23,8 @@ def calc_pandas_vif(df, cols=None):
     :param cols: list of columns in the dataframe
     :return: A pandas series containing the VIF for each predictor variable.
 
-    Example::
+    .. code:: python
+
         df = pandas.read_csv('metrics.csv')
         cols = list(df.columns)
         # Subset to the column names of interest
@@ -721,11 +722,12 @@ def calc_isodata_threshold(data):
 
     threshold = (data[data <= threshold].mean() + data[data > threshold].mean()) / 2.0
 
-    Ridler, TW & Calvard, S (1978), "Picture thresholding using an iterative selection method"
-    IEEE Transactions on Systems, Man and Cybernetics 8: 630-632, DOI:`10.1109/TSMC.1978.4310039`
+    Ridler, TW & Calvard, S (1978), "Picture thresholding using an iterative selection
+    method" IEEE Transactions on Systems, Man and Cybernetics 8: 630-632,
+    DOI:`10.1109/TSMC.1978.4310039`
 
     :param data: 1d numeric numpy array
-    :returns: float (threshold)
+    :return: float (threshold)
 
     """
     # Note, this is based on the implementation within scikit-image

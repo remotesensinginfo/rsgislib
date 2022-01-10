@@ -391,7 +391,8 @@ class RSGISTime:
     Class to calculate run time for a function, format and print out.
 
     Need to call start before running function and end immediately after.
-    Example::
+
+    .. code:: python
 
         t = RSGISTime()
         t.start()

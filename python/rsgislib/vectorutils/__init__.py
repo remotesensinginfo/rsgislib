@@ -386,8 +386,6 @@ def merge_vectors_to_gpkg_ind_lyrs(
     where each input file forms a new layer using the existing layer name. This
     function wraps the ogr2ogr command.
 
-    Where:
-
     :param in_vec_files: is a list of input files.
     :param out_vec_file: is the output GPKG database (\*.gpkg)
     :param rename_dup_lyrs: If False an exception will be throw if any input layers

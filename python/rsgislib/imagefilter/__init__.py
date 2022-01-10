@@ -46,7 +46,7 @@ def apply_median_filter(input_img, output_img, filter_size, gdalformat, datatype
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -77,7 +77,7 @@ def apply_mean_filter(input_img, output_img, filter_size, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -108,7 +108,7 @@ def apply_min_filter(input_img, output_img, filter_size, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -139,7 +139,7 @@ def apply_max_filter(input_img, output_img, filter_size, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -170,7 +170,7 @@ def apply_mode_filter(input_img, output_img, filter_size, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -201,7 +201,7 @@ def apply_stddev_filter(input_img, output_img, filter_size, gdalformat, datatype
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -232,7 +232,7 @@ def apply_range_filter(input_img, output_img, filter_size, gdalformat, datatype)
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -263,7 +263,7 @@ def apply_mean_diff_filter(input_img, output_img, filter_size, gdalformat, datat
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -296,7 +296,7 @@ def apply_mean_diff_abs_filter(
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -327,7 +327,7 @@ def apply_total_diff_filter(input_img, output_img, filter_size, gdalformat, data
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -352,7 +352,7 @@ def apply_total_diff_abs_filter(
     """
     Apply a total absolute difference filter to the specified input image.
 
-    ::param input_img: string specifying the input image to be filtered.
+    :param input_img: string specifying the input image to be filtered.
     :param output_img: string specifying the output image file..
     :param filter_size: int specifying the size of the image filter
                         (must be an odd number, i.e., 3, 5, 7, etc).
@@ -360,14 +360,14 @@ def apply_total_diff_abs_filter(
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_totaldiffabs3.kea'
         imagefilter.apply_total_diff_abs_filter(input_img, outImgFile, 3, "KEA",
-                                      rsgislib.TYPE_32FLOAT)
+                                                rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(output_img)
@@ -391,7 +391,7 @@ def apply_coeff_of_var_filter(input_img, output_img, filter_size, gdalformat, da
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -422,7 +422,7 @@ def apply_total_filter(input_img, output_img, filter_size, gdalformat, datatype)
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -453,7 +453,7 @@ def apply_norm_var_filter(input_img, output_img, filter_size, gdalformat, dataty
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -486,7 +486,7 @@ def apply_norm_var_sqrt_filter(
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -517,7 +517,7 @@ def apply_norm_var_ln_filter(input_img, output_img, filter_size, gdalformat, dat
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -548,7 +548,7 @@ def apply_texture_var_filter(input_img, output_img, filter_size, gdalformat, dat
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -579,7 +579,7 @@ def apply_kuwahara_filter(input_img, output_img, filter_size, gdalformat, dataty
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -608,7 +608,7 @@ def apply_sobel_filter(input_img, output_img, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -635,7 +635,7 @@ def apply_sobel_x_filter(input_img, output_img, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -662,7 +662,7 @@ def apply_sobel_y_filter(input_img, output_img, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -689,7 +689,7 @@ def apply_prewitt_filter(input_img, output_img, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -716,7 +716,7 @@ def apply_prewitt_x_filter(input_img, output_img, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -743,7 +743,7 @@ def apply_prewitt_y_filter(input_img, output_img, gdalformat, datatype):
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -784,7 +784,7 @@ def apply_gaussian_smooth_filter(
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -834,7 +834,7 @@ def apply_gaussian_1st_deriv_filter(
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
@@ -884,14 +884,15 @@ def apply_gaussian_2nd_deriv_filter(
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_gau1st.kea'
-        imagefilter.apply_gaussian_2nd_deriv_filter(input_img, outImgFile, 3, 1.0, 1.0. 0.0,
-                                                "KEA", rsgislib.TYPE_32FLOAT)
+        imagefilter.apply_gaussian_2nd_deriv_filter(input_img, outImgFile, 3, 1.0,
+                                                    1.0. 0.0, "KEA",
+                                                    rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(output_img)
@@ -925,14 +926,14 @@ def apply_laplacian_filter(
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_laplacian.kea'
         imagefilter.apply_laplacian_filter(input_img, outImgFile, 3, 1.0, "KEA",
-                                      rsgislib.TYPE_32FLOAT)
+                                           rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(output_img)
@@ -958,14 +959,14 @@ def apply_lee_filter(input_img, output_img, filter_size, n_looks, gdalformat, da
     :param datatype: Specifying the output image pixel data type
                      (e.g., rsgislib.TYPE_32FLOAT).
 
-    Example::
+    .. code:: python
 
         import rsgislib
         from rsgislib import imagefilter
         input_img = 'jers1palsar_stack.kea'
         outImgFile = 'jers1palsar_stack_lee.kea'
         imagefilter.apply_lee_filter(input_img, outImgFile, 3, 3, "KEA",
-                                      rsgislib.TYPE_32FLOAT)
+                                     rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(output_img)

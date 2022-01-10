@@ -640,6 +640,7 @@ def identify_small_units(
     Example:
 
     .. code:: python
+
         import rsgislib.rastergis
 
         clumpsImg = "LS2MSS_19750620_lat10lon6493_r67p250_rad_srefdem_30m_clumps.kea"

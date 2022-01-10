@@ -5,7 +5,7 @@ The segmentation module contains the segmentation functionality for RSGISLib.
 A number of steps are required for the segmentation, for most users it is recommended to use the `run_shepherd_segmentation`
 helper function which will run all the required steps to generate a segmentation:
 
-Example::
+.. code:: python
 
     from rsgislib.segmentation import segutils
     
