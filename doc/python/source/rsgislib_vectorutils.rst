@@ -32,6 +32,7 @@ Vector I/O
 ----------------
 
 .. autofunction:: rsgislib.vectorutils.open_gdal_vec_lyr
+.. autofunction:: rsgislib.vectorutils.read_vec_lyr_to_mem
 .. autofunction:: rsgislib.vectorutils.get_mem_vec_lyr_subset
 .. autofunction:: rsgislib.vectorutils.write_vec_lyr_to_file
 .. autofunction:: rsgislib.vectorutils.vector_translate
