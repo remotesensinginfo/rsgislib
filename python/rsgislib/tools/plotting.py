@@ -663,16 +663,16 @@ def linear_stretch_np_arr(
         arr_data_out = arr_data.copy()
 
     if len(arr_shp) == 2:
-        min_val = arr_data_out.min()
-        max_val = arr_data_out.max()
+        min_val = numpy.nanmin(arr_data_out)
+        max_val = numpy.nanmax(arr_data_out)
         range_val = max_val - min_val
 
         arr_data_out = (((arr_data_out - min_val) / range_val) * out_gain) + out_off
     else:
         n_bands = arr_shp[2]
         for n in range(n_bands):
-            min_val = arr_data_out[..., n].min()
-            max_val = arr_data_out[..., n].max()
+            min_val = numpy.nanmin(arr_data_out[..., n])
+            max_val = numpy.nanmax(arr_data_out[..., n])
             range_val = max_val - min_val
 
             arr_data_out[..., n] = (
@@ -743,14 +743,14 @@ def cumulative_stretch_np_arr(
         arr_data_out = arr_data.copy()
 
     if len(arr_shp) == 2:
-        min_val, max_val = numpy.percentile(arr_data_out, [lower, upper])
+        min_val, max_val = numpy.nanpercentile(arr_data_out, [lower, upper])
         range_val = max_val - min_val
 
         arr_data_out = (((arr_data_out - min_val) / range_val) * out_gain) + out_off
     else:
         n_bands = arr_shp[2]
         for n in range(n_bands):
-            min_val, max_val = numpy.percentile(arr_data_out[..., n], [lower, upper])
+            min_val, max_val = numpy.nanpercentile(arr_data_out[..., n], [lower, upper])
             range_val = max_val - min_val
 
             arr_data_out[..., n] = (
@@ -820,10 +820,10 @@ def stdev_stretch_np_arr(
         arr_data_out = arr_data.copy()
 
     if len(arr_shp) == 2:
-        min_val = arr_data_out.min()
-        max_val = arr_data_out.max()
-        mean_val = numpy.mean(arr_data_out)
-        std_val = numpy.std(arr_data_out)
+        min_val = numpy.nanmin(arr_data_out)
+        max_val = numpy.nanmax(arr_data_out)
+        mean_val = numpy.nanmean(arr_data_out)
+        std_val = numpy.nanstd(arr_data_out)
         low_val = mean_val - (std_val * n_stdevs)
         up_val = mean_val + (std_val * n_stdevs)
         if low_val < min_val:
@@ -837,10 +837,10 @@ def stdev_stretch_np_arr(
     else:
         n_bands = arr_shp[2]
         for n in range(n_bands):
-            min_val = arr_data_out[..., n].min()
-            max_val = arr_data_out[..., n].max()
-            mean_val = numpy.mean(arr_data_out[..., n])
-            std_val = numpy.std(arr_data_out[..., n])
+            min_val = numpy.nanmin(arr_data_out[..., n])
+            max_val = numpy.nanmax(arr_data_out[..., n])
+            mean_val = numpy.nanmean(arr_data_out[..., n])
+            std_val = numpy.nanstd(arr_data_out[..., n])
             low_val = mean_val - (std_val * n_stdevs)
             up_val = mean_val + (std_val * n_stdevs)
             if low_val < min_val:
@@ -861,3 +861,4 @@ def stdev_stretch_np_arr(
         arr_data_out = arr_data_out.astype(int)
 
     return arr_data_out
+
