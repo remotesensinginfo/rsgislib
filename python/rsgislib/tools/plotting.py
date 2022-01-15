@@ -17,6 +17,7 @@ haveMatPlotLib = True
 try:
     import matplotlib.pyplot as plt
     import matplotlib.colors as mClrs
+    from matplotlib.patches import Patch
 except ImportError as pltErr:
     haveMatPlotLib = False
 
@@ -609,6 +610,133 @@ def get_gdal_raster_mpl_imshow(
     return img_data_arr, coords_bbox
 
 
+def get_gdal_thematic_raster_mpl_imshow(
+    input_img: str,
+    band: int = 1,
+    bbox: list[float] = None,
+    out_patches=False,
+    cls_names_lut=None,
+) -> Tuple[numpy.array, list[float], list]:
+    """
+    A function which retrieves thematic image data with a colour table as an
+    array in an appropriate structure for use within the matplotlib imshow function.
+    The image pixel values are converted from there thematic integer values
+    to a three band array using the RGB values from the colour table. If the
+    pixel values are required then use the get_gdal_raster_mpl_imshow function.
+    The extent is also returned and optionally a list of matplotlib patches
+    which can be used to create a legend.
+
+    :param input_img: The input image file path.
+    :param band: The image band to be used for the visualisation (Default = 1).
+    :param bbox: Optional bbox (xmin, xmax, ymin, ymax) used to subset the
+                 input image so only data for the subset are returned.
+    :param out_patches: Boolean to specify whether patches should be returned to
+                        create a legend.
+    :param cls_names_lut: A dictionary LUT with labels for the classes. The dict
+                          key is the pixel value for the class and
+    :return: numpy.array either [n,m,3], a bbox (xmin, xmax, ymin, ymax)
+             specifying the extent of the image data and list of matplotlib patches,
+             if out_patches=False then None is returned.
+
+    .. code:: python
+
+        img_sub_bbox = [554756, 577168, 9903924, 9944315]
+        input_img = "class_img.kea"
+
+        cls_names_lut = dict()
+        cls_names_lut[1] = "Vegetation"
+        cls_names_lut[2] = "Non-Veg"
+        cls_names_lut[3] = "Productive Veg"
+
+        (img_data_arr,
+        coords_bbox,
+        lgd_patches) = get_gdal_thematic_raster_mpl_imshow(input_img,
+                                                           band=1,
+                                                           bbox=img_sub_bbox,
+                                                           out_patches=True,
+                                                           cls_names_lut=cls_names_lut)
+
+
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        ax.imshow(img_data_arr, extent=coords_bbox)
+        ax.legend(handles=lgd_patches)
+        plt.show()
+
+    """
+    import rsgislib.imageutils
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+    if (band <= 0) or (band > n_bands):
+        raise rsgislib.RSGISPyException(
+            f"Band {band} is not valid (i.e., within the image)"
+        )
+
+    x_size, y_size = rsgislib.imageutils.get_img_size(input_img)
+    pxl_bbox = [0, x_size, 0, y_size]
+    if bbox is not None:
+        pxl_bbox = rsgislib.imageutils.get_img_subset_pxl_bbox(input_img, bbox)
+
+    n_x_pxls = pxl_bbox[1] - pxl_bbox[0]
+    n_y_pxls = pxl_bbox[3] - pxl_bbox[2]
+
+    print(f"Image Data Size: {n_x_pxls} x {n_y_pxls}")
+
+    coords_bbox = rsgislib.imageutils.get_img_pxl_spatial_coords(input_img, pxl_bbox)
+
+    image_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if image_ds is None:
+        raise rsgislib.RSGISPyException(
+            f"Could not open the input image file: '{input_img}'"
+        )
+
+    clr_tab = image_ds.GetRasterBand(band).GetRasterColorTable()
+    if clr_tab is None:
+        raise rsgislib.RSGISPyException("No colour table was present")
+
+    img_data_arr = image_ds.ReadAsArray(
+        xoff=pxl_bbox[0],
+        yoff=pxl_bbox[2],
+        xsize=n_x_pxls,
+        ysize=n_y_pxls,
+        band_list=[band],
+    )
+
+    red_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
+    grn_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
+    blu_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
+
+    lgd_out_patches = None
+    if out_patches:
+        lgd_out_patches = list()
+
+    for i in range(clr_tab.GetCount()):
+        clr_tab_entry = clr_tab.GetColorEntry(i)
+        red_arr[img_data_arr == i] = clr_tab_entry[0]
+        grn_arr[img_data_arr == i] = clr_tab_entry[1]
+        blu_arr[img_data_arr == i] = clr_tab_entry[2]
+
+        if out_patches and (i > 0):
+            cls_name = f"{i}"
+            if (cls_names_lut is not None) and (i in cls_names_lut):
+                cls_name = f"{cls_names_lut[i]}"
+            rgb_clr = (
+                clr_tab_entry[0] / 255.0,
+                clr_tab_entry[1] / 255.0,
+                clr_tab_entry[2] / 255.0,
+            )
+            lgd_out_patches.append(
+                Patch(facecolor=rgb_clr, edgecolor=rgb_clr, label=cls_name)
+            )
+
+    img_clr_data_arr = numpy.stack([red_arr, grn_arr, blu_arr], axis=-1)
+
+    image_ds = None
+    img_data_arr = None
+
+    return img_clr_data_arr, coords_bbox, lgd_out_patches
+
+
 def linear_stretch_np_arr(
     arr_data: numpy.array,
     no_data_val: float = None,
@@ -861,4 +989,3 @@ def stdev_stretch_np_arr(
         arr_data_out = arr_data_out.astype(int)
 
     return arr_data_out
-
