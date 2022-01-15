@@ -17,6 +17,7 @@ Image Plots
 Visualise Raster Data
 -----------------------
 .. autofunction:: rsgislib.tools.plotting.get_gdal_raster_mpl_imshow
+.. autofunction:: rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow
 .. autofunction:: rsgislib.tools.plotting.linear_stretch_np_arr
 .. autofunction:: rsgislib.tools.plotting.cumulative_stretch_np_arr
 .. autofunction:: rsgislib.tools.plotting.stdev_stretch_np_arr
