@@ -488,15 +488,17 @@ def get_vec_lyrs_lst(vec_file: str) -> list[str]:
     :return: list of layer names (can be used with gdal.Dataset.GetLayerByName()).
 
     """
-    gdalDataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
-    layerList = []
-    for lyr_idx in range(gdalDataset.GetLayerCount()):
-        lyr = gdalDataset.GetLayerByIndex(lyr_idx)
-        tLyrName = lyr.GetName()
-        if not tLyrName in layerList:
-            layerList.append(tLyrName)
-    gdalDataset = None
-    return layerList
+    gdal_dataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    if gdal_dataset is None:
+        raise rsgislib.RSGISPyException(f"Could not open input file: {vec_file}")
+    layer_list = []
+    for lyr_idx in range(gdal_dataset.GetLayerCount()):
+        lyr = gdal_dataset.GetLayerByIndex(lyr_idx)
+        t_lyr_name = lyr.GetName()
+        if not t_lyr_name in layer_list:
+            layer_list.append(t_lyr_name)
+    gdal_dataset = None
+    return layer_list
 
 
 def get_vec_layer_extent(
