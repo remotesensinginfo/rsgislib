@@ -140,6 +140,7 @@ def calc_dist_to_img_vals(
     gdalformat="KEA",
     max_dist=None,
     no_data_val=None,
+    out_no_data_val=None,
     unit_geo=True,
 ):
     """
@@ -158,6 +159,8 @@ def calc_dist_to_img_vals(
     :param no_data_val: is the no data value in the input image for which distance
                         should not be calculated for (Default = None; None = no
                         specified no data value).
+    :param out_no_data_val: is output image no data value. If None then set as the
+                            max_dist value.
     :param unit_geo: is a boolean specifying the output distance units.
                      True = Geographic units (e.g., metres),
                      False is in Pixels (Default = True).
@@ -211,10 +214,13 @@ def calc_dist_to_img_vals(
     except:
         callback = gdal.TermProgress
 
+    if out_no_data_val is None:
+        out_no_data_val = max_dist
+
     valsImgDS = gdal.Open(input_img, gdal.GA_ReadOnly)
     valsImgBand = valsImgDS.GetRasterBand(img_band)
     rsgislib.imageutils.create_copy_img(
-        input_img, output_img, 1, no_data_val, gdalformat, rsgislib.TYPE_32FLOAT
+        input_img, output_img, 1, out_no_data_val, gdalformat, rsgislib.TYPE_32FLOAT
     )
     distImgDS = gdal.Open(output_img, gdal.GA_Update)
     distImgBand = distImgDS.GetRasterBand(1)
@@ -266,6 +272,7 @@ def calc_dist_to_img_vals_tiled(
     img_band=1,
     max_dist=1000,
     no_data_val=1000,
+    out_no_data_val=None,
     gdalformat="KEA",
     unit_geo=True,
     tmp_dir="./tmp",
@@ -288,6 +295,8 @@ def calc_dist_to_img_vals_tiled(
     :param no_data_val: is the no data value in the input image for which distance
                         should not be calculated for (Default = None;
                         None = no specified no data value).
+    :param out_no_data_val: is output image no data value. If None then set as the
+                            max_dist value.
     :param unit_geo: is a boolean specifying the output distance units.
                      True = Geographic units (e.g., metres),
                      False is in Pixels (Default = True).
@@ -332,7 +341,10 @@ def calc_dist_to_img_vals_tiled(
         tmpPresent = False
 
     if n_cores <= 0:
-        n_cores = rsgislib.tools.utils.numProcessCores()
+        n_cores = rsgislib.tools.utils.num_process_cores()
+
+    if out_no_data_val is None:
+        out_no_data_val = max_dist
 
     uid = rsgislib.tools.utils.uid_generator()
 
@@ -403,7 +415,14 @@ def calc_dist_to_img_vals_tiled(
     for tileFile in imgTileFiles:
         baseTileName = os.path.basename(tileFile)
         distTileFile = os.path.join(distTilesDIR, baseTileName)
-        tileArgs = [tileFile, distTileFile, proxOptions, no_data_val, "KEA", img_band]
+        tileArgs = [
+            tileFile,
+            distTileFile,
+            proxOptions,
+            out_no_data_val,
+            "KEA",
+            img_band,
+        ]
         distTiles.append(distTileFile)
         distTileArgs.append(tileArgs)
 
@@ -415,7 +434,7 @@ def calc_dist_to_img_vals_tiled(
         distTiles, output_img, 0, 0, 1, 1, gdalformat, rsgislib.TYPE_32FLOAT
     )
     rsgislib.imageutils.pop_img_stats(
-        output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        output_img, use_no_data=True, no_data_val=out_no_data_val, calc_pyramids=True
     )
 
     for imgFile in distTiles:

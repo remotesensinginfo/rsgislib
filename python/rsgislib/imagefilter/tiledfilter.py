@@ -1007,7 +1007,7 @@ def perform_tiled_img_filter(
         createdTmp = True
 
     if n_cores <= 0:
-        n_cores = rsgislib.tools.utils.numProcessCores()
+        n_cores = rsgislib.tools.utils.num_process_cores()
 
     uidStr = rsgislib.tools.utils.uid_generator()
     if datatype is None:
@@ -1132,7 +1132,7 @@ def perform_tiled_img_multi_filter(
         createdTmp = True
 
     if n_cores <= 0:
-        n_cores = rsgislib.tools.utils.numProcessCores()
+        n_cores = rsgislib.tools.utils.num_process_cores()
 
     uidStr = rsgislib.tools.utils.uid_generator()
     if datatype is None:

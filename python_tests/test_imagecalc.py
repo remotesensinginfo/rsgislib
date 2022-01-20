@@ -275,6 +275,24 @@ def test_calc_dist_to_img_vals_sgl_val_pxl(tmp_path):
     )
     assert img_eq
 
+def test_calc_dist_to_img_vals_sgl_val_pxl_out_no_data(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.kea")
+    rsgislib.imagecalc.calc_dist_to_img_vals(
+        input_img,
+        output_img,
+        2,
+        img_band=1,
+        gdalformat="KEA",
+        max_dist=10,
+        no_data_val=0,
+        out_no_data_val=11,
+        unit_geo=False,
+    )
+
+
 
 def test_calc_dist_to_img_vals_multi_val_geo(tmp_path):
     import rsgislib.imagecalc
