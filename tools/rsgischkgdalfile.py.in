@@ -64,6 +64,6 @@ if __name__ == "__main__":
     if args.vec:
         rsgislib.tools.checkdatasets.run_check_gdal_vector_files(files, chk_proj=chk_projection, epsg_code=args.epsg, max_file_size=None, rm_err=args.rmerr, print_err=True, multi_file=args.vecmulti, print_file_names=args.printnames)
     else:
-        rsgislib.tools.checkdatasets.run_check_gdal_image_files(files, check_bands=True, n_bands=args.nbands, chk_proj=chk_projection, epsg_code=args.epsg, read_img=args.readimg, smpl_n_pxls=10, calc_chk_sum=args.chksum, rm_err=args.rmerr, print_err=args.printnames)
+        rsgislib.tools.checkdatasets.run_check_gdal_image_files(files, check_bands=True, n_bands=args.nbands, chk_proj=chk_projection, epsg_code=args.epsg, read_img=args.readimg, smpl_n_pxls=10, calc_chk_sum=args.chksum, rm_err=args.rmerr, print_err=args.printerrs, print_file_names=args.printnames)
     print("Finish Checks")
 
