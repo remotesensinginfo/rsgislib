@@ -884,3 +884,21 @@ def test_rsgisvectools_nfeats():
     )
     pprint.pprint(rtn_info)
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
+
+def test_rsgisvectools_proj():
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    rtn_info = subprocess.run(
+        [
+            "rsgisvectools.py",
+            "--vecfile",
+            vec_file,
+            "--veclyr",
+            "aber_osgb_multi_polys",
+            "--proj",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    pprint.pprint(rtn_info)
+    assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
