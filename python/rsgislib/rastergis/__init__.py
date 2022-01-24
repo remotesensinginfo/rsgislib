@@ -5,6 +5,7 @@ raster attribute tables.
 """
 import os
 import sys
+from typing import List
 
 import numpy
 from osgeo import gdal
@@ -84,7 +85,7 @@ def export_cols_to_gdal_img(
     output_img: str,
     gdalformat: str,
     datatype: int,
-    fields: list[str],
+    fields: List[str],
     rat_band: int = 1,
     tmp_dir: str = None,
 ):
@@ -177,7 +178,7 @@ def get_rat_length(clumps_img: str, rat_band: int = 1) -> int:
     return nrows
 
 
-def get_rat_columns(clumps_img: str, rat_band: int = 1) -> list[str]:
+def get_rat_columns(clumps_img: str, rat_band: int = 1) -> List[str]:
     """
     A function which returns a list of column names within the RAT.
 
@@ -360,7 +361,7 @@ def get_column_data(clumps_img: str, col_name: str) -> numpy.array:
 
 def read_rat_neighbours(
     clumps_img: str, start_row: int = None, end_row: int = None, rat_band: int = 1
-) -> list[list[int]]:
+) -> List[List[int]]:
     """
     A function which returns a list of clumps neighbours from a KEA RAT. Note, the
     neighbours are popualted using the function rsgislib.rastergis.findNeighbours.

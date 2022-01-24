@@ -3,7 +3,7 @@
 The tools.plotting module contains functions for extracting and plotting remote sensing data.
 """
 
-from typing import Tuple
+from typing import Tuple, List
 import os
 
 import rsgislib
@@ -528,8 +528,8 @@ def quantile_plot(residuals, ylabel, out_file, out_format="PNG", title=None):
 
 
 def get_gdal_raster_mpl_imshow(
-    input_img: str, bands: list[int] = None, bbox: list[float] = None
-) -> Tuple[numpy.array, list[float]]:
+    input_img: str, bands: List[int] = None, bbox: List[float] = None
+) -> Tuple[numpy.array, List[float]]:
     """
     A function which retrieves image data as an array in an appropriate structure
     for use within the matplotlib imshow function. The extent is also returned.
@@ -613,10 +613,10 @@ def get_gdal_raster_mpl_imshow(
 def get_gdal_thematic_raster_mpl_imshow(
     input_img: str,
     band: int = 1,
-    bbox: list[float] = None,
+    bbox: List[float] = None,
     out_patches=False,
     cls_names_lut=None,
-) -> Tuple[numpy.array, list[float], list]:
+) -> Tuple[numpy.array, List[float], list]:
     """
     A function which retrieves thematic image data with a colour table as an
     array in an appropriate structure for use within the matplotlib imshow function.

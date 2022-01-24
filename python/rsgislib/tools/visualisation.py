@@ -7,7 +7,7 @@ The tools.visualisation module contains functions for aiding visualisation of da
 import os
 import shutil
 import subprocess
-from typing import Union
+from typing import Union, List
 
 import rsgislib
 import rsgislib.imageutils
@@ -447,8 +447,8 @@ def create_webtiles_img(
 def create_quicklook_imgs(
     input_img: str,
     bands: str,
-    output_imgs: Union[str, list[str]] = "quicklook.jpg",
-    output_img_sizes: Union[int, list[int]] = 250,
+    output_imgs: Union[str, List[str]] = "quicklook.jpg",
+    output_img_sizes: Union[int, List[int]] = 250,
     scale_axis: str = "auto",
     img_stats_msk: str = None,
     img_msk_vals: int = 1,
@@ -1092,11 +1092,11 @@ def create_webtiles_vis_gtiff_img(
 
 
 def create_quicklook_overview_imgs(
-    input_imgs: list[str],
+    input_imgs: List[str],
     bands: str,
     tmp_dir: str,
-    output_imgs: Union[str, list[str]] = "quicklook.jpg",
-    output_img_sizes: Union[int, list[int]] = 250,
+    output_imgs: Union[str, List[str]] = "quicklook.jpg",
+    output_img_sizes: Union[int, List[int]] = 250,
     scale_axis: str = "auto",
     stretch_file: str = None,
     no_data_val: float = None,
@@ -1388,17 +1388,17 @@ def burn_in_binary_msk(
 
 
 def create_quicklook_overview_imgs_vec_overlay(
-    input_imgs: list[str],
+    input_imgs: List[str],
     bands: str,
     tmp_dir: str,
     vec_overlay_file: str,
     vec_overlay_lyr: str,
-    output_imgs: Union[str, list[str]] = "quicklook.jpg",
-    output_img_sizes: Union[int, list[int]] = 250,
+    output_imgs: Union[str, List[str]] = "quicklook.jpg",
+    output_img_sizes: Union[int, List[int]] = 250,
     gdalformat: str = "JPEG",
     scale_axis: str = "auto",
     stretch_file: str = None,
-    overlay_clrs: list[int] = None,
+    overlay_clrs: List[int] = None,
     no_data_val: float = None,
 ):
     """
@@ -1705,13 +1705,13 @@ def create_quicklook_overview_imgs_vec_overlay(
 
 
 def create_visual_overview_imgs_vec_extent(
-    input_imgs: list[str],
+    input_imgs: List[str],
     bands: str,
     tmp_dir: str,
     vec_extent_file: str = None,
     vec_extent_lyr: str = None,
-    output_imgs: Union[str, list[str]] = "quicklook.tif",
-    output_img_sizes: Union[int, list[int]] = 500,
+    output_imgs: Union[str, List[str]] = "quicklook.tif",
+    output_img_sizes: Union[int, List[int]] = 500,
     gdalformat: str = "GTIFF",
     scale_axis: str = "auto",
     stretch_file: str = None,
@@ -1977,7 +1977,7 @@ def overlay_vec_on_img(
     vec_overlay_lyr: str,
     tmp_dir: str,
     gdalformat: str = "PNG",
-    overlay_clrs: list[int] = None,
+    overlay_clrs: List[int] = None,
 ):
     """
     A function to overlay a vector layer on to a raster image 'burning' in the vector

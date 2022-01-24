@@ -2,8 +2,6 @@
 """
 The imageutils module contains general utilities for applying to images.
 """
-# Maintain python 2 backwards compatibility
-from __future__ import print_function
 
 # import the C++ extension into this level
 from ._imageutils import *
@@ -12,6 +10,7 @@ import rsgislib
 import os
 import math
 import shutil
+from typing import List
 
 import numpy
 
@@ -29,7 +28,9 @@ class OutImageInfo(object):
     This class is used within the StdImgBlockIter class.
 
     :param file_name: is the output image file name and path.
-    :param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
+    :param name: is a name associated with this layer - doesn't really matter what
+                 you use but needs to be unique; this is used as a dict key in
+                 some functions.
     :param nbands: is an int with the number of output image bands.
     :param no_data_val: is a no data value for the output image
     :param gdalformat: is the output image file format
@@ -47,7 +48,9 @@ class OutImageInfo(object):
     ):
         """
         :param file_name: is the input image file name and path.
-        :param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
+        :param name: is a name associated with this layer - doesn't really
+                     matter what you use but needs to be unique; this is used
+                     as a dict key in some functions.
         :param nbands: is an int with the number of output image bands.
         :param no_data_val: is a no data value for the output image
         :param gdalformat: is the output image file format
@@ -66,17 +69,22 @@ class SharpBandInfo(object):
     Create a list of these objects to pass to the sharpenLowResBands function.
 
     :param band: is the band number (band numbering starts at 1).
-    :param status: needs to be either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW or rsgislib.SHARP_RES_HIGH
-                   lowres bands will be sharpened using the highres bands and ignored bands
-                   will just be copied into the output image.
-    :param name: is a name associated with this image band - doesn't really matter what you put in here.
+    :param status: needs to be either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW
+                   or rsgislib.SHARP_RES_HIGH lowres bands will be sharpened using
+                   the highres bands and ignored bands will just be copied into
+                   the output image.
+    :param name: is a name associated with this image band - doesn't really
+                 matter what you put in here.
     """
 
     def __init__(self, band=None, status=None, name=None):
         """
         :param band: is the band number (band numbering starts at 1).
-        :param status: needs to be either 'ignore', 'lowres' or 'highres' - lowres bands will be sharpened using the highres bands and ignored bands will just be copied into the output image.
-        :param name: is a name associated with this image band - doesn't really matter what you put in here.
+        :param status: needs to be either 'ignore', 'lowres' or 'highres' - lowres
+                       bands will be sharpened using the highres bands and ignored
+                       bands will just be copied into the output image.
+        :param name: is a name associated with this image band - doesn't really
+                     matter what you put in here.
 
         """
         self.band = band
@@ -121,19 +129,28 @@ class RSGISTimeseriesFillInfo(object):
     Create a list of these objects to pass to the fillTimeSeriesGaps function
 
     :param year: year the composite represents.
-    :param day: the (nominal) day within the year the composite represents (a value of zero and day will not be used)
+    :param day: the (nominal) day within the year the composite represents (a value
+                of zero and day will not be used)
     :param compImg: The input compsite image which has been generated.
-    :param imgRef:  The reference layer (e.g., from create_max_ndvi_composite or create_max_ndvi_ndwi_composite_landsat) with zero for no data regions
-    :param outRef: A boolean variable specify which layer a fill reference layer is to be produced.
+    :param imgRef:  The reference layer (e.g., from create_max_ndvi_composite or
+                    create_max_ndvi_ndwi_composite_landsat) with zero for no
+                    data regions
+    :param outRef: A boolean variable specify which layer a fill reference layer
+                   is to be produced.
+
     """
 
     def __init__(self, year=1900, day=0, compImg=None, imgRef=None, outRef=False):
         """
         :param year: year the composite represents.
-        :param day: the (nominal) day within the year the composite represents (a value of zero and day will not be used)
+        :param day: the (nominal) day within the year the composite represents (a
+                    value of zero and day will not be used)
         :param compImg: The input compsite image which has been generated.
-        :param imgRef:  The reference layer (e.g., from create_max_ndvi_composite or create_max_ndvi_ndwi_composite_landsat) with zero for no data regions
-        :param outRef: A boolean variable specify which layer a fill reference layer is to be produced.
+        :param imgRef:  The reference layer (e.g., from create_max_ndvi_composite
+                        or create_max_ndvi_ndwi_composite_landsat) with zero for
+                        no data regions
+        :param outRef: A boolean variable specify which layer a fill reference
+                       layer is to be produced.
 
         """
         self.year = year
@@ -187,7 +204,9 @@ def set_env_vars_deflate_gtiff_outs(bigtiff: bool = False):
 
     """
     if bigtiff:
-        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+        os.environ[
+            "RSGISLIB_IMG_CRT_OPTS_GTIFF"
+        ] = "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
     else:
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=DEFLATE"
 
@@ -791,7 +810,7 @@ def get_img_bbox_in_proj(input_img: str, out_epsg: int):
     return reproj_img_bbox
 
 
-def get_img_subset_pxl_bbox(input_img: str, sub_bbox: list[float]) -> list[int]:
+def get_img_subset_pxl_bbox(input_img: str, sub_bbox: List[float]) -> List[int]:
     """
     A function which returns a BBOX (xmin, xmax, ymin, ymax) with the pixel coordinates
     for an intersecting BBOX in the spatial coordinates of the image. Note, the
@@ -829,7 +848,7 @@ def get_img_subset_pxl_bbox(input_img: str, sub_bbox: list[float]) -> list[int]:
     return [min_x_pxl, max_x_pxl, min_y_pxl, max_y_pxl]
 
 
-def get_img_pxl_spatial_coords(input_img: str, sub_pxl_bbox: list[int]) -> list[float]:
+def get_img_pxl_spatial_coords(input_img: str, sub_pxl_bbox: List[int]) -> List[float]:
     """
     A function which gets the spatial coordinates for a image pixel space
     BBOX (xmin, xmax, ymin, ymax). The returned BBOX will be within the
@@ -3109,7 +3128,7 @@ def create_mosaic_images_vrt(
     gdal.BuildVRT(out_vrt_file, input_imgs, options=build_vrt_opt)
 
 
-def create_vrt_band_subset(input_img: str, img_bands: list[int], out_vrt_img: str):
+def create_vrt_band_subset(input_img: str, img_bands: List[int], out_vrt_img: str):
     """
     A function which creates a GDAL VRT for the input image with the bands selected in
     the input list.

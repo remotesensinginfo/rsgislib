@@ -37,6 +37,7 @@ RSGISLib.
 ############################################################################
 
 import os
+from typing import List
 
 from osgeo import gdal
 from osgeo import ogr
@@ -48,7 +49,7 @@ import rsgislib.vectorutils
 
 
 def create_img_extent_lut(
-    input_imgs: list[str],
+    input_imgs: List[str],
     vec_file: str,
     vec_lyr: str,
     out_format: str,
@@ -148,7 +149,7 @@ def create_img_extent_lut(
     )
 
 
-def query_img_lut(scn_bbox: list[float], lut_db_file: str, lyr_name: str) -> list:
+def query_img_lut(scn_bbox: List[float], lut_db_file: str, lyr_name: str) -> List[str]:
     """
     A function for querying the LUT DB spatially filtering using a BBOX
 
@@ -168,7 +169,7 @@ def query_img_lut(scn_bbox: list[float], lut_db_file: str, lyr_name: str) -> lis
     return imgs
 
 
-def get_all_lut_imgs(lut_db_file: str, lyr_name: str) -> list:
+def get_all_lut_imgs(lut_db_file: str, lyr_name: str) -> List[str]:
     """
     Get a list of all the images within the LUT.
 
@@ -189,7 +190,7 @@ def get_all_lut_imgs(lut_db_file: str, lyr_name: str) -> list:
 
 
 def get_raster_lyr(
-    scn_bbox: list[float], lut_db_file: str, lyr_name: str, tmp_dir: str
+    scn_bbox: List[float], lut_db_file: str, lyr_name: str, tmp_dir: str
 ) -> str:
     """
     This function provides a single raster layer using the LUT file provided. If
@@ -238,7 +239,7 @@ def query_file_lut(
     out_dest: str,
     targz_out: bool,
     cp_cmds: bool,
-) -> list:
+) -> List[str]:
     """
     A function which allows the file LUT to be queried (intersection) and commands
     generated for completing operations. Must select (pass true) for either targz_out

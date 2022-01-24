@@ -10,8 +10,8 @@ import os
 import sys
 import shutil
 import subprocess
-import warnings
 import math
+from typing import List
 
 from osgeo import gdal
 from osgeo import osr
@@ -479,7 +479,7 @@ def merge_vectors_to_gpkg_ind_lyrs(
                 out_lyr_names.append(out_lyr)
 
 
-def get_vec_lyrs_lst(vec_file: str) -> list[str]:
+def get_vec_lyrs_lst(vec_file: str) -> List[str]:
     """
     A function which returns a list of available layers within the inputted vector file.
 
@@ -1423,7 +1423,7 @@ def export_spatial_select_feats(
         raise e
 
 
-def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> list[str]:
+def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> List[str]:
     """
     A function which returns a list of columns from the input vector layer.
 
