@@ -4,6 +4,9 @@ import pytest
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 FILETOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools/filetools")
 
+import rsgislib.tools.filetools
+unzip_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("unzip")
+tar_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("tar")
 
 @pytest.mark.parametrize(
     "input, expected",
@@ -229,6 +232,7 @@ def test_convert_file_size_units_kb_tb():
     assert abs(out_size - 9.313e-07) < 0.0000001
 
 
+@pytest.mark.skipif((not tar_cmd_avail), reason="tar command not available")
 def test_untar_file_gen_arch_dir_true(tmp_path):
     import rsgislib.tools.filetools
 
@@ -248,6 +252,7 @@ def test_untar_file_gen_arch_dir_true(tmp_path):
     assert success
 
 
+@pytest.mark.skipif((not tar_cmd_avail), reason="tar command not available")
 def test_untar_file_gen_arch_dir_false(tmp_path):
     import rsgislib.tools.filetools
 
@@ -267,6 +272,7 @@ def test_untar_file_gen_arch_dir_false(tmp_path):
     assert success
 
 
+@pytest.mark.skipif((not tar_cmd_avail), reason="tar command not available")
 def test_untar_gz_file_gen_arch_dir_true(tmp_path):
     import rsgislib.tools.filetools
 
@@ -286,6 +292,7 @@ def test_untar_gz_file_gen_arch_dir_true(tmp_path):
     assert success
 
 
+@pytest.mark.skipif((not tar_cmd_avail), reason="tar command not available")
 def test_untar_gz_file_gen_arch_dir_false(tmp_path):
     import rsgislib.tools.filetools
 
@@ -305,6 +312,7 @@ def test_untar_gz_file_gen_arch_dir_false(tmp_path):
     assert success
 
 
+@pytest.mark.skipif((not tar_cmd_avail), reason="tar command not available")
 def test_untar_bz_file_gen_arch_dir_true(tmp_path):
     import rsgislib.tools.filetools
 
@@ -324,6 +332,7 @@ def test_untar_bz_file_gen_arch_dir_true(tmp_path):
     assert success
 
 
+@pytest.mark.skipif((not tar_cmd_avail), reason="tar command not available")
 def test_untar_bz_file_gen_arch_dir_false(tmp_path):
     import rsgislib.tools.filetools
 
@@ -343,6 +352,7 @@ def test_untar_bz_file_gen_arch_dir_false(tmp_path):
     assert success
 
 
+@pytest.mark.skipif((not unzip_cmd_avail), reason="unzip command not available")
 def test_unzip_file_gen_arch_dir_true(tmp_path):
     import rsgislib.tools.filetools
 
@@ -362,6 +372,7 @@ def test_unzip_file_gen_arch_dir_true(tmp_path):
     assert success
 
 
+@pytest.mark.skipif((not unzip_cmd_avail), reason="unzip command not available")
 def test_unzip_file_gen_arch_dir_false(tmp_path):
     import rsgislib.tools.filetools
 

@@ -493,6 +493,17 @@ def find_files_size_limits(
     return out_files
 
 
+def is_cmd_tool_avail(cmd_name: str):
+    """
+    A function which finds if an executable command is available
+    on the system path.
+
+    :param cmd_name: the name of the command to test (e.g., tar, gzip etc.)
+    :return: boolean (True: Command available. False Command not available)
+    """
+    return shutil.which(cmd_name) is not None
+
+
 def file_is_hidden(dir_path: str) -> bool:
     """
     A function to test whether a file or folder is 'hidden' or not on the
