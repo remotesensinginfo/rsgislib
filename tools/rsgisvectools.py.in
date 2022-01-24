@@ -40,6 +40,7 @@ if __name__ == "__main__":
     parser.add_argument("--lyrs", action='store_true', default=False, help="List the layers in vector file.")
     parser.add_argument("--cols", action='store_true', default=False, help="List the columns in vector layer.")
     parser.add_argument("--nfeats", action='store_true', default=False, help="Count for the number of feats in layer.")
+    parser.add_argument("--proj", action='store_true', default=False, help="Print the projection of the vector layer.")
     args = parser.parse_args()
     
     if args.lyrs:
@@ -55,3 +56,7 @@ if __name__ == "__main__":
     if args.nfeats:
         n_lyr_feats = rsgislib.vectorutils.get_vec_feat_count(args.vecfile, args.veclyr)
         print(f"N Features in {args.veclyr}: {n_lyr_feats}")
+        
+    if args.proj:
+        proj_wkt = rsgislib.vectorutils.get_proj_wkt_from_vec(args.vecfile, args.veclyr)
+        print(proj_wkt)
