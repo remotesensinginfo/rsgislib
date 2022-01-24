@@ -1,0 +1,18 @@
+[flake8]
+ exclude = .git,__pycache__,build,dist,doc,share,src
+ # Error codes we should ignore
+ # W291 trailing whitespace
+ # W293 blank line contains whitespace
+ # W391 blank line at end of file
+ # W504 line break after binary operator
+ # E128 continuation line under-indented for visual indent
+ # E225 missing whitespace around operator
+ # E228 missing whitespace around modulo operator
+ # E501 line too long (??? > 88 characters)
+ # W503 line break before binary operator
+ # F405 '?????' may be undefined, or defined from star imports
+ # F403 'from ???? import *' used; unable to detect undefined names
+ # F401 '?????.*' imported but unused
+ ignore = W291,W293,W504,E128,E225,E228,E501,W503,F405,F403,F401
+
+

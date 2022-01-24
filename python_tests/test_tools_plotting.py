@@ -97,7 +97,7 @@ def test_get_gdal_thematic_raster_mpl_imshow_basic():
     rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(input_img)
 
 
-def test_get_gdal_raster_mpl_imshow_bands_bbox():
+def test_get_gdal_thematic_raster_mpl_imshow_bbox():
     import rsgislib.tools.plotting
     import rsgislib.imageutils
 

@@ -101,26 +101,6 @@ def test_extract_image_footprint_exception(tmp_path):
         )
 
 
-def test_extract_image_footprint(tmp_path):
-    import rsgislib.vectorutils.createvectors
-
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
-    out_vec_lyr = "out_vec"
-
-    rsgislib.vectorutils.createvectors.extract_image_footprint(
-        input_img,
-        out_vec_file,
-        out_vec_lyr,
-        "GPKG",
-        tmp_dir=tmp_path,
-        reproj_to=None,
-        no_data_val=0,
-    )
-
-    assert os.path.exists(out_vec_file)
-
-
 def test_extract_image_footprint_reproj(tmp_path):
     import rsgislib.vectorutils.createvectors
 
