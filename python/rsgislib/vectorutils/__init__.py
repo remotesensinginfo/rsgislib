@@ -2843,10 +2843,11 @@ def merge_utm_vecs_wgs84(
     import tqdm
 
     if n_hemi_utm_file is None:
-        install_prefix = __file__[: __file__.find("lib")]
-        print(install_prefix)
         n_hemi_utm_file = os.path.join(
-            install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_north.gpkg"
+            rsgislib.RSGISLIB_INSTALL_PREFIX,
+            "share",
+            "rsgislib",
+            "utm_zone_boundaries_lyrs_north.gpkg",
         )
         if n_hemi_utm_file is None:
             raise rsgislib.RSGISPyException(
@@ -2854,10 +2855,11 @@ def merge_utm_vecs_wgs84(
                 "installed version was not be found."
             )
     if s_hemi_utm_file is None:
-        install_prefix = __file__[: __file__.find("lib")]
-        print(install_prefix)
         s_hemi_utm_file = os.path.join(
-            install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_south.gpkg"
+            rsgislib.RSGISLIB_INSTALL_PREFIX,
+            "share",
+            "rsgislib",
+            "utm_zone_boundaries_lyrs_south.gpkg",
         )
         if s_hemi_utm_file is None:
             raise rsgislib.RSGISPyException(

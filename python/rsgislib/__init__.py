@@ -87,12 +87,23 @@ Constants specifying how bands should be treated when sharpening
     * SHARP_RES_LOW = 1
     * SHARP_RES_HIGH = 2
 
+Options for interpolating raster data:
+
+    * INTERP_NEAREST_NEIGHBOUR = 0
+    * INTERP_BILINEAR = 1
+    * INTERP_CUBIC = 2
+    * INTERP_CUBICSPLINE = 3
+    * INTERP_LANCZOS = 4
+    * INTERP_AVERAGE = 5
+    * INTERP_MODE = 6
+
 """
 from __future__ import print_function
 
 import time
 import datetime
 import sys
+import pathlib
 
 from osgeo import gdal
 
@@ -173,8 +184,47 @@ INTERP_AVERAGE = 5
 INTERP_MODE = 6
 
 
+def get_install_base_path() -> pathlib.PurePath:
+    """
+    A function which returns the base path for the RSGISLib installation.
+    This can be used to find files stored in share etc. installed alongside
+    the RSGISLib source code.
+
+    :return: a pathlib.PurePath object with the base path of the RSGISLib
+             installation.
+
+    """
+    import site
+    import platform
+
+    site_path_str = site.getsitepackages()[0]
+    site_path = pathlib.PurePath(site_path_str)
+
+    base_path_comps = []
+    for path_part in site_path.parts:
+        if path_part != "lib":
+            base_path_comps.append(path_part)
+        else:
+            break
+
+    if platform.system() == "Windows":
+        base_path = pathlib.PureWindowsPath(*base_path_comps)
+    else:
+        base_path = pathlib.PurePosixPath(*base_path_comps)
+
+    return base_path
+
+
+RSGISLIB_INSTALL_PREFIX = str(get_install_base_path())
+
+
 def get_rsgislib_version() -> str:
-    """Calls rsgis-config to get the version number."""
+    """
+    Calls rsgis-config to get the version number.
+
+    :return: string with the rsgislib version number
+
+    """
 
     # Try calling rsgis-config to get minor version number
     try:
