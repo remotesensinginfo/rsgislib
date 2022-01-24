@@ -77,7 +77,13 @@ def test_extract_image_footprint(tmp_path):
     out_vec_lyr = "out_vec"
 
     rsgislib.vectorutils.createvectors.extract_image_footprint(
-        input_img, out_vec_file, out_vec_lyr, "GPKG", tmp_dir=tmp_path, reproj_to=None
+        input_img,
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        tmp_dir=tmp_path,
+        reproj_to=None,
+        no_data_val=0,
     )
 
     assert os.path.exists(out_vec_file)
