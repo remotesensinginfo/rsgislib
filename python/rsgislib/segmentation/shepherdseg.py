@@ -176,7 +176,7 @@ def run_shepherd_segmentation(
     # Select Image Bands if required
     inputImgBands = input_img
     selectBands = False
-    if not bands == None:
+    if not bands is None:
         print("Subsetting the image bands")
         selectBands = True
         inputImgBands = os.path.join(
@@ -333,7 +333,7 @@ def run_shepherd_segmentation(
         rsgislib.rastergis.pop_rat_img_stats(out_clumps_img, True, True)
 
     # Create mean image if required.
-    if not (out_mean_img == None):
+    if not (out_mean_img is None):
         rsgislib.segmentation.mean_image(
             input_img, out_clumps_img, out_mean_img, gdalformat, input_datatype
         )
@@ -473,7 +473,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
     import rsgislib.tools.filetools
 
     if not no_stretch:
-        if (img_stretch_stats == "") or (img_stretch_stats == None):
+        if (img_stretch_stats == "") or (img_stretch_stats is None):
             raise rsgislib.RSGISPyException("A stretch stats file must be provided")
 
     basefile = os.path.basename(input_img)
@@ -496,7 +496,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
     # Select Image Bands if required
     inputImgBands = input_img
     selectBands = False
-    if not bands == None:
+    if not bands is None:
         print("Subsetting the image bands")
         selectBands = True
         inputImgBands = os.path.join(
@@ -635,7 +635,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
         rsgislib.rastergis.pop_rat_img_stats(out_clumps_img, True, True)
 
     # Create mean image if required.
-    if not (out_mean_img == None):
+    if not (out_mean_img is None):
         rsgislib.segmentation.mean_image(
             input_img, out_clumps_img, out_mean_img, gdalformat, input_datatype
         )

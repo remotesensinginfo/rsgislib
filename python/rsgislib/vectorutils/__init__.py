@@ -832,16 +832,16 @@ def reproj_vec_lyr_obj(
 
     # Create shapefile driver
     driver = ogr.GetDriverByName(out_format)
-    if driver == None:
+    if driver is None:
         raise rsgislib.RSGISPyException("Driver has not be recognised.")
 
     # create the output layer
     result_ds = driver.CreateDataSource(out_vec_file)
-    if result_ds == None:
+    if result_ds is None:
         raise rsgislib.RSGISPyException(
             "The output vector data source was not created: {}".format(out_vec_file)
         )
-    if out_vec_lyr == None:
+    if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
     result_lyr = result_ds.CreateLayer(
         out_vec_lyr, out_spat_ref, geom_type=vec_lyr_obj.GetGeomType()
@@ -1642,7 +1642,7 @@ def open_gdal_vec_lyr(
     if vec_obj_ds is None:
         raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
 
-    if vec_lyr == None:
+    if vec_lyr is None:
         lyr_obj = vec_obj_ds.GetLayer()
         if lyr_obj is None:
             raise rsgislib.RSGISPyException("Could not find a layer.")

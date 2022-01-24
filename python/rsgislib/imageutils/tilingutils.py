@@ -128,7 +128,7 @@ def create_min_data_tiles(
     )
     rastergis.pop_rat_img_stats(tileClumpsImage, True, True)
 
-    if not maskIntersect == None:
+    if not maskIntersect is None:
         bs = []
         bs.append(rastergis.BandAttStats(band=1, maxField="Mask"))
         rastergis.populate_rat_with_stats(maskIntersect, tileClumpsImage, bs)

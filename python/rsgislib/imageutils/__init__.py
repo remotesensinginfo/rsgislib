@@ -451,12 +451,12 @@ def get_rsgislib_datatype_from_img(input_img: str):
 
     """
     raster = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if raster == None:
+    if raster is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: '" + input_img + "'"
         )
     band = raster.GetRasterBand(1)
-    if band == None:
+    if band is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster band 1 in image: '" + input_img + "'"
         )
@@ -481,12 +481,12 @@ def get_gdal_datatype_from_img(input_img: str) -> int:
 
     """
     raster = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if raster == None:
+    if raster is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: '" + input_img + "'"
         )
     band = raster.GetRasterBand(1)
-    if band == None:
+    if band is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster band 1 in image: '" + input_img + "'"
         )
@@ -511,12 +511,12 @@ def get_gdal_datatype_name_from_img(input_img: str) -> str:
 
     """
     raster = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if raster == None:
+    if raster is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: '" + input_img + "'"
         )
     band = raster.GetRasterBand(1)
-    if band == None:
+    if band is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster band 1 in image: '" + input_img + "'"
         )
@@ -671,7 +671,7 @@ def get_img_res(input_img: str, abs_vals: bool = False):
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if rasterDS == None:
+    if rasterDS is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: {}".format(input_img)
         )
@@ -726,7 +726,7 @@ def get_img_size(input_img: str):
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if rasterDS == None:
+    if rasterDS is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: '" + input_img + "'"
         )
@@ -754,7 +754,7 @@ def get_img_bbox(input_img: str):
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if rasterDS == None:
+    if rasterDS is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: '" + input_img + "'"
         )
@@ -931,7 +931,7 @@ def get_img_band_count(input_img: str):
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if rasterDS == None:
+    if rasterDS is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: '" + input_img + "'"
         )
@@ -959,7 +959,7 @@ def get_img_no_data_value(input_img: str, img_band: int = 1):
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if rasterDS == None:
+    if rasterDS is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: '" + input_img + "'"
         )
@@ -1087,7 +1087,7 @@ def get_wkt_proj_from_img(input_img: str):
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if rasterDS == None:
+    if rasterDS is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: '" + input_img + "'"
         )
@@ -1107,7 +1107,7 @@ def get_epsg_proj_from_img(input_img: str):
     epsgCode = None
     try:
         layerDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-        if layerDS == None:
+        if layerDS is None:
             raise rsgislib.RSGISPyException(
                 "Could not open raster image: '{}'".format(input_img)
             )
@@ -1150,7 +1150,7 @@ def get_utm_zone(input_img: str):
 
     """
     rasterDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if rasterDS == None:
+    if rasterDS is None:
         raise rsgislib.RSGISPyException(
             "Could not open raster image: '" + input_img + "'"
         )
@@ -1273,7 +1273,7 @@ def set_img_thematic(input_img: str):
 
     """
     ds = gdal.Open(input_img, gdal.GA_Update)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
     for bandnum in range(ds.RasterCount):
         band = ds.GetRasterBand(bandnum + 1)
@@ -1290,7 +1290,7 @@ def set_img_not_thematic(input_img: str):
 
     """
     ds = gdal.Open(input_img, gdal.GA_Update)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
     for bandnum in range(ds.RasterCount):
         band = ds.GetRasterBand(bandnum + 1)
@@ -1307,7 +1307,7 @@ def is_img_thematic(input_img: str, img_band: int = 1):
 
     """
     ds = gdal.Open(input_img)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
     band_obj = ds.GetRasterBand(img_band)
     meta_data_dict = band_obj.GetMetadata_Dict()
@@ -1330,7 +1330,7 @@ def has_gcps(input_img: str):
 
     """
     raster = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if raster == None:
+    if raster is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
     numGCPs = raster.GetGCPCount()
     hasGCPs = False
@@ -1349,10 +1349,10 @@ def copy_gcps(input_img: str, output_img: str):
 
     """
     srcDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if srcDS == None:
+    if srcDS is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
     destDS = gdal.Open(output_img, gdal.GA_Update)
-    if destDS == None:
+    if destDS is None:
         srcDS = None
         raise rsgislib.RSGISPyException("Could not open the output_img.")
 
@@ -1384,7 +1384,7 @@ def set_img_band_metadata(
         )
 
     ds = gdal.Open(input_img, gdal.GA_Update)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException(
             "Could not open the image file: {}".format(input_img)
         )
@@ -1417,7 +1417,7 @@ def get_img_band_metadata(input_img: str, img_band: int, meta_field_name: str):
         )
 
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException(
             "Could not open the image file: {}".format(input_img)
         )
@@ -1451,7 +1451,7 @@ def get_img_band_metadata_fields(input_img: str, img_band: int):
         )
 
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException(
             "Could not open the image file: {}".format(input_img)
         )
@@ -1485,7 +1485,7 @@ def get_img_band_metadata_fields_dict(input_img: str, img_band: int):
         )
 
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException(
             "Could not open the image file: {}".format(input_img)
         )
@@ -1515,7 +1515,7 @@ def set_img_metadata(input_img: str, meta_field_name: str, meta_field_value: str
 
     """
     ds = gdal.Open(input_img, gdal.GA_Update)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException(
             "Could not open the image file: {}".format(input_img)
         )
@@ -1533,7 +1533,7 @@ def get_img_metadata(input_img: str, meta_field_name: str):
 
     """
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException(
             "Could not open the image file: {}".format(input_img)
         )
@@ -1552,7 +1552,7 @@ def get_img_metadata_fields(input_img: str):
 
     """
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException(
             "Could not open the image file: {}".format(input_img)
         )
@@ -1571,7 +1571,7 @@ def get_img_metadata_fields_dict(input_img: str):
 
     """
     ds = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if ds == None:
+    if ds is None:
         raise rsgislib.RSGISPyException(
             "Could not open the image file: {}".format(input_img)
         )
@@ -2031,10 +2031,10 @@ def resample_img_to_match(
     :param multicore: use multiple processing cores (Default = False)
     """
     numBands = get_img_band_count(in_process_img)
-    if no_data_val == None:
+    if no_data_val is None:
         no_data_val = get_img_no_data_value(in_process_img)
 
-    if datatype == None:
+    if datatype is None:
         datatype = get_gdal_datatype_from_img(in_process_img)
 
     interpolationMethod = gdal.GRA_NearestNeighbour
@@ -3200,7 +3200,7 @@ def subset_to_vec(
 
     if rsgislib.tools.geometrytools.do_bboxes_intersect(img_bbox, vec_bbox):
         common_bbox = rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox)
-        if datatype == None:
+        if datatype is None:
             datatype = get_gdal_datatype_from_img(input_img)
         subset_bbox(
             input_img,
@@ -3392,7 +3392,7 @@ def mask_img_with_vec(
         )
         mem_result_ds = None
 
-        if datatype == None:
+        if datatype is None:
             datatype = rsgislib.get_gdal_data_type_from_img(input_img)
         mask_img(input_img, roi_img, output_img, gdalformat, datatype, outvalue, 0)
         shutil.rmtree(tmp_file_dir)

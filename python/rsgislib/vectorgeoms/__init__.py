@@ -49,13 +49,12 @@ def convert_polygon_to_polyline(
     if vec_line_lyr is None:
         vec_line_lyr = os.path.splitext(os.path.basename(vec_line_file))[0]
 
-    gdal.UseExceptions()
     vec_poly_ds_obj = gdal.OpenEx(vec_poly_file, gdal.OF_VECTOR)
     vec_poly_lyr_obj = vec_poly_ds_obj.GetLayer(vec_poly_lyr)
     vec_poly_spat_ref = vec_poly_lyr_obj.GetSpatialRef()
 
     out_vec_drv = gdal.GetDriverByName(out_format)
-    if out_vec_drv == None:
+    if out_vec_drv is None:
         raise rsgislib.RSGISPyException(
             "Driver ('{}') has not be recognised.".format(out_format)
         )
@@ -110,8 +109,6 @@ def get_pt_on_line(pt1: ogr.Geometry, pt2: ogr.Geometry, dist: float) -> (float,
     :return: The created point; returned as a set of floats: (x, y)
 
     """
-    import math
-
     out_pt_x = 0.0
     out_pt_y = 0.0
     if dist == 0:
@@ -177,8 +174,6 @@ def find_pt_to_side(
     :return: The created point; returned as a set of floats: (x, y)
 
     """
-    import math
-
     if left_hand:
         tmp_pt = pt_end
         pt_end = pt_start
@@ -265,7 +260,6 @@ def create_orthg_lines(
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
-    gdal.UseExceptions()
     vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
     if vec_ds_obj is None:
         raise rsgislib.RSGISPyException(
@@ -279,7 +273,7 @@ def create_orthg_lines(
     vec_spat_ref = vec_lyr_obj.GetSpatialRef()
 
     out_vec_drv = gdal.GetDriverByName(out_format)
-    if out_vec_drv == None:
+    if out_vec_drv is None:
         raise rsgislib.RSGISPyException(
             "Driver ('{}') has not be recognised.".format(out_format)
         )
@@ -432,7 +426,6 @@ def closest_line_intersection(
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
-    gdal.UseExceptions()
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_line_file, vec_line_lyr)
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
@@ -627,7 +620,6 @@ def line_intersection_range(
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
-    gdal.UseExceptions()
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_line_file, vec_line_lyr)
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
@@ -834,7 +826,6 @@ def scnd_line_intersection_range(
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
-    gdal.UseExceptions()
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_line_file, vec_line_lyr)
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
@@ -1114,7 +1105,6 @@ def vec_lyr_intersection_gp(
     :param out_format: The output file format of the vector file.
     :param del_exist_vec: remove output file if it exists.
     """
-    import os
     import geopandas
 
     if os.path.exists(out_vec_file):
@@ -1167,7 +1157,6 @@ def vec_lyr_difference_gp(
     :param out_format: The output file format of the vector file.
     :param del_exist_vec: remove output file if it exists.
     """
-    import os
     import geopandas
 
     if os.path.exists(out_vec_file):
@@ -1220,7 +1209,6 @@ def vec_lyr_sym_difference_gp(
     :param out_format: The output file format of the vector file.
     :param del_exist_vec: remove output file if it exists.
     """
-    import os
     import geopandas
 
     if os.path.exists(out_vec_file):
@@ -1278,7 +1266,6 @@ def vec_lyr_identity_gp(
     :param out_format: The output file format of the vector file.
     :param del_exist_vec: remove output file if it exists.
     """
-    import os
     import geopandas
 
     if os.path.exists(out_vec_file):
@@ -1331,7 +1318,6 @@ def vec_lyr_union_gp(
     :param out_format: The output file format of the vector file.
     :param del_exist_vec: remove output file if it exists.
     """
-    import os
     import geopandas
 
     if os.path.exists(out_vec_file):
@@ -1370,10 +1356,8 @@ def get_vec_lyr_as_pts(vec_file: str, vec_lyr: str) -> list:
     :return: returns a list of points.
 
     """
-    from osgeo import gdal
     import tqdm
 
-    gdal.UseExceptions()
     vec_ds_obj = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     vec_lyr_obj = vec_ds_obj.GetLayer(vec_lyr)
 
@@ -1439,11 +1423,6 @@ def create_alpha_shape(
 
     """
     import alphashape
-    from osgeo import ogr
-    from osgeo import gdal
-    import os
-
-    gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -1631,7 +1610,6 @@ def explode_vec_files(
 
     """
     import tqdm
-    import rsgislib.vectorutils
     import rsgislib.tools.filetools
 
     for vec_file in tqdm.tqdm(in_vec_files):
@@ -1662,12 +1640,7 @@ def convert_multi_geoms_to_single(
     :param del_exist_vec: remove output file if it exists.
 
     """
-    import rsgislib.vectorutils
-    from osgeo import gdal
-    from osgeo import ogr
     import tqdm
-
-    gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -1790,11 +1763,7 @@ def simplify_geometries(
     :param out_vec_lyr: output vector layer name.
     :param del_exist_vec: remove output file if it exists.
     """
-    from osgeo import gdal
-    from osgeo import ogr
     import tqdm
-
-    gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -1883,11 +1852,7 @@ def delete_polygon_holes(
                        threshold is None then all holes are removed.
     :param del_exist_vec: remove output file if it exists.
     """
-    from osgeo import gdal
-    from osgeo import ogr
     import tqdm
-
-    gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -1998,11 +1963,7 @@ def get_poly_hole_area(vec_file: str, vec_lyr: str):
     :returns: A list of areas.
 
     """
-    from osgeo import gdal
-    from osgeo import ogr
     import tqdm
-
-    gdal.UseExceptions()
 
     def _calc_hole_area(polygon):
         if polygon.GetGeometryName().lower() != "polygon":
@@ -2078,11 +2039,7 @@ def remove_polygon_area(
     :param area_thres: threshold below which polygons are removed.
     :param del_exist_vec: remove output file if it exists.
     """
-    from osgeo import gdal
-    from osgeo import ogr
     import tqdm
-
-    gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -2187,10 +2144,6 @@ def vec_lyr_intersection(
     :param del_exist_vec: remove output file if it exists.
 
     """
-    from osgeo import gdal
-    from osgeo import ogr
-    import rsgislib
-    import os
     import tqdm
 
     if os.path.exists(out_vec_file):
@@ -2204,9 +2157,6 @@ def vec_lyr_intersection(
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
-
-    gdal.UseExceptions()
-    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
@@ -2341,10 +2291,6 @@ def vec_lyr_difference(
     :param del_exist_vec: remove output file if it exists.
 
     """
-    from osgeo import gdal
-    from osgeo import ogr
-    import rsgislib
-    import os
     import tqdm
 
     if os.path.exists(out_vec_file):
@@ -2358,9 +2304,6 @@ def vec_lyr_difference(
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
-
-    gdal.UseExceptions()
-    vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
@@ -2523,8 +2466,6 @@ def get_geom_pts(geom: ogr.Geometry, pts_lst: list = None) -> list:
     :return: a list of points.
 
     """
-    from osgeo import ogr
-
     if pts_lst is None:
         pts_lst = list()
 
@@ -2562,10 +2503,7 @@ def vec_intersects_vec(
     :return: boolean
 
     """
-    from osgeo import gdal
     import tqdm
-
-    gdal.UseExceptions()
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
@@ -2632,10 +2570,7 @@ def vec_overlaps_vec(
     :return: boolean
 
     """
-    from osgeo import gdal
     import tqdm
-
-    gdal.UseExceptions()
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
@@ -2702,10 +2637,7 @@ def vec_within_vec(
     :return: boolean
 
     """
-    from osgeo import gdal
     import tqdm
-
-    gdal.UseExceptions()
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
@@ -2776,10 +2708,7 @@ def vec_contains_vec(
     :return: boolean
 
     """
-    from osgeo import gdal
     import tqdm
-
-    gdal.UseExceptions()
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
@@ -2850,10 +2779,7 @@ def vec_touches_vec(
     :return: boolean
 
     """
-    from osgeo import gdal
     import tqdm
-
-    gdal.UseExceptions()
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:
@@ -2921,10 +2847,7 @@ def vec_crosses_vec(
     :return: boolean
 
     """
-    from osgeo import gdal
     import tqdm
-
-    gdal.UseExceptions()
 
     dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
     if dsVecBaseObj is None:

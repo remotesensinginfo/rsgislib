@@ -13,6 +13,7 @@
  # F405 '?????' may be undefined, or defined from star imports
  # F403 'from ???? import *' used; unable to detect undefined names
  # F401 '?????.*' imported but unused
- ignore = W291,W293,W504,E128,E225,E228,E501,W503,F405,F403,F401
+ # E203 whitespace before ':'
+ ignore = W291,W293,W504,E128,E225,E228,E501,W503,F405,F403,F401,E203
 
 
