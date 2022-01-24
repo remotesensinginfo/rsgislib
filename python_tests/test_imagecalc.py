@@ -275,6 +275,7 @@ def test_calc_dist_to_img_vals_sgl_val_pxl(tmp_path):
     )
     assert img_eq
 
+
 def test_calc_dist_to_img_vals_sgl_val_pxl_out_no_data(tmp_path):
     import rsgislib.imagecalc
 
@@ -291,7 +292,6 @@ def test_calc_dist_to_img_vals_sgl_val_pxl_out_no_data(tmp_path):
         out_no_data_val=11,
         unit_geo=False,
     )
-
 
 
 def test_calc_dist_to_img_vals_multi_val_geo(tmp_path):

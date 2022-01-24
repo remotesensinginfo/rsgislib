@@ -5,8 +5,10 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 FILETOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools/filetools")
 
 import rsgislib.tools.filetools
+
 unzip_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("unzip")
 tar_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("tar")
+
 
 @pytest.mark.parametrize(
     "input, expected",
