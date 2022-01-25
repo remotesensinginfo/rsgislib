@@ -47,6 +47,51 @@ def test_convert_polygon_to_polyline(tmp_path):
     assert os.path.exists(vec_line_file)
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_convert_polys_to_lines_gp(tmp_path):
+    import rsgislib.vectorgeoms
+
+    vec_poly_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_poly_lyr = "aber_osgb_multi_polys"
+
+    vec_line_file = os.path.join(tmp_path, "out_vec.gpkg")
+    vec_line_lyr = "out_vec"
+
+    rsgislib.vectorgeoms.convert_polys_to_lines_gp(
+        vec_poly_file,
+        vec_poly_lyr,
+        vec_line_file,
+        vec_line_lyr,
+        out_format="GPKG",
+        del_exist_vec=False,
+    )
+
+    assert os.path.exists(vec_line_file)
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_convert_polys_to_lines_gp_exterior(tmp_path):
+    import rsgislib.vectorgeoms
+
+    vec_poly_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_poly_lyr = "aber_osgb_multi_polys"
+
+    vec_line_file = os.path.join(tmp_path, "out_vec.gpkg")
+    vec_line_lyr = "out_vec"
+
+    rsgislib.vectorgeoms.convert_polys_to_lines_gp(
+        vec_poly_file,
+        vec_poly_lyr,
+        vec_line_file,
+        vec_line_lyr,
+        out_format="GPKG",
+        del_exist_vec=False,
+        exterior_lines=True,
+    )
+
+    assert os.path.exists(vec_line_file)
+
+
 def test_get_pt_on_line():
     import rsgislib.vectorgeoms
     from osgeo import ogr

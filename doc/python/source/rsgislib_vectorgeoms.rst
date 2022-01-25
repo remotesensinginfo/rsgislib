@@ -4,6 +4,7 @@ RSGISLib Vector Geometry Module
 Convert Geometries
 -------------------
 .. autofunction:: rsgislib.vectorgeoms.convert_polygon_to_polyline
+.. autofunction:: rsgislib.vectorgeoms.convert_polys_to_lines_gp
 .. autofunction:: rsgislib.vectorgeoms.convert_multi_geoms_to_single
 .. autofunction:: rsgislib.vectorgeoms.explode_vec_lyr
 .. autofunction:: rsgislib.vectorgeoms.explode_vec_files

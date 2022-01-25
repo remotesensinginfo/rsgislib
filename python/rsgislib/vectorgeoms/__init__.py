@@ -99,6 +99,58 @@ def convert_polygon_to_polyline(
     out_ds_obj = None
 
 
+def convert_polys_to_lines_gp(
+    vec_poly_file: str,
+    vec_poly_lyr: str,
+    vec_line_file: str,
+    vec_line_lyr: str = None,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
+    exterior_lines: bool = False,
+):
+    """
+    A function to convert a polygon vector file to a polyline file using
+    geopandas.
+
+    :param vec_poly_file: Input polygon vector file
+    :param vec_poly_lyr: The name of the vector layer
+    :param vec_line_file: The output vector file
+    :param vec_line_lyr: The output vector layer name
+    :param out_format: The output vector file format (default: GPKG).
+    :param del_exist_vec: remove output file if it exists.
+    :param exterior_lines: If True then only the outer exterior lines are outputted.
+
+    """
+    import geopandas
+
+    if os.path.exists(vec_line_file):
+        if del_exist_vec:
+            rsgislib.vectorutils.delete_vector_file(vec_line_file)
+        else:
+            raise rsgislib.RSGISPyException(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(vec_line_file)
+            )
+
+    if vec_line_lyr is None:
+        vec_line_lyr = os.path.splitext(os.path.basename(vec_line_lyr))[0]
+
+    data_gdf = geopandas.read_file(vec_poly_file, layer=vec_poly_lyr)
+    if exterior_lines:
+        data_bounds_gsrs = data_gdf.boundary
+    else:
+        data_bounds_gsrs = data_gdf.exterior
+
+    if out_format == "GPKG":
+        if vec_line_lyr is None:
+            raise rsgislib.RSGISPyException(
+                "If output format is GPKG then an output layer is required."
+            )
+        data_bounds_gsrs.to_file(vec_line_file, layer=vec_line_lyr, driver=out_format)
+    else:
+        data_bounds_gsrs.to_file(vec_line_file, driver=out_format)
+
+
 def get_pt_on_line(pt1: ogr.Geometry, pt2: ogr.Geometry, dist: float) -> (float, float):
     """
     A function that calculates a point on the vector defined by pt1 and pt2.
