@@ -13,13 +13,13 @@ endif(APPLE)
 
 #set(PYRSGIS_ROOT_PATH "${Python_SITELIB}")
 file(TO_CMAKE_PATH "${Python_SITELIB}" PYRSGIS_ROOT_PATH)
-if(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+if(NOT MSVC AND NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     # user has set CMAKE_INSTALL_PREFIX - ensure we install
     # under there rather than the default Python install location.
     # BUT we want to keep the last part of the path the same as Python_SITELIB
     # (ie the lib/pythonX.X/site-packages part)
     string(REPLACE "${_Python_PREFIX}" "${CMAKE_INSTALL_PREFIX}" PYRSGIS_ROOT_PATH "${PYRSGIS_ROOT_PATH}")
-endif(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+endif(NOT MSVC AND NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 message(STATUS "installing Python libs to ${PYRSGIS_ROOT_PATH}")
 
 #set(PYRSGIS_INSTALL_PATH "${PYRSGIS_ROOT_PATH}/rsgislib")
