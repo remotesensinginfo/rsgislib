@@ -1,11 +1,17 @@
 import os
-
 import pytest
+import rsgislib.tools.filetools
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TOOLS_VIS_DATA_DIR = os.path.join(DATA_DIR, "tools", "visualisation")
 
+gdal_translate_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("gdal_translate")
+gdal2tiles_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("gdal2tiles.py")
 
+
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_kmz_img(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -23,6 +29,9 @@ def test_create_kmz_img(tmp_path):
     assert os.path.exists(output_file)
 
 
+@pytest.mark.skipif(
+    (not gdal2tiles_cmd_avail), reason="gdal2tiles.py command not available"
+)
 def test_create_webtiles_img_no_stats_msk_tms_true(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -41,6 +50,9 @@ def test_create_webtiles_img_no_stats_msk_tms_true(tmp_path):
     )
 
 
+@pytest.mark.skipif(
+    (not gdal2tiles_cmd_avail), reason="gdal2tiles.py command not available"
+)
 def test_create_webtiles_img_no_stats_msk_tms_false(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -59,6 +71,9 @@ def test_create_webtiles_img_no_stats_msk_tms_false(tmp_path):
     )
 
 
+@pytest.mark.skipif(
+    (not gdal2tiles_cmd_avail), reason="gdal2tiles.py command not available"
+)
 def test_create_webtiles_img_no_stats_msk_tms_true_finite(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -77,6 +92,9 @@ def test_create_webtiles_img_no_stats_msk_tms_true_finite(tmp_path):
     )
 
 
+@pytest.mark.skipif(
+    (not gdal2tiles_cmd_avail), reason="gdal2tiles.py command not available"
+)
 def test_create_webtiles_img_nodata_exp(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -94,6 +112,9 @@ def test_create_webtiles_img_nodata_exp(tmp_path):
         )
 
 
+@pytest.mark.skipif(
+    (not gdal2tiles_cmd_avail), reason="gdal2tiles.py command not available"
+)
 def test_create_webtiles_img_tms_true(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -112,6 +133,9 @@ def test_create_webtiles_img_tms_true(tmp_path):
     )
 
 
+@pytest.mark.skipif(
+    (not gdal2tiles_cmd_avail), reason="gdal2tiles.py command not available"
+)
 def test_create_webtiles_img_tms_false(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -130,6 +154,9 @@ def test_create_webtiles_img_tms_false(tmp_path):
     )
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_quicklook_imgs_sgl(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -147,6 +174,9 @@ def test_create_quicklook_imgs_sgl(tmp_path):
     assert os.path.exists(output_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_quicklook_imgs_multi(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -186,6 +216,9 @@ def test_create_mbtile_file(tmp_path):
     assert os.path.exists(output_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_webtiles_vis_gtiff_img(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -208,6 +241,9 @@ def test_create_webtiles_vis_gtiff_img(tmp_path):
     assert os.path.exists(output_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_quicklook_overview_imgs_sgl(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -229,6 +265,9 @@ def test_create_quicklook_overview_imgs_sgl(tmp_path):
     assert os.path.exists(output_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_quicklook_overview_imgs_multi(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -290,6 +329,9 @@ def test_create_quicklook_overview_imgs_vec_overlay_sgl(tmp_path):
     assert os.path.exists(output_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_quicklook_overview_imgs_vec_overlay_sgl_clr(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -314,6 +356,9 @@ def test_create_quicklook_overview_imgs_vec_overlay_sgl_clr(tmp_path):
     assert os.path.exists(output_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_quicklook_overview_imgs_vec_overlay_multi(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -340,6 +385,9 @@ def test_create_quicklook_overview_imgs_vec_overlay_multi(tmp_path):
     assert os.path.exists(output_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_quicklook_overview_imgs_vec_overlay_multi_clr(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -367,6 +415,9 @@ def test_create_quicklook_overview_imgs_vec_overlay_multi_clr(tmp_path):
     assert os.path.exists(output_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_quicklook_overview_imgs_vec_overlay_multi_clr_multi_out(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -397,6 +448,9 @@ def test_create_quicklook_overview_imgs_vec_overlay_multi_clr_multi_out(tmp_path
     assert os.path.exists(output_files[0]) and os.path.exists(output_files[1])
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_visual_overview_imgs_vec_extent(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -421,6 +475,9 @@ def test_create_visual_overview_imgs_vec_extent(tmp_path):
     assert os.path.exists(output_file) and os.path.exists(stretch_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_visual_overview_imgs_vec_extent_multi_out(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -453,6 +510,9 @@ def test_create_visual_overview_imgs_vec_extent_multi_out(tmp_path):
     )
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_visual_overview_imgs_vec_extent_vec_ext(tmp_path):
     import rsgislib.tools.visualisation
 
@@ -480,6 +540,9 @@ def test_create_visual_overview_imgs_vec_extent_vec_ext(tmp_path):
     assert os.path.exists(output_file) and os.path.exists(stretch_file)
 
 
+@pytest.mark.skipif(
+    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+)
 def test_create_visual_overview_imgs_vec_extent_multi_out_vec_ext(tmp_path):
     import rsgislib.tools.visualisation
 

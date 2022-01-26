@@ -1,11 +1,10 @@
 import os
 import platform
 import pytest
+import rsgislib.tools.filetools
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 FILETOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools/filetools")
-
-import rsgislib.tools.filetools
 
 unzip_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("unzip")
 tar_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("tar")
@@ -259,8 +258,7 @@ def test_untar_gz_file_gen_arch_dir_false(tmp_path):
 
 
 @pytest.mark.skipif(
-    (not on_windows) and (not tar_cmd_avail),
-    reason="tar command not available or on Windows",
+    on_windows or (not tar_cmd_avail), reason="tar command not available or on Windows"
 )
 def test_untar_bz_file_gen_arch_dir_true(tmp_path):
     input_file = os.path.join(FILETOOLS_DATA_DIR, "test_file.tar.bz")
@@ -280,8 +278,7 @@ def test_untar_bz_file_gen_arch_dir_true(tmp_path):
 
 
 @pytest.mark.skipif(
-    (not on_windows) and (not tar_cmd_avail),
-    reason="tar command not available or on Windows",
+    on_windows or (not tar_cmd_avail), reason="tar command not available or on Windows"
 )
 def test_untar_bz_file_gen_arch_dir_false(tmp_path):
     input_file = os.path.join(FILETOOLS_DATA_DIR, "test_file.tar.bz")
