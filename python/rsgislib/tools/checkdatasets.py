@@ -215,7 +215,7 @@ def _run_check_gdal_image_file(img_params: list):
             print("Error: '{}'".format(err_str))
         if not file_ok:
             if rm_err:
-                os.remove(input_img)
+                rsgislib.tools.filetools.delete_file_silent(input_img)
                 print("Removed {}".format(input_img))
             else:
                 print("rm {}".format(input_img))
@@ -223,7 +223,7 @@ def _run_check_gdal_image_file(img_params: list):
         if print_err:
             print("Error: '{}'".format(e))
         if rm_err:
-            os.remove(input_img)
+            rsgislib.tools.filetools.delete_file_silent(input_img)
             print("Removed {}".format(input_img))
         else:
             print("rm {}".format(input_img))
@@ -300,7 +300,7 @@ def run_check_gdal_image_file(
     except Exception as e:
         file_ok = False
         if rm_err:
-            os.remove(input_img)
+            rsgislib.tools.filetools.delete_file_silent(input_img)
             print("Removed {}".format(input_img))
         else:
             print("rm {}".format(input_img))
@@ -390,7 +390,7 @@ def run_check_gdal_image_files(
             except Exception as e:
                 files_ok = False
                 if rm_err:
-                    os.remove(input_img)
+                    rsgislib.tools.filetools.delete_file_silent(input_img)
                     print("Removed {}".format(input_img))
                 else:
                     print("rm {}".format(input_img))
@@ -535,7 +535,7 @@ def _run_check_gdal_vector_file(file_params: list):
                 if multi_file:
                     rsgislib.tools.filetools.delete_file_with_basename(vec_file)
                 else:
-                    os.remove(vec_file)
+                    rsgislib.tools.filetools.delete_file_silent(vec_file)
                     print("Removed {}".format(vec_file))
             else:
                 print("rm {}".format(vec_file))
@@ -546,7 +546,7 @@ def _run_check_gdal_vector_file(file_params: list):
             if multi_file:
                 rsgislib.tools.filetools.delete_file_with_basename(vec_file)
             else:
-                os.remove(vec_file)
+                rsgislib.tools.filetools.delete_file_silent(vec_file)
                 print("Removed {}".format(vec_file))
         else:
             print("rm {}".format(vec_file))
@@ -611,7 +611,7 @@ def run_check_gdal_vector_file(
             if multi_file:
                 rsgislib.tools.filetools.delete_file_with_basename(vec_file)
             else:
-                os.remove(vec_file)
+                rsgislib.tools.filetools.delete_file_silent(vec_file)
                 print("Removed {}".format(vec_file))
         else:
             print("rm {}".format(vec_file))
@@ -689,7 +689,7 @@ def run_check_gdal_vector_files(
                     if multi_file:
                         rsgislib.tools.filetools.delete_file_with_basename(vec_file)
                     else:
-                        os.remove(vec_file)
+                        rsgislib.tools.filetools.delete_file_silent(vec_file)
                         print("Removed {}".format(vec_file))
                 else:
                     print("rm {}".format(vec_file))
@@ -773,7 +773,7 @@ def _run_check_hdf5_file(file_params: list):
             print("Error: '{}'".format(err_str))
         if not file_ok:
             if rm_err:
-                os.remove(input_file)
+                rsgislib.tools.filetools.delete_file_silent(input_file)
                 print("Removed {}".format(input_file))
             else:
                 print("rm {}".format(input_file))
@@ -781,7 +781,7 @@ def _run_check_hdf5_file(file_params: list):
         if print_err:
             print("Error: '{}'".format(e))
         if rm_err:
-            os.remove(input_file)
+            rsgislib.tools.filetools.delete_file_silent(input_file)
             print("Removed {}".format(input_file))
         else:
             print("rm {}".format(input_file))
@@ -818,7 +818,7 @@ def run_check_hdf5_file(
     except Exception as e:
         file_ok = False
         if rm_err:
-            os.remove(input_file)
+            rsgislib.tools.filetools.delete_file_silent(input_file)
             print("Removed {}".format(input_file))
         else:
             print("rm {}".format(input_file))
@@ -869,7 +869,7 @@ def run_check_hdf5_files(
             except Exception as e:
                 files_ok = False
                 if rm_err:
-                    os.remove(input_file)
+                    rsgislib.tools.filetools.delete_file_silent(input_file)
                     print("Removed {}".format(input_file))
                 else:
                     print("rm {}".format(input_file))

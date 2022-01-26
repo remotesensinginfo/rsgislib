@@ -84,7 +84,7 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
 
     """
     from osgeo import gdal
-    import os
+    import rsgislib.tools.filetools
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
@@ -93,7 +93,7 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
     for cfile in file_lst:
         if feedback:
             print("Deleting: {}".format(cfile))
-        os.remove(cfile)
+        rsgislib.tools.filetools.delete_file_silent(cfile)
 
 
 def check_format_name(vec_file_format: str) -> str:
@@ -3025,7 +3025,7 @@ def create_train_test_smpls(
     out_test_vec_lyr: str,
     out_format: str = "GPKG",
     prop_test: float = 0.2,
-    tmp_dir: str = "./tmp",
+    tmp_dir: str = "tmp",
     rnd_seed: int = None,
 ):
     """

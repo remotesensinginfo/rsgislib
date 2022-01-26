@@ -65,7 +65,7 @@ def test_populate_clumps_with_class_training(tmp_path):
     )
 
     rsgislib.classification.classratutils.populate_clumps_with_class_training(
-        clumps_img, class_vec_sample_info, "./tmp", "cls_int", "cls_name"
+        clumps_img, class_vec_sample_info, "tmp", "cls_int", "cls_name"
     )
 
     clumps_cls_img = os.path.join(

@@ -59,6 +59,7 @@ def plot_image_spectra(
         tools.plotting.plot_image_spectra(inputImage, roiFile, outputPlotFile, wavelengths, plotTitle)
 
     """
+    import rsgislib.tools.filetools
     # Check matplotlib is available
     if not haveMatPlotLib:
         raise rsgislib.RSGISPyException(
@@ -158,7 +159,7 @@ def plot_image_spectra(
     plt.ylabel("Reflectance (%)")
 
     plt.savefig(output_plot_file, format="PDF")
-    os.remove(tmpOutFile)
+    rsgislib.tools.filetools.delete_file_silent(tmpOutFile)
     print("Completed.\n")
 
 

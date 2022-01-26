@@ -233,6 +233,28 @@ def get_dir_name(input_file: str) -> str:
     return dir_name
 
 
+def delete_file_silent(input_file: str) -> bool:
+    """
+    A function which can be used in-place of os.remove to delete
+    a file but if checks if the file exists and only calls os.remove
+    if it does exist but also catches any Exceptions from os.remove
+    and just returns a boolean as to whether the input_file has been
+    removed.
+
+    :param input_file: input file path for the file which is to be removed.
+    :return: boolean (True: File was removed or did not exist. False:
+             os.remove through an Exception so assume file was not removed)
+
+    """
+    try:
+        if os.path.exists(input_file) and os.path.isfile(input_file):
+            os.remove(input_file)
+        file_removed = True
+    except Exception:
+        file_removed = False
+    return file_removed
+
+
 def delete_file_with_basename(input_file: str, print_rms=True):
     """
     Function to delete all the files which have a path
@@ -247,24 +269,7 @@ def delete_file_with_basename(input_file: str, print_rms=True):
     for file in fileList:
         if print_rms:
             print("Deleting file: " + str(file))
-        os.remove(file)
-
-
-def delete_dir(dir_path: str):
-    """
-    A function which will delete a directory, if files and other directories
-    are within the path specified they will be recursively deleted as well.
-    So be careful you don't delete things within meaning it.
-
-    :param dir_path: string for the input directory path
-
-    """
-    for root, dirs, files in os.walk(dir_path, topdown=False):
-        for name in files:
-            os.remove(os.path.join(root, name))
-        for name in dirs:
-            os.rmdir(os.path.join(root, name))
-    os.rmdir(dir_path)
+        delete_file_silent(file)
 
 
 def find_file(dir_path: str, file_search: str) -> str:
@@ -711,7 +716,9 @@ def release_file_lock(input_file: str):
     lock_file_name = ".{}.lok".format(file_name)
     lock_file_path = os.path.join(file_path, lock_file_name)
     if os.path.exists(lock_file_path):
-        os.remove(lock_file_path)
+        if not delete_file_silent(lock_file_path):
+            raise rsgislib.RSGISPyException("Could not delete the lock file..."
+                                            " something has gone wrong!")
 
 
 def clean_file_locks(dir_path: str, timeout: int = 3600):
@@ -735,7 +742,9 @@ def clean_file_locks(dir_path: str, timeout: int = 3600):
         create_date = datetime.datetime.fromisoformat(create_date_str)
         time_since_create = (c_dateime - create_date).total_seconds()
         if time_since_create > timeout:
-            os.remove(lock_file_path)
+            if not delete_file_silent(lock_file_path):
+                raise rsgislib.RSGISPyException("Could not delete the lock file..."
+                                                " something has gone wrong!")
 
 
 def sort_imgs_to_dirs_utm(input_imgs_dir: str, file_search_str: str, out_base_dir: str):

@@ -106,8 +106,8 @@ def export_cols_to_gdal_img(
 
     .. code:: python
 
-       clumps='./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'
-       outimage='./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea'
+       clumps='RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'
+       outimage='TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea'
        gdalformat = 'KEA'
        datatype = rsgislib.TYPE_32FLOAT
        fields = ['RedAvg','GreenAvg','BlueAvg']
@@ -645,7 +645,7 @@ def identify_small_units(
         import rsgislib.rastergis
 
         clumpsImg = "LS2MSS_19750620_lat10lon6493_r67p250_rad_srefdem_30m_clumps.kea"
-        tmpPath = "./tmp/"
+        tmpPath = "tmp/"
         classCol = "OutClass"
         outColName = ["SmallUnits25", "SmallUnits50", "SmallUnits100"]
         smallClumpsThres = [25, 50, 100]
@@ -772,7 +772,7 @@ def calc_dist_to_classes(
     clumps_img: str,
     class_col: str,
     out_img_base: str,
-    tmp_dir: str = "./tmp",
+    tmp_dir: str = "tmp",
     tile_size: int = 2000,
     max_dist: int = 1000,
     no_data_val: int = 1000,
@@ -788,7 +788,7 @@ def calc_dist_to_classes(
                        be KEA files.
     :param tmp_dir: is a directory to be used for storing the image tiles and
                    other temporary files - if not directory does not exist it
-                   will be created and deleted on completion (Default: ./tmp).
+                   will be created and deleted on completion (Default: tmp).
     :param tile_size: is an int specifying in pixels the size of the image tiles
                      used for processing (Default: 2000)
     :param max_dist: is the maximum distance in units of the geographic units of
@@ -927,13 +927,13 @@ def calc_dist_to_classes(
     if not tmp_present:
         shutil.rmtree(tmp_dir, ignore_errors=True)
     else:
-        os.remove(classes_img)
+        rsgislib.tools.filetools.delete_file_silent(classes_img)
 
 
 def calc_dist_between_clumps(
     clumps_img: str,
     out_col_name: str,
-    tmp_dir: str = "./tmp",
+    tmp_dir: str = "tmp",
     use_idx: bool = False,
     max_dist_thres: float = 10,
 ):
@@ -991,7 +991,7 @@ def calc_dist_to_large_clumps(
     clumps_img: str,
     out_col_name: str,
     size_thres: float,
-    tmp_dir: str = "./tmp",
+    tmp_dir: str = "tmp",
     use_idx: bool = False,
     max_dist_thres: float = 10,
 ):

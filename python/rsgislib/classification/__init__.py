@@ -8,7 +8,6 @@ from ._classification import *
 
 import rsgislib
 
-
 class ClassSimpleInfoObj(object):
     """
     This is a class to store the information associated within the classification.
@@ -491,6 +490,7 @@ def split_sample_train_valid_test(
 
     """
     import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     import rsgislib.zonalstats
     import os
 
@@ -532,8 +532,8 @@ def split_sample_train_valid_test(
             rnd_seed,
             datatype,
         )
-        os.remove(tmp_train_sample_file)
-        os.remove(tmp_remain_sample_file)
+        rsgislib.tools.filetools.delete_file_silent(tmp_train_sample_file)
+        rsgislib.tools.filetools.delete_file_silent(tmp_remain_sample_file)
     else:
         rsgislib.zonalstats.split_sample_hdf5_file(
             tmp_train_valid_sample_file,
@@ -543,7 +543,7 @@ def split_sample_train_valid_test(
             rnd_seed,
             datatype,
         )
-    os.remove(tmp_train_valid_sample_file)
+    rsgislib.tools.filetools.delete_file_silent(tmp_train_valid_sample_file)
 
 
 def split_chip_sample_train_valid_test(
@@ -575,6 +575,7 @@ def split_chip_sample_train_valid_test(
 
     """
     import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     import rsgislib.zonalstats
     import os
 
@@ -617,8 +618,8 @@ def split_chip_sample_train_valid_test(
             rnd_seed,
             datatype,
         )
-        os.remove(tmp_train_sample_file)
-        os.remove(tmp_remain_sample_file)
+        rsgislib.tools.filetools.delete_file_silent(tmp_train_sample_file)
+        rsgislib.tools.filetools.delete_file_silent(tmp_remain_sample_file)
     else:
         rsgislib.zonalstats.split_sample_chip_hdf5_file(
             tmp_train_valid_sample_file,
@@ -628,7 +629,7 @@ def split_chip_sample_train_valid_test(
             rnd_seed,
             datatype,
         )
-    os.remove(tmp_train_valid_sample_file)
+    rsgislib.tools.filetools.delete_file_silent(tmp_train_valid_sample_file)
 
 
 def split_chip_sample_ref_train_valid_test(
@@ -660,6 +661,7 @@ def split_chip_sample_ref_train_valid_test(
 
     """
     import rsgislib
+    import rsgislib.tools.filetools
     import rsgislib.tools.utils
     from rsgislib.zonalstats import split_sample_ref_chip_hdf5_file
     import os
@@ -703,8 +705,8 @@ def split_chip_sample_ref_train_valid_test(
             rnd_seed,
             datatype,
         )
-        os.remove(tmp_train_sample_file)
-        os.remove(tmp_remain_sample_file)
+        rsgislib.tools.filetools.delete_file_silent(tmp_train_sample_file)
+        rsgislib.tools.filetools.delete_file_silent(tmp_remain_sample_file)
     else:
         split_sample_ref_chip_hdf5_file(
             tmp_train_valid_sample_file,
@@ -714,7 +716,7 @@ def split_chip_sample_ref_train_valid_test(
             rnd_seed,
             datatype,
         )
-    os.remove(tmp_train_valid_sample_file)
+    rsgislib.tools.filetools.delete_file_silent(tmp_train_valid_sample_file)
 
 
 def flip_chip_hdf5_file(input_h5_file, output_h5_file, datatype=None):

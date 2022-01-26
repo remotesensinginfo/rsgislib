@@ -11,7 +11,7 @@ helper function which will run all the required steps to generate a segmentation
     
     segutils.run_shepherd_segmentation(inImage,
                                      outputClumps,
-                                     tmpath='./',
+                                     tmpath='',
                                      numClusters=60,
                                      minPxls=100,
                                      distThres=100,

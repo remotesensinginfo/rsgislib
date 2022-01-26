@@ -51,8 +51,8 @@ def test_convert_polygon_to_polyline(tmp_path):
 def test_convert_polys_to_lines_gp(tmp_path):
     import rsgislib.vectorgeoms
 
-    vec_poly_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
-    vec_poly_lyr = "aber_osgb_multi_polys"
+    vec_poly_file = os.path.join(VECTORGEOMS_DATA_DIR, "welsh_land_area.gpkg")
+    vec_poly_lyr = "welsh_land_area"
 
     vec_line_file = os.path.join(tmp_path, "out_vec.gpkg")
     vec_line_lyr = "out_vec"
@@ -64,6 +64,7 @@ def test_convert_polys_to_lines_gp(tmp_path):
         vec_line_lyr,
         out_format="GPKG",
         del_exist_vec=False,
+        exterior_lines=False,
     )
 
     assert os.path.exists(vec_line_file)
@@ -73,8 +74,8 @@ def test_convert_polys_to_lines_gp(tmp_path):
 def test_convert_polys_to_lines_gp_exterior(tmp_path):
     import rsgislib.vectorgeoms
 
-    vec_poly_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
-    vec_poly_lyr = "aber_osgb_multi_polys"
+    vec_poly_file = os.path.join(VECTORGEOMS_DATA_DIR, "welsh_land_area.gpkg")
+    vec_poly_lyr = "welsh_land_area"
 
     vec_line_file = os.path.join(tmp_path, "out_vec.gpkg")
     vec_line_lyr = "out_vec"

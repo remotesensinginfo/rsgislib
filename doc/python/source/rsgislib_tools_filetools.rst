@@ -39,7 +39,7 @@ Sorting
 Deleting
 ---------
 .. autofunction:: rsgislib.tools.filetools.delete_file_with_basename
-.. autofunction:: rsgislib.tools.filetools.delete_dir
+.. autofunction:: rsgislib.tools.filetools.delete_file_silent
 
 Lock Files
 ------------

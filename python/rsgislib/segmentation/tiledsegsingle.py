@@ -193,7 +193,7 @@ class RSGISTiledShepherdSegmentationSingleThread(object):
                 jsonStrData = f.read()
             segStatsInfo = json.loads(jsonStrData)
             tileStatsFiles[baseName] = segStatsInfo
-            os.remove(tmpStatsJSON)
+            rsgislib.tools.filetools.delete_file_silent(tmpStatsJSON)
 
         with open(tileSegInfoJSON, "w") as outfile:
             json.dump(
@@ -498,7 +498,7 @@ def perform_tiled_segmentation(
         inputImage = 'LS5TM_20110428_sref_submask_osgb.kea'
         clumpsImage = 'LS5TM_20110428_sref_submask_osgb_clumps.kea'
 
-        tiledsegsingle.perform_tiled_segmentation(inputImage, clumpsImage, tmpDIR='./rsgislibsegtmp', tileWidth=2000, tileHeight=2000, validDataThreshold=0.3, numClusters=60, minPxls=100, distThres=100, bands=[4,5,3], sampling=100, kmMaxIter=200)
+        tiledsegsingle.perform_tiled_segmentation(inputImage, clumpsImage, tmpDIR='rsgislibsegtmp', tileWidth=2000, tileHeight=2000, validDataThreshold=0.3, numClusters=60, minPxls=100, distThres=100, bands=[4,5,3], sampling=100, kmMaxIter=200)
 
     """
     import rsgislib.tools.utils
@@ -722,6 +722,6 @@ def perform_tiled_segmentation(
     rsgislib.tools.filetools.delete_file_with_basename(stage1TileRAT)
     rsgislib.tools.filetools.delete_file_with_basename(stage2TileShp)
     rsgislib.tools.filetools.delete_file_with_basename(stage2TileRAT)
-    os.remove(tileSegInfo)
+    rsgislib.tools.filetools.delete_file_silent(tileSegInfo)
     if createdTmp:
         shutil.rmtree(tmp_dir)

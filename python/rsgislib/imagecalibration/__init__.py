@@ -145,7 +145,7 @@ def calc_clear_sky_regions(
     validAreaImg,
     outputClearSkyMask,
     outFormat,
-    tmpPath="./tmpClearSky",
+    tmpPath="tmpClearSky",
     deleteTmpFiles=True,
     initClearSkyRegionDist=5000,
     initClearSkyRegionMinSize=3000,
@@ -159,7 +159,7 @@ def calc_clear_sky_regions(
     :param validAreaImg: A mask of the image data area (1 = valid and 0 = not-valid; i.e., outside of the data area)
     :param outputClearSkyMask: The output mask of the clear sky areas
     :param outFormat: The output image format.
-    :param tmpPath: The path for temporay images produced during the processing to be stored (Default: './tmpClearSky'; Note. all temp files are generated as KEA files).
+    :param tmpPath: The path for temporay images produced during the processing to be stored (Default: 'tmpClearSky'; Note. all temp files are generated as KEA files).
     :param deleteTmpFiles: Boolean as to whether the intermediate files should be deleted following processing (Default: True - delete files).
     :param initClearSkyRegionDist: The distance in metres from a cloud/shadow object for the initial identification of clear sky regions (Default: 5000)
     :param initClearSkyRegionMinSize: The minimum size (in pixels) of the initial clear sky regions (Default: 3000 pixels)
@@ -169,10 +169,10 @@ def calc_clear_sky_regions(
     .. code:: python
 
         import rsgislib.imagecalibration
-        cloudsImg = "./Outputs/LS8_20160605_lat52lon261_r24p203_clouds.kea"
-        validAreaImg = "./Outputs/LS8_20160605_lat52lon261_r24p203_valid.kea"
-        outputMask = "./Outputs/LS8_20160605_lat52lon261_r24p203_openskyvalid.kea"
-        tmpPath = "./temp"
+        cloudsImg = "Outputs/LS8_20160605_lat52lon261_r24p203_clouds.kea"
+        validAreaImg = "Outputs/LS8_20160605_lat52lon261_r24p203_valid.kea"
+        outputMask = "Outputs/LS8_20160605_lat52lon261_r24p203_openskyvalid.kea"
+        tmpPath = "temp"
         rsgislib.imagecalibration.calc_clear_sky_regions(cloudsImg, validAreaImg, outputMask, 'KEA', tmpPath)
 
     """

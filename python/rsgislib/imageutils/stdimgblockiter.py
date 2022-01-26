@@ -412,13 +412,13 @@ class StdImgBlockIter:
 import tqdm
 
 imgBandInfo = []
-imgBandInfo.append(rsgislib.imageutils.ImageBandInfo(fileName='./S2_UVD_27sept_27700_sub.kea', name='sen2a', bands=[1,2,3,4,5,6,7,8,9,10]))
-imgBandInfo.append(rsgislib.imageutils.ImageBandInfo(fileName='./S2_UVD_27sept_27700_sub_roi1.kea', name='sen2a1', bands=[1,2,3,4,5,6,7,8,9,10]))
-imgBandInfo.append(rsgislib.imageutils.ImageBandInfo(fileName='./S2_UVD_27sept_27700_sub_roi2.kea', name='sen2a2', bands=[1,2,3,4,5,6,7,8,9,10]))
+imgBandInfo.append(rsgislib.imageutils.ImageBandInfo(fileName='S2_UVD_27sept_27700_sub.kea', name='sen2a', bands=[1,2,3,4,5,6,7,8,9,10]))
+imgBandInfo.append(rsgislib.imageutils.ImageBandInfo(fileName='S2_UVD_27sept_27700_sub_roi1.kea', name='sen2a1', bands=[1,2,3,4,5,6,7,8,9,10]))
+imgBandInfo.append(rsgislib.imageutils.ImageBandInfo(fileName='S2_UVD_27sept_27700_sub_roi2.kea', name='sen2a2', bands=[1,2,3,4,5,6,7,8,9,10]))
 
 imgOutInfo = []
-imgOutInfo.append(OutImageInfo(file_name='./S2_UVD_27sept_27700_sub_ndvi.kea', name='sen2a_ndvi', nbands=1, no_data_val=-999, gdalformat='KEA', datatype=rsgislib.TYPE_32FLOAT))
-imgOutInfo.append(OutImageInfo(file_name='./S2_UVD_27sept_27700_sub_ndwi.kea', name='sen2a_ndwi', nbands=1, no_data_val=-999, gdalformat='KEA', datatype=rsgislib.TYPE_32FLOAT))
+imgOutInfo.append(OutImageInfo(file_name='S2_UVD_27sept_27700_sub_ndvi.kea', name='sen2a_ndvi', nbands=1, no_data_val=-999, gdalformat='KEA', datatype=rsgislib.TYPE_32FLOAT))
+imgOutInfo.append(OutImageInfo(file_name='S2_UVD_27sept_27700_sub_ndwi.kea', name='sen2a_ndwi', nbands=1, no_data_val=-999, gdalformat='KEA', datatype=rsgislib.TYPE_32FLOAT))
 
 img_iter = StdImgBlockIter(imgBandInfo, 64)
 img_iter.create_output_imgs(imgOutInfo)

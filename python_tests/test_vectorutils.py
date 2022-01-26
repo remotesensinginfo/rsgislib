@@ -31,8 +31,8 @@ def test_delete_vector_file(tmp_path):
     import rsgislib.vectorutils
     import shutil
 
-    ref_vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
-    cp_vec_file = os.path.join(tmp_path, "./cls_forest_smpls.gpkg")
+    ref_vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
+    cp_vec_file = os.path.join(tmp_path, "cls_forest_smpls.gpkg")
     shutil.copyfile(ref_vec_file, cp_vec_file)
     if not os.path.exists(cp_vec_file):
         raise Exception("Test file is not present")
@@ -74,7 +74,7 @@ def test_check_format_name_shp():
 def test_get_proj_wkt_from_vec_osgb():
     import rsgislib.vectorutils
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
     vec_lyr = "cls_forest_smpls"
     wkt_str = rsgislib.vectorutils.get_proj_wkt_from_vec(vec_file, vec_lyr)
     assert "British National Grid" in wkt_str
@@ -83,7 +83,7 @@ def test_get_proj_wkt_from_vec_osgb():
 def test_get_proj_epsg_from_vec_osgb():
     import rsgislib.vectorutils
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
     vec_lyr = "cls_forest_smpls"
     epsg_code = rsgislib.vectorutils.get_proj_epsg_from_vec(vec_file, vec_lyr)
     assert epsg_code == 27700
@@ -92,7 +92,7 @@ def test_get_proj_epsg_from_vec_osgb():
 def test_get_vec_feat_count():
     import rsgislib.vectorutils
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
     vec_lyr = "cls_forest_smpls"
     n_feats = rsgislib.vectorutils.get_vec_feat_count(vec_file, vec_lyr)
     assert n_feats == 9
@@ -101,10 +101,10 @@ def test_get_vec_feat_count():
 def test_merge_vectors_to_gpkg(tmp_path):
     import rsgislib.vectorutils
 
-    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
-    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
-    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_urban_smpls.gpkg")
-    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_water_smpls.gpkg")
+    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
+    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
+    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "cls_urban_smpls.gpkg")
+    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "cls_water_smpls.gpkg")
 
     in_vec_files = [vec_file_1, vec_file_2, vec_file_3, vec_file_4]
 
@@ -180,10 +180,10 @@ def test_merge_vectors_to_gpkg_ind_lyrs_geom_type_excp(tmp_path):
 def test_merge_to_multi_layer_vec(tmp_path):
     import rsgislib.vectorutils
 
-    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
-    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
-    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_urban_smpls.gpkg")
-    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_water_smpls.gpkg")
+    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
+    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
+    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "cls_urban_smpls.gpkg")
+    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "cls_water_smpls.gpkg")
 
     input_file_lyrs = list()
     input_file_lyrs.append(
@@ -207,7 +207,7 @@ def test_merge_to_multi_layer_vec(tmp_path):
         )
     )
 
-    out_vec_file = os.path.join(tmp_path, "./cls_poly_smpls.gpkg")
+    out_vec_file = os.path.join(tmp_path, "cls_poly_smpls.gpkg")
     rsgislib.vectorutils.merge_to_multi_layer_vec(
         input_file_lyrs, out_vec_file, out_format="GPKG", overwrite=False
     )
@@ -218,10 +218,10 @@ def test_merge_to_multi_layer_vec(tmp_path):
 def test_merge_to_multi_layer_vec_exists(tmp_path):
     import rsgislib.vectorutils
 
-    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
-    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
-    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_urban_smpls.gpkg")
-    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_water_smpls.gpkg")
+    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
+    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
+    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "cls_urban_smpls.gpkg")
+    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "cls_water_smpls.gpkg")
 
     input_file_lyrs = list()
     input_file_lyrs.append(
@@ -245,7 +245,7 @@ def test_merge_to_multi_layer_vec_exists(tmp_path):
         )
     )
 
-    out_vec_file = os.path.join(tmp_path, "./cls_poly_smpls.gpkg")
+    out_vec_file = os.path.join(tmp_path, "cls_poly_smpls.gpkg")
     rsgislib.vectorutils.merge_to_multi_layer_vec(
         input_file_lyrs, out_vec_file, out_format="GPKG", overwrite=False
     )
@@ -268,7 +268,7 @@ def test_get_vec_lyrs_lst():
 def test_get_vec_layer_extent():
     import rsgislib.vectorutils
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
     vec_lyr = "cls_forest_smpls"
     bbox = rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
     assert (
@@ -282,7 +282,7 @@ def test_get_vec_layer_extent():
 def test_get_vec_layer_extent_file_excp():
     import rsgislib.vectorutils
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./err_file.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "err_file.gpkg")
     vec_lyr = "err_lyr"
     with pytest.raises(rsgislib.RSGISPyException):
         rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
@@ -291,7 +291,7 @@ def test_get_vec_layer_extent_file_excp():
 def test_get_vec_layer_extent_lyr_excp():
     import rsgislib.vectorutils
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
     vec_lyr = "err_lyr"
     with pytest.raises(rsgislib.RSGISPyException):
         rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
@@ -301,7 +301,7 @@ def test_split_vec_lyr(tmp_path):
     import rsgislib.vectorutils
     import glob
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
     vec_lyr = "cls_forest_smpls"
 
     rsgislib.vectorutils.split_vec_lyr(
@@ -316,7 +316,7 @@ def test_reproj_vector_layer(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.tools.utils
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
     vec_lyr = "cls_forest_smpls"
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
@@ -341,7 +341,7 @@ def test_reproj_vector_layer(tmp_path):
 def test_reproj_vec_lyr_obj_4326(tmp_path):
     import rsgislib.vectorutils
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
     vec_lyr = "cls_forest_smpls"
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
@@ -359,7 +359,7 @@ def test_reproj_vec_lyr_obj_4326(tmp_path):
 def test_reproj_vec_lyr_obj_32630(tmp_path):
     import rsgislib.vectorutils
 
-    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
+    vec_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
     vec_lyr = "cls_forest_smpls"
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
@@ -380,7 +380,7 @@ def test_get_att_lst_select_feats():
     vec_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
     vec_lyr = "sample_pts"
 
-    vec_sel_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
+    vec_sel_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
     vec_sel_lyr = "cls_grass_smpls"
 
     att_names = ["re_b4", "re_b5"]
@@ -399,7 +399,7 @@ def test_get_att_lst_select_feats_lyr_objs():
     vec_lyr = "sample_pts"
     vec_obj_ds, vec_lyr_obj = rsgislib.vectorutils.open_gdal_vec_lyr(vec_file, vec_lyr)
 
-    vec_sel_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
+    vec_sel_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
     vec_sel_lyr = "cls_grass_smpls"
     vec_sel_obj_ds, vec_lyr_sel_obj = rsgislib.vectorutils.open_gdal_vec_lyr(
         vec_sel_file, vec_sel_lyr
@@ -456,7 +456,7 @@ def test_select_intersect_feats(tmp_path):
     vec_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
     vec_lyr = "sample_pts"
 
-    vec_roi_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
+    vec_roi_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
     vec_roi_lyr = "cls_grass_smpls"
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
@@ -481,7 +481,7 @@ def test_export_spatial_select_feats(tmp_path):
     vec_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
     vec_lyr = "sample_pts"
 
-    vec_roi_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
+    vec_roi_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
     vec_roi_lyr = "cls_grass_smpls"
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
@@ -533,7 +533,7 @@ def test_subset_veclyr_to_featboxs(tmp_path):
     vec_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
     vec_lyr = "sample_pts"
 
-    vec_roi_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
+    vec_roi_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
     vec_roi_lyr = "cls_grass_smpls"
 
     out_file_base = os.path.join(tmp_path, "out_vec")
@@ -825,7 +825,7 @@ def test_perform_spatial_join_empty(tmp_path):
 def test_perform_spatial_join(tmp_path):
     import rsgislib.vectorutils
 
-    vec_join_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
+    vec_join_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
     vec_join_lyr = "cls_grass_smpls"
 
     vec_base_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
@@ -900,7 +900,7 @@ def test_spatial_select(tmp_path):
     vec_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
     vec_lyr = "sample_pts"
 
-    vec_roi_file = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
+    vec_roi_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
     vec_roi_lyr = "cls_grass_smpls"
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
@@ -1047,10 +1047,10 @@ def test_subset_by_attribute_start(tmp_path):
 def test_merge_vector_files(tmp_path):
     import rsgislib.vectorutils
 
-    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
-    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
-    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_urban_smpls.gpkg")
-    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_water_smpls.gpkg")
+    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
+    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
+    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "cls_urban_smpls.gpkg")
+    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "cls_water_smpls.gpkg")
 
     in_vec_files = [vec_file_1, vec_file_2, vec_file_3, vec_file_4]
 
@@ -1066,10 +1066,10 @@ def test_merge_vector_files(tmp_path):
 def test_merge_vector_layers(tmp_path):
     import rsgislib.vectorutils
 
-    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_forest_smpls.gpkg")
-    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_grass_smpls.gpkg")
-    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_urban_smpls.gpkg")
-    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "./cls_water_smpls.gpkg")
+    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "cls_forest_smpls.gpkg")
+    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
+    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "cls_urban_smpls.gpkg")
+    vec_file_4 = os.path.join(VECTORUTILS_DATA_DIR, "cls_water_smpls.gpkg")
 
     in_vec_files = list()
     in_vec_files.append({"file": vec_file_1, "layer": "cls_forest_smpls"})
@@ -1109,9 +1109,9 @@ def test_geopd_check_polys_wgs84_bounds_geometry():
 def test_merge_utm_vecs_wgs84(tmp_path):
     import rsgislib.vectorutils
 
-    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "./utm_1n_polys.geojson")
-    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "./utm_30n_polys.geojson")
-    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "./utm_60s_polys.geojson")
+    vec_file_1 = os.path.join(VECTORUTILS_DATA_DIR, "utm_1n_polys.geojson")
+    vec_file_2 = os.path.join(VECTORUTILS_DATA_DIR, "utm_30n_polys.geojson")
+    vec_file_3 = os.path.join(VECTORUTILS_DATA_DIR, "utm_60s_polys.geojson")
     in_vec_files = [vec_file_1, vec_file_2, vec_file_3]
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")

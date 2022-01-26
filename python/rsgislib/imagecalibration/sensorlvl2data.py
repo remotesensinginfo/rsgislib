@@ -60,7 +60,7 @@ def create_stacked_ls8_cl2_lv2_img(
     .. code:: python
 
         import rsgislib.imagecalibration.sensorlvl2data
-        rsgislib.imagecalibration.sensorlvl2data.create_stacked_ls8_cl2_lv2_img("LC08_L2SP_135046_20210319_20210328_02_T1.tar", "./outputs", "./tmp", gdalformat="GTIFF")
+        rsgislib.imagecalibration.sensorlvl2data.create_stacked_ls8_cl2_lv2_img("LC08_L2SP_135046_20210319_20210328_02_T1.tar", "outputs", "tmp", gdalformat="GTIFF")
 
     """
 

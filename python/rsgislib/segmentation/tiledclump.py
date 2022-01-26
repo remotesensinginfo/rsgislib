@@ -50,17 +50,25 @@ def perform_clumping_single_thread(
     input_img, clumps_img, tmp_dir="tmp", width=2000, height=2000, gdalformat="KEA"
 ):
     """
-    Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
+    Clump the input image using a tiled processing chain allowing large images to
+    be clumped more quickly.
 
     :param input_img: the input image to be clumped.
     :param clumps_img: the output clumped image.
-    :param tmp_dir: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-    :param width: int for width of the image tiles used for processing (Default = 2000).
-    :param height: int for height of the image tiles used for processing (Default = 2000).
-    :param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+    :param tmp_dir: the temporary directory where intermediate files will be
+                    written (default is 'tmp'). Directory will be created and
+                    deleted if does not exist.
+    :param width: int for width of the image tiles used for
+                  processing (Default = 2000).
+    :param height: int for height of the image tiles used for
+                   processing (Default = 2000).
+    :param gdalformat: string with the GDAL image format for the output image
+                       (Default = KEA). NOTE. KEA is used as intermediate format
+                       internally and therefore needs to be available.
 
     """
     import rsgislib.tools.utils
+    import rsgislib.tools.filetools
 
     createdTmp = False
     if not os.path.exists(tmp_dir):
@@ -111,7 +119,7 @@ def perform_clumping_single_thread(
 
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
-    os.remove(initMergedClumps)
+    rsgislib.tools.filetools.delete_file_silent(initMergedClumps)
     if createdTmp:
         shutil.rmtree(tmp_dir)
 
@@ -133,18 +141,27 @@ def perform_clumping_multi_process(
     n_cores=-1,
 ):
     """
-    Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
+    Clump the input image using a tiled processing chain allowing large images
+    to be clumped more quickly.
 
     :param input_img: the input image to be clumped.
     :param clumps_img: the output clumped image.
-    :param tmp_dir: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-    :param width: int for width of the image tiles used for processing (Default = 2000).
-    :param height: int for height of the image tiles used for processing (Default = 2000).
-    :param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
-    :param n_cores: is an int specifying the number of cores to be used for clumping processing.
+    :param tmp_dir: the temporary directory where intermediate files will be
+                    written (default is 'tmp'). Directory will be created and
+                    deleted if does not exist.
+    :param width: int for width of the image tiles used for
+                  processing (Default = 2000).
+    :param height: int for height of the image tiles used for
+                   processing (Default = 2000).
+    :param gdalformat: string with the GDAL image format for the output image
+                       (Default = KEA). NOTE. KEA is used as intermediate format
+                       internally and therefore needs to be available.
+    :param n_cores: is an int specifying the number of cores to be used for
+                    clumping processing.
 
     """
     import rsgislib.tools.utils
+    import rsgislib.tools.filetools
 
     createdTmp = False
     if not os.path.exists(tmp_dir):
@@ -202,7 +219,7 @@ def perform_clumping_multi_process(
 
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
-    os.remove(initMergedClumps)
+    rsgislib.tools.filetools.delete_file_silent(initMergedClumps)
     if createdTmp:
         shutil.rmtree(tmp_dir)
 
@@ -223,18 +240,27 @@ def perform_union_clumping_single_thread(
     gdalformat="KEA",
 ):
     """
-    Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
+    Clump and union with the reference image the input image using a tiled processing
+    chain allowing large images to be clumped more quickly.
 
     :param input_img: the input image to be clumped.
-    :param in_ref_img: the reference image which the union is undertaken with (typically an existing classification)
+    :param in_ref_img: the reference image which the union is undertaken with
+                       (typically an existing classification)
     :param clumps_img: the output clumped image.
-    :param tmp_dir: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-    :param width: int for width of the image tiles used for processing (Default = 2000).
-    :param height: int for height of the image tiles used for processing (Default = 2000).
-    :param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+    :param tmp_dir: the temporary directory where intermediate files will be written
+                    (default is 'tmp'). Directory will be created and deleted if
+                    does not exist.
+    :param width: int for width of the image tiles used for
+                  processing (Default = 2000).
+    :param height: int for height of the image tiles used for
+                   processing (Default = 2000).
+    :param gdalformat: string with the GDAL image format for the output image
+                       (Default = KEA). NOTE. KEA is used as intermediate format
+                       internally and therefore needs to be available.
 
     """
     import rsgislib.tools.utils
+    import rsgislib.tools.filetools
 
     createdTmp = False
     if not os.path.exists(tmp_dir):
@@ -285,14 +311,15 @@ def perform_union_clumping_single_thread(
 
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
-    os.remove(initMergedClumps)
+    rsgislib.tools.filetools.delete_file_silent(initMergedClumps)
     if createdTmp:
         shutil.rmtree(tmp_dir)
 
 
 def _union_clump_img_func(imgs):
     """
-    Union Clump an image with values provides as an array for use within a multiprocessing Pool
+    Union Clump an image with values provides as an array for use
+    within a multiprocessing Pool
     """
     segmentation.union_of_clumps([imgs[0], imgs[1]], imgs[2], "KEA", 0, True)
 
@@ -308,19 +335,29 @@ def perform_union_clumping_multi_process(
     n_cores=-1,
 ):
     """
-    Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
+    Clump and union with the reference image the input image using a tiled
+    processing chain allowing large images to be clumped more quickly.
 
     :param input_img: the input image to be clumped.
-    :param in_ref_img: the reference image which the union is undertaken with (typically an existing classification)
+    :param in_ref_img: the reference image which the union is undertaken
+                       with (typically an existing classification)
     :param clumps_img: the output clumped image.
-    :param tmp_dir: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-    :param width: int for width of the image tiles used for processing (Default = 2000).
-    :param height: int for height of the image tiles used for processing (Default = 2000).
-    :param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
-    :param n_cores: is an int specifying the number of cores to be used for clumping processing.
+    :param tmp_dir: the temporary directory where intermediate files will be
+                    written (default is 'tmp'). Directory will be created and
+                    deleted if does not exist.
+    :param width: int for width of the image tiles used for
+                  processing (Default = 2000).
+    :param height: int for height of the image tiles used for
+                   processing (Default = 2000).
+    :param gdalformat: string with the GDAL image format for the output image
+                       (Default = KEA). NOTE. KEA is used as intermediate format
+                       internally and therefore needs to be available.
+    :param n_cores: is an int specifying the number of cores to be used for
+                    clumping processing.
 
     """
     import rsgislib.tools.utils
+    import rsgislib.tools.filetools
 
     createdTmp = False
     if not os.path.exists(tmp_dir):
@@ -378,6 +415,6 @@ def perform_union_clumping_multi_process(
 
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
-    os.remove(initMergedClumps)
+    rsgislib.tools.filetools.delete_file_silent(initMergedClumps)
     if createdTmp:
         shutil.rmtree(tmp_dir)

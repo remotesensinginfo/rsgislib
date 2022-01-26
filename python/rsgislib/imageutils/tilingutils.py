@@ -66,6 +66,7 @@ from rsgislib import segmentation
 from rsgislib import rastergis
 from rsgislib import imageutils
 from rsgislib import vectorutils
+import rsgislib.tools.filetools
 
 haveGDALPy = True
 try:
@@ -146,7 +147,7 @@ def create_min_data_tiles(
         segmentation.dropSelectedClumps(
             tileClumpsImage, tileClumpsImageDropClumps, "KEA", "Selected"
         )
-        os.remove(tileClumpsImage)
+        rsgislib.tools.filetools.delete_file_silent(tileClumpsImage)
         tileClumpsImage = tileClumpsImageDropClumps
 
     rastergis.populateRATWithPropValidPxls(
@@ -190,7 +191,7 @@ def create_min_data_tiles(
     if not tmpPresent:
         shutil.rmtree(tmpdir, ignore_errors=True)
     else:
-        os.remove(tileClumpsImage)
+        rsgislib.tools.filetools.delete_file_silent(tileClumpsImage)
 
 
 def create_tile_mask_images_from_shp(

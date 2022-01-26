@@ -78,7 +78,7 @@ def create_img_extent_lut(
         import rsgislib.imageutils.imagelut
         imgList = glob.glob('/Users/pete/Temp/GabonLandsat/Hansen*.kea')
         rsgislib.imageutils.imagelut.create_img_extent_lut(imgList,
-                                                          './ImgExtents.gpkg',
+                                                          'ImgExtents.gpkg',
                                                           'HansenImgExtents', 'GPKG')
 
     """

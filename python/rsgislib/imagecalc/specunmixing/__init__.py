@@ -1055,7 +1055,7 @@ def summarise_multi_endmember_linear_unmixing(
     in_unmixed_datasets,
     out_unmix_img,
     out_ref_img,
-    tmp_dir="./tmp",
+    tmp_dir="tmp",
     gdalformat="KEA",
     calc_stats=True,
 ):

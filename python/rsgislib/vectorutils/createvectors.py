@@ -224,7 +224,7 @@ def extract_image_footprint(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
-    tmp_dir: str = "./tmp",
+    tmp_dir: str = "tmp",
     reproj_to: str = None,
     no_data_val=None,
 ):

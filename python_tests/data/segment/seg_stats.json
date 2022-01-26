@@ -9,6 +9,6 @@
         "X": 261715.59483340546,
         "Y": 280993.7167059921
     },
-    "KCENTRES": "./kmeans_centres.gmtxt",
-    "STRETCHSTATS": "./img_stch_stats.txt"
+    "KCENTRES": "kmeans_centres.gmtxt",
+    "STRETCHSTATS": "img_stch_stats.txt"
 }

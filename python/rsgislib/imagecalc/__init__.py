@@ -275,7 +275,7 @@ def calc_dist_to_img_vals_tiled(
     out_no_data_val=None,
     gdalformat="KEA",
     unit_geo=True,
-    tmp_dir="./tmp",
+    tmp_dir="tmp",
     tile_size=2000,
     n_cores=-1,
 ):
@@ -302,7 +302,7 @@ def calc_dist_to_img_vals_tiled(
                      False is in Pixels (Default = True).
     :param tmp_dir: is a directory to be used for storing the image tiles and other
                     temporary files - if not directory does not exist it will be
-                    created and deleted on completion (Default: ./tmp).
+                    created and deleted on completion (Default: tmp).
     :param tile_size: is an int specifying in pixels the size of the image tiles
                       used for processing (Default: 2000)
     :param n_cores: is the number of processing cores which are available to be used
@@ -650,7 +650,7 @@ def perform_image_mnf(
     n_comps=None,
     pxl_n_sample=100,
     in_img_no_data=None,
-    tmp_dir="./tmp",
+    tmp_dir="tmp",
     gdalformat="KEA",
     datatype=rsgislib.TYPE_32FLOAT,
     calc_stats=True,
@@ -748,9 +748,9 @@ def perform_image_mnf(
     if created_tmp_dir:
         shutil.rmtree(tmp_dir)
     else:
-        os.remove(valid_msk_img)
-        os.remove(whiten_img)
-        os.remove(eigenVecFile)
+        rsgislib.tools.filetools.delete_file_silent(valid_msk_img)
+        rsgislib.tools.filetools.delete_file_silent(whiten_img)
+        rsgislib.tools.filetools.delete_file_silent(eigenVecFile)
 
     return varExplain
 
