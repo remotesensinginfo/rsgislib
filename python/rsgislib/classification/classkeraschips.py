@@ -52,7 +52,7 @@ from rios.imagewriter import ImageWriter
 from rios import rat
 
 
-def train_keras_chips_pixel_classifer(
+def train_keras_chips_pixel_classifier(
     cls_mdl, cls_info_dict, out_mdl_file=None, train_epochs=5, train_batch_size=32
 ):
     """
@@ -180,12 +180,12 @@ def apply_keras_chips_pixel_classifier(
     class_clr_names=True,
 ):
     """
-    This function applies a trained single pixel keras model to an image. The function train_keras_pixel_classifer
+    This function applies a trained single pixel keras model to an image. The function train_keras_pixel_classifier
     can be used to train such as model. The output image will contain the hard membership of the predicted class.
 
 
     :param class_train_info: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
-                           objects which will be used to train the classifier (i.e., train_keras_pixel_classifer()),
+                           objects which will be used to train the classifier (i.e., train_keras_pixel_classifier()),
                            provide pixel value id and RGB class values.
     :param keras_cls_mdl: a trained keras model object, with a input dimensions equivlent to the number of image
                           bands specified in the imgFileInfo input and output layer which provides an output array
@@ -338,7 +338,7 @@ def apply_keras_chips_pixel_classifier(
         ratDataset = None
 
 
-def train_keras_chips_ref_classifer(
+def train_keras_chips_ref_classifier(
     cls_mdl,
     train_data_file,
     valid_data_file,

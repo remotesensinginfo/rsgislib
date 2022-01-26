@@ -1,7 +1,7 @@
 RSGISLib Keras Pixel Classification
 =====================================
 
-While per-pixel neural network based classifers can be created using the scikit-learn library the `Keras <https://keras.io>`_ library provide many more options and flexibility for the creation of a neural network.
+While per-pixel neural network based classifiers can be created using the scikit-learn library the `Keras <https://keras.io>`_ library provide many more options and flexibility for the creation of a neural network.
 
 .. note:: While these functions have been provided for completeness. Results from `Kaggle <https://www.kaggle.com>`_ competitions would indicate that for these type of problems that classifiers such as Gradient Boosted Decision Tree (i.e., LightGBM) will probably produce the best results. However, deep learning neural networks will probably produce the best classification for images where a window/chip of data are provided. Although, these image chip based classifiers are considerably more computational complex.
 
@@ -107,7 +107,7 @@ Training the neural network::
 
     out_mdl_file = 'basic_pxl_mdl.h5'
 
-    rsgislib.classification.classkeraspxl.train_keras_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file)
+    rsgislib.classification.classkeraspxl.train_keras_pixel_classifier(cls_mdl, clsinfodict, out_mdl_file)
 
 The following code allows you to re-opening the model you have trained, it would be common for the training phase to take a long period of time (hours, even days!!) so you will likely have separate training and application scripts::
 
@@ -123,7 +123,7 @@ Apply the classifier to scene::
 Training Functions
 --------------------
 
-.. autofunction:: rsgislib.classification.classkeraspxl.train_keras_pixel_classifer
+.. autofunction:: rsgislib.classification.classkeraspxl.train_keras_pixel_classifier
 
 Classify Functions
 -------------------

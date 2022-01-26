@@ -49,7 +49,7 @@ from rios import cuiprogress
 from rios import rat
 
 
-def train_keras_pixel_classifer(
+def train_keras_pixel_classifier(
     cls_mdl, cls_info_dict, out_mdl_file=None, train_epochs=5, train_batch_size=32
 ):
     """
@@ -174,11 +174,11 @@ def apply_keras_pixel_classifier(
     class_clr_names=True,
 ):
     """
-    This function applies a trained single pixel keras model to an image. The function train_keras_pixel_classifer
+    This function applies a trained single pixel keras model to an image. The function train_keras_pixel_classifier
     can be used to train such as model. The output image will contain the hard membership of the predicted class.
 
     :param class_train_info: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
-                           objects which will be used to train the classifier (i.e., train_keras_pixel_classifer()),
+                           objects which will be used to train the classifier (i.e., train_keras_pixel_classifier()),
                            provide pixel value id and RGB class values.
     :param keras_cls_mdl: a trained keras model object, with a input dimensions equivlent to the number of image
                           bands specified in the imgFileInfo input and output layer which provides an output array
@@ -204,7 +204,9 @@ def apply_keras_pixel_classifier(
             n_pxls = inputs.imageMask.shape[1] * inputs.imageMask.shape[2]
             outClassIdVals = outClassIdVals.flatten()
             imgMaskVals = inputs.imageMask.flatten()
-            classVars = numpy.zeros((n_pxls, otherargs.numClassVars), dtype=numpy.float)
+            classVars = numpy.zeros(
+                (n_pxls, otherargs.numClassVars), dtype=numpy.float32
+            )
             # Array index which can be used to populate the output array following masking etc.
             ID = numpy.arange(imgMaskVals.shape[0])
             classVarsIdx = 0

@@ -436,6 +436,27 @@ def get_numpy_char_codes_datatype(rsgislib_datatype: int) -> str:
     return numpy_dt
 
 
+def is_notebook():
+    """
+    A function to find if running within a python notebook. If
+    running within a jupyter notebook then can use a different
+    progress bar.
+
+    :return: boolean: True: within notebook
+
+    """
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True   # Jupyter notebook or qtconsole
+        elif shell == 'TerminalInteractiveShell':
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False      # Probably standard Python interpreter
+
+
 class RSGISTime:
     """
     Class to calculate run time for a function, format and print out.
@@ -527,8 +548,11 @@ class TQDMProgressBar:
 
     def setTotalSteps(self, steps: int):
         import tqdm
-
-        self.pbar = tqdm.tqdm(total=steps)
+        if is_notebook():
+            import tqdm.notebook
+            self.pbar = tqdm.notebook.tqdm(total=steps)
+        else:
+            self.pbar = tqdm.tqdm(total=steps)
         self.lprogress = 0
 
     def setProgress(self, progress: int):
@@ -540,7 +564,11 @@ class TQDMProgressBar:
         self.pbar.close()
         import tqdm
 
-        self.pbar = tqdm.tqdm(total=100)
+        if is_notebook():
+            import tqdm.notebook
+            self.pbar = tqdm.notebook.tqdm(total=100)
+        else:
+            self.pbar = tqdm.tqdm(total=100)
         self.lprogress = 0
 
     def setLabelText(self, text: str):

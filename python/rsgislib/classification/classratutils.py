@@ -147,7 +147,7 @@ def extract_rat_col_data(
     :param cols: a list of the columns to be exported. Note, they will be stored in the
                  HDF5 file in the order specified here and therefore this order is
                  important and needs to be maintained when this is used going forward
-                 (e.g., when applying a classifer trained using this data.
+                 (e.g., when applying a classifier trained using this data.
     :param sel_col: The column within the RAT specifying which rows will be exported.
     :param sel_col_val: The value in the sel_col which indicated which rows are to be
                         exported.

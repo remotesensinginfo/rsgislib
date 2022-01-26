@@ -106,7 +106,7 @@ The classification model can then be trained, note this can take a lot of time (
 
     out_mdl_file = 'basic_chip_mdl.h5'
 
-    rsgislib.classification.classkeraschips.train_keras_chips_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file)
+    rsgislib.classification.classkeraschips.train_keras_chips_pixel_classifier(cls_mdl, clsinfodict, out_mdl_file)
 
 **Apply Classifier**
 
@@ -125,13 +125,13 @@ Apply the classifier to scene::
 Training Functions
 -------------------
 
-.. autofunction:: rsgislib.classification.classkeraschips.train_keras_chips_pixel_classifer
+.. autofunction:: rsgislib.classification.classkeraschips.train_keras_chips_pixel_classifier
 
 Classify Functions
 -------------------
 
 .. autofunction:: rsgislib.classification.classkeraschips.apply_keras_chips_pixel_classifier
-.. autofunction:: rsgislib.classification.classkeraschips.train_keras_chips_ref_classifer
+.. autofunction:: rsgislib.classification.classkeraschips.train_keras_chips_ref_classifier
 
 
 

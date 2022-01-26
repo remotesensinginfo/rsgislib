@@ -1,6 +1,6 @@
 import os
-import pytest
 from shutil import copy2
+import pytest
 
 H5PY_NOT_AVAIL = False
 try:
@@ -22,7 +22,7 @@ CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
     (H5PY_NOT_AVAIL or XGBOOST_NOT_AVAIL),
     reason="h5py or xgboost dependencies not available",
 )
-def test_optimise_xgboost_binary_classifer(tmp_path):
+def test_optimise_xgboost_binary_classifier(tmp_path):
     import rsgislib.classification.classxgboost
 
     cls1_train_file = os.path.join(
@@ -39,7 +39,7 @@ def test_optimise_xgboost_binary_classifer(tmp_path):
     )
 
     out_params_file = os.path.join(tmp_path, "out_params_file.json")
-    rsgislib.classification.classxgboost.optimise_xgboost_binary_classifer(
+    rsgislib.classification.classxgboost.optimise_xgboost_binary_classifier(
         out_params_file,
         cls1_train_file,
         cls1_valid_file,
@@ -57,7 +57,7 @@ def test_optimise_xgboost_binary_classifer(tmp_path):
     (H5PY_NOT_AVAIL or XGBOOST_NOT_AVAIL),
     reason="h5py or xgboost dependencies not available",
 )
-def test_train_xgboost_binary_classifer(tmp_path):
+def test_train_xgboost_binary_classifier(tmp_path):
     import rsgislib.classification.classxgboost
 
     cls1_train_file = os.path.join(
@@ -81,7 +81,7 @@ def test_train_xgboost_binary_classifer(tmp_path):
 
     cls_params_file = os.path.join(CLASSIFICATION_DATA_DIR, "gxb_params_file.json")
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
-    rsgislib.classification.classxgboost.train_xgboost_binary_classifer(
+    rsgislib.classification.classxgboost.train_xgboost_binary_classifier(
         out_mdl_file,
         cls_params_file,
         cls1_train_file,
@@ -101,7 +101,7 @@ def test_train_xgboost_binary_classifer(tmp_path):
     (H5PY_NOT_AVAIL or XGBOOST_NOT_AVAIL),
     reason="h5py or xgboost dependencies not available",
 )
-def test_train_opt_xgboost_binary_classifer(tmp_path):
+def test_train_opt_xgboost_binary_classifier(tmp_path):
     import rsgislib.classification.classxgboost
 
     cls1_train_file = os.path.join(
@@ -124,7 +124,7 @@ def test_train_opt_xgboost_binary_classifer(tmp_path):
     )
 
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
-    rsgislib.classification.classxgboost.train_opt_xgboost_binary_classifer(
+    rsgislib.classification.classxgboost.train_opt_xgboost_binary_classifier(
         out_mdl_file,
         cls1_train_file,
         cls1_valid_file,
@@ -169,7 +169,7 @@ def test_apply_xgboost_binary_classifier(tmp_path):
     )
 
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
-    rsgislib.classification.classxgboost.train_opt_xgboost_binary_classifer(
+    rsgislib.classification.classxgboost.train_opt_xgboost_binary_classifier(
         out_mdl_file,
         cls1_train_file,
         cls1_valid_file,
@@ -212,7 +212,7 @@ def test_apply_xgboost_binary_classifier(tmp_path):
     (H5PY_NOT_AVAIL or XGBOOST_NOT_AVAIL),
     reason="h5py or xgboost dependencies not available",
 )
-def test_optimise_xgboost_multiclass_classifer(tmp_path):
+def test_optimise_xgboost_multiclass_classifier(tmp_path):
     import rsgislib.classification.classxgboost
 
     cls_info_dict = dict()
@@ -282,7 +282,7 @@ def test_optimise_xgboost_multiclass_classifer(tmp_path):
     )
 
     out_params_file = os.path.join(tmp_path, "out_params_file.json")
-    rsgislib.classification.classxgboost.optimise_xgboost_multiclass_classifer(
+    rsgislib.classification.classxgboost.optimise_xgboost_multiclass_classifier(
         out_params_file,
         cls_info_dict,
         n_threads=1,
@@ -298,7 +298,7 @@ def test_optimise_xgboost_multiclass_classifer(tmp_path):
     (H5PY_NOT_AVAIL or XGBOOST_NOT_AVAIL),
     reason="h5py or xgboost dependencies not available",
 )
-def test_train_xgboost_multiclass_classifer(tmp_path):
+def test_train_xgboost_multiclass_classifier(tmp_path):
     import rsgislib.classification.classxgboost
 
     cls_info_dict = dict()
@@ -371,7 +371,7 @@ def test_train_xgboost_multiclass_classifer(tmp_path):
         CLASSIFICATION_DATA_DIR, "gxb_mulcls_params_file.json"
     )
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
-    rsgislib.classification.classxgboost.train_xgboost_multiclass_classifer(
+    rsgislib.classification.classxgboost.train_xgboost_multiclass_classifier(
         out_mdl_file, cls_params_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
     )
 
@@ -382,7 +382,7 @@ def test_train_xgboost_multiclass_classifer(tmp_path):
     (H5PY_NOT_AVAIL or XGBOOST_NOT_AVAIL),
     reason="h5py or xgboost dependencies not available",
 )
-def test_train_opt_xgboost_multiclass_classifer(tmp_path):
+def test_train_opt_xgboost_multiclass_classifier(tmp_path):
     import rsgislib.classification.classxgboost
 
     cls_info_dict = dict()
@@ -452,7 +452,7 @@ def test_train_opt_xgboost_multiclass_classifer(tmp_path):
     )
 
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
-    rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifer(
+    rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifier(
         out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
     )
 
@@ -534,7 +534,7 @@ def test_apply_xgboost_multiclass_classifier(tmp_path):
     )
 
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
-    rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifer(
+    rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifier(
         out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
     )
 
@@ -643,7 +643,7 @@ def test_apply_xgboost_multiclass_classifier_rat(tmp_path):
     )
 
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
-    rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifer(
+    rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifier(
         out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
     )
 

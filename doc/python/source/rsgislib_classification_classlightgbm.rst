@@ -79,7 +79,7 @@ To train a single binary classifier you need to use the following function::
     import rsgislib.classification.classlightgbm
 
     out_mdl_file = 'model_file.txt'
-    rsgislib.classification.classlightgbm.train_lightgbm_binary_classifer(out_mdl_file, mangroves_sample_h5_train, mangroves_sample_h5_valid, mangroves_sample_h5_test, other_sample_h5_train, other_sample_h5_valid, other_sample_h5_test)
+    rsgislib.classification.classlightgbm.train_lightgbm_binary_classifier(out_mdl_file, mangroves_sample_h5_train, mangroves_sample_h5_valid, mangroves_sample_h5_test, other_sample_h5_train, other_sample_h5_valid, other_sample_h5_test)
 
 To apply the binary classifier use the following function::
 
@@ -104,7 +104,7 @@ To train a multi-class classifier you need to use the following function::
     # Note. Water samples not shown above but would be extracted and generated using the same functions.
     clsinfodict['Water'] = rsgislib.classification.ClassInfoObj(id=2, out_id=3, trainfileH5=water_sample_h5_train, testfileH5=water_sample_h5_test, validfileH5=water_sample_h5_valid,, red=0, green=0, blue=255)
 
-    rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict)
+    rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier(out_mdl_file, clsinfodict)
 
 To apply the multi-class classifier use the following function::
 
@@ -119,10 +119,10 @@ To apply the multi-class classifier use the following function::
 Training Functions
 -------------------
 
-.. autofunction:: rsgislib.classification.classlightgbm.optimise_lightgbm_binary_classifer
-.. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_binary_classifer
-.. autofunction:: rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifer
-.. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifer
+.. autofunction:: rsgislib.classification.classlightgbm.optimise_lightgbm_binary_classifier
+.. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_binary_classifier
+.. autofunction:: rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifier
+.. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier
 
 Classify Functions
 -------------------

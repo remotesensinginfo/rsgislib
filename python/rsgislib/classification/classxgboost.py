@@ -65,7 +65,7 @@ import gc
 import json
 
 
-def optimise_xgboost_binary_classifer(
+def optimise_xgboost_binary_classifier(
     out_params_file,
     cls1_train_file,
     cls1_valid_file,
@@ -222,7 +222,7 @@ def optimise_xgboost_binary_classifer(
         )
 
 
-def train_xgboost_binary_classifer(
+def train_xgboost_binary_classifier(
     out_mdl_file,
     cls_params_file,
     cls1_train_file,
@@ -362,7 +362,7 @@ def train_xgboost_binary_classifer(
     print("Testing Accuracy: {}".format(test_acc))
 
 
-def train_opt_xgboost_binary_classifer(
+def train_opt_xgboost_binary_classifier(
     out_mdl_file,
     cls1_train_file,
     cls1_valid_file,
@@ -601,7 +601,7 @@ def apply_xgboost_binary_classifier(
     n_threads=1,
 ):
     """
-    This function applies a trained binary (i.e., two classes) xgboost model. The function train_xgboost_binary_classifer
+    This function applies a trained binary (i.e., two classes) xgboost model. The function train_xgboost_binary_classifier
     can be used to train such as model. The output image will contain the probability of membership to the class of
     interest. You will need to threshold this image to get a final hard classification. Alternative, a hard class output
     image and threshold can be applied to this image.
@@ -632,7 +632,7 @@ def apply_xgboost_binary_classifier(
             outClassVals = outClassVals.flatten()
             imgMaskVals = inputs.imageMask.flatten()
             classVars = numpy.zeros(
-                (outClassVals.shape[0], otherargs.numClassVars), dtype=numpy.float
+                (outClassVals.shape[0], otherargs.numClassVars), dtype=numpy.float32
             )
             # Array index which can be used to populate the output array following masking etc.
             ID = numpy.arange(imgMaskVals.shape[0])
@@ -707,7 +707,7 @@ def apply_xgboost_binary_classifier(
             )
 
 
-def optimise_xgboost_multiclass_classifer(
+def optimise_xgboost_multiclass_classifier(
     out_params_file,
     cls_info_dict,
     n_threads=1,
@@ -890,7 +890,7 @@ def optimise_xgboost_multiclass_classifer(
         )
 
 
-def train_xgboost_multiclass_classifer(
+def train_xgboost_multiclass_classifier(
     out_mdl_file, cls_params_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
 ):
     """
@@ -988,7 +988,7 @@ def train_xgboost_multiclass_classifer(
     if n_classes != cls_params["num_class"]:
         raise rsgislib.RSGISPyException(
             "The number of classes used to optimise the "
-            "classifer and the number for training are different!"
+            "classifier and the number for training are different!"
         )
 
     print("Start Training Find Classifier")
@@ -1030,7 +1030,7 @@ def train_xgboost_multiclass_classifer(
     print("Testing Accuracy: {}".format(test_acc_scr))
 
 
-def train_opt_xgboost_multiclass_classifer(
+def train_opt_xgboost_multiclass_classifier(
     out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
 ):
     """
@@ -1231,13 +1231,13 @@ def apply_xgboost_multiclass_classifier(
     n_threads=1,
 ):
     """
-    This function applies a trained multiple classes xgboost model. The function train_xgboost_multiclass_classifer
+    This function applies a trained multiple classes xgboost model. The function train_xgboost_multiclass_classifier
     can be used to train such as model. The output image will contain the probability of membership to the class of
     interest. You will need to threshold this image to get a final hard classification. Alternative, a hard class
     output image and threshold can be applied to this image.
 
     :param class_train_info: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
-                           objects which will be used to train the classifier (i.e., train_xgboost_multiclass_classifer()),
+                           objects which will be used to train the classifier (i.e., train_xgboost_multiclass_classifier()),
                            provide pixel value id and RGB class values.
     :param model_file: a trained xgboost multiclass model which can be loaded with lgb.Booster(model_file=model_file).
     :param in_mask_img: is an image file providing a mask to specify where should be classified. Simplest mask is all the
@@ -1263,7 +1263,9 @@ def apply_xgboost_multiclass_classifier(
             n_pxls = inputs.imageMask.shape[1] * inputs.imageMask.shape[2]
             outClassIdVals = outClassIdVals.flatten()
             imgMaskVals = inputs.imageMask.flatten()
-            classVars = numpy.zeros((n_pxls, otherargs.numClassVars), dtype=numpy.float)
+            classVars = numpy.zeros(
+                (n_pxls, otherargs.numClassVars), dtype=numpy.float32
+            )
             # Array index which can be used to populate the output array following masking etc.
             ID = numpy.arange(imgMaskVals.shape[0])
             classVarsIdx = 0
@@ -1385,7 +1387,7 @@ def apply_xgboost_multiclass_classifier_rat(
     :param class_train_info: dict (where the key is the class name) of
                              rsgislib.classification.ClassInfoObj objects which will be
                              used to train the classifier (i.e.,
-                             train_xgboost_multiclass_classifer()), provide pixel value
+                             train_xgboost_multiclass_classifier()), provide pixel value
                              id and RGB class values.
     :param model_file: a trained xgboost multiclass model which can be loaded with lgb.Booster(model_file=model_file).
     :param out_col_int: is the output column name for the int class representation (Default: 'OutClass')

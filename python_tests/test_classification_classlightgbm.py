@@ -21,7 +21,7 @@ CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
     (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
     reason="h5py or lightgbm dependencies not available",
 )
-def test_optimise_lightgbm_binary_classifer(tmp_path):
+def test_optimise_lightgbm_binary_classifier(tmp_path):
     import rsgislib.classification.classlightgbm
 
     cls1_train_file = os.path.join(
@@ -38,7 +38,7 @@ def test_optimise_lightgbm_binary_classifer(tmp_path):
     )
 
     out_params_file = os.path.join(tmp_path, "out_params_file.json")
-    rsgislib.classification.classlightgbm.optimise_lightgbm_binary_classifer(
+    rsgislib.classification.classlightgbm.optimise_lightgbm_binary_classifier(
         out_params_file,
         cls1_train_file,
         cls1_valid_file,
@@ -56,7 +56,7 @@ def test_optimise_lightgbm_binary_classifer(tmp_path):
     (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
     reason="h5py or lightgbm dependencies not available",
 )
-def test_train_lightgbm_binary_classifer(tmp_path):
+def test_train_lightgbm_binary_classifier(tmp_path):
     import rsgislib.classification.classlightgbm
 
     cls1_train_file = os.path.join(
@@ -80,7 +80,7 @@ def test_train_lightgbm_binary_classifer(tmp_path):
 
     cls_params_file = os.path.join(CLASSIFICATION_DATA_DIR, "lgbm_params_file.json")
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.txt")
-    rsgislib.classification.classlightgbm.train_lightgbm_binary_classifer(
+    rsgislib.classification.classlightgbm.train_lightgbm_binary_classifier(
         out_mdl_file,
         cls_params_file,
         cls1_train_file,
@@ -100,7 +100,7 @@ def test_train_lightgbm_binary_classifer(tmp_path):
     (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
     reason="h5py or lightgbm dependencies not available",
 )
-def test_train_opt_lightgbm_binary_classifer(tmp_path):
+def test_train_opt_lightgbm_binary_classifier(tmp_path):
     import rsgislib.classification.classlightgbm
 
     cls1_train_file = os.path.join(
@@ -124,7 +124,7 @@ def test_train_opt_lightgbm_binary_classifer(tmp_path):
 
     out_params_file = os.path.join(tmp_path, "out_cls_params.json")
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.txt")
-    rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifer(
+    rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifier(
         out_mdl_file,
         out_params_file,
         cls1_train_file,
@@ -170,7 +170,7 @@ def test_apply_lightgbm_binary_classifier(tmp_path):
 
     out_params_file = os.path.join(tmp_path, "out_cls_params.json")
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.txt")
-    rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifer(
+    rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifier(
         out_mdl_file,
         out_params_file,
         cls1_train_file,
@@ -212,7 +212,7 @@ def test_apply_lightgbm_binary_classifier(tmp_path):
     (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
     reason="h5py or lightgbm dependencies not available",
 )
-def test_train_lightgbm_multiclass_classifer(tmp_path):
+def test_train_lightgbm_multiclass_classifier(tmp_path):
     import rsgislib.classification.classlightgbm
 
     cls_info_dict = dict()
@@ -282,7 +282,7 @@ def test_train_lightgbm_multiclass_classifer(tmp_path):
     )
 
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.txt")
-    rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifer(
+    rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier(
         out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
     )
 
@@ -364,7 +364,7 @@ def test_apply_lightgbm_multiclass_classifier(tmp_path):
     )
 
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.txt")
-    rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifer(
+    rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier(
         out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
     )
 

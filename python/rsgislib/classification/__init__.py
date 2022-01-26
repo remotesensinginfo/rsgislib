@@ -8,6 +8,7 @@ from ._classification import *
 
 import rsgislib
 
+
 class ClassSimpleInfoObj(object):
     """
     This is a class to store the information associated within the classification.
@@ -261,7 +262,7 @@ def get_class_training_data(
             img_band_info, rasterise_ref_img, "KEA", tmp_lcl_dir
         )
 
-    classInfo = dict()
+    class_info = dict()
     for class_sample_info in class_vec_sample_info:
         cls_basename = rsgislib.tools.filetools.get_file_basename(
             class_sample_info.file_h5
@@ -300,7 +301,7 @@ def get_class_training_data(
         rand_red_val = random.randint(1, 255)
         rand_grn_val = random.randint(1, 255)
         rand_blu_val = random.randint(1, 255)
-        classInfo[class_sample_info.class_name] = ClassSimpleInfoObj(
+        class_info[class_sample_info.class_name] = ClassSimpleInfoObj(
             id=class_sample_info.id,
             file_h5=class_sample_info.file_h5,
             red=rand_red_val,
@@ -309,7 +310,7 @@ def get_class_training_data(
         )
 
     shutil.rmtree(tmp_lcl_dir)
-    return classInfo
+    return class_info
 
 
 def get_class_training_chips_data(

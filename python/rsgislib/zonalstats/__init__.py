@@ -1684,7 +1684,7 @@ def extract_chip_zone_image_band_values_to_hdf(
 ):
     """
     A function which extracts a chip/window of image pixel values. The expectation is
-    that this is used to train a classifer (see deep learning functions
+    that this is used to train a classifier (see deep learning functions
     in classification) but it could be used to extract image 'chips' for other purposes.
 
     :param input_image_info: is a list of rsgislib.imageutils.ImageBandInfo objects
@@ -2120,7 +2120,7 @@ def extract_ref_chip_zone_image_band_values_to_hdf(
 ):
     """
     A function which extracts a chip/window of image pixel values. The expectation is
-    that this is used to train a classifer (see deep learning functions in
+    that this is used to train a classifier (see deep learning functions in
     classification) but it could be used to extract image 'chips' for other purposes.
 
     :param input_image_info: is a list of rsgislib.imageutils.ImageBandInfo objects

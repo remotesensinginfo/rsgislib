@@ -65,7 +65,7 @@ import gc
 import json
 
 
-def optimise_lightgbm_binary_classifer(
+def optimise_lightgbm_binary_classifier(
     out_params_file,
     cls1_train_file,
     cls1_valid_file,
@@ -280,7 +280,7 @@ def optimise_lightgbm_binary_classifer(
         )
 
 
-def train_lightgbm_binary_classifer(
+def train_lightgbm_binary_classifier(
     out_mdl_file,
     cls_params_file,
     cls1_train_file,
@@ -471,7 +471,7 @@ def train_lightgbm_binary_classifer(
     print("Testing Accuracy: {}".format(test_acc))
 
 
-def train_opt_lightgbm_binary_classifer(
+def train_opt_lightgbm_binary_classifier(
     out_mdl_file,
     out_params_file,
     cls1_train_file,
@@ -802,7 +802,7 @@ def apply_lightgbm_binary_classifier(
     class_thres=5000,
 ):
     """
-    This function applies a trained binary (i.e., two classes) lightgbm model. The function train_lightgbm_binary_classifer
+    This function applies a trained binary (i.e., two classes) lightgbm model. The function train_lightgbm_binary_classifier
     can be used to train such as model. The output image will contain the softmax score for the class of interest.
     You will need to threshold this image to get a final hard classification. Alternative, a hard class output
     image and threshold can be applied to this image. Note. the softmax score is not a probability.
@@ -832,7 +832,7 @@ def apply_lightgbm_binary_classifier(
             outClassVals = outClassVals.flatten()
             imgMaskVals = inputs.imageMask.flatten()
             classVars = numpy.zeros(
-                (outClassVals.shape[0], otherargs.numClassVars), dtype=numpy.float
+                (outClassVals.shape[0], otherargs.numClassVars), dtype=numpy.float32
             )
             # Array index which can be used to populate the output array following masking etc.
             ID = numpy.arange(imgMaskVals.shape[0])
@@ -905,7 +905,7 @@ def apply_lightgbm_binary_classifier(
         )
 
 
-def train_lightgbm_multiclass_classifer(
+def train_lightgbm_multiclass_classifier(
     out_mdl_file,
     cls_info_dict,
     out_info_file=None,
@@ -1213,12 +1213,12 @@ def apply_lightgbm_multiclass_classifier(
     class_clr_names=True,
 ):
     """
-    This function applies a trained multiple classes lightgbm model. The function train_lightgbm_multiclass_classifer
+    This function applies a trained multiple classes lightgbm model. The function train_lightgbm_multiclass_classifier
     can be used to train such as model. The output image will be a final hard classification using the class with
     the maximum softmax score.
 
     :param cls_train_info: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
-                           objects which will be used to train the classifier (i.e., train_lightgbm_multiclass_classifer()),
+                           objects which will be used to train the classifier (i.e., train_lightgbm_multiclass_classifier()),
                            provide pixel value id and RGB class values.
     :param model_file: a trained lightgbm multiclass model which can be loaded with lgb.Booster(model_file=model_file).
     :param in_img_mask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
@@ -1248,7 +1248,9 @@ def apply_lightgbm_multiclass_classifier(
             outClassVals = outClassVals.reshape((n_pxls, otherargs.n_classes))
             outClassIdVals = outClassIdVals.flatten()
             imgMaskVals = inputs.imageMask.flatten()
-            classVars = numpy.zeros((n_pxls, otherargs.numClassVars), dtype=numpy.float)
+            classVars = numpy.zeros(
+                (n_pxls, otherargs.numClassVars), dtype=numpy.float32
+            )
             # Array index which can be used to populate the output array following masking etc.
             ID = numpy.arange(imgMaskVals.shape[0])
             classVarsIdx = 0

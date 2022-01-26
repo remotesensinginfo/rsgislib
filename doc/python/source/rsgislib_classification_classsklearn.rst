@@ -83,13 +83,13 @@ To train a classifier using a grid search you need to define the classifier para
     cls_train_info['Other'] = rsgislib.classification.ClassSimpleInfoObj(id=2, fileH5='other_cls_samples_train.h5', red=100, green=100, blue=100)
 
     grid_search = GridSearchCV(RandomForestClassifier(), param_grid={'n_estimators':[10,20,50,100], 'max_depth':[2,4,8]})
-    skclf = rsgislib.classification.classsklearn.train_sklearn_classifer_gridsearch(cls_train_info, 500, grid_search)
+    skclf = rsgislib.classification.classsklearn.train_sklearn_classifier_gridsearch(cls_train_info, 500, grid_search)
 
 To apply trained classifier you need to use the following function::
 
     out_cls_img = 'mangrove_classification_result.kea'
     img_msk = 'valid_area_msk.kea'
-    rsgislib.classification.classsklearn.apply_sklearn_classifer(cls_train_info, skclf, img_msk, 1, imgs_info, out_cls_img, 'KEA', classClrNames=True)
+    rsgislib.classification.classsklearn.apply_sklearn_classifier(cls_train_info, skclf, img_msk, 1, imgs_info, out_cls_img, 'KEA', classClrNames=True)
 
 The output image file name needs to be defined and an image mask also needs to provided which defines the parts of the image to be classified. This is useful as by using a previous classification result as the mask for another classifier a hierarchical classification process could be built.
 
@@ -97,12 +97,13 @@ The output image file name needs to be defined and an image mask also needs to p
 Training Functions
 -------------------
 
-.. autofunction:: rsgislib.classification.classsklearn.train_sklearn_classifer_gridsearch
+.. autofunction:: rsgislib.classification.classsklearn.perform_sklearn_classifier_param_search
 .. autofunction:: rsgislib.classification.classsklearn.train_sklearn_classifier
 
 Classify Functions
 -------------------
 
-.. autofunction:: rsgislib.classification.classsklearn.apply_sklearn_classifer
+.. autofunction:: rsgislib.classification.classsklearn.apply_sklearn_classifier
+.. autofunction:: rsgislib.classification.classsklearn.apply_sklearn_classifier_rat
 
 

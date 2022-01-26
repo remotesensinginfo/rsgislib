@@ -1,4 +1,5 @@
 import os
+from shutil import copy2
 import pytest
 
 H5PY_NOT_AVAIL = False
@@ -21,7 +22,7 @@ CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
     (H5PY_NOT_AVAIL or SKLEARN_NOT_AVAIL),
     reason="h5py or scikit-learn dependencies not available",
 )
-def test_train_sklearn_classifer_gridsearch():
+def test_perform_sklearn_classifier_param_search():
     import rsgislib.classification
     import rsgislib.classification.classsklearn
     from sklearn.model_selection import GridSearchCV
@@ -31,38 +32,74 @@ def test_train_sklearn_classifer_gridsearch():
         RandomForestClassifier(), {"n_estimators": [10, 20, 30], "max_depth": [2, 3, 4]}
     )
 
-    cls_train_info = dict()
-    cls_train_info["Forest"] = rsgislib.classification.ClassSimpleInfoObj(
+    cls_info_dict = dict()
+    cls_info_dict["Forest"] = rsgislib.classification.ClassInfoObj(
+        id=0,
+        out_id=1,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Grass"] = rsgislib.classification.ClassInfoObj(
         id=1,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_forest_smpls.h5"),
+        out_id=2,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_valid.h5"
+        ),
         red=120,
         green=120,
         blue=120,
     )
-    cls_train_info["Grass"] = rsgislib.classification.ClassSimpleInfoObj(
+    cls_info_dict["Urban"] = rsgislib.classification.ClassInfoObj(
         id=2,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_grass_smpls.h5"),
+        out_id=3,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_valid.h5"
+        ),
         red=120,
         green=120,
         blue=120,
     )
-    cls_train_info["Urban"] = rsgislib.classification.ClassSimpleInfoObj(
+    cls_info_dict["Water"] = rsgislib.classification.ClassInfoObj(
         id=3,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_urban_smpls.h5"),
-        red=120,
-        green=120,
-        blue=120,
-    )
-    cls_train_info["Water"] = rsgislib.classification.ClassSimpleInfoObj(
-        id=4,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_water_smpls.h5"),
+        out_id=4,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_valid.h5"
+        ),
         red=120,
         green=120,
         blue=120,
     )
 
-    rsgislib.classification.classsklearn.train_sklearn_classifer_gridsearch(
-        cls_train_info, param_search_samp_num=100, grid_search=grid_search
+    rsgislib.classification.classsklearn.perform_sklearn_classifier_param_search(
+        cls_info_dict, search_obj=grid_search
     )
 
 
@@ -75,31 +112,67 @@ def test_train_sklearn_classifier():
     import rsgislib.classification.classsklearn
     from sklearn.ensemble import RandomForestClassifier
 
-    cls_train_info = dict()
-    cls_train_info["Forest"] = rsgislib.classification.ClassSimpleInfoObj(
+    cls_info_dict = dict()
+    cls_info_dict["Forest"] = rsgislib.classification.ClassInfoObj(
+        id=0,
+        out_id=1,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Grass"] = rsgislib.classification.ClassInfoObj(
         id=1,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_forest_smpls.h5"),
+        out_id=2,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_valid.h5"
+        ),
         red=120,
         green=120,
         blue=120,
     )
-    cls_train_info["Grass"] = rsgislib.classification.ClassSimpleInfoObj(
+    cls_info_dict["Urban"] = rsgislib.classification.ClassInfoObj(
         id=2,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_grass_smpls.h5"),
+        out_id=3,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_valid.h5"
+        ),
         red=120,
         green=120,
         blue=120,
     )
-    cls_train_info["Urban"] = rsgislib.classification.ClassSimpleInfoObj(
+    cls_info_dict["Water"] = rsgislib.classification.ClassInfoObj(
         id=3,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_urban_smpls.h5"),
-        red=120,
-        green=120,
-        blue=120,
-    )
-    cls_train_info["Water"] = rsgislib.classification.ClassSimpleInfoObj(
-        id=4,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_water_smpls.h5"),
+        out_id=4,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_valid.h5"
+        ),
         red=120,
         green=120,
         blue=120,
@@ -108,7 +181,7 @@ def test_train_sklearn_classifier():
     sk_classifier = RandomForestClassifier()
 
     rsgislib.classification.classsklearn.train_sklearn_classifier(
-        cls_train_info, sk_classifier
+        cls_info_dict, sk_classifier
     )
 
 
@@ -116,37 +189,73 @@ def test_train_sklearn_classifier():
     (H5PY_NOT_AVAIL or SKLEARN_NOT_AVAIL),
     reason="h5py or scikit-learn dependencies not available",
 )
-def test_apply_sklearn_classifer(tmp_path):
+def test_apply_sklearn_classifier(tmp_path):
     import rsgislib.imageutils
     import rsgislib.classification
     import rsgislib.classification.classsklearn
     from sklearn.ensemble import RandomForestClassifier
 
-    cls_train_info = dict()
-    cls_train_info["Forest"] = rsgislib.classification.ClassSimpleInfoObj(
+    cls_info_dict = dict()
+    cls_info_dict["Forest"] = rsgislib.classification.ClassInfoObj(
+        id=0,
+        out_id=1,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Grass"] = rsgislib.classification.ClassInfoObj(
         id=1,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_forest_smpls.h5"),
+        out_id=2,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_valid.h5"
+        ),
         red=120,
         green=120,
         blue=120,
     )
-    cls_train_info["Grass"] = rsgislib.classification.ClassSimpleInfoObj(
+    cls_info_dict["Urban"] = rsgislib.classification.ClassInfoObj(
         id=2,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_grass_smpls.h5"),
+        out_id=3,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_valid.h5"
+        ),
         red=120,
         green=120,
         blue=120,
     )
-    cls_train_info["Urban"] = rsgislib.classification.ClassSimpleInfoObj(
+    cls_info_dict["Water"] = rsgislib.classification.ClassInfoObj(
         id=3,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_urban_smpls.h5"),
-        red=120,
-        green=120,
-        blue=120,
-    )
-    cls_train_info["Water"] = rsgislib.classification.ClassSimpleInfoObj(
-        id=4,
-        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_water_smpls.h5"),
+        out_id=4,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_valid.h5"
+        ),
         red=120,
         green=120,
         blue=120,
@@ -162,13 +271,13 @@ def test_apply_sklearn_classifer(tmp_path):
 
     sk_classifier = RandomForestClassifier()
     rsgislib.classification.classsklearn.train_sklearn_classifier(
-        cls_train_info, sk_classifier
+        cls_info_dict, sk_classifier
     )
 
     output_img = os.path.join(tmp_path, "out_cls_img.kea")
     out_score_img = os.path.join(tmp_path, "out_cls_scr_img.kea")
-    rsgislib.classification.classsklearn.apply_sklearn_classifer(
-        cls_train_info,
+    rsgislib.classification.classsklearn.apply_sklearn_classifier(
+        cls_info_dict,
         sk_classifier,
         s2_vld_img,
         1,
@@ -180,3 +289,120 @@ def test_apply_sklearn_classifer(tmp_path):
     )
 
     assert os.path.exists(output_img) and os.path.exists(out_score_img)
+
+
+def test_apply_sklearn_classifier_rat(tmp_path):
+    import rsgislib.classification.classsklearn
+    import rsgislib.rastergis
+    from sklearn.ensemble import RandomForestClassifier
+
+    ref_clumps_img = os.path.join(
+        CLASSIFICATION_DATA_DIR, "sen2_20210527_aber_clumps_s2means_cls.kea"
+    )
+    clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps_s2means_cls.kea")
+    copy2(ref_clumps_img, clumps_img)
+
+    cls_info_dict = dict()
+    cls_info_dict["Forest"] = rsgislib.classification.ClassInfoObj(
+        id=0,
+        out_id=1,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Grass"] = rsgislib.classification.ClassInfoObj(
+        id=1,
+        out_id=2,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Urban"] = rsgislib.classification.ClassInfoObj(
+        id=2,
+        out_id=3,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Water"] = rsgislib.classification.ClassInfoObj(
+        id=3,
+        out_id=4,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+
+    sk_classifier = RandomForestClassifier()
+
+    rsgislib.classification.classsklearn.train_sklearn_classifier(
+        cls_info_dict, sk_classifier
+    )
+
+    variables = [
+        "b1Mean",
+        "b2Mean",
+        "b3Mean",
+        "b4Mean",
+        "b5Mean",
+        "b6Mean",
+        "b7Mean",
+        "b8Mean",
+        "b9Mean",
+        "b10Mean",
+    ]
+    rsgislib.classification.classsklearn.apply_sklearn_classifier_rat(
+        clumps_img,
+        variables,
+        sk_classifier,
+        cls_info_dict,
+        out_col_int="OutClass",
+        out_col_str="OutClassName",
+        roi_col=None,
+        roi_val=1,
+        class_colours=True,
+    )
+
+    read_out_cls = False
+    try:
+        cls_col_vals = rsgislib.rastergis.get_column_data(clumps_img, "OutClass")
+        read_out_cls = True
+    except:
+        read_out_cls = False
+
+    assert read_out_cls

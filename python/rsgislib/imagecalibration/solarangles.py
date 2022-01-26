@@ -136,13 +136,13 @@ def calc_solar_azimuth_zenith(inputImg, inImgDateTime, outputImg, gdalformat):
         xBlockF = xBlock.flatten()
         yBlockF = yBlock.flatten()
 
-        pts = numpy.zeros((xBlockF.shape[0], 2), dtype=numpy.float)
+        pts = numpy.zeros((xBlockF.shape[0], 2), dtype=numpy.float32)
         pts[..., 0] = xBlockF
         pts[..., 1] = yBlockF
         outPts = numpy.array(transform.TransformPoints(pts))
 
-        outAz = numpy.zeros_like(xBlockF, dtype=numpy.float)
-        outZen = numpy.zeros_like(xBlockF, dtype=numpy.float)
+        outAz = numpy.zeros_like(xBlockF, dtype=numpy.float32)
+        outZen = numpy.zeros_like(xBlockF, dtype=numpy.float32)
 
         for i in range(outPts.shape[0]):
             outAz[i] = 90 - Pysolar.solar.GetAltitude(

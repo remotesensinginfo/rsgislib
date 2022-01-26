@@ -92,13 +92,13 @@ def find_class_outliers(
     pyod_obj.fit(msk_arr_vals)
     print("Fitted oulier detector")
 
-    # RIOS function to apply classifer
+    # RIOS function to apply classifier
     def _applyPyOB(info, inputs, outputs, otherargs):
         # Internal function for rios applier. Used within find_class_outliers.
 
         out_lbls_vals = numpy.zeros_like(inputs.image_mask, dtype=numpy.uint8)
         if otherargs.out_scores:
-            out_scores_vals = numpy.zeros_like(inputs.image_mask, dtype=numpy.float)
+            out_scores_vals = numpy.zeros_like(inputs.image_mask, dtype=numpy.float32)
         if numpy.any(inputs.image_mask == otherargs.msk_val):
             out_lbls_vals = out_lbls_vals.flatten()
             img_msk_vals = inputs.image_mask.flatten()
