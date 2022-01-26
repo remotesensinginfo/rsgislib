@@ -129,3 +129,29 @@ def test_summarise_multi_acc_ptonly_metrics(tmp_path):
     )
 
     assert os.path.exists(out_json_file)
+
+
+def test_calc_acc_metrics_vecsamples(tmp_path):
+    import rsgislib.classification.classaccuracymetrics
+
+    vec_file = os.path.join(CLASS_ACC_DATA_DIR, "cls_acc_assessment_pts_ref.geojson")
+    vec_lyr = "cls_acc_assessment_pts_ref"
+
+    in_cls_img = os.path.join(CLASS_ACC_DATA_DIR, "cls_rf_refl.kea")
+
+    out_json_file = os.path.join(tmp_path, "out_acc_stats.json")
+    out_csv_file = os.path.join(tmp_path, "out_acc_stats.csv")
+
+    rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples(
+        vec_file=vec_file,
+        vec_lyr=vec_lyr,
+        ref_col="ref_pts",
+        cls_col="rf_rl_cls",
+        cls_img=in_cls_img,
+        img_cls_name_col="class_names",
+        img_hist_col="Histogram",
+        out_json_file=out_json_file,
+        out_csv_file=out_csv_file,
+    )
+
+    assert os.path.exists(out_json_file) and os.path.exists(out_csv_file)
