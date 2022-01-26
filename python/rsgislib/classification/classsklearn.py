@@ -408,10 +408,10 @@ def apply_sklearn_classifier(
 
         for class_key in cls_train_info:
             print(f"Apply Colour to class '{class_key}'")
-            red[cls_train_info[class_key].id] = cls_train_info[class_key].red
-            green[cls_train_info[class_key].id] = cls_train_info[class_key].green
-            blue[cls_train_info[class_key].id] = cls_train_info[class_key].blue
-            class_names_col[cls_train_info[class_key].id] = class_key
+            red[cls_train_info[class_key].out_id] = cls_train_info[class_key].red
+            green[cls_train_info[class_key].out_id] = cls_train_info[class_key].green
+            blue[cls_train_info[class_key].out_id] = cls_train_info[class_key].blue
+            class_names_col[cls_train_info[class_key].out_id] = class_key
 
         rat.writeColumn(rat_dataset, "Red", red)
         rat.writeColumn(rat_dataset, "Green", green)
