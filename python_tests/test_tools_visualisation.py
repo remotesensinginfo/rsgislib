@@ -217,7 +217,8 @@ def test_create_mbtile_file(tmp_path):
 
 
 @pytest.mark.skipif(
-    (not gdal_translate_cmd_avail), reason="gdal_translate command not available"
+    (not gdal_translate_cmd_avail) or (not gdal2tiles_cmd_avail),
+    reason="gdal_translate or gdal2tiles.py command not available",
 )
 def test_create_webtiles_vis_gtiff_img(tmp_path):
     import rsgislib.tools.visualisation

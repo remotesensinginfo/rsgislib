@@ -942,7 +942,7 @@ def calc_dist_between_clumps(
 
     :param clumps_img: image clumps for which the distance will be calculated.
     :param out_col_name: output column within the clumps image.
-    :param tmp_dir: directory out tempory files will be outputted to.
+    :param tmp_dir: directory out temporary files will be outputted to.
     :param use_idx: use a spatial index when calculating the distance between
                    clumps (needed for large number of clumps).
     :param max_dist_thres: if using an index than an upper limit on the distance
@@ -1002,7 +1002,7 @@ def calc_dist_to_large_clumps(
     :param clumps_img: image clumps for which the distance will be calculated.
     :param out_col_name: output column within the clumps image.
     :param size_thres: is a threshold to seperate the sets of large and small clumps.
-    :param tmp_dir: directory out tempory files will be outputted to.
+    :param tmp_dir: directory out temporary files will be outputted to.
     :param use_idx: use a spatial index when calculating the distance between clumps
                    (needed for large number of clumps).
     :param max_dist_thres: if using an index than an upper limit on the distance

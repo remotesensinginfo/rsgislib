@@ -2013,7 +2013,7 @@ def overlay_vec_on_img(
             "values as the number of bands within the input image."
         )
 
-    # Create a tempory directory for processing stage outputs.
+    # Create a temporary directory for processing stage outputs.
     img_basename = rsgislib.tools.filetools.get_file_basename(input_img)
     uid_str = rsgislib.tools.utils.uid_generator()
     usr_tmp_dir = os.path.join(
