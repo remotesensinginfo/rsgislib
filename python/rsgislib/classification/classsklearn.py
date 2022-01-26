@@ -128,7 +128,7 @@ def perform_sklearn_classifier_param_search(
 
 def train_sklearn_classifier(
     cls_train_info: Dict[str, ClassInfoObj], sk_classifier: BaseEstimator
-):
+) -> (float, float):
     """
     This function trains the classifier.
 
@@ -136,6 +136,7 @@ def train_sklearn_classifier(
                            which will be used to train and test the classifier.
     :param sk_classifier: an instance of a parameterised scikit-learn classifier
                          (http://scikit-learn.org/stable/supervised_learning.html)
+    :return training and testing accuracies (between 0-1)
 
     """
     if len(cls_train_info) < 2:
@@ -206,12 +207,13 @@ def train_sklearn_classifier(
     print("Completed")
 
     print("Calc Classifier Accuracy")
-    accVal = sk_classifier.score(data_train_arr, class_train_arr)
-    print("Classifier Train Score = {}%".format(round(accVal * 100, 2)))
+    train_acc_val = sk_classifier.score(data_train_arr, class_train_arr)
+    print("Classifier Train Score = {}%".format(round(train_acc_val * 100, 2)))
 
-    accVal = sk_classifier.score(data_test_arr, class_test_arr)
-    print("Classifier Test Score = {}%".format(round(accVal * 100, 2)))
+    test_acc_val = sk_classifier.score(data_test_arr, class_test_arr)
+    print("Classifier Test Score = {}%".format(round(test_acc_val * 100, 2)))
 
+    return train_acc_val, test_acc_val
 
 def apply_sklearn_classifier(
     cls_train_info: Dict[str, ClassInfoObj],
