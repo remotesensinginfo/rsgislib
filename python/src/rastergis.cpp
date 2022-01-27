@@ -1652,16 +1652,16 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "   from rsgislib import rastergis\n"
 "   clumps = './RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
-"   outimage = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea'\n"
-"   rastergis.copy_rat(clumps, outimage)\n"
+"   output_img = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea'\n"
+"   rastergis.copy_rat(clumps, output_img)\n"
 "\n"},
 
 {"copy_gdal_rat_columns", (PyCFunction)RasterGIS_CopyGDALATTColumns, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.rastergis.copy_gdal_rat_columns(clumps_img, outimage, fields, copy_colours=True, copy_hist=True, rat_band=1)\n"
+"rsgislib.rastergis.copy_gdal_rat_columns(clumps_img, output_img, fields, copy_colours=True, copy_hist=True, rat_band=1)\n"
 "Copies GDAL RAT columns from one image to another\n"
 "\n"
 ":param clumps_img: is a string containing the name and path for the image with RAT from which columns are to copied from.\n"
-":param outimage: is a string containing the name of the file to which the columns are to be copied.\n"
+":param output_img: is a string containing the name of the file to which the columns are to be copied.\n"
 ":param fields: is a sequence of strings containing the names of the fields to copy\n"
 ":param copy_colours: is a bool specifying if the colour columns should be copied (default = True)\n"
 ":param copy_hist: is a bool specifying if the histogram  should be copied (default = True)\n"
@@ -1833,11 +1833,11 @@ static PyMethodDef RasterGISMethods[] = {
 ".. code:: python\n"
 "\n"
 "   clumps='./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
-"   outimage='./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea'\n"
+"   output_img='./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
 "   field = 'RedAvg'\n"
-"   rastergis.export_col_to_gdal_img(clumps, outimage, gdalformat, datatype, field)"
+"   rastergis.export_col_to_gdal_img(clumps, output_img, gdalformat, datatype, field)"
 "\n"},
     
     {"export_rat_cols_to_ascii",  (PyCFunction)RasterGIS_Export2Ascii, METH_VARARGS | METH_KEYWORDS,

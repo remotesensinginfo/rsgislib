@@ -47,7 +47,7 @@ import rsgislib.imageutils
 import rsgislib.imagecalc
 
 
-def find_class_outliers(
+def find_class_pyod_outliers(
     pyod_obj,
     input_img,
     in_msk_img,
