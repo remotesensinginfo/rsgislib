@@ -6,6 +6,8 @@ The classification module provides classification functionality within RSGISLib.
 # import the C++ extension into this level
 from ._classification import *
 
+from typing import Dict
+
 import rsgislib
 
 
@@ -214,6 +216,61 @@ class SamplesInfoObj(object):
         self.red = red
         self.green = green
         self.blue = blue
+
+
+def get_class_info_dict(
+    cls_smpls_info: Dict[str, ClassSimpleInfoObj], smpls_dir: str
+) -> Dict[str, ClassInfoObj]:
+    """
+    A function which converts a dictionary of ClassSimpleInfoObj objects into
+    a dictionary of ClassInfoObj objects. This is useful when get_class_training_data
+    has been used to extract samples and you then want to use
+    create_train_valid_test_sets to split the samples into training, validation and
+    testing datasets.
+
+    Note. the output file names for the training, validation and testing datasets
+    are as defined as the basename of the input hdf5 samples with either _train,
+    _valid or _test appended on the end.
+
+    :param cls_smpls_info: A dict with the class name as the key with a
+                           ClassSimpleInfoObj instance as the value.
+    :param smpls_dir: the file path for the training, validation and
+                      testing datasets.
+    :return: A dict with the class name as the key with a ClassInfoObj
+             instance as the value.
+
+    """
+    import os
+    import rsgislib.tools.filetools
+
+    cls_smpls_fnl_info = dict()
+    for id, cls_name in enumerate(cls_smpls_info):
+        # Get the HDF5 file name / path
+        smpls_h5_file = cls_smpls_info[cls_name].file_h5
+        # Get the file basename (i.e., without directory path or file extension).
+        basename = rsgislib.tools.filetools.get_file_basename(smpls_h5_file)
+        train_file = os.path.join(smpls_dir, f"{basename}_train.h5")
+        valid_file = os.path.join(smpls_dir, f"{basename}_valid.h5")
+        test_file = os.path.join(smpls_dir, f"{basename}_test.h5")
+
+        # Note ClassInfoObj has both an id and out_id. id has to start at 0
+        # and be continuous for some of the classification algorithms
+        # and therefore out_id will be the output pixel value for the class.
+        # Therefore, the existing id will be copied to out_id while the
+        # id value will be defined by the index from the enumerate.
+        cls_smpls_fnl_info[cls_name] = ClassInfoObj(
+            id=id,
+            out_id=cls_smpls_info[cls_name].id,
+            train_file_h5=train_file,
+            test_file_h5=test_file,
+            valid_file_h5=valid_file,
+            red=cls_smpls_info[cls_name].red,
+            green=cls_smpls_info[cls_name].green,
+            blue=cls_smpls_info[cls_name].blue,
+        )
+        print(cls_smpls_fnl_info[cls_name])
+
+    return cls_smpls_fnl_info
 
 
 def get_class_training_data(

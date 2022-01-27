@@ -215,6 +215,7 @@ def train_sklearn_classifier(
 
     return train_acc_val, test_acc_val
 
+
 def apply_sklearn_classifier(
     cls_train_info: Dict[str, ClassInfoObj],
     sk_classifier: BaseEstimator,

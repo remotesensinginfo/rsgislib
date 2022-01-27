@@ -492,3 +492,41 @@ def test_pop_class_info_accuracy_pts_all_col(tmp_path):
         "ref_new_col",
         "new_process",
     )
+
+
+def test_get_class_info_dict(tmp_path):
+    import rsgislib.classification
+
+    cls_in_info = dict()
+    cls_in_info["Forest"] = rsgislib.classification.ClassSimpleInfoObj(
+        id=1,
+        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_in_info["Grass"] = rsgislib.classification.ClassSimpleInfoObj(
+        id=2,
+        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_in_info["Urban"] = rsgislib.classification.ClassSimpleInfoObj(
+        id=3,
+        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_in_info["Water"] = rsgislib.classification.ClassSimpleInfoObj(
+        id=4,
+        file_h5=os.path.join(CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal.h5"),
+        red=120,
+        green=120,
+        blue=120,
+    )
+
+    cls_out_info = rsgislib.classification.get_class_info_dict(
+        cls_in_info, smpls_dir=tmp_path
+    )
