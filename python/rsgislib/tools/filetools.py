@@ -717,8 +717,9 @@ def release_file_lock(input_file: str):
     lock_file_path = os.path.join(file_path, lock_file_name)
     if os.path.exists(lock_file_path):
         if not delete_file_silent(lock_file_path):
-            raise rsgislib.RSGISPyException("Could not delete the lock file..."
-                                            " something has gone wrong!")
+            raise rsgislib.RSGISPyException(
+                "Could not delete the lock file... something has gone wrong!"
+            )
 
 
 def clean_file_locks(dir_path: str, timeout: int = 3600):
@@ -743,8 +744,9 @@ def clean_file_locks(dir_path: str, timeout: int = 3600):
         time_since_create = (c_dateime - create_date).total_seconds()
         if time_since_create > timeout:
             if not delete_file_silent(lock_file_path):
-                raise rsgislib.RSGISPyException("Could not delete the lock file..."
-                                                " something has gone wrong!")
+                raise rsgislib.RSGISPyException(
+                    "Could not delete the lock file... something has gone wrong!"
+                )
 
 
 def sort_imgs_to_dirs_utm(input_imgs_dir: str, file_search_str: str, out_base_dir: str):

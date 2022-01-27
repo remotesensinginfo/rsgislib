@@ -63,6 +63,8 @@ Extracting Image Chips to HDF5
 HDF Utilities
 -------------------------------
 .. autofunction:: rsgislib.zonalstats.msk_h5_smpls_to_finite_values
+.. autofunction:: rsgislib.zonalstats.get_hdf5_data
+.. autofunction:: rsgislib.zonalstats.get_var_from_hdf5_data
 
 
 * :ref:`genindex`

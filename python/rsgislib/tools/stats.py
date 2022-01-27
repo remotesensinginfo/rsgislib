@@ -311,7 +311,7 @@ def lassolars_feature_selection(df, dep_vars, ind_vars, alpha_val=None):
 
 
 def breusch_pagan_test(x, y):
-    """ "
+    """
     A function to perform a Breusch-Pagan test for heteroskedasticity in a linear model:
     H_0 = No heteroskedasticity.
     H_1 = Heteroskedasticity is present.

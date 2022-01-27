@@ -224,6 +224,26 @@ def test_image_math_binary_out(tmp_path):
     assert img_eq
 
 
+def test_buffer_img_pxl_vals(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    output_img = os.path.join(tmp_path, "test_buf_vals.kea")
+
+    rsgislib.imagecalc.buffer_img_pxl_vals(
+        input_img,
+        output_img,
+        pxl_vals=[2, 3],
+        buf_thres=100,
+        tmp_dir=tmp_path,
+        gdalformat="KEA",
+        img_band=1,
+        unit_geo=True,
+    )
+
+    assert os.path.exists(output_img)
+
+
 def test_calc_dist_to_img_vals_sgl_val_geo(tmp_path):
     import rsgislib.imagecalc
 

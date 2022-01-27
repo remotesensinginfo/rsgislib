@@ -78,10 +78,11 @@ def calc_ndvi(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_wbi(
@@ -116,9 +117,11 @@ def calc_wbi(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
     # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_ndwi(
@@ -156,10 +159,11 @@ def calc_ndwi(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_gndwi(
@@ -197,10 +201,11 @@ def calc_gndwi(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_gmndwi(
@@ -238,10 +243,11 @@ def calc_gmndwi(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_whiteness(
@@ -278,10 +284,11 @@ def calc_whiteness(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_brightness(
@@ -324,10 +331,11 @@ def calc_brightness(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_brightness_scaled(
@@ -391,10 +399,11 @@ def calc_brightness_scaled(
         stretch_param=2,
     )
     rsgislib.tools.filetools.delete_file_with_basename(tmp_img)
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_ctvi(
@@ -426,10 +435,11 @@ def calc_ctvi(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_ndsi(
@@ -463,10 +473,11 @@ def calc_ndsi(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_nbr(
@@ -500,10 +511,11 @@ def calc_nbr(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_bai(
@@ -550,10 +562,11 @@ def calc_bai(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 def calc_mvi(
@@ -596,10 +609,11 @@ def calc_mvi(
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
-    # Set no data value
-    rsgislib.imageutils.set_img_no_data_value(output_img, -999)
+
     if calc_stats:
-        rsgislib.imageutils.pop_img_stats(output_img, False, -999.0, True)
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
 """

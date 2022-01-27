@@ -29,6 +29,7 @@ from ._zonalstats import *
 
 import math
 import sys
+from typing import List
 
 from osgeo import gdal
 from osgeo import ogr
@@ -1618,8 +1619,6 @@ def merge_extracted_hdf5_data(h5_files, out_h5_file, datatype=None):
 
     """
     import h5py
-    import numpy
-    import rsgislib
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -1709,9 +1708,6 @@ def extract_chip_zone_image_band_values_to_hdf(
     from rios.imagereader import ImageReader
     import h5py
     import tqdm
-    import numpy
-    import math
-    import rsgislib
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -1927,9 +1923,7 @@ def split_sample_chip_hdf5_file(
                      then the output data type will be float32.
 
     """
-    import numpy
     import h5py
-    import rsgislib
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -2043,8 +2037,6 @@ def merge_extracted_hdf5_chip_data(h5_files, out_h5_file, datatype=None):
 
     """
     import h5py
-    import numpy
-    import rsgislib
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -2149,9 +2141,6 @@ def extract_ref_chip_zone_image_band_values_to_hdf(
     from rios.imagereader import ImageReader
     import h5py
     import tqdm
-    import numpy
-    import math
-    import rsgislib
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -2388,9 +2377,7 @@ def split_sample_ref_chip_hdf5_file(
                      then the output data type will be float32.
 
     """
-    import numpy
     import h5py
-    import rsgislib
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -2522,8 +2509,6 @@ def merge_extracted_hdf5_chip_ref_data(h5_files, out_h5_file, datatype=None):
 
     """
     import h5py
-    import numpy
-    import rsgislib
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -2613,8 +2598,6 @@ def msk_h5_smpls_to_finite_values(
 
     """
     import h5py
-    import numpy
-    import rsgislib
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -2649,3 +2632,92 @@ def msk_h5_smpls_to_finite_values(
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = "finite values".encode()
     fH5Out.close()
+
+
+def get_var_from_hdf5_data(h5_files: List[str], var_idx: int = 0) -> numpy.array:
+    """
+    A function to get the data for a specific variable from a list of HDF files
+     (e.g., from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf)
+
+    :param h5_files: a list of input files.
+    :param var_idx: the index for the variable of interest. Note array indexing
+                    starts at 0. So if you want image band 2 then that will be
+                    index 1 etc.
+    :return: numpy array with the data or None is there is no data to return.
+
+    """
+    import h5py
+
+    if var_idx < 0:
+        raise rsgislib.RSGISPyException("The variable index must be greater than 0.")
+
+    num_vals = 0
+    for h5_file in h5_files:
+        f_obj_h5 = h5py.File(h5_file, "r")
+        data_shp = f_obj_h5["DATA/DATA"].shape
+        if var_idx < data_shp[1]:
+            num_vals += data_shp[0]
+        f_obj_h5.close()
+
+    if num_vals == 0:
+        return None
+
+    data_arr = numpy.zeros(num_vals, dtype=float)
+
+    row_init = 0
+    for h5_file in h5_files:
+        f_obj_h5 = h5py.File(h5_file, "r")
+        data_shp = f_obj_h5["DATA/DATA"].shape
+        if var_idx < data_shp[1]:
+            num_rows = f_obj_h5["DATA/DATA"].shape[0]
+            data_arr[row_init : (row_init + num_rows)] = f_obj_h5["DATA/DATA"][
+                ..., var_idx
+            ]
+            row_init += num_rows
+        f_obj_h5.close()
+
+    return data_arr
+
+
+def get_hdf5_data(h5_files: List[str]) -> numpy.array:
+    """
+    A function to get the data from a list of HDF files
+     (e.g., from rsgislib.zonalstats.extract_zone_img_band_values_to_hdf)
+
+    :param h5_files: a list of input files.
+    :return: numpy array with the data or None is there is no data to return.
+
+    """
+    import h5py
+
+    num_vals = 0
+    n_vars = 0
+    first = True
+    for h5_file in h5_files:
+        f_obj_h5 = h5py.File(h5_file, "r")
+        data_shp = f_obj_h5["DATA/DATA"].shape
+        if first:
+            n_vars = data_shp[1]
+            first = False
+        else:
+            if n_vars != data_shp[1]:
+                raise rsgislib.RSGISPyException(
+                    "The input hdf5 files have a different number of input variables"
+                )
+        num_vals += data_shp[0]
+        f_obj_h5.close()
+
+    if num_vals == 0:
+        return None
+
+    data_arr = numpy.zeros([num_vals, n_vars], dtype=float)
+
+    row_init = 0
+    for h5_file in h5_files:
+        f_obj_h5 = h5py.File(h5_file, "r")
+        num_rows = f_obj_h5["DATA/DATA"].shape[0]
+        data_arr[row_init : (row_init + num_rows)] = f_obj_h5["DATA/DATA"]
+        row_init += num_rows
+        f_obj_h5.close()
+
+    return data_arr

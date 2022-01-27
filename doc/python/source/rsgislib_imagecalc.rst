@@ -82,6 +82,7 @@ Geometry
 .. autofunction:: rsgislib.imagecalc.mahalanobis_dist_to_img_filter
 .. autofunction:: rsgislib.imagecalc.calc_dist_to_img_vals
 .. autofunction:: rsgislib.imagecalc.calc_dist_to_img_vals_tiled
+.. autofunction:: rsgislib.imagecalc.buffer_img_pxl_vals
 
 Image Indices
 -------------

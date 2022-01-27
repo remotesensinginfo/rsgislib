@@ -413,7 +413,8 @@ def merge_vectors_to_gpkg_ind_lyrs(
             "MULTIPOINT",
             "MULTIPOLYGON",
             "MULTILINESTRING",
-            "PROMOTE_TO_MULTI" "CONVERT_TO_LINEAR",
+            "PROMOTE_TO_MULTI",
+            "CONVERT_TO_LINEAR",
         ]:
             raise rsgislib.RSGISPyException("The geom_type is not valid.")
 

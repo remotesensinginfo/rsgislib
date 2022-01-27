@@ -6,6 +6,7 @@ calculating on images.
 
 import math
 import os
+from typing import List, Union
 
 import numpy
 from osgeo import gdal
@@ -133,15 +134,15 @@ class ImageBandRescale:
 
 
 def calc_dist_to_img_vals(
-    input_img,
-    output_img,
-    pxl_vals,
-    img_band=1,
-    gdalformat="KEA",
-    max_dist=None,
-    no_data_val=None,
-    out_no_data_val=None,
-    unit_geo=True,
+    input_img: str,
+    output_img: str,
+    pxl_vals: List[int],
+    img_band: int = 1,
+    gdalformat: str = "KEA",
+    max_dist: float = None,
+    no_data_val: float = None,
+    out_no_data_val: float = None,
+    unit_geo: bool = True,
 ):
     """
     A function to calculate the distance to the nearest pixel value with one
@@ -453,7 +454,65 @@ def calc_dist_to_img_vals_tiled(
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
-def count_pxls_of_val(input_img, vals, img_band=None):
+def buffer_img_pxl_vals(
+    input_img: str,
+    output_img: str,
+    pxl_vals: List[int],
+    buf_thres: float,
+    tmp_dir: str,
+    gdalformat: str = "KEA",
+    img_band: int = 1,
+    unit_geo: bool = True,
+):
+    """
+    A function which uses the calc_dist_to_img_vals function and a threshold to
+    buffer image pixel value(s) to create a binary mask
+
+    :param input_img: The input image
+    :param output_img: the output image
+    :param pxl_vals: a list of pixel values defining the region to be buffered
+    :param buf_thres: the threshold below which the buffered region will be defined.
+    :param tmp_dir: a tmp directory for intermediate outputs
+    :param gdalformat: output image format
+    :param img_band: the input image bands
+    :param unit_geo: is a boolean specifying the buf_thres distance units.
+                     True = Geographic units (e.g., metres),
+                     False is in Pixels (Default = True).
+
+    """
+    import rsgislib.tools.filetools
+
+    if not os.path.exists(tmp_dir):
+        raise rsgislib.RSGISPyException("The tmp_dir does not exist.")
+
+    basename = rsgislib.tools.filetools.get_file_basename(input_img)
+
+    dist_img = os.path.join(tmp_dir, f"{basename}_dist.kea")
+
+    calc_dist_to_img_vals(
+        input_img,
+        dist_img,
+        pxl_vals,
+        img_band,
+        "KEA",
+        max_dist=(buf_thres * 1.1),
+        no_data_val=None,
+        out_no_data_val=-999,
+        unit_geo=unit_geo,
+    )
+
+    image_math(
+        dist_img,
+        output_img,
+        "(b1>=0)&&(b1<{})?1:0".format(buf_thres),
+        gdalformat,
+        rsgislib.TYPE_32FLOAT,
+    )
+
+    rsgislib.tools.filetools.delete_file_silent(dist_img)
+
+
+def count_pxls_of_val(input_img: str, vals: List[int], img_band: int = None):
     """
     Function which counts the number of pixels of a set of values returning a
     list in the same order as the list of values provided.

@@ -62,7 +62,6 @@ class Band6SCoeff(object):
         DifIrr=None,
         EnvIrr=None,
     ):
-        """ """
         self.band = band
         self.aX = aX
         self.bX = bX

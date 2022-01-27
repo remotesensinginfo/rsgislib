@@ -447,14 +447,14 @@ def is_notebook():
     """
     try:
         shell = get_ipython().__class__.__name__
-        if shell == 'ZMQInteractiveShell':
-            return True   # Jupyter notebook or qtconsole
-        elif shell == 'TerminalInteractiveShell':
+        if shell == "ZMQInteractiveShell":
+            return True  # Jupyter notebook or qtconsole
+        elif shell == "TerminalInteractiveShell":
             return False  # Terminal running IPython
         else:
             return False  # Other type (?)
     except NameError:
-        return False      # Probably standard Python interpreter
+        return False  # Probably standard Python interpreter
 
 
 class RSGISTime:
@@ -548,8 +548,10 @@ class TQDMProgressBar:
 
     def setTotalSteps(self, steps: int):
         import tqdm
+
         if is_notebook():
             import tqdm.notebook
+
             self.pbar = tqdm.notebook.tqdm(total=steps)
         else:
             self.pbar = tqdm.tqdm(total=steps)
@@ -566,6 +568,7 @@ class TQDMProgressBar:
 
         if is_notebook():
             import tqdm.notebook
+
             self.pbar = tqdm.notebook.tqdm(total=100)
         else:
             self.pbar = tqdm.tqdm(total=100)

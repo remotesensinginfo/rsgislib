@@ -1154,6 +1154,30 @@ def test_merge_extracted_hdf5_data(tmp_path):
 
 
 @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_get_var_from_hdf5_data():
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_vals.h5")
+
+    data = rsgislib.zonalstats.get_var_from_hdf5_data(
+        [in_h5_file, in_h5_file], var_idx=1
+    )
+
+    assert data.shape[0] == 1406
+
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+def test_get_hdf5_data():
+    import rsgislib.zonalstats
+
+    in_h5_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_b1-6_vals.h5")
+
+    data = rsgislib.zonalstats.get_hdf5_data([in_h5_file, in_h5_file])
+
+    assert (data.shape[0] == 1406) and (data.shape[1] == 6)
+
+
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_msk_h5_smpls_to_finite_values(tmp_path):
     import rsgislib.zonalstats
 

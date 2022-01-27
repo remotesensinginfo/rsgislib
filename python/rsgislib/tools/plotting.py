@@ -60,6 +60,7 @@ def plot_image_spectra(
 
     """
     import rsgislib.tools.filetools
+
     # Check matplotlib is available
     if not haveMatPlotLib:
         raise rsgislib.RSGISPyException(
