@@ -1231,7 +1231,7 @@ def apply_lightgbm_multiclass_classifier(
     :param out_class_img: Output image which will contain the hard classification defined as the maximum probability.
     :param gdalformat: is the output image format - all GDAL supported formats are supported.
     :param class_clr_names: default is True and therefore a colour table will the colours specified in ClassInfoObj
-                          and a ClassName (from classTrainInfo) column will be added to the output file.
+                          and a class_names (from classTrainInfo) column will be added to the output file.
 
     """
     if not HAVE_LIGHTGBM:
@@ -1340,18 +1340,18 @@ def apply_lightgbm_multiclass_classifier(
         red = rat.readColumn(ratDataset, "Red")
         green = rat.readColumn(ratDataset, "Green")
         blue = rat.readColumn(ratDataset, "Blue")
-        ClassName = numpy.empty_like(red, dtype=numpy.dtype("a255"))
-        ClassName[...] = ""
+        class_names = numpy.empty_like(red, dtype=numpy.dtype("a255"))
+        class_names[...] = ""
 
         for classKey in cls_train_info:
             print("Apply Colour to class '" + classKey + "'")
             red[cls_train_info[classKey].out_id] = cls_train_info[classKey].red
             green[cls_train_info[classKey].out_id] = cls_train_info[classKey].green
             blue[cls_train_info[classKey].out_id] = cls_train_info[classKey].blue
-            ClassName[cls_train_info[classKey].out_id] = classKey
+            class_names[cls_train_info[classKey].out_id] = classKey
 
         rat.writeColumn(ratDataset, "Red", red)
         rat.writeColumn(ratDataset, "Green", green)
         rat.writeColumn(ratDataset, "Blue", blue)
-        rat.writeColumn(ratDataset, "ClassName", ClassName)
+        rat.writeColumn(ratDataset, "class_names", class_names)
         ratDataset = None

@@ -202,7 +202,7 @@ def apply_keras_chips_pixel_classifier(
     :param chip_size: is the chip size to be extracted.
     :param gdalformat: is the output image format - all GDAL supported formats are supported.
     :param class_clr_names: default is True and therefore a colour table will the colours specified in ClassInfoObj
-                          and a ClassName (from classTrainInfo) column will be added to the output file.
+                          and a class_names (from classTrainInfo) column will be added to the output file.
 
     """
     n_classes = len(class_train_info)
@@ -321,20 +321,20 @@ def apply_keras_chips_pixel_classifier(
             green = rat.readColumn(ratDataset, "Green")
             blue = rat.readColumn(ratDataset, "Blue")
 
-        ClassName = numpy.empty_like(red, dtype=numpy.dtype("a255"))
-        ClassName[...] = ""
+        class_names = numpy.empty_like(red, dtype=numpy.dtype("a255"))
+        class_names[...] = ""
 
         for classKey in class_train_info:
             print("Apply Colour to class '" + classKey + "'")
             red[class_train_info[classKey].out_id] = class_train_info[classKey].red
             green[class_train_info[classKey].out_id] = class_train_info[classKey].green
             blue[class_train_info[classKey].out_id] = class_train_info[classKey].blue
-            ClassName[class_train_info[classKey].out_id] = classKey
+            class_names[class_train_info[classKey].out_id] = classKey
 
         rat.writeColumn(ratDataset, "Red", red)
         rat.writeColumn(ratDataset, "Green", green)
         rat.writeColumn(ratDataset, "Blue", blue)
-        rat.writeColumn(ratDataset, "ClassName", ClassName)
+        rat.writeColumn(ratDataset, "class_names", class_names)
         ratDataset = None
 
 

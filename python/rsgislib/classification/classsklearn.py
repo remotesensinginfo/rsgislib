@@ -223,7 +223,7 @@ def apply_sklearn_classifier(
     img_file_info: List[ImageBandInfo],
     output_img: str,
     gdalformat: str = "KEA",
-    class_clr_names: str = True,
+    class_clr_names: bool = True,
     out_score_img: str = None,
 ):
     """
