@@ -44,31 +44,38 @@ from rios import cuiprogress
 import rsgislib
 import rsgislib.rastergis
 import rsgislib.imageutils
+import rsgislib.imagecalc
 
 
 def find_class_outliers(
     pyod_obj,
     input_img,
     in_msk_img,
-    out_lbls_img,
+    output_img,
     out_scores_img=None,
     img_mask_val=1,
     img_bands=None,
     gdalformat="KEA",
 ):
     """
-    This function uses the pyod (https://github.com/yzhao062/pyod) library to find outliers within a class.
-    It is assumed that the input images are from a different date than the mask (classification) and therefore
-    the outliners will related to class changes.
+    This function uses the pyod (https://github.com/yzhao062/pyod) library to
+    find outliers within a class. It is assumed that the input images are from a
+    different date than the mask (classification) and therefore the outliers will
+    related to class changes.
 
-    :param pyod_obj: an instance of a pyod.models (e.g., pyod.models.knn.KNN) pass parameters to the constructor
+    :param pyod_obj: an instance of a pyod.models (e.g., pyod.models.knn.KNN) pass
+                     parameters to the constructor
     :param input_img: input image used for analysis
     :param in_msk_img: input image mask use to define the region of interest.
-    :param out_lbls_img: output image with pixel over of 1 for within mask but not outlier and 2 for in mask and outlier.
-    :param out_scores_img: output image (optional, None and won't be provided; Default None) providing the probability of
+    :param output_img: output image with pixel over of 1 for within mask but
+                         not outlier and 2 for in mask and outlier.
+    :param out_scores_img: output image (optional, None and won't be provided;
+                           Default None) providing the probability of
                            each pixel being an outlier
-    :param img_mask_val: the pixel value within the mask image for the class of interest. (Default 1)
-    :param img_bands: the image bands to be used for the analysis. If None then all used (Default: None)
+    :param img_mask_val: the pixel value within the mask image for the
+                         class of interest. (Default 1)
+    :param img_bands: the image bands to be used for the analysis.
+                      If None then all used (Default: None)
     :param gdalformat: file format for the output image(s). Default KEA.
 
     """
@@ -83,14 +90,14 @@ def find_class_outliers(
     num_vars = len(img_bands)
     img_val_no_data = rsgislib.imageutils.get_img_no_data_value(input_img)
 
-    msk_arr_vals = rsgislib.imageutils.extractImgPxlValsInMsk(
+    msk_arr_vals = rsgislib.imageutils.extract_img_pxl_vals_in_msk(
         input_img, img_bands, in_msk_img, img_mask_val, img_val_no_data
     )
     print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))
 
-    print("Fitting oulier detector")
+    print("Fitting outlier detector")
     pyod_obj.fit(msk_arr_vals)
-    print("Fitted oulier detector")
+    print("Fitted outlier detector")
 
     # RIOS function to apply classifier
     def _applyPyOB(info, inputs, outputs, otherargs):
@@ -174,7 +181,7 @@ def find_class_outliers(
     otherargs.no_data_val = img_val_no_data
 
     outfiles = applier.FilenameAssociations()
-    outfiles.out_lbls_img = out_lbls_img
+    outfiles.out_lbls_img = output_img
     if out_scores_img is not None:
         outfiles.out_scores_img = out_scores_img
         otherargs.out_scores = True
@@ -195,10 +202,335 @@ def find_class_outliers(
     applier.apply(_applyPyOB, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
 
-    rsgislib.rastergis.pop_rat_img_stats(
-        clumps_img=out_lbls_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
-    )
+    if gdalformat == "KEA":
+        rsgislib.rastergis.pop_rat_img_stats(
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
+        )
+        class_info_dict = dict()
+        class_info_dict[1] = {"classname": "no_chng", "red": 0, "green": 255, "blue": 0}
+        class_info_dict[2] = {"classname": "chng", "red": 255, "green": 0, "blue": 0}
+        rsgislib.rastergis.set_class_names_colours(
+            output_img, "chng_cls", class_info_dict
+        )
+    else:
+        rsgislib.imageutils.pop_thmt_img_stats(
+            output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+        )
+
     if out_scores_img is not None:
         rsgislib.imageutils.pop_img_stats(
             out_scores_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
+
+
+def find_class_kurt_skew_outliers(
+    input_img: str,
+    in_msk_img: str,
+    output_img: str,
+    vld_min: float,
+    vld_max: float,
+    init_thres: float,
+    low_thres: bool,
+    contamination: float = 10.0,
+    only_kurtosis: bool = False,
+    img_mask_val: int = 1,
+    img_band: int = 1,
+    img_val_no_data: float = None,
+    gdalformat: str = "KEA",
+    plot_thres_file: str = None,
+) -> float:
+    """
+    This function to find outliers within a class using an optimisation of the skewness
+    and kurtosis. It is assumed that the input_img is from a different date than
+    the mask (classification) and therefore the outliers will related to class changes.
+    The skewness and kurtosis method assume that without change image values will
+    be normally distributed.
+
+    :param input_img: the input image for the analysis. Just a single band will be used.
+    :param in_msk_img: input image mask use to define the region (class) of interest.
+    :param output_img:  output image with pixel over of 1 for within mask but
+                         not outlier and 2 for in mask and outlier.
+    :param vld_min: the minimum threshold for valid image values.
+    :param vld_max: the maximum threshold for valid image values.
+    :param init_thres: an initial estimate of the change threshold
+    :param low_thres: a boolean as to whether the threshold is on the upper or lower
+                      side of the histogram. If True (default) then outliers will be
+                      identified as values below the threshold. If False then outliers
+                      will be above the threshold.
+    :param contamination: An estimate of the amount of contamination (i.e., outliners)
+                          which is within the scene.
+    :param only_kurtosis: A boolean to specify that only the kurtosis should be used
+                          to estimate the threshold. Default: False (i.e., both the
+                        kurtosis and skewness are used.
+    :param img_mask_val: the pixel value within the in_msk_img specifying the class
+                         of interest.
+    :param img_band: the input_img image band to be used for the analysis.
+    :param img_val_no_data: the input_img image not data value. If None then the value
+                            will be read from the image header.
+    :param gdalformat: the output image file format. (Default: KEA)
+    :param plot_thres_file: A file path for a plot of the histogram with the
+                            threshold. If None then ignored.
+    :return: The threshold identified.
+
+    """
+    import rsgislib.tools.stats
+
+    if img_val_no_data is None:
+        img_val_no_data = rsgislib.imageutils.get_img_no_data_value(input_img)
+
+    msk_arr_vals = rsgislib.imageutils.extract_img_pxl_vals_in_msk(
+        input_img, [img_band], in_msk_img, img_mask_val, img_val_no_data
+    )
+    print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))
+
+    chng_thres = rsgislib.tools.stats.calc_kurt_skew_threshold(
+        msk_arr_vals[..., 0],
+        vld_max,
+        vld_min,
+        init_thres,
+        low_thres,
+        contamination,
+        only_kurtosis,
+    )
+
+    band_defns = list()
+    band_defns.append(rsgislib.imagecalc.BandDefn("msk", in_msk_img, 1))
+    band_defns.append(rsgislib.imagecalc.BandDefn("val", input_img, img_band))
+    if low_thres:
+        exp = (
+            f"(val=={img_val_no_data})?0:(msk=={img_mask_val})&&"
+            f"(val<{chng_thres})?2:(msk=={img_mask_val})?1:0"
+        )
+    else:
+        exp = (
+            f"(val=={img_val_no_data})?0:(msk=={img_mask_val})&&"
+            f"(val>{chng_thres})?2:(msk=={img_mask_val})?1:0"
+        )
+    rsgislib.imagecalc.band_math(
+        output_img, exp, gdalformat, rsgislib.TYPE_8UINT, band_defns
+    )
+
+    if gdalformat == "KEA":
+        rsgislib.rastergis.pop_rat_img_stats(
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
+        )
+        class_info_dict = dict()
+        class_info_dict[1] = {"classname": "no_chng", "red": 0, "green": 255, "blue": 0}
+        class_info_dict[2] = {"classname": "chng", "red": 255, "green": 0, "blue": 0}
+        rsgislib.rastergis.set_class_names_colours(
+            output_img, "chng_cls", class_info_dict
+        )
+    else:
+        rsgislib.imageutils.pop_thmt_img_stats(
+            output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+        )
+
+    if plot_thres_file is not None:
+        import rsgislib.tools.plotting
+
+        rsgislib.tools.plotting.plot_histogram_threshold(
+            msk_arr_vals[..., 0], plot_thres_file, chng_thres
+        )
+
+    return chng_thres
+
+
+def find_class_otsu_outliers(
+    input_img: str,
+    in_msk_img: str,
+    output_img: str,
+    low_thres: bool,
+    img_mask_val: int = 1,
+    img_band: int = 1,
+    img_val_no_data: float = None,
+    gdalformat: str = "KEA",
+    plot_thres_file: str = None,
+) -> float:
+    """
+    This function to find outliers within a class using an otsu thresholding. It is
+    assumed that the input_img is from a different date than the mask
+    (classification) and therefore the outliers will related to class changes.
+
+    :param input_img: the input image for the analysis. Just a single band will be used.
+    :param in_msk_img: input image mask use to define the region (class) of interest.
+    :param output_img:  output image with pixel over of 1 for within mask but
+                         not outlier and 2 for in mask and outlier.
+    :param low_thres: a boolean as to whether the threshold is on the upper or lower
+                      side of the histogram. If True (default) then outliers will be
+                      identified as values below the threshold. If False then outliers
+                      will be above the threshold.
+    :param img_mask_val: the pixel value within the in_msk_img specifying the class
+                         of interest.
+    :param img_band: the input_img image band to be used for the analysis.
+    :param img_val_no_data: the input_img image not data value. If None then the value
+                            will be read from the image header.
+    :param gdalformat: the output image file format. (Default: KEA)
+    :param plot_thres_file: A file path for a plot of the histogram with the
+                            threshold. If None then ignored.
+    :return: The threshold identified.
+
+    """
+    import rsgislib.tools.stats
+
+    if img_val_no_data is None:
+        img_val_no_data = rsgislib.imageutils.get_img_no_data_value(input_img)
+
+    msk_arr_vals = rsgislib.imageutils.extract_img_pxl_vals_in_msk(
+        input_img, [img_band], in_msk_img, img_mask_val, img_val_no_data
+    )
+    print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))
+
+    chng_thres = rsgislib.tools.stats.calc_otsu_threshold(msk_arr_vals[..., 0])
+
+    band_defns = list()
+    band_defns.append(rsgislib.imagecalc.BandDefn("msk", in_msk_img, 1))
+    band_defns.append(rsgislib.imagecalc.BandDefn("val", input_img, img_band))
+    if low_thres:
+        exp = (
+            f"(val=={img_val_no_data})?0:(msk=={img_mask_val})&&"
+            f"(val<{chng_thres})?2:(msk=={img_mask_val})?1:0"
+        )
+    else:
+        exp = (
+            f"(val=={img_val_no_data})?0:(msk=={img_mask_val})&&"
+            f"(val>{chng_thres})?2:(msk=={img_mask_val})?1:0"
+        )
+    rsgislib.imagecalc.band_math(
+        output_img, exp, gdalformat, rsgislib.TYPE_8UINT, band_defns
+    )
+
+    if gdalformat == "KEA":
+        rsgislib.rastergis.pop_rat_img_stats(
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
+        )
+        class_info_dict = dict()
+        class_info_dict[1] = {"classname": "no_chng", "red": 0, "green": 255, "blue": 0}
+        class_info_dict[2] = {"classname": "chng", "red": 255, "green": 0, "blue": 0}
+        rsgislib.rastergis.set_class_names_colours(
+            output_img, "chng_cls", class_info_dict
+        )
+    else:
+        rsgislib.imageutils.pop_thmt_img_stats(
+            output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+        )
+
+    if plot_thres_file is not None:
+        import rsgislib.tools.plotting
+
+        rsgislib.tools.plotting.plot_histogram_threshold(
+            msk_arr_vals[..., 0], plot_thres_file, chng_thres
+        )
+
+    return chng_thres
+
+
+def find_class_li_outliers(
+    input_img: str,
+    in_msk_img: str,
+    output_img: str,
+    low_thres: bool,
+    tolerance: float = None,
+    init_thres: float = None,
+    img_mask_val: int = 1,
+    img_band: int = 1,
+    img_val_no_data: float = None,
+    gdalformat: str = "KEA",
+    plot_thres_file: str = None,
+) -> float:
+    """
+    This function to find outliers within a class using Li's iterative Minimum Cross
+    Entropy method. It is assumed that the input_img is from a different date than
+    the mask (classification) and therefore the outliers will related to class changes.
+
+    :param input_img: the input image for the analysis. Just a single band will be used.
+    :param in_msk_img: input image mask use to define the region (class) of interest.
+    :param output_img:  output image with pixel over of 1 for within mask but
+                         not outlier and 2 for in mask and outlier.
+    :param low_thres: a boolean as to whether the threshold is on the upper or lower
+                      side of the histogram. If True (default) then outliers will be
+                      identified as values below the threshold. If False then outliers
+                      will be above the threshold.
+    :param tolerance: float (optional) - Finish the computation when the
+                      change in the threshold in an iteration is less than
+                      this value. By default, this is half the smallest
+                      difference between data values.
+    :param init_thres: an initial estimate of the change threshold
+    :param img_mask_val: the pixel value within the in_msk_img specifying the class
+                         of interest.
+    :param img_band: the input_img image band to be used for the analysis.
+    :param img_val_no_data: the input_img image not data value. If None then the value
+                            will be read from the image header.
+    :param gdalformat: the output image file format. (Default: KEA)
+    :param plot_thres_file: A file path for a plot of the histogram with the
+                            threshold. If None then ignored.
+    :return: The threshold identified.
+
+    """
+    import rsgislib.tools.stats
+
+    if img_val_no_data is None:
+        img_val_no_data = rsgislib.imageutils.get_img_no_data_value(input_img)
+
+    msk_arr_vals = rsgislib.imageutils.extract_img_pxl_vals_in_msk(
+        input_img, [img_band], in_msk_img, img_mask_val, img_val_no_data
+    )
+    print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))
+
+    chng_thres = rsgislib.tools.stats.calc_li_threshold(
+        msk_arr_vals[..., 0],
+        tolerance,
+        init_thres,
+    )
+
+    band_defns = list()
+    band_defns.append(rsgislib.imagecalc.BandDefn("msk", in_msk_img, 1))
+    band_defns.append(rsgislib.imagecalc.BandDefn("val", input_img, img_band))
+    if low_thres:
+        exp = (
+            f"(val=={img_val_no_data})?0:(msk=={img_mask_val})&&"
+            f"(val<{chng_thres})?2:(msk=={img_mask_val})?1:0"
+        )
+    else:
+        exp = (
+            f"(val=={img_val_no_data})?0:(msk=={img_mask_val})&&"
+            f"(val>{chng_thres})?2:(msk=={img_mask_val})?1:0"
+        )
+    rsgislib.imagecalc.band_math(
+        output_img, exp, gdalformat, rsgislib.TYPE_8UINT, band_defns
+    )
+
+    if gdalformat == "KEA":
+        rsgislib.rastergis.pop_rat_img_stats(
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
+        )
+        class_info_dict = dict()
+        class_info_dict[1] = {"classname": "no_chng", "red": 0, "green": 255, "blue": 0}
+        class_info_dict[2] = {"classname": "chng", "red": 255, "green": 0, "blue": 0}
+        rsgislib.rastergis.set_class_names_colours(
+            output_img, "chng_cls", class_info_dict
+        )
+    else:
+        rsgislib.imageutils.pop_thmt_img_stats(
+            output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+        )
+
+    if plot_thres_file is not None:
+        import rsgislib.tools.plotting
+
+        rsgislib.tools.plotting.plot_histogram_threshold(
+            msk_arr_vals[..., 0], plot_thres_file, chng_thres
+        )
+
+    return chng_thres

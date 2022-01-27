@@ -13,13 +13,15 @@ from rsgislib import imagecalc
 from osgeo import gdal
 import numpy
 
-haveMatPlotLib = True
+have_matplotlib = True
 try:
     import matplotlib.pyplot as plt
     import matplotlib.colors as mClrs
     from matplotlib.patches import Patch
-except ImportError as pltErr:
-    haveMatPlotLib = False
+    from matplotlib import rcParams
+    from matplotlib import gridspec
+except ImportError:
+    have_matplotlib = False
 
 
 def plot_image_spectra(
@@ -60,13 +62,8 @@ def plot_image_spectra(
 
     """
     import rsgislib.tools.filetools
-
-    # Check matplotlib is available
-    if not haveMatPlotLib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required for this function could not be imported\n\t"
-            + pltErr
-        )
+    if not have_matplotlib:
+        raise rsgislib.RSGISPyException("The matplotlib module is required and could not be imported.")
 
     dataset = gdal.Open(input_img, gdal.GA_ReadOnly)
     numBands = dataset.RasterCount
@@ -221,12 +218,8 @@ def plot_image_comparison(
         plotting.plot_image_comparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
 
     """
-    # Check matplotlib is available
-    if not haveMatPlotLib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required for this function could not be imported\n\t"
-            + pltErr
-        )
+    if not have_matplotlib:
+        raise rsgislib.RSGISPyException("The matplotlib module is required and could not be imported.")
 
     gdalformat = "KEA"
     tmpOutFile = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmp.kea"
@@ -367,12 +360,8 @@ def plot_image_histogram(
         plotting.plot_image_histogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
 
     """
-    # Check matplotlib is available
-    if not haveMatPlotLib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required for this function could not be imported\n\t"
-            + pltErr
-        )
+    if not have_matplotlib:
+        raise rsgislib.RSGISPyException("The matplotlib module is required and could not be imported.")
 
     if (imgMin is None) or (imgMax is None):
         # Calculate image 1 stats
@@ -429,8 +418,9 @@ def residual_plot(y_true, residuals, out_file, out_format="PNG", title=None):
     :param title: A title for the plot. Optional, if None then ignored. (Default: None)
 
     """
-    from matplotlib import rcParams
-    from matplotlib import gridspec
+    if not have_matplotlib:
+        raise rsgislib.RSGISPyException("The matplotlib module is required and could not be imported.")
+
 
     if not isinstance(residuals, numpy.ndarray):
         residuals = numpy.array(residuals)
@@ -487,7 +477,8 @@ def quantile_plot(residuals, ylabel, out_file, out_format="PNG", title=None):
     :param title: A title for the plot. Optional, if None then ignored. (Default: None)
 
     """
-    from matplotlib import rcParams
+    if not have_matplotlib:
+        raise rsgislib.RSGISPyException("The matplotlib module is required and could not be imported.")
     from scipy.stats import probplot
 
     if not isinstance(residuals, numpy.ndarray):
@@ -527,6 +518,37 @@ def quantile_plot(residuals, ylabel, out_file, out_format="PNG", title=None):
     ax.get_lines()[1].set_color("r")
     plt.savefig(out_file, format=out_format, dpi=300, bbox_inches="tight")
     plt.close()
+
+
+def plot_histogram_threshold(data:numpy.array, out_file:str, threshold:float=None, title_str:str=None, hist_clr:str="gray", out_format:str=None, plot_dpi:int=300):
+    """
+    A function which creates a histogram plot for a numpy array of data and optionally
+    displaying a threshold on the histogram
+
+    :param data: The numpy array to be plotted. The array should be a 1d array.
+    :param out_file: The output image file path for the plot
+    :param threshold: An optional threshold to be plotted. If None then ignored.
+    :param title_str: An optional string for the plot title.
+    :param hist_clr: the colour for the histogram bars.
+    :param out_format: the output format of the plot. If None then matplotlib uses
+                       the output file extension.
+    :param plot_dpi: the dpi for the output plot.
+
+    """
+    if not have_matplotlib:
+        raise rsgislib.RSGISPyException("The matplotlib module is required and could not be imported.")
+    import rsgislib.tools.stats
+
+
+    n_bins, bin_width = rsgislib.tools.stats.get_nbins_histogram(data)
+
+    plt.figure()
+    plt.hist(data, bins=n_bins, color=hist_clr)
+    if threshold is not None:
+        plt.axvline(x=threshold, color='red')
+    if title_str is not None:
+        plt.title(title_str)
+    plt.savefig(out_file, format=out_format, dpi=plot_dpi)
 
 
 def get_gdal_raster_mpl_imshow(
