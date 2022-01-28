@@ -814,6 +814,7 @@ def test_vec_crosses_vec():
     assert not out_bool
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_get_geoms_as_bboxs():
     import rsgislib.vectorgeoms
 
@@ -838,6 +839,7 @@ def test_bbox_intersects_vec_lyr():
     assert out_bool
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_shiftxy_vec_lyr(tmp_path):
     import rsgislib.vectorgeoms
 
@@ -866,6 +868,7 @@ def test_create_rtree_index():
     assert len(geom_lst) == 4
 
 
+@pytest.mark.skipif(RTREE_NOT_AVAIL, reason="tree dependency not available")
 def test_bbox_intersects_index():
     import rsgislib.vectorgeoms
 

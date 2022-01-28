@@ -5,6 +5,7 @@ import glob
 from shutil import copy2
 import platform
 import pytest
+import rsgislib.tools.filetools
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 RASTERGIS_DATA_DIR = os.path.join(DATA_DIR, "rastergis")
@@ -18,6 +19,13 @@ try:
     import jinja2
 except ImportError:
     JINJA2_NOT_AVAIL = True
+
+gdal2tiles_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail(
+    "gdal2tiles.py", test_call_cmd=["gdal2tiles.py", "-h"]
+)
+gdal_translate_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail(
+    "gdal_translate", test_call_cmd=["gdal_translate", "-h"]
+)
 
 
 @pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
@@ -93,8 +101,9 @@ def test_rsgis_config_fail():
 
 
 @pytest.mark.skipif(
-    (JINJA2_NOT_AVAIL or on_windows),
-    reason="Either jinja2 not available or command not tested on Windows",
+    (JINJA2_NOT_AVAIL or on_windows or (not gdal_translate_cmd_avail)),
+    reason="Either jinja2 not available or command not tested on Windows, "
+    "or gdal_translate is not available",
 )
 def test_rsgisapplycmd_run(tmp_path):
     in_dir = os.path.join(tmp_path, "in")
@@ -138,8 +147,9 @@ def test_rsgisapplycmd_run(tmp_path):
 
 
 @pytest.mark.skipif(
-    (JINJA2_NOT_AVAIL or on_windows),
-    reason="Either jinja2 not available or command not tested on Windows",
+    (JINJA2_NOT_AVAIL or on_windows or (not gdal_translate_cmd_avail)),
+    reason="Either jinja2 not available or command not tested on "
+    "Windows or gdal_translate is not available",
 )
 def test_rsgisapplycmd_print(tmp_path):
     in_dir = os.path.join(tmp_path, "in")
@@ -179,7 +189,10 @@ def test_rsgisapplycmd_print(tmp_path):
     assert (rtn_info.returncode == 0) and ("gdal_translate" in rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(
+    ((not gdal_translate_cmd_avail) or on_windows),
+    reason="Command not tested on Windows or gdal_translate is not available",
+)
 def test_rsgisbatchconvert2tif(tmp_path):
     in_dir = os.path.join(tmp_path, "in")
     os.mkdir(in_dir)
@@ -206,7 +219,10 @@ def test_rsgisbatchconvert2tif(tmp_path):
     )
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(
+    ((not gdal_translate_cmd_avail) or on_windows),
+    reason="Command not tested on Windows or gdal_translate is not available",
+)
 def test_rsgisbatchconvert2tif_chk(tmp_path):
     in_dir = os.path.join(tmp_path, "in")
     os.mkdir(in_dir)
@@ -735,7 +751,10 @@ def test_rsgisimg2kmz(tmp_path):
     assert (rtn_info.returncode == 0) and (os.path.exists(out_file))
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(
+    (not gdal2tiles_cmd_avail) or on_windows,
+    reason="Command not tested on Windows or gdal2tiles.py command not available.",
+)
 def test_rsgisimg2webtiles(tmp_path):
     img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
 
@@ -889,7 +908,10 @@ def test_rsgisproj_epsg_wkt():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(
+    ((not gdal_translate_cmd_avail) or on_windows),
+    reason="Command not tested on Windows or gdal_translate is not available",
+)
 def test_rsgistranslate2tif(tmp_path):
     img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
     out_img = os.path.join(tmp_path, "out_img.tif")

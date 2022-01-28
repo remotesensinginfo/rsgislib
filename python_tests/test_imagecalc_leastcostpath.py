@@ -1,8 +1,17 @@
 import os
+import pytest
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
+SKIMAGE_NOT_AVAIL = False
+try:
+    import skimage
+except ImportError:
+    SKIMAGE_NOT_AVAIL = True
+
+
+@pytest.mark.skipif(SKIMAGE_NOT_AVAIL, reason="scikit-image dependency not available")
 def test_perform_least_cost_path_calc(tmp_path):
     import rsgislib.imagecalc.leastcostpath
 

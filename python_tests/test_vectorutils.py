@@ -530,6 +530,7 @@ def test_subset_envs_vec_lyr_obj():
     vec_rsl_obj_ds = None
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_subset_veclyr_to_featboxs(tmp_path):
     import rsgislib.vectorutils
     import glob

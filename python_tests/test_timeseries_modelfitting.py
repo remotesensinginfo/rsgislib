@@ -1,9 +1,17 @@
 import os
+import pytest
+
+SKLEARN_NOT_AVAIL = False
+try:
+    import sklearn
+except ImportError:
+    SKLEARN_NOT_AVAIL = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TIMESERIES_DATA_DIR = os.path.join(DATA_DIR, "timeseries")
 
 
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_get_ST_model_coeffs(tmp_path):
     from rsgislib.timeseries import modelfitting
     import rsgislib.tools.utils
@@ -29,6 +37,7 @@ def test_get_ST_model_coeffs(tmp_path):
     assert os.path.exists(coeffs_img)
 
 
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_predict_for_date(tmp_path):
     from rsgislib.timeseries import modelfitting
 

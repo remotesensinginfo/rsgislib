@@ -291,6 +291,10 @@ def test_apply_sklearn_classifier(tmp_path):
     assert os.path.exists(output_img) and os.path.exists(out_score_img)
 
 
+@pytest.mark.skipif(
+    (H5PY_NOT_AVAIL or SKLEARN_NOT_AVAIL),
+    reason="h5py or scikit-learn dependencies not available",
+)
 def test_apply_sklearn_classifier_rat(tmp_path):
     import rsgislib.classification.classsklearn
     import rsgislib.rastergis
