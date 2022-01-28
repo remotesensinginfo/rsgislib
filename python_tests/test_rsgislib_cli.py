@@ -13,6 +13,12 @@ IMGUTILS_DATA_DIR = os.path.join(DATA_DIR, "imageutils")
 # TODO Need to figure out what is happening on windows but get it building first!
 on_windows = platform.system() == "Windows"
 
+JINJA2_NOT_AVAIL = False
+try:
+    import jinja2
+except ImportError:
+    JINJA2_NOT_AVAIL = True
+
 
 @pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
 def test_rsgis_config_version():
@@ -86,7 +92,10 @@ def test_rsgis_config_fail():
     assert (rtn_info.returncode == 0) and ("" == rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(
+    (JINJA2_NOT_AVAIL or on_windows),
+    reason="Either jinja2 not available or command not tested on Windows",
+)
 def test_rsgisapplycmd_run(tmp_path):
     in_dir = os.path.join(tmp_path, "in")
     os.mkdir(in_dir)
@@ -128,7 +137,10 @@ def test_rsgisapplycmd_run(tmp_path):
     )
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(
+    (JINJA2_NOT_AVAIL or on_windows),
+    reason="Either jinja2 not available or command not tested on Windows",
+)
 def test_rsgisapplycmd_print(tmp_path):
     in_dir = os.path.join(tmp_path, "in")
     os.mkdir(in_dir)

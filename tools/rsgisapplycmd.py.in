@@ -39,7 +39,6 @@ import sys
 import argparse
 import pathlib
 import os
-import os.path
 import jinja2
 import subprocess
 from multiprocessing import Pool
