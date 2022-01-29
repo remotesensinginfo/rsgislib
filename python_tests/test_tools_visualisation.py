@@ -5,8 +5,12 @@ import rsgislib.tools.filetools
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TOOLS_VIS_DATA_DIR = os.path.join(DATA_DIR, "tools", "visualisation")
 
-gdal_translate_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("gdal_translate")
-gdal2tiles_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("gdal2tiles.py")
+gdal2tiles_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail(
+    "gdal2tiles.py", test_call_cmd=["gdal2tiles.py", "-h"]
+)
+gdal_translate_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail(
+    "gdal_translate", test_call_cmd=["gdal_translate", "-h"]
+)
 
 
 @pytest.mark.skipif(

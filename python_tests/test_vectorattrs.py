@@ -311,6 +311,7 @@ def test_pop_bbox_cols(tmp_path):
     rsgislib.vectorattrs.pop_bbox_cols(vec_file, vec_lyr)
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_add_geom_bbox_cols(tmp_path):
     import rsgislib.vectorattrs
 

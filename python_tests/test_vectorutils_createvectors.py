@@ -1,6 +1,12 @@
 import os
 import pytest
 
+GEOPANDAS_NOT_AVAIL = False
+try:
+    import geopandas
+except ImportError:
+    GEOPANDAS_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
@@ -48,6 +54,7 @@ def test_polygonise_raster_to_vec_lyr_8_conn(tmp_path):
     assert os.path.exists(out_vec_file)
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_vectorise_pxls_to_pts(tmp_path):
     import rsgislib.vectorutils.createvectors
 

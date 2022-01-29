@@ -13,6 +13,12 @@ try:
 except ImportError:
     PYMCR_NOT_AVAIL = True
 
+MATPLOTLIB_NOT_AVAIL = False
+try:
+    import matplotlib.pyplot
+except ImportError:
+    MATPLOTLIB_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SPECUNMIX_DATA_DIR = os.path.join(DATA_DIR, "imagecalc", "specunmixing")
 
@@ -181,6 +187,7 @@ def test_read_endmembers_mtxt_gain():
             assert False
 
 
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_plot_endmembers_basic(tmp_path):
     from rsgislib.imagecalc import specunmixing
 
@@ -191,6 +198,7 @@ def test_plot_endmembers_basic(tmp_path):
     assert os.path.exists(out_plot_file)
 
 
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_plot_endmembers_gain(tmp_path):
     from rsgislib.imagecalc import specunmixing
 
@@ -203,6 +211,7 @@ def test_plot_endmembers_gain(tmp_path):
     assert os.path.exists(out_plot_file)
 
 
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_plot_endmembers_title(tmp_path):
     from rsgislib.imagecalc import specunmixing
 
@@ -216,6 +225,7 @@ def test_plot_endmembers_title(tmp_path):
     assert os.path.exists(out_plot_file)
 
 
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_plot_endmembers_wavelengths(tmp_path):
     from rsgislib.imagecalc import specunmixing
 

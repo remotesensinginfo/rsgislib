@@ -226,12 +226,12 @@ def create_webtiles_img_no_stats_msk(
 
     img_to_strch = sel_img_bands_img
     if finite_msk:
-        finiteMskImg = os.path.join(tmp_dir, f"{base_name}_FiniteMsk.kea")
-        rsgislib.imageutils.gen_finite_mask(sel_img_bands_img, finiteMskImg, "KEA")
+        finite_msk_img = os.path.join(tmp_dir, f"{base_name}_FiniteMsk.kea")
+        rsgislib.imageutils.gen_finite_mask(sel_img_bands_img, finite_msk_img, "KEA")
         img_to_strch = os.path.join(tmp_dir, f"{base_name}_Msk2FiniteRegions.kea")
         rsgislib.imageutils.mask_img(
             sel_img_bands_img,
-            finiteMskImg,
+            finite_msk_img,
             img_to_strch,
             "KEA",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),

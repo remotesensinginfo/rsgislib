@@ -1,4 +1,11 @@
 import os
+import pytest
+
+MATPLOTLIB_NOT_AVAIL = False
+try:
+    import matplotlib.pyplot
+except ImportError:
+    MATPLOTLIB_NOT_AVAIL = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -108,6 +115,7 @@ def test_get_gdal_thematic_raster_mpl_imshow_bbox():
     )
 
 
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_get_gdal_thematic_raster_mpl_imshow_patches():
     import rsgislib.tools.plotting
 

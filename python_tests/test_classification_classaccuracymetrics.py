@@ -11,6 +11,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CLASS_ACC_DATA_DIR = os.path.join(DATA_DIR, "classification", "accuracy")
 
 
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_calc_acc_ptonly_metrics_vecsamples(tmp_path):
     import rsgislib.classification.classaccuracymetrics
 
@@ -30,6 +31,7 @@ def test_calc_acc_ptonly_metrics_vecsamples(tmp_path):
     assert os.path.exists(out_json_file) and os.path.exists(out_csv_file)
 
 
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(tmp_path):
     import rsgislib.classification.classaccuracymetrics
 
@@ -55,6 +57,7 @@ def test_calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(tmp_path):
     assert os.path.exists(out_json_file)
 
 
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(tmp_path):
     import rsgislib.classification.classaccuracymetrics
     import rsgislib.tools.filetools
@@ -98,6 +101,7 @@ def test_calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(tmp_path):
     assert os.path.exists(out_plot_file)
 
 
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_summarise_multi_acc_ptonly_metrics(tmp_path):
     import rsgislib.classification.classaccuracymetrics
     import rsgislib.tools.filetools
@@ -131,6 +135,7 @@ def test_summarise_multi_acc_ptonly_metrics(tmp_path):
     assert os.path.exists(out_json_file)
 
 
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_calc_acc_metrics_vecsamples(tmp_path):
     import rsgislib.classification.classaccuracymetrics
 

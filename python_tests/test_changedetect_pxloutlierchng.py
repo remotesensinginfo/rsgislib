@@ -7,6 +7,12 @@ try:
 except ImportError:
     PYOD_NOT_AVAIL = True
 
+MATPLOTLIB_NOT_AVAIL = False
+try:
+    import matplotlib.pyplot
+except ImportError:
+    MATPLOTLIB_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CHANGEDETECT_DATA_DIR = os.path.join(DATA_DIR, "changedetect")
 
@@ -36,6 +42,7 @@ def test_find_class_pyod_outliers(tmp_path):
     assert os.path.exists(output_img) and os.path.exists(out_scores_img)
 
 
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_find_class_kurt_skew_outliers(tmp_path):
     from rsgislib.changedetect.pxloutlierchng import find_class_kurt_skew_outliers
 
@@ -64,6 +71,7 @@ def test_find_class_kurt_skew_outliers(tmp_path):
     assert os.path.exists(output_img)
 
 
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_find_class_otsu_outliers(tmp_path):
     from rsgislib.changedetect.pxloutlierchng import find_class_otsu_outliers
 
@@ -87,6 +95,7 @@ def test_find_class_otsu_outliers(tmp_path):
     assert os.path.exists(output_img)
 
 
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_find_class_li_outliers(tmp_path):
     from rsgislib.changedetect.pxloutlierchng import find_class_li_outliers
 

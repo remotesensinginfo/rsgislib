@@ -13,7 +13,7 @@ import tempfile
 import shutil
 import datetime
 import time
-from typing import Union
+from typing import Union, List
 
 import rsgislib
 
@@ -498,15 +498,47 @@ def find_files_size_limits(
     return out_files
 
 
-def is_cmd_tool_avail(cmd_name: str):
+def is_cmd_tool_avail(cmd_name: str, test_call_cmd: List[str] = None):
     """
     A function which finds if an executable command is available
-    on the system path.
+    on the system path. If you use the option to call the command
+    then care is needed as this is running a command on the system
+    and this function does no checking on what command and options
+    has been past(!).
 
     :param cmd_name: the name of the command to test (e.g., tar, gzip etc.)
+    :param test_call_cmd: Option to call the command to test if an error
+                          is thrown. Default is None and then command is not
+                          called but if a List (e.g., ["tar", "-h"]) is provided
+                          then it will be executed to test whether the command
+                          runs without throwing an error. Note, this is
     :return: boolean (True: Command available. False Command not available)
     """
-    return shutil.which(cmd_name) is not None
+    command_exists = shutil.which(cmd_name) is not None
+    if (test_call_cmd is not None) and command_exists:
+        import subprocess
+
+        if not isinstance(test_call_cmd, list):
+            raise rsgislib.RSGISPyException(
+                "Input test command was not provided as a list."
+            )
+
+        try:
+            rtn_info = subprocess.run(
+                test_call_cmd,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            if rtn_info.returncode == 0:
+                return True
+            else:
+                return False
+        except subprocess.CalledProcessError:
+            return False
+        except Exception:
+            return False
+    return command_exists
 
 
 def file_is_hidden(dir_path: str) -> bool:

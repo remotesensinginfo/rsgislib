@@ -10,6 +10,12 @@ try:
 except ImportError:
     RTREE_NOT_AVAIL = True
 
+SKLEARN_NOT_AVAIL = False
+try:
+    import sklearn
+except ImportError:
+    SKLEARN_NOT_AVAIL = True
+
 
 def test_count_pxls_of_val_band1():
     import rsgislib.imagecalc
@@ -570,6 +576,7 @@ def test_calc_img_rescale_multi_imgs(tmp_path):
     assert img_eq
 
 
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_perform_image_pca(tmp_path):
     import rsgislib.imagecalc
 
@@ -593,6 +600,7 @@ def test_perform_image_pca(tmp_path):
     assert os.path.exists(output_img) and os.path.exists(out_eigen_vec_file)
 
 
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_perform_image_mnf(tmp_path):
     import rsgislib.imagecalc
 
