@@ -343,12 +343,12 @@ def get_class_training_data(
             out_vec_img_subsample = os.path.join(
                 tmp_lcl_dir, "{}_img_subsample.kea".format(cls_basename)
             )
-            rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(
+            rsgislib.imageutils.perform_random_pxl_sample_in_mask(
                 out_vec_img,
                 out_vec_img_subsample,
                 "KEA",
-                maskvals=[class_sample_info.id],
-                numSamples=sub_sample,
+                mask_vals=[class_sample_info.id],
+                n_samples=sub_sample,
             )
             out_vec_img = out_vec_img_subsample
 

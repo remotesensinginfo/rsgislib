@@ -1321,7 +1321,7 @@ static PyObject *ImageUtils_GenImageEdgeMask(PyObject *self, PyObject *args, PyO
 
 static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_imgs"), RSGIS_PY_C_TEXT("gdalformat"),
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("no_data_val"), nullptr};
     PyObject *pInputImages;
     const char *pszOutputImage = "";
@@ -2537,11 +2537,11 @@ static PyMethodDef ImageUtilsMethods[] = {
 
    
 {"combine_imgs_to_band", (PyCFunction)ImageUtils_CombineImages2Band, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.combine_imgs_to_band(input_imgs=list, output_imgs=string, gdalformat=string, datatype=int, no_data_val=float)\n"
+"rsgislib.imageutils.combine_imgs_to_band(input_imgs=list, output_img=string, gdalformat=string, datatype=int, no_data_val=float)\n"
 "Combine images together into a single image band by excluding the no data value.\n"
 "\n"
 ":param input_imgs: is a list of strings containing the names and paths of the input image files\n"
-":param output_imgs: is a string containing the name of the output file.\n"
+":param output_img: is a string containing the name of the output file.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 ":param no_data_val: is the no data value which will be ignored (Default is 0)\n"
@@ -2549,8 +2549,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n.. code:: python\n"
 "\n"
 "   from rsgislib import imageutils\n"
-"   inputImages = ['./forest.kea', './urban.kea', './water.kea']\n"
-"   outputImage = './classes.kea'\n"
+"   input_imgs = ['./forest.kea', './urban.kea', './water.kea']\n"
+"   output_img = './classes.kea'\n"
 "   datatype = rsgislib.TYPE_8UINT\n"
 "   format = 'KEA'\n"
 "   imageutils.combine_imgs_to_band(inputImages, outputImage, format, datatype, 0.0)\n"
