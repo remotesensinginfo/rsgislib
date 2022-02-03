@@ -31,7 +31,6 @@ Get Column Summaries
 .. autofunction:: rsgislib.vectorattrs.get_unq_col_values
 
 
-
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

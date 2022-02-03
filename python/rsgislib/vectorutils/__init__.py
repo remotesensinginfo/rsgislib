@@ -3127,3 +3127,42 @@ def create_train_test_smpls(
         import shutil
 
         shutil.rmtree(tmp_dir)
+
+
+def rm_feat_att_duplicates(
+    vec_file: str,
+    vec_lyr: str,
+    col_name: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which uses the values within an attribute column
+    to remove duplicate features from the vector layer.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param col_name: The column used to define unique features
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: output vector layer name.
+    :param out_format: output file format (default GPKG).
+
+    """
+    import geopandas
+
+    out_format = check_format_name(out_format)
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    unq_vals = base_gpdf[col_name].unique()
+
+    if unq_vals.shape[0] != base_gpdf[col_name].shape[0]:
+        base_gpdf.drop_duplicates(
+            subset=col_name, keep="first", inplace=True, ignore_index=False
+        )
+
+    if out_format == "GPKG":
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(out_vec_file, driver=out_format)

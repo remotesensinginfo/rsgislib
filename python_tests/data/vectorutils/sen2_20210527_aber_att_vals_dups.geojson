@@ -1,0 +1,13 @@
+{
+"type": "FeatureCollection",
+"name": "sen2_20210527_aber_att_vals_dups",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::27700" } },
+"features": [
+{ "type": "Feature", "properties": { "IntCol": 1, "FloatCol": 1.1, "StrCol": "One" }, "geometry": { "type": "Point", "coordinates": [ 258396.067709850496612, 280715.088143387401942 ] } },
+{ "type": "Feature", "properties": { "IntCol": 2, "FloatCol": 2.2, "StrCol": "Two" }, "geometry": { "type": "Point", "coordinates": [ 261494.971913638000842, 281917.037794988369569 ] } },
+{ "type": "Feature", "properties": { "IntCol": 3, "FloatCol": 3.3, "StrCol": "Three" }, "geometry": { "type": "Point", "coordinates": [ 259311.838872975029517, 282374.923376550606918 ] } },
+{ "type": "Feature", "properties": { "IntCol": 1, "FloatCol": 1.1, "StrCol": "One" }, "geometry": { "type": "Point", "coordinates": [ 257791.004619928920874, 282701.984506237960886 ] } },
+{ "type": "Feature", "properties": { "IntCol": 2, "FloatCol": 2.2, "StrCol": "Two" }, "geometry": { "type": "Point", "coordinates": [ 257987.241297741304152, 281794.389871355611831 ] } },
+{ "type": "Feature", "properties": { "IntCol": 3, "FloatCol": 3.3, "StrCol": "Three" }, "geometry": { "type": "Point", "coordinates": [ 262811.392960629542358, 279464.07932233333122 ] } }
+]
+}
