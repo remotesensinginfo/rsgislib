@@ -76,6 +76,7 @@ Vector Select / Subset
 .. autofunction:: rsgislib.vectorutils.subset_veclyr_to_featboxs
 .. autofunction:: rsgislib.vectorutils.spatial_select
 .. autofunction:: rsgislib.vectorutils.subset_by_attribute
+.. autofunction:: rsgislib.vectorutils.drop_rows_by_attribute
 
 
 Vector Split

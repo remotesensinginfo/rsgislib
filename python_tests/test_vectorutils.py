@@ -973,7 +973,6 @@ def test_split_by_attribute_mul_files(tmp_path):
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_subset_by_attribute_equals(tmp_path):
     import rsgislib.vectorutils
-    import glob
 
     vec_file = os.path.join(DATA_DIR, "degree_grid_named_subset.geojson")
     vec_lyr = "degree_grid_named_subset"
@@ -999,7 +998,6 @@ def test_subset_by_attribute_equals(tmp_path):
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_subset_by_attribute_contains(tmp_path):
     import rsgislib.vectorutils
-    import glob
 
     vec_file = os.path.join(DATA_DIR, "degree_grid_named_subset.geojson")
     vec_lyr = "degree_grid_named_subset"
@@ -1025,7 +1023,6 @@ def test_subset_by_attribute_contains(tmp_path):
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_subset_by_attribute_start(tmp_path):
     import rsgislib.vectorutils
-    import glob
 
     vec_file = os.path.join(DATA_DIR, "degree_grid_named_subset.geojson")
     vec_lyr = "degree_grid_named_subset"
@@ -1044,6 +1041,30 @@ def test_subset_by_attribute_start(tmp_path):
         out_vec_lyr,
         out_format="GPKG",
         match_type="start",
+    )
+    assert os.path.exists(out_vec_file)
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_drop_rows_by_attribute(tmp_path):
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(DATA_DIR, "degree_grid_named_subset.geojson")
+    vec_lyr = "degree_grid_named_subset"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    sub_col = "names"
+    sub_vals = ["N63"]
+    rsgislib.vectorutils.drop_rows_by_attribute(
+        vec_file,
+        vec_lyr,
+        sub_col,
+        sub_vals,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
     )
     assert os.path.exists(out_vec_file)
 
