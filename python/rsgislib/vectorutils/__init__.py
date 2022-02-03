@@ -2587,7 +2587,7 @@ def drop_rows_by_attribute(
     sub_vals: list,
     out_vec_file: str,
     out_vec_lyr: str,
-    out_format: str = "GPKG"
+    out_format: str = "GPKG",
 ):
     """
     A function which subsets an input vector layer based on a list of values.
@@ -2607,6 +2607,7 @@ def drop_rows_by_attribute(
 
     """
     import geopandas
+
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
     first = True
@@ -2625,6 +2626,7 @@ def drop_rows_by_attribute(
             out_gpdf.to_file(out_vec_file, driver=out_format)
     else:
         raise rsgislib.RSGISPyException("No output file as no features selected.")
+
 
 def merge_vector_files(
     vec_files: list,
