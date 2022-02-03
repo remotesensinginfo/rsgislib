@@ -77,6 +77,7 @@ Vector Select / Subset
 .. autofunction:: rsgislib.vectorutils.spatial_select
 .. autofunction:: rsgislib.vectorutils.subset_by_attribute
 .. autofunction:: rsgislib.vectorutils.drop_rows_by_attribute
+.. autofunction:: rsgislib.vectorutils.rm_feat_att_duplicates
 
 
 Vector Split

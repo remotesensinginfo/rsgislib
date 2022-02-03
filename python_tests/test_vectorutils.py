@@ -1220,3 +1220,63 @@ def test_create_train_test_smpls(tmp_path):
         rnd_seed=42,
     )
     assert os.path.exists(out_train_vec_file) and os.path.exists(out_test_vec_file)
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_rm_feat_att_duplicates_str(tmp_path):
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(
+        VECTORUTILS_DATA_DIR, "sen2_20210527_aber_att_vals_dups.geojson"
+    )
+    vec_lyr = "sen2_20210527_aber_att_vals_dups"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorutils.rm_feat_att_duplicates(
+        vec_file, vec_lyr, "StrCol", out_vec_file, out_vec_lyr, out_format="GPKG"
+    )
+
+    n_feats = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+    assert n_feats == 3
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_rm_feat_att_duplicates_int(tmp_path):
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(
+        VECTORUTILS_DATA_DIR, "sen2_20210527_aber_att_vals_dups.geojson"
+    )
+    vec_lyr = "sen2_20210527_aber_att_vals_dups"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorutils.rm_feat_att_duplicates(
+        vec_file, vec_lyr, "IntCol", out_vec_file, out_vec_lyr, out_format="GPKG"
+    )
+
+    n_feats = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+    assert n_feats == 3
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_rm_feat_att_duplicates_float(tmp_path):
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(
+        VECTORUTILS_DATA_DIR, "sen2_20210527_aber_att_vals_dups.geojson"
+    )
+    vec_lyr = "sen2_20210527_aber_att_vals_dups"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorutils.rm_feat_att_duplicates(
+        vec_file, vec_lyr, "FloatCol", out_vec_file, out_vec_lyr, out_format="GPKG"
+    )
+
+    n_feats = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+    assert n_feats == 3

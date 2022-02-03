@@ -3,7 +3,6 @@
 The vector attributes module performs attribute table operations on vectors.
 """
 
-import os
 import math
 
 from osgeo import gdal
@@ -11,6 +10,8 @@ import osgeo.ogr
 from osgeo import ogr
 
 import rsgislib
+
+gdal.UseExceptions()
 
 
 def write_vec_column(
@@ -32,8 +33,6 @@ def write_vec_column(
                         in vector file.
 
     """
-    gdal.UseExceptions()
-
     ds = gdal.OpenEx(out_vec_file, gdal.OF_UPDATE)
     if ds is None:
         raise rsgislib.RSGISPyException("Could not open '{}'".format(out_vec_file))
@@ -120,8 +119,6 @@ def write_vec_column_to_layer(
                          in vector file.
 
     """
-    gdal.UseExceptions()
-
     if out_vec_lyr_obj is None:
         raise rsgislib.RSGISPyException("The layer passed in is None...")
 
@@ -186,8 +183,6 @@ def read_vec_column(vec_file: str, vec_lyr: str, att_column: str) -> list:
     :returns: a list with the column values.
 
     """
-    gdal.UseExceptions()
-
     ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if ds is None:
         raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
@@ -229,8 +224,6 @@ def read_vec_columns(vec_file: str, vec_lyr: str, att_columns: list) -> list:
     :returns: list of dicts with the column names as keys
 
     """
-    gdal.UseExceptions()
-
     ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if ds is None:
         raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
