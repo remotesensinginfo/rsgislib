@@ -21,6 +21,8 @@ Visualise Raster Data
 .. autofunction:: rsgislib.tools.plotting.linear_stretch_np_arr
 .. autofunction:: rsgislib.tools.plotting.cumulative_stretch_np_arr
 .. autofunction:: rsgislib.tools.plotting.stdev_stretch_np_arr
+.. autofunction:: rsgislib.tools.plotting.manual_stretch_np_arr
+.. autofunction:: rsgislib.tools.plotting.limit_range_np_arr
 
 
 

@@ -97,6 +97,38 @@ def test_stdev_stretch_np_arr_1_band():
     rsgislib.tools.plotting.stdev_stretch_np_arr(img_data, no_data_val=0.0)
 
 
+def test_manual_stretch_np_arr_3_bands():
+    import rsgislib.tools.plotting
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[1, 2, 3], bbox=None
+    )
+
+    min_max_vals = list()
+    min_max_vals.append({"min": 10, "max": 400})
+    min_max_vals.append({"min": 22, "max": 300})
+    min_max_vals.append({"min": 1, "max": 120})
+
+    rsgislib.tools.plotting.manual_stretch_np_arr(
+        img_data, min_max_vals, no_data_val=0.0
+    )
+
+
+def test_manual_stretch_np_arr_1_band():
+    import rsgislib.tools.plotting
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[1], bbox=None
+    )
+    min_max_vals = {"min": 10, "max": 400}
+
+    rsgislib.tools.plotting.manual_stretch_np_arr(
+        img_data, min_max_vals, no_data_val=0.0
+    )
+
+
 def test_get_gdal_thematic_raster_mpl_imshow_basic():
     import rsgislib.tools.plotting
 
