@@ -816,8 +816,8 @@ def linear_stretch_np_arr(
     out_off: float = 0,
     out_gain: float = 1,
     out_int_type=False,
-    min_val: float = 0,
-    max_val: float = 1,
+    min_out_val: float = 0,
+    max_out_val: float = 1,
 ) -> numpy.array:
     """
     A function which performs a linear stretch using the min-max values on a per
@@ -836,8 +836,8 @@ def linear_stretch_np_arr(
     :param out_gain: Output gain value (value * gain) + offset. Default: 1
     :param out_int_type: False (default) and the output type will be float and
                          True and the output type with be integers.
-    :param min_val: Minimum output value within the output array (default: 0)
-    :param max_val: Maximum output value within the output array (default: 1)
+    :param min_out_val: Minimum output value within the output array (default: 0)
+    :param max_out_val: Maximum output value within the output array (default: 1)
     :return: A number array with the rescaled values but same dimensions as the
              input numpy array.
 
@@ -886,10 +886,10 @@ def linear_stretch_np_arr(
 
     arr_data_out = limit_range_np_arr(
         arr_data_out,
-        min_thres=min_val,
-        min_out_val=min_val,
-        max_thres=max_val,
-        max_out_val=max_val,
+        min_thres=min_out_val,
+        min_out_val=min_out_val,
+        max_thres=max_out_val,
+        max_out_val=max_out_val,
     )
 
     if out_int_type:
@@ -906,8 +906,8 @@ def cumulative_stretch_np_arr(
     out_off: float = 0,
     out_gain: float = 1,
     out_int_type=False,
-    min_val: float = 0,
-    max_val: float = 1,
+    min_out_val: float = 0,
+    max_out_val: float = 1,
 ) -> numpy.array:
     """
     A function which performs a cumulative stretch using an upper and lower
@@ -929,8 +929,8 @@ def cumulative_stretch_np_arr(
     :param out_gain: Output gain value (value * gain) + offset. Default: 1
     :param out_int_type: False (default) and the output type will be float and
                          True and the output type with be integers.
-    :param min_val: Minimum output value within the output array (default: 0)
-    :param max_val: Maximum output value within the output array (default: 1)
+    :param min_out_val: Minimum output value within the output array (default: 0)
+    :param max_out_val: Maximum output value within the output array (default: 1)
     :return: A number array with the rescaled values but same dimensions as the
              input numpy array.
 
@@ -976,10 +976,10 @@ def cumulative_stretch_np_arr(
 
     arr_data_out = limit_range_np_arr(
         arr_data_out,
-        min_thres=min_val,
-        min_out_val=min_val,
-        max_thres=max_val,
-        max_out_val=max_val,
+        min_thres=min_out_val,
+        min_out_val=min_out_val,
+        max_thres=max_out_val,
+        max_out_val=max_out_val,
     )
 
     if out_int_type:
@@ -995,8 +995,8 @@ def stdev_stretch_np_arr(
     out_off: float = 0,
     out_gain: float = 1,
     out_int_type=False,
-    min_val: float = 0,
-    max_val: float = 1,
+    min_out_val: float = 0,
+    max_out_val: float = 1,
 ) -> numpy.array:
     """
     A function which performs a standard deviation stretch using an upper and lower
@@ -1018,8 +1018,8 @@ def stdev_stretch_np_arr(
     :param out_gain: Output gain value (value * gain) + offset. Default: 1
     :param out_int_type: False (default) and the output type will be float and
                          True and the output type with be integers.
-    :param min_val: Minimum output value within the output array (default: 0)
-    :param max_val: Maximum output value within the output array (default: 1)
+    :param min_out_val: Minimum output value within the output array (default: 0)
+    :param max_out_val: Maximum output value within the output array (default: 1)
     :return: A number array with the rescaled values but same dimensions as the
              input numpy array.
 
@@ -1088,10 +1088,10 @@ def stdev_stretch_np_arr(
 
     arr_data_out = limit_range_np_arr(
         arr_data_out,
-        min_thres=min_val,
-        min_out_val=min_val,
-        max_thres=max_val,
-        max_out_val=max_val,
+        min_thres=min_out_val,
+        min_out_val=min_out_val,
+        max_thres=max_out_val,
+        max_out_val=max_out_val,
     )
 
     if out_int_type:
@@ -1107,8 +1107,8 @@ def manual_stretch_np_arr(
     out_off: float = 0,
     out_gain: float = 1,
     out_int_type=False,
-    min_val: float = 0,
-    max_val: float = 1,
+    min_out_val: float = 0,
+    max_out_val: float = 1,
 ) -> numpy.array:
     """
     A function which performs a linear stretch using the min-max values provided
@@ -1132,8 +1132,8 @@ def manual_stretch_np_arr(
     :param out_gain: Output gain value (value * gain) + offset. Default: 1
     :param out_int_type: False (default) and the output type will be float and
                          True and the output type with be integers.
-    :param min_val: Minimum output value within the output array (default: 0)
-    :param max_val: Maximum output value within the output array (default: 1)
+    :param min_out_val: Minimum output value within the output array (default: 0)
+    :param max_out_val: Maximum output value within the output array (default: 1)
     :return: A number array with the rescaled values but same dimensions as the
              input numpy array.
 
@@ -1218,10 +1218,10 @@ def manual_stretch_np_arr(
 
     arr_data_out = limit_range_np_arr(
         arr_data_out,
-        min_thres=min_val,
-        min_out_val=min_val,
-        max_thres=max_val,
-        max_out_val=max_val,
+        min_thres=min_out_val,
+        min_out_val=min_out_val,
+        max_thres=max_out_val,
+        max_out_val=max_out_val,
     )
 
     if out_int_type:
