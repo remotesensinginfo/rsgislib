@@ -118,7 +118,6 @@ set(RSGISLIB_CMDSINTERFACE_LIB_NAME rsgis_cmds)
 
 option (BUILD_SHARED_LIBS "Build with shared library" ON)
 set(RSGISLIB_WITH_UTILTIES TRUE CACHE BOOL "Choose if RSGISLib utilities should be built")
-set(RSGISLIB_WITH_DOCUMENTS TRUE CACHE BOOL "Choose if RSGISLib documentation should be installed.")
 set(RSGISLIB_WITH_DATA TRUE CACHE BOOL "Choose if RSGISLib datasets should be installed.")
 
 set(BOOST_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for Boost")
@@ -364,11 +363,6 @@ if (RSGISLIB_WITH_UTILTIES)
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgisfilehash.py.in" "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgisfilehash.py" )
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgischkgdalfile.py.in" "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgischkgdalfile.py" )
 endif(RSGISLIB_WITH_UTILTIES)
-
-if (RSGISLIB_WITH_DOCUMENTS)
-	configure_file ( "${PROJECT_DOC_DIR}/Doxyfile.in" "${PROJECT_DOC_DIR}/Doxyfile" )
-	configure_file ( "${PROJECT_DOC_DIR}/dox_files/index.dox.in" "${PROJECT_DOC_DIR}/dox_files/index.dox" )
-endif(RSGISLIB_WITH_DOCUMENTS)
 
 ###############################################################################
 
