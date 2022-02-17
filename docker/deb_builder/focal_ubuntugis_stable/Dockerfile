@@ -24,24 +24,11 @@ RUN apt-get update -y && \
     add-apt-repository universe && \
     add-apt-repository -y ppa:ubuntugis/ppa && \
     apt-get update -y && apt-get install --no-install-recommends -y \
-    software-properties-common \
     build-essential \
     python3-dev \
-    python3-pip \
-    python3-wheel \
-    libspatialite-dev \
-    libpq-dev \
+    python3-setuptools \
     libgdal-dev \
-    libcurl4-gnutls-dev \
-    libproj-dev \
-    libxml2-dev \
-    libnetcdf-dev \
-    libpoppler-dev \
-    libspatialite-dev \
-    libhdf4-alt-dev \
     libhdf5-serial-dev \
-    bash-completion \
-    gdal-bin \
     libgsl-dev \
     libgsl23 \
     libgmp-dev \
@@ -52,10 +39,7 @@ RUN apt-get update -y && \
     libmuparser-dev \
     libmuparser2v5 \
     libhdf5-dev \
-    libhdf5-cpp-103 \
     wget \
-    unzip \
-    python3-setuptools \
     locales \
     cmake
 
