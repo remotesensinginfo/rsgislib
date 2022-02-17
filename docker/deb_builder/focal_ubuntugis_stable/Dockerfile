@@ -44,7 +44,6 @@ RUN apt-get update -y && \
     cmake
 
 ARG KEALIB_VER=1.4.14
-ARG RIOS_VER=1.4.8
 ARG RSGISLIB_VER=5.0.5
 ARG PACKAGE_DIR=/usr/local/packages
 ARG RSGSILIB_PACKAGE_DIR=$PACKAGE_DIR/rsgislib_$RSGISLIB_VER-1
@@ -70,14 +69,7 @@ RUN cd /usr/local/src && \
     echo export GDAL_DRIVER_PATH=/usr/local/lib/gdalplugins >> /etc/profile.d/kealib.sh && \
     echo export LD_LIBRARY_PATH=/usr/local/lib >> /etc/profile.d/kealib.sh
 
-# Install rios
-RUN cd /usr/local/src && \
-    wget https://github.com/ubarsc/rios/releases/download/rios-$RIOS_VER/rios-$RIOS_VER.tar.gz && \
-    tar -zxvf rios-$RIOS_VER.tar.gz && \
-    cd ./rios-$RIOS_VER && \
-    python3 setup.py install
-
-# Copy in RSGISLib
+# Install rsgislib
 RUN mkdir /usr/local/src/rsgislib
 COPY . /usr/local/src/rsgislib
 
@@ -101,7 +93,6 @@ RUN cd /usr/local/src/rsgislib && \
     
 RUN mkdir $RSGSILIB_PACKAGE_DIR/DEBIAN
 COPY ./docker/deb_builder/focal_ubuntugis_stable/DEBIAN $RSGSILIB_PACKAGE_DIR/DEBIAN
-
 RUN dpkg-deb --build $RSGSILIB_PACKAGE_DIR
 
 
