@@ -92,9 +92,12 @@ def cls_quantity_accuracy(
     )  # same as Comparison Total (see Ref.)
 
     # normalise the confusion matrix by proportional area:
-    norm_cm = cm.astype(float) / cm.sum(axis=1)[
-        :,
-    ].reshape(-1, 1)
+    norm_cm = (
+        cm.astype(float)
+        / cm.sum(axis=1)[
+            :,
+        ].reshape(-1, 1)
+    )
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -201,9 +204,12 @@ def calc_class_accuracy_metrics(
         -1, 1
     )  # same as Comparison Total (see Ref.)
     # normalise the confusion matrix by proportional area:
-    norm_cm = cm.astype(float) / cm.sum(axis=1)[
-        :,
-    ].reshape(-1, 1)
+    norm_cm = (
+        cm.astype(float)
+        / cm.sum(axis=1)[
+            :,
+        ].reshape(-1, 1)
+    )
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -1628,6 +1634,7 @@ def calc_sampled_acc_metrics(
     y_plt_usr_max=None,
     y_plt_prod_min=None,
     y_plt_prod_max=None,
+    ref_line_clr: List = (0.0, 0.0, 0.0),
 ):
     """
     A function which calculates users and producers accuracies for the inputted
@@ -1671,6 +1678,9 @@ def calc_sampled_acc_metrics(
     :param y_plt_usr_max: Optional maximum y value for users plot.
     :param y_plt_prod_min: Optional minimum y value for producers plot.
     :param y_plt_prod_max: Optional maximum y value for producers plot.
+    :param ref_line_clr: The colour of the reference line added to the
+                         out_usr_metrics_plot and out_prod_metrics_plot.
+                         The default is black (0.0, 0.0, 0.0).
 
     """
     import rsgislib.classification.classaccuracymetrics
@@ -1803,7 +1813,7 @@ def calc_sampled_acc_metrics(
                 color=cls_colours[cls_name],
                 alpha=0.25,
             )
-            axs_flat[j].axhline(y=ref_usr[j], color="r", linestyle="-")
+            axs_flat[j].axhline(y=ref_usr[j], color=ref_line_clr, linestyle="-")
             axs_flat[j].plot(smpls_lst, usr_lower[..., j], color=cls_colours[cls_name])
             axs_flat[j].plot(smpls_lst, usr_upper[..., j], color=cls_colours[cls_name])
             axs_flat[j].plot(smpls_lst, usr_mean[..., j], color=cls_colours[cls_name])
@@ -1858,7 +1868,7 @@ def calc_sampled_acc_metrics(
                 color=cls_colours[cls_name],
                 alpha=0.25,
             )
-            axs_flat[j].axhline(y=ref_prod[j], color="r", linestyle="-")
+            axs_flat[j].axhline(y=ref_prod[j], color=ref_line_clr, linestyle="-")
             axs_flat[j].plot(smpls_lst, prod_lower[..., j], color=cls_colours[cls_name])
             axs_flat[j].plot(smpls_lst, prod_upper[..., j], color=cls_colours[cls_name])
             axs_flat[j].plot(smpls_lst, prod_mean[..., j], color=cls_colours[cls_name])
