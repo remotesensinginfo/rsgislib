@@ -6,9 +6,22 @@ The tools.utils module contains some useful tools
 import datetime
 import os
 import string
+import json
 
 import numpy
 import rsgislib
+
+
+class RSGISNumpyArrayEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, numpy.integer):
+            return int(obj)
+        elif isinstance(obj, numpy.floating):
+            return float(obj)
+        elif isinstance(obj, numpy.ndarray):
+            return obj.tolist()
+        else:
+            return super(RSGISNumpyArrayEncoder, self).default(obj)
 
 
 def uid_generator(size: int = 6):
@@ -231,12 +244,11 @@ def write_dict_to_json(data_dict: dict, out_file: str):
     :param out_file: The file path to the output file.
 
     """
-    import json
-
     with open(out_file, "w") as fp:
         json.dump(
             data_dict,
             fp,
+            cls=RSGISNumpyArrayEncoder,
             sort_keys=True,
             indent=4,
             separators=(",", ": "),
@@ -254,11 +266,15 @@ def write_dict_to_json_gz(data_dict: dict, out_file: str, encoding: str = "utf-8
     :param encoding: the character set encoding (default: utf-8)
 
     """
-    import json
     import gzip
 
-    json_str = json.dump(
-        data_dict, sort_keys=True, indent=4, separators=(",", ": "), ensure_ascii=False
+    json_str = json.dumps(
+        data_dict,
+        cls=RSGISNumpyArrayEncoder,
+        sort_keys=True,
+        indent=4,
+        separators=(",", ": "),
+        ensure_ascii=False,
     )
     json_bytes = json_str.encode(encoding)
 
@@ -273,8 +289,6 @@ def read_json_to_dict(input_file: str):
     :param input_file: input JSON file path.
 
     """
-    import json
-
     with open(input_file) as f:
         data = json.load(f)
     return data
@@ -288,7 +302,6 @@ def read_gz_json_to_dict(input_file: str, encoding: str = "utf-8"):
     :param encoding: the character set encoding (default: utf-8)
 
     """
-    import json
     import gzip
 
     with gzip.GzipFile(input_file, "r") as fin:
