@@ -275,8 +275,8 @@ def test_write_dict_to_json_numpy(tmp_path):
     out_data["data"] = numpy.arange(10)
     out_file = os.path.join(tmp_path, "out_file.json")
     rsgislib.tools.utils.write_dict_to_json(out_data, out_file)
-    in_data = numpy.array(rsgislib.tools.utils.read_json_to_dict(out_file))
-    assert in_data == out_data
+    in_data = rsgislib.tools.utils.read_json_to_dict(out_file)
+    assert numpy.sum(in_data["data"] - out_data["data"]) == 0
 
 
 def test_in_bounds_sgl_num():
