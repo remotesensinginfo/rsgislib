@@ -3,6 +3,8 @@
 [![<remotesensinginfo>](https://circleci.com/gh/remotesensinginfo/rsgislib/tree/main.svg?style=shield)](https://app.circleci.com/pipelines/github/remotesensinginfo/rsgislib)
 [![codecov](https://codecov.io/gh/remotesensinginfo/rsgislib/branch/main/graph/badge.svg?token=EHTF2G1KCL)](https://codecov.io/gh/remotesensinginfo/rsgislib)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=remotesensinginfo_rsgislib&metric=bugs)](https://sonarcloud.io/summary/new_code?id=remotesensinginfo_rsgislib)
+[![Install](https://anaconda.org/conda-forge/rsgislib/badges/installer/conda.svg)](https://anaconda.org/conda-forge/rsgislib)
+  
   
 The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets.
 For more details see the project website: http://rsgislib.org/
@@ -14,7 +16,17 @@ We provide updated and support for the project for free as a open source project
   
 ## Installing ##
 
-Instructions on installing RSGISLib are provided on the [download](doc/python/source/download.rst) page of the project documentation.
+Instructions on installing RSGISLib:
+  
+```shell
+conda install -c conda-forge rsgislib
+```
+  
+If you want to install a system of packages for undertaking remote sensing and GIS data analysis in python then the following packages would be a recommended list:
+  
+```shell
+conda install -c conda-forge rsgislib gdal h5py parallel scikit-learn scikit-image scikit-optimize imbalanced-learn matplotlib pandas geopandas statsmodels scipy rasterio shapely networkx sqlalchemy pycurl xgboost lightgbm tpot seaborn numba pip sphinx elevation rtree tqdm jinja2 keras keras-preprocessing pytables bokeh pygal jupyterlab psutil pysal libpysal esda pyyaml netcdf4 xarray rasterstats fiona plotly python-kaleido psycopg2 ipywidgets tuiview
+```
 
 ## Documentation and Support ##
 
@@ -44,6 +56,48 @@ Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Re
     	Volume = {62},
     	Year = {2014}}
 ```
- 
+
+## Building from Source ##
+  
+RSGISLib uses cmake for the build system, so you will need that and the dependencies installed on your system.
+
+```shell
+# Create a build directory in the release directory
+mkdir build_dir
+cd build_dir
+
+# if all the dependencies are within the same path (e.g., installed with conda)
+# then use a variable to specify the path.
+export DEPEND_ENV_PATH=/home/user/miniconda/envs/rsgislib_v5_dev
+
+# Set the install location and path to dependencies
+cmake -D CMAKE_INSTALL_PREFIX=/usr/local \
+-D BOOST_INCLUDE_DIR=$DEPEND_ENV_PATH/include \
+-D BOOST_LIB_PATH=$DEPEND_ENV_PATH/lib \
+-D GDAL_INCLUDE_DIR=$DEPEND_ENV_PATH/include \
+-D GDAL_LIB_PATH=$DEPEND_ENV_PATH/lib \
+-D HDF5_INCLUDE_DIR=$DEPEND_ENV_PATH/include \
+-D HDF5_LIB_PATH=$DEPEND_ENV_PATH/lib \
+-D GSL_INCLUDE_DIR=$DEPEND_ENV_PATH/include \
+-D GSL_LIB_PATH=$DEPEND_ENV_PATH/lib \
+-D MUPARSER_INCLUDE_DIR=$DEPEND_ENV_PATH/include \
+-D MUPARSER_LIB_PATH=$DEPEND_ENV_PATH/lib \
+-D KEA_INCLUDE_DIR=$DEPEND_ENV_PATH/include \
+-D KEA_LIB_PATH=$DEPEND_ENV_PATH/lib \
+-D Python_EXECUTABLE=$DEPEND_ENV_PATH/bin/python \
+-D CMAKE_VERBOSE_MAKEFILE=ON \
+-D CMAKE_BUILD_TYPE=Debug \
+-D CMAKE_SKIP_RPATH=ON \
+..
+  
+# build rsgislib -j N is the number of cores to use for build 
+make -j 2
+  
+# Install the build into the install prefix.
+make install
+```
+  
+
+  
 [![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/summary/new_code?id=remotesensinginfo_rsgislib)
   
