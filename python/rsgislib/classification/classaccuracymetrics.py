@@ -1580,7 +1580,7 @@ def create_modelled_acc_pts(
 
     err_mtx_unit_area_arr = numpy.array(err_matrix)
 
-    if err_mtx_unit_area_arr.sum() != 1:
+    if abs(err_mtx_unit_area_arr.sum() - 1) > 0.0001:
         raise rsgislib.RSGISPyException("The error matrix does not sum to 1")
 
     out_ref_arr = numpy.empty(n_pts, dtype=numpy.dtype("a255"))
