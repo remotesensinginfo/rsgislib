@@ -43,7 +43,7 @@ RUN apt-get update -y && \
     locales \
     cmake
 
-ARG KEALIB_VER=1.4.14
+ARG KEALIB_DEB_URL=https://envsys-public.s3.amazonaws.com/ubuntu/kealib/focal_ubuntugis_stable_libkea_1.4.14-1.deb
 ARG RSGISLIB_VER=5.0.5
 ARG PACKAGE_DIR=/usr/local/packages
 ARG RSGSILIB_PACKAGE_DIR=$PACKAGE_DIR/rsgislib_$RSGISLIB_VER-1
@@ -51,23 +51,9 @@ ARG make_threads=7
 
 # Install kealib
 RUN cd /usr/local/src && \
-    wget https://github.com/ubarsc/kealib/releases/download/kealib-$KEALIB_VER/kealib-$KEALIB_VER.tar.gz && \
-    tar -zxvf kealib-$KEALIB_VER.tar.gz && \
-    cd ./kealib-$KEALIB_VER && \
-    cmake \
-    -D CMAKE_VERBOSE_MAKEFILE=ON \
-    -D HDF5_INCLUDE_DIR=/usr/include/hdf5/serial \
-    -D HDF5_LIB_PATH=/usr/lib/x86_64-linux-gnu/hdf5/serial \
-    -D GDAL_INCLUDE_DIR=/usr/include/gdal \
-    -D GDAL_LIB_PATH=/usr/lib/ \
-    -D LIBKEA_WITH_GDAL=ON \
-    -D BUILD_SHARED_LIBS=ON \
-    -D CMAKE_BUILD_TYPE=Release \
-    . && \
-    make -j "${make_threads}" && \
-    make install && \
-    echo export GDAL_DRIVER_PATH=/usr/local/lib/gdalplugins >> /etc/profile.d/kealib.sh && \
-    echo export LD_LIBRARY_PATH=/usr/local/lib >> /etc/profile.d/kealib.sh
+    wget $KEALIB_DEB_URL && \
+    dpkg -i *libkea*.deb && \
+    ldconfig
 
 # Install rsgislib
 RUN mkdir /usr/local/src/rsgislib
