@@ -92,7 +92,7 @@ RUN cd /usr/local/src/rsgislib && \
     touch $RSGSILIB_PACKAGE_DIR/usr/lib/python3.8/dist-packages/rsgislib-$RSGISLIB_VER.dist-info/METADATA
     
 RUN mkdir $RSGSILIB_PACKAGE_DIR/DEBIAN
-COPY ./docker/deb_builder/focal_ubuntugis_stable/DEBIAN $RSGSILIB_PACKAGE_DIR/DEBIAN
+COPY ./contrib/ubuntu/focal_ubuntugis_stable/DEBIAN $RSGSILIB_PACKAGE_DIR/DEBIAN
 RUN dpkg-deb --build $RSGSILIB_PACKAGE_DIR
 
 
