@@ -52,6 +52,7 @@ Accuracy Assessment Samples
 .. autofunction:: rsgislib.classification.pop_class_info_accuracy_pts
 .. autofunction:: rsgislib.classification.create_acc_pt_sets
 .. autofunction:: rsgislib.classification.classaccuracymetrics.create_modelled_acc_pts
+.. autofunction:: rsgislib.classification.classaccuracymetrics.create_norm_modelled_err_matrix
 
 Accuracy Assessment Stats
 ----------------------------
@@ -76,4 +77,3 @@ Classification Utility Classes
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

@@ -92,12 +92,7 @@ def cls_quantity_accuracy(
     )  # same as Comparison Total (see Ref.)
 
     # normalise the confusion matrix by proportional area:
-    norm_cm = (
-        cm.astype(float)
-        / cm.sum(axis=1)[
-            :,
-        ].reshape(-1, 1)
-    )
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -204,12 +199,7 @@ def calc_class_accuracy_metrics(
         -1, 1
     )  # same as Comparison Total (see Ref.)
     # normalise the confusion matrix by proportional area:
-    norm_cm = (
-        cm.astype(float)
-        / cm.sum(axis=1)[
-            :,
-        ].reshape(-1, 1)
-    )
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -1963,3 +1953,46 @@ def calc_sampled_acc_metrics(
         fig.supylabel("%")
         plt.tight_layout()
         plt.savefig(out_ref_prod_plot)
+
+
+def create_norm_modelled_err_matrix(
+    cls_areas: List[float], ref_smpl_accs: List[List[float]]
+) -> List[List[float]]:
+    """
+    A function which creates a normalised error matrix (as required by
+    create_modelled_acc_pts function) using the class areas and relative
+    accuracies of the reference samples.
+
+    :param cls_areas: a list of relative class areas (i.e., percentage are for each
+                      class). The list must be either add up to 100 or 1. (e.g.,
+                      [10, 40, 30, 20] would mean that there is 10% of the area
+                      mapped as class 1, 40% for class2, 30 for class3 and 20 for
+                      class4.
+    :param ref_smpl_accs: The accuracy of the classes relative to the reference
+                          samples. This is an n x n square matrix where n
+                          is the number of classes. Each row is the relative
+                          accuracy of the reference samples for the class. Each
+                          row must either sum to 1 or 100.
+    :return: an n x n square matrix which is normalised for the class areas.
+
+    """
+    cls_areas_arr = numpy.array(cls_areas)
+
+    if cls_areas_arr.sum() == 100:
+        cls_areas_arr = cls_areas_arr / 100
+
+    if abs(cls_areas_arr.sum() - 1) > 0.0001:
+        raise rsgislib.RSGISPyException("The list of class areas must sum to 1 or 100.")
+
+    n_clses = cls_areas_arr.shape[0]
+    ref_smpl_accs_arr = numpy.array(ref_smpl_accs)
+
+    for i in range(n_clses):
+        if abs(ref_smpl_accs_arr[i].sum() - 1) > 0.0001:
+            ref_smpl_accs_arr[i] = ref_smpl_accs_arr[i] / 100
+            if abs(ref_smpl_accs_arr[i].sum() - 1) > 0.0001:
+                raise rsgislib.RSGISPyException(f"Row {i} does not sum to 1 or 100.")
+
+        ref_smpl_accs_arr[i] = ref_smpl_accs_arr[i] * cls_areas_arr[i]
+
+    return ref_smpl_accs_arr.tolist()

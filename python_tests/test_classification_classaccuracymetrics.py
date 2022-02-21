@@ -168,6 +168,23 @@ def test_calc_acc_metrics_vecsamples(tmp_path):
     assert os.path.exists(out_json_file) and os.path.exists(out_csv_file)
 
 
+def test_create_norm_modelled_err_matrix():
+    from rsgislib.classification.classaccuracymetrics import (
+        create_norm_modelled_err_matrix,
+    )
+
+    cls_areas = [40, 40, 10, 10]
+
+    rel_err_mtx = [
+        [75.0, 5.0, 5.0, 15.0],
+        [5.0, 75.0, 2.0, 18.0],
+        [20.0, 2.5, 75.0, 2.5],
+        [2.5, 20.0, 2.5, 75.0],
+    ]
+
+    err_mtx = create_norm_modelled_err_matrix(cls_areas, rel_err_mtx)
+
+
 def test_create_modelled_acc_pts():
     import rsgislib.classification.classaccuracymetrics
 
@@ -214,10 +231,9 @@ def test_calc_sampled_acc_metrics(tmp_path):
         [0.0, 0.02, 0.0, 0.03],
     ]
 
-    (
-        ref_samples,
-        pred_samples,
-    ) = classaccuracymetrics.create_modelled_acc_pts(err_mtx_unit_area, cls_lst, 2500)
+    (ref_samples, pred_samples,) = classaccuracymetrics.create_modelled_acc_pts(
+        err_mtx_unit_area, cls_lst, 2500
+    )
 
     smpls_lst = [500, 1000, 1500, 2000]
 

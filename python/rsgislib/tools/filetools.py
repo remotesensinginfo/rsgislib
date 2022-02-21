@@ -525,10 +525,7 @@ def is_cmd_tool_avail(cmd_name: str, test_call_cmd: List[str] = None):
 
         try:
             rtn_info = subprocess.run(
-                test_call_cmd,
-                capture_output=True,
-                text=True,
-                check=True,
+                test_call_cmd, capture_output=True, text=True, check=True,
             )
             if rtn_info.returncode == 0:
                 return True
