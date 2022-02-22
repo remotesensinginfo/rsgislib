@@ -1976,16 +1976,16 @@ def create_norm_modelled_err_matrix(
     :return: an n x n square matrix which is normalised for the class areas.
 
     """
-    cls_areas_arr = numpy.array(cls_areas)
+    cls_areas_arr = numpy.array(cls_areas, dtype=float)
 
-    if cls_areas_arr.sum() == 100:
+    if abs(cls_areas_arr.sum() - 100) < 0.01:
         cls_areas_arr = cls_areas_arr / 100
 
     if abs(cls_areas_arr.sum() - 1) > 0.0001:
         raise rsgislib.RSGISPyException("The list of class areas must sum to 1 or 100.")
 
     n_clses = cls_areas_arr.shape[0]
-    ref_smpl_accs_arr = numpy.array(ref_smpl_accs)
+    ref_smpl_accs_arr = numpy.array(ref_smpl_accs, dtype=float)
 
     for i in range(n_clses):
         if abs(ref_smpl_accs_arr[i].sum() - 1) > 0.0001:
