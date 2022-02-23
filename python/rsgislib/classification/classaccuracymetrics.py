@@ -99,9 +99,9 @@ def cls_quantity_accuracy(
 
     quantity_disagreement = sum(numpy.abs(ref_total - comp_total)) / 2
     commission = [(row.sum() - row[idx]) for idx, row in enumerate(norm_cm)]
-    ommission = ref_total - numpy.diag(norm_cm)
+    omission = ref_total - numpy.diag(norm_cm)
     allocation_disagreement = (
-        sum(2 * numpy.min(numpy.array([commission, ommission]), axis=0)) / 2
+        sum(2 * numpy.min(numpy.array([commission, omission]), axis=0)) / 2
     )
     prop_correct = sum(numpy.diag(norm_cm)) / numpy.sum(norm_cm)
     disagreement = quantity_disagreement + allocation_disagreement
@@ -138,6 +138,8 @@ def calc_class_accuracy_metrics(
 
     """
     import sklearn.metrics
+
+    cls_names.sort()
 
     acc_metrics = sklearn.metrics.classification_report(
         ref_samples, pred_samples, target_names=cls_names, output_dict=True
@@ -204,7 +206,7 @@ def calc_class_accuracy_metrics(
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
     commission = [(row.sum() - row[idx]) for idx, row in enumerate(norm_cm)]
-    ommission = ref_total - numpy.diag(norm_cm)
+    omission = ref_total - numpy.diag(norm_cm)
     # Sum the normalised cm columns to estimate the proportion of scene for each class.
     cls_area_prop = numpy.sum(norm_cm, axis=0)
 
@@ -214,7 +216,7 @@ def calc_class_accuracy_metrics(
 
     acc_metrics["norm_confusion_matrix"] = norm_cm.tolist()
     acc_metrics["commission"] = commission
-    acc_metrics["ommission"] = ommission.tolist()
+    acc_metrics["omission"] = omission.tolist()
     acc_metrics["est_prop_cls_area"] = cls_area_prop.tolist()
 
     quantity_metrics = cls_quantity_accuracy(ref_samples, pred_samples, cls_area)
@@ -248,6 +250,8 @@ def calc_class_pt_accuracy_metrics(
 
     """
     import sklearn.metrics
+
+    cls_names.sort()
 
     acc_metrics = sklearn.metrics.classification_report(
         ref_samples, pred_samples, target_names=cls_names, output_dict=True
@@ -360,7 +364,7 @@ def calc_acc_metrics_vecsamples(
     # Find unique class values
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    )
+    ).sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
@@ -588,13 +592,13 @@ def calc_acc_metrics_vecsamples(
                 acc_metrics_writer.writerow(row)
 
             acc_metrics_writer.writerow([""])
-            acc_metrics_writer.writerow(["class", "commission", "ommision"])
+            acc_metrics_writer.writerow(["class", "commission", "omission"])
             for i, cls_name in enumerate(unq_cls_names):
                 acc_metrics_writer.writerow(
                     [
                         cls_name,
                         acc_metrics["commission"][i],
-                        acc_metrics["ommission"][i],
+                        acc_metrics["omission"][i],
                     ]
                 )
 
@@ -672,7 +676,7 @@ def calc_acc_ptonly_metrics_vecsamples(
     # Find unique class values
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    )
+    ).sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
@@ -841,7 +845,7 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     # Find unique class values
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    )
+    ).sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
