@@ -1625,6 +1625,7 @@ def calc_sampled_acc_metrics(
     y_plt_prod_min=None,
     y_plt_prod_max=None,
     ref_line_clr: List = (0.0, 0.0, 0.0),
+    in_loop=False,
 ):
     """
     A function which calculates users and producers accuracies for the inputted
@@ -1671,6 +1672,8 @@ def calc_sampled_acc_metrics(
     :param ref_line_clr: The colour of the reference line added to the
                          out_usr_metrics_plot and out_prod_metrics_plot.
                          The default is black (0.0, 0.0, 0.0).
+    :param in_loop: True is called within a loop so tqdm progress bar will
+                    then be passed a position parameter of 1.
 
     """
     import rsgislib.classification.classaccuracymetrics
@@ -1692,7 +1695,10 @@ def calc_sampled_acc_metrics(
     n_clses = len(cls_names)
 
     n_smpls = len(smpls_lst)
-    for n_smps in tqdm.tqdm(smpls_lst):
+    tqdm_pos = 0
+    if in_loop:
+        tqdm_pos = 1
+    for n_smps in tqdm.tqdm(smpls_lst, position=tqdm_pos):
         tmp_usr_vals = numpy.zeros((n_repeats, n_clses), dtype=float)
         tmp_prod_vals = numpy.zeros((n_repeats, n_clses), dtype=float)
 
@@ -1707,18 +1713,26 @@ def calc_sampled_acc_metrics(
                 tmp_usr_vals[i, j] = tmp_metrics["user_accuracy"][j]
                 tmp_prod_vals[i, j] = tmp_metrics["producer_accuracy"][j]
 
+        tmp_usr_vals[numpy.isnan(tmp_usr_vals)] = 0
+        tmp_prod_vals[numpy.isnan(tmp_prod_vals)] = 0
+
         out_stats = dict()
         out_stats["users_mean"] = tmp_usr_vals.mean(axis=0)
         out_stats["users_lower"] = numpy.percentile(tmp_usr_vals, 5, axis=0)
+        out_stats["users_lower"][numpy.isnan(out_stats["users_lower"])] = 0
         out_stats["users_upper"] = numpy.percentile(tmp_usr_vals, 95, axis=0)
+        out_stats["users_upper"][numpy.isnan(out_stats["users_upper"])] = 100
         out_stats["users_conf_range"] = (
             out_stats["users_upper"] - out_stats["users_lower"]
         )
         out_stats["users_ref_diff"] = ref_usr - out_stats["users_mean"]
         out_stats["users_ref_diff_abs"] = numpy.abs(out_stats["users_ref_diff"])
+
         out_stats["producers_mean"] = tmp_prod_vals.mean(axis=0)
         out_stats["producers_lower"] = numpy.percentile(tmp_prod_vals, 5, axis=0)
+        out_stats["producers_lower"][numpy.isnan(out_stats["producers_lower"])] = 0
         out_stats["producers_upper"] = numpy.percentile(tmp_prod_vals, 95, axis=0)
+        out_stats["producers_upper"][numpy.isnan(out_stats["producers_upper"])] = 100
         out_stats["producers_conf_range"] = (
             out_stats["producers_upper"] - out_stats["producers_lower"]
         )
