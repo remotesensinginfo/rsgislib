@@ -229,7 +229,7 @@ def calc_clear_sky_regions(
     tmpMorphOperator = os.path.join(tmpPath, "CircularMorphOp.gmtxt")
 
     rsgislib.imagecalc.calc_dist_to_img_vals(
-        cloudsImg, tmpCloudsImgDist2Clouds, pxlVals=[1, 2]
+        cloudsImg, tmpCloudsImgDist2Clouds, pxl_vals=[1, 2]
     )
 
     rsgislib.imageutils.mask_img(
@@ -291,7 +291,7 @@ def calc_clear_sky_regions(
     rsgislib.rastergis.populate_rat_with_stats(
         tmpInitClearSkyRegionsFinal,
         tmpClearSkyRegionsFullExtentClumps,
-        [rsgislib.rastergis.BandAttStats(band=1, maxField="InitRegionInter")],
+        [rsgislib.rastergis.BandAttStats(band=1, max_field="InitRegionInter")],
     )
 
     ratDataset = gdal.Open(tmpClearSkyRegionsFullExtentClumps, gdal.GA_Update)
@@ -314,16 +314,16 @@ def calc_clear_sky_regions(
     )
 
     rsgislib.imagemorphology.create_circular_op(
-        outputFile=tmpMorphOperator, opSize=morphSize
+        output_file=tmpMorphOperator, op_size=morphSize
     )
 
     rsgislib.imagemorphology.image_opening(
-        inputImage=tmpClearSkyRegionsFullExtentSelectClumps,
-        outputImage=tmpClearSkyRegionsFullExtentSelectClumpsOpen,
-        tempImage="",
-        morphOperator=tmpMorphOperator,
-        useOpFile=True,
-        opSize=21,
+        input_img=tmpClearSkyRegionsFullExtentSelectClumps,
+        output_img=tmpClearSkyRegionsFullExtentSelectClumpsOpen,
+        tmp_img="",
+        morph_op_file=tmpMorphOperator,
+        use_op_file=True,
+        op_size=21,
         gdalformat="KEA",
         datatype=rsgislib.TYPE_32UINT,
     )
