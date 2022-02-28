@@ -229,7 +229,7 @@ def calc_clear_sky_regions(
     tmpMorphOperator = os.path.join(tmpPath, "CircularMorphOp.gmtxt")
 
     rsgislib.imagecalc.calc_dist_to_img_vals(
-        cloudsImg, tmpCloudsImgDist2Clouds, pxl_vals=[1, 2]
+        cloudsImg, tmpCloudsImgDist2Clouds, pxl_vals=[1, 2], out_no_data_val=-9999
     )
 
     rsgislib.imageutils.mask_img(
