@@ -35,10 +35,12 @@
 
 import math
 import os
+from typing import List, Tuple, Dict
 
 import numpy
 
 import rsgislib
+import rsgislib.tools.utils
 
 
 def cls_quantity_accuracy(
@@ -90,21 +92,16 @@ def cls_quantity_accuracy(
     )  # same as Comparison Total (see Ref.)
 
     # normalise the confusion matrix by proportional area:
-    norm_cm = (
-        cm.astype(float)
-        / cm.sum(axis=1)[
-            :,
-        ].reshape(-1, 1)
-    )
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
 
     quantity_disagreement = sum(numpy.abs(ref_total - comp_total)) / 2
     commission = [(row.sum() - row[idx]) for idx, row in enumerate(norm_cm)]
-    ommission = ref_total - numpy.diag(norm_cm)
+    omission = ref_total - numpy.diag(norm_cm)
     allocation_disagreement = (
-        sum(2 * numpy.min(numpy.array([commission, ommission]), axis=0)) / 2
+        sum(2 * numpy.min(numpy.array([commission, omission]), axis=0)) / 2
     )
     prop_correct = sum(numpy.diag(norm_cm)) / numpy.sum(norm_cm)
     disagreement = quantity_disagreement + allocation_disagreement
@@ -141,6 +138,8 @@ def calc_class_accuracy_metrics(
 
     """
     import sklearn.metrics
+
+    cls_names.sort()
 
     acc_metrics = sklearn.metrics.classification_report(
         ref_samples, pred_samples, target_names=cls_names, output_dict=True
@@ -202,17 +201,12 @@ def calc_class_accuracy_metrics(
         -1, 1
     )  # same as Comparison Total (see Ref.)
     # normalise the confusion matrix by proportional area:
-    norm_cm = (
-        cm.astype(float)
-        / cm.sum(axis=1)[
-            :,
-        ].reshape(-1, 1)
-    )
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
     commission = [(row.sum() - row[idx]) for idx, row in enumerate(norm_cm)]
-    ommission = ref_total - numpy.diag(norm_cm)
+    omission = ref_total - numpy.diag(norm_cm)
     # Sum the normalised cm columns to estimate the proportion of scene for each class.
     cls_area_prop = numpy.sum(norm_cm, axis=0)
 
@@ -222,7 +216,7 @@ def calc_class_accuracy_metrics(
 
     acc_metrics["norm_confusion_matrix"] = norm_cm.tolist()
     acc_metrics["commission"] = commission
-    acc_metrics["ommission"] = ommission.tolist()
+    acc_metrics["omission"] = omission.tolist()
     acc_metrics["est_prop_cls_area"] = cls_area_prop.tolist()
 
     quantity_metrics = cls_quantity_accuracy(ref_samples, pred_samples, cls_area)
@@ -256,6 +250,8 @@ def calc_class_pt_accuracy_metrics(
 
     """
     import sklearn.metrics
+
+    cls_names.sort()
 
     acc_metrics = sklearn.metrics.classification_report(
         ref_samples, pred_samples, target_names=cls_names, output_dict=True
@@ -368,7 +364,7 @@ def calc_acc_metrics_vecsamples(
     # Find unique class values
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    )
+    ).sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
@@ -596,13 +592,13 @@ def calc_acc_metrics_vecsamples(
                 acc_metrics_writer.writerow(row)
 
             acc_metrics_writer.writerow([""])
-            acc_metrics_writer.writerow(["class", "commission", "ommision"])
+            acc_metrics_writer.writerow(["class", "commission", "omission"])
             for i, cls_name in enumerate(unq_cls_names):
                 acc_metrics_writer.writerow(
                     [
                         cls_name,
                         acc_metrics["commission"][i],
-                        acc_metrics["ommission"][i],
+                        acc_metrics["omission"][i],
                     ]
                 )
 
@@ -680,7 +676,7 @@ def calc_acc_ptonly_metrics_vecsamples(
     # Find unique class values
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    )
+    ).sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
@@ -849,7 +845,7 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     # Find unique class values
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    )
+    ).sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
@@ -1534,3 +1530,487 @@ def summarise_multi_acc_ptonly_metrics(
         )
 
     rsgislib.tools.utils.write_dict_to_json(out_dict, out_acc_json_sum_file)
+
+
+def create_modelled_acc_pts(
+    err_matrix: List[List[float]],
+    cls_lst: List[str],
+    n_pts: int,
+    shuffle_pts: bool = True,
+    rnd_seed: int = 42,
+) -> Tuple[numpy.array, numpy.array]:
+    """
+    A function which generates a set of of modelled accuracy assessment points which
+    would produce the error matrix passed to the function. The output of this function
+    can be used with the classaccuracymetrics.calc_class_pt_accuracy_metrics
+    function to calculate accuracy metrics for these points.
+
+    The input error matrix is represented by n x n list of lists, where the
+    first axis is the reference class and the second the 'classification'.
+
+    :param err_matrix: a list of lists representing the error matrix which should be
+                       square with the same number of classes and order as the cls_lst.
+                       The error matrix should sum to 1 with the individual class values
+                       relative to the proportion of the scene and class accuracy.
+    :param cls_lst: A list of class names
+    :param n_pts: the number of output points produced
+    :param rnd_seed: a seed for the random generator which shuffles the output.
+    :return: a tuple with two numpy arrays of size n where the first is the 'reference'
+    and the second is the 'classification'.
+
+    """
+    import numpy.random
+
+    n_classes = len(cls_lst)
+    if len(err_matrix) != n_classes:
+        raise rsgislib.RSGISPyException(
+            "The number of classes in the list and error matrix do not match"
+        )
+    for i in range(n_classes):
+        if len(err_matrix[i]) != n_classes:
+            raise rsgislib.RSGISPyException(
+                "The number of classes in the list and error matrix do not match"
+            )
+
+    err_mtx_unit_area_arr = numpy.array(err_matrix)
+
+    if abs(err_mtx_unit_area_arr.sum() - 1) > 0.0001:
+        raise rsgislib.RSGISPyException("The error matrix does not sum to 1")
+
+    out_ref_arr = numpy.empty(n_pts, dtype=numpy.dtype("a255"))
+    out_ref_arr[...] = ""
+    out_cls_arr = numpy.empty(n_pts, dtype=numpy.dtype("a255"))
+    out_cls_arr[...] = ""
+
+    s_ref_idx = 0
+    s_cls_idx = 0
+    for i, ref_cls in enumerate(cls_lst):
+        prop_pts = err_mtx_unit_area_arr[i].sum()
+        n_cls_pts = int(n_pts * prop_pts)
+        out_ref_arr[s_ref_idx : s_ref_idx + n_cls_pts] = ref_cls
+        for j, cls_cls in enumerate(cls_lst):
+            n_cls_cls_pts = int(n_pts * err_mtx_unit_area_arr[i][j])
+            out_cls_arr[s_cls_idx : s_cls_idx + n_cls_cls_pts] = cls_cls
+            s_cls_idx += n_cls_cls_pts
+        s_ref_idx += n_cls_pts
+
+    # Check that all points have a class value and remove those which don't
+    # this can happen if the proportions don't perfectly divide into the
+    # number of points requested.
+    empty_pt = numpy.zeros_like(out_ref_arr, dtype=int)
+    empty_pt[out_ref_arr == b""] = 1
+    empty_pt[out_cls_arr == b""] = 1
+    out_ref_arr = out_ref_arr[empty_pt == 0]
+    out_cls_arr = out_cls_arr[empty_pt == 0]
+
+    if shuffle_pts:
+        # Randomly shuffle the points so they are in a random order.
+        n_out_pts = out_cls_arr.shape[0]
+        np_rng = numpy.random.default_rng(seed=rnd_seed)
+        shuffle_idx = np_rng.permutation(n_out_pts)
+        return out_ref_arr[shuffle_idx], out_cls_arr[shuffle_idx]
+    return out_ref_arr, out_cls_arr
+
+
+def calc_sampled_acc_metrics(
+    ref_samples: numpy.array,
+    pred_samples: numpy.array,
+    cls_names: numpy.array,
+    smpls_lst: List[int],
+    out_metrics_file: str,
+    n_repeats: int = 10,
+    out_usr_metrics_plot: str = None,
+    out_prod_metrics_plot: str = None,
+    out_ref_usr_plot: str = None,
+    out_ref_prod_plot: str = None,
+    cls_colours: Dict[str, List[float]] = None,
+    y_plt_usr_min=None,
+    y_plt_usr_max=None,
+    y_plt_prod_min=None,
+    y_plt_prod_max=None,
+    ref_line_clr: List = (0.0, 0.0, 0.0),
+    in_loop=False,
+):
+    """
+    A function which calculates users and producers accuracies for the inputted
+    reference and predicted samples by under sampling the points (with bootstrapping)
+    to try and estimate the number of points which are needed to get a reliable
+    estimate of the whole population of samples.
+
+    This function was original written alongside create_modelled_acc_pts to aid
+    the estimation of the number of accuracy assessment points required.
+
+    Be careful not to use under-sampling values which are too small as you maybe not
+    sample all the classes and therefore get an error.
+
+    :param ref_samples: a 1d array of reference samples represented by a
+                        numeric class id
+    :param pred_samples: a 1d array of predicted samples represented by a
+                         numeric class id
+    :param cls_names: a 1d list of the class names (labels) in the order of
+                      the class ids.
+    :param smpls_lst: list of n samples to use for under sampling the input data
+                       (e.g., [400, 500, 600, 700]). Clearly the number of samples
+                       cannot be more than the total number of points. Also, be
+                       careful not to values which are too small as you maybe not
+                       sample all the classes.
+    :param out_metrics_file: an output json file which will have the calculated
+                             statistics for future reference.
+    :param n_repeats: the number of bootstrap repeats for the sub-sampling. This is
+                      used to calculate the 95th confidence interval for each estimate.
+    :param out_usr_metrics_plot: A file path for an optional plot for the users
+                                 accuracies. (Default: None - no plot produced).
+    :param out_prod_metrics_plot: A file path for an optional plot for the producers
+                                  accuracies. (Default: None - no plot produced).
+    :param out_ref_usr_plot: A file path for an optional plot for the users
+                             reference accuracies. (Default: None - no plot produced).
+    :param out_ref_prod_plot: A file path for an optional plot for the producers
+                              reference accuracies. (Default: None - no plot produced).
+    :param cls_colours: an optional dict with class colours. The key value should be
+                        the class name while the value should be a list of 3 float
+                        between 0-1 representing RGB values.
+    :param y_plt_usr_min: Optional minimum y value for users plot.
+    :param y_plt_usr_max: Optional maximum y value for users plot.
+    :param y_plt_prod_min: Optional minimum y value for producers plot.
+    :param y_plt_prod_max: Optional maximum y value for producers plot.
+    :param ref_line_clr: The colour of the reference line added to the
+                         out_usr_metrics_plot and out_prod_metrics_plot.
+                         The default is black (0.0, 0.0, 0.0).
+    :param in_loop: True is called within a loop so tqdm progress bar will
+                    then be passed a position parameter of 1.
+
+    """
+    import rsgislib.classification.classaccuracymetrics
+    import tqdm
+    import matplotlib.pyplot as plt
+
+    cls_names = sorted(cls_names, key=str.lower)
+    n_tot_pts = ref_samples.shape[0]
+
+    # Calculate the baseline statistics using all the data.
+    # This will provide a 'Truth'.
+    ref_metrics = calc_class_pt_accuracy_metrics(ref_samples, pred_samples, cls_names)
+
+    ref_usr = ref_metrics["user_accuracy"]
+    ref_prod = ref_metrics["producer_accuracy"]
+
+    smp_idx = numpy.arange(ref_samples.shape[0])
+    out_ref_metrics = dict()
+    n_clses = len(cls_names)
+
+    n_smpls = len(smpls_lst)
+    tqdm_pos = 0
+    if in_loop:
+        tqdm_pos = 1
+    for n_smps in tqdm.tqdm(smpls_lst, position=tqdm_pos):
+        tmp_usr_vals = numpy.zeros((n_repeats, n_clses), dtype=float)
+        tmp_prod_vals = numpy.zeros((n_repeats, n_clses), dtype=float)
+
+        for i in range(n_repeats):
+            sub_sel_idx = numpy.random.choice(smp_idx, n_smps, replace=False)
+            sub_ref_samples = ref_samples[sub_sel_idx]
+            sub_pred_samples = pred_samples[sub_sel_idx]
+            tmp_metrics = calc_class_pt_accuracy_metrics(
+                sub_ref_samples, sub_pred_samples, cls_names
+            )
+            for j in range(n_clses):
+                tmp_usr_vals[i, j] = tmp_metrics["user_accuracy"][j]
+                tmp_prod_vals[i, j] = tmp_metrics["producer_accuracy"][j]
+
+        tmp_usr_vals[numpy.isnan(tmp_usr_vals)] = 0
+        tmp_prod_vals[numpy.isnan(tmp_prod_vals)] = 0
+
+        out_stats = dict()
+        out_stats["users_mean"] = tmp_usr_vals.mean(axis=0)
+        out_stats["users_lower"] = numpy.percentile(tmp_usr_vals, 5, axis=0)
+        out_stats["users_lower"][numpy.isnan(out_stats["users_lower"])] = 0
+        out_stats["users_upper"] = numpy.percentile(tmp_usr_vals, 95, axis=0)
+        out_stats["users_upper"][numpy.isnan(out_stats["users_upper"])] = 100
+        out_stats["users_conf_range"] = (
+            out_stats["users_upper"] - out_stats["users_lower"]
+        )
+        out_stats["users_ref_diff"] = ref_usr - out_stats["users_mean"]
+        out_stats["users_ref_diff_abs"] = numpy.abs(out_stats["users_ref_diff"])
+
+        out_stats["producers_mean"] = tmp_prod_vals.mean(axis=0)
+        out_stats["producers_lower"] = numpy.percentile(tmp_prod_vals, 5, axis=0)
+        out_stats["producers_lower"][numpy.isnan(out_stats["producers_lower"])] = 0
+        out_stats["producers_upper"] = numpy.percentile(tmp_prod_vals, 95, axis=0)
+        out_stats["producers_upper"][numpy.isnan(out_stats["producers_upper"])] = 100
+        out_stats["producers_conf_range"] = (
+            out_stats["producers_upper"] - out_stats["producers_lower"]
+        )
+        out_stats["producers_ref_diff"] = ref_prod - out_stats["producers_mean"]
+        out_stats["producers_ref_diff_abs"] = numpy.abs(out_stats["producers_ref_diff"])
+        out_ref_metrics[n_smps] = out_stats
+
+    # Write stats to output file.
+    rsgislib.tools.utils.write_dict_to_json(out_ref_metrics, out_metrics_file)
+
+    usr_mean = numpy.zeros((n_smpls, n_clses))
+    usr_lower = numpy.zeros((n_smpls, n_clses))
+    usr_upper = numpy.zeros((n_smpls, n_clses))
+    usr_abs_diff = numpy.zeros((n_smpls, n_clses))
+    prod_mean = numpy.zeros((n_smpls, n_clses))
+    prod_lower = numpy.zeros((n_smpls, n_clses))
+    prod_upper = numpy.zeros((n_smpls, n_clses))
+    prod_abs_diff = numpy.zeros((n_smpls, n_clses))
+    for i, n_smpls in enumerate(smpls_lst):
+        for j in range(n_clses):
+            usr_mean[i, j] = out_ref_metrics[n_smpls]["users_mean"][j]
+            usr_lower[i, j] = out_ref_metrics[n_smpls]["users_lower"][j]
+            usr_upper[i, j] = out_ref_metrics[n_smpls]["users_upper"][j]
+            usr_abs_diff[i, j] = out_ref_metrics[n_smpls]["users_ref_diff_abs"][j]
+
+            prod_mean[i, j] = out_ref_metrics[n_smpls]["producers_mean"][j]
+            prod_lower[i, j] = out_ref_metrics[n_smpls]["producers_lower"][j]
+            prod_upper[i, j] = out_ref_metrics[n_smpls]["producers_upper"][j]
+            prod_abs_diff[i, j] = out_ref_metrics[n_smpls]["producers_ref_diff_abs"][j]
+
+    if (
+        (out_usr_metrics_plot is not None)
+        or (out_prod_metrics_plot is not None)
+        or (out_ref_usr_plot is not None)
+        or (out_ref_prod_plot is not None)
+    ) and (cls_colours is None):
+        cls_colours = dict()
+        np_rng = numpy.random.default_rng()
+        for cls_name in cls_names:
+            cls_colours[cls_name] = np_rng.random(3)
+
+    if out_usr_metrics_plot is not None:
+        if y_plt_usr_min is None:
+            y_plt_usr_min = usr_lower.min() - 5
+
+        if y_plt_usr_max is None:
+            y_plt_usr_max = usr_upper.max() + 5
+
+        x_axs = 1
+        y_axs = n_clses
+        if n_clses == 4:
+            x_axs = 2
+            y_axs = 2
+        elif n_clses > 4:
+            x_axs = 3
+            y_axs = round((n_clses / 3) + 0.5)
+
+        print(f"Plot Shape: {x_axs} x {y_axs}")
+
+        fig_x_size = 12 * x_axs
+        fig_y_size = 6 * y_axs
+
+        fig, axs = plt.subplots(
+            x_axs, y_axs, figsize=(fig_x_size, fig_y_size), sharex=True, sharey=True
+        )
+
+        if x_axs > 1:
+            axs_flat = list()
+            for x in range(x_axs):
+                for y in range(y_axs):
+                    axs_flat.append(axs[x][y])
+        else:
+            axs_flat = axs
+
+        for j in range(n_clses):
+            cls_name = cls_names[j]
+
+            axs_flat[j].fill_between(
+                smpls_lst,
+                usr_lower[..., j],
+                usr_upper[..., j],
+                color=cls_colours[cls_name],
+                alpha=0.25,
+            )
+            axs_flat[j].axhline(y=ref_usr[j], color=ref_line_clr, linestyle="-")
+            axs_flat[j].plot(smpls_lst, usr_lower[..., j], color=cls_colours[cls_name])
+            axs_flat[j].plot(smpls_lst, usr_upper[..., j], color=cls_colours[cls_name])
+            axs_flat[j].plot(smpls_lst, usr_mean[..., j], color=cls_colours[cls_name])
+            axs_flat[j].set_title(cls_name)
+            axs_flat[j].set_ylim(y_plt_usr_min, y_plt_usr_max)
+        fig.suptitle(f"Users Accuracy (n: {n_tot_pts})")
+        fig.supxlabel("n samples")
+        fig.supylabel("%")
+        plt.tight_layout()
+        plt.savefig(out_usr_metrics_plot)
+
+    if out_prod_metrics_plot is not None:
+        if y_plt_prod_min is None:
+            y_plt_prod_min = prod_lower.min() - 5
+
+        if y_plt_prod_max is None:
+            y_plt_prod_max = prod_upper.max() + 5
+
+        x_axs = 1
+        y_axs = n_clses
+        if n_clses == 4:
+            x_axs = 2
+            y_axs = 2
+        elif n_clses > 4:
+            x_axs = 3
+            y_axs = round((n_clses / 3) + 0.5)
+
+        print(f"Plot Shape: {x_axs} x {y_axs}")
+
+        fig_x_size = 12 * x_axs
+        fig_y_size = 6 * y_axs
+
+        fig, axs = plt.subplots(
+            x_axs, y_axs, figsize=(fig_x_size, fig_y_size), sharex=True, sharey=True
+        )
+
+        if x_axs > 1:
+            axs_flat = list()
+            for x in range(x_axs):
+                for y in range(y_axs):
+                    axs_flat.append(axs[x][y])
+        else:
+            axs_flat = axs
+
+        for j in range(n_clses):
+            cls_name = cls_names[j]
+
+            axs_flat[j].fill_between(
+                smpls_lst,
+                prod_lower[..., j],
+                prod_upper[..., j],
+                color=cls_colours[cls_name],
+                alpha=0.25,
+            )
+            axs_flat[j].axhline(y=ref_prod[j], color=ref_line_clr, linestyle="-")
+            axs_flat[j].plot(smpls_lst, prod_lower[..., j], color=cls_colours[cls_name])
+            axs_flat[j].plot(smpls_lst, prod_upper[..., j], color=cls_colours[cls_name])
+            axs_flat[j].plot(smpls_lst, prod_mean[..., j], color=cls_colours[cls_name])
+            axs_flat[j].set_title(cls_name)
+            axs_flat[j].set_ylim(y_plt_prod_min, y_plt_prod_max)
+        fig.suptitle(f"Producers Accuracy (n: {n_tot_pts})")
+        fig.supxlabel("n samples")
+        fig.supylabel("%")
+        plt.tight_layout()
+        plt.savefig(out_prod_metrics_plot)
+
+    if out_ref_usr_plot is not None:
+        y_plt_max = usr_abs_diff.max() + 5
+
+        x_axs = 1
+        y_axs = n_clses
+        if n_clses == 4:
+            x_axs = 2
+            y_axs = 2
+        elif n_clses > 4:
+            x_axs = round((n_clses / 3) + 0.5)
+            y_axs = 3
+
+        print(f"Plot Shape: {x_axs} x {y_axs}")
+
+        fig_x_size = 12 * x_axs
+        fig_y_size = 6 * y_axs
+
+        fig, axs = plt.subplots(
+            x_axs, y_axs, figsize=(fig_x_size, fig_y_size), sharex=True, sharey=True
+        )
+
+        if x_axs > 1:
+            axs_flat = list()
+            for x in range(x_axs):
+                for y in range(y_axs):
+                    axs_flat.append(axs[x][y])
+        else:
+            axs_flat = axs
+
+        for j in range(n_clses):
+            cls_name = cls_names[j]
+            axs_flat[j].plot(
+                smpls_lst, usr_abs_diff[..., j], color=cls_colours[cls_name]
+            )
+            axs_flat[j].set_title(cls_name)
+            axs_flat[j].set_ylim(0, y_plt_max)
+        fig.suptitle(f"Users Reference (n: {n_tot_pts})")
+        fig.supxlabel("n samples")
+        fig.supylabel("%")
+        plt.tight_layout()
+        plt.savefig(out_ref_usr_plot)
+
+    if out_ref_prod_plot is not None:
+        y_plt_max = prod_abs_diff.max() + 5
+
+        x_axs = 1
+        y_axs = n_clses
+        if n_clses == 4:
+            x_axs = 2
+            y_axs = 2
+        elif n_clses > 4:
+            x_axs = round((n_clses / 3) + 0.5)
+            y_axs = 3
+
+        print(f"Plot Shape: {x_axs} x {y_axs}")
+
+        fig_x_size = 12 * x_axs
+        fig_y_size = 6 * y_axs
+
+        fig, axs = plt.subplots(
+            x_axs, y_axs, figsize=(fig_x_size, fig_y_size), sharex=True, sharey=True
+        )
+
+        if x_axs > 1:
+            axs_flat = list()
+            for x in range(x_axs):
+                for y in range(y_axs):
+                    axs_flat.append(axs[x][y])
+        else:
+            axs_flat = axs
+
+        for j in range(n_clses):
+            cls_name = cls_names[j]
+            axs_flat[j].plot(
+                smpls_lst, prod_abs_diff[..., j], color=cls_colours[cls_name]
+            )
+            axs_flat[j].set_title(cls_name)
+            axs_flat[j].set_ylim(0, y_plt_max)
+        fig.suptitle(f"Producers Reference (n: {n_tot_pts})")
+        fig.supxlabel("n samples")
+        fig.supylabel("%")
+        plt.tight_layout()
+        plt.savefig(out_ref_prod_plot)
+
+
+def create_norm_modelled_err_matrix(
+    cls_areas: List[float], ref_smpl_accs: List[List[float]]
+) -> List[List[float]]:
+    """
+    A function which creates a normalised error matrix (as required by
+    create_modelled_acc_pts function) using the class areas and relative
+    accuracies of the reference samples.
+
+    :param cls_areas: a list of relative class areas (i.e., percentage are for each
+                      class). The list must be either add up to 100 or 1. (e.g.,
+                      [10, 40, 30, 20] would mean that there is 10% of the area
+                      mapped as class 1, 40% for class2, 30 for class3 and 20 for
+                      class4.
+    :param ref_smpl_accs: The accuracy of the classes relative to the reference
+                          samples. This is an n x n square matrix where n
+                          is the number of classes. Each row is the relative
+                          accuracy of the reference samples for the class. Each
+                          row must either sum to 1 or 100.
+    :return: an n x n square matrix which is normalised for the class areas.
+
+    """
+    cls_areas_arr = numpy.array(cls_areas, dtype=float)
+
+    if abs(cls_areas_arr.sum() - 100) < 0.01:
+        cls_areas_arr = cls_areas_arr / 100
+
+    if abs(cls_areas_arr.sum() - 1) > 0.0001:
+        raise rsgislib.RSGISPyException("The list of class areas must sum to 1 or 100.")
+
+    n_clses = cls_areas_arr.shape[0]
+    ref_smpl_accs_arr = numpy.array(ref_smpl_accs, dtype=float)
+
+    for i in range(n_clses):
+        if abs(ref_smpl_accs_arr[i].sum() - 1) > 0.0001:
+            ref_smpl_accs_arr[i] = ref_smpl_accs_arr[i] / 100
+            if abs(ref_smpl_accs_arr[i].sum() - 1) > 0.0001:
+                raise rsgislib.RSGISPyException(f"Row {i} does not sum to 1 or 100.")
+
+        ref_smpl_accs_arr[i] = ref_smpl_accs_arr[i] * cls_areas_arr[i]
+
+    return ref_smpl_accs_arr.tolist()

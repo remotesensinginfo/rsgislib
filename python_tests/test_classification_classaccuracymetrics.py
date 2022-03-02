@@ -7,6 +7,12 @@ try:
 except ImportError:
     SKLEARN_NOT_AVAIL = True
 
+MATPLOTLIB_NOT_AVAIL = False
+try:
+    import matplotlib.pyplot
+except ImportError:
+    MATPLOTLIB_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CLASS_ACC_DATA_DIR = os.path.join(DATA_DIR, "classification", "accuracy")
 
@@ -160,3 +166,92 @@ def test_calc_acc_metrics_vecsamples(tmp_path):
     )
 
     assert os.path.exists(out_json_file) and os.path.exists(out_csv_file)
+
+
+def test_create_norm_modelled_err_matrix():
+    from rsgislib.classification.classaccuracymetrics import (
+        create_norm_modelled_err_matrix,
+    )
+
+    cls_areas = [40, 40, 10, 10]
+
+    rel_err_mtx = [
+        [75.0, 5.0, 5.0, 15.0],
+        [5.0, 75.0, 2.0, 18.0],
+        [20.0, 2.5, 75.0, 2.5],
+        [2.5, 20.0, 2.5, 75.0],
+    ]
+
+    err_mtx = create_norm_modelled_err_matrix(cls_areas, rel_err_mtx)
+
+
+def test_create_modelled_acc_pts():
+    import rsgislib.classification.classaccuracymetrics
+
+    cls_lst = [
+        "Mangroves",
+        "Not Mangroves",
+        "Mangroves to Not Mangroves",
+        "Not Mangroves to Mangroves",
+    ]
+
+    err_mtx_unit_area = [
+        [0.378, 0.02, 0.002, 0.0],
+        [0.02, 0.478, 0.0, 0.002],
+        [0.02, 0.0, 0.03, 0.0],
+        [0.0, 0.02, 0.0, 0.03],
+    ]
+
+    (
+        ref_samples,
+        pred_samples,
+    ) = rsgislib.classification.classaccuracymetrics.create_modelled_acc_pts(
+        err_mtx_unit_area, cls_lst, 1600
+    )
+
+
+@pytest.mark.skipif(
+    (MATPLOTLIB_NOT_AVAIL or SKLEARN_NOT_AVAIL),
+    reason="matplotlib or scikit-learn dependency not available",
+)
+def test_calc_sampled_acc_metrics(tmp_path):
+    from rsgislib.classification import classaccuracymetrics
+
+    cls_lst = [
+        "Mangroves",
+        "Not Mangroves",
+        "Mangroves to Not Mangroves",
+        "Not Mangroves to Mangroves",
+    ]
+
+    err_mtx_unit_area = [
+        [0.378, 0.02, 0.002, 0.0],
+        [0.02, 0.478, 0.0, 0.002],
+        [0.02, 0.0, 0.03, 0.0],
+        [0.0, 0.02, 0.0, 0.03],
+    ]
+
+    (ref_samples, pred_samples,) = classaccuracymetrics.create_modelled_acc_pts(
+        err_mtx_unit_area, cls_lst, 2500
+    )
+
+    smpls_lst = [500, 1000, 1500, 2000]
+
+    out_metrics_file = os.path.join(tmp_path, "out_stats_file.json")
+    out_usr_metrics_plot = os.path.join(tmp_path, "usr_metrics_plot.png")
+    out_prod_metrics_plot = os.path.join(tmp_path, "prod_metrics_plot.png")
+    out_ref_usr_plot = os.path.join(tmp_path, "usr_ref_metrics_plot.png")
+    out_ref_prod_plot = os.path.join(tmp_path, "prod_ref_metrics_plot.png")
+
+    classaccuracymetrics.calc_sampled_acc_metrics(
+        ref_samples,
+        pred_samples,
+        cls_lst,
+        smpls_lst,
+        out_metrics_file,
+        n_repeats=10,
+        out_usr_metrics_plot=out_usr_metrics_plot,
+        out_prod_metrics_plot=out_prod_metrics_plot,
+        out_ref_usr_plot=out_ref_usr_plot,
+        out_ref_prod_plot=out_ref_prod_plot,
+    )

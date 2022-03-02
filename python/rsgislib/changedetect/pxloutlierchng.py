@@ -486,9 +486,7 @@ def find_class_li_outliers(
     print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))
 
     chng_thres = rsgislib.tools.stats.calc_li_threshold(
-        msk_arr_vals[..., 0],
-        tolerance,
-        init_thres,
+        msk_arr_vals[..., 0], tolerance, init_thres,
     )
 
     band_defns = list()
