@@ -16,6 +16,7 @@ except ImportError:
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TOOLS_UTILS_DATA_DIR = os.path.join(DATA_DIR, "tools", "utils")
 
+# Using test ftp service provided by: https://dlptest.com/ftp-test/
 ftp_url_ref = "ftp.dlptest.com"
 ftp_user_ref = "dlpuser"
 ftp_pass_ref = "rNrKYTX9g7z3RgJRmxWuGHbeu"
