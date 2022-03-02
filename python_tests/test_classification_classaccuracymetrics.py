@@ -231,9 +231,10 @@ def test_calc_sampled_acc_metrics(tmp_path):
         [0.0, 0.02, 0.0, 0.03],
     ]
 
-    (ref_samples, pred_samples,) = classaccuracymetrics.create_modelled_acc_pts(
-        err_mtx_unit_area, cls_lst, 2500
-    )
+    (
+        ref_samples,
+        pred_samples,
+    ) = classaccuracymetrics.create_modelled_acc_pts(err_mtx_unit_area, cls_lst, 2500)
 
     smpls_lst = [500, 1000, 1500, 2000]
 

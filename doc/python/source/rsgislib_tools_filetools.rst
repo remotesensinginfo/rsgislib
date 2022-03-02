@@ -6,6 +6,7 @@ Naming
 
 .. autofunction:: rsgislib.tools.filetools.get_file_basename
 .. autofunction:: rsgislib.tools.filetools.get_dir_name
+.. autofunction:: rsgislib.tools.filetools.split_path_all
 
 Searching
 -----------

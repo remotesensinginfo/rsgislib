@@ -232,6 +232,29 @@ def get_dir_name(input_file: str) -> str:
     dir_name = os.path.basename(dir_path)
     return dir_name
 
+def split_path_all(input_path:str)->List[str]:
+    """
+    A function which splits all the components within a file path
+    into a list of components rather than the os.path.split function
+    which just splits the last item.
+
+    :param input_path: the input file path.
+    :return: a list of the file path components.
+
+    """
+    all_parts = []
+    while 1:
+        parts = os.path.split(input_path)
+        if parts[0] == input_path:  # sentinel for absolute paths
+            all_parts.insert(0, parts[0])
+            break
+        elif parts[1] == input_path: # sentinel for relative paths
+            all_parts.insert(0, parts[1])
+            break
+        else:
+            input_path = parts[0]
+            all_parts.insert(0, parts[1])
+    return all_parts
 
 def delete_file_silent(input_file: str) -> bool:
     """
