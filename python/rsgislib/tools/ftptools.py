@@ -4,6 +4,7 @@ from typing import Dict, List
 import ftplib
 
 import rsgislib
+import rsgislib.tools.filetools
 
 
 def _traverse_mlsd_ftp_dirs(
@@ -247,9 +248,9 @@ def create_file_listings_db(
 
 def download_ftp_file(
     ftp_url: str,
-    remote_path: str,
-    local_path: str,
-    time_out: int = 300,
+    remote_file: str,
+    local_file: str,
+    ftp_timeout: int = 300,
     ftp_user: str = None,
     ftp_pass: str = None,
     print_info: bool = True,
@@ -258,9 +259,9 @@ def download_ftp_file(
     A function to download a file from an FTP server.
 
     :param ftp_url: The remote URL for the ftp server.
-    :param remote_path: the remote path on the ftp server for the file to be downloaded
-    :param local_path: the local path to where the file should be downloaded to.
-    :param time_out: the timeout for the download. Default: 300 seconds.
+    :param remote_file: the remote path on the ftp server for the file to be downloaded
+    :param local_file: the local path to where the file should be downloaded to.
+    :param ftp_timeout: the timeout for the download. Default: 300 seconds.
     :param ftp_user: the username, if required, for the ftp server.
     :param ftp_pass: the password, if required, for the ftp server.
     :param print_info: bool for whether info should be printed to the console
@@ -269,17 +270,17 @@ def download_ftp_file(
 
     """
     try:
-        ftp_conn = ftplib.FTP(ftp_url, timeout=time_out)
+        ftp_conn = ftplib.FTP(ftp_url, timeout=ftp_timeout)
         ftp_conn.login(user=ftp_user, passwd=ftp_pass)
 
         # Write file in binary mode
         if print_info:
-            print(f"Downloading: {remote_path}")
-        with open(local_path, "wb") as lcl_file_obj:
+            print(f"Downloading: {remote_file}")
+        with open(local_file, "wb") as lcl_file_obj:
             # Command for Downloading the file "RETR remote_path"
-            ftp_conn.retrbinary(f"RETR {remote_path}", lcl_file_obj.write)
+            ftp_conn.retrbinary(f"RETR {remote_file}", lcl_file_obj.write)
         if print_info:
-            print(f"Finished Downloading: {local_path}")
+            print(f"Finished Downloading: {local_file}")
         ftp_conn.quit()
     except:
         return False
@@ -289,9 +290,9 @@ def download_ftp_file(
 
 def download_curl_ftp_file(
     ftp_url: str,
-    remote_path: str,
-    local_path: str,
-    time_out: int = 300,
+    remote_file: str,
+    local_file: str,
+    ftp_timeout: int = 300,
     ftp_user: str = None,
     ftp_pass: str = None,
     print_info: bool = True,
@@ -300,9 +301,9 @@ def download_curl_ftp_file(
     A function to download a file from an FTP server using curl.
 
     :param ftp_url: The remote URL for the ftp server.
-    :param remote_path: the remote path on the ftp server for the file to be downloaded
-    :param local_path: the local path to where the file should be downloaded to.
-    :param time_out: the timeout for the download. Default: 300 seconds.
+    :param remote_file: the remote path on the ftp server for the file to be downloaded
+    :param local_file: the local path to where the file should be downloaded to.
+    :param ftp_timeout: the timeout for the download. Default: 300 seconds.
     :param ftp_user: the username, if required, for the ftp server.
     :param ftp_pass: the password, if required, for the ftp server.
     :param print_info: bool for whether info should be printed to the console
@@ -312,9 +313,9 @@ def download_curl_ftp_file(
     """
     import pycurl
 
-    full_path_url = ftp_url + remote_path
+    full_path_url = ftp_url + remote_file
     try:
-        fp = open(local_path, "wb")
+        fp = open(local_file, "wb")
         curl = pycurl.Curl()
         curl.setopt(pycurl.URL, full_path_url)
         curl.setopt(pycurl.FOLLOWLOCATION, True)
@@ -325,7 +326,7 @@ def download_curl_ftp_file(
         curl.setopt(pycurl.FOLLOWLOCATION, 1)
         curl.setopt(pycurl.MAXREDIRS, 5)
         curl.setopt(pycurl.CONNECTTIMEOUT, 50)
-        curl.setopt(pycurl.TIMEOUT, time_out)
+        curl.setopt(pycurl.TIMEOUT, ftp_timeout)
         curl.setopt(pycurl.FTP_RESPONSE_TIMEOUT, 600)
         curl.setopt(pycurl.NOSIGNAL, 1)
         if (not ftp_user is None) and (not ftp_pass is None):
@@ -347,7 +348,7 @@ def download_curl_ftp_file(
     except:
         print(
             "An error occurred when downloading {}.".format(
-                os.path.join(ftp_url, remote_path)
+                os.path.join(ftp_url, remote_file)
             )
         )
         success = False
@@ -357,7 +358,7 @@ def download_curl_ftp_file(
 def download_files_use_lst_db(
     db_json: str,
     out_dir_path: str,
-    time_out: int = 300,
+    ftp_timeout: int = 300,
     ftp_user: str = None,
     ftp_pass: str = None,
     create_dir_struct: bool = False,
@@ -370,7 +371,7 @@ def download_files_use_lst_db(
 
     :param db_json: file path for the JSON db file.
     :param out_dir_path: the output path where data should be downloaded to.
-    :param time_out: the timeout for the download. Default: 300 seconds.
+    :param ftp_timeout: the timeout for the download. Default: 300 seconds.
     :param ftp_user: the username, if required, for the ftp server.
     :param ftp_pass: the password, if required, for the ftp server.
     :param create_dir_struct: boolean specifying whether the folder structure on the
@@ -404,9 +405,9 @@ def download_files_use_lst_db(
         if use_curl:
             dwnlded = download_curl_ftp_file(
                 ftp_url=dwn_file["ftp_url"],
-                remote_path=dwn_file["rmt_path"],
-                local_path=local_path,
-                time_out=time_out,
+                remote_file=dwn_file["rmt_path"],
+                local_file=local_path,
+                ftp_timeout=ftp_timeout,
                 ftp_user=ftp_user,
                 ftp_pass=ftp_pass,
                 print_info=False,
@@ -414,9 +415,9 @@ def download_files_use_lst_db(
         else:
             dwnlded = download_ftp_file(
                 ftp_url=dwn_file["ftp_url"],
-                remote_path=dwn_file["rmt_path"],
-                local_path=local_path,
-                time_out=time_out,
+                remote_file=dwn_file["rmt_path"],
+                local_file=local_path,
+                ftp_timeout=ftp_timeout,
                 ftp_user=ftp_user,
                 ftp_pass=ftp_pass,
                 print_info=False,
@@ -425,3 +426,83 @@ def download_files_use_lst_db(
             lst_db.updateById(
                 dwn_file["id"], {"lcl_path": local_path, "downloaded": True}
             )
+
+
+def upload_ftp_file(
+    local_file: str,
+    ftp_url: str,
+    remote_path: str,
+    ftp_timeout: int = 300,
+    ftp_user: str = None,
+    ftp_pass: str = None,
+    print_info: bool = True,
+) -> bool:
+    """
+    A function for uploading a file to an ftp server.
+
+    :param local_file: the path to the local file to be uploaded.
+    :param ftp_url: the url for the ftp server for the upload.
+    :param remote_path: the path on the ftp server for the file to be uploaded to.
+                        this should not include the file name which will be taken
+                        from the local_file.
+    :param ftp_timeout: the timeout for the download. Default: 300 seconds.
+    :param ftp_user: the username, if required, for the ftp server.
+    :param ftp_pass: the password, if required, for the ftp server.
+    :param print_info: bool for whether info should be printed to the console
+                       (default: True)
+    :return: boolean as to whether the upload was successfully completed or otherwise.
+
+    """
+    if not os.path.isfile(local_file):
+        raise rsgislib.RSGISPyException("Input path must be a file.")
+
+    lcl_file_name = os.path.basename(local_file)
+
+    if print_info:
+        print("Opening FTP Connection to {}".format(ftp_url))
+
+    ftp_conn = ftplib.FTP(ftp_url, timeout=ftp_timeout)
+    ftp_conn.login(user=ftp_user, passwd=ftp_pass)
+    if print_info:
+        print("FTP Connection to {} is open".format(ftp_url))
+
+    # Check remote path exists and create if it does not.
+    remote_path_parts = rsgislib.tools.filetools.split_path_all(remote_path)
+    if len(remote_path_parts) > 0:
+        if remote_path_parts[0] == "/":
+            remote_path_parts.pop(0)
+
+        for rmt_part in remote_path_parts:
+            dir_lst = list()
+            ftp_conn.retrlines("LIST", dir_lst.append)
+            dir_lst = map(str.split, dir_lst)
+            found_part = False
+            part_dir = False
+            for item in dir_lst:
+                if item[-1] == rmt_part:
+                    found_part = True
+                    if item[0][0] == "d":
+                        part_dir = True
+                    break
+
+            if found_part and (not part_dir):
+                raise rsgislib.RSGISPyException("Part of the path was not a directory.")
+
+            if not found_part:
+                ftp_conn.mkd(rmt_part)
+
+            ftp_conn.cwd(rmt_part)
+
+    try:
+        if print_info:
+            print(f"Uploading {lcl_file_name} to FTP Connection.")
+        lcl_file_obj = open(local_file, "rb")
+        ftp_conn.storbinary(f"STOR {lcl_file_name}", lcl_file_obj)
+        lcl_file_obj.close()
+        if print_info:
+            print(f"Finished Uploading {lcl_file_name}.")
+
+        ftp_conn.quit()
+    except:
+        return False
+    return True

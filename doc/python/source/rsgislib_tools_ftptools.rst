@@ -14,3 +14,9 @@ Download Data
 .. autofunction:: rsgislib.tools.ftptools.download_curl_ftp_file
 .. autofunction:: rsgislib.tools.ftptools.download_files_use_lst_db
 
+
+Upload Data
+------------
+
+.. autofunction:: rsgislib.tools.ftptools.upload_ftp_file
+
