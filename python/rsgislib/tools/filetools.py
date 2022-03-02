@@ -233,6 +233,31 @@ def get_dir_name(input_file: str) -> str:
     return dir_name
 
 
+def split_path_all(input_path: str) -> List[str]:
+    """
+    A function which splits all the components within a file path
+    into a list of components rather than the os.path.split function
+    which just splits the last item.
+
+    :param input_path: the input file path.
+    :return: a list of the file path components.
+
+    """
+    all_parts = []
+    while 1:
+        parts = os.path.split(input_path)
+        if parts[0] == input_path:  # sentinel for absolute paths
+            all_parts.insert(0, parts[0])
+            break
+        elif parts[1] == input_path:  # sentinel for relative paths
+            all_parts.insert(0, parts[1])
+            break
+        else:
+            input_path = parts[0]
+            all_parts.insert(0, parts[1])
+    return all_parts
+
+
 def delete_file_silent(input_file: str) -> bool:
     """
     A function which can be used in-place of os.remove to delete
@@ -525,7 +550,10 @@ def is_cmd_tool_avail(cmd_name: str, test_call_cmd: List[str] = None):
 
         try:
             rtn_info = subprocess.run(
-                test_call_cmd, capture_output=True, text=True, check=True,
+                test_call_cmd,
+                capture_output=True,
+                text=True,
+                check=True,
             )
             if rtn_info.returncode == 0:
                 return True

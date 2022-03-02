@@ -378,3 +378,53 @@ def test_delete_file_with_basename(tmp_path):
             and (not os.path.exists(file_3_to_del))
         )
     assert success
+
+
+def test_split_path_all_abs():
+    import rsgislib.tools.filetools
+
+    parts = rsgislib.tools.filetools.split_path_all("/a/b/c/d")
+    assert (
+        (parts[0] == "/")
+        and (parts[1] == "a")
+        and (parts[2] == "b")
+        and (parts[3] == "c")
+        and (parts[4] == "d")
+    )
+
+
+def test_split_path_all_rel():
+    import rsgislib.tools.filetools
+
+    parts = rsgislib.tools.filetools.split_path_all("a/b/c/d")
+    assert (
+        (parts[0] == "a")
+        and (parts[1] == "b")
+        and (parts[2] == "c")
+        and (parts[3] == "d")
+    )
+
+
+def test_split_path_all_file_abs():
+    import rsgislib.tools.filetools
+
+    parts = rsgislib.tools.filetools.split_path_all("/a/b/c/hello.txt")
+    assert (
+        (parts[0] == "/")
+        and (parts[1] == "a")
+        and (parts[2] == "b")
+        and (parts[3] == "c")
+        and (parts[4] == "hello.txt")
+    )
+
+
+def test_split_path_all_file_rel():
+    import rsgislib.tools.filetools
+
+    parts = rsgislib.tools.filetools.split_path_all("a/b/c/hello.txt")
+    assert (
+        (parts[0] == "a")
+        and (parts[1] == "b")
+        and (parts[2] == "c")
+        and (parts[3] == "hello.txt")
+    )
