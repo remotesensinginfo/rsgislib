@@ -364,7 +364,8 @@ def calc_acc_metrics_vecsamples(
     # Find unique class values
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    ).sort()
+    )
+    unq_cls_names.sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
@@ -676,7 +677,8 @@ def calc_acc_ptonly_metrics_vecsamples(
     # Find unique class values
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    ).sort()
+    )
+    unq_cls_names.sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
@@ -845,7 +847,8 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     # Find unique class values
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    ).sort()
+    )
+    #sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
