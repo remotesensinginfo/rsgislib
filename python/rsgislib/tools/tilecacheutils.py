@@ -20,7 +20,7 @@ def resolution(zoom):
     :return: float image pixel resolution
 
     """
-    return INITIAL_RESOLUTION / (2**zoom)
+    return INITIAL_RESOLUTION / (2 ** zoom)
 
 
 def truncate_lng_lat(lon_deg, lat_deg):
@@ -68,7 +68,7 @@ def get_tile_for_point(lon_deg, lat_deg, zoom, tms=True, tile_size=TILE_SIZE):
     tile_x = int(math.ceil(pixel_x / float(tile_size)) - 1)
     tile_y = int(math.ceil(pixel_y / float(tile_size)) - 1)
     if tms:
-        tile_y = (2**zoom - 1) - tile_y
+        tile_y = (2 ** zoom - 1) - tile_y
 
     return tile_x, tile_y, zoom
 
@@ -87,8 +87,8 @@ def get_tile_tl_lonlat(tile_x, tile_y, zoom, tms=True):
 
     """
     if tms:
-        tile_y = (2**zoom - 1) - tile_y
-    n = 2.0**zoom
+        tile_y = (2 ** zoom - 1) - tile_y
+    n = 2.0 ** zoom
     lon_deg = tile_x / n * 360.0 - 180.0
     lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * tile_y / n)))
     lat_deg = math.degrees(lat_rad)
@@ -125,7 +125,7 @@ def flip_xyz_tms_tiles(tile_x, tile_y, zoom):
     :return:  (tile_x, tile_y, zoom)
 
     """
-    tile_y = (2**zoom - 1) - tile_y
+    tile_y = (2 ** zoom - 1) - tile_y
     return tile_x, tile_y, zoom
 
 
@@ -205,7 +205,7 @@ def get_quadkey_for_tile_path(tile_x, tile_y, zoom, tms=True):
 
     """
     if tms:
-        tile_y = (2**zoom - 1) - tile_y
+        tile_y = (2 ** zoom - 1) - tile_y
     qk = []
     for z in range(zoom, 0, -1):
         digit = 0
@@ -247,7 +247,7 @@ def get_tile_path_from_quadkey(quadkey, tms=True):
             )
     zoom = i + 1
     if tms:
-        tile_y = (2**zoom - 1) - tile_y
+        tile_y = (2 ** zoom - 1) - tile_y
     return tile_x, tile_y, zoom
 
 
@@ -320,9 +320,9 @@ def get_tiles(bbox, zooms, tms=True, truncate=False):
             if llx == urx:
                 n_x_tiles = 1
             elif llx < urx:
-                n_x_tiles = urx - min(llx + 1, 2**z)
+                n_x_tiles = urx - min(llx + 1, 2 ** z)
             else:
-                n_x_tiles = llx - min(urx + 1, 2**z)
+                n_x_tiles = llx - min(urx + 1, 2 ** z)
 
             n_x_tiles = 1 if n_x_tiles == 0 else n_x_tiles
             print("\tx {} + {}".format(min_x_tile, n_x_tiles))
@@ -332,9 +332,9 @@ def get_tiles(bbox, zooms, tms=True, truncate=False):
             if ury == lly:
                 n_y_tiles = 1
             elif ury < lly:
-                n_y_tiles = lly - min(ury + 1, 2**z)
+                n_y_tiles = lly - min(ury + 1, 2 ** z)
             else:
-                n_y_tiles = ury - min(lly + 1, 2**z)
+                n_y_tiles = ury - min(lly + 1, 2 ** z)
             n_y_tiles = 1 if n_y_tiles == 0 else n_y_tiles
             print("\ty {} + {}".format(min_y_tile, n_y_tiles))
 

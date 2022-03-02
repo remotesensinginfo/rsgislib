@@ -59,7 +59,8 @@ from rios import ratapplier
 
 
 def perform_sklearn_classifier_param_search(
-    cls_train_info: Dict[str, ClassInfoObj], search_obj: BaseSearchCV,
+    cls_train_info: Dict[str, ClassInfoObj],
+    search_obj: BaseSearchCV,
 ) -> BaseEstimator:
     """
     A function to find the 'optimal' parameters for classification using a grid search

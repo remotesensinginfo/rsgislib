@@ -92,7 +92,12 @@ def cls_quantity_accuracy(
     )  # same as Comparison Total (see Ref.)
 
     # normalise the confusion matrix by proportional area:
-    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
+    norm_cm = (
+        cm.astype(float)
+        / cm.sum(axis=1)[
+            :,
+        ].reshape(-1, 1)
+    )
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -201,7 +206,12 @@ def calc_class_accuracy_metrics(
         -1, 1
     )  # same as Comparison Total (see Ref.)
     # normalise the confusion matrix by proportional area:
-    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
+    norm_cm = (
+        cm.astype(float)
+        / cm.sum(axis=1)[
+            :,
+        ].reshape(-1, 1)
+    )
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -848,7 +858,7 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     unq_cls_names = numpy.unique(
         numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
     )
-    #sort()
+    # sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()

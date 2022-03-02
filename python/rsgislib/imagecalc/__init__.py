@@ -552,7 +552,15 @@ def count_pxls_of_val(input_img: str, vals: List[int], img_band: int = None):
             if img_band is None:
                 outVals[idx] = outVals[idx] + (block == vals[idx]).sum()
             else:
-                outVals[idx] = outVals[idx] + (block[img_band_idx,] == vals[idx]).sum()
+                outVals[idx] = (
+                    outVals[idx]
+                    + (
+                        block[
+                            img_band_idx,
+                        ]
+                        == vals[idx]
+                    ).sum()
+                )
 
     return outVals
 

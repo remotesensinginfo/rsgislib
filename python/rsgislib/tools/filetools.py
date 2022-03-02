@@ -232,7 +232,8 @@ def get_dir_name(input_file: str) -> str:
     dir_name = os.path.basename(dir_path)
     return dir_name
 
-def split_path_all(input_path:str)->List[str]:
+
+def split_path_all(input_path: str) -> List[str]:
     """
     A function which splits all the components within a file path
     into a list of components rather than the os.path.split function
@@ -248,13 +249,14 @@ def split_path_all(input_path:str)->List[str]:
         if parts[0] == input_path:  # sentinel for absolute paths
             all_parts.insert(0, parts[0])
             break
-        elif parts[1] == input_path: # sentinel for relative paths
+        elif parts[1] == input_path:  # sentinel for relative paths
             all_parts.insert(0, parts[1])
             break
         else:
             input_path = parts[0]
             all_parts.insert(0, parts[1])
     return all_parts
+
 
 def delete_file_silent(input_file: str) -> bool:
     """
@@ -652,11 +654,11 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str) -> float:
     elif in_unit == "kb":
         file_size_bytes = in_size * 1024.0
     elif in_unit == "mb":
-        file_size_bytes = in_size * (1024.0**2)
+        file_size_bytes = in_size * (1024.0 ** 2)
     elif in_unit == "gb":
-        file_size_bytes = in_size * (1024.0**3)
+        file_size_bytes = in_size * (1024.0 ** 3)
     elif in_unit == "tb":
-        file_size_bytes = in_size * (1024.0**4)
+        file_size_bytes = in_size * (1024.0 ** 4)
     else:
         raise rsgislib.RSGISPyException("Input unit it not recognised.")
 
@@ -665,11 +667,11 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str) -> float:
     elif out_unit == "kb":
         out_file_size = file_size_bytes / 1024.0
     elif out_unit == "mb":
-        out_file_size = file_size_bytes / (1024.0**2)
+        out_file_size = file_size_bytes / (1024.0 ** 2)
     elif out_unit == "gb":
-        out_file_size = file_size_bytes / (1024.0**3)
+        out_file_size = file_size_bytes / (1024.0 ** 3)
     elif out_unit == "tb":
-        out_file_size = file_size_bytes / (1024.0**4)
+        out_file_size = file_size_bytes / (1024.0 ** 4)
     else:
         raise rsgislib.RSGISPyException("Output unit it not recognised.")
 
