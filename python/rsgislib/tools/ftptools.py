@@ -243,7 +243,8 @@ def create_file_listings_db(
             }
         )
 
-    lst_db.addMany(db_data)
+    if len(db_data) > 0:
+        lst_db.addMany(db_data)
 
 
 def download_ftp_file(
