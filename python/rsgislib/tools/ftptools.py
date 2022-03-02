@@ -7,7 +7,7 @@ import rsgislib
 
 
 def _traverse_mlsd_ftp_dirs(
-    ftp_conn, ftp_path: str, ftp_files: Dict, try_n_times: int = 5
+    ftp_conn: ftplib.FTP, ftp_path: str, ftp_files: Dict, try_n_times: int = 5
 ) -> List[str]:
     """
     An internal function used within the get_ftp_file_listings function
@@ -15,8 +15,11 @@ def _traverse_mlsd_ftp_dirs(
     uses the mlsd function which isn't supported by all ftp servers but
     is preferable to use if it is supported.
 
+    Note, this is a recursive function which is used internally. You
+    probably want to call get_ftp_file_listings to use this function.
+
     :param ftp_conn: an ftplib connection object.
-    :param ftp_path: The path on the ftp server to
+    :param ftp_path: The path on the ftp server to start from
     :param ftp_files: of the directory and list of files within that directory
     :param try_n_times: if server connection fails try again (sleeping for
                         5 secs in between) n times for failing.
@@ -67,7 +70,7 @@ def _traverse_mlsd_ftp_dirs(
 
 
 def _traverse_nlst_ftp_dirs(
-    ftp_conn, ftp_path: str, ftp_files: Dict, try_n_times: int = 5
+    ftp_conn: ftplib.FTP, ftp_path: str, ftp_files: Dict, try_n_times: int = 5
 ) -> List[str]:
     """
     An internal function used within the get_ftp_file_listings function
@@ -75,8 +78,11 @@ def _traverse_nlst_ftp_dirs(
     uses the retrlines function which should be supported by all servers.
     Use this function if _traverse_mlsd_ftp_dirs does not work.
 
+    Note, this is a recursive function which is used internally. You
+    probably want to call get_ftp_file_listings to use this function.
+
     :param ftp_conn: an ftplib connection object.
-    :param ftp_path: The path on the ftp server to
+    :param ftp_path: The path on the ftp server to start from
     :param ftp_files: of the directory and list of files within that directory
     :param try_n_times: if server connection fails try again (sleeping for
                         5 secs in between) n times for failing.
@@ -141,16 +147,26 @@ def get_ftp_file_listings(
 ) -> (Dict[str, str], List[str]):
     """
     Traverse the FTP server directory structure to create a list of all the
-    files (full paths)
+    files (full paths).
 
-    :param ftp_url:
-    :param ftp_path:
-    :param ftp_user:
-    :param ftp_pass:
+    Note, it is not good practise to hard code passwords into you
+    scripts. It would be recommended that you get the password
+    from an environmental variable or config file rather than
+    hard code the password.
+
+    :param ftp_url: the url for the ftp server
+    :param ftp_path: the path on the ftp server where to start the
+                     transverse of the tree.
+    :param ftp_user: The username for the ftp server
+    :param ftp_pass: the password for the ftp server
     :param ftp_timeout: in seconds (None and system default will be used;
-                        system defaults are usual aboue 300 seconds)
+                        system defaults are usual above 300 seconds)
     :param try_n_times: if server connection fails try again (sleeping for 5
                         secs in between) n times for failing.
+    :param mlsd_not_avail: Option to support older FTP servers which don't
+                           support the mlsd function. Default is False but
+                           if you get errors then suggest that you try
+                           setting this to True and trying again.
     :return: directory by directory and simple list of files as tuple
 
     """
@@ -182,6 +198,31 @@ def create_file_listings_db(
     try_n_times: int = 5,
     mlsd_not_avail: bool = False,
 ):
+    """
+    A function which transverses the directory structure on an ftp server
+    and saves the result to a JSON database using the pysondb module.
+
+    Note, it is not good practise to hard code passwords into you
+    scripts. It would be recommended that you get the password
+    from an environmental variable or config file rather than
+    hard code the password.
+
+    :param db_json: The file path for the databases JSON file.
+    :param ftp_url: the url for the ftp server
+    :param ftp_path: the path on the ftp server where to start the
+                     transverse of the tree.
+    :param ftp_user: The username for the ftp server
+    :param ftp_pass: the password for the ftp server
+    :param ftp_timeout: in seconds (None and system default will be used;
+                        system defaults are usual above 300 seconds)
+    :param try_n_times: if server connection fails try again (sleeping for 5
+                        secs in between) n times for failing.
+    :param mlsd_not_avail: Option to support older FTP servers which don't
+                           support the mlsd function. Default is False but
+                           if you get errors then suggest that you try
+                           setting this to True and trying again.
+
+    """
     import pysondb
     import tqdm
 
@@ -211,7 +252,7 @@ def download_ftp_file(
     time_out: int = 300,
     ftp_user: str = None,
     ftp_pass: str = None,
-    print_info=False,
+    print_info: bool = True,
 ) -> bool:
     """
     A function to download a file from an FTP server.
@@ -222,6 +263,8 @@ def download_ftp_file(
     :param time_out: the timeout for the download. Default: 300 seconds.
     :param ftp_user: the username, if required, for the ftp server.
     :param ftp_pass: the password, if required, for the ftp server.
+    :param print_info: bool for whether info should be printed to the console
+                       (default: True)
     :return: boolean as to whether the file was successfully downloaded or not.
 
     """
@@ -251,6 +294,7 @@ def download_curl_ftp_file(
     time_out: int = 300,
     ftp_user: str = None,
     ftp_pass: str = None,
+    print_info: bool = True,
 ) -> bool:
     """
     A function to download a file from an FTP server using curl.
@@ -261,6 +305,8 @@ def download_curl_ftp_file(
     :param time_out: the timeout for the download. Default: 300 seconds.
     :param ftp_user: the username, if required, for the ftp server.
     :param ftp_pass: the password, if required, for the ftp server.
+    :param print_info: bool for whether info should be printed to the console
+                       (default: True)
     :return: boolean as to whether the file was successfully downloaded or not.
 
     """
@@ -272,7 +318,10 @@ def download_curl_ftp_file(
         curl = pycurl.Curl()
         curl.setopt(pycurl.URL, full_path_url)
         curl.setopt(pycurl.FOLLOWLOCATION, True)
-        curl.setopt(pycurl.NOPROGRESS, 0)
+        if print_info:
+            curl.setopt(pycurl.NOPROGRESS, 0)
+        else:
+            curl.setopt(pycurl.NOPROGRESS, 1)
         curl.setopt(pycurl.FOLLOWLOCATION, 1)
         curl.setopt(pycurl.MAXREDIRS, 5)
         curl.setopt(pycurl.CONNECTTIMEOUT, 50)
@@ -283,15 +332,17 @@ def download_curl_ftp_file(
             curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_ANY)
             curl.setopt(pycurl.USERPWD, ftp_user + ":" + ftp_pass)
         curl.setopt(pycurl.WRITEDATA, fp)
-        print("Starting download of {}".format(full_path_url))
+        if print_info:
+            print("Starting download of {}".format(full_path_url))
         curl.perform()
-        print(
-            "Finished download in {0} of {1} bytes for {2}".format(
-                curl.getinfo(curl.TOTAL_TIME),
-                curl.getinfo(curl.SIZE_DOWNLOAD),
-                full_path_url,
+        if print_info:
+            print(
+                "Finished download in {0} of {1} bytes for {2}".format(
+                    curl.getinfo(curl.TOTAL_TIME),
+                    curl.getinfo(curl.SIZE_DOWNLOAD),
+                    full_path_url,
+                )
             )
-        )
         success = True
     except:
         print(
@@ -309,16 +360,26 @@ def download_files_use_lst_db(
     time_out: int = 300,
     ftp_user: str = None,
     ftp_pass: str = None,
-    create_dir_struct=False,
+    create_dir_struct: bool = False,
     use_curl: bool = False,
 ):
     """
+    A function which uses the pysondb JSON database to download all the files
+    recording whether files have been downloaded successful and the output
+    path for the file.
 
-    :param db_json:
-    :param out_dir_path:
-    :param time_out:
-    :param ftp_user:
-    :param ftp_pass:
+    :param db_json: file path for the JSON db file.
+    :param out_dir_path: the output path where data should be downloaded to.
+    :param time_out: the timeout for the download. Default: 300 seconds.
+    :param ftp_user: the username, if required, for the ftp server.
+    :param ftp_pass: the password, if required, for the ftp server.
+    :param create_dir_struct: boolean specifying whether the folder structure on the
+                              ftp server should be maintained within the out_dir_path
+                              (True) or ignored and all the individual files just
+                              downloaded into the output directory as a flat
+                              structure (False; Default).
+    :param use_curl: boolean specifying whether to use CURL to download the files.
+                     (Default: False).
 
     """
     import pysondb
@@ -348,6 +409,7 @@ def download_files_use_lst_db(
                 time_out=time_out,
                 ftp_user=ftp_user,
                 ftp_pass=ftp_pass,
+                print_info=False,
             )
         else:
             dwnlded = download_ftp_file(
@@ -357,6 +419,7 @@ def download_files_use_lst_db(
                 time_out=time_out,
                 ftp_user=ftp_user,
                 ftp_pass=ftp_pass,
+                print_info=False,
             )
         if dwnlded:
             lst_db.updateById(
