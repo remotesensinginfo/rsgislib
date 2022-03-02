@@ -173,7 +173,7 @@ def calc_dist_to_img_vals(
         dist2Clouds = 'LS5TM_20110701_lat52lon421_r24p204_distclouds.kea'
         # Pixel value 1 == Clouds
         # Pixel value 2 == Cloud Shadows
-        rsgislib.imagecalc.calc_dist_to_img_vals(cloudsImg, dist2Clouds, pxl_vals=[1,2])
+        rsgislib.imagecalc.calc_dist_to_img_vals(cloudsImg, dist2Clouds, pxl_vals=[1,2], out_no_data_val=-9999)
 
     """
     # Check gdal is available
@@ -217,6 +217,8 @@ def calc_dist_to_img_vals(
 
     if out_no_data_val is None:
         out_no_data_val = max_dist
+    if out_no_data_val is None:
+        raise ValueError("Either out_no_data_val or max_dist must be supplied.")
 
     valsImgDS = gdal.Open(input_img, gdal.GA_ReadOnly)
     valsImgBand = valsImgDS.GetRasterBand(img_band)
