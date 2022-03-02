@@ -389,7 +389,7 @@ def download_files_use_lst_db(
 
     lst_db = pysondb.getDb(db_json)
 
-    dwld_files = lst_db.getBy({"downloaded": False})
+    dwld_files = lst_db.getByQuery({"downloaded": False})
 
     for dwn_file in tqdm.tqdm(dwld_files):
         basename = os.path.basename(dwn_file["rmt_path"])
