@@ -74,8 +74,8 @@ def usgs_search(dataset:str,
     :param end_date:
     :param cloud_min:
     :param cloud_max:
-    :param bbox:
-    :param pt:
+    :param bbox: (MinX, MaxX, MinY, MaxY)
+    :param pt: (X, Y)
     :param poly_geom:
     :param sort_field:
     :param sort_direct:
@@ -103,10 +103,24 @@ def usgs_search(dataset:str,
 
     if pt is not None:
         print("Use point to filter.")
+        search_data["sceneFilter"]["spatialFilter"] = dict()
+        search_data["sceneFilter"]["spatialFilter"]["filterType"] = "geoJson"
+        search_data["sceneFilter"]["spatialFilter"]["geoJson"] = dict()
+        search_data["sceneFilter"]["spatialFilter"]["geoJson"]["type"] = "point"
+        search_data["sceneFilter"]["spatialFilter"]["geoJson"]["coordinates"] = [{"longitude": pt[0], "latitude": pt[1]}]
     elif bbox is not None:
         print("Use bbox to filter.")
+        search_data["sceneFilter"]["spatialFilter"] = dict()
+        search_data["sceneFilter"]["spatialFilter"]["filterType"] = "mbr"
+        search_data["sceneFilter"]["spatialFilter"]["lowerLeft"] = {"longitude": bbox[0], "latitude": bbox[2]}
+        search_data["sceneFilter"]["spatialFilter"]["upperRight"] = {"longitude": bbox[1], "latitude": bbox[3]}
     elif poly_geom is not None:
         print("Use poly_geom to filter.")
+        search_data["sceneFilter"]["spatialFilter"] = dict()
+        search_data["sceneFilter"]["spatialFilter"]["filterType"] = "geoJson"
+        search_data["sceneFilter"]["spatialFilter"]["geoJson"] = dict()
+        search_data["sceneFilter"]["spatialFilter"]["geoJson"]["type"] = "polygon"
+        #self["geoJson"] = GeoJson(shape)
 
     if sort_field is not None:
         search_data["sortCustomization"] = dict()
