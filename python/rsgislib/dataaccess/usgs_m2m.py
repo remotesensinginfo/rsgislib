@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+"""
+Tools for accessing (searching and downloading) datasets from the USGS
+
+"""
+
 import datetime
 from typing import List, Dict
 
