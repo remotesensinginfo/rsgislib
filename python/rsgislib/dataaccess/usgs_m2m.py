@@ -92,14 +92,14 @@ def usgs_search(dataset:str,
         end_date = datetime.datetime.now()
 
     search_data["sceneFilter"] = dict()
-    search_data["acquisitionFilter"] = dict()
-    search_data["acquisitionFilter"]["start"] = "{}".format(start_date)
-    search_data["acquisitionFilter"]["end"] = "{}".format(end_date)
+    search_data["sceneFilter"]["acquisitionFilter"] = dict()
+    search_data["sceneFilter"]["acquisitionFilter"]["start"] = "{}".format(start_date)
+    search_data["sceneFilter"]["acquisitionFilter"]["end"] = "{}".format(end_date)
 
     if cloud_max is not None:
-        search_data["cloudCoverFilter"] = dict()
-        search_data["cloudCoverFilter"]["min"] = cloud_min
-        search_data["cloudCoverFilter"]["max"] = cloud_max
+        search_data["sceneFilter"]["cloudCoverFilter"] = dict()
+        search_data["sceneFilter"]["cloudCoverFilter"]["min"] = cloud_min
+        search_data["sceneFilter"]["cloudCoverFilter"]["max"] = cloud_max
 
     if pt is not None:
         print("Use point to filter.")
@@ -112,6 +112,10 @@ def usgs_search(dataset:str,
         search_data["sortCustomization"] = dict()
         search_data["sortCustomization"]["field_name"] = sort_field
         search_data["sortCustomization"]["direction"] = sort_direct
+
+
+    import pprint
+    pprint.pprint(search_data)
 
     search_url = USGS_M2M_URL + "scene-search"
     out_info = rsgislib.tools.httptools.send_http_json_request(search_url, search_data, api_key=api_key)
