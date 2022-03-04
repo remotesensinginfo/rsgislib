@@ -29,7 +29,8 @@ USGS_M2M_URL = "https://m2m.cr.usgs.gov/api/api/json/stable/"
 # Note to download data you need to registered for m2m access:
 # https://ers.cr.usgs.gov/profile/access
 
-def usgs_login(username:str=None, password:str=None)->str:
+
+def usgs_login(username: str = None, password: str = None) -> str:
     """
     A function to login to the USGS m2m service.
 
@@ -47,12 +48,13 @@ def usgs_login(username:str=None, password:str=None)->str:
     if password is None:
         password = rsgislib.tools.utils.get_environment_variable("RSGIS_USGS_PASS")
 
-    login_data = {'username': username, 'password': password}
+    login_data = {"username": username, "password": password}
     login_url = USGS_M2M_URL + "login"
     api_key = rsgislib.tools.httptools.send_http_json_request(login_url, login_data)
     return api_key
 
-def usgs_logout(api_key:str):
+
+def usgs_logout(api_key: str):
     """
 
     :param api_key:
@@ -61,17 +63,22 @@ def usgs_logout(api_key:str):
     logout_url = USGS_M2M_URL + "logout"
     rsgislib.tools.httptools.send_http_json_request(logout_url, None, api_key)
 
-def usgs_search(dataset:str,
-                api_key:str,
-                start_date:datetime.datetime,
-                end_date:datetime.datetime=None,
-                cloud_min:int=0,
-                cloud_max:int=None,
-                pt:List=None,
-                bbox:List=None,
-                poly_geom:str=None,
-                sort_field:str=None,
-                sort_direct:str="DESC")->Dict:
+
+def usgs_search(
+    dataset: str,
+    api_key: str,
+    start_date: datetime.datetime = None,
+    end_date: datetime.datetime = None,
+    cloud_min: int = 0,
+    cloud_max: int = None,
+    pt: List = None,
+    bbox: List = None,
+    poly_geom: str = None,
+    months: List[int] = None,
+    full_meta: bool = False,
+    max_n_rslts: int = None,
+    start_n: int = None,
+) -> (List, Dict):
     """
 
     :param dataset:
@@ -83,13 +90,19 @@ def usgs_search(dataset:str,
     :param bbox: (MinX, MaxX, MinY, MaxY)
     :param pt: (X, Y)
     :param poly_geom:
-    :param sort_field:
-    :param sort_direct:
+    :param months:
+    :param max_n_rslts:
+    :param start_n:
     :return:
-    """
 
+    """
     if dataset not in DATA_PRODUCTS:
         raise rsgislib.RSGISPyException(f"No not recognise dataset: {dataset}")
+
+    if (max_n_rslts is not None) and (max_n_rslts > 100):
+        raise rsgislib.RSGISPyException(
+            "The maximum number of results requested should not be higher than 100."
+        )
 
     search_data = dict()
     search_data["datasetName"] = dataset
@@ -97,49 +110,170 @@ def usgs_search(dataset:str,
     if end_date is None:
         end_date = datetime.datetime.now()
 
-    search_data["sceneFilter"] = dict()
-    search_data["sceneFilter"]["acquisitionFilter"] = dict()
-    search_data["sceneFilter"]["acquisitionFilter"]["start"] = "{}".format(start_date)
-    search_data["sceneFilter"]["acquisitionFilter"]["end"] = "{}".format(end_date)
+    scn_filter = dict()
+
+    if start_date is not None:
+        scn_filter["acquisitionFilter"] = dict()
+        scn_filter["acquisitionFilter"]["start"] = "{}".format(start_date)
+        scn_filter["acquisitionFilter"]["end"] = "{}".format(end_date)
 
     if cloud_max is not None:
-        search_data["sceneFilter"]["cloudCoverFilter"] = dict()
-        search_data["sceneFilter"]["cloudCoverFilter"]["min"] = cloud_min
-        search_data["sceneFilter"]["cloudCoverFilter"]["max"] = cloud_max
+        scn_filter["cloudCoverFilter"] = dict()
+        scn_filter["cloudCoverFilter"]["min"] = cloud_min
+        scn_filter["cloudCoverFilter"]["max"] = cloud_max
 
     if pt is not None:
-        print("Use point to filter.")
-        search_data["sceneFilter"]["spatialFilter"] = dict()
-        search_data["sceneFilter"]["spatialFilter"]["filterType"] = "geoJson"
-        search_data["sceneFilter"]["spatialFilter"]["geoJson"] = dict()
-        search_data["sceneFilter"]["spatialFilter"]["geoJson"]["type"] = "point"
-        search_data["sceneFilter"]["spatialFilter"]["geoJson"]["coordinates"] = [{"longitude": pt[0], "latitude": pt[1]}]
+        scn_filter["spatialFilter"] = dict()
+        scn_filter["spatialFilter"]["filterType"] = "geojson"
+        scn_filter["spatialFilter"]["geoJson"] = dict()
+        scn_filter["spatialFilter"]["geoJson"]["type"] = "Point"
+        scn_filter["spatialFilter"]["geoJson"]["coordinates"] = [pt[1], pt[0]]
+        # raise rsgislib.RSGISPyException("Trying to point to filter but not implemented yet.")
     elif bbox is not None:
         print("Use bbox to filter.")
-        search_data["sceneFilter"]["spatialFilter"] = dict()
-        search_data["sceneFilter"]["spatialFilter"]["filterType"] = "mbr"
-        search_data["sceneFilter"]["spatialFilter"]["lowerLeft"] = {"longitude": bbox[0], "latitude": bbox[2]}
-        search_data["sceneFilter"]["spatialFilter"]["upperRight"] = {"longitude": bbox[1], "latitude": bbox[3]}
+        scn_filter["spatialFilter"] = dict()
+        scn_filter["spatialFilter"]["filterType"] = "mbr"
+        scn_filter["spatialFilter"]["lowerLeft"] = {
+            "longitude": bbox[0],
+            "latitude": bbox[2],
+        }
+        scn_filter["spatialFilter"]["upperRight"] = {
+            "longitude": bbox[1],
+            "latitude": bbox[3],
+        }
     elif poly_geom is not None:
-        print("Use poly_geom to filter.")
-        search_data["sceneFilter"]["spatialFilter"] = dict()
-        search_data["sceneFilter"]["spatialFilter"]["filterType"] = "geoJson"
-        search_data["sceneFilter"]["spatialFilter"]["geoJson"] = dict()
-        search_data["sceneFilter"]["spatialFilter"]["geoJson"]["type"] = "polygon"
+        """
+        scn_filter["spatialFilter"] = dict()
+        scn_filter["spatialFilter"]["filterType"] = "geoJson"
+        scn_filter["spatialFilter"]["geoJson"] = dict()
+        scn_filter["spatialFilter"]["geoJson"]["type"] = "Polygon"
         #self["geoJson"] = GeoJson(shape)
+        """
+        raise rsgislib.RSGISPyException(
+            "Trying to use a polygon to filter but not implemented yet."
+        )
 
-    if sort_field is not None:
-        search_data["sortCustomization"] = dict()
-        search_data["sortCustomization"]["field_name"] = sort_field
-        search_data["sortCustomization"]["direction"] = sort_direct
+    if months is not None:
+        scn_filter["seasonalFilter"] = dict()
+        scn_filter["seasonalFilter"] = months
 
+    if len(scn_filter) > 0:
+        search_data["sceneFilter"] = scn_filter
 
-    import pprint
-    pprint.pprint(search_data)
+    if full_meta:
+        search_data["metadataType"] = "full"
+
+    if max_n_rslts is not None:
+        search_data["maxResults"] = max_n_rslts
+
+    if start_n is not None:
+        search_data["startingNumber"] = start_n
+
+    # import pprint
+    # pprint.pprint(search_data)
 
     search_url = USGS_M2M_URL + "scene-search"
-    out_info = rsgislib.tools.httptools.send_http_json_request(search_url, search_data, api_key=api_key)
+    srch_data = rsgislib.tools.httptools.send_http_json_request(
+        search_url, search_data, api_key=api_key
+    )
 
-    n_scns = out_info["totalHits"]
+    if srch_data["totalHits"] > 0:
+        scns = srch_data["results"]
+    else:
+        scns = None
 
-    print(n_scns)
+    srch_meta = {
+        "totalHits": srch_data["totalHits"],
+        "startingNumber": srch_data["startingNumber"],
+        "nextRecord": srch_data["nextRecord"],
+        "recordsReturned": srch_data["recordsReturned"],
+    }
+
+    return scns, srch_meta
+
+
+def get_all_usgs_search(
+    dataset: str,
+    api_key: str,
+    max_n_rslts: int = 1000,
+    start_date: datetime.datetime = None,
+    end_date: datetime.datetime = None,
+    cloud_min: int = 0,
+    cloud_max: int = None,
+    pt: List = None,
+    bbox: List = None,
+    poly_geom: str = None,
+    months: List[int] = None,
+    full_meta: bool = False,
+) -> List:
+    """
+
+    :param dataset:
+    :param api_key:
+    :param max_n_rslts:
+    :param start_date:
+    :param end_date:
+    :param cloud_min:
+    :param cloud_max:
+    :param pt:
+    :param bbox:
+    :param poly_geom:
+    :param months:
+    :param full_meta:
+    :return:
+
+    """
+    if max_n_rslts <= 100:
+        scns, srch_meta = usgs_search(
+            dataset,
+            api_key,
+            start_date,
+            end_date,
+            cloud_min,
+            cloud_max,
+            pt,
+            bbox,
+            poly_geom,
+            months,
+            full_meta,
+        )
+    else:
+        scns, srch_meta = usgs_search(
+            dataset,
+            api_key,
+            start_date,
+            end_date,
+            cloud_min,
+            cloud_max,
+            pt,
+            bbox,
+            poly_geom,
+            months,
+            full_meta,
+        )
+        tot_n_scns = srch_meta["recordsReturned"]
+        total_hits = srch_meta["totalHits"]
+        if max_n_rslts > total_hits:
+            max_n_rslts = total_hits
+        while tot_n_scns <= max_n_rslts:
+            xtr_scns, srch_meta = usgs_search(
+                dataset,
+                api_key,
+                start_date,
+                end_date,
+                cloud_min,
+                cloud_max,
+                pt,
+                bbox,
+                poly_geom,
+                months,
+                full_meta,
+                start_n=srch_meta["nextRecord"],
+            )
+            scns += xtr_scns
+            tot_n_scns += len(xtr_scns)
+
+    if len(scns) > max_n_rslts:
+        scns = scns[0:max_n_rslts]
+
+    return scns
