@@ -343,3 +343,110 @@ def get_download_ids(scns, bulk=False) -> (List, List):
                 scn_dsp_ids.append(scn["displayId"])
                 scn_ent_ids.append(scn["entityId"])
     return scn_dsp_ids, scn_ent_ids
+
+
+def create_scene_list(api_key: str, dataset:str, scn_ent_ids:List[str], lst_name:str, lst_period:str="P1W")->int:
+    """
+    A function which creates a list of scenes on the system which could be
+    downloaded.
+
+    ISO 8601 duration format:
+    P(n)Y(n)M(n)DT(n)H(n)M(n)S
+    Where:
+        P is the duration designator (referred to as "period"), and is always placed
+          at the beginning of the duration.
+        Y is the year designator that follows the value for the number of years.
+        M is the month designator that follows the value for the number of months.
+        W is the week designator that follows the value for the number of weeks.
+        D is the day designator that follows the value for the number of days.
+        T is the time designator that precedes the time components.
+        H is the hour designator that follows the value for the number of hours.
+        M is the minute designator that follows the value for the number of minutes.
+        S is the second designator that follows the value for the number of seconds.
+    For example: "P3Y6M4DT12H30M5S" = A duration of three years, six months, four
+    days, twelve hours, thirty minutes, and five seconds.
+
+    :param api_key: The API key created at login to authenticate user.
+    :param dataset: name of the dataset
+    :param scn_ent_ids: list of entity IDs
+    :param lst_name: a name for the list.
+    :param lst_period: Period the list will exist for in ISO 8601 duration format.
+                       Default is P1W (i.e., 1 week).
+    :return: Number of scenes added.
+
+    """
+
+    if dataset not in DATA_PRODUCTS:
+        raise rsgislib.RSGISPyException(f"No not recognise dataset: {dataset}")
+
+    add_scn_info = dict()
+    add_scn_info["listId"] = lst_name
+    add_scn_info["datasetName"] = dataset
+    add_scn_info["idField"] = "entityId"
+    add_scn_info["entityIds"] = scn_ent_ids
+    add_scn_info["timeToLive"] = lst_period
+
+    scn_lst_add_url = USGS_M2M_URL + "scene-list-add"
+    scn_lst_add_info = rsgislib.tools.httptools.send_http_json_request(
+        scn_lst_add_url, add_scn_info, api_key=api_key
+        )
+    return scn_lst_add_info
+
+
+def remove_scene_list(api_key: str, lst_name:str)->int:
+    rm_scn_info = {"listId": lst_name}
+    scn_lst_add_url = USGS_M2M_URL + "scene-list-remove"
+    rsgislib.tools.httptools.send_http_json_request(
+        scn_lst_add_url, rm_scn_info, api_key=api_key
+        )
+
+def check_dwnld_opts(api_key: str, lst_name:str, dataset:str, dwnld_filetype:str="bundle", rm_lst:bool=True)->List[Dict[str,str]]:
+    """
+
+    :param api_key:
+    :param lst_name:
+    :param dataset:
+    :param dwnld_filetype: options: bundle, band or all
+    :param rm_lst:
+    :return:
+    """
+    if not can_user_dwnld(api_key):
+        raise rsgislib.RSGISPyException("Your user account does not have permission to download data.")
+
+    dwnld_opts_params = {
+        "listId":      lst_name,
+        "datasetName": dataset
+        }
+
+    dwnld_opts_url = USGS_M2M_URL + "download-options"
+    dnwld_opt_out_info = rsgislib.tools.httptools.send_http_json_request(dwnld_opts_url, dwnld_opts_params, api_key)
+
+    # Select products
+    dwlds_lst = []
+    if dwnld_filetype == 'bundle':
+        # select bundle files
+        for prod in dnwld_opt_out_info:
+            if prod["bulkAvailable"]:
+                dwlds_lst.append({"entityId": prod["entityId"], "productId":prod["id"]})
+    elif dwnld_filetype == 'band':
+        # select band files
+        for prod in dnwld_opt_out_info:
+            if (prod["secondaryDownloads"] is not None) and (len(prod["secondaryDownloads"]) > 0):
+                for sec_dwnld in prod["secondaryDownloads"]:
+                    if sec_dwnld["bulkAvailable"]:
+                        dwlds_lst.append({"entityId": sec_dwnld["entityId"], "productId":sec_dwnld["id"]})
+    elif dwnld_filetype == 'all':
+        # select all available files
+        for prod in dnwld_opt_out_info:
+            if prod["bulkAvailable"]:
+                dwlds_lst.append({"entityId": prod["entityId"], "productId":prod["id"]})
+                if (prod["secondaryDownloads"] is not None) and (
+                        len(prod["secondaryDownloads"]) > 0):
+                    for sec_dwnld in prod["secondaryDownloads"]:
+                        if sec_dwnld["bulkAvailable"]:
+                            dwlds_lst.append({"entityId": sec_dwnld["entityId"], "productId":sec_dwnld["id"]})
+    else:
+        raise rsgislib.RSGISPyException("dwnld_filetype is not recognised - must be either bundle, band or all.")
+
+    if rm_lst:
+        remove_scene_list(api_key, lst_name)
