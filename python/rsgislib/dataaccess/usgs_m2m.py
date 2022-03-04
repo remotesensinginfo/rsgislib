@@ -56,12 +56,47 @@ def usgs_login(username: str = None, password: str = None) -> str:
 
 def usgs_logout(api_key: str):
     """
-
-    :param api_key:
+    Log out of the USGS m2m system using the api_key created at login.
+    :param api_key: The API key created at login to authenticate.
 
     """
     logout_url = USGS_M2M_URL + "logout"
     rsgislib.tools.httptools.send_http_json_request(logout_url, None, api_key)
+
+
+def can_user_dwnld(api_key: str) -> bool:
+    """
+    Does the user logged in with the api_key have permission to download data.
+
+    :param api_key: The API key created at login to authenticate.
+    :return: boolean - True does have permission.
+
+    """
+    permissions_url = USGS_M2M_URL + "permissions"
+    permissions_info = rsgislib.tools.httptools.send_http_json_request(
+        permissions_url, api_key=api_key
+    )
+    have_dwn_per = False
+    if (permissions_info is not None) and ("download" in permissions_info):
+        have_dwn_per = True
+    return have_dwn_per
+
+
+def can_user_order(api_key: str) -> bool:
+    """
+    Does the user logged in with the api_key have permission to order data.
+
+    :param api_key: The API key created at login to authenticate.
+    :return: boolean - True does have permission.
+    """
+    permissions_url = USGS_M2M_URL + "permissions"
+    permissions_info = rsgislib.tools.httptools.send_http_json_request(
+        permissions_url, api_key=api_key
+    )
+    have_ord_per = False
+    if (permissions_info is not None) and ("order" in permissions_info):
+        have_ord_per = True
+    return have_ord_per
 
 
 def usgs_search(
@@ -81,19 +116,24 @@ def usgs_search(
 ) -> (List, Dict):
     """
 
-    :param dataset:
-    :param api_key:
+    :param dataset: The name of the dataset to query.
+    :param api_key: The API key created at login to authenticate.
     :param start_date:
     :param end_date:
     :param cloud_min:
     :param cloud_max:
     :param bbox: (MinX, MaxX, MinY, MaxY)
     :param pt: (X, Y)
-    :param poly_geom:
-    :param months:
-    :param max_n_rslts:
-    :param start_n:
-    :return:
+    :param poly_geom: NOT IMPLEMENTED YET!
+    :param months: List of months as ints (1-12) you want to limit the search for.
+    :param max_n_rslts: the maximum number of scenes to be returned (cannot be
+                        larger than 100 - if larger than 100 then use
+                        get_all_usgs_search function.
+    :param start_n: The scene number to start the data retrieval from. Note
+                    you probably don't want to use this parameter but use the
+                    get_all_usgs_search function.
+    :return: List of scenes found and Dict of meta-data for the number of scenes
+             available.
 
     """
     if dataset not in DATA_PRODUCTS:
@@ -207,10 +247,13 @@ def get_all_usgs_search(
     full_meta: bool = False,
 ) -> List:
     """
+    Uses the usgs_search function to retrive multiple 'pages' of search results. So, if
+    you need more than 100 scenes you can use this function to undertake the multiple
+    queries required and merge the results into a single list.
 
-    :param dataset:
-    :param api_key:
-    :param max_n_rslts:
+    :param dataset: The name of the dataset to query.
+    :param api_key: The API key created at login to authenticate.
+    :param max_n_rslts: The maximum number of scenes you want returned.
     :param start_date:
     :param end_date:
     :param cloud_min:
@@ -220,7 +263,7 @@ def get_all_usgs_search(
     :param poly_geom:
     :param months:
     :param full_meta:
-    :return:
+    :return: List of scenes found through the query.
 
     """
     if max_n_rslts <= 100:
@@ -277,3 +320,26 @@ def get_all_usgs_search(
         scns = scns[0:max_n_rslts]
 
     return scns
+
+
+def get_download_ids(scns, bulk=False) -> (List, List):
+    """
+    A function for extracting a list of display and entity IDs from a list
+    of scenes as would have been returned by from a search query.
+
+    :param scns: a list of the scenes
+    :param bulk: If True then only scenes available for bulk download will be outputted.
+    :return: List of display IDs, List of Entity IDs
+
+    """
+    scn_dsp_ids = list()
+    scn_ent_ids = list()
+    for scn in scns:
+        if scn["options"]["download"] == True:
+            if bulk and (scn["options"]["bulk"] == True):
+                scn_dsp_ids.append(scn["displayId"])
+                scn_ent_ids.append(scn["entityId"])
+            elif not bulk:
+                scn_dsp_ids.append(scn["displayId"])
+                scn_ent_ids.append(scn["entityId"])
+    return scn_dsp_ids, scn_ent_ids

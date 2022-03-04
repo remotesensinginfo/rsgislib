@@ -8,7 +8,7 @@ import requests
 import rsgislib
 
 
-def send_http_json_request(url:str, data:Dict, api_key:str=None)->str:
+def send_http_json_request(url:str, data:Dict=None, api_key:str=None)->str:
     """
     A function which sends a http request with a json data packet.
     If an error occurs an exception will be raised.
@@ -21,7 +21,10 @@ def send_http_json_request(url:str, data:Dict, api_key:str=None)->str:
     :return: the JSON string returned by the server.
 
     """
-    json_data = json.dumps(data)
+    if data is None:
+        json_data = None
+    else:
+        json_data = json.dumps(data)
 
     if api_key == None:
         response = requests.post(url, json_data)
