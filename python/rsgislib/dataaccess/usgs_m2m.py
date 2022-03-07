@@ -443,6 +443,7 @@ def create_scene_list(
 
     ISO 8601 duration format:
     P(n)Y(n)M(n)DT(n)H(n)M(n)S
+
     Where:
         P is the duration designator (referred to as "period"), and is always placed
           at the beginning of the duration.
@@ -454,6 +455,7 @@ def create_scene_list(
         H is the hour designator that follows the value for the number of hours.
         M is the minute designator that follows the value for the number of minutes.
         S is the second designator that follows the value for the number of seconds.
+
     For example: "P3Y6M4DT12H30M5S" = A duration of three years, six months, four
     days, twelve hours, thirty minutes, and five seconds.
 
