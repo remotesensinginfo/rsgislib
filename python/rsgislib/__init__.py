@@ -183,6 +183,12 @@ INTERP_LANCZOS = 4
 INTERP_AVERAGE = 5
 INTERP_MODE = 6
 
+GEOM_PT = 1
+GEOM_LINE = 2
+GEOM_POLY = 3
+GEOM_MLINE = 4
+GEOM_MPOLY = 5
+
 
 def get_install_base_path() -> pathlib.PurePath:
     """

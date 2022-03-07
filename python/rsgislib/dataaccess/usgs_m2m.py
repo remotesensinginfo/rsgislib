@@ -24,6 +24,10 @@ DATA_PRODUCTS = {
     "sentinel_2a": "5e83a42c6eba8084",
 }
 
+USGS_WRS1 = 1
+USGS_WRS2 = 2
+
+
 USGS_M2M_URL = "https://m2m.cr.usgs.gov/api/api/json/stable/"
 
 # Note to download data you need to registered for m2m access:
@@ -99,6 +103,89 @@ def can_user_order(api_key: str) -> bool:
     return have_ord_per
 
 
+def get_wrs_pt(
+    api_key: str, row: int, path: int, grid_version: int = USGS_WRS2
+) -> (float, float):
+    """
+    Get a point for the WRS row/path which can be used for a query.
+
+    :param api_key: The API key created at login to authenticate.
+    :param row: integer for row
+    :param path: integer for path
+    :param grid_version: Whether the row/path is WRS1 or WRS2. Default: WRS2.
+    :return: longitude, latitude
+
+    """
+    grid2ll_url = USGS_M2M_URL + "grid2ll"
+    grid2ll_data = dict()
+    if grid_version == USGS_WRS1:
+        grid2ll_data["gridType"] = "WRS1"
+    else:
+        grid2ll_data["gridType"] = "WRS2"
+
+    grid2ll_data["path"] = path
+    grid2ll_data["row"] = row
+    grid2ll_data["responseShape"] = "point"
+
+    grid2ll_info = rsgislib.tools.httptools.send_http_json_request(
+        grid2ll_url, grid2ll_data, api_key=api_key
+    )
+
+    if grid2ll_info["shape"] == "point":
+        lat = grid2ll_info["coordinates"][0]["latitude"]
+        lon = grid2ll_info["coordinates"][0]["longitude"]
+    else:
+        raise rsgislib.RSGISPyException("The returned shape was not a point.")
+
+    return lon, lat
+
+
+def get_wrs_bbox(
+    api_key: str, row: int, path: int, grid_version: int = USGS_WRS2
+) -> (float, float, float, float):
+    """
+    Get a bbox for the WRS row/path which can be used for a query.
+
+    :param api_key: The API key created at login to authenticate.
+    :param row: integer for row
+    :param path: integer for path
+    :param grid_version: Whether the row/path is WRS1 or WRS2. Default: WRS2.
+    :return: BBOX in lon/lat (x_min, x_max, y_min, y_max)
+
+    """
+    grid2ll_url = USGS_M2M_URL + "grid2ll"
+    grid2ll_data = dict()
+    if grid_version == USGS_WRS1:
+        grid2ll_data["gridType"] = "WRS1"
+    else:
+        grid2ll_data["gridType"] = "WRS2"
+
+    grid2ll_data["path"] = path
+    grid2ll_data["row"] = row
+    grid2ll_data["responseShape"] = "polygon"
+
+    grid2ll_info = rsgislib.tools.httptools.send_http_json_request(
+        grid2ll_url, grid2ll_data, api_key=api_key
+    )
+
+    lat_vals = []
+    lon_vals = []
+
+    if grid2ll_info["shape"] == "polygon":
+        for coord in grid2ll_info["coordinates"]:
+            lat_vals.append(coord["latitude"])
+            lon_vals.append(coord["longitude"])
+    else:
+        raise rsgislib.RSGISPyException("The returned shape was not a polygon.")
+
+    min_lon = min(lon_vals)
+    max_lon = max(lon_vals)
+    min_lat = min(lat_vals)
+    max_lat = max(lat_vals)
+
+    return min_lon, max_lon, min_lat, max_lat
+
+
 def usgs_search(
     dataset: str,
     api_key: str,
@@ -115,17 +202,19 @@ def usgs_search(
     start_n: int = None,
 ) -> (List, Dict):
     """
+    A function to search for landsat imagery from the USGS.
 
     :param dataset: The name of the dataset to query.
     :param api_key: The API key created at login to authenticate.
-    :param start_date:
-    :param end_date:
-    :param cloud_min:
-    :param cloud_max:
+    :param start_date: Start date as a datetime object. (Earlier date)
+    :param end_date: End date as a datetime object. (Later date)
+    :param cloud_min: Minimum cloud cover (Default: 0)
+    :param cloud_max: Maximum cloud cover.
     :param bbox: (MinX, MaxX, MinY, MaxY)
     :param pt: (X, Y)
     :param poly_geom: NOT IMPLEMENTED YET!
     :param months: List of months as ints (1-12) you want to limit the search for.
+    :param full_meta: Full metadata returned (Default: False)
     :param max_n_rslts: the maximum number of scenes to be returned (cannot be
                         larger than 100 - if larger than 100 then use
                         get_all_usgs_search function.
@@ -168,7 +257,6 @@ def usgs_search(
         scn_filter["spatialFilter"]["geoJson"] = dict()
         scn_filter["spatialFilter"]["geoJson"]["type"] = "Point"
         scn_filter["spatialFilter"]["geoJson"]["coordinates"] = [pt[1], pt[0]]
-        # raise rsgislib.RSGISPyException("Trying to point to filter but not implemented yet.")
     elif bbox is not None:
         print("Use bbox to filter.")
         scn_filter["spatialFilter"] = dict()
@@ -208,9 +296,6 @@ def usgs_search(
 
     if start_n is not None:
         search_data["startingNumber"] = start_n
-
-    # import pprint
-    # pprint.pprint(search_data)
 
     search_url = USGS_M2M_URL + "scene-search"
     srch_data = rsgislib.tools.httptools.send_http_json_request(
@@ -254,15 +339,15 @@ def get_all_usgs_search(
     :param dataset: The name of the dataset to query.
     :param api_key: The API key created at login to authenticate.
     :param max_n_rslts: The maximum number of scenes you want returned.
-    :param start_date:
-    :param end_date:
-    :param cloud_min:
-    :param cloud_max:
-    :param pt:
-    :param bbox:
-    :param poly_geom:
-    :param months:
-    :param full_meta:
+    :param start_date: Start date as a datetime object. (Earlier date)
+    :param end_date: End date as a datetime object. (Later date)
+    :param cloud_min: Minimum cloud cover (Default: 0)
+    :param cloud_max: Maximum cloud cover.
+    :param bbox: (MinX, MaxX, MinY, MaxY)
+    :param pt: (X, Y)
+    :param poly_geom: NOT IMPLEMENTED YET!
+    :param months: List of months as ints (1-12) you want to limit the search for.
+    :param full_meta: Full metadata returned (Default: False)
     :return: List of scenes found through the query.
 
     """
@@ -345,7 +430,13 @@ def get_download_ids(scns, bulk=False) -> (List, List):
     return scn_dsp_ids, scn_ent_ids
 
 
-def create_scene_list(api_key: str, dataset:str, scn_ent_ids:List[str], lst_name:str, lst_period:str="P1W")->int:
+def create_scene_list(
+    api_key: str,
+    dataset: str,
+    scn_ent_ids: List[str],
+    lst_name: str,
+    lst_period: str = "P1W",
+) -> int:
     """
     A function which creates a list of scenes on the system which could be
     downloaded.
@@ -389,18 +480,25 @@ def create_scene_list(api_key: str, dataset:str, scn_ent_ids:List[str], lst_name
     scn_lst_add_url = USGS_M2M_URL + "scene-list-add"
     scn_lst_add_info = rsgislib.tools.httptools.send_http_json_request(
         scn_lst_add_url, add_scn_info, api_key=api_key
-        )
+    )
     return scn_lst_add_info
 
 
-def remove_scene_list(api_key: str, lst_name:str)->int:
+def remove_scene_list(api_key: str, lst_name: str) -> int:
     rm_scn_info = {"listId": lst_name}
     scn_lst_add_url = USGS_M2M_URL + "scene-list-remove"
     rsgislib.tools.httptools.send_http_json_request(
         scn_lst_add_url, rm_scn_info, api_key=api_key
-        )
+    )
 
-def check_dwnld_opts(api_key: str, lst_name:str, dataset:str, dwnld_filetype:str="bundle", rm_lst:bool=True)->List[Dict[str,str]]:
+
+def check_dwnld_opts(
+    api_key: str,
+    lst_name: str,
+    dataset: str,
+    dwnld_filetype: str = "bundle",
+    rm_lst: bool = True,
+) -> List[Dict[str, str]]:
     """
 
     :param api_key:
@@ -411,42 +509,62 @@ def check_dwnld_opts(api_key: str, lst_name:str, dataset:str, dwnld_filetype:str
     :return:
     """
     if not can_user_dwnld(api_key):
-        raise rsgislib.RSGISPyException("Your user account does not have permission to download data.")
+        raise rsgislib.RSGISPyException(
+            "Your user account does not have permission to download data."
+        )
 
-    dwnld_opts_params = {
-        "listId":      lst_name,
-        "datasetName": dataset
-        }
+    dwnld_opts_params = {"listId": lst_name, "datasetName": dataset}
 
     dwnld_opts_url = USGS_M2M_URL + "download-options"
-    dnwld_opt_out_info = rsgislib.tools.httptools.send_http_json_request(dwnld_opts_url, dwnld_opts_params, api_key)
+    dnwld_opt_out_info = rsgislib.tools.httptools.send_http_json_request(
+        dwnld_opts_url, dwnld_opts_params, api_key
+    )
 
     # Select products
     dwlds_lst = []
-    if dwnld_filetype == 'bundle':
+    if dwnld_filetype == "bundle":
         # select bundle files
         for prod in dnwld_opt_out_info:
             if prod["bulkAvailable"]:
-                dwlds_lst.append({"entityId": prod["entityId"], "productId":prod["id"]})
-    elif dwnld_filetype == 'band':
+                dwlds_lst.append(
+                    {"entityId": prod["entityId"], "productId": prod["id"]}
+                )
+    elif dwnld_filetype == "band":
         # select band files
         for prod in dnwld_opt_out_info:
-            if (prod["secondaryDownloads"] is not None) and (len(prod["secondaryDownloads"]) > 0):
+            if (prod["secondaryDownloads"] is not None) and (
+                len(prod["secondaryDownloads"]) > 0
+            ):
                 for sec_dwnld in prod["secondaryDownloads"]:
                     if sec_dwnld["bulkAvailable"]:
-                        dwlds_lst.append({"entityId": sec_dwnld["entityId"], "productId":sec_dwnld["id"]})
-    elif dwnld_filetype == 'all':
+                        dwlds_lst.append(
+                            {
+                                "entityId": sec_dwnld["entityId"],
+                                "productId": sec_dwnld["id"],
+                            }
+                        )
+    elif dwnld_filetype == "all":
         # select all available files
         for prod in dnwld_opt_out_info:
             if prod["bulkAvailable"]:
-                dwlds_lst.append({"entityId": prod["entityId"], "productId":prod["id"]})
+                dwlds_lst.append(
+                    {"entityId": prod["entityId"], "productId": prod["id"]}
+                )
                 if (prod["secondaryDownloads"] is not None) and (
-                        len(prod["secondaryDownloads"]) > 0):
+                    len(prod["secondaryDownloads"]) > 0
+                ):
                     for sec_dwnld in prod["secondaryDownloads"]:
                         if sec_dwnld["bulkAvailable"]:
-                            dwlds_lst.append({"entityId": sec_dwnld["entityId"], "productId":sec_dwnld["id"]})
+                            dwlds_lst.append(
+                                {
+                                    "entityId": sec_dwnld["entityId"],
+                                    "productId": sec_dwnld["id"],
+                                }
+                            )
     else:
-        raise rsgislib.RSGISPyException("dwnld_filetype is not recognised - must be either bundle, band or all.")
+        raise rsgislib.RSGISPyException(
+            "dwnld_filetype is not recognised - must be either bundle, band or all."
+        )
 
     if rm_lst:
         remove_scene_list(api_key, lst_name)
