@@ -3,11 +3,14 @@
 The vector attributes module performs attribute table operations on vectors.
 """
 
+from typing import Union, List, Dict
 import math
 
 from osgeo import gdal
 import osgeo.ogr
 from osgeo import ogr
+
+import numpy
 
 import rsgislib
 
@@ -19,7 +22,7 @@ def write_vec_column(
     out_vec_lyr: str,
     att_column: str,
     att_col_datatype: int,
-    att_col_data: list,
+    att_col_data: List,
 ):
     """
     A function which will write a column to a vector file
@@ -106,7 +109,7 @@ def write_vec_column_to_layer(
     out_vec_lyr_obj: osgeo.ogr.Layer,
     att_column: str,
     att_col_datatype: int,
-    att_col_data: list,
+    att_col_data: List,
 ):
     """
     A function which will write a column to a vector layer.
@@ -173,7 +176,7 @@ def write_vec_column_to_layer(
         openTransaction = False
 
 
-def read_vec_column(vec_file: str, vec_lyr: str, att_column: str) -> list:
+def read_vec_column(vec_file: str, vec_lyr: str, att_column: str) -> List:
     """
     A function which will reads a column from a vector file
 
@@ -214,14 +217,14 @@ def read_vec_column(vec_file: str, vec_lyr: str, att_column: str) -> list:
     return outVal
 
 
-def read_vec_columns(vec_file: str, vec_lyr: str, att_columns: list) -> list:
+def read_vec_columns(vec_file: str, vec_lyr: str, att_columns: List[str]) -> List[Dict]:
     """
     A function which will reads a number of column from a vector file
 
     :param vec_file: The file / path to the vector data 'file'.
     :param vec_lyr: The layer to which the data is to be read from.
     :param att_columns: List of input attribute column names to be read in.
-    :returns: list of dicts with the column names as keys
+    :return: list of dicts with the column names as keys
 
     """
     ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
@@ -489,7 +492,6 @@ def create_name_col(
 
     """
     import geopandas
-    import numpy
     import tqdm
     import rsgislib.tools.utils
     import rsgislib.vectorutils
@@ -583,7 +585,6 @@ def add_unq_numeric_col(
 
     """
     import geopandas
-    import numpy
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -630,7 +631,6 @@ def add_numeric_col_lut(
 
     """
     import geopandas
-    import numpy
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -676,7 +676,6 @@ def add_numeric_col(
 
     """
     import geopandas
-    import numpy
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -715,7 +714,6 @@ def add_string_col(
 
     """
     import geopandas
-    import numpy
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -733,7 +731,7 @@ def add_string_col(
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def get_unq_col_values(vec_file: str, vec_lyr: str, col_name: str):
+def get_unq_col_values(vec_file: str, vec_lyr: str, col_name: str) -> numpy.array:
     """
     A function which splits a vector layer by an attribute value into either
     different layers or different output files.
@@ -773,7 +771,6 @@ def add_fid_col(
 
     """
     import geopandas
-    import numpy
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -790,10 +787,10 @@ def add_fid_col(
 def get_vec_cols_as_array(
     vec_file: str,
     vec_lyr: str,
-    cols: list,
+    cols: List[str],
     lower_limit: float = None,
     upper_limit: float = None,
-):
+) -> numpy.array:
     """
     A function returns an n x m numpy array with the values for the columns specified.
 
@@ -823,3 +820,53 @@ def get_vec_cols_as_array(
     out_arr = rsgislib.tools.stats.mask_data_to_valid(out_arr, lower_limit, upper_limit)
 
     return out_arr
+
+
+def sort_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    sort_by: Union[str, List[str]],
+    ascending: Union[bool, List[bool]],
+    out_format: str = "GPKG",
+):
+    """
+    A function which sorts a vector layer based on the attributes of the layer.
+    You can sort by either a single attribute or within multiple attributes
+    if a list is provided. This function is implemented using geopandas.
+
+    :param vec_file: the input vector file.
+    :param vec_lyr: the input vector layer name.
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the output vector layer name.
+    :param sort_by: either a string with the name of a single attribute or a list
+                    of strings if multiple attributes are used for the sort.
+    :param ascending: either a bool (True: ascending; False: descending) or list
+                      of bools if a list of attributes was given.
+    :param out_format: The output vector file format (Default: GPKG)
+
+    """
+    import geopandas
+
+    if type(sort_by) is list:
+        if type(ascending) is not list:
+            raise rsgislib.RSGISPyException(
+                "If sort_by is a list then ascending must be too."
+            )
+
+        if len(sort_by) != len(ascending):
+            raise rsgislib.RSGISPyException(
+                "If lists, the length of sort_by and ascending must be the same."
+            )
+
+    # Read input vector file.
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    # sort layer.
+    sorted_gpdf = base_gpdf.sort_values(by=sort_by, ascending=ascending)
+
+    if out_format == "GPKG":
+        sorted_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        sorted_gpdf.to_file(out_vec_file, driver=out_format)

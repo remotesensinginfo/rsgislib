@@ -30,6 +30,10 @@ Get Column Summaries
 ----------------------
 .. autofunction:: rsgislib.vectorattrs.get_unq_col_values
 
+Sort By Attributes
+-------------------
+.. autofunction:: rsgislib.vectorattrs.sort_vec_lyr
+
 
 * :ref:`genindex`
 * :ref:`modindex`
