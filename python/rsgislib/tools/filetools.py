@@ -220,15 +220,20 @@ def does_path_exists_or_creatable(file_path_name: str) -> bool:
 
 def get_dir_name(input_file: str) -> str:
     """
-    A function which returns just the name of the directory of the input file
-    without the rest of the path.
+    A function which returns just the name of the directory of the input path
+    (file or directory) without the rest of the path.
 
-    :param input_file: string for the input file name and path
+    :param input_file: string for the input path (file or directory) name and path
     :return: directory name
 
     """
     input_file = os.path.abspath(input_file)
-    dir_path = os.path.dirname(input_file)
+    if os.path.isfile(input_file):
+        dir_path = os.path.dirname(input_file)
+    elif os.path.isdir(input_file):
+        dir_path = input_file
+    else:
+        raise rsgislib.RSGISPyException("Input path must be either a file or directory")
     dir_name = os.path.basename(dir_path)
     return dir_name
 

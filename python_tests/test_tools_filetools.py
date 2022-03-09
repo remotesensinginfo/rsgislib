@@ -428,3 +428,18 @@ def test_split_path_all_file_rel():
         and (parts[2] == "c")
         and (parts[3] == "hello.txt")
     )
+
+
+def test_get_dir_name_file():
+    import rsgislib.tools.filetools
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    dir_name = rsgislib.tools.filetools.get_dir_name(input_img)
+    assert dir_name == "data"
+
+
+def test_get_dir_name_dir():
+    import rsgislib.tools.filetools
+
+    dir_name = rsgislib.tools.filetools.get_dir_name(DATA_DIR)
+    assert dir_name == "data"

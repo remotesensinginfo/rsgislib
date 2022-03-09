@@ -144,7 +144,7 @@ def test_download_curl_ftp_file(tmp_path):
     assert os.path.exists(out_file)
 
 
-#@pytest.mark.skipif(PYSON_DB_NOT_AVAIL, reason="pysondb dependency not available")
+# @pytest.mark.skipif(PYSON_DB_NOT_AVAIL, reason="pysondb dependency not available")
 @pytest.mark.skipif(True, reason="Skipping from automatically running.")
 def test_download_files_use_lst_db_no_struct(tmp_path):
     import rsgislib.tools.ftptools
@@ -220,7 +220,7 @@ def test_download_files_use_lst_db_no_struct(tmp_path):
     )
 
 
-#@pytest.mark.skipif(PYSON_DB_NOT_AVAIL, reason="pysondb dependency not available")
+# @pytest.mark.skipif(PYSON_DB_NOT_AVAIL, reason="pysondb dependency not available")
 @pytest.mark.skipif(True, reason="Skipping from automatically running.")
 def test_download_files_use_lst_db_struct(tmp_path):
     import rsgislib.tools.ftptools

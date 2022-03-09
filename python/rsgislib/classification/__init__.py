@@ -1221,7 +1221,7 @@ def create_acc_pt_sets(
     :param sets_col: A column added to the output files with an integer representing
                      the set the row belongs to so if vector files are merged again
                      then the set information is not lost. (Default: 'set_id')
-    :param out_format: The output vector file format (Default: GPKG)
+    :param out_format: The output vector file format (Default: GeoJSON)
     :param out_ext: the output vector file format extension (Default: gpkg)
     :param shuffle_rows: Boolean specifying whether the vector layer rows should be
                          shuffled before splitting into sets (Default: True)
