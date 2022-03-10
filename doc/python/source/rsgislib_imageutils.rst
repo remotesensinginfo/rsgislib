@@ -32,9 +32,10 @@ Get Image Info
 .. autofunction:: rsgislib.imageutils.has_gcps
 .. autofunction:: rsgislib.imageutils.get_gdal_format_name
 .. autofunction:: rsgislib.imageutils.is_img_thematic
+.. autofunction:: rsgislib.imageutils.get_img_pxl_coords
 
-Projection
------------
+Spatial Header info
+--------------------
 .. autofunction:: rsgislib.imageutils.assign_wkt_proj
 .. autofunction:: rsgislib.imageutils.assign_spatial_info
 .. autofunction:: rsgislib.imageutils.copy_proj_from_img
@@ -43,6 +44,9 @@ Projection
 .. autofunction:: rsgislib.imageutils.get_epsg_proj_from_img
 .. autofunction:: rsgislib.imageutils.get_utm_zone
 .. autofunction:: rsgislib.imageutils.copy_gcps
+
+Image Reprojection / Warp
+---------------------------
 .. autofunction:: rsgislib.imageutils.resample_img_to_match
 .. autofunction:: rsgislib.imageutils.reproject_image
 .. autofunction:: rsgislib.imageutils.gdal_warp
@@ -219,6 +223,7 @@ Image I/O
 
 .. autofunction:: rsgislib.imageutils.get_img_pxl_values
 .. autofunction:: rsgislib.imageutils.set_img_pxl_values
+.. autofunction:: rsgislib.imageutils.get_img_pxl_column
 .. autofunction:: rsgislib.imageutils.assign_random_pxls
 .. autofunction:: rsgislib.imageutils.generate_random_pxl_vals_img
 

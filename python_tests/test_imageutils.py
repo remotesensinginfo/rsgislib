@@ -1514,6 +1514,26 @@ def test_set_img_pxl_values(tmp_path):
     assert pxl_vals[0] == 1 and pxl_vals[1] == 1
 
 
+def test_get_img_pxl_column():
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    pxl_vals = rsgislib.imageutils.get_img_pxl_column(input_img, 20, 10)
+
+    assert (
+        pxl_vals[0] == 79.0
+        and pxl_vals[1] == 83.0
+        and pxl_vals[2] == 51.0
+        and pxl_vals[3] == 48.0
+        and pxl_vals[4] == 42.0
+        and pxl_vals[5] == 40.0
+        and pxl_vals[6] == 37.0
+        and pxl_vals[7] == 37.0
+        and pxl_vals[8] == 27.0
+        and pxl_vals[9] == 26.0
+    )
+
+
 def test_assign_random_pxls(tmp_path):
     import rsgislib.imageutils
 
@@ -1643,3 +1663,24 @@ def test_get_img_metadata_fields_dict():
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
     rsgislib.imageutils.get_img_metadata_fields_dict(input_img)
+
+
+def test_get_img_pxl_coords():
+    import rsgislib.imageutils
+    import numpy
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+
+    x_coords = numpy.array([260453.28, 260430.37])
+    y_coords = numpy.array([281327.15, 279581.76])
+
+    x_pxl_coords, y_pxl_coords = rsgislib.imageutils.get_img_pxl_coords(
+        input_img, x_coords, y_coords
+    )
+
+    assert (
+        (x_pxl_coords[0] == 286)
+        and (y_pxl_coords[0] == 151)
+        and (x_pxl_coords[1] == 284)
+        and (y_pxl_coords[1] == 325)
+    )
