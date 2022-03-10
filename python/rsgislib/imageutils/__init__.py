@@ -3582,7 +3582,7 @@ def set_img_pxl_values(
 
 
 def get_img_pxl_column(
-    input_img: str, x_pxl_coord: int, y_pxl_coords: int
+    input_img: str, x_pxl_coord: int, y_pxl_coord: int
 ) -> numpy.array:
     """
     Function which gets pixel band values for a single pixel within an image.
@@ -3590,7 +3590,7 @@ def get_img_pxl_column(
 
     :param input_img: The input image name and path
     :param x_pxl_coord: An image X coordinate (in the image pixel coordinates)
-    :param y_pxl_coords: An image Y coordinate (in the image pixel coordinates)
+    :param y_pxl_coord: An image Y coordinate (in the image pixel coordinates)
     :return: An array of image pixel values (length = the number of image bands).
 
     """
@@ -3603,8 +3603,8 @@ def get_img_pxl_column(
         )
     n_bands = image_ds.RasterCount
     out_pxl_vals_byte = image_ds.ReadRaster(
-        xoff=x_pxl_coord,
-        yoff=y_pxl_coords,
+        xoff=int(x_pxl_coord),
+        yoff=int(y_pxl_coord),
         xsize=1,
         ysize=1,
         band_list=None,
