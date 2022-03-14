@@ -85,15 +85,15 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
     """
     from osgeo import gdal
     import rsgislib.tools.filetools
-
-    ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
-    if ds_in_vec is None:
-        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
-    file_lst = ds_in_vec.GetFileList()
-    for cfile in file_lst:
-        if feedback:
-            print("Deleting: {}".format(cfile))
-        rsgislib.tools.filetools.delete_file_silent(cfile)
+    if os.path.exists(vec_file):
+        ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
+        if ds_in_vec is None:
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
+        file_lst = ds_in_vec.GetFileList()
+        for cfile in file_lst:
+            if feedback:
+                print("Deleting: {}".format(cfile))
+            rsgislib.tools.filetools.delete_file_silent(cfile)
 
 
 def check_format_name(vec_file_format: str) -> str:
