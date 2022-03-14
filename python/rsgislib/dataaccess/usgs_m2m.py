@@ -18,6 +18,7 @@ DATA_PRODUCTS = {
     "landsat_tm_c2_l1": "5e83d0a0f94d7d8d",
     "landsat_etm_c2_l1": "5e83d0d0d2aaa488",
     "landsat_ot_c2_l1": "5e81f14ff4f9941c",
+    "landsat_mss_c2_l1": "5e83d0e09a752cff",
     "landsat_tm_c2_l2": "5e83d11933473426",
     "landsat_etm_c2_l2": "5e83d12aada2e3c5",
     "landsat_ot_c2_l2": "5e83d14f30ea90a9",
@@ -186,6 +187,58 @@ def get_wrs_bbox(
     return min_lon, max_lon, min_lat, max_lat
 
 
+def get_dataset_info(dataset: str, api_key: str) -> Dict:
+    """
+    Get information on a particular dataset.
+
+    :parma dataset: the name of the dataset
+    :param api_key: The API key created at login to authenticate.
+    :return: dict of dataset info.
+
+    """
+    dataset_url = USGS_M2M_URL + "dataset"
+    dataset_data = {"datasetName": dataset}
+    dataset_info = rsgislib.tools.httptools.send_http_json_request(
+        dataset_url, dataset_data, api_key=api_key
+    )
+    return dataset_info
+
+
+def get_earth_explorer_datasets(api_key: str) -> Dict[List[str]]:
+    """
+    Get a structured dict of datasets available on the system. Structure
+    is category and then a list of datasets under each category. Note,
+    subcategories have been removed and lists merged.
+
+    :param api_key: The API key created at login to authenticate.
+    :return: a dict with lists of dataset names
+
+    """
+    dataset_url = USGS_M2M_URL + "dataset-categories"
+    dataset_data = {"catalog": "EE"}
+    dataset_info = rsgislib.tools.httptools.send_http_json_request(
+        dataset_url, dataset_data, api_key=api_key
+    )
+
+    dataset_names = dict()
+    for dataset_id in dataset_info:
+        dataset_names[dataset_info[dataset_id]["categoryName"]] = list()
+        if "subCategories" in dataset_info[dataset_id]:
+            for sub_cat_id in dataset_info[dataset_id]["subCategories"]:
+                if type(sub_cat_id) != dict:
+                    for dataset_item in dataset_info[dataset_id]["subCategories"][
+                        sub_cat_id
+                    ]["datasets"]:
+                        dataset_names[dataset_info[dataset_id]["categoryName"]].append(
+                            dataset_item["datasetAlias"]
+                        )
+        for dataset_item in dataset_info[dataset_id]["datasets"]:
+            dataset_names[dataset_info[dataset_id]["categoryName"]].append(
+                dataset_item["datasetAlias"]
+            )
+    return dataset_names
+
+
 def usgs_search(
     dataset: str,
     api_key: str,
@@ -226,7 +279,14 @@ def usgs_search(
 
     """
     if dataset not in DATA_PRODUCTS:
-        raise rsgislib.RSGISPyException(f"No not recognise dataset: {dataset}")
+        all_datasets = get_earth_explorer_datasets(api_key)
+        found_dataset = False
+        for cat in all_datasets:
+            if dataset in all_datasets[cat]:
+                found_dataset = True
+                break
+        if not found_dataset:
+            raise rsgislib.RSGISPyException(f"No not recognise dataset: {dataset}")
 
     if (max_n_rslts is not None) and (max_n_rslts > 100):
         raise rsgislib.RSGISPyException(
@@ -462,15 +522,22 @@ def create_scene_list(
     :param api_key: The API key created at login to authenticate user.
     :param dataset: name of the dataset
     :param scn_ent_ids: list of entity IDs
-    :param lst_name: a name for the list.
+    :param lst_name: a name for the list - can be anything you want but should
+                     be meaningful to you.
     :param lst_period: Period the list will exist for in ISO 8601 duration format.
                        Default is P1W (i.e., 1 week).
     :return: Number of scenes added.
 
     """
-
     if dataset not in DATA_PRODUCTS:
-        raise rsgislib.RSGISPyException(f"No not recognise dataset: {dataset}")
+        all_datasets = get_earth_explorer_datasets(api_key)
+        found_dataset = False
+        for cat in all_datasets:
+            if dataset in all_datasets[cat]:
+                found_dataset = True
+                break
+        if not found_dataset:
+            raise rsgislib.RSGISPyException(f"No not recognise dataset: {dataset}")
 
     add_scn_info = dict()
     add_scn_info["listId"] = lst_name
@@ -486,7 +553,14 @@ def create_scene_list(
     return scn_lst_add_info
 
 
-def remove_scene_list(api_key: str, lst_name: str) -> int:
+def remove_scene_list(api_key: str, lst_name: str):
+    """
+    A function to remove a scene list from the system.
+
+    :param api_key: The API key created at login to authenticate user.
+    :param lst_name: a name for the list. Defined by create_scene_list.
+
+    """
     rm_scn_info = {"listId": lst_name}
     scn_lst_add_url = USGS_M2M_URL + "scene-list-remove"
     rsgislib.tools.httptools.send_http_json_request(
@@ -503,12 +577,16 @@ def check_dwnld_opts(
 ) -> List[Dict[str, str]]:
     """
 
-    :param api_key:
-    :param lst_name:
-    :param dataset:
-    :param dwnld_filetype: options: bundle, band or all
-    :param rm_lst:
-    :return:
+    :param api_key: The API key created at login to authenticate user.
+    :param lst_name: A name for the list - Defined by create_scene_list.
+    :param dataset: name of the dataset
+    :param dwnld_filetype: What you want to download. Options: bundle, band or all
+                           Default: is bundle which will be a tar.gz with all the
+                           files for the scene.
+    :param rm_lst: bool specifying whether the list should be deleted
+                   once the processing has finished.
+    :return: returns a list of dicts with the entityId and productId.
+
     """
     if not can_user_dwnld(api_key):
         raise rsgislib.RSGISPyException(
@@ -570,3 +648,39 @@ def check_dwnld_opts(
 
     if rm_lst:
         remove_scene_list(api_key, lst_name)
+
+    return dwlds_lst
+
+
+def request_downloads(api_key: str, dwlds_lst: str, dwnld_label: str) -> (Dict, List):
+    """
+    A function to request download URLs for a download list (from check_dwnld_opts)
+
+    :param api_key: The API key created at login to authenticate user.
+    :param dwlds_lst: The available download list created by check_dwnld_opts.
+    :param dwnld_label: A name for the download - can be anything you want but should
+                        be meaningful to you.
+    :return: a dict of download IDs and URL which are ready to be downloaded and
+             a list of downloads IDs for scenes which are being prepared for download.
+
+    """
+    avail_dwn_urls = dict()
+    dwnld_reqst_url = USGS_M2M_URL + "download-request"
+    dwnld_reqst_data = {
+        "downloads": dwlds_lst,
+        "label": dwnld_label,
+        "returnAvailable": True,
+    }
+    dwnld_reqst_info = rsgislib.tools.httptools.send_http_json_request(
+        dwnld_reqst_url, dwnld_reqst_data, api_key=api_key
+    )
+    for dwnld_info in dwnld_reqst_info["availableDownloads"]:
+        avail_dwn_urls[dwnld_info["downloadId"]] = dwnld_info["url"]
+
+    prep_dwnld_count = len(dwnld_reqst_info["preparingDownloads"])
+    prep_dwnld_ids = list()
+    if prep_dwnld_count > 0:
+        for dwnld_info in dwnld_reqst_info["preparingDownloads"]:
+            prep_dwnld_ids.append(dwnld_info["downloadId"])
+
+    return avail_dwn_urls, prep_dwnld_ids
