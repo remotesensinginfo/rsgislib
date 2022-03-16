@@ -125,8 +125,8 @@ Subsetting
 .. autofunction:: rsgislib.imageutils.subset_to_vec
 
 
-Extract
---------
+Extract / Sample
+-----------------
 .. autofunction:: rsgislib.imageutils.perform_random_pxl_sample_in_mask
 .. autofunction:: rsgislib.imageutils.perform_random_pxl_sample_in_mask_low_pxl_count
 .. autofunction:: rsgislib.imageutils.extract_img_pxl_sample

@@ -118,7 +118,7 @@ def polygonise_raster_to_vec_lyr(
 def vectorise_pxls_to_pts(
     input_img: str,
     img_band: int,
-    img_msk_val: str,
+    img_msk_val: int,
     out_vec_file: str,
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
