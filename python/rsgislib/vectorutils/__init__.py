@@ -11,7 +11,7 @@ import sys
 import shutil
 import subprocess
 import math
-from typing import List
+from typing import List, Dict
 
 from osgeo import gdal
 from osgeo import osr
@@ -85,6 +85,7 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
     """
     from osgeo import gdal
     import rsgislib.tools.filetools
+
     if os.path.exists(vec_file):
         ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if ds_in_vec is None:
@@ -200,6 +201,49 @@ def get_vec_feat_count(
         raise rsgislib.RSGISPyException("Check layer name as did not open layer.")
     nFeats = inLayer.GetFeatureCount(compute_count)
     return nFeats
+
+
+def count_feats_per_att_val(
+    vec_file: str,
+    vec_lyr: str,
+    col_name: str,
+    out_df_dict: bool = False,
+) -> Dict:
+    """
+    A function which returns the count of features for each variable
+    value.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param col_name: The column used to count the number of features per value.
+    :param out_df_dict: if true then dict will be formatted to import into a
+                        pandas dataframe. Otherwise, the output dict will use
+                        the attribute values as the key and count as value.
+    :return: either dict with keys of vals and count for import into pandas or
+             with attribute value and number of features
+
+    """
+    import geopandas
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    unq_vals = base_gpdf[col_name].unique()
+
+    out_dict = dict()
+    for val in unq_vals:
+        c_gpdf = base_gpdf.loc[base_gpdf[col_name] == val]
+        out_dict[val] = len(c_gpdf)
+
+    if out_df_dict:
+        blt_df_dict = dict()
+        blt_df_dict["vals"] = list()
+        blt_df_dict["count"] = list()
+
+        for val in out_dict:
+            blt_df_dict["vals"].append(val)
+            blt_df_dict["count"].append(out_dict[val])
+        out_dict = blt_df_dict
+
+    return out_dict
 
 
 def merge_vectors_to_gpkg(

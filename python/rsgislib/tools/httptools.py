@@ -140,7 +140,7 @@ def download_file_http(
         ) as r:
             check_http_response(r, input_url)
             total = int(r.headers.get("content-length", 0))
-            chunk_size = 2 ** 20
+            chunk_size = 2**20
             n_chunks = int(total / chunk_size) + 1
 
             with open(tmp_dwnld_path, "wb") as f:
