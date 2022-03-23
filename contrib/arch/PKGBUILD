@@ -1,0 +1,33 @@
+# Maintainer: Maximilian Friedersdorff <maximilian.friedersdorff@envsys.co.uk>
+pkgname=rsgislib
+pkgver=5.0.5
+pkgrel=1
+epoch=
+pkgdesc="The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets."
+arch=("x86_64")
+url="http://rsgislib.org"
+license=('GPLv3')
+groups=()
+depends=('libkea' 'python38' 'hdf5')
+makedepends=('cmake>=3.16')
+source=("https://github.com/remotesensinginfo/rsgislib/archive/refs/tags/5.0.5.tar.gz")
+sha256sums=("664bca755720b1023cd18a8c47d14a6a89353b6cb9029796eae595e9cc7e7802")
+
+build() {
+        cd "$pkgname-$pkgver"
+
+        cmake \
+            -D CMAKE_INSTALL_PREFIX=/usr \
+            -D CMAKE_Python_EXECUTABLE=/usr/bin/python3.8 \
+            .
+        make
+}
+
+package() {
+        cd "$pkgname-$pkgver"
+        make DESTDIR="$pkgdir/" install
+        local site_packages=$(python3.8 -c "import site; print(site.getsitepackages()[0])")
+        mkdir -p "$pkgdir/$site_packages/$pkgname-$pkgver.dist-info"
+        mv $pkgdir/usr/lib/python*/site-packages/rsgislib $pkgdir/$site_packages/rsgislib
+        touch "$pkgdir/$site_packages/$pkgname-$pkgver.dist-info/METADATA"
+}
