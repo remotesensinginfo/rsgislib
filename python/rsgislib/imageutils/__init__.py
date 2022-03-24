@@ -2695,7 +2695,7 @@ def calc_wgs84_pixel_area(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    x_res, y_res = get_img_res(input_img)
+    x_res, y_res = get_img_res(input_img, abs_vals=True)
 
     infiles = applier.FilenameAssociations()
     infiles.input_img = input_img
