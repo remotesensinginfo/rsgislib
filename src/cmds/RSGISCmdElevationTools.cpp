@@ -79,7 +79,7 @@ namespace rsgis{ namespace cmds {
     }
 
 
-    void executeCalcSlopeImgPxlRes(std::string demImage, std::string outputImage, std::string demPxlResImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)
+    void executeCalcSlopeImgPxlRes(std::string demImage, std::string demPxlResImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)
     {
         try
         {

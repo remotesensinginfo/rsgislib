@@ -5,6 +5,7 @@ Slope and Aspect
 -----------------
 
 .. autofunction:: rsgislib.elevation.slope
+.. autofunction:: rsgislib.elevation.slope_pxl_res
 .. autofunction:: rsgislib.elevation.aspect
 .. autofunction:: rsgislib.elevation.catagorise_aspect
 

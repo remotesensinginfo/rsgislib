@@ -1419,6 +1419,17 @@ def test_calc_wgs84_pixel_area(tmp_path):
     assert os.path.exists(output_img)
 
 
+def test_calc_wsg84_pixel_size(tmp_path):
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_wgs84.kea")
+    output_img = os.path.join(tmp_path, "out_img.kea")
+
+    rsgislib.imageutils.calc_wsg84_pixel_size(input_img, output_img, gdalformat="KEA")
+
+    assert os.path.exists(output_img)
+
+
 def test_calc_pixel_locations(tmp_path):
     import rsgislib.imageutils
 
