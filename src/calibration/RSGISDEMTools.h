@@ -81,6 +81,24 @@ namespace rsgis{namespace calib{
         double noDataVal;
 	};
 
+    /***
+     * If output type is set to 1 then output is radians if 0 then degrees.
+     *
+     */
+    class DllExport RSGISCalcSlopePerPxlRes: public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISCalcSlopePerPxlRes(int numberOutBands, unsigned int band, int outType, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
+        ~RSGISCalcSlopePerPxlRes();
+    private:
+        unsigned int band;
+        int outType;
+        double noDataVal;
+        unsigned int ew_res_band;
+        unsigned int ns_res_band;
+    };
+
 
 
     class DllExport RSGISCalcAspect : public rsgis::img::RSGISCalcImageValue

@@ -42,7 +42,7 @@ namespace rsgis{namespace calib{
             throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
         }
         
-        if(!(band < numBands))
+        if(band >= numBands)
         {
             throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
@@ -113,6 +113,105 @@ namespace rsgis{namespace calib{
     {
         
     }
+
+
+
+    RSGISCalcSlopePerPxlRes::RSGISCalcSlopePerPxlRes(int numberOutBands, unsigned int band, int outType, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    {
+        this->band = band;
+        this->outType = outType;
+        this->noDataVal = noDataVal;
+        this->ew_res_band = ew_res_band;
+        this->ns_res_band = ns_res_band;
+    }
+    void RSGISCalcSlopePerPxlRes::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output)
+    {
+        if(winSize != 3)
+        {
+            throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+        }
+
+        if(band >= numBands)
+        {
+            throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
+        }
+
+        bool hasNoDataVal = false;
+        float sumVals = 0.0;
+        int nVals = 0;
+        for(int i = 0; i < winSize; ++i)
+        {
+            for(int j = 0; j < winSize; ++j)
+            {
+                if(dataBlock[band][i][j] == noDataVal)
+                {
+                    hasNoDataVal = true;
+                }
+                else
+                {
+                    sumVals += dataBlock[band][i][j];
+                    ++nVals;
+                }
+            }
+        }
+        if(hasNoDataVal && (nVals>1))
+        {
+            float meanVal = sumVals / nVals;
+            for(int i = 0; i < winSize; ++i)
+            {
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        dataBlock[band][i][j] = meanVal;
+                    }
+                }
+            }
+        }
+
+        if(nVals > 1)
+        {
+            const double radiansToDegrees = 180.0 / M_PI;
+
+            float ewRes = dataBlock[this->ew_res_band][1][1];
+            float nsRes = dataBlock[this->ns_res_band][1][1];
+            if(nsRes < 0)
+            {
+                nsRes = nsRes * (-1);
+            }
+
+            double dx, dy, slopeRad;
+
+            dx = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) -
+                  (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
+
+            dy = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) -
+                  (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+
+            slopeRad = atan(sqrt((dx * dx) + (dy * dy))/8);
+
+            if(outType == 0)
+            {
+                output[0] = (slopeRad * radiansToDegrees);
+            }
+            else
+            {
+                output[0] = slopeRad;
+            }
+        }
+        else
+        {
+            output[0] = 0.0;
+        }
+    }
+
+    RSGISCalcSlopePerPxlRes::~RSGISCalcSlopePerPxlRes()
+    {
+
+    }
+
+
+
 
     RSGISCalcAspect::RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
@@ -313,7 +412,7 @@ namespace rsgis{namespace calib{
             throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
         }
         
-        if(!(band < numBands))
+        if(band >= numBands)
         {
             throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
