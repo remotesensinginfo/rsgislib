@@ -4149,7 +4149,9 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
     pixel projected in WGS84.
 
     :param input_img: input image, for which the per-pixel area will be calculated.
-    :param output_img: output image file.
+    :param output_img: output image file where band 1 is X and band 2 is the Y
+                       pixel resolution.
+    :param gdalformat: the output image file format (default: KEA).
 
     """
     import rsgislib.tools
