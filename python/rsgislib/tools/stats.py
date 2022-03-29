@@ -703,7 +703,7 @@ def calc_yen_threshold(data):
     # Calculate probability mass function
     pmf = hist.astype(numpy.float32) / hist.sum()
     p1 = numpy.cumsum(pmf)  # Cumulative normalized histogram
-    p1_sq = numpy.cumsum(pmf ** 2)
+    p1_sq = numpy.cumsum(pmf**2)
     # Get cumsum calculated from end of squared array:
     p2_sq = numpy.cumsum(pmf[::-1] ** 2)[::-1]
     # P2_sq indexes is shifted +1. I assume, with P1[:-1] it's help avoid

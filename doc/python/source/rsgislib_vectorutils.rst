@@ -108,6 +108,7 @@ Vector Info
 .. autofunction:: rsgislib.vectorutils.get_proj_wkt_from_vec
 .. autofunction:: rsgislib.vectorutils.get_proj_epsg_from_vec
 .. autofunction:: rsgislib.vectorutils.get_vec_feat_count
+.. autofunction:: rsgislib.vectorutils.count_feats_per_att_val
 .. autofunction:: rsgislib.vectorutils.get_vec_lyrs_lst
 .. autofunction:: rsgislib.vectorutils.get_vec_layer_extent
 .. autofunction:: rsgislib.vectorutils.get_vec_lyr_cols
