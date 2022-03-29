@@ -54,6 +54,8 @@ namespace rsgis{ namespace cmds {
     
     /** A function to generate a slope layer */
     DllExport void executeCalcSlope(std::string demImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat);
+    /** A function to generate a slope layer using External Pixel Resolution Image */
+    DllExport void executeCalcSlopeImgPxlRes(std::string demImage, std::string demPxlResImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat);
     /** A function to generate an aspect layer */
     DllExport void executeCalcAspect(std::string demImage, std::string outputImage, std::string outImageFormat);
     /** A function to categorise an aspect layer */

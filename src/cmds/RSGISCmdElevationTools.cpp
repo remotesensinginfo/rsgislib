@@ -78,6 +78,60 @@ namespace rsgis{ namespace cmds {
         }
     }
 
+
+    void executeCalcSlopeImgPxlRes(std::string demImage, std::string demPxlResImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[2];
+
+            std::cout << "Open " << demImage << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            std::cout << "Open " << demPxlResImage << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(demPxlResImage.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demPxlResImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = datasets[0]->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                delete[] datasets;
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+
+            unsigned int n_dem_bands = datasets[0]->GetRasterCount();
+            unsigned int ew_pxl_res_band = n_dem_bands;
+            unsigned int ns_pxl_res_band = n_dem_bands+1;
+
+            auto calcSlope = rsgis::calib::RSGISCalcSlopePerPxlRes(1, 0, outAngleUnit, demNoDataVal, ew_pxl_res_band, ns_pxl_res_band);
+
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcSlope, "", true);
+            calcImage.calcImageWindowData(datasets, 2, outputImage, 3, outImageFormat, GDT_Float32);
+
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
     
     void executeCalcAspect(std::string demImage, std::string outputImage, std::string outImageFormat)
     {

@@ -4154,7 +4154,7 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
     :param gdalformat: the output image file format (default: KEA).
 
     """
-    import rsgislib.tools
+    import rsgislib.tools.projection
     from rios import applier
 
     try:
@@ -4188,7 +4188,7 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
         x_res_arr[...] = otherargs.x_res
         y_res_arr = numpy.zeros_like(yBlock, dtype=float)
         y_res_arr[...] = otherargs.y_res
-        x_res_arr_m, y_res_arr_m = rsgislib.tools.degrees_to_metres(
+        x_res_arr_m, y_res_arr_m = rsgislib.tools.projection.degrees_to_metres(
             yBlock, x_res_arr, y_res_arr
         )
         outputs.outimage = numpy.stack((x_res_arr_m, y_res_arr_m), axis=0)

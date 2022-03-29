@@ -76,6 +76,45 @@ static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args, PyObject *k
     Py_RETURN_NONE;
 }
 
+static PyObject *Elevation_calcSlopePxlResImg(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_pxl_res_img"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("unit"), nullptr};
+    const char *pszInDEMImage, *pszInPxlResImage, *pszOutputFile, *pszGDALFormat, *pszOutUnit;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssss:slope", kwlist, &pszInDEMImage, &pszInPxlResImage, &pszOutputFile, &pszOutUnit, &pszGDALFormat))
+    {
+        return nullptr;
+    }
+
+    try
+    {
+        rsgis::cmds::RSGISAngleMeasure outAngleUnit;
+        std::string angUnit = std::string(pszOutUnit);
+        if(angUnit == "degrees")
+        {
+            outAngleUnit = rsgis::cmds::rsgis_degrees;
+        }
+        else if(angUnit == "radians")
+        {
+            outAngleUnit = rsgis::cmds::rsgis_radians;
+        }
+        else
+        {
+            throw rsgis::cmds::RSGISCmdException("The unit option needs to be specified as either 'degrees' or 'radians'.");
+        }
+
+        rsgis::cmds::executeCalcSlopeImgPxlRes(std::string(pszInDEMImage), std::string(pszInPxlResImage), std::string(pszOutputFile), outAngleUnit, std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return nullptr;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
@@ -287,6 +326,21 @@ static PyMethodDef ElevationMethods[] = {
 "Calculates a slope layer given an input elevation model.\n"
 "\n"
 ":param input_img: is a string containing the name and path of the input DEM file.\n"
+":param output_img: is a string containing the name and path of the output file.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"
+":param unit: is a string specifying the output unit ('degrees' or 'radians').\n"},
+
+{"slope_pxl_res", (PyCFunction)Elevation_calcSlopePxlResImg, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.elevation.slope_pxl_res(in_dem_img, in_pxl_res_img, output_img, gdalformat, unit)\n"
+"Calculates a slope layer given an input elevation model and external pixel \n"
+"resolution image, which allows the slope to be calculated for images in \n"
+"projections (e.g., EPSG:4326) which do not use the same units as the \n"
+"elevation values (e.g., metres)."
+"\n"
+":param in_dem_img: is a string containing the name and path of the input DEM file.\n"
+":param in_pxl_res_img: is a string containing the name and path of the input image.\n"
+"                       specifying the image pixel resolutions. Band 1: East-West \n"
+"                       resolution and Band 2 is the North-South resolution.\n"
 ":param output_img: is a string containing the name and path of the output file.\n"
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"
 ":param unit: is a string specifying the output unit ('degrees' or 'radians').\n"},
