@@ -619,7 +619,7 @@ def test_calc_unmixing_rmse_residual_err(tmp_path):
     assert img_eq
 
 
-@pytest.mark.skipif(gdal.__version__ == '3.4.2', reason="Fails due to GDAL 3.4.2 bug.")
+@pytest.mark.skipif(gdal.__version__ == "3.4.2", reason="Fails due to GDAL 3.4.2 bug.")
 def test_summarise_multi_endmember_linear_unmixing(tmp_path):
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc

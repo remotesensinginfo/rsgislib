@@ -35,6 +35,7 @@ def test_slope(tmp_path):
     img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(output_img, slope_ref_img)
     assert img_eq
 
+
 def test_slope_pxl_res_img(tmp_path):
     import rsgislib.elevation
     import rsgislib.imagecalc
@@ -44,7 +45,9 @@ def test_slope_pxl_res_img(tmp_path):
     output_img = os.path.join(tmp_path, "out_slope.kea")
     out_angle_unit = "degrees"
     gdalformat = "KEA"
-    rsgislib.elevation.slope_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, out_angle_unit, gdalformat)
+    rsgislib.elevation.slope_pxl_res_img(
+        in_dem_img, in_pxl_res_img, output_img, out_angle_unit, gdalformat
+    )
 
     slope_ref_img = os.path.join(DATA_DIR, "AberSRTM_4326_slope.kea")
     img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(output_img, slope_ref_img)
@@ -65,6 +68,7 @@ def test_aspect(tmp_path):
     print(prop_match)
     assert img_eq
 
+
 def test_aspect_pxl_res_img(tmp_path):
     import rsgislib.elevation
     import rsgislib.imagecalc
@@ -73,7 +77,9 @@ def test_aspect_pxl_res_img(tmp_path):
     in_pxl_res_img = os.path.join(DATA_DIR, "AberSRTM_4326_PxlRes.kea")
     output_img = os.path.join(tmp_path, "out_aspect.kea")
     gdalformat = "KEA"
-    rsgislib.elevation.aspect_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, gdalformat)
+    rsgislib.elevation.aspect_pxl_res_img(
+        in_dem_img, in_pxl_res_img, output_img, gdalformat
+    )
 
     aspect_ref_img = os.path.join(DATA_DIR, "AberSRTM_4326_aspect.kea")
     img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(output_img, aspect_ref_img)
@@ -229,10 +235,12 @@ def test_hillshade_pxl_res_img(tmp_path):
     solar_azimuth = 126.45
     solar_zenith = 35.67
     gdalformat = "KEA"
-    rsgislib.elevation.hillshade_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, solar_azimuth, solar_zenith, gdalformat)
+    rsgislib.elevation.hillshade_pxl_res_img(
+        in_dem_img, in_pxl_res_img, output_img, solar_azimuth, solar_zenith, gdalformat
+    )
 
     hillshade_ref_img = os.path.join(DATA_DIR, "AberSRTM_4326_hillshade.kea")
-    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(output_img, hillshade_ref_img)
+    img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(
+        output_img, hillshade_ref_img
+    )
     assert img_eq
-
-
