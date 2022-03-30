@@ -5,8 +5,9 @@ Slope and Aspect
 -----------------
 
 .. autofunction:: rsgislib.elevation.slope
-.. autofunction:: rsgislib.elevation.slope_pxl_res
+.. autofunction:: rsgislib.elevation.slope_pxl_res_img
 .. autofunction:: rsgislib.elevation.aspect
+.. autofunction:: rsgislib.elevation.aspect_pxl_res_img
 .. autofunction:: rsgislib.elevation.catagorise_aspect
 
 
@@ -32,6 +33,7 @@ Visualisation
 --------------
 
 .. autofunction:: rsgislib.elevation.hillshade
+.. autofunction:: rsgislib.elevation.hillshade_pxl_res_img
 
 Fusion
 -------

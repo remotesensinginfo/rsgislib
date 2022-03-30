@@ -70,9 +70,9 @@ namespace rsgis{namespace calib{
 	class DllExport RSGISCalcSlope: public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType, double noDataVal);
+		RSGISCalcSlope(unsigned int band, float ewRes, float nsRes, int outType, double noDataVal);
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-		~RSGISCalcSlope();
+		~RSGISCalcSlope(){};
     private:
         unsigned int band;
         float ewRes;
@@ -88,9 +88,9 @@ namespace rsgis{namespace calib{
     class DllExport RSGISCalcSlopePerPxlRes: public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISCalcSlopePerPxlRes(int numberOutBands, unsigned int band, int outType, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band);
+        RSGISCalcSlopePerPxlRes(unsigned int band, int outType, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band);
         void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        ~RSGISCalcSlopePerPxlRes();
+        ~RSGISCalcSlopePerPxlRes(){};
     private:
         unsigned int band;
         int outType;
@@ -104,15 +104,28 @@ namespace rsgis{namespace calib{
     class DllExport RSGISCalcAspect : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes, double noDataVal);
+		RSGISCalcAspect(unsigned int band, float ewRes, float nsRes, double noDataVal);
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-		~RSGISCalcAspect();
+		~RSGISCalcAspect(){};
     private:
         unsigned int band;
         float ewRes;
         float nsRes;
         double noDataVal;
 	};
+
+    class DllExport RSGISCalcAspectPerPxlRes : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISCalcAspectPerPxlRes(unsigned int band, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
+        ~RSGISCalcAspectPerPxlRes(){};
+    private:
+        unsigned int band;
+        unsigned int ew_res_band;
+        unsigned int ns_res_band;
+        double noDataVal;
+    };
 
 
 
@@ -121,7 +134,7 @@ namespace rsgis{namespace calib{
 	public:
 		RSGISRecodeAspect();
 		void calcImageValue(float *bandValues, int numBands, double *output);
-		~RSGISRecodeAspect();
+		~RSGISRecodeAspect(){};
 	};
 
     
@@ -129,9 +142,9 @@ namespace rsgis{namespace calib{
 	class DllExport RSGISCalcHillShade : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal);
+		RSGISCalcHillShade(unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal);
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-		~RSGISCalcHillShade();
+		~RSGISCalcHillShade(){};
     private:
         unsigned int band;
         float ewRes;
@@ -141,12 +154,27 @@ namespace rsgis{namespace calib{
         double noDataVal;
 	};
 
+    class DllExport RSGISCalcHillShadePerPxlRes : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISCalcHillShadePerPxlRes(unsigned int band, float sunZenith, float sunAzimuth, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
+        ~RSGISCalcHillShadePerPxlRes(){};
+    private:
+        unsigned int band;
+        float sunZenith;
+        float sunAzimuth;
+        double noDataVal;
+        unsigned int ew_res_band;
+        unsigned int ns_res_band;
+    };
+
 
 
     class DllExport RSGISCalcShadowBinaryMask : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight, double noDataVal);
+		RSGISCalcShadowBinaryMask(GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight, double noDataVal);
         void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, OGREnvelope extent);
 		~RSGISCalcShadowBinaryMask();
     private:
@@ -171,9 +199,9 @@ namespace rsgis{namespace calib{
     class DllExport RSGISCalcRayIncidentAngle : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal);
+		RSGISCalcRayIncidentAngle(unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal);
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-		~RSGISCalcRayIncidentAngle();
+		~RSGISCalcRayIncidentAngle(){};
     private:
         unsigned int band;
         float ewRes;
@@ -187,9 +215,9 @@ namespace rsgis{namespace calib{
     class DllExport RSGISCalcRayExitanceAngle : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth, double noDataVal);
+		RSGISCalcRayExitanceAngle(unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth, double noDataVal);
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-		~RSGISCalcRayExitanceAngle();
+		~RSGISCalcRayExitanceAngle(){};
     private:
         unsigned int band;
         float ewRes;
@@ -206,7 +234,7 @@ namespace rsgis{namespace calib{
 	public:
 		RSGISFilterDTMWithAspectMedianFilter(float aspectRange, double noDataVal);
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        ~RSGISFilterDTMWithAspectMedianFilter();
+        ~RSGISFilterDTMWithAspectMedianFilter(){};
     private:
         float aspectRange;
         double noDataVal;

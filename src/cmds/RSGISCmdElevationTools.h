@@ -58,10 +58,14 @@ namespace rsgis{ namespace cmds {
     DllExport void executeCalcSlopeImgPxlRes(std::string demImage, std::string demPxlResImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat);
     /** A function to generate an aspect layer */
     DllExport void executeCalcAspect(std::string demImage, std::string outputImage, std::string outImageFormat);
+    /** A function to generate an aspect layer using External Pixel Resolution Image */
+    DllExport void executeCalcAspectImgPxlRes(std::string demImage, std::string demPxlResImage, std::string outputImage, std::string outImageFormat);
     /** A function to categorise an aspect layer */
     DllExport void executeCatagoriseAspect(std::string aspectImage, std::string outputImage, std::string outImageFormat);
     /** A function to generate a hillshade layer */
     DllExport void executeCalcHillshade(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat);
+    /** A function to generate a hillshade layer using External Pixel Resolution Image */
+    DllExport void executeCalcHillshadeImgPxlRes(std::string demImage, std::string demPxlResImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat);
     /** A function to generate a shadow mask layer */
     DllExport void executeCalcShadowMask(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, float maxHeight, std::string outImageFormat);
     /** A function to generate a local incidence angle layer given the sun position */

@@ -27,7 +27,7 @@
 namespace rsgis{namespace calib{
     
     
-    RSGISCalcSlope::RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcSlope::RSGISCalcSlope(unsigned int band, float ewRes, float nsRes, int outType, double noDataVal) : rsgis::img::RSGISCalcImageValue(1)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -108,15 +108,10 @@ namespace rsgis{namespace calib{
             output[0] = 0.0;
         }
     }
-    
-    RSGISCalcSlope::~RSGISCalcSlope()
-    {
-        
-    }
 
 
 
-    RSGISCalcSlopePerPxlRes::RSGISCalcSlopePerPxlRes(int numberOutBands, unsigned int band, int outType, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcSlopePerPxlRes::RSGISCalcSlopePerPxlRes(unsigned int band, int outType, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band) : rsgis::img::RSGISCalcImageValue(1)
     {
         this->band = band;
         this->outType = outType;
@@ -205,15 +200,10 @@ namespace rsgis{namespace calib{
         }
     }
 
-    RSGISCalcSlopePerPxlRes::~RSGISCalcSlopePerPxlRes()
-    {
-
-    }
 
 
 
-
-    RSGISCalcAspect::RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcAspect::RSGISCalcAspect(unsigned int band, float ewRes, float nsRes, double noDataVal) : rsgis::img::RSGISCalcImageValue(1)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -228,7 +218,7 @@ namespace rsgis{namespace calib{
             throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
         }
         
-        if(!(band < numBands))
+        if(band >= numBands)
         {
             throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
@@ -236,7 +226,7 @@ namespace rsgis{namespace calib{
         const double radiansToDegrees = 180.0 / M_PI;
         
         bool hasNoDataVal = false;
-        double sumVals = 0.0;
+        float sumVals = 0.0;
         int nVals = 0;
         for(int i = 0; i < winSize; ++i)
         {
@@ -255,7 +245,7 @@ namespace rsgis{namespace calib{
         }
         if(hasNoDataVal && (nVals>1))
         {
-            double meanVal = sumVals / nVals;
+            float meanVal = sumVals / nVals;
             for(int i = 0; i < winSize; ++i)
             {
                 for(int j = 0; j < winSize; ++j)
@@ -309,10 +299,113 @@ namespace rsgis{namespace calib{
         }
     }
 
-    RSGISCalcAspect::~RSGISCalcAspect()
+
+
+    RSGISCalcAspectPerPxlRes::RSGISCalcAspectPerPxlRes(unsigned int band, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band) : rsgis::img::RSGISCalcImageValue(1)
     {
-        
+        this->band = band;
+        this->noDataVal = noDataVal;
+        this->ew_res_band = ew_res_band;
+        this->ns_res_band = ns_res_band;
     }
+    void RSGISCalcAspectPerPxlRes::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output)
+    {
+        if(winSize != 3)
+        {
+            throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+        }
+
+        if(band >= numBands)
+        {
+            throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
+        }
+
+        const double radiansToDegrees = 180.0 / M_PI;
+
+        bool hasNoDataVal = false;
+        float sumVals = 0.0;
+        int nVals = 0;
+        for(int i = 0; i < winSize; ++i)
+        {
+            for(int j = 0; j < winSize; ++j)
+            {
+                if(dataBlock[band][i][j] == noDataVal)
+                {
+                    hasNoDataVal = true;
+                }
+                else
+                {
+                    sumVals += dataBlock[band][i][j];
+                    ++nVals;
+                }
+            }
+        }
+        if(hasNoDataVal && (nVals>1))
+        {
+            float meanVal = sumVals / nVals;
+            for(int i = 0; i < winSize; ++i)
+            {
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        dataBlock[band][i][j] = meanVal;
+                    }
+                }
+            }
+        }
+
+        if(nVals > 1)
+        {
+            float ewRes = dataBlock[this->ew_res_band][1][1];
+            float nsRes = dataBlock[this->ns_res_band][1][1];
+            if(nsRes < 0)
+            {
+                nsRes = nsRes * (-1);
+            }
+
+            double dx, dy, aspect;
+
+            dx = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) -
+                  (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
+
+            dy = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) -
+                  (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+
+            aspect = atan2(-dx, dy)*radiansToDegrees;
+
+            if (dx == 0 && dy == 0)
+            {
+                // Flat area
+                aspect = std::numeric_limits<double>::signaling_NaN();
+            }
+            else if(aspect < 0)
+            {
+                aspect += 360.0;
+            }
+            else if(aspect == 360.0)
+            {
+                aspect = 0.0;
+            }
+            else if(aspect > 360)
+            {
+                double num = aspect / 360.0;
+                int num360s = floor(num);
+                aspect = aspect - (360 * num360s);
+            }
+
+            output[0] = aspect;
+        }
+        else
+        {
+            // Input was no data region.
+            output[0] = std::numeric_limits<double>::signaling_NaN();
+        }
+
+
+    }
+
+
     
     
     RSGISRecodeAspect::RSGISRecodeAspect():rsgis::img::RSGISCalcImageValue(1)
@@ -320,82 +413,67 @@ namespace rsgis{namespace calib{
         
     }
 
-    void RSGISRecodeAspect::calcImageValue(float *bandValues, int numBands, double *output) 
+    void RSGISRecodeAspect::calcImageValue(float *bandValues, int numBands, double *output)
     {
-        if(boost::math::isnan(bandValues[0]))
+        if (boost::math::isnan(bandValues[0]))
         {
             output[0] = 0;
-        }
-        else
+        } else
         {
-            if(bandValues[0] > 360)
+            if (bandValues[0] > 360)
             {
                 double num = bandValues[0] / 360.0;
                 int num360s = floor(num);
                 bandValues[0] = bandValues[0] - (360 * num360s);
             }
-            
-            if((bandValues[0] >= 0) & (bandValues[0] < 45))
+
+            if ((bandValues[0] >= 0) & (bandValues[0] < 45))
             {
                 output[0] = 1;
-            }
-            else if((bandValues[0] >= 45) & (bandValues[0] < 90))
+            } else if ((bandValues[0] >= 45) & (bandValues[0] < 90))
             {
                 output[0] = 2;
-            }
-            else if((bandValues[0] >= 90) & (bandValues[0] < 135))
+            } else if ((bandValues[0] >= 90) & (bandValues[0] < 135))
             {
                 output[0] = 3;
-            }
-            else if((bandValues[0] >= 135) & (bandValues[0] < 180))
+            } else if ((bandValues[0] >= 135) & (bandValues[0] < 180))
             {
                 output[0] = 4;
-            }
-            else if((bandValues[0] >= 180) & (bandValues[0] < 225))
+            } else if ((bandValues[0] >= 180) & (bandValues[0] < 225))
             {
                 output[0] = 5;
-            }
-            else if((bandValues[0] >= 225) & (bandValues[0] < 270))
+            } else if ((bandValues[0] >= 225) & (bandValues[0] < 270))
             {
                 output[0] = 6;
-            }
-            else if((bandValues[0] >= 270) & (bandValues[0] < 315))
+            } else if ((bandValues[0] >= 270) & (bandValues[0] < 315))
             {
                 output[0] = 7;
-            }
-            else if((bandValues[0] >= 315) & (bandValues[0] <= 360))
+            } else if ((bandValues[0] >= 315) & (bandValues[0] <= 360))
             {
                 output[0] = 8;
-            }
-            else if((bandValues[0] >= 360) & (bandValues[0] <= 405))
+            } else if ((bandValues[0] >= 360) & (bandValues[0] <= 405))
             {
                 output[0] = 1;
-            }
-            else
+            } else
             {
                 std::cerr << "Input Aspect Value = " << bandValues[0] << std::endl;
-                throw rsgis::img::RSGISImageCalcException("The input image pixel values much be between 0 and 360 degrees.");
+                throw rsgis::img::RSGISImageCalcException(
+                        "The input image pixel values much be between 0 and 360 degrees.");
             }
         }
     }
-    
-    RSGISRecodeAspect::~RSGISRecodeAspect()
-    {
-        
-    }
-    
 
-    
-    
-    
-    RSGISCalcHillShade::RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+
+
+
+    RSGISCalcHillShade::RSGISCalcHillShade(unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(1)
     {
         this->band = band;
         this->ewRes = ewRes;
         this->nsRes = nsRes;
         this->sunZenith = sunZenith;
         this->sunAzimuth = sunAzimuth;
-        
+
         this->sunAzimuth = 360 - this->sunAzimuth;
         this->sunAzimuth = this->sunAzimuth + 90;
         if(this->sunAzimuth > 360)
@@ -404,19 +482,19 @@ namespace rsgis{namespace calib{
         }
         this->noDataVal = noDataVal;
     }
-    
-    void RSGISCalcHillShade::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
+
+    void RSGISCalcHillShade::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output)
     {
         if(winSize != 3)
         {
             throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
         }
-        
+
         if(band >= numBands)
         {
             throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
-        
+
         bool hasNoDataVal = false;
         double sumVals = 0.0;
         int nVals = 0;
@@ -449,33 +527,33 @@ namespace rsgis{namespace calib{
                 }
             }
         }
-        
+
         if(nVals > 1)
         {
             const double degreesToRadians = M_PI / 180.0;
-            
+
             double dx, dy, aspect;
-            
+
             dx = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2])-
-                    (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/(ewRes*8);
-            
+                  (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/(ewRes*8);
+
             dy = ((dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2])-
-                  (dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]))/(nsRes*8);       
-            
+                  (dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]))/(nsRes*8);
+
             double xx_plus_yy = dx * dx + dy * dy;
-            
+
             // aspect...
             aspect = atan2(dy,dx);
-            
+
             // shade value
             double sunZenRad = sunZenith * degreesToRadians;
             double sunAzRad = sunAzimuth * degreesToRadians;
-                    
+
             double cang = (sin(sunZenRad) -
-                    cos(sunZenRad) * sqrt(xx_plus_yy) *
-                    sin(aspect - (sunAzRad-M_PI/2))) /
-                    sqrt(1 + 1 * xx_plus_yy);
-            
+                           cos(sunZenRad) * sqrt(xx_plus_yy) *
+                           sin(aspect - (sunAzRad-M_PI/2))) /
+                          sqrt(1 + 1 * xx_plus_yy);
+
             if (cang <= 0.0)
             {
                 cang = 1.0;
@@ -484,7 +562,121 @@ namespace rsgis{namespace calib{
             {
                 cang = 1.0 + (254.0 * cang);
             }
-            
+
+            output[0] = cang;
+        }
+        else
+        {
+            output[0] = 1.0;
+        }
+    }
+
+
+
+    RSGISCalcHillShadePerPxlRes::RSGISCalcHillShadePerPxlRes(unsigned int band, float sunZenith, float sunAzimuth, double noDataVal, unsigned int ew_res_band, unsigned int ns_res_band) : rsgis::img::RSGISCalcImageValue(1)
+    {
+        this->band = band;
+        this->sunZenith = sunZenith;
+        this->sunAzimuth = sunAzimuth;
+
+        this->sunAzimuth = 360 - this->sunAzimuth;
+        this->sunAzimuth = this->sunAzimuth + 90;
+        if(this->sunAzimuth > 360)
+        {
+            this->sunAzimuth = this->sunAzimuth - 360;
+        }
+        this->noDataVal = noDataVal;
+        this->ew_res_band = ew_res_band;
+        this->ns_res_band = ns_res_band;
+    }
+
+    void RSGISCalcHillShadePerPxlRes::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output)
+    {
+        if(winSize != 3)
+        {
+            throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+        }
+
+        if(band >= numBands)
+        {
+            throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
+        }
+
+        bool hasNoDataVal = false;
+        double sumVals = 0.0;
+        int nVals = 0;
+        for(int i = 0; i < winSize; ++i)
+        {
+            for(int j = 0; j < winSize; ++j)
+            {
+                if(dataBlock[band][i][j] == noDataVal)
+                {
+                    hasNoDataVal = true;
+                }
+                else
+                {
+                    sumVals += dataBlock[band][i][j];
+                    ++nVals;
+                }
+            }
+        }
+        if(hasNoDataVal && (nVals>1))
+        {
+            double meanVal = sumVals / nVals;
+            for(int i = 0; i < winSize; ++i)
+            {
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        dataBlock[band][i][j] = meanVal;
+                    }
+                }
+            }
+        }
+
+        if(nVals > 1)
+        {
+            float ewRes = dataBlock[this->ew_res_band][1][1];
+            float nsRes = dataBlock[this->ns_res_band][1][1];
+            if(nsRes < 0)
+            {
+                nsRes = nsRes * (-1);
+            }
+
+            const double degreesToRadians = M_PI / 180.0;
+
+            double dx, dy, aspect;
+
+            dx = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2])-
+                  (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/(ewRes*8);
+
+            dy = ((dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2])-
+                  (dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]))/(nsRes*8);
+
+            double xx_plus_yy = dx * dx + dy * dy;
+
+            // aspect...
+            aspect = atan2(dy,dx);
+
+            // shade value
+            double sunZenRad = sunZenith * degreesToRadians;
+            double sunAzRad = sunAzimuth * degreesToRadians;
+
+            double cang = (sin(sunZenRad) -
+                           cos(sunZenRad) * sqrt(xx_plus_yy) *
+                           sin(aspect - (sunAzRad-M_PI/2))) /
+                          sqrt(1 + 1 * xx_plus_yy);
+
+            if (cang <= 0.0)
+            {
+                cang = 1.0;
+            }
+            else
+            {
+                cang = 1.0 + (254.0 * cang);
+            }
+
             output[0] = cang;
         }
         else
@@ -493,16 +685,9 @@ namespace rsgis{namespace calib{
         }
     }
     
-    RSGISCalcHillShade::~RSGISCalcHillShade()
-    {
-        
-    }
     
     
-    
-    
-    
-    RSGISCalcShadowBinaryMask::RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcShadowBinaryMask::RSGISCalcShadowBinaryMask(GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight, double noDataVal) : rsgis::img::RSGISCalcImageValue(1)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -532,7 +717,7 @@ namespace rsgis{namespace calib{
             throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
         }
         
-        if(!(this->band <= numBands))
+        if(this->band >= numBands)
         {
             throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
@@ -728,7 +913,7 @@ namespace rsgis{namespace calib{
     
     
 
-    RSGISCalcRayIncidentAngle::RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcRayIncidentAngle::RSGISCalcRayIncidentAngle(unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(1)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -752,7 +937,7 @@ namespace rsgis{namespace calib{
                 throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
             }
             
-            if(!(band < numBands))
+            if(band >= numBands)
             {
                 throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
             }
@@ -863,14 +1048,9 @@ namespace rsgis{namespace calib{
         output[0] = outputValue;
     }
     
-    RSGISCalcRayIncidentAngle::~RSGISCalcRayIncidentAngle()
-    {
-        
-	}
     
     
-    
-    RSGISCalcRayExitanceAngle::RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcRayExitanceAngle::RSGISCalcRayExitanceAngle(unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(1)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -893,7 +1073,7 @@ namespace rsgis{namespace calib{
                 throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
             }
             
-            if(!(band < numBands))
+            if(band >= numBands)
             {
                 throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
             }
@@ -1004,12 +1184,6 @@ namespace rsgis{namespace calib{
         
         output[0] = outputValue;
     }
-		
-    RSGISCalcRayExitanceAngle::~RSGISCalcRayExitanceAngle()
-    {
-        
-    }
-
 
     
     RSGISFilterDTMWithAspectMedianFilter::RSGISFilterDTMWithAspectMedianFilter(float aspectRange, double noDataVal) : rsgis::img::RSGISCalcImageValue(1)
@@ -1084,11 +1258,6 @@ namespace rsgis{namespace calib{
             }
             
         }
-        
-    }
-    
-    RSGISFilterDTMWithAspectMedianFilter::~RSGISFilterDTMWithAspectMedianFilter()
-    {
         
     }
     
