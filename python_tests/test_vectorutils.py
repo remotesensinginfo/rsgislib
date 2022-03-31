@@ -102,6 +102,7 @@ def test_get_vec_feat_count():
     assert n_feats == 9
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_count_feats_per_att_val():
     import rsgislib.vectorutils
 
@@ -115,6 +116,7 @@ def test_count_feats_per_att_val():
     )
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_count_feats_per_att_val_df_dict():
     import rsgislib.vectorutils
 
