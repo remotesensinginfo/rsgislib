@@ -1271,7 +1271,7 @@ def calc_zonal_band_stats_test_poly_pts(
                                     )
                                 if percentile_field is not None:
                                     feat.SetField(
-                                        fieldAttIdxs[percentile_field], perc_val
+                                        fieldAttIdxs[percentile_field], out_no_data_val
                                     )
                             else:
                                 if min_field is not None:
@@ -1292,7 +1292,7 @@ def calc_zonal_band_stats_test_poly_pts(
                                     feat.SetField(fieldAttIdxs[median_field], out_val)
                                 if percentile_field is not None:
                                     feat.SetField(
-                                        fieldAttIdxs[percentile_field], perc_val
+                                        fieldAttIdxs[percentile_field], out_val
                                     )
 
                         # Write the updated feature to the vector layer.
