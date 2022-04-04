@@ -79,8 +79,8 @@ static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args, PyObject *k
 static PyObject *Elevation_calcSlopePxlResImg(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_pxl_res_img"),
-                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("unit"), nullptr};
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("unit"),
+                             RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInDEMImage, *pszInPxlResImage, *pszOutputFile, *pszGDALFormat, *pszOutUnit;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssss:slope_pxl_res_img", kwlist, &pszInDEMImage, &pszInPxlResImage, &pszOutputFile, &pszOutUnit, &pszGDALFormat))
     {
@@ -375,19 +375,19 @@ static PyMethodDef ElevationMethods[] = {
 ":param unit: is a string specifying the output unit ('degrees' or 'radians').\n"},
 
 {"slope_pxl_res_img", (PyCFunction)Elevation_calcSlopePxlResImg, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.elevation.slope_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, gdalformat, unit)\n"
+"rsgislib.elevation.slope_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, unit, gdalformat)\n"
 "Calculates a slope layer given an input elevation model and external pixel \n"
 "resolution image, which allows the slope to be calculated for images in \n"
 "projections (e.g., EPSG:4326) which do not use the same units as the \n"
-"elevation values (e.g., metres)."
+"elevation values (e.g., metres).\n"
 "\n"
 ":param in_dem_img: is a string containing the name and path of the input DEM file.\n"
 ":param in_pxl_res_img: is a string containing the name and path of the input image.\n"
 "                       specifying the image pixel resolutions. Band 1: East-West \n"
 "                       resolution and Band 2 is the North-South resolution.\n"
 ":param output_img: is a string containing the name and path of the output file.\n"
-":param gdalformat: is a string with the output image format for the GDAL driver.\n"
-":param unit: is a string specifying the output unit ('degrees' or 'radians').\n"},
+":param unit: is a string specifying the output unit ('degrees' or 'radians').\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
 
 {"aspect", (PyCFunction)Elevation_calcAspect, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.aspect(input_img, output_img, gdalformat)\n"
@@ -402,7 +402,7 @@ static PyMethodDef ElevationMethods[] = {
 "Calculates a aspect layer given an input elevation model and external pixel \n"
 "resolution image, which allows the slope to be calculated for images in \n"
 "projections (e.g., EPSG:4326) which do not use the same units as the \n"
-"elevation values (e.g., metres)."
+"elevation values (e.g., metres).\n"
 "\n"
 ":param in_dem_img: is a string containing the name and path of the input DEM file.\n"
 ":param in_pxl_res_img: is a string containing the name and path of the input image.\n"
@@ -435,7 +435,7 @@ static PyMethodDef ElevationMethods[] = {
 "Calculates a hillshade layer given an input elevation model and external pixel \n"
 "resolution image, which allows the slope to be calculated for images in \n"
 "projections (e.g., EPSG:4326) which do not use the same units as the \n"
-"elevation values (e.g., metres)."
+"elevation values (e.g., metres).\n"
 "\n"
 ":param in_dem_img: is a string containing the name and path of the input DEM file.\n"
 ":param in_pxl_res_img: is a string containing the name and path of the input image.\n"
