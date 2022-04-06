@@ -585,6 +585,7 @@ def test_sort_vec_lyr(tmp_path):
         ascending=True,
         out_format="GeoJSON",
     )
+    assert os.path.exists(out_vec_file)
 
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
@@ -606,3 +607,28 @@ def test_sort_vec_lyr_multi_var(tmp_path):
         ascending=[True, True],
         out_format="GeoJSON",
     )
+
+    assert os.path.exists(out_vec_file)
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_find_replace_str_vec_lyr(tmp_path):
+    import rsgislib.vectorattrs
+
+    vec_file = os.path.join(DATA_DIR, "degree_grid_named.geojson")
+    vec_lyr = "degree_grid_named"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorattrs.find_replace_str_vec_lyr(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        cols=["names"],
+        find_replace={"hello": "goodbye", "world": ""},
+        out_format="GeoJSON",
+    )
+
+    assert os.path.exists(out_vec_file)
