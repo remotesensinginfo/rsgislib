@@ -6,7 +6,9 @@ from typing import Dict
 import json
 import os
 import requests
+
 import rsgislib
+import rsgislib.tools.utils
 import tqdm
 
 
@@ -60,7 +62,7 @@ def check_http_response(response: requests.Response, url: str) -> bool:
     return success
 
 
-def send_http_json_request(url: str, data: Dict = None, api_key: str = None) -> str:
+def send_http_json_request(url: str, data: Dict = None, api_key: str = None, convert_to_json:bool=True, header_data:Dict=None) -> Dict:
     """
     A function which sends a http request with a json data packet.
     If an error occurs an exception will be raised.
@@ -70,42 +72,47 @@ def send_http_json_request(url: str, data: Dict = None, api_key: str = None) -> 
                  using json.dumps.
     :param api_key: if provided then the api-key will be provided
                     via the http header.
-    :return: the JSON string returned by the server.
+    :param convert_to_json:
+    :param header_data: a dict of header information.
+    :return: A dict of data returned from the server.
 
     """
-    if data is None:
-        json_data = None
+    if convert_to_json:
+        if data is None:
+            params_data = None
+        else:
+            params_data = json.dumps(data)
     else:
-        json_data = json.dumps(data)
+        params_data = data
 
     if api_key == None:
-        response = requests.post(url, json_data)
+        response = requests.post(url, params_data, headers=header_data)
     else:
-        headers = {"X-Auth-Token": api_key}
-        response = requests.post(url, json_data, headers=headers)
+        if header_data is not None:
+            header_data["X-Auth-Token"] = api_key
+        else:
+            header_data = {"X-Auth-Token": api_key}
+        response = requests.post(url, params_data, headers=header_data)
 
     try:
         http_status_code = response.status_code
         if response == None:
             raise rsgislib.RSGISPyException("No output from service")
 
-        output = json.loads(response.text)
-        if output["errorCode"] != None:
-            raise rsgislib.RSGISPyException(
-                "{} - {}".format(output["errorCode"], output["errorMessage"])
-            )
         if http_status_code == 404:
             raise rsgislib.RSGISPyException("404 Not Found")
         elif http_status_code == 401:
             raise rsgislib.RSGISPyException("401 Unauthorized")
         elif http_status_code == 400:
             raise rsgislib.RSGISPyException(f"Error Code: {http_status_code}")
+
+        output = json.loads(response.text)
     except Exception as e:
         response.close()
         raise rsgislib.RSGISPyException(f"{e}")
     response.close()
 
-    return output["data"]
+    return output
 
 
 def download_file_http(
