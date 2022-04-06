@@ -305,7 +305,7 @@ def run_check_gdal_image_file(
         else:
             print("rm {}".format(input_img))
     processes_pool.close()
-    processes_pool.join()
+    #processes_pool.join()
 
     return file_ok
 
@@ -394,8 +394,9 @@ def run_check_gdal_image_files(
                     print("Removed {}".format(input_img))
                 else:
                     print("rm {}".format(input_img))
+                continue
         processes_pool.close()
-        processes_pool.join()
+        #processes_pool.join()
     except Exception as inst:
         print("Finished with pool")
 
@@ -616,7 +617,7 @@ def run_check_gdal_vector_file(
         else:
             print("rm {}".format(vec_file))
     processes_pool.close()
-    processes_pool.join()
+    #processes_pool.join()
 
     return file_ok
 
@@ -693,8 +694,9 @@ def run_check_gdal_vector_files(
                         print("Removed {}".format(vec_file))
                 else:
                     print("rm {}".format(vec_file))
+                continue
         processes_pool.close()
-        processes_pool.join()
+        #processes_pool.join()
     except Exception as inst:
         print("Finished with pool")
 
@@ -823,7 +825,7 @@ def run_check_hdf5_file(
         else:
             print("rm {}".format(input_file))
     processes_pool.close()
-    processes_pool.join()
+    #processes_pool.join()
 
     return file_ok
 
@@ -873,8 +875,9 @@ def run_check_hdf5_files(
                     print("Removed {}".format(input_file))
                 else:
                     print("rm {}".format(input_file))
+                continue
         processes_pool.close()
-        processes_pool.join()
+        #processes_pool.join()
     except Exception as inst:
         print("Finished with pool")
 
