@@ -462,8 +462,9 @@ def download_granules_use_dwnld_db(
 
     dwld_files = lst_db.getByQuery({"downloaded": False})
 
-    for dwn_file in tqdm.tqdm(dwld_files):
+    for dwn_file in dwld_files:
         out_file_path = os.path.join(out_path, dwn_file["producer_granule_id"])
+        print(f"Downloading: {out_file_path}")
         dwn_success = False
         if use_wget:
             dwn_success, dwn_message = rsgislib.tools.httptools.wget_download_file(
