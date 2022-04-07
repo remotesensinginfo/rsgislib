@@ -9,6 +9,7 @@ import requests
 
 import rsgislib
 import rsgislib.tools.utils
+import rsgislib.tools.filetools
 import tqdm
 
 
@@ -62,7 +63,13 @@ def check_http_response(response: requests.Response, url: str) -> bool:
     return success
 
 
-def send_http_json_request(url: str, data: Dict = None, api_key: str = None, convert_to_json:bool=True, header_data:Dict=None) -> Dict:
+def send_http_json_request(
+    url: str,
+    data: Dict = None,
+    api_key: str = None,
+    convert_to_json: bool = True,
+    header_data: Dict = None,
+) -> Dict:
     """
     A function which sends a http request with a json data packet.
     If an error occurs an exception will be raised.
@@ -147,7 +154,7 @@ def download_file_http(
         ) as r:
             check_http_response(r, input_url)
             total = int(r.headers.get("content-length", 0))
-            chunk_size = 2**20
+            chunk_size = 2 ** 20
             n_chunks = int(total / chunk_size) + 1
 
             with open(tmp_dwnld_path, "wb") as f:
@@ -166,3 +173,80 @@ def download_file_http(
             raise rsgislib.RSGISPyException("{}".format(e))
         return False
     return True
+
+
+def wget_download_file(
+    input_url: str,
+    out_file_path: str,
+    username: str = None,
+    password: str = None,
+    try_number: int = 10,
+    time_out: int = 60,
+    input_url_md5: str = None,
+) -> (bool, str):
+    """
+    A function which downloads a file from a url using the wget command line tool.
+    If a username or password are provided then both must be provided.
+
+    :param input_url_md5:
+    :param input_url: string with the URL to be downloaded.
+    :param out_file_path: output file name and path.
+    :param username: username for the download, if required. Default is None meaning
+                     it will be ignored.
+    :param password: password for the download, if required. Default is None meaning
+                     it will be ignored.
+    :param try_number: number of attempts at the download. Default is 10.
+    :param time_out: number of seconds to time out Default is 60.
+    :return: boolean specifying whether the file had been successfully downloaded
+             and a string with user feedback (e.g., error message)
+
+    """
+    import subprocess
+
+    try_number = str(try_number)
+    time_out = str(time_out)
+    success = False
+    out_message = ""
+    command = [
+        "wget",
+        "-c",
+        "-P",
+        out_file_path,
+        "-t",
+        f"{try_number}",
+        "-T",
+        f"{time_out}",
+        "--no-check-certificate",
+    ]
+    if (username is not None) and (password is not None):
+        command.append("--user")
+        command.append(username)
+        command.append("--password")
+        command.append(password)
+    command.append(input_url)
+
+    download_state = -1
+    try:
+        download_state = subprocess.call(command)
+    except Exception as e:
+        out_message = (
+            f"Download of file ({out_file_path}) failed.: Exception:\n" + e.__str__()
+        )
+
+    if download_state == 0:
+        if input_url_md5 is not None:
+            dwnld_file_md5 = rsgislib.tools.filetools.create_md5_hash(out_file_path)
+            if dwnld_file_md5 == input_url_md5:
+                success = True
+                out_message = "File Downloaded and MD5 to checked."
+            else:
+                success = False
+                out_message = "File Downloaded but MD5 did not match."
+        else:
+            success = True
+            out_message = "File Downloaded but no MD5 to check against."
+
+    if out_message == "":
+        out_message = "File did not successfully download but no exception thrown."
+
+    return success, out_message
