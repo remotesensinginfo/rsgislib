@@ -210,7 +210,7 @@ def wget_download_file(
     command = [
         "wget",
         "-c",
-        "-P",
+        "-O",
         out_file_path,
         "-t",
         f"{try_number}",
