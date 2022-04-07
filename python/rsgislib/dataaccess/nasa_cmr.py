@@ -329,6 +329,59 @@ def get_total_file_size(granule_lst: List[Dict]) -> float:
     return tot_file_size
 
 
+def create_cmr_dwnld_db(
+    db_json: str, granule_lst: List[Dict], dwnld_file_mime_type: str
+) -> List[str]:
+    """
+    A function which iterates through a granule list and builds a json database
+    of file to be downloaded. The database can then be used to keep track of
+    which files have been successfully downloaded allowing those which haven't
+    downloaded to be tried again.
+
+    :param db_json: The file path for the databases JSON file.
+    :param granule_lst: List of granules from find_granules or find_all_granules
+    :param dwnld_file_mime_type: (e.g., application/x-hdfeos, application/x-hdf)
+    :return: a List of producer_granule_id's for the granules where a
+             URL could not be found.
+
+    """
+    import pysondb
+    import tqdm
+
+    db_data = []
+    granules_no_url = []
+    for granule in tqdm.tqdm(granule_lst):
+        id_val = granule["id"]
+        producer_granule_id = granule["producer_granule_id"]
+        granule_size = granule["granule_size"]
+        found_url = False
+        for link in granule["links"]:
+            if "type" in link:
+                if link["type"] == dwnld_file_mime_type:
+                    granule_url = link["href"]
+                    found_url = True
+                    break
+        if found_url:
+            db_data.append(
+                {
+                    "id": id_val,
+                    "producer_granule_id": producer_granule_id,
+                    "granule_size": granule_size,
+                    "granule_url": granule_url,
+                    "lcl_path": "",
+                    "downloaded": False,
+                }
+            )
+        else:
+            granules_no_url.append(producer_granule_id)
+
+    lst_db = pysondb.getDb(db_json)
+    if len(db_data) > 0:
+        lst_db.addMany(db_data)
+
+    return granules_no_url
+
+
 def cmr_download_file_http(
     input_url: str,
     out_file_path: str,
@@ -338,11 +391,11 @@ def cmr_download_file_http(
 ) -> bool:
     """
 
-    :param input_url:
-    :param out_file_path:
-    :param username:
-    :param password:
-    :return:
+    :param input_url: The input remote URL to be downloaded.
+    :param out_file_path: the local file path and file name
+    :param username: the username for the server
+    :param password: the password for the server
+    :return: boolean as to whether the file was successfully downloaded or not.
 
     """
     import tqdm
@@ -381,3 +434,53 @@ def cmr_download_file_http(
             raise rsgislib.RSGISPyException("{}".format(e))
         return False
     return True
+
+
+def download_granules_use_dwnld_db(
+    db_json: str, out_path: str, user_pass_file: str, use_wget: bool = False
+):
+    """
+    A function which can use the JSON database built by create_cmr_dwnld_db to
+    batch download a set of files keeping track of those which where successfully
+    downloaded and those that were unsuccessful.
+
+    :param db_json: file path for the JSON db file.
+    :param out_path: the output path where data should be downloaded to.
+    :param user_pass_file: path to an encoded (base64) username/password file
+    :param use_wget: boolean as to whether to use wget to download files or
+                     a pure python function. (Default: False - i.e., pure python).
+
+    """
+    import pysondb
+    import tqdm
+    import rsgislib.tools.utils
+    import rsgislib.tools.httptools
+
+    username, password = rsgislib.tools.utils.get_username_password(user_pass_file)
+
+    lst_db = pysondb.getDb(db_json)
+
+    dwld_files = lst_db.getByQuery({"downloaded": False})
+
+    for dwn_file in tqdm.tqdm(dwld_files):
+        out_file_path = os.path.join(out_path, dwn_file["producer_granule_id"])
+        dwn_success = False
+        if use_wget:
+            dwn_success, dwn_message = rsgislib.tools.httptools.wget_download_file(
+                input_url=dwn_file["granule_url"],
+                out_file_path=out_file_path,
+                username=username,
+                password=password,
+            )
+        else:
+            dwn_success = cmr_download_file_http(
+                input_url=dwn_file["granule_url"],
+                out_file_path=out_file_path,
+                username=username,
+                password=password,
+            )
+
+        if dwn_success:
+            lst_db.updateById(
+                dwn_file["id"], {"lcl_path": out_file_path, "downloaded": True}
+            )
