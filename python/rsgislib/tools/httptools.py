@@ -14,7 +14,6 @@ import rsgislib.tools.utils
 import rsgislib.tools.filetools
 
 
-
 class RSGISPyResponseException(rsgislib.RSGISPyException):
     def __init__(self, value, response=None):
         """
@@ -253,9 +252,3 @@ def wget_download_file(
         out_message = "File did not successfully download but no exception thrown."
 
     return success, out_message
-
-
-
-
-
-

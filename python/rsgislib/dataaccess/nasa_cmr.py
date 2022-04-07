@@ -25,7 +25,7 @@ CMR_GRANULES_URL = "https://cmr.earthdata.nasa.gov/search/granules.json"
 
 
 class SessionWithHeaderNASARedirection(requests.Session):
-    AUTH_HOST = 'urs.earthdata.nasa.gov'
+    AUTH_HOST = "urs.earthdata.nasa.gov"
 
     def __init__(self, username, password):
         super().__init__()
@@ -43,14 +43,17 @@ class SessionWithHeaderNASARedirection(requests.Session):
         headers = prepared_request.headers
         url = prepared_request.url
 
-        if 'Authorization' in headers:
+        if "Authorization" in headers:
             original_parsed = requests.utils.urlparse(response.request.url)
             redirect_parsed = requests.utils.urlparse(url)
-            if (original_parsed.hostname != redirect_parsed.hostname) and redirect_parsed.hostname != self.AUTH_HOST and  original_parsed.hostname != self.AUTH_HOST:
-                del headers['Authorization']
+            if (
+                (original_parsed.hostname != redirect_parsed.hostname)
+                and redirect_parsed.hostname != self.AUTH_HOST
+                and original_parsed.hostname != self.AUTH_HOST
+            ):
+                del headers["Authorization"]
 
         return
-
 
 
 def _check_cmr_response(data: Dict) -> Union[str, List, Dict]:
@@ -326,14 +329,13 @@ def get_total_file_size(granule_lst: List[Dict]) -> float:
     return tot_file_size
 
 
-
 def cmr_download_file_http(
     input_url: str,
     out_file_path: str,
     username: str,
     password: str,
     no_except: bool = True,
-)->bool:
+) -> bool:
     """
 
     :param input_url:
@@ -356,9 +358,7 @@ def cmr_download_file_http(
     headers = {}
 
     try:
-        with session_http.get(
-                input_url, stream=True, headers=headers
-                ) as r:
+        with session_http.get(input_url, stream=True, headers=headers) as r:
             if rsgislib.tools.httptools.check_http_response(r, input_url):
                 total = int(r.headers.get("content-length", 0))
                 chunk_size = 2 ** 20
@@ -366,8 +366,8 @@ def cmr_download_file_http(
 
                 with open(tmp_dwnld_path, "wb") as f:
                     for chunk in tqdm.tqdm(
-                            r.iter_content(chunk_size=chunk_size), total=n_chunks
-                            ):
+                        r.iter_content(chunk_size=chunk_size), total=n_chunks
+                    ):
                         if chunk:  # filter out keep-alive new chunks
                             f.write(chunk)
         if os.path.exists(tmp_dwnld_path):
@@ -381,5 +381,3 @@ def cmr_download_file_http(
             raise rsgislib.RSGISPyException("{}".format(e))
         return False
     return True
-
-

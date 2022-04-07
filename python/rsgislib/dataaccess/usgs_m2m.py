@@ -34,7 +34,8 @@ USGS_M2M_URL = "https://m2m.cr.usgs.gov/api/api/json/stable/"
 # Note to download data you need to registered for m2m access:
 # https://ers.cr.usgs.gov/profile/access
 
-def _check_usgs_response(data:Dict)->Dict:
+
+def _check_usgs_response(data: Dict) -> Dict:
     """
     A function which checks the response for an error (producing an exception)
     and extracts the text output and returns it.
@@ -43,10 +44,13 @@ def _check_usgs_response(data:Dict)->Dict:
     :return:
     """
 
-    if rsgislib.tools.utils.dict_struct_does_path_exist(data, ["errorCode"]) and data["errorCode"] != None:
+    if (
+        rsgislib.tools.utils.dict_struct_does_path_exist(data, ["errorCode"])
+        and data["errorCode"] != None
+    ):
         raise rsgislib.RSGISPyException(
             "{} - {}".format(data["errorCode"], data["errorMessage"])
-            )
+        )
 
     if not rsgislib.tools.utils.dict_struct_does_path_exist(data, ["data"]):
         print(data)
