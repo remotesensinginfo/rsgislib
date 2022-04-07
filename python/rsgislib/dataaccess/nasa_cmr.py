@@ -338,6 +338,10 @@ def create_cmr_dwnld_db(
     which files have been successfully downloaded allowing those which haven't
     downloaded to be tried again.
 
+    For the mine types, print a few of the granule list of the terminal (i.e.,
+    pprint.pprint(granule_lst) and check what the mime type is for the download
+    you want. However, for GEDI data it is probably application/x-hdfeos. 
+
     :param db_json: The file path for the databases JSON file.
     :param granule_lst: List of granules from find_granules or find_all_granules
     :param dwnld_file_mime_type: (e.g., application/x-hdfeos, application/x-hdf)
@@ -452,7 +456,6 @@ def download_granules_use_dwnld_db(
 
     """
     import pysondb
-    import tqdm
     import rsgislib.tools.utils
     import rsgislib.tools.httptools
 
