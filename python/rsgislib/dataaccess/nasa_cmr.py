@@ -7,8 +7,10 @@ EOSDIS Common Metadata Repository API (https://cmr.earthdata.nasa.gov/search/)
 
 import datetime
 from typing import Union, List, Dict
-import json
-import pprint
+import os
+
+import requests
+import requests.utils
 
 import rsgislib
 import rsgislib.tools.utils
@@ -20,6 +22,35 @@ import rsgislib.tools.httptools
 
 CMR_COLLECTS_URL = "https://cmr.earthdata.nasa.gov/search/collections.json"
 CMR_GRANULES_URL = "https://cmr.earthdata.nasa.gov/search/granules.json"
+
+
+class SessionWithHeaderNASARedirection(requests.Session):
+    AUTH_HOST = 'urs.earthdata.nasa.gov'
+
+    def __init__(self, username, password):
+        super().__init__()
+        self.auth = (username, password)
+
+    def rebuild_auth(self, prepared_request, response):
+        """
+        Overrides from the library to keep headers when redirected to or from
+        the NASA auth host.
+
+        :param prepared_request:
+        :param response:
+        :return:
+        """
+        headers = prepared_request.headers
+        url = prepared_request.url
+
+        if 'Authorization' in headers:
+            original_parsed = requests.utils.urlparse(response.request.url)
+            redirect_parsed = requests.utils.urlparse(url)
+            if (original_parsed.hostname != redirect_parsed.hostname) and redirect_parsed.hostname != self.AUTH_HOST and  original_parsed.hostname != self.AUTH_HOST:
+                del headers['Authorization']
+
+        return
+
 
 
 def _check_cmr_response(data: Dict) -> Union[str, List, Dict]:
@@ -293,3 +324,62 @@ def get_total_file_size(granule_lst: List[Dict]) -> float:
     for granule in granule_lst:
         tot_file_size += float(granule["granule_size"])
     return tot_file_size
+
+
+
+def cmr_download_file_http(
+    input_url: str,
+    out_file_path: str,
+    username: str,
+    password: str,
+    no_except: bool = True,
+)->bool:
+    """
+
+    :param input_url:
+    :param out_file_path:
+    :param username:
+    :param password:
+    :return:
+
+    """
+    import tqdm
+    import rsgislib.tools.httptools
+
+    session_http = SessionWithHeaderNASARedirection(username, password)
+
+    user_agent = "rsgislib/{}".format(rsgislib.get_rsgislib_version())
+    session_http.headers["User-Agent"] = user_agent
+
+    tmp_dwnld_path = out_file_path + ".incomplete"
+
+    headers = {}
+
+    try:
+        with session_http.get(
+                input_url, stream=True, headers=headers
+                ) as r:
+            if rsgislib.tools.httptools.check_http_response(r, input_url):
+                total = int(r.headers.get("content-length", 0))
+                chunk_size = 2 ** 20
+                n_chunks = int(total / chunk_size) + 1
+
+                with open(tmp_dwnld_path, "wb") as f:
+                    for chunk in tqdm.tqdm(
+                            r.iter_content(chunk_size=chunk_size), total=n_chunks
+                            ):
+                        if chunk:  # filter out keep-alive new chunks
+                            f.write(chunk)
+        if os.path.exists(tmp_dwnld_path):
+            os.rename(tmp_dwnld_path, out_file_path)
+            print("Download Complete: {}".format(out_file_path))
+
+    except Exception as e:
+        if no_except:
+            print(e)
+        else:
+            raise rsgislib.RSGISPyException("{}".format(e))
+        return False
+    return True
+
+

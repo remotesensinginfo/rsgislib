@@ -5,12 +5,14 @@ The tools.httptools
 from typing import Dict
 import json
 import os
+
+import tqdm
 import requests
 
 import rsgislib
 import rsgislib.tools.utils
 import rsgislib.tools.filetools
-import tqdm
+
 
 
 class RSGISPyResponseException(rsgislib.RSGISPyException):
@@ -152,19 +154,20 @@ def download_file_http(
         with session_http.get(
             input_url, stream=True, auth=session_http.auth, headers=headers
         ) as r:
-            check_http_response(r, input_url)
-            total = int(r.headers.get("content-length", 0))
-            chunk_size = 2 ** 20
-            n_chunks = int(total / chunk_size) + 1
+            if check_http_response(r, input_url):
+                total = int(r.headers.get("content-length", 0))
+                chunk_size = 2 ** 20
+                n_chunks = int(total / chunk_size) + 1
 
-            with open(tmp_dwnld_path, "wb") as f:
-                for chunk in tqdm.tqdm(
-                    r.iter_content(chunk_size=chunk_size), total=n_chunks
-                ):
-                    if chunk:  # filter out keep-alive new chunks
-                        f.write(chunk)
-        os.rename(tmp_dwnld_path, out_file_path)
-        print("Download Complete: {}".format(out_file_path))
+                with open(tmp_dwnld_path, "wb") as f:
+                    for chunk in tqdm.tqdm(
+                        r.iter_content(chunk_size=chunk_size), total=n_chunks
+                    ):
+                        if chunk:  # filter out keep-alive new chunks
+                            f.write(chunk)
+        if os.path.exists(tmp_dwnld_path):
+            os.rename(tmp_dwnld_path, out_file_path)
+            print("Download Complete: {}".format(out_file_path))
 
     except Exception as e:
         if no_except:
@@ -250,3 +253,9 @@ def wget_download_file(
         out_message = "File did not successfully download but no exception thrown."
 
     return success, out_message
+
+
+
+
+
+
