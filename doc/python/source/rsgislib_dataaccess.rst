@@ -28,5 +28,7 @@ NASA Common Metadata Repository
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.check_prod_version_avail
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.get_max_prod_version
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.find_granules
+.. autofunction:: rsgislib.dataaccess.nasa_cmr.find_all_granules
+.. autofunction:: rsgislib.dataaccess.nasa_cmr.get_total_file_size
 
 

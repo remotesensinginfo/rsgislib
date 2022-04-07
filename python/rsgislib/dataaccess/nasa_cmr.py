@@ -14,9 +14,9 @@ import rsgislib
 import rsgislib.tools.utils
 import rsgislib.tools.httptools
 
-#CMR_OPS = "https://cmr.earthdata.nasa.gov/search/"
-#CMR_UAT = "https://cmr.uat.earthdata.nasa.gov/search/"
-#CMR_SIT = "https://cmr.sit.earthdata.nasa.gov/search/"
+# CMR_OPS = "https://cmr.earthdata.nasa.gov/search/"
+# CMR_UAT = "https://cmr.uat.earthdata.nasa.gov/search/"
+# CMR_SIT = "https://cmr.sit.earthdata.nasa.gov/search/"
 
 CMR_COLLECTS_URL = "https://cmr.earthdata.nasa.gov/search/collections.json"
 CMR_GRANULES_URL = "https://cmr.earthdata.nasa.gov/search/granules.json"
@@ -29,6 +29,7 @@ def _check_cmr_response(data: Dict) -> Union[str, List, Dict]:
 
     :param data:
     :return:
+
     """
 
     if not rsgislib.tools.utils.dict_struct_does_path_exist(data, ["feed", "entry"]):
@@ -41,6 +42,9 @@ def _check_cmr_response(data: Dict) -> Union[str, List, Dict]:
 def get_prods_info(prod_short_name: str) -> List[Dict]:
     """
     A function which returns information for a product available from the CMR.
+
+    Available products can be found here:
+    https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-standard-products
 
     :param prod_short_name: The name of the product you are interested in.
     :return: A list of products (probably different versions).
@@ -62,10 +66,12 @@ def get_prods_info(prod_short_name: str) -> List[Dict]:
 
 def check_prod_version_avail(prod_short_name: str, version: str) -> bool:
     """
+    A function which checks if a version is available.
 
-    :param prod_short_name:
-    :param version:
-    :return:
+    :param prod_short_name: the product short name for the product of interest.
+    :param version: the version of the product to be retrieved.
+    :return: Boolean specifying whether the version is available.
+
     """
     prod_lst = get_prods_info(prod_short_name)
     found_version = False
@@ -78,9 +84,12 @@ def check_prod_version_avail(prod_short_name: str, version: str) -> bool:
 
 def get_max_prod_version(prod_short_name: str) -> str:
     """
+    A function which attempts to find the highest (latest) version for
+    a product.
 
-    :param prod_short_name:
-    :return:
+    :param prod_short_name: the product short name for the product of interest.
+    :return: string representation of the highest version.
+
     """
     prod_lst = get_prods_info(prod_short_name)
     first = True
@@ -113,14 +122,16 @@ def find_granules(
     page_size: int = 100,
     page_num: int = 1,
     other_params: Dict[str, str] = None,
-):
+) -> List[Dict]:
     """
     A function which will find granules from the CMR system for the product of
     interest using the search parameters provided.
 
-    :param prod_short_name:
-    :param version:
-    :param only_dnwld:
+    https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html#granule-search-by-parameters
+
+    :param prod_short_name: the product short name for the product of interest.
+    :param version: the version of the product to be retrieved.
+    :param only_dnwld: If true (default)
     :param bbox: (MinX, MaxX, MinY, MaxY)
     :param pt: (X, Y)
     :param start_date: Start date as a datetime object. (Earlier date)
@@ -136,9 +147,8 @@ def find_granules(
                      the number which will fit on a single page to be retrieved.
     :param other_params: A dict of other parameters where the key is the search
                          parameter name and the value is the value to search with.
-    :return:
+    :return: A list of dictionaries with a dictionary for item.
     """
-    # https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html#granule-search-by-parameters
 
     prod_srch_params = {"short_name": prod_short_name, "version": version}
     header_info = {"Accept": "application/json"}
@@ -184,6 +194,9 @@ def find_granules(
         else:
             prod_srch_params["sort_key"] = "%2Bstart_date"
 
+    if other_params is not None:
+        prod_srch_params = {**prod_srch_params, **other_params}
+
     rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         CMR_GRANULES_URL,
         data=prod_srch_params,
@@ -193,3 +206,90 @@ def find_granules(
     granules_lst = _check_cmr_response(rtnd_data)
 
     return granules_lst
+
+
+def find_all_granules(
+    prod_short_name: str,
+    version: str,
+    only_dnwld: bool = True,
+    bbox: List[float] = None,
+    pt: List[float] = None,
+    start_date: datetime.datetime = None,
+    end_date: datetime.datetime = None,
+    cloud_min: int = 0,
+    cloud_max: int = None,
+    sort_date: bool = True,
+    sort_desc: bool = True,
+    page_size: int = 100,
+    max_n_pages: int = 100,
+    other_params: Dict[str, str] = None,
+) -> List[Dict]:
+    """
+    A function which will find granules from the CMR system for the product of
+    interest using the search parameters provided using the find_granules function
+    but iterates through all the pages available to return all the available
+    granules rather than just a single page.
+
+    :param prod_short_name: the product short name for the product of interest.
+    :param version: the version of the product to be retrieved.
+    :param only_dnwld: If true (default)
+    :param bbox: (MinX, MaxX, MinY, MaxY)
+    :param pt: (X, Y)
+    :param start_date: Start date as a datetime object. (Earlier date)
+    :param end_date: End date as a datetime object. (Later date)
+    :param cloud_min: Minimum cloud cover (Default: 0)
+    :param cloud_max: Maximum cloud cover.
+    :param sort_date: Sort the response by the acquisition date
+    :param sort_desc: Sort order (ascending or descending). Ascending: oldest version.
+                      Descending: newest version.
+    :param page_size: The number of records to be returned by a single query as a
+                      'page'. (Default: 100)
+    :param max_n_pages: the maximum number of pages returned (Default: 100)
+    :param other_params: A dict of other parameters where the key is the search
+                         parameter name and the value is the value to search with.
+    :return: A list of dictionaries with a dictionary for item.
+    """
+    import tqdm
+
+    rtn_granules = list()
+    print("Note. Progress bar is for the maximum number of pages...")
+    print("Hopefully you do not need the maximum so it will be quicker...")
+    for i in tqdm.tqdm(range(max_n_pages)):
+        page_granules = find_granules(
+            prod_short_name=prod_short_name,
+            version=version,
+            only_dnwld=only_dnwld,
+            bbox=bbox,
+            pt=pt,
+            start_date=start_date,
+            end_date=end_date,
+            cloud_min=cloud_min,
+            cloud_max=cloud_max,
+            sort_date=sort_date,
+            sort_desc=sort_desc,
+            page_size=page_size,
+            page_num=i + 1,
+            other_params=other_params,
+        )
+        if len(page_granules) > 0:
+            rtn_granules += page_granules
+        else:
+            break
+
+    return rtn_granules
+
+
+def get_total_file_size(granule_lst: List[Dict]) -> float:
+    """
+    A function which using the list granules to sum the total file
+    size of the granules in the list. The file size units are whatever
+    has been use for the product but seems to be usually be MegaBytes (MB).
+
+    :param granule_lst: List of granules from find_granules or find_all_granules
+    :return: float for the total file size.
+
+    """
+    tot_file_size = 0.0
+    for granule in granule_lst:
+        tot_file_size += float(granule["granule_size"])
+    return tot_file_size
