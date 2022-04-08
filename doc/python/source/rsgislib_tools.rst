@@ -19,6 +19,7 @@ RSGISLib Tools
    rsgislib_tools_checkdatasets
    rsgislib_tools_visualisation
    rsgislib_tools_ftptools
+   rsgislib_tools_httptools
 
 
 * :ref:`genindex`

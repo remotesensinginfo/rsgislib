@@ -40,6 +40,14 @@ Strings
 .. autofunction:: rsgislib.tools.utils.remove_repeated_chars
 .. autofunction:: rsgislib.tools.utils.check_str
 
+Encode String
+--------------
+.. autofunction:: rsgislib.tools.utils.encode_base64_text
+.. autofunction:: rsgislib.tools.utils.decode_base64_text
+.. autofunction:: rsgislib.tools.utils.create_username_password_file
+.. autofunction:: rsgislib.tools.utils.get_username_password
+
+
 
 Numeric
 ---------

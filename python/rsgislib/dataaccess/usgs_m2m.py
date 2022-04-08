@@ -35,6 +35,30 @@ USGS_M2M_URL = "https://m2m.cr.usgs.gov/api/api/json/stable/"
 # https://ers.cr.usgs.gov/profile/access
 
 
+def _check_usgs_response(data: Dict) -> Dict:
+    """
+    A function which checks the response for an error (producing an exception)
+    and extracts the text output and returns it.
+
+    :param data:
+    :return:
+    """
+
+    if (
+        rsgislib.tools.utils.dict_struct_does_path_exist(data, ["errorCode"])
+        and data["errorCode"] != None
+    ):
+        raise rsgislib.RSGISPyException(
+            "{} - {}".format(data["errorCode"], data["errorMessage"])
+        )
+
+    if not rsgislib.tools.utils.dict_struct_does_path_exist(data, ["data"]):
+        print(data)
+        raise rsgislib.RSGISPyException("Data structure is not as expected - check.")
+
+    return data["data"]
+
+
 def usgs_login(username: str = None, password: str = None) -> str:
     """
     A function to login to the USGS m2m service.
@@ -55,7 +79,8 @@ def usgs_login(username: str = None, password: str = None) -> str:
 
     login_data = {"username": username, "password": password}
     login_url = USGS_M2M_URL + "login"
-    api_key = rsgislib.tools.httptools.send_http_json_request(login_url, login_data)
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(login_url, login_data)
+    api_key = _check_usgs_response(rtnd_data)
     return api_key
 
 
@@ -78,9 +103,11 @@ def can_user_dwnld(api_key: str) -> bool:
 
     """
     permissions_url = USGS_M2M_URL + "permissions"
-    permissions_info = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         permissions_url, api_key=api_key
     )
+    permissions_info = _check_usgs_response(rtnd_data)
+
     have_dwn_per = False
     if (permissions_info is not None) and ("download" in permissions_info):
         have_dwn_per = True
@@ -95,9 +122,10 @@ def can_user_order(api_key: str) -> bool:
     :return: boolean - True does have permission.
     """
     permissions_url = USGS_M2M_URL + "permissions"
-    permissions_info = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         permissions_url, api_key=api_key
     )
+    permissions_info = _check_usgs_response(rtnd_data)
     have_ord_per = False
     if (permissions_info is not None) and ("order" in permissions_info):
         have_ord_per = True
@@ -128,9 +156,10 @@ def get_wrs_pt(
     grid2ll_data["row"] = row
     grid2ll_data["responseShape"] = "point"
 
-    grid2ll_info = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         grid2ll_url, grid2ll_data, api_key=api_key
     )
+    grid2ll_info = _check_usgs_response(rtnd_data)
 
     if grid2ll_info["shape"] == "point":
         lat = grid2ll_info["coordinates"][0]["latitude"]
@@ -165,9 +194,10 @@ def get_wrs_bbox(
     grid2ll_data["row"] = row
     grid2ll_data["responseShape"] = "polygon"
 
-    grid2ll_info = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         grid2ll_url, grid2ll_data, api_key=api_key
     )
+    grid2ll_info = _check_usgs_response(rtnd_data)
 
     lat_vals = []
     lon_vals = []
@@ -198,13 +228,14 @@ def get_dataset_info(dataset: str, api_key: str) -> Dict:
     """
     dataset_url = USGS_M2M_URL + "dataset"
     dataset_data = {"datasetName": dataset}
-    dataset_info = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         dataset_url, dataset_data, api_key=api_key
     )
+    dataset_info = _check_usgs_response(rtnd_data)
     return dataset_info
 
 
-def get_earth_explorer_datasets(api_key: str) -> Dict[List[str]]:
+def get_earth_explorer_datasets(api_key: str) -> Dict[str, List[str]]:
     """
     Get a structured dict of datasets available on the system. Structure
     is category and then a list of datasets under each category. Note,
@@ -216,9 +247,10 @@ def get_earth_explorer_datasets(api_key: str) -> Dict[List[str]]:
     """
     dataset_url = USGS_M2M_URL + "dataset-categories"
     dataset_data = {"catalog": "EE"}
-    dataset_info = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         dataset_url, dataset_data, api_key=api_key
     )
+    dataset_info = _check_usgs_response(rtnd_data)
 
     dataset_names = dict()
     for dataset_id in dataset_info:
@@ -358,9 +390,10 @@ def usgs_search(
         search_data["startingNumber"] = start_n
 
     search_url = USGS_M2M_URL + "scene-search"
-    srch_data = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         search_url, search_data, api_key=api_key
     )
+    srch_data = _check_usgs_response(rtnd_data)
 
     if srch_data["totalHits"] > 0:
         scns = srch_data["results"]
@@ -547,9 +580,10 @@ def create_scene_list(
     add_scn_info["timeToLive"] = lst_period
 
     scn_lst_add_url = USGS_M2M_URL + "scene-list-add"
-    scn_lst_add_info = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         scn_lst_add_url, add_scn_info, api_key=api_key
     )
+    scn_lst_add_info = _check_usgs_response(rtnd_data)
     return scn_lst_add_info
 
 
@@ -596,9 +630,10 @@ def check_dwnld_opts(
     dwnld_opts_params = {"listId": lst_name, "datasetName": dataset}
 
     dwnld_opts_url = USGS_M2M_URL + "download-options"
-    dnwld_opt_out_info = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         dwnld_opts_url, dwnld_opts_params, api_key
     )
+    dnwld_opt_out_info = _check_usgs_response(rtnd_data)
 
     # Select products
     dwlds_lst = []
@@ -671,9 +706,11 @@ def request_downloads(api_key: str, dwlds_lst: str, dwnld_label: str) -> (Dict, 
         "label": dwnld_label,
         "returnAvailable": True,
     }
-    dwnld_reqst_info = rsgislib.tools.httptools.send_http_json_request(
+    rtnd_data = rsgislib.tools.httptools.send_http_json_request(
         dwnld_reqst_url, dwnld_reqst_data, api_key=api_key
     )
+    dwnld_reqst_info = _check_usgs_response(rtnd_data)
+
     for dwnld_info in dwnld_reqst_info["availableDownloads"]:
         avail_dwn_urls[dwnld_info["downloadId"]] = dwnld_info["url"]
 
