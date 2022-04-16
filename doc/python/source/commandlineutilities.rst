@@ -29,3 +29,4 @@ Other
 -----
 * flip - Convert line endings (e.g., Windows to UNIX, UNIX to Mac Classic etc.).
 * rsgis-config - developer tool to find the installation paths and build options.
+* rsgisuserpassfile.py - create an rsgislib username/password file where the data are encoded.

@@ -102,6 +102,38 @@ def test_get_vec_feat_count():
     assert n_feats == 9
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_count_feats_per_att_val():
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(
+        VECTORUTILS_DATA_DIR, "sen2_20210527_aber_att_vals_dups.geojson"
+    )
+    vec_lyr = "sen2_20210527_aber_att_vals_dups"
+    out_dict = rsgislib.vectorutils.count_feats_per_att_val(vec_file, vec_lyr, "StrCol")
+    assert (
+        (out_dict["One"] == 2) and (out_dict["Two"] == 2) and (out_dict["Three"] == 2)
+    )
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_count_feats_per_att_val_df_dict():
+    import rsgislib.vectorutils
+
+    vec_file = os.path.join(
+        VECTORUTILS_DATA_DIR, "sen2_20210527_aber_att_vals_dups.geojson"
+    )
+    vec_lyr = "sen2_20210527_aber_att_vals_dups"
+    out_dict = rsgislib.vectorutils.count_feats_per_att_val(
+        vec_file, vec_lyr, "StrCol", True
+    )
+    assert (
+        (out_dict["count"][0] == 2)
+        and (out_dict["count"][1] == 2)
+        and (out_dict["count"][2] == 2)
+    )
+
+
 def test_merge_vectors_to_gpkg(tmp_path):
     import rsgislib.vectorutils
 

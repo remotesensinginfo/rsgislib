@@ -19,11 +19,11 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.createvectors.extract_image_footprint
 .. autofunction:: rsgislib.vectorutils.createvectors.create_poly_vec_for_lst_bboxs
 .. autofunction:: rsgislib.vectorutils.createvectors.define_grid
+.. autofunction:: rsgislib.vectorutils.createvectors.create_wgs84_vector_grid
 .. autofunction:: rsgislib.vectorutils.createvectors.create_poly_vec_bboxs
 .. autofunction:: rsgislib.vectorutils.createvectors.write_pts_to_vec
 .. autofunction:: rsgislib.vectorutils.createvectors.create_bboxs_for_pts
 .. autofunction:: rsgislib.vectorutils.create_lines_of_points
-.. autofunction:: rsgislib.vectorutils.split_vec_lyr
 .. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
 
 
@@ -83,6 +83,7 @@ Vector Select / Subset
 Vector Split
 ---------------
 
+.. autofunction:: rsgislib.vectorutils.split_vec_lyr
 .. autofunction:: rsgislib.vectorutils.split_by_attribute
 .. autofunction:: rsgislib.vectorutils.split_feats_to_mlyrs
 .. autofunction:: rsgislib.vectorutils.split_vec_lyr_random_subset
@@ -108,6 +109,7 @@ Vector Info
 .. autofunction:: rsgislib.vectorutils.get_proj_wkt_from_vec
 .. autofunction:: rsgislib.vectorutils.get_proj_epsg_from_vec
 .. autofunction:: rsgislib.vectorutils.get_vec_feat_count
+.. autofunction:: rsgislib.vectorutils.count_feats_per_att_val
 .. autofunction:: rsgislib.vectorutils.get_vec_lyrs_lst
 .. autofunction:: rsgislib.vectorutils.get_vec_layer_extent
 .. autofunction:: rsgislib.vectorutils.get_vec_lyr_cols

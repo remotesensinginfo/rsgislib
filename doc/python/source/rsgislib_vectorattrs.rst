@@ -34,6 +34,10 @@ Sort By Attributes
 -------------------
 .. autofunction:: rsgislib.vectorattrs.sort_vec_lyr
 
+Change Attribute Values
+------------------------
+.. autofunction:: rsgislib.vectorattrs.find_replace_str_vec_lyr
+
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -521,3 +521,45 @@ def test_get_days_since_date():
     day = 15
     n_days = rsgislib.tools.utils.get_days_since_date(year, month, day, base_date)
     assert n_days == 105
+
+
+def test_encode_base64_text():
+    import rsgislib.tools.utils
+
+    input_str = "Hello World"
+    encoded_str = rsgislib.tools.utils.encode_base64_text(input_str)
+    ref_encoded_str = "SGVsbG8gV29ybGQ="
+    assert encoded_str == ref_encoded_str
+
+
+def test_decode_base64_text():
+    import rsgislib.tools.utils
+
+    input_str = "SGVsbG8gV29ybGQ="
+    decoded_str = rsgislib.tools.utils.decode_base64_text(input_str)
+    ref_decoded_str = "Hello World"
+    assert decoded_str == ref_decoded_str
+
+
+def test_get_username_password():
+    import rsgislib.tools.utils
+
+    input_file = os.path.join(TOOLS_UTILS_DATA_DIR, "user_pass_file.txt")
+    rtn_user, rtn_pass = rsgislib.tools.utils.get_username_password(input_file)
+    assert (rtn_user == "Hello1") and (rtn_pass == "World!")
+
+
+def test_create_username_password_file(tmp_path):
+    import rsgislib.tools.utils
+
+    out_file = os.path.join(tmp_path, "userpass.txt")
+    username = "Hello"
+    password = "World"
+    rsgislib.tools.utils.create_username_password_file(username, password, out_file)
+
+    file_exists = os.path.exists(out_file)
+    if not file_exists:
+        assert False
+    else:
+        rtn_user, rtn_pass = rsgislib.tools.utils.get_username_password(out_file)
+        assert (rtn_user == username) and (rtn_pass == password)

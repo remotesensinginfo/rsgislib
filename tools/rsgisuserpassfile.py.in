@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgisuserpassfile.py
+#
+#  Copyright 2021 RSGISLib.
+#
+#  RSGISLib: 'The Remote Sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Create a text file for storing username and password
+#           encoded using base64 for system configuration.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 07/04/2022
+# Version: 1.0
+#
+#############################################
+
+import rsgislib.tools.utils
+import argparse
+import getpass
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="A utility which stores a username and password in a text file."
+    )
+    parser.add_argument("out_file", type=str, help="The output file to be created.")
+
+    args = parser.parse_args()
+    print(args.out_file)
+
+    user_val = str(input("Username: "))
+    pass_val = getpass.getpass()
+
+    rsgislib.tools.utils.create_username_password_file(
+        username=user_val, password=pass_val, out_file=args.out_file
+    )

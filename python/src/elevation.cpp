@@ -76,6 +76,45 @@ static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args, PyObject *k
     Py_RETURN_NONE;
 }
 
+static PyObject *Elevation_calcSlopePxlResImg(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_pxl_res_img"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("unit"),
+                             RSGIS_PY_C_TEXT("gdalformat"), nullptr};
+    const char *pszInDEMImage, *pszInPxlResImage, *pszOutputFile, *pszGDALFormat, *pszOutUnit;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssss:slope_pxl_res_img", kwlist, &pszInDEMImage, &pszInPxlResImage, &pszOutputFile, &pszOutUnit, &pszGDALFormat))
+    {
+        return nullptr;
+    }
+
+    try
+    {
+        rsgis::cmds::RSGISAngleMeasure outAngleUnit;
+        std::string angUnit = std::string(pszOutUnit);
+        if(angUnit == "degrees")
+        {
+            outAngleUnit = rsgis::cmds::rsgis_degrees;
+        }
+        else if(angUnit == "radians")
+        {
+            outAngleUnit = rsgis::cmds::rsgis_radians;
+        }
+        else
+        {
+            throw rsgis::cmds::RSGISCmdException("The unit option needs to be specified as either 'degrees' or 'radians'.");
+        }
+
+        rsgis::cmds::executeCalcSlopeImgPxlRes(std::string(pszInDEMImage), std::string(pszInPxlResImage), std::string(pszOutputFile), outAngleUnit, std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return nullptr;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
@@ -94,6 +133,27 @@ static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args, PyObject *
         return nullptr;
     }
     
+    Py_RETURN_NONE;
+}
+
+static PyObject *Elevation_calcAspectPxlResImg(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_pxl_res_img"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
+    const char *pszInDEMImage, *pszInPxlResImage, *pszOutputFile, *pszGDALFormat;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:aspect_pxl_res_img", kwlist, &pszInDEMImage, &pszInPxlResImage, &pszOutputFile, &pszGDALFormat))
+        return nullptr;
+
+    try
+    {
+        rsgis::cmds::executeCalcAspectImgPxlRes(std::string(pszInDEMImage), std::string(pszInPxlResImage), std::string(pszOutputFile), std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return nullptr;
+    }
+
     Py_RETURN_NONE;
 }
 
@@ -138,6 +198,29 @@ static PyObject *Elevation_calcHillshade(PyObject *self, PyObject *args, PyObjec
         return nullptr;
     }
     
+    Py_RETURN_NONE;
+}
+
+static PyObject *Elevation_calcHillshadePxlResImg(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_pxl_res_img"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("azimuth"),
+                             RSGIS_PY_C_TEXT("zenith"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
+    const char *pszInDEMImage, *pszInPxlResImage, *pszOutputFile, *pszGDALFormat;
+    float azimuth, zenith = 0.0;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssffs:hillshade_pxl_res_img", kwlist, &pszInDEMImage, &pszInPxlResImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
+        return nullptr;
+
+    try
+    {
+        rsgis::cmds::executeCalcHillshadeImgPxlRes(std::string(pszInDEMImage), std::string(pszInPxlResImage), std::string(pszOutputFile), azimuth, zenith, std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return nullptr;
+    }
+
     Py_RETURN_NONE;
 }
 
@@ -291,11 +374,40 @@ static PyMethodDef ElevationMethods[] = {
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"
 ":param unit: is a string specifying the output unit ('degrees' or 'radians').\n"},
 
+{"slope_pxl_res_img", (PyCFunction)Elevation_calcSlopePxlResImg, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.elevation.slope_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, unit, gdalformat)\n"
+"Calculates a slope layer given an input elevation model and external pixel \n"
+"resolution image, which allows the slope to be calculated for images in \n"
+"projections (e.g., EPSG:4326) which do not use the same units as the \n"
+"elevation values (e.g., metres).\n"
+"\n"
+":param in_dem_img: is a string containing the name and path of the input DEM file.\n"
+":param in_pxl_res_img: is a string containing the name and path of the input image.\n"
+"                       specifying the image pixel resolutions. Band 1: East-West \n"
+"                       resolution and Band 2 is the North-South resolution.\n"
+":param output_img: is a string containing the name and path of the output file.\n"
+":param unit: is a string specifying the output unit ('degrees' or 'radians').\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
+
 {"aspect", (PyCFunction)Elevation_calcAspect, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.aspect(input_img, output_img, gdalformat)\n"
 "Calculates a aspect layer given an input elevation model\n"
 "\n"
 ":param input_img: is a string containing the name and path of the input DEM file.\n"
+":param output_img: is a string containing the name and path of the output file.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
+
+{"aspect_pxl_res_img", (PyCFunction)Elevation_calcAspectPxlResImg, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.elevation.aspect_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, gdalformat)\n"
+"Calculates a aspect layer given an input elevation model and external pixel \n"
+"resolution image, which allows the slope to be calculated for images in \n"
+"projections (e.g., EPSG:4326) which do not use the same units as the \n"
+"elevation values (e.g., metres).\n"
+"\n"
+":param in_dem_img: is a string containing the name and path of the input DEM file.\n"
+":param in_pxl_res_img: is a string containing the name and path of the input image.\n"
+"                       specifying the image pixel resolutions. Band 1: East-West \n"
+"                       resolution and Band 2 is the North-South resolution.\n"
 ":param output_img: is a string containing the name and path of the output file.\n"
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
@@ -313,6 +425,22 @@ static PyMethodDef ElevationMethods[] = {
 "Calculates a hillshade layer given an input elevation model\n"
 "\n"
 ":param input_img: is a string containing the name and path of the input DEM file.\n"
+":param output_img: is a string containing the name and path of the output file.\n"
+":param azimuth: is a float with the solar azimuth in degrees (Good value is 315).\n"
+":param zenith: is a float with the solar zenith in degrees (Good value is 45).\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
+
+{"hillshade_pxl_res_img", (PyCFunction)Elevation_calcHillshadePxlResImg, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.elevation.hillshade_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, azimuth, zenith, gdalformat)\n"
+"Calculates a hillshade layer given an input elevation model and external pixel \n"
+"resolution image, which allows the slope to be calculated for images in \n"
+"projections (e.g., EPSG:4326) which do not use the same units as the \n"
+"elevation values (e.g., metres).\n"
+"\n"
+":param in_dem_img: is a string containing the name and path of the input DEM file.\n"
+":param in_pxl_res_img: is a string containing the name and path of the input image.\n"
+"                       specifying the image pixel resolutions. Band 1: East-West \n"
+"                       resolution and Band 2 is the North-South resolution.\n"
 ":param output_img: is a string containing the name and path of the output file.\n"
 ":param azimuth: is a float with the solar azimuth in degrees (Good value is 315).\n"
 ":param zenith: is a float with the solar zenith in degrees (Good value is 45).\n"

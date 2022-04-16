@@ -19,6 +19,8 @@ try:
 except ImportError:
     MATPLOTLIB_NOT_AVAIL = True
 
+from osgeo import gdal
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SPECUNMIX_DATA_DIR = os.path.join(DATA_DIR, "imagecalc", "specunmixing")
 
@@ -617,6 +619,7 @@ def test_calc_unmixing_rmse_residual_err(tmp_path):
     assert img_eq
 
 
+@pytest.mark.skipif(gdal.__version__ == "3.4.2", reason="Fails due to GDAL 3.4.2 bug.")
 def test_summarise_multi_endmember_linear_unmixing(tmp_path):
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc

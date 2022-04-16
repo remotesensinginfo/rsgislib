@@ -123,8 +123,8 @@ Subsetting
 .. autofunction:: rsgislib.imageutils.subset_to_vec
 
 
-Extract
---------
+Extract / Sample
+-----------------
 .. autofunction:: rsgislib.imageutils.perform_random_pxl_sample_in_mask
 .. autofunction:: rsgislib.imageutils.perform_random_pxl_sample_in_mask_low_pxl_count
 .. autofunction:: rsgislib.imageutils.extract_img_pxl_sample
@@ -204,6 +204,7 @@ Check Images
 Pixel Size / Area
 -------------------
 .. autofunction:: rsgislib.imageutils.calc_wgs84_pixel_area
+.. autofunction:: rsgislib.imageutils.calc_wsg84_pixel_size
 .. autofunction:: rsgislib.imageutils.calc_pixel_locations
 
 

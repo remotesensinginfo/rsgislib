@@ -428,6 +428,9 @@ def add_geom_bbox_cols(
 
     """
     import geopandas
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
 
     # Read input vector file.
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
@@ -848,6 +851,9 @@ def sort_vec_lyr(
 
     """
     import geopandas
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
 
     if type(sort_by) is list:
         if type(ascending) is not list:
@@ -870,3 +876,50 @@ def sort_vec_lyr(
         sorted_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         sorted_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def find_replace_str_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    cols: List[str],
+    find_replace: Dict[str, str],
+    out_format: str = "GPKG",
+):
+    """
+    A function which performs a find and replace on a string column(s) within the
+    vector layer. For example, replacing a no data value (e.g., NA) with something
+    more useful. This function is implemented using geopandas.
+
+    :param vec_file: the input vector file.
+    :param vec_lyr: the input vector layer name.
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the output vector layer name.
+    :param cols: a list of strings with the names of the columns to which
+                 the find and replace is to be applied.
+    :param find_replace: the value pairs where the dict keys are the values
+                         to be replaced and the value is the replacement
+                         value.
+    :param out_format: The output vector file format (Default: GPKG)
+
+    """
+    import geopandas
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
+
+    # Read input vector file.
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    # Perform find and replace
+    for col in cols:
+        for find_val in find_replace:
+            base_gpdf[col] = base_gpdf[col].str.replace(
+                find_val, find_replace[find_val]
+            )
+
+    if out_format == "GPKG":
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(out_vec_file, driver=out_format)

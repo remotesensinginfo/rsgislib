@@ -92,12 +92,9 @@ def cls_quantity_accuracy(
     )  # same as Comparison Total (see Ref.)
 
     # normalise the confusion matrix by proportional area:
-    norm_cm = (
-        cm.astype(float)
-        / cm.sum(axis=1)[
-            :,
-        ].reshape(-1, 1)
-    )
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[
+        :,
+    ].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -206,12 +203,9 @@ def calc_class_accuracy_metrics(
         -1, 1
     )  # same as Comparison Total (see Ref.)
     # normalise the confusion matrix by proportional area:
-    norm_cm = (
-        cm.astype(float)
-        / cm.sum(axis=1)[
-            :,
-        ].reshape(-1, 1)
-    )
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[
+        :,
+    ].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -837,7 +831,10 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     :param out_json_file: if specified the generated metrics and confusion matrix
                           are written to a JSON file (Default=None).
     :param sample_frac: The fraction of the whole dataset selected for each
-                        bootstrap iteration.
+                        bootstrap iteration. If sample_n_smps is not None.
+    :param sample_n_smps: Rather than a fraction of the dataset the number of
+                          samples can be specified. If None, then sample_frac
+                          will be used to calculate sample_n_smps.
     :param bootstrap_n: The number of bootstrap iterations.
     :return: dict with mean/median and bootstrap intervals.
 
@@ -1318,7 +1315,10 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
                           path and name. File format can be PNG or PDF. Use file
                           extension of the output file to specify.
     :param sample_frac: The fraction of the whole dataset selected for each
-                        bootstrap iteration.
+                        bootstrap iteration. If sample_n_smps is not None.
+    :param sample_n_smps: Rather than a fraction of the dataset the number of
+                          samples can be specified. If None, then sample_frac
+                          will be used to calculate sample_n_smps.
     :param bootstrap_n: The number of bootstrap iterations.
     :return: (bool, int, list, list). 1. Did the confidence interval fall below the
              the confidence threshold. 2. the index of the point it first fell below

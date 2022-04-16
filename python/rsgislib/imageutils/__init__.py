@@ -2695,7 +2695,7 @@ def calc_wgs84_pixel_area(
 
         progress_bar = cuiprogress.GDALProgressBar()
 
-    x_res, y_res = get_img_res(input_img)
+    x_res, y_res = get_img_res(input_img, abs_vals=True)
 
     infiles = applier.FilenameAssociations()
     infiles.input_img = input_img
@@ -4149,10 +4149,12 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
     pixel projected in WGS84.
 
     :param input_img: input image, for which the per-pixel area will be calculated.
-    :param output_img: output image file.
+    :param output_img: output image file where band 1 is X and band 2 is the Y
+                       pixel resolution.
+    :param gdalformat: the output image file format (default: KEA).
 
     """
-    import rsgislib.tools
+    import rsgislib.tools.projection
     from rios import applier
 
     try:
@@ -4186,7 +4188,7 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
         x_res_arr[...] = otherargs.x_res
         y_res_arr = numpy.zeros_like(yBlock, dtype=float)
         y_res_arr[...] = otherargs.y_res
-        x_res_arr_m, y_res_arr_m = rsgislib.tools.degrees_to_metres(
+        x_res_arr_m, y_res_arr_m = rsgislib.tools.projection.degrees_to_metres(
             yBlock, x_res_arr, y_res_arr
         )
         outputs.outimage = numpy.stack((x_res_arr_m, y_res_arr_m), axis=0)

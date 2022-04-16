@@ -34,7 +34,7 @@ namespace rsgis{ namespace cmds {
         {
             GDALAllRegister();
             std::cout << "Open " << demImage << std::endl;
-            GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            auto *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + demImage;
@@ -63,14 +63,65 @@ namespace rsgis{ namespace cmds {
             
             delete[] transformation;
             
-            rsgis::calib::RSGISCalcSlope *calcSlope = new rsgis::calib::RSGISCalcSlope(1, 0, imageEWRes, imageNSRes, outAngleUnit, demNoDataVal);
-            
-            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcSlope, "", true);
+            auto calcSlope = rsgis::calib::RSGISCalcSlope(0, imageEWRes, imageNSRes, outAngleUnit, demNoDataVal);
+            auto calcImage = rsgis::img::RSGISCalcImage(&calcSlope, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Float32);
-            
-            
+
             GDALClose(dataset);
-            delete calcSlope;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+
+    void executeCalcSlopeImgPxlRes(std::string demImage, std::string demPxlResImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)
+    {
+        try
+        {
+            GDALAllRegister();
+            auto **datasets = new GDALDataset*[2];
+
+            std::cout << "Open " << demImage << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            std::cout << "Open " << demPxlResImage << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(demPxlResImage.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demPxlResImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = datasets[0]->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                delete[] datasets;
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+
+            unsigned int n_dem_bands = datasets[0]->GetRasterCount();
+            unsigned int ew_pxl_res_band = n_dem_bands;
+            unsigned int ns_pxl_res_band = n_dem_bands+1;
+
+            auto calcSlope = rsgis::calib::RSGISCalcSlopePerPxlRes(0, outAngleUnit, demNoDataVal, ew_pxl_res_band, ns_pxl_res_band);
+
+            auto calcImage = rsgis::img::RSGISCalcImage(&calcSlope, "", true);
+            calcImage.calcImageWindowData(datasets, 2, outputImage, 3, outImageFormat, GDT_Float32);
+
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
         }
         catch(rsgis::RSGISException &e)
         {
@@ -86,7 +137,7 @@ namespace rsgis{ namespace cmds {
             GDALAllRegister();
             
             std::cout << "Open " << demImage << std::endl;
-            GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            auto *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + demImage;
@@ -101,8 +152,8 @@ namespace rsgis{ namespace cmds {
                 GDALClose(dataset);
                 throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
             }
-            
-            double *transformation = new double[6];
+
+            auto *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
             float imageEWRes = transformation[1];
@@ -114,15 +165,66 @@ namespace rsgis{ namespace cmds {
             }
             
             delete[] transformation;
-            
-            rsgis::calib::RSGISCalcAspect *calcAspect = new rsgis::calib::RSGISCalcAspect(1, 0, imageEWRes, imageNSRes, demNoDataVal);
-            
-            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcAspect, "", true);
+
+            auto calcAspect = rsgis::calib::RSGISCalcAspect(0, imageEWRes, imageNSRes, demNoDataVal);
+
+            auto calcImage = rsgis::img::RSGISCalcImage(&calcAspect, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Float32);
-            
-            
+
             GDALClose(dataset);
-            delete calcAspect;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+    void executeCalcAspectImgPxlRes(std::string demImage, std::string demPxlResImage, std::string outputImage, std::string outImageFormat)
+    {
+        try
+        {
+            GDALAllRegister();
+            auto **datasets = new GDALDataset*[2];
+
+            std::cout << "Open " << demImage << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            std::cout << "Open " << demPxlResImage << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(demPxlResImage.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demPxlResImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = datasets[0]->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                delete[] datasets;
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+
+            unsigned int n_dem_bands = datasets[0]->GetRasterCount();
+            unsigned int ew_pxl_res_band = n_dem_bands;
+            unsigned int ns_pxl_res_band = n_dem_bands+1;
+
+            auto calcAspect = rsgis::calib::RSGISCalcAspectPerPxlRes(0, demNoDataVal, ew_pxl_res_band, ns_pxl_res_band);
+            auto calcImage = rsgis::img::RSGISCalcImage(&calcAspect, "", true);
+            calcImage.calcImageWindowData(datasets, 2, outputImage, 3, outImageFormat, GDT_Float32);
+
+
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
         }
         catch(rsgis::RSGISException &e)
         {
@@ -137,19 +239,18 @@ namespace rsgis{ namespace cmds {
             GDALAllRegister();
             
             std::cout << "Open Aspect Image: " << aspectImage << std::endl;
-            GDALDataset *dataset = (GDALDataset *) GDALOpen(aspectImage.c_str(), GA_ReadOnly);
+            auto *dataset = (GDALDataset *) GDALOpen(aspectImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + aspectImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-            
-            rsgis::calib::RSGISRecodeAspect *catAspect = new rsgis::calib::RSGISRecodeAspect();
-            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(catAspect, "", true);
+
+            auto catAspect = rsgis::calib::RSGISRecodeAspect();
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&catAspect, "", true);
             calcImage.calcImage(&dataset, 1, outputImage, false, NULL, outImageFormat, GDT_Byte);
             
             GDALClose(dataset);
-            delete catAspect;
         }
         catch(rsgis::RSGISException &e)
         {
@@ -177,7 +278,7 @@ namespace rsgis{ namespace cmds {
             solarZenith = 90 - solarZenith;
             
             std::cout << "Open " << demImage << std::endl;
-            GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            auto *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + demImage;
@@ -192,8 +293,8 @@ namespace rsgis{ namespace cmds {
                 GDALClose(dataset);
                 throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
             }
-            
-            double *transformation = new double[6];
+
+            auto *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
             float imageEWRes = transformation[1];
@@ -205,15 +306,77 @@ namespace rsgis{ namespace cmds {
             }
             
             delete[] transformation;
-            
-            rsgis::calib::RSGISCalcHillShade *calcHillshade = new rsgis::calib::RSGISCalcHillShade(1, 0, imageEWRes, imageNSRes, solarZenith, solarAzimuth, demNoDataVal);
-            
-            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcHillshade, "", true);
+
+            auto calcHillshade = rsgis::calib::RSGISCalcHillShade(0, imageEWRes, imageNSRes, solarZenith, solarAzimuth, demNoDataVal);
+            auto calcImage = rsgis::img::RSGISCalcImage(&calcHillshade, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Byte);
-            
-            
+
             GDALClose(dataset);
-            delete calcHillshade;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+    void executeCalcHillshadeImgPxlRes(std::string demImage, std::string demPxlResImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)
+    {
+        try
+        {
+            GDALAllRegister();
+
+            if((solarZenith < 0) | (solarZenith > 90))
+            {
+                throw rsgis::RSGISException("The solar zenith should be between 0 and 90 degrees.");
+            }
+
+            if((solarAzimuth < 0) | (solarAzimuth > 360))
+            {
+                throw rsgis::RSGISException("The solar azimuth should be between 0 and 360 degrees.");
+            }
+
+            solarZenith = 90 - solarZenith;
+
+            auto **datasets = new GDALDataset*[2];
+
+            std::cout << "Open " << demImage << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            std::cout << "Open " << demPxlResImage << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(demPxlResImage.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demPxlResImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = datasets[0]->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                delete[] datasets;
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+
+            unsigned int n_dem_bands = datasets[0]->GetRasterCount();
+            unsigned int ew_pxl_res_band = n_dem_bands;
+            unsigned int ns_pxl_res_band = n_dem_bands+1;
+
+            auto calcHillshade = rsgis::calib::RSGISCalcHillShadePerPxlRes(0, solarZenith, solarAzimuth, demNoDataVal, ew_pxl_res_band, ns_pxl_res_band);
+            auto calcImage = rsgis::img::RSGISCalcImage(&calcHillshade, "", true);
+            calcImage.calcImageWindowData(datasets, 2, outputImage, 3, outImageFormat, GDT_Byte);
+
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
         }
         catch(rsgis::RSGISException &e)
         {
@@ -239,7 +402,7 @@ namespace rsgis{ namespace cmds {
             }
             
             std::cout << "Open " << demImage << std::endl;
-            GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            auto *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + demImage;
@@ -254,8 +417,8 @@ namespace rsgis{ namespace cmds {
                 GDALClose(dataset);
                 throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
             }
-            
-            double *transformation = new double[6];
+
+            auto *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
             float imageEWRes = transformation[1];
@@ -267,15 +430,14 @@ namespace rsgis{ namespace cmds {
             }
             
             delete[] transformation;
-            
-            rsgis::calib::RSGISCalcShadowBinaryMask *calcShadowMask = new rsgis::calib::RSGISCalcShadowBinaryMask(1, dataset, 0, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxHeight, demNoDataVal);
-            
-            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcShadowMask, "", true);
+
+            auto calcShadowMask = rsgis::calib::RSGISCalcShadowBinaryMask(dataset, 0, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxHeight, demNoDataVal);
+
+            auto calcImage = rsgis::img::RSGISCalcImage(&calcShadowMask, "", true);
             
             calcImage.calcImageWindowDataExtent(&dataset, 1, outputImage, 3, outImageFormat, GDT_Byte);
             
             GDALClose(dataset);
-            delete calcShadowMask;
         }
         catch(rsgis::RSGISException &e)
         {
@@ -291,7 +453,7 @@ namespace rsgis{ namespace cmds {
             GDALAllRegister();
             
             std::cout << "Open " << demImage << std::endl;
-            GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            auto *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + demImage;
@@ -306,8 +468,8 @@ namespace rsgis{ namespace cmds {
                 GDALClose(dataset);
                 throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
             }
-            
-            double *transformation = new double[6];
+
+            auto *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
             float imageEWRes = transformation[1];
@@ -319,15 +481,12 @@ namespace rsgis{ namespace cmds {
             }
             
             delete[] transformation;
-            
-            rsgis::calib::RSGISCalcRayIncidentAngle *calcIncidAngle = new rsgis::calib::RSGISCalcRayIncidentAngle(1, 0, imageEWRes, imageNSRes, solarZenith, solarAzimuth, demNoDataVal);
-            
-            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcIncidAngle, "", true);
+
+            auto calcIncidAngle = rsgis::calib::RSGISCalcRayIncidentAngle(0, imageEWRes, imageNSRes, solarZenith, solarAzimuth, demNoDataVal);
+            auto calcImage = rsgis::img::RSGISCalcImage(&calcIncidAngle, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Float32);
-            
-            
+
             GDALClose(dataset);
-            delete calcIncidAngle;
         }
         catch(rsgis::RSGISException &e)
         {
@@ -343,7 +502,7 @@ namespace rsgis{ namespace cmds {
             GDALAllRegister();
             
             std::cout << "Open " << demImage << std::endl;
-            GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            auto *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + demImage;
@@ -358,8 +517,8 @@ namespace rsgis{ namespace cmds {
                 GDALClose(dataset);
                 throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
             }
-            
-            double *transformation = new double[6];
+
+            auto *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
             float imageEWRes = transformation[1];
@@ -371,15 +530,13 @@ namespace rsgis{ namespace cmds {
             }
             
             delete[] transformation;
-            
-            rsgis::calib::RSGISCalcRayExitanceAngle *calcExitAngle = new rsgis::calib::RSGISCalcRayExitanceAngle(1, 0, imageEWRes, imageNSRes, viewZenith, viewAzimuth, demNoDataVal);
-            
-            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcExitAngle, "", true);
+
+            auto calcExitAngle = rsgis::calib::RSGISCalcRayExitanceAngle(0, imageEWRes, imageNSRes, viewZenith, viewAzimuth, demNoDataVal);
+
+            auto calcImage = rsgis::img::RSGISCalcImage(&calcExitAngle, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Float32);
-            
-            
+
             GDALClose(dataset);
-            delete calcExitAngle;
         }
         catch(rsgis::RSGISException &e)
         {
@@ -392,7 +549,7 @@ namespace rsgis{ namespace cmds {
         try
         {
             GDALAllRegister();
-            GDALDataset **datasets = new GDALDataset*[2];
+            auto **datasets = new GDALDataset*[2];
             
             std::cout << "Open " << demImage << std::endl;
             datasets[0] = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
@@ -421,13 +578,10 @@ namespace rsgis{ namespace cmds {
             }
             
             int winSize = (winHSize * 2) + 1;
-            
-            rsgis::calib::RSGISFilterDTMWithAspectMedianFilter *dtmFilter = new rsgis::calib::RSGISFilterDTMWithAspectMedianFilter(aspectRange, demNoDataVal);
-            
-            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(dtmFilter, "", true);
+
+            auto dtmFilter = rsgis::calib::RSGISFilterDTMWithAspectMedianFilter(aspectRange, demNoDataVal);
+            auto calcImage = rsgis::img::RSGISCalcImage(&dtmFilter, "", true);
             calcImage.calcImageWindowData(datasets, 2, outputImage, winSize, outImageFormat, GDT_Float32);
-            
-            delete dtmFilter;
 
             GDALClose(datasets[0]);
             GDALClose(datasets[1]);
@@ -446,14 +600,14 @@ namespace rsgis{ namespace cmds {
             GDALAllRegister();
             
             std::cout << "Open " << inImage << std::endl;
-            GDALDataset *inImgDS = (GDALDataset *) GDALOpen(inImage.c_str(), GA_ReadOnly);
+            auto *inImgDS = (GDALDataset *) GDALOpen(inImage.c_str(), GA_ReadOnly);
             if(inImgDS == NULL)
             {
                 std::string message = std::string("Could not open image ") + inImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
             std::cout << "Open " << validDataImg << std::endl;
-            GDALDataset *inValidImgDS = (GDALDataset *) GDALOpen(validDataImg.c_str(), GA_ReadOnly);
+            auto *inValidImgDS = (GDALDataset *) GDALOpen(validDataImg.c_str(), GA_ReadOnly);
             if(inValidImgDS == NULL)
             {
                 std::string message = std::string("Could not open image ") + validDataImg;
@@ -493,7 +647,7 @@ namespace rsgis{ namespace cmds {
             GDALAllRegister();
             
             std::cout << "Open " << demImage << std::endl;
-            GDALDataset *inImgDS = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            auto *inImgDS = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(inImgDS == NULL)
             {
                 std::string message = std::string("Could not open image ") + demImage;
@@ -508,12 +662,11 @@ namespace rsgis{ namespace cmds {
                 GDALClose(inImgDS);
                 throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
             }
-            
-            rsgis::calib::RSGISDetreadDEMUsingPlaneFit *detreadDEM = new rsgis::calib::RSGISDetreadDEMUsingPlaneFit(demNoDataVal, winSize);
-            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(detreadDEM, "", true);
+
+            auto detreadDEM = rsgis::calib::RSGISDetreadDEMUsingPlaneFit(demNoDataVal, winSize);
+            auto calcImage = rsgis::img::RSGISCalcImage(&detreadDEM, "", true);
             calcImage.calcImageWindowData(&inImgDS, 1, outputImage, winSize, outImageFormat, GDT_Float32);
-            delete detreadDEM;
-            
+
             GDALClose(inImgDS);
         }
         catch(rsgis::RSGISException &e)

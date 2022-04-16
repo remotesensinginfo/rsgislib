@@ -7,6 +7,7 @@ import datetime
 import os
 import string
 import json
+from typing import List
 
 import numpy
 import rsgislib
@@ -92,7 +93,7 @@ def zero_pad_num_str(
     return num_str
 
 
-def powerset_iter(in_set: list):
+def powerset_iter(in_set: List):
     """
     A function which returns an iterator (generator) for all the subsets
     of the inputted set (i.e., the powerset)
@@ -109,7 +110,7 @@ def powerset_iter(in_set: list):
             yield item
 
 
-def powerset_lst(in_set: list, min_items: int = 0):
+def powerset_lst(in_set: List, min_items: int = 0):
     """
     A function which returns a list for all the subsets
     of the inputted set (i.e., the powerset)
@@ -199,7 +200,7 @@ def read_text_file_to_list(input_file: str):
     return outList
 
 
-def write_list_to_file(data_lst: list, out_file: str):
+def write_list_to_file(data_lst: List, out_file: str):
     """
     Write a list a text file, one line per item.
 
@@ -560,7 +561,7 @@ def get_days_since_date(year: int, month: int, day, base_date: datetime.date):
     return (date_val - base_date).days
 
 
-def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: list):
+def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: List):
     """
     A function which tests whether a path exists within JSON file.
 
@@ -583,7 +584,7 @@ def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: list):
 
 
 def dict_struct_get_str_value(
-    dict_struct_obj: dict, tree_sequence: list, valid_values: list = None
+    dict_struct_obj: dict, tree_sequence: List, valid_values: List = None
 ):
     """
     A function which retrieves a single string value from a JSON structure.
@@ -614,7 +615,7 @@ def dict_struct_get_str_value(
     return curr_dict_struct_obj
 
 
-def dict_struct_get_boolean_value(dict_struct_obj: dict, tree_sequence: list):
+def dict_struct_get_boolean_value(dict_struct_obj: dict, tree_sequence: List):
     """
     A function which retrieves a single boolean value from a JSON structure.
 
@@ -641,7 +642,7 @@ def dict_struct_get_boolean_value(dict_struct_obj: dict, tree_sequence: list):
 
 
 def dict_struct_get_date_value(
-    dict_struct_obj: dict, tree_sequence: list, date_format: str = "%Y-%m-%d"
+    dict_struct_obj: dict, tree_sequence: List, date_format: str = "%Y-%m-%d"
 ):
     """
     A function which retrieves a single date value from a JSON structure.
@@ -693,7 +694,7 @@ def dict_struct_get_date_value(
 
 def dict_struct_get_datetime_value(
     dict_struct_obj: dict,
-    tree_sequence: list,
+    tree_sequence: List,
     date_time_format: str = "%Y-%m-%dT%H:%M:%S.%f",
 ):
     """
@@ -745,7 +746,7 @@ def dict_struct_get_datetime_value(
 
 
 def dict_struct_get_str_list_value(
-    dict_struct_obj: dict, tree_sequence: list, valid_values: list = None
+    dict_struct_obj: dict, tree_sequence: List, valid_values: List = None
 ):
     """
     A function which retrieves a list of string values from a JSON structure.
@@ -784,7 +785,7 @@ def dict_struct_get_str_list_value(
 
 def dict_struct_get_numeric_value(
     dict_struct_obj: dict,
-    tree_sequence: list,
+    tree_sequence: List,
     valid_lower: float = None,
     valid_upper: float = None,
 ):
@@ -840,7 +841,7 @@ def dict_struct_get_numeric_value(
     return out_value
 
 
-def dict_struct_get_list_value(dict_struct_obj: dict, tree_sequence: list):
+def dict_struct_get_list_value(dict_struct_obj: dict, tree_sequence: List):
     """
     A function which retrieves a list of values from a JSON structure.
 
@@ -861,3 +862,71 @@ def dict_struct_get_list_value(dict_struct_obj: dict, tree_sequence: list):
     if type(curr_dict_struct_obj).__name__ != "list":
         raise rsgislib.RSGISPyException("Retrieved value is not a list.")
     return curr_dict_struct_obj
+
+
+def encode_base64_text(input_txt: str) -> str:
+    """
+    A function which encoded the input text using base64 into bytes.
+    Useful for storing passwords in configure files, which while not
+    secure means they cannot just be read as plain text.
+
+    :param plain_txt: The input string to be encoded
+    :return: Output encoded string.
+
+    """
+    import base64
+
+    encoded_txt = base64.b64encode(input_txt.encode()).decode()
+    return encoded_txt
+
+
+def decode_base64_text(in_encoded_txt: str) -> str:
+    """
+    A function which decoded text encoded using the encode_base64_text function.
+
+    :param in_encoded_txt: Input encoded byte string (i.e., encoded using
+                           the encode_base64_text function).
+    :return: Output plain text string
+
+    """
+    import base64
+
+    output_txt = base64.b64decode(in_encoded_txt.encode()).decode()
+    return output_txt
+
+
+def create_username_password_file(username: str, password: str, out_file: str):
+    """
+    A function which will create a username/password file where the
+    username and password are encoded using base64 so the information
+    is not stored in plain text - note this is note 'secure' just means
+    that someone cannot just read the plain text username and password.
+
+    :param username: string with the username
+    :param password: string with the password
+    :param out_file: output file path.
+
+    """
+    out_data = []
+    out_data.append(encode_base64_text(username))
+    out_data.append(encode_base64_text(password))
+    write_list_to_file(out_data, out_file)
+
+
+def get_username_password(input_file: str) -> (str, str):
+    """
+    A function which retrieves a username and password from an input file
+    where the data has been encoded with base64.
+
+    :param input_file: input file path.
+    :return: plain text username and password
+
+    """
+    in_data_lst = read_text_file_to_list(input_file)
+    if len(in_data_lst) != 2:
+        raise rsgislib.RSGISPyException(
+            "There should just be two lines in username/password file."
+        )
+    username = decode_base64_text(in_data_lst[0])
+    password = decode_base64_text(in_data_lst[1])
+    return username, password

@@ -2302,12 +2302,13 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"
 "   import rsgislib\n"
 "   from rsgislib import imageutils\n"
-"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"   inputVector = './Vectors/injune_p142_plot_location_utm.shp'\n"
-"   outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'\n"
+"   input_img = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+"   vec_file = './Vectors/injune_p142_plot_location_utm.shp'\n"
+"   vec_lyr = 'injune_p142_plot_location_utm'\n"
+"   output_img = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.subset(inputImage, inputVector, outputImage, gdalformat, datatype)\n"
+"   imageutils.subset(input_img, vec_file, vec_lyr, output_img, gdalformat, datatype)\n"
 "\n"},
     
 {"subset_bbox", (PyCFunction)ImageUtils_SubsetBBox, METH_VARARGS | METH_KEYWORDS,

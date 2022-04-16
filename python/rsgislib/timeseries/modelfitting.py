@@ -131,7 +131,7 @@ class MakeSeasonTrendModel(object):
         self.coefficients = self.model.coef_
         self.residuals = self.band_data - self.predicted
         # Get overall RMSE of model
-        self.RMSE = numpy.sqrt(numpy.mean(self.residuals ** 2))
+        self.RMSE = numpy.sqrt(numpy.mean(self.residuals**2))
 
     def fit_lasso_model(self, cv, alpha):
         """
