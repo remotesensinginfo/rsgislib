@@ -2,9 +2,13 @@
 """
 The tools.projection module contains some useful tools for working with projections.
 """
+from typing import List
+import math
 
 import numpy
 from osgeo import osr
+
+import rsgislib
 
 
 def get_epsg_code_from_wkt(wkt_str: str) -> int:
@@ -16,10 +20,10 @@ def get_epsg_code_from_wkt(wkt_str: str) -> int:
     """
     epsg_code = None
     try:
-        spatRef = osr.SpatialReference()
-        spatRef.ImportFromWkt(wkt_str)
-        spatRef.AutoIdentifyEPSG()
-        epsg_code = spatRef.GetAuthorityCode(None)
+        spat_ref = osr.SpatialReference()
+        spat_ref.ImportFromWkt(wkt_str)
+        spat_ref.AutoIdentifyEPSG()
+        epsg_code = spat_ref.GetAuthorityCode(None)
         epsg_code = int(epsg_code)
     except Exception:
         epsg_code = None
@@ -37,9 +41,9 @@ def get_wkt_from_epsg_code(epsg_code: int) -> str:
     """
     wkt_str = None
     try:
-        spatRef = osr.SpatialReference()
-        spatRef.ImportFromEPSG(epsg_code)
-        wkt_str = spatRef.ExportToWkt()
+        spat_ref = osr.SpatialReference()
+        spat_ref.ImportFromEPSG(epsg_code)
+        wkt_str = spat_ref.ExportToWkt()
     except Exception:
         wkt_str = None
     return wkt_str
@@ -68,7 +72,8 @@ def degrees_to_metres(
     :param latitude: latitude
     :param lon_size: numpy array of x pixel sizes (degrees)
     :param lat_size: numpy array of y pixel sizes (degrees)
-    :return: x_size (numpy array of x pixel sizes (m)), y_size (numpy array of y pixel sizes (m))
+    :return: x_size (numpy array of x pixel sizes (m)),
+             y_size (numpy array of y pixel sizes (m))
 
     .. code:: python
 
@@ -84,7 +89,7 @@ def degrees_to_metres(
     radlat = numpy.deg2rad(latitude)
 
     Rsq = (ellipse[0] * numpy.cos(radlat)) ** 2 + (ellipse[1] * numpy.sin(radlat)) ** 2
-    Mlat = (ellipse[0] * ellipse[1]) ** 2 / (Rsq**1.5)
+    Mlat = (ellipse[0] * ellipse[1]) ** 2 / (Rsq ** 1.5)
     Nlon = ellipse[0] ** 2 / numpy.sqrt(Rsq)
     x_size = numpy.pi / 180 * numpy.cos(radlat) * Nlon * lon_size
     y_size = numpy.pi / 180 * Mlat * lat_size
@@ -99,7 +104,8 @@ def metres_to_degrees(latitude: float, x_size: float, y_size: float) -> (float, 
     :param latitude: latitude
     :param x_size: numpy array of x pixel sizes (m)
     :param y_size: numpy array of y pixel sizes (m)
-    :return: lon_size (numpy array of x pixel sizes (degrees)), lat_size (numpy array of y pixel sizes (degrees))
+    :return: lon_size (numpy array of x pixel sizes (degrees)),
+             lat_size (numpy array of y pixel sizes (degrees))
 
     .. code:: python
 
@@ -115,7 +121,7 @@ def metres_to_degrees(latitude: float, x_size: float, y_size: float) -> (float, 
     radlat = numpy.deg2rad(latitude)
 
     Rsq = (ellipse[0] * numpy.cos(radlat)) ** 2 + (ellipse[1] * numpy.sin(radlat)) ** 2
-    Mlat = (ellipse[0] * ellipse[1]) ** 2 / (Rsq**1.5)
+    Mlat = (ellipse[0] * ellipse[1]) ** 2 / (Rsq ** 1.5)
     Nlon = ellipse[0] ** 2 / numpy.sqrt(Rsq)
     lon_size = x_size / (numpy.pi / 180 * numpy.cos(radlat) * Nlon)
     lat_size = y_size / (numpy.pi / 180 * Mlat)
@@ -125,11 +131,14 @@ def metres_to_degrees(latitude: float, x_size: float, y_size: float) -> (float, 
 
 def get_deg_coord_as_str(lat: float, lon: float, n_chars: int = 4) -> str:
     """
+    A function which produces a string representation of the coordinate
+    provided in degrees.
 
-    :param lat:
-    :param lon:
-    :param n_chars:
-    :return:
+    :param lat: the latitude in degrees
+    :param lon: the longitude in degrees
+    :param n_chars: the number of characters to be used for each number.
+    :return: string representation of the coordinates.
+
     """
     import rsgislib.tools.utils
 
@@ -161,3 +170,61 @@ def get_deg_coord_as_str(lat: float, lon: float, n_chars: int = 4) -> str:
 
     pos = "{}{}{}{}".format(north_south, lat_str, east_west, lon_str)
     return pos
+
+
+def great_circle_distance(
+    wgs84_p1: List[float], wgs84_p2: List[float], earth_radius=6378137.0
+) -> float:
+    """
+    A function which calculates the great circle distance between two points
+    provided in degrees and projected with WGS84.
+
+    :param wgs84_p1: A point provided as a list [lon (x), lat (y)]
+    :param wgs84_p2: A point provided as a list [lon (x), lat (y)]
+    :param earth_radius: the radius of the earth to use for the calculation.
+                         The unit of this distance will define the unit of the
+                         returned distance. The default is 6,378,137 metres
+                         and therefore the the returned distance will also be
+                         in metres. However, if 6378.137 km was passed then the
+                         returned value will be in km.
+    :return: the great circle distance between the two points.
+
+    """
+
+    if (wgs84_p1[1] < -90.0) or (wgs84_p1[1] > 90.0):
+        raise rsgislib.RSGISPyException(
+            "Point 1 latitude is not within valid range (-90 - 90)"
+        )
+
+    if (wgs84_p2[1] < -90.0) or (wgs84_p2[1] > 90.0):
+        raise rsgislib.RSGISPyException(
+            "Point 2 latitude is not within valid range (-90 - 90)"
+        )
+
+    if (wgs84_p1[0] < -180.0) or (wgs84_p1[0] > 180.0):
+        raise rsgislib.RSGISPyException(
+            "Point 1 longitude is not within valid range (-180 - 180)"
+        )
+
+    if (wgs84_p2[0] < -180.0) or (wgs84_p2[0] > 180.0):
+        raise rsgislib.RSGISPyException(
+            "Point 2 longitude is not within valid range (-180 - 180)"
+        )
+
+    wgs84_rads_p1 = (math.radians(wgs84_p1[0]), math.radians(wgs84_p1[1]))
+    wgs84_rads_p2 = (math.radians(wgs84_p2[0]), math.radians(wgs84_p2[1]))
+
+    if wgs84_rads_p1[0] > wgs84_rads_p2[0]:
+        lon_abs_diff = wgs84_rads_p1[0] - wgs84_rads_p2[0]
+    else:
+        lon_abs_diff = wgs84_rads_p2[0] - wgs84_rads_p1[0]
+
+    central_angle_radians = math.acos(
+        math.sin(wgs84_rads_p1[1]) * math.sin(wgs84_rads_p2[1])
+        + math.cos(wgs84_rads_p1[1])
+        * math.cos(wgs84_rads_p2[1])
+        * math.cos(lon_abs_diff)
+    )
+    gt_circle_dist = earth_radius * central_angle_radians
+
+    return gt_circle_dist
