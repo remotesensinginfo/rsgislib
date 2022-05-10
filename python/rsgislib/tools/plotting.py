@@ -1228,3 +1228,121 @@ def manual_stretch_np_arr(
         arr_data_out = arr_data_out.astype(int)
 
     return arr_data_out
+
+
+def create_legend_img(
+    legend_info,
+    out_img_file,
+    n_cols=1,
+    box_size=(10, 20),
+    title_str=None,
+    font_size=12,
+    font=None,
+    font_clr=(0, 0, 0, 255),
+    col_width=None,
+    img_height=None,
+    char_width=6,
+    bkgd_clr=(255, 255, 255, 255),
+    title_height=16,
+    margin=2,
+):
+    """
+    A function which can generate a legend image file using the PIL module.
+    Colours can be specified using any format PIL supports (i.e., hex or list 3 or 4
+    values). The output image has an alpha channel.
+
+    :param legend_info: dict using the class names as the key and value is the colour
+                        used for the class.
+    :param out_img_file: the output image file (Recommend output as PNG).
+    :param n_cols: the number of columns the classes are split between (Default: 1).
+    :param box_size: the size, in pixels, of the colour box for each class.
+                     Default: (10, 20)
+    :param title_str: An optional title for the legend. If None then no title,
+                      default: None
+    :param font_size: The size of the font to use for the legend (Default: 12)
+    :param font: Optionally, pass a ttf file for the font to be used. Default: None
+    :param font_clr: The font colour (Default: (0, 0, 0, 255) i.e., black)
+    :param col_width: Override the calculated column width in pixels. (Default: None)
+    :param img_height: Override the calculated image height in pixels. (Default: None)
+    :param char_width: Define the number of pixels representing each character used
+                       for calculating column widths. Try changing this before
+                       overriding the column width. (Default: 6)
+    :param bkgd_clr: the background colour for the legend
+                     (Default: (255, 255, 255, 255) i.e., white). Note, this uses
+                     an alpha channel so specifying (255, 255, 255, 0) will provide
+                     a transparent background
+    :param title_height: Extra height in pixels for the title (Default: 16)
+    :param margin: The margin in pixels around the image each and between features
+                   (Default: 2)
+
+    """
+    import math
+    from PIL import Image, ImageDraw, ImageFont
+
+    n_cls = len(legend_info)
+    if n_cols > n_cls:
+        n_cols = n_cls
+
+    n_cls_col = math.ceil(n_cls / n_cols)
+
+    cls_name_max_len = 0
+    for cls_name in legend_info:
+        if len(cls_name) > cls_name_max_len:
+            cls_name_max_len = len(cls_name)
+    print(f"Max. characters in class name: {cls_name_max_len}")
+
+    if col_width is None:
+        col_width = box_size[0] + margin + (cls_name_max_len * char_width)
+    print(f"Column width: {col_width}")
+
+    if img_height is None:
+        img_height = (n_cls_col * (box_size[1] + (margin * 2))) + 10
+
+    if title_str is not None:
+        img_height += title_height
+
+    img_width = (margin * 2) + (((margin * 2) + col_width) * n_cols)
+
+    print(f"Image: {img_width} x  {img_height}")
+
+    img_obj = Image.new("RGBA", (img_width, img_height), color=bkgd_clr)
+    draw_obj = ImageDraw.Draw(img_obj)
+
+    if font is not None:
+        fnt = ImageFont.truetype(font, font_size)
+    else:
+        fnt = None
+
+    if title_str is not None:
+        title_pos = [img_width / 2, margin]
+        draw_obj.text(title_pos, title_str, fill=font_clr, anchor="mt", font=fnt)
+
+    cls_names = list(legend_info.keys())
+    cls_i = 0
+    x_pos = 0
+    for col_i in range(n_cols):
+        if col_i == 0:
+            # Start from pixel margin
+            x_pos = margin
+        else:
+            # From previous pos add pixel margin for each column and column width
+            x_pos = x_pos + (margin * 2) + col_width
+        # Pixel margin
+        y_pos = margin
+        if title_str is not None:
+            y_pos += title_height
+        for row_i in range(n_cls_col):
+            cls_name = cls_names[cls_i]
+            rec_bbox = [x_pos, y_pos, x_pos + box_size[0], y_pos + box_size[1]]
+            draw_obj.rectangle(
+                rec_bbox, fill=legend_info[cls_name], outline=None, width=1
+            )
+            txt_pos = [x_pos + margin + box_size[0], y_pos + box_size[1] / 2]
+            draw_obj.text(txt_pos, cls_name, fill=font_clr, anchor="lm", font=fnt)
+
+            y_pos = y_pos + (margin * 2) + box_size[1]
+            cls_i += 1
+            if cls_i >= n_cls:
+                break
+
+    img_obj.save(out_img_file)

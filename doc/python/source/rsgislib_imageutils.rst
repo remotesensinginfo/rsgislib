@@ -67,11 +67,9 @@ Composite
 .. autofunction:: rsgislib.imageutils.create_ref_img_composite_img
 .. autofunction:: rsgislib.imageutils.combine_binary_masks
 .. autofunction:: rsgislib.imageutils.export_single_merged_img_band
+.. autofunction:: rsgislib.imageutils.imagecomp.check_build_ls8_ls9_vrts
 .. autofunction:: rsgislib.imageutils.imagecomp.create_max_ndvi_composite
-.. autofunction:: rsgislib.imageutils.imagecomp.create_max_ndvi_ndwi_composite_landsat
 .. autofunction:: rsgislib.imageutils.imagecomp.create_max_ndvi_ndwi_composite
-.. autofunction:: rsgislib.imageutils.imagecomp.create_max_scaled_ndvi_ndwi_composite
-.. autofunction:: rsgislib.imageutils.imagecomp.check_build_ls8_vrts
 .. autofunction:: rsgislib.imageutils.order_img_using_prop_valid_pxls
 .. autofunction:: rsgislib.imageutils.gen_timeseries_fill_composite_img
 .. autoclass:: rsgislib.imageutils.RSGISTimeseriesFillInfo
