@@ -23,6 +23,12 @@ try:
 except ImportError:
     have_matplotlib = False
 
+have_mpl_scatter_density = True
+try:
+    import mpl_scatter_density
+except ImportError:
+    have_mpl_scatter_density = False
+
 
 def plot_image_spectra(
     input_img,
@@ -520,7 +526,11 @@ def residual_density_plot(
         raise rsgislib.RSGISPyException(
             "The matplotlib module is required and could not be imported."
         )
-
+    if not have_mpl_scatter_density:
+        raise rsgislib.RSGISPyException(
+            "The mpl_scatter_density module is required and could not be imported."
+            )
+    
     if not isinstance(residuals, numpy.ndarray):
         residuals = numpy.array(residuals)
     if not isinstance(y_true, numpy.ndarray):
