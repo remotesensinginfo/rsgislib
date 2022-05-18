@@ -529,8 +529,8 @@ def residual_density_plot(
     if not have_mpl_scatter_density:
         raise rsgislib.RSGISPyException(
             "The mpl_scatter_density module is required and could not be imported."
-            )
-    
+        )
+
     if not isinstance(residuals, numpy.ndarray):
         residuals = numpy.array(residuals)
     if not isinstance(y_true, numpy.ndarray):
@@ -780,8 +780,9 @@ def get_gdal_thematic_raster_mpl_imshow(
     input_img: str,
     band: int = 1,
     bbox: List[float] = None,
-    out_patches=False,
-    cls_names_lut=None,
+    out_patches: bool = False,
+    cls_names_lut: Dict = None,
+    alpha_lyr: bool = False,
 ) -> Tuple[numpy.array, List[float], list]:
     """
     A function which retrieves thematic image data with a colour table as an
@@ -800,7 +801,11 @@ def get_gdal_thematic_raster_mpl_imshow(
                         create a legend.
     :param cls_names_lut: A dictionary LUT with labels for the classes. The dict
                           key is the pixel value for the class and
-    :return: numpy.array either [n,m,3], a bbox (xmin, xmax, ymin, ymax)
+    :param alpha_lyr: a boolean specifying whether an alpha channel should be
+                      created and therefore the returned array will have 4
+                      rather than 3 dims. If an alpha channel is created then
+                      then background will be transparent.
+    :return: numpy.array either [n,m,3 or 4], a bbox (xmin, xmax, ymin, ymax)
              specifying the extent of the image data and list of matplotlib patches,
              if out_patches=False then None is returned.
 
@@ -871,6 +876,8 @@ def get_gdal_thematic_raster_mpl_imshow(
     red_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
     grn_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
     blu_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
+    if alpha_lyr:
+        alp_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
 
     lgd_out_patches = None
     if out_patches:
@@ -881,6 +888,8 @@ def get_gdal_thematic_raster_mpl_imshow(
         red_arr[img_data_arr == i] = clr_tab_entry[0]
         grn_arr[img_data_arr == i] = clr_tab_entry[1]
         blu_arr[img_data_arr == i] = clr_tab_entry[2]
+        if alpha_lyr and (i > 0):
+            alp_arr[img_data_arr == i] = 255
 
         if out_patches and (i > 0):
             cls_name = f"{i}"
@@ -895,7 +904,10 @@ def get_gdal_thematic_raster_mpl_imshow(
                 Patch(facecolor=rgb_clr, edgecolor=rgb_clr, label=cls_name)
             )
 
-    img_clr_data_arr = numpy.stack([red_arr, grn_arr, blu_arr], axis=-1)
+    if alpha_lyr:
+        img_clr_data_arr = numpy.stack([red_arr, grn_arr, blu_arr, alp_arr], axis=-1)
+    else:
+        img_clr_data_arr = numpy.stack([red_arr, grn_arr, blu_arr], axis=-1)
 
     image_ds = None
     img_data_arr = None
