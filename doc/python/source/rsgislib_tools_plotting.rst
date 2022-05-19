@@ -4,6 +4,7 @@ RSGISLib Plotting Tools
 Statistical Plots
 -------------------
 .. autofunction:: rsgislib.tools.plotting.residual_plot
+.. autofunction:: rsgislib.tools.plotting.residual_density_plot
 .. autofunction:: rsgislib.tools.plotting.quantile_plot
 
 

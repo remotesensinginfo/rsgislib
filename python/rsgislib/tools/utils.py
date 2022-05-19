@@ -7,7 +7,7 @@ import datetime
 import os
 import string
 import json
-from typing import List
+from typing import List, Union
 
 import numpy
 import rsgislib
@@ -448,6 +448,45 @@ def hex_to_rgb(hex_str: str):
     g_hex = hex_str[2:4]
     b_hex = hex_str[4:6]
     return int(r_hex, 16), int(g_hex, 16), int(b_hex, 16)
+
+
+def rgb_to_hex(
+    r: Union[int, float],
+    g: Union[int, float],
+    b: Union[int, float],
+    normalised: bool = False,
+) -> str:
+    """
+    A function which converts red, green, blue values to a hexadecimal colour
+    representation.
+
+    For example: 180, 50, 190 is equal to: #b432be
+
+    :param r: number with range either 0-255 or 0-1 if normalised
+    :param g: number with range either 0-255 or 0-1 if normalised
+    :param b: number with range either 0-255 or 0-1 if normalised
+    :param normalised: a boolean specifying the inputs are in range 0-1
+    :return: string with hexadecimal colour representation
+    """
+    if normalised:
+        r = int(r * 255)
+        g = int(g * 255)
+        b = int(b * 255)
+
+    if (r < 0) or (r > 255):
+        raise rsgislib.RSGISPyException(
+            "Red value must be between 0-255 or 0-1 if normalised"
+        )
+    if (g < 0) or (g > 255):
+        raise rsgislib.RSGISPyException(
+            "Green value must be between 0-255 or 0-1 if normalised"
+        )
+    if (b < 0) or (b > 255):
+        raise rsgislib.RSGISPyException(
+            "Blue value must be between 0-255 or 0-1 if normalised"
+        )
+
+    return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
 
 def remove_repeated_chars(str_val: str, repeat_char: str):
