@@ -192,7 +192,7 @@ def create_raster_img_map(
 
 
 def create_thematic_raster_map(
-    input_img: str,
+    input_img: Union[str,List],
     bbox: List[float] = None,
     title_str: str = None,
     cx_src=None,
@@ -210,18 +210,31 @@ def create_thematic_raster_map(
     if cx_src is not None:
         import contextily
 
+    input_imgs = list()
+    if isinstance(input_img, str):
+        input_imgs.append(input_img)
+    else:
+        input_imgs = input_img
+
     if bbox is None:
-        bbox = rsgislib.imageutils.get_img_bbox(input_img)
+        bbox = rsgislib.imageutils.get_img_bbox(input_imgs[0])
 
-    img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
+    img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_imgs[0])
 
-    (
-        img_data_arr,
-        img_coords,
-        lgd_patches,
-    ) = rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(
-        input_img, band=1, bbox=bbox, alpha_lyr=alpha_backgd
-    )
+    img_data_arr_scns = list()
+    img_coords_scns = list()
+    lgd_patches_scns = list()
+    for input_img in input_imgs:
+        (
+            img_data_arr,
+            img_coords,
+            lgd_patches,
+        ) = rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(
+            input_img, band=1, bbox=bbox, alpha_lyr=alpha_backgd
+        )
+        img_data_arr_scns.append(img_data_arr)
+        img_coords_scns.append(img_coords)
+        lgd_patches_scns.append(lgd_patches)
 
     if fig_y_size is None:
         x_bbox_size = bbox[1] - bbox[0]
@@ -231,8 +244,8 @@ def create_thematic_raster_map(
 
     fig, ax = plt.subplots(1, 1, figsize=(fig_x_size, fig_y_size))
 
-    ax.set_xlim([img_coords[0], img_coords[1]])
-    ax.set_ylim([img_coords[2], img_coords[3]])
+    ax.set_xlim([img_coords_scns[0][0], img_coords_scns[0][1]])
+    ax.set_ylim([img_coords_scns[0][2], img_coords_scns[0][3]])
 
     if cx_src is not None:
         contextily.add_basemap(
@@ -243,8 +256,8 @@ def create_thematic_raster_map(
             attribution=cx_attribution,
             attribution_size=cx_att_size,
         )
-    ax.imshow(img_data_arr, extent=img_coords)
-
+    for img_data_arr, img_coords in zip(img_data_arr_scns, img_coords_scns):
+        ax.imshow(img_data_arr, extent=img_coords)
 
     if use_grid:
         ax.grid()
@@ -271,7 +284,7 @@ def create_thematic_raster_img_base_map(
     in_base_img: str,
     img_bands:List[int],
     img_stch:int,
-    in_them_img:str,
+    in_them_img:Union[str,List],
     bbox: List[float] = None,
     title_str: str = None,
     alpha_backgd: bool = True,
@@ -291,15 +304,26 @@ def create_thematic_raster_img_base_map(
     if bbox is None:
         bbox = rsgislib.imageutils.get_img_bbox(in_base_img)
 
-    img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(in_base_img)
+    in_them_imgs = list()
+    if isinstance(in_them_img, str):
+        in_them_imgs.append(in_them_img)
+    else:
+        in_them_imgs = in_them_img
 
-    (
-        img_data_arr,
-        img_them_coords,
-        lgd_patches,
-    ) = rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(
-        in_them_img, band=1, bbox=bbox, alpha_lyr=alpha_backgd
-    )
+    img_data_arr_scns = list()
+    img_coords_scns = list()
+    lgd_patches_scns = list()
+    for in_them_img in in_them_imgs:
+        (
+            img_data_arr,
+            img_coords,
+            lgd_patches,
+        ) = rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(
+            in_them_img, band=1, bbox=bbox, alpha_lyr=alpha_backgd
+        )
+        img_data_arr_scns.append(img_data_arr)
+        img_coords_scns.append(img_coords)
+        lgd_patches_scns.append(lgd_patches)
 
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         in_base_img, bands=img_bands, bbox=bbox
@@ -339,10 +363,14 @@ def create_thematic_raster_img_base_map(
 
     # base image data
     ax.imshow(img_data_strch, extent=img_coords)
-    # thematic data
-    ax.imshow(img_data_arr, extent=img_them_coords)
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
+
+    # thematic data
+    for img_data_arr, img_therm_coords in zip(img_data_arr_scns, img_coords_scns):
+        ax.imshow(img_data_arr, extent=img_therm_coords)
+
+
 
     if use_grid:
         ax.grid()
