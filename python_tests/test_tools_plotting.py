@@ -7,8 +7,15 @@ try:
 except ImportError:
     MATPLOTLIB_NOT_AVAIL = True
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
+PIL_NOT_AVAIL = False
+try:
+    import PIL
+except ImportError:
+    PIL_NOT_AVAIL = True
+
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+TOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools")
 
 def test_get_gdal_raster_mpl_imshow_basic():
     import rsgislib.tools.plotting
@@ -161,3 +168,57 @@ def test_get_gdal_thematic_raster_mpl_imshow_patches():
     rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(
         input_img, out_patches=True, cls_names_lut=cls_names_lut
     )
+
+
+@pytest.mark.skipif(PIL_NOT_AVAIL, reason="PIL dependency not available")
+def test_create_legend_img(tmp_path):
+    import rsgislib.tools.plotting
+
+    years = [
+        "1996",
+        "2007",
+        "2008",
+        "2009",
+        "2010",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020",
+    ]
+    lyr_clrs = [
+        "#FFCD00",
+        "#FF7700",
+        "#FF0000",
+        "#FF00E6",
+        "#C400FF",
+        "#5E00FF",
+        "#001AFF",
+        "#0080FF",
+        "#00CDFF",
+        "#00FF91",
+        "#00FF22",
+    ]
+
+    legend_info_dict = dict()
+    for year, clr in zip(years, lyr_clrs):
+        legend_info_dict[year] = clr
+
+    out_file = os.path.join(tmp_path, "gmw_loss_legend.png")
+    font_file = os.path.join(TOOLS_DATA_DIR, "Palatino Font.ttf")
+
+    rsgislib.tools.plotting.create_legend_img(
+        legend_info_dict,
+        out_img_file=out_file,
+        n_cols=4,
+        box_size=(60, 40),
+        font=font_file,
+        font_size=24,
+        char_width=12,
+        title_str="Loss",
+        title_height=32,
+        margin=5,
+    )
+
+    assert os.path.exists(out_file)

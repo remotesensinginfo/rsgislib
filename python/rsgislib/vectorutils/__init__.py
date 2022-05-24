@@ -2269,11 +2269,10 @@ def vector_translate(
     if os.path.exists(out_vec_file) and del_exist_vec:
         delete_vector_file(out_vec_file)
 
-    n_feats = get_vec_feat_count(vec_file, vec_lyr)
     try:
         import tqdm
 
-        pbar = tqdm.tqdm(total=n_feats)
+        pbar = tqdm.tqdm(total=100)
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress

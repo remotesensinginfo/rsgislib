@@ -4,6 +4,7 @@ RSGISLib Plotting Tools
 Statistical Plots
 -------------------
 .. autofunction:: rsgislib.tools.plotting.residual_plot
+.. autofunction:: rsgislib.tools.plotting.residual_density_plot
 .. autofunction:: rsgislib.tools.plotting.quantile_plot
 
 
@@ -24,6 +25,9 @@ Visualise Raster Data
 .. autofunction:: rsgislib.tools.plotting.manual_stretch_np_arr
 .. autofunction:: rsgislib.tools.plotting.limit_range_np_arr
 
+Other
+-------
+.. autofunction:: rsgislib.tools.plotting.create_legend_img
 
 
 * :ref:`genindex`
