@@ -7,7 +7,7 @@ import datetime
 import os
 import string
 import json
-from typing import List, Union
+from typing import List, Union, Dict
 
 import numpy
 import rsgislib
@@ -25,7 +25,7 @@ class RSGISNumpyArrayEncoder(json.JSONEncoder):
             return super(RSGISNumpyArrayEncoder, self).default(obj)
 
 
-def uid_generator(size: int = 6):
+def uid_generator(size: int = 6) -> str:
     """
     A function which will generate a 'random' string of the specified length
     based on the UUID
@@ -41,7 +41,7 @@ def uid_generator(size: int = 6):
     return random_str[0:size]
 
 
-def is_number(str_val: str):
+def is_number(str_val: str) -> bool:
     """
     A function which tests whether the input string contains a number of not.
 
@@ -66,7 +66,7 @@ def zero_pad_num_str(
     integerise: bool = False,
     absolute: bool = False,
     gain: float = 1,
-):
+) -> str:
     """
     A function which zero pads a number to make a string
 
@@ -110,7 +110,7 @@ def powerset_iter(in_set: List):
             yield item
 
 
-def powerset_lst(in_set: List, min_items: int = 0):
+def powerset_lst(in_set: List, min_items: int = 0) -> List:
     """
     A function which returns a list for all the subsets
     of the inputted set (i.e., the powerset)
@@ -131,7 +131,7 @@ def powerset_lst(in_set: List, min_items: int = 0):
     return out_pset
 
 
-def get_environment_variable(var: str):
+def get_environment_variable(var: str) -> str:
     """
     A function to get an environmental variable, if variable is not present
     returns None.
@@ -140,15 +140,15 @@ def get_environment_variable(var: str):
     :return: value of env var.
 
     """
-    outVar = None
+    out_var = None
     try:
-        outVar = os.environ[var]
+        out_var = os.environ[var]
     except Exception:
-        outVar = None
-    return outVar
+        out_var = None
+    return out_var
 
 
-def num_process_cores():
+def num_process_cores() -> int:
     """
     A functions which returns the number of processing cores available on the machine
 
@@ -160,7 +160,7 @@ def num_process_cores():
     return multiprocessing.cpu_count()
 
 
-def read_text_file_no_new_lines(input_file: str):
+def read_text_file_no_new_lines(input_file: str) -> str:
     """
     Read a text file into a single string removing new lines.
 
@@ -168,36 +168,37 @@ def read_text_file_no_new_lines(input_file: str):
     :return: string
 
     """
-    txtStr = ""
+    txt_str = ""
     try:
-        dataFile = open(input_file, "r")
-        for line in dataFile:
-            txtStr += line.strip()
-        dataFile.close()
+        data_file = open(input_file, "r")
+        for line in data_file:
+            txt_str += line.strip()
+        data_file.close()
     except Exception as e:
         raise e
-    return txtStr
+    return txt_str
 
 
-def read_text_file_to_list(input_file: str):
+def read_text_file_to_list(input_file: str, include_empty_lines: bool = False) -> List:
     """
     Read a text file into a list where each line is an element in the list.
 
     :param input_file: File path to the input file.
+    :param include_empty_lines: Include empty lines within the line (Default: False)
     :return: list
 
     """
-    outList = []
+    out_list = []
     try:
-        dataFile = open(input_file, "r")
-        for line in dataFile:
+        data_file = open(input_file, "r")
+        for line in data_file:
             line = line.strip()
-            if line != "":
-                outList.append(line)
-        dataFile.close()
+            if include_empty_lines or (line != ""):
+                out_list.append(line)
+        data_file.close()
     except Exception as e:
         raise e
-    return outList
+    return out_list
 
 
 def write_list_to_file(data_lst: List, out_file: str):
@@ -283,7 +284,7 @@ def write_dict_to_json_gz(data_dict: dict, out_file: str, encoding: str = "utf-8
         fout.write(json_bytes)
 
 
-def read_json_to_dict(input_file: str):
+def read_json_to_dict(input_file: str) -> Dict:
     """
     Read a JSON file. Will return a list or dict.
 
@@ -295,7 +296,7 @@ def read_json_to_dict(input_file: str):
     return data
 
 
-def read_gz_json_to_dict(input_file: str, encoding: str = "utf-8"):
+def read_gz_json_to_dict(input_file: str, encoding: str = "utf-8") -> Dict:
     """
     Read a JSON file. Will return a list or dict.
 
@@ -313,7 +314,7 @@ def read_gz_json_to_dict(input_file: str, encoding: str = "utf-8"):
     return data
 
 
-def create_var_list(in_vals_lsts: dict, val_dict: dict = None):
+def create_var_list(in_vals_lsts: dict, val_dict: dict = None) -> List[Dict]:
     """
     A function which will produce a list of dictionaries with all the combinations
     of the input variables listed (i.e., the powerset).
@@ -368,7 +369,9 @@ def create_var_list(in_vals_lsts: dict, val_dict: dict = None):
     return out_vars
 
 
-def in_bounds(x: numpy.array, lower: float, upper: float, upper_strict: bool = False):
+def in_bounds(
+    x: numpy.array, lower: float, upper: float, upper_strict: bool = False
+) -> bool:
     """
     Checks whether a value or array of values is within specified bounds.
 
@@ -385,7 +388,7 @@ def in_bounds(x: numpy.array, lower: float, upper: float, upper_strict: bool = F
         return lower <= numpy.min(x) and numpy.max(x) <= upper
 
 
-def mixed_signs(x: numpy.array):
+def mixed_signs(x: numpy.array) -> bool:
     """
     Check whether an array of numbers has a mix of positive and negative values.
 
@@ -396,7 +399,7 @@ def mixed_signs(x: numpy.array):
     return numpy.min(x) < 0 and numpy.max(x) >= 0
 
 
-def negative(x: numpy.array):
+def negative(x: numpy.array) -> bool:
     """
     Is the maximum number in the list negative.
     :param x: list of values
@@ -407,7 +410,7 @@ def negative(x: numpy.array):
     return numpy.max(x) < 0
 
 
-def is_odd(number: float):
+def is_odd(number: float) -> bool:
     """
     A function which tests whether a number is odd
 
@@ -420,7 +423,7 @@ def is_odd(number: float):
     return False
 
 
-def hex_to_rgb(hex_str: str):
+def hex_to_rgb(hex_str: str) -> (int, int, int):
     """
     A function which converts an hexadecimal colour representation to RGB values
     between 0 and 255.
@@ -489,7 +492,7 @@ def rgb_to_hex(
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
 
-def remove_repeated_chars(str_val: str, repeat_char: str):
+def remove_repeated_chars(str_val: str, repeat_char: str) -> str:
     """
     A function which removes repeated characters within a string for the
     specified character
@@ -519,7 +522,7 @@ def check_str(
     rm_dashs: bool = False,
     rm_spaces: bool = False,
     rm_punc: bool = False,
-):
+) -> str:
     """
     A function which can check a string removing spaces (replaced with underscores),
     remove punctuation and any non ascii characters.
@@ -565,8 +568,25 @@ def check_str(
 
     return str_val_tmp
 
+def create_ascii_text_file(input_file, output_file):
+    """
+    A function which will ensure that an input text file will
+    only have ascii characters. Non-ascii characters will be
+    removed.
 
-def get_days_since(year: int, day_of_year: int, base_date: datetime.date):
+    :param input_file: input file path
+    :param output_file: output file path
+
+    """
+    txt_lst = read_text_file_to_list(input_file, True)
+    out_txt_lst = list()
+    for line in txt_lst:
+        out_line = check_str(line, rm_non_ascii=True)
+        out_txt_lst.append(out_line)
+
+    write_list_to_file(out_txt_lst, output_file)
+
+def get_days_since(year: int, day_of_year: int, base_date: datetime.date) -> int:
     """
     Calculate the number of days from a base data to a defined year/day.
 
@@ -583,7 +603,7 @@ def get_days_since(year: int, day_of_year: int, base_date: datetime.date):
     return (date_val - base_date).days
 
 
-def get_days_since_date(year: int, month: int, day, base_date: datetime.date):
+def get_days_since_date(year: int, month: int, day, base_date: datetime.date) -> int:
     """
     Calculate the number of days from a base data to a defined year/day.
 
@@ -600,7 +620,7 @@ def get_days_since_date(year: int, month: int, day, base_date: datetime.date):
     return (date_val - base_date).days
 
 
-def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: List):
+def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: List) -> bool:
     """
     A function which tests whether a path exists within JSON file.
 
@@ -624,7 +644,7 @@ def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: List):
 
 def dict_struct_get_str_value(
     dict_struct_obj: dict, tree_sequence: List, valid_values: List = None
-):
+) -> str:
     """
     A function which retrieves a single string value from a JSON structure.
 
@@ -654,7 +674,7 @@ def dict_struct_get_str_value(
     return curr_dict_struct_obj
 
 
-def dict_struct_get_boolean_value(dict_struct_obj: dict, tree_sequence: List):
+def dict_struct_get_boolean_value(dict_struct_obj: dict, tree_sequence: List) -> bool:
     """
     A function which retrieves a single boolean value from a JSON structure.
 
@@ -682,7 +702,7 @@ def dict_struct_get_boolean_value(dict_struct_obj: dict, tree_sequence: List):
 
 def dict_struct_get_date_value(
     dict_struct_obj: dict, tree_sequence: List, date_format: str = "%Y-%m-%d"
-):
+) -> datetime.datetime:
     """
     A function which retrieves a single date value from a JSON structure.
 
@@ -786,7 +806,7 @@ def dict_struct_get_datetime_value(
 
 def dict_struct_get_str_list_value(
     dict_struct_obj: dict, tree_sequence: List, valid_values: List = None
-):
+) -> List[str]:
     """
     A function which retrieves a list of string values from a JSON structure.
 
@@ -827,7 +847,7 @@ def dict_struct_get_numeric_value(
     tree_sequence: List,
     valid_lower: float = None,
     valid_upper: float = None,
-):
+) -> Union[int, float]:
     """
     A function which retrieves a single numeric value from a JSON structure.
 
@@ -880,7 +900,7 @@ def dict_struct_get_numeric_value(
     return out_value
 
 
-def dict_struct_get_list_value(dict_struct_obj: dict, tree_sequence: List):
+def dict_struct_get_list_value(dict_struct_obj: dict, tree_sequence: List) -> List:
     """
     A function which retrieves a list of values from a JSON structure.
 
