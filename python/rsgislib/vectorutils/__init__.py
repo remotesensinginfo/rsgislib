@@ -1127,7 +1127,7 @@ def get_att_lst_select_feats_lyr_objs(
         for attName in att_names:
             mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
 
-        vec_lyr_obj.Intersection(vec_sel_lyr_obj, mem_result_lyr)
+        vec_sel_lyr_obj.Intersection(vec_lyr_obj, mem_result_lyr)
 
         # loop through the input features
         reslyrDefn = mem_result_lyr.GetLayerDefn()
