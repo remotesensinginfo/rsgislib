@@ -41,6 +41,7 @@ Deleting
 ---------
 .. autofunction:: rsgislib.tools.filetools.delete_file_with_basename
 .. autofunction:: rsgislib.tools.filetools.delete_file_silent
+.. autofunction:: rsgislib.tools.filetools.rm_files_size_gt
 
 Lock Files
 ------------
