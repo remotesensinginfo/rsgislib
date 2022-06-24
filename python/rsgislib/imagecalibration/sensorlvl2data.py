@@ -426,46 +426,35 @@ def parse_landsat_c2_qa_pixel_img(
         img_dims = inputs.image.shape
         img_dims_lst = list(img_dims)
         img_dims_lst[0] = 12
-        # print(img_dims_lst)
         outputs.outimage = numpy.zeros(img_dims_lst, dtype=numpy.uint8)
 
         for val in otherargs.qa_lut:
-            outputs.outimage[0][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["Fill"]
-            outputs.outimage[1][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["DilatedCloud"]
-            outputs.outimage[2][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["Cirrus"]
-            outputs.outimage[3][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["Cloud"]
-            outputs.outimage[4][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["CloudShadow"]
-            outputs.outimage[5][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["Snow"]
-            outputs.outimage[6][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["Clear"]
-            outputs.outimage[7][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["Water"]
-            outputs.outimage[8][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["CloudConfidence"]
-            outputs.outimage[9][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["CloudShadowConfidence"]
-            outputs.outimage[10][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["SnowIceConfidence"]
-            outputs.outimage[11][numpy.squeeze(inputs.image) == val] = otherargs.qa_lut[
-                val
-            ]["CirrusConfidence"]
+            outputs.outimage[0][inputs.image[0] == val] = otherargs.qa_lut[val]["Fill"]
+            outputs.outimage[1][inputs.image[0] == val] = otherargs.qa_lut[val][
+                "DilatedCloud"
+            ]
+            outputs.outimage[2][inputs.image[0] == val] = otherargs.qa_lut[val][
+                "Cirrus"
+            ]
+            outputs.outimage[3][inputs.image[0] == val] = otherargs.qa_lut[val]["Cloud"]
+            outputs.outimage[4][inputs.image[0] == val] = otherargs.qa_lut[val][
+                "CloudShadow"
+            ]
+            outputs.outimage[5][inputs.image[0] == val] = otherargs.qa_lut[val]["Snow"]
+            outputs.outimage[6][inputs.image[0] == val] = otherargs.qa_lut[val]["Clear"]
+            outputs.outimage[7][inputs.image[0] == val] = otherargs.qa_lut[val]["Water"]
+            outputs.outimage[8][inputs.image[0] == val] = otherargs.qa_lut[val][
+                "CloudConfidence"
+            ]
+            outputs.outimage[9][inputs.image[0] == val] = otherargs.qa_lut[val][
+                "CloudShadowConfidence"
+            ]
+            outputs.outimage[10][inputs.image[0] == val] = otherargs.qa_lut[val][
+                "SnowIceConfidence"
+            ]
+            outputs.outimage[11][inputs.image[0] == val] = otherargs.qa_lut[val][
+                "CirrusConfidence"
+            ]
 
     applier.apply(
         _apply_gen_ls_c2_qa_img, infiles, outfiles, otherargs, controls=aControls
