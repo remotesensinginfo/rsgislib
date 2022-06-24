@@ -691,12 +691,15 @@ def check_dwnld_opts(
     return dwlds_lst
 
 
-def request_downloads(api_key: str, dwlds_lst: str, dwnld_label: str) -> (Dict, List):
+def request_downloads(
+    api_key: str, dwlds_lst: List[Dict[str, str]], dwnld_label: str
+) -> (Dict, List):
     """
     A function to request download URLs for a download list (from check_dwnld_opts)
 
     :param api_key: The API key created at login to authenticate user.
-    :param dwlds_lst: The available download list created by check_dwnld_opts.
+    :param dwlds_lst: The available download list created and returned
+                      by check_dwnld_opts.
     :param dwnld_label: A name for the download - can be anything you want but should
                         be meaningful to you.
     :return: a dict of download IDs and URL which are ready to be downloaded and
