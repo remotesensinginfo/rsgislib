@@ -290,6 +290,8 @@ def create_stacked_sref_ls_oli_cl2_lv2_img(
         shutil.rmtree(raw_dir)
         for img_band in sref_bands:
             rsgislib.imageutils.delete_gdal_layer(img_band)
+        if not inc_full_qa_pxl_img:
+            rsgislib.imageutils.delete_gdal_layer(qa_pxl_mband_img)
 
 
 def parse_landsat_c2_qa_pixel_img(

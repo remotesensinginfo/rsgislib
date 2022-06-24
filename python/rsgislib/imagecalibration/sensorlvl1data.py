@@ -295,3 +295,5 @@ def create_stacked_toa_ls_oli_cl2_lv1_img(
         shutil.rmtree(raw_dir)
         for img_band in sref_bands:
             rsgislib.imageutils.delete_gdal_layer(img_band)
+        if not inc_full_qa_pxl_img:
+            rsgislib.imageutils.delete_gdal_layer(qa_pxl_mband_img)
