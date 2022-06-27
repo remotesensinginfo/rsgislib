@@ -12,27 +12,127 @@ import rsgislib.tools.projection
 import rsgislib.tools.plotting
 import rsgislib.imageutils
 
-# import numpy
 import geopandas
 
-
 import matplotlib.pyplot as plt
-
-# import matplotlib.colors as mclrs
-# from matplotlib.patches import Patch
-# from matplotlib import rcParams
-# from matplotlib import gridspec
-
 from matplotlib_scalebar.scalebar import ScaleBar
 
 
+def calc_y_fig_size(bbox: List[float], fig_x_size=Union[int, float]) -> float:
+    """
+    A function which calculates the y axis size give the bbox and x axis size
+    and the BBOX for the area to be mapped. This is useful so the map fills
+    the whole area rather than having lots of white space in the resulting
+    figure image file.
+
+    :param bbox: the (MinX, MaxX, MinY, MaxY) for the region of interest.
+    :param fig_x_size: the size for the figure in the x axis.
+    :return: the figure size in the y axis.
+
+    """
+    x_bbox_size = bbox[1] - bbox[0]
+    y_bbox_size = bbox[3] - bbox[2]
+    bbox_xy_ratio = y_bbox_size / x_bbox_size
+    fig_y_size = fig_x_size * bbox_xy_ratio
+    return fig_y_size
+
+
+def get_overview_info(
+    roi_bbox: List[float],
+    roi_epsg: int = 4236,
+    overview_buf: int = 30,
+    out_epsg: int = 4236,
+) -> (List[float], List[float]):
+    """
+    A function which uses the BBOX for the extent of the map being drawn to create
+    the a BBOX for and centre point which can be used within the add_overview_maps
+    function to add an overview map to an axis.
+
+    :param roi_bbox: the region of interest (ROI) bbox (MinX, MaxX, MinY, MaxY)
+                     representing the area for the which the map is being drawn
+                     for.
+    :param roi_epsg: the project (as an EPSG code) for the coordinates provided in
+                     the roi_bbox.
+    :param overview_buf: the buffer used to specify the overview area. This is taken
+                         from the centre point of the roi_bbox.
+    :return: the overview bbox (MinX, MaxX, MinY, MaxY) and point (X, Y)
+    """
+    import rsgislib.tools.geometrytools
+
+    if roi_epsg != out_epsg:
+        roi_proj_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(
+            roi_bbox, roi_epsg, out_epsg
+        )
+    else:
+        roi_proj_bbox = roi_bbox
+
+    c_pt_x = roi_proj_bbox[0] + ((roi_proj_bbox[1] - roi_proj_bbox[0]) / 2)
+    c_pt_y = roi_proj_bbox[2] + ((roi_proj_bbox[3] - roi_proj_bbox[2]) / 2)
+    over_min_x = c_pt_x - overview_buf
+    over_max_x = c_pt_x + overview_buf
+    over_min_y = c_pt_y - overview_buf
+    over_max_y = c_pt_y + overview_buf
+
+    return [over_min_x, over_max_x, over_min_y, over_max_y], [c_pt_x, c_pt_y]
+
+
+def add_overview_maps(
+    ax: plt.axis,
+    overview_lyr: geopandas.GeoDataFrame,
+    overview_bbox: List[float],
+    overview_pt: List[float] = None,
+    over_size_x: float = 0.1,
+    over_size_y: float = 0.1,
+    over_x_off: float = 0.0,
+    over_y_off: float = 0.0,
+    pt_clr="red",
+    pt_size=10,
+    fill_clr="white",
+    line_clr="black",
+    line_width=0.25,
+):
+    """
+    Add an overview map in the top-left corner of the map.
+
+    :param ax: The matplotlib axis to which to add the overview map.
+    :param overview_lyr: The geopandas layer to used used for the overview map
+                         usually this would be a global vector layer of the countries
+                         but could be anything.
+    :param overview_bbox: the bbox (MinX, MaxX, MinY, MaxY) for the area to be shown
+                          within the overview map.
+    :param overview_pt: an optional point (X, Y) to displayed on the overview map.
+    :param over_size_x: the size of the overview map in the x-axis
+    :param over_size_y: the size of the overview map in the y-axis
+    :param over_x_off: the x-axis offset for the overmap position
+    :param over_y_off: the y-axis offset for the overmap position
+    :param pt_clr: the colour of the point (if specified). Default: Red.
+    :param pt_size: the size of the point (if specified). Default: 10.
+    :param fill_clr: the colour used to fill the polygons within the overview layer.
+                     Default: white
+    :param line_clr: the colour of the lines of the overview layer. Default: black
+    :param line_width: the line width of the lines of the overview layer. Default: 0.25
+
+    """
+    ax_over = ax.inset_axes(
+        [over_x_off, ((1.0 - over_size_y) + over_y_off), over_size_x, over_size_y]
+    )
+    ax_over.set_xticks([])
+    ax_over.set_yticks([])
+    overview_lyr.plot(
+        ax=ax_over, color=fill_clr, edgecolor=line_clr, linewidth=line_width, alpha=1
+    )
+    if overview_pt is not None:
+        ax_over.scatter(overview_pt[0], overview_pt[1], color=pt_clr, s=pt_size)
+    ax_over.set_xlim([overview_bbox[0], overview_bbox[1]])
+    ax_over.set_ylim([overview_bbox[2], overview_bbox[3]])
+
+
 def create_vec_lyr_map(
+    ax: plt.axis,
     gp_vec: geopandas.GeoDataFrame,
     bbox: List[float],
     title_str: str = None,
     cx_src=None,
-    out_file: str = None,
-    out_dpi: int = 400,
     vec_fill_clr: str = "grey",
     vec_line_clr: str = "black",
     vec_line_width: float = 0.25,
@@ -40,12 +140,29 @@ def create_vec_lyr_map(
     use_grid: bool = False,
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
-    fig_x_size: int = 10,
-    fig_y_size: int = None,
     cx_zoom_lvl: int = Union[int, "auto"],
     cx_attribution: Union[str, bool] = None,
     cx_att_size: int = 8,
 ):
+    """
+
+    :param ax:
+    :param gp_vec:
+    :param bbox:
+    :param title_str:
+    :param cx_src:
+    :param vec_fill_clr:
+    :param vec_line_clr:
+    :param vec_line_width:
+    :param vec_fill_alpha:
+    :param use_grid:
+    :param show_map_axis:
+    :param sub_in_vec:
+    :param cx_zoom_lvl:
+    :param cx_attribution:
+    :param cx_att_size:
+    :return:
+    """
     if cx_src is not None:
         import contextily
 
@@ -57,14 +174,6 @@ def create_vec_lyr_map(
         gp_vec_sub = gp_vec.cx[min_x_sub:max_x_sub, min_y_sub:max_y_sub]
     else:
         gp_vec_sub = gp_vec
-
-    if fig_y_size is None:
-        x_bbox_size = bbox[1] - bbox[0]
-        y_bbox_size = bbox[3] - bbox[2]
-        bbox_xy_ratio = y_bbox_size / x_bbox_size
-        fig_y_size = fig_x_size * bbox_xy_ratio
-
-    fig, ax = plt.subplots(1, 1, figsize=(fig_x_size, fig_y_size))
 
     gp_vec_sub.plot(
         ax=ax,
@@ -101,40 +210,40 @@ def create_vec_lyr_map(
     if title_str is not None:
         ax.title.set_text(title_str)
 
-    plt.tight_layout()
-    if out_file is None:
-        plt.show()
-    else:
-        plt.savefig(out_file, dpi=out_dpi)
-
 
 def create_raster_img_map(
-    input_img,
-    img_bands,
-    img_stch,
+    ax: plt.axis,
+    input_img: str,
+    img_bands: List[int],
+    img_stch: int,
     bbox=None,
     title_str=None,
-    out_file=None,
-    out_dpi=400,
     use_grid: bool = False,
     show_map_axis: bool = True,
-    fig_x_size: int = 10,
-    fig_y_size: int = None,
     img_no_data_val=None,
     stch_min_max_vals=None,
     stch_n_stdevs=2.0,
 ):
+    """
+
+    :param ax:
+    :param input_img:
+    :param img_bands:
+    :param img_stch:
+    :param bbox:
+    :param title_str:
+    :param use_grid:
+    :param show_map_axis:
+    :param img_no_data_val:
+    :param stch_min_max_vals:
+    :param stch_n_stdevs:
+    :return:
+    """
     if bbox is None:
         bbox = rsgislib.imageutils.get_img_bbox(input_img)
 
     if img_no_data_val is None:
         img_no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
-
-    if fig_y_size is None:
-        x_bbox_size = bbox[1] - bbox[0]
-        y_bbox_size = bbox[3] - bbox[2]
-        bbox_xy_ratio = y_bbox_size / x_bbox_size
-        fig_y_size = fig_x_size * bbox_xy_ratio
 
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=img_bands, bbox=bbox
@@ -164,7 +273,6 @@ def create_raster_img_map(
         print("No stretch is being used - is this what you intended?!")
         img_data_strch = img_data
 
-    fig, ax = plt.subplots(1, 1, figsize=(fig_x_size, fig_y_size))
     ax.imshow(img_data_strch, extent=img_coords)
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
@@ -184,29 +292,35 @@ def create_raster_img_map(
     if title_str is not None:
         ax.title.set_text(title_str)
 
-    plt.tight_layout()
-    if out_file is None:
-        plt.show()
-    else:
-        plt.savefig(out_file, dpi=out_dpi)
-
 
 def create_thematic_raster_map(
-    input_img: Union[str,List],
+    ax: plt.axis,
+    input_img: Union[str, List],
     bbox: List[float] = None,
     title_str: str = None,
     cx_src=None,
     alpha_backgd: bool = True,
-    out_file: str = None,
-    out_dpi: int = 400,
     use_grid: bool = False,
     show_map_axis: bool = True,
-    fig_x_size: int = 10,
-    fig_y_size: int = None,
     cx_zoom_lvl: int = Union[int, "auto"],
     cx_attribution: Union[str, bool] = None,
     cx_att_size: int = 8,
 ):
+    """
+
+    :param ax:
+    :param input_img:
+    :param bbox:
+    :param title_str:
+    :param cx_src:
+    :param alpha_backgd:
+    :param use_grid:
+    :param show_map_axis:
+    :param cx_zoom_lvl:
+    :param cx_attribution:
+    :param cx_att_size:
+    :return:
+    """
     if cx_src is not None:
         import contextily
 
@@ -235,14 +349,6 @@ def create_thematic_raster_map(
         img_data_arr_scns.append(img_data_arr)
         img_coords_scns.append(img_coords)
         lgd_patches_scns.append(lgd_patches)
-
-    if fig_y_size is None:
-        x_bbox_size = bbox[1] - bbox[0]
-        y_bbox_size = bbox[3] - bbox[2]
-        bbox_xy_ratio = y_bbox_size / x_bbox_size
-        fig_y_size = fig_x_size * bbox_xy_ratio
-
-    fig, ax = plt.subplots(1, 1, figsize=(fig_x_size, fig_y_size))
 
     ax.set_xlim([img_coords_scns[0][0], img_coords_scns[0][1]])
     ax.set_ylim([img_coords_scns[0][2], img_coords_scns[0][3]])
@@ -274,30 +380,39 @@ def create_thematic_raster_map(
     if title_str is not None:
         ax.title.set_text(title_str)
 
-    plt.tight_layout()
-    if out_file is None:
-        plt.show()
-    else:
-        plt.savefig(out_file, dpi=out_dpi)
 
 def create_thematic_raster_img_base_map(
+    ax: plt.axis,
     in_base_img: str,
-    img_bands:List[int],
-    img_stch:int,
-    in_them_img:Union[str,List],
+    img_bands: List[int],
+    img_stch: int,
+    in_them_img: Union[str, List],
     bbox: List[float] = None,
     title_str: str = None,
     alpha_backgd: bool = True,
-    out_file: str = None,
-    out_dpi: int = 400,
     use_grid: bool = False,
     show_map_axis: bool = True,
-    fig_x_size: int = 10,
-    fig_y_size: int = None,
     img_no_data_val=None,
     stch_min_max_vals=None,
     stch_n_stdevs=2.0,
 ):
+    """
+
+    :param ax:
+    :param in_base_img:
+    :param img_bands:
+    :param img_stch:
+    :param in_them_img:
+    :param bbox:
+    :param title_str:
+    :param alpha_backgd:
+    :param use_grid:
+    :param show_map_axis:
+    :param img_no_data_val:
+    :param stch_min_max_vals:
+    :param stch_n_stdevs:
+    :return:
+    """
     if img_no_data_val is None:
         img_no_data_val = rsgislib.imageutils.get_img_no_data_value(in_base_img)
 
@@ -353,14 +468,6 @@ def create_thematic_raster_img_base_map(
         print("No stretch is being used - is this what you intended?!")
         img_data_strch = img_data
 
-    if fig_y_size is None:
-        x_bbox_size = bbox[1] - bbox[0]
-        y_bbox_size = bbox[3] - bbox[2]
-        bbox_xy_ratio = y_bbox_size / x_bbox_size
-        fig_y_size = fig_x_size * bbox_xy_ratio
-
-    fig, ax = plt.subplots(1, 1, figsize=(fig_x_size, fig_y_size))
-
     # base image data
     ax.imshow(img_data_strch, extent=img_coords)
     ax.set_xlim([img_coords[0], img_coords[1]])
@@ -369,8 +476,6 @@ def create_thematic_raster_img_base_map(
     # thematic data
     for img_data_arr, img_therm_coords in zip(img_data_arr_scns, img_coords_scns):
         ax.imshow(img_data_arr, extent=img_therm_coords)
-
-
 
     if use_grid:
         ax.grid()
@@ -386,9 +491,3 @@ def create_thematic_raster_img_base_map(
 
     if title_str is not None:
         ax.title.set_text(title_str)
-
-    plt.tight_layout()
-    if out_file is None:
-        plt.show()
-    else:
-        plt.savefig(out_file, dpi=out_dpi)
