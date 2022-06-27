@@ -9,7 +9,6 @@ Map Raster Layers
 -------------------
 .. autofunction:: rsgislib.tools.mapping.create_raster_img_map
 .. autofunction:: rsgislib.tools.mapping.create_thematic_raster_map
-.. autofunction:: rsgislib.tools.mapping.create_thematic_raster_img_base_map
 
 Overview Maps
 ---------------
