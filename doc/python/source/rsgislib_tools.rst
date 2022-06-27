@@ -8,6 +8,7 @@ RSGISLib Tools
    rsgislib_tools_geometrytools
    rsgislib_tools_googlecloud
    rsgislib_tools_plotting
+   rsgislib_tools_mapping
    rsgislib_tools_projection
    rsgislib_tools_sensors
    rsgislib_tools_stats
