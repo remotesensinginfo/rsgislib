@@ -15,6 +15,8 @@ import rsgislib.imageutils
 import geopandas
 
 import matplotlib.pyplot as plt
+import matplotlib.colors
+import matplotlib.cm
 from matplotlib_scalebar.scalebar import ScaleBar
 
 
@@ -127,12 +129,31 @@ def add_overview_maps(
     ax_over.set_ylim([overview_bbox[2], overview_bbox[3]])
 
 
+def add_contextily_basemap(
+    ax: plt.axis,
+    gp_ref_vec: geopandas.GeoDataFrame,
+    cx_src,
+    cx_zoom_lvl: int = Union[int, "auto"],
+    cx_attribution: Union[str, bool] = None,
+    cx_att_size: int = 8,
+):
+    import contextily
+
+    contextily.add_basemap(
+        ax,
+        zoom=cx_zoom_lvl,
+        crs=gp_ref_vec.crs,
+        source=cx_src,
+        attribution=cx_attribution,
+        attribution_size=cx_att_size,
+    )
+
+
 def create_vec_lyr_map(
     ax: plt.axis,
     gp_vecs: Union[geopandas.GeoDataFrame, List[geopandas.GeoDataFrame]],
     bbox: List[float],
     title_str: str = None,
-    cx_src=None,
     vec_fill_clrs: Union[str, List[str]] = "grey",
     vec_line_clrs: Union[str, List[str]] = "black",
     vec_line_widths: Union[float, List[float]] = 0.25,
@@ -141,9 +162,6 @@ def create_vec_lyr_map(
     use_grid: bool = False,
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
-    cx_zoom_lvl: int = Union[int, "auto"],
-    cx_attribution: Union[str, bool] = None,
-    cx_att_size: int = 8,
 ):
     """
 
@@ -165,9 +183,6 @@ def create_vec_lyr_map(
     :param cx_att_size:
     :return:
     """
-    if cx_src is not None:
-        import contextily
-
     n_vec_lyrs = 1
     if type(gp_vecs) is list:
         n_vec_lyrs = len(gp_vecs)
@@ -230,16 +245,6 @@ def create_vec_lyr_map(
         )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
-
-    if cx_src is not None:
-        contextily.add_basemap(
-            ax,
-            zoom=cx_zoom_lvl,
-            crs=gp_vecs[0].crs,
-            source=cx_src,
-            attribution=cx_attribution,
-            attribution_size=cx_att_size,
-        )
 
     if use_grid:
         ax.grid()
@@ -348,14 +353,10 @@ def create_thematic_raster_map(
     input_img: Union[str, List],
     bbox: List[float] = None,
     title_str: str = None,
-    cx_src=None,
     alpha_backgd: bool = True,
     show_scale_bar: bool = True,
     use_grid: bool = False,
     show_map_axis: bool = True,
-    cx_zoom_lvl: int = Union[int, "auto"],
-    cx_attribution: Union[str, bool] = None,
-    cx_att_size: int = 8,
 ):
     """
 
@@ -373,9 +374,6 @@ def create_thematic_raster_map(
     :param cx_att_size:
     :return:
     """
-    if cx_src is not None:
-        import contextily
-
     input_imgs = list()
     if isinstance(input_img, str):
         input_imgs.append(input_img)
@@ -405,17 +403,83 @@ def create_thematic_raster_map(
     ax.set_xlim([img_coords_scns[0][0], img_coords_scns[0][1]])
     ax.set_ylim([img_coords_scns[0][2], img_coords_scns[0][3]])
 
-    if cx_src is not None:
-        contextily.add_basemap(
-            ax,
-            zoom=cx_zoom_lvl,
-            crs=f"epsg:{img_epsg}",
-            source=cx_src,
-            attribution=cx_attribution,
-            attribution_size=cx_att_size,
-        )
     for img_data_arr, img_coords in zip(img_data_arr_scns, img_coords_scns):
         ax.imshow(img_data_arr, extent=img_coords)
+
+    if use_grid:
+        ax.grid()
+
+    if not show_map_axis:
+        ax.set_axis_off()
+        ax.set_axis_off()
+
+    if show_scale_bar:
+        distance_meters = rsgislib.tools.projection.great_circle_distance(
+            wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+        )
+        ax.add_artist(ScaleBar(distance_meters))
+
+    if title_str is not None:
+        ax.title.set_text(title_str)
+
+
+def create_choropleth_vec_lyr_map(
+    ax: plt.axis,
+    gp_vec: geopandas.GeoDataFrame,
+    vec_col: str,
+    bbox: List[float],
+    title_str: str = None,
+    vec_fill_cmap: matplotlib.colors.Colormap = None,
+    vec_var_norm: matplotlib.colors.Normalize = None,
+    vec_line_clr: str = "black",
+    vec_line_width: float = 0.25,
+    vec_fill_alpha: float = 1.0,
+    show_scale_bar: bool = True,
+    use_grid: bool = False,
+    show_map_axis: bool = True,
+    sub_in_vec: bool = False,
+):
+    """
+
+    :param ax:
+    :param gp_vec:
+    :param vec_col:
+    :param bbox:
+    :param title_str:
+    :param vec_fill_cmap:
+    :param vec_var_norm:
+    :param vec_line_clr:
+    :param vec_line_width:
+    :param vec_fill_alpha:
+    :param show_scale_bar:
+    :param use_grid:
+    :param show_map_axis:
+    :param sub_in_vec:
+
+    """
+    if vec_fill_cmap is not None:
+        vec_fill_cmap = matplotlib.cm.get_cmap("viridis")
+
+    if sub_in_vec:
+        min_x_sub = math.floor(bbox[0] - 4)
+        max_x_sub = math.ceil(bbox[1] + 4)
+        min_y_sub = math.floor(bbox[2] - 4)
+        max_y_sub = math.ceil(bbox[3] + 4)
+        gp_vec_sub = gp_vec.cx[min_x_sub:max_x_sub, min_y_sub:max_y_sub]
+    else:
+        gp_vec_sub = gp_vec
+
+    gp_vec_sub.plot(
+        column=vec_col,
+        ax=ax,
+        cmap=vec_fill_cmap,
+        norm=vec_var_norm,
+        edgecolor=vec_line_clr,
+        linewidth=vec_line_width,
+        alpha=vec_fill_alpha,
+    )
+    ax.set_xlim([bbox[0], bbox[1]])
+    ax.set_ylim([bbox[2], bbox[3]])
 
     if use_grid:
         ax.grid()
