@@ -58,6 +58,7 @@ def get_overview_info(
     :param overview_buf: the buffer used to specify the overview area. This is taken
                          from the centre point of the roi_bbox.
     :return: the overview bbox (MinX, MaxX, MinY, MaxY) and point (X, Y)
+
     """
     import rsgislib.tools.geometrytools
 
@@ -131,18 +132,39 @@ def add_overview_maps(
 
 def add_contextily_basemap(
     ax: plt.axis,
-    gp_ref_vec: geopandas.GeoDataFrame,
+    epsg_crs: int,
     cx_src,
-    cx_zoom_lvl: Union[int, "auto"] = "auto",
-    cx_attribution: Union[str, bool] = False,
+    cx_zoom_lvl: Union[int, str] = "auto",
+    cx_attribution: Union[str, bool] = None,
     cx_att_size: int = 8,
 ):
+    """
+    A function which adds a contextily (https://contextily.readthedocs.io)
+    basemap (e.g., open street map) to an matplotlib axis. This function is
+    generally used to add a base map underneath other layers (e.g., after using
+    one of the other mapping functions such as create_vec_lyr_map).
+
+    Note. this function must be called after you have added the other layers
+    to the axis as those will define the spatial extent of the axis.
+
+    :param ax: The matplotlib axis to which to add the base map.
+    :param epsg_crs: An epsg code for the projection being used for the map. The
+                     contextily basemap will be warped to this projection.
+    :param cx_src: the contextily basemap (e.g., contextily.providers.OpenTopoMap)
+    :param cx_zoom_lvl: the zoom level of the basemap to be used. Default: auto
+    :param cx_attribution: The attribution of the map, if None then the default
+                           attribution will be used. If a string is provided then
+                           this will be used. If False is used then no attribution
+                           will be outputted. Default: None
+    :param cx_att_size: the font size of the attribution. Default: 8
+
+    """
     import contextily
 
     contextily.add_basemap(
         ax,
         zoom=cx_zoom_lvl,
-        crs=gp_ref_vec.crs,
+        crs=f"epsg:{epsg_crs}",
         source=cx_src,
         attribution=cx_attribution,
         attribution_size=cx_att_size,
@@ -164,24 +186,37 @@ def create_vec_lyr_map(
     sub_in_vec: bool = False,
 ):
     """
+    A function which adds vector layer(s) to a matplotlib axis. This function
+    takes either a single or list of geopandas dataframes to be displayed on
+    the axis.
 
-    :param ax:
-    :param gp_vecs:
-    :param bbox:
-    :param title_str:
-    :param cx_src:
-    :param vec_fill_clrs:
-    :param vec_line_clrs:
-    :param vec_line_widths:
-    :param vec_fill_alphas:
-    :param show_scale_bar:
-    :param use_grid:
-    :param show_map_axis:
-    :param sub_in_vec:
-    :param cx_zoom_lvl:
-    :param cx_attribution:
-    :param cx_att_size:
-    :return:
+    Note. if only the vector outlines are required (i.e., no colour fill of
+    the polygons) then use the boundary i.e., gp_df_lyr.boundary
+
+    :param ax: The matplotlib axis to which to add the vector layer.
+    :param gp_vecs: either a geopandas dataframe or list of geopandas dataframes.
+                    Note. all the dataframes must be the same projection.
+    :param bbox: a bbox (MinX, MaxX, MinY, MaxY) for the region to be displayed
+    :param title_str: an optional title for the map (Default: None)
+    :param vec_fill_clrs: either a single string or list of strings with the colours
+                          for filling the vectors. (Default: grey)
+    :param vec_line_clrs: either a single string or list of strings with the colours
+                          for the vector lines. (Default: black)
+    :param vec_line_widths: either a single float or list of floats for the line width
+                            to be used for the vector layer(s). (Default: 0.25)
+    :param vec_fill_alphas: either a single float or list of floats for the alpha
+                            value(s) for the vector layers. (Default: 1)
+    :param show_scale_bar: boolean specifying whether a scale bar should be added to
+                           the axis. Default: False
+    :param use_grid: boolean specifying whether a grid should be added to the axis.
+                     Default: False
+    :param show_map_axis: boolean specifying whether the axes should be shown
+                          Default: False
+    :param sub_in_vec: boolean specifying whether the vector layer should be
+                       spatially subset before displaying as for large vector
+                       layers this can make the processing much faster.
+                       Default: False
+
     """
     n_vec_lyrs = 1
     if type(gp_vecs) is list:
@@ -272,30 +307,45 @@ def create_raster_img_map(
     input_img: str,
     img_bands: List[int],
     img_stch: int,
-    bbox=None,
-    title_str=None,
+    bbox: List[float] = None,
+    title_str: str = None,
     show_scale_bar: bool = True,
     use_grid: bool = False,
     show_map_axis: bool = True,
-    img_no_data_val:bool=None,
-    stch_min_max_vals:Union[Dict, List[Dict]] = None,
-    stch_n_stdevs:float=2.0,
+    img_no_data_val: float = None,
+    stch_min_max_vals: Union[Dict, List[Dict]] = None,
+    stch_n_stdevs: float = 2.0,
 ):
     """
+    A function which displays a stretched raster layer onto the axis provided.
 
-    :param ax:
-    :param input_img:
-    :param img_bands:
-    :param img_stch:
-    :param bbox:
-    :param title_str:
-    :param show_scale_bar:
-    :param use_grid:
-    :param show_map_axis:
-    :param img_no_data_val:
-    :param stch_min_max_vals:
-    :param stch_n_stdevs:
-    :return:
+    :param ax: The matplotlib axis to which to add the image to.
+    :param input_img: the file path for the input image
+    :param img_bands: a list of bands (either 1 or 3) to be used for display.
+                      Note, band numbering starts at 1.
+    :param img_stch: the stretch used for the input image.
+                     Options are: rsgislib.IMG_STRETCH_XXXX
+    :param bbox: An optional bbox (MinX, MaxX, MinY, MaxY) specifying the
+                 spatial region to be displayed. If None then the whole image
+                 bbox will be used.
+    :param title_str: an optional title for the map (Default: None)
+    :param show_scale_bar: boolean specifying whether a scale bar should be added to
+                           the axis. Default: False
+    :param use_grid: boolean specifying whether a grid should be added to the axis.
+                     Default: False
+    :param show_map_axis: boolean specifying whether the axes should be shown
+                          Default: False
+    :param img_no_data_val: a float with the no data value for the input image.
+                            if None then the no data value will be read from the
+                            input image.
+    :param stch_min_max_vals: If using the rsgislib.IMG_STRETCH_USER stretch then
+                              these are the user specified min and max values for
+                              the stretch.
+                              See rsgislib.tools.plotting.manual_stretch_np_arr
+    :param stch_n_stdevs: If using the rsgislib.IMG_STRETCH_STDEV stretch then
+                          this is the number of standard deviations parameters.
+                          See rsgislib.tools.plotting.stdev_stretch_np_arr
+
     """
     if bbox is None:
         bbox = rsgislib.imageutils.get_img_bbox(input_img)
@@ -367,20 +417,24 @@ def create_thematic_raster_map(
     show_map_axis: bool = True,
 ):
     """
+    A function which displays a thematic raster layer onto the axis provided
+    where the colours are read from the colour table of the input image.
 
-    :param ax:
-    :param input_img:
-    :param bbox:
-    :param title_str:
-    :param cx_src:
-    :param alpha_backgd:
-    :param show_scale_bar:
-    :param use_grid:
-    :param show_map_axis:
-    :param cx_zoom_lvl:
-    :param cx_attribution:
-    :param cx_att_size:
-    :return:
+    :param ax: The matplotlib axis to which to add the image to.
+    :param input_img: the file path for the input image
+    :param bbox: An optional bbox (MinX, MaxX, MinY, MaxY) specifying the
+                 spatial region to be displayed. If None then the whole image
+                 bbox will be used.
+    :param title_str: an optional title for the map (Default: None)
+    :param alpha_backgd: boolean specifying that the background (i.e., 0)
+                         value will be transparent and not shown.
+    :param show_scale_bar: boolean specifying whether a scale bar should be added to
+                           the axis. Default: False
+    :param use_grid: boolean specifying whether a grid should be added to the axis.
+                     Default: False
+    :param show_map_axis: boolean specifying whether the axes should be shown
+                          Default: False
+
     """
     input_imgs = list()
     if isinstance(input_img, str):
@@ -451,21 +505,37 @@ def create_choropleth_vec_lyr_map(
     sub_in_vec: bool = False,
 ):
     """
+    A function which adds a vector layer to a matplotlib axis. This function
+    takes a single geopandas dataframe to be displayed on the axis.
 
-    :param ax:
-    :param gp_vec:
-    :param vec_col:
-    :param bbox:
-    :param title_str:
-    :param vec_fill_cmap:
-    :param vec_var_norm:
-    :param vec_line_clr:
-    :param vec_line_width:
-    :param vec_fill_alpha:
-    :param show_scale_bar:
-    :param use_grid:
-    :param show_map_axis:
-    :param sub_in_vec:
+    Note. this function uses a variable from the attribute table to colour
+    the features creating a choropleth map.
+
+    :param ax: The matplotlib axis to which to add the vector layer.
+    :param gp_vec: geopandas dataframe to be displayed
+    :param vec_col: the column within the dataframe to be displayed.
+    :param bbox: a bbox (MinX, MaxX, MinY, MaxY) for the region to be displayed
+    :param title_str: an optional title for the map (Default: None)
+    :param vec_fill_cmap: a matplotlib colour map used to visualise the choropleth map.
+                          If None (Default) then the viridis colour map will be used.
+    :param vec_var_norm: a matplotlib normalisation used to visualise the choropleth
+                         map. If None (Default) then no normalisation will be applied.
+    :param vec_line_clrs: either a single string or list of strings with the colours
+                          for the vector lines. (Default: black)
+    :param vec_line_widths: either a single float or list of floats for the line width
+                            to be used for the vector layer(s). (Default: 0.25)
+    :param vec_fill_alphas: either a single float or list of floats for the alpha
+                            value(s) for the vector layers. (Default: 1)
+    :param show_scale_bar: boolean specifying whether a scale bar should be added to
+                           the axis. Default: False
+    :param use_grid: boolean specifying whether a grid should be added to the axis.
+                     Default: False
+    :param show_map_axis: boolean specifying whether the axes should be shown
+                          Default: False
+    :param sub_in_vec: boolean specifying whether the vector layer should be
+                       spatially subset before displaying as for large vector
+                       layers this can make the processing much faster.
+                       Default: False
 
     """
     if vec_fill_cmap is not None:
