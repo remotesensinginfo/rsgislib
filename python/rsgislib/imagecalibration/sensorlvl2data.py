@@ -33,8 +33,12 @@
 #
 ############################################################################
 
-import rsgislib
+import os
+
 import numpy
+
+import rsgislib
+import rsgislib.tools.sensors
 
 
 def create_stacked_sref_ls_oli_cl2_lv2_img(
@@ -70,9 +74,7 @@ def create_stacked_sref_ls_oli_cl2_lv2_img(
 
     """
 
-    import os
     import rsgislib.tools.filetools
-    import rsgislib.tools.sensors
     import rsgislib.tools.utils
     import rsgislib.imagecalc
     import rsgislib.imageutils
@@ -480,3 +482,35 @@ def parse_landsat_c2_qa_pixel_img(
     rsgislib.imageutils.pop_img_stats(
         output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
     )
+
+
+
+
+def create_sen2_l2a_stack(input_safe: str, out_dir: str, tmp_dir: str,
+                          out_res_10m: bool = True, sharpen: bool = True,
+                          scale_factor: int = 10000, gdalformat: str = "KEA",
+                          delete_inter_data: bool = True):
+    """
+    """
+    import rsgislib.tools.filetools
+    import rsgislib.imageutils
+
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+
+    if gdalformat == "GTIFF":
+        rsgislib.imageutils.set_env_vars_lzw_gtiff_outs()
+
+
+    mtd_header_file = rsgislib.tools.filetools.find_file_none(input_safe, "MTD_MSIL2A.xml")
+
+    if mtd_header_file is None:
+        raise rsgislib.RSGISPyException("Could not find the Sentinel-2 MTD header")
+
+    s2_hdr_info = rsgislib.tools.sensors.read_sen2_l2a_mtd_to_dict(mtd_header_file)
+    import pprint
+
+    pprint.pprint(s2_hdr_info)
