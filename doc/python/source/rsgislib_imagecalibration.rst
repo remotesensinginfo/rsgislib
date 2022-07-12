@@ -60,6 +60,9 @@ Landsat Collection 2  Utilities
 .. autofunction:: rsgislib.imagecalibration.sensorlvl2data.create_stacked_sref_ls_oli_cl2_lv2_img
 .. autofunction:: rsgislib.imagecalibration.sensorlvl2data.parse_landsat_c2_qa_pixel_img
 
+Sentinel-2  Utilities
+---------------------------------
+.. autofunction:: rsgislib.imagecalibration.sensorlvl2data.create_stacked_sen2_esa_l2a_img
 
 * :ref:`genindex`
 * :ref:`modindex`

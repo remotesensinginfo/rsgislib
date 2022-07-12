@@ -484,7 +484,7 @@ def parse_landsat_c2_qa_pixel_img(
     )
 
 
-def create_sen2_l2a_stack(
+def create_stacked_sen2_esa_l2a_img(
     input_safe: str,
     out_dir: str,
     tmp_dir: str,
