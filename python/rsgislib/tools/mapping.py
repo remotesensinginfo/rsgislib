@@ -133,8 +133,8 @@ def add_contextily_basemap(
     ax: plt.axis,
     gp_ref_vec: geopandas.GeoDataFrame,
     cx_src,
-    cx_zoom_lvl: int = Union[int, "auto"],
-    cx_attribution: Union[str, bool] = None,
+    cx_zoom_lvl: Union[int, "auto"] = "auto",
+    cx_attribution: Union[str, bool] = False,
     cx_att_size: int = 8,
 ):
     import contextily
@@ -210,7 +210,7 @@ def create_vec_lyr_map(
             vec_fill_clr = vec_fill_clrs
 
         if type(vec_line_clrs) is list:
-            if len(vec_fill_clrs) != n_vec_lyrs:
+            if len(vec_line_clrs) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of line colours not same as number of vector layers"
                 )
@@ -219,7 +219,7 @@ def create_vec_lyr_map(
             vec_line_clr = vec_line_clrs
 
         if type(vec_line_widths) is list:
-            if len(vec_fill_clrs) != n_vec_lyrs:
+            if len(vec_line_widths) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of line widths not same as number of vector layers"
                 )
@@ -228,7 +228,7 @@ def create_vec_lyr_map(
             vec_line_width = vec_line_widths
 
         if type(vec_fill_alphas) is list:
-            if len(vec_fill_clrs) != n_vec_lyrs:
+            if len(vec_fill_alphas) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of fill alphas not same as number of vector layers"
                 )
@@ -254,9 +254,13 @@ def create_vec_lyr_map(
         ax.set_axis_off()
 
     if show_scale_bar:
-        distance_meters = rsgislib.tools.projection.great_circle_distance(
-            wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
-        )
+        distance_meters = 1
+        vec_crs = str(gp_vecs[0].crs)
+        vec_epsg = int(vec_crs.split(":")[1])
+        if vec_epsg == 4326:
+            distance_meters = rsgislib.tools.projection.great_circle_distance(
+                wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+            )
         ax.add_artist(ScaleBar(distance_meters))
 
     if title_str is not None:
@@ -273,9 +277,9 @@ def create_raster_img_map(
     show_scale_bar: bool = True,
     use_grid: bool = False,
     show_map_axis: bool = True,
-    img_no_data_val=None,
-    stch_min_max_vals=None,
-    stch_n_stdevs=2.0,
+    img_no_data_val:bool=None,
+    stch_min_max_vals:Union[Dict, List[Dict]] = None,
+    stch_n_stdevs:float=2.0,
 ):
     """
 
@@ -339,9 +343,13 @@ def create_raster_img_map(
         ax.set_axis_off()
 
     if show_scale_bar:
-        distance_meters = rsgislib.tools.projection.great_circle_distance(
-            wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
-        )
+        distance_meters = 1
+        img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
+        if img_epsg == 4326:
+            distance_meters = rsgislib.tools.projection.great_circle_distance(
+                wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+            )
+
         ax.add_artist(ScaleBar(distance_meters))
 
     if title_str is not None:
@@ -414,9 +422,12 @@ def create_thematic_raster_map(
         ax.set_axis_off()
 
     if show_scale_bar:
-        distance_meters = rsgislib.tools.projection.great_circle_distance(
-            wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
-        )
+        distance_meters = 1
+        img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
+        if img_epsg == 4326:
+            distance_meters = rsgislib.tools.projection.great_circle_distance(
+                wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+            )
         ax.add_artist(ScaleBar(distance_meters))
 
     if title_str is not None:
@@ -489,9 +500,13 @@ def create_choropleth_vec_lyr_map(
         ax.set_axis_off()
 
     if show_scale_bar:
-        distance_meters = rsgislib.tools.projection.great_circle_distance(
-            wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
-        )
+        distance_meters = 1
+        vec_crs = str(gp_vec.crs)
+        vec_epsg = int(vec_crs.split(":")[1])
+        if vec_epsg == 4326:
+            distance_meters = rsgislib.tools.projection.great_circle_distance(
+                wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+            )
         ax.add_artist(ScaleBar(distance_meters))
 
     if title_str is not None:
