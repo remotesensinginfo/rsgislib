@@ -740,7 +740,7 @@ def create_stacked_sen2_esa_l2a_img(
         rsgislib.imagecalc.image_math(
             out_scl_img,
             out_clouds_img,
-            "(b1==8)&&(b1==9)&&(b1==10)?1:(b1==3)?2:0",
+            "(b1==8)||(b1==9)||(b1==10)?1:(b1==3)?2:0",
             gdalformat,
             rsgislib.TYPE_8UINT,
         )
@@ -800,7 +800,11 @@ def create_stacked_sen2_esa_l2a_img(
             out_dir, f"{scn_file_name}_20m_clouds.{out_img_ext}"
         )
         rsgislib.imagecalc.image_math(
-            scl_20m_img, out_clouds_img, "b1==0?1:0", gdalformat, rsgislib.TYPE_8UINT
+            scl_20m_img,
+            out_clouds_img,
+            "(b1==8)||(b1==9)||(b1==10)?1:(b1==3)?2:0",
+            gdalformat,
+            rsgislib.TYPE_8UINT,
         )
         out_vld_img = os.path.join(out_dir, f"{scn_file_name}_20m_vld.{out_img_ext}")
         rsgislib.imagecalc.image_math(
