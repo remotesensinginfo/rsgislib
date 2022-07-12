@@ -398,7 +398,7 @@ def usgs_search(
     if srch_data["totalHits"] > 0:
         scns = srch_data["results"]
     else:
-        scns = None
+        scns = []
 
     srch_meta = {
         "totalHits": srch_data["totalHits"],
@@ -474,25 +474,29 @@ def get_all_usgs_search(
         )
         tot_n_scns = srch_meta["recordsReturned"]
         total_hits = srch_meta["totalHits"]
-        if max_n_rslts > total_hits:
-            max_n_rslts = total_hits
-        while tot_n_scns <= max_n_rslts:
-            xtr_scns, srch_meta = usgs_search(
-                dataset,
-                api_key,
-                start_date,
-                end_date,
-                cloud_min,
-                cloud_max,
-                pt,
-                bbox,
-                poly_geom,
-                months,
-                full_meta,
-                start_n=srch_meta["nextRecord"],
-            )
-            scns += xtr_scns
-            tot_n_scns += len(xtr_scns)
+        if total_hits > 0:
+            if max_n_rslts > total_hits:
+                max_n_rslts = total_hits
+            while tot_n_scns <= max_n_rslts:
+                xtr_scns, srch_meta = usgs_search(
+                    dataset,
+                    api_key,
+                    start_date,
+                    end_date,
+                    cloud_min,
+                    cloud_max,
+                    pt,
+                    bbox,
+                    poly_geom,
+                    months,
+                    full_meta,
+                    start_n=srch_meta["nextRecord"],
+                )
+                if len(xtr_scns) == 0:
+                    scns += xtr_scns
+                    tot_n_scns += len(xtr_scns)
+                else:
+                    break
 
     if len(scns) > max_n_rslts:
         scns = scns[0:max_n_rslts]
@@ -687,12 +691,15 @@ def check_dwnld_opts(
     return dwlds_lst
 
 
-def request_downloads(api_key: str, dwlds_lst: str, dwnld_label: str) -> (Dict, List):
+def request_downloads(
+    api_key: str, dwlds_lst: List[Dict[str, str]], dwnld_label: str
+) -> (Dict, List):
     """
     A function to request download URLs for a download list (from check_dwnld_opts)
 
     :param api_key: The API key created at login to authenticate user.
-    :param dwlds_lst: The available download list created by check_dwnld_opts.
+    :param dwlds_lst: The available download list created and returned
+                      by check_dwnld_opts.
     :param dwnld_label: A name for the download - can be anything you want but should
                         be meaningful to you.
     :return: a dict of download IDs and URL which are ready to be downloaded and

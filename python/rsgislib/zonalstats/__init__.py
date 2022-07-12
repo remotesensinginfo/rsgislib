@@ -23,25 +23,7 @@ the polygon then the centriod is used.
 
 * rsgislib.zonalstats.calc_zonal_band_stats_test_poly_pts
 
-"""
-# import the C++ extension into this level
-from ._zonalstats import *
 
-import math
-import sys
-from typing import List
-
-from osgeo import gdal
-from osgeo import ogr
-from osgeo import osr
-import numpy
-import tqdm
-
-import rsgislib
-
-gdal.UseExceptions()
-
-"""
 Alternatively, the other functions are slower to execute but have more options with
 respect to the method of intersection. The options for intersection are:
 
@@ -58,6 +40,23 @@ respect to the method of intersection. The options for intersection are:
                                          # the polygon
 * METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within pixel
 """
+
+# import the C++ extension into this level
+from ._zonalstats import *
+
+import math
+import sys
+from typing import List
+
+from osgeo import gdal
+from osgeo import ogr
+from osgeo import osr
+import numpy
+import tqdm
+
+import rsgislib
+
+gdal.UseExceptions()
 
 METHOD_POLYCONTAINSPIXEL = 0  # Polygon completely contains pixel
 METHOD_POLYCONTAINSPIXELCENTER = 1  # Pixel center is within the polygon

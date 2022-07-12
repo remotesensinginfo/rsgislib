@@ -97,6 +97,14 @@ Options for interpolating raster data:
     * INTERP_AVERAGE = 5
     * INTERP_MODE = 6
 
+Options for image stretching / normalisation:
+
+    * IMG_STRETCH_USER = 1
+    * IMG_STRETCH_LINEAR = 2
+    * IMG_STRETCH_STDEV = 2
+    * IMG_STRECTH_CUMULATIVE = 3
+
+
 """
 from __future__ import print_function
 
@@ -188,6 +196,11 @@ GEOM_LINE = 2
 GEOM_POLY = 3
 GEOM_MLINE = 4
 GEOM_MPOLY = 5
+
+IMG_STRETCH_USER = 1
+IMG_STRETCH_LINEAR = 2
+IMG_STRETCH_STDEV = 2
+IMG_STRECTH_CUMULATIVE = 3
 
 
 def get_install_base_path() -> pathlib.PurePath:

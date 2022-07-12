@@ -659,6 +659,7 @@ def plot_histogram_threshold(
     hist_clr: str = "gray",
     out_format: str = None,
     plot_dpi: int = 300,
+    n_bins: int = None,
 ):
     """
     A function which creates a histogram plot for a numpy array of data and optionally
@@ -672,6 +673,8 @@ def plot_histogram_threshold(
     :param out_format: the output format of the plot. If None then matplotlib uses
                        the output file extension.
     :param plot_dpi: the dpi for the output plot.
+    :parma n_bins: specify the number of bins within the histogram. If None (default)
+                   then the number of bins will be calculated from the data.
 
     """
     import rsgislib
@@ -682,7 +685,8 @@ def plot_histogram_threshold(
         )
     import rsgislib.tools.stats
 
-    n_bins, bin_width = rsgislib.tools.stats.get_nbins_histogram(data)
+    if n_bins is None:
+        n_bins, bin_width = rsgislib.tools.stats.get_nbins_histogram(data)
 
     plt.figure()
     plt.hist(data, bins=n_bins, color=hist_clr)
