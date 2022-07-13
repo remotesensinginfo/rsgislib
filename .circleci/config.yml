@@ -37,6 +37,7 @@ jobs:
             mkdir -p pytest_reports/coverage
             pip install pytest-html coverage pytest-cov
             pip install pysondb
+            pip install matplotlib-scalebar
             pytest -v python_tests --cov=/opt/miniconda/lib/python3.9/site-packages/rsgislib --cov-report=xml:pytest_reports/coverage.xml --cov-report=html:pytest_reports/coverage/ --junitxml=pytest_reports/junit.xml --html=pytest_reports/rsgisib_tests_report.html --self-contained-html
       - store_test_results:
           path: pytest_reports
@@ -49,6 +50,7 @@ jobs:
       - run:
           name: build documentation
           command: |
+            pip install matplotlib-scalebar
             cd doc/python
             sh run_doc_gen.sh
       - aws-s3/sync:
