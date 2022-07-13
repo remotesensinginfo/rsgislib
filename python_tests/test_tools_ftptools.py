@@ -22,7 +22,7 @@ ftp_url_ref = "ftp.dlptest.com"
 ftp_user_ref = "dlpuser"
 ftp_pass_ref = "rNrKYTX9g7z3RgJRmxWuGHbeu"
 
-
+@pytest.mark.skipif(True, reason="Skip test as timeout can be a problem for ci.")
 def test_upload_ftp_file():
     import rsgislib.tools.ftptools
 
@@ -63,10 +63,11 @@ def test_get_ftp_file_listings():
     assert len(non_dirs_lst) > 0
 
 
-@pytest.mark.skipif(
-    True,
-    reason="pysondb dependency not available and test currently skipped as timeout can be a problem for ci.",
-)
+#@pytest.mark.skipif(
+#    True,
+#    reason="pysondb dependency not available and test currently skipped as timeout can be a problem for ci.",
+#)
+@pytest.mark.skipif(True, reason="Skip test as timeout can be a problem for ci.")
 def test_create_file_listings_db(tmp_path):
     import rsgislib.tools.ftptools
 
@@ -93,7 +94,7 @@ def test_create_file_listings_db(tmp_path):
 
     assert os.path.exists(out_db_file)
 
-
+@pytest.mark.skipif(True, reason="Skip test as timeout can be a problem for ci.")
 def test_download_ftp_file(tmp_path):
     import rsgislib.tools.ftptools
 
@@ -121,7 +122,8 @@ def test_download_ftp_file(tmp_path):
     assert os.path.exists(out_file)
 
 
-@pytest.mark.skipif(PYCURL_DB_NOT_AVAIL, reason="pycurl dependency not available")
+#@pytest.mark.skipif(PYCURL_DB_NOT_AVAIL, reason="pycurl dependency not available")
+@pytest.mark.skipif(True, reason="Skip test as timeout can be a problem for ci.")
 def test_download_curl_ftp_file(tmp_path):
     import rsgislib.tools.ftptools
 
