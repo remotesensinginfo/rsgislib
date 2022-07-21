@@ -130,7 +130,7 @@ def get_file_vec_extension(format: str):
     :return: string
 
     """
-    if format.lower() == "GPKG":
+    if format.lower() == "gpkg":
         ext = "gpkg"
     elif format.lower() == "geojson":
         ext = "geojson"
