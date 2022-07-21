@@ -104,6 +104,14 @@ Options for image stretching / normalisation:
     * IMG_STRETCH_STDEV = 2
     * IMG_STRECTH_CUMULATIVE = 3
 
+Options for vector geometry types:
+
+    * GEOM_PT = 1
+    * GEOM_LINE = 2
+    * GEOM_POLY = 3
+    * GEOM_MPT = 4
+    * GEOM_MLINE = 5
+    * GEOM_MPOLY = 6
 
 """
 from __future__ import print_function
@@ -194,8 +202,9 @@ INTERP_MODE = 6
 GEOM_PT = 1
 GEOM_LINE = 2
 GEOM_POLY = 3
-GEOM_MLINE = 4
-GEOM_MPOLY = 5
+GEOM_MPT = 4
+GEOM_MLINE = 5
+GEOM_MPOLY = 6
 
 IMG_STRETCH_USER = 1
 IMG_STRETCH_LINEAR = 2

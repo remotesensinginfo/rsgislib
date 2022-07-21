@@ -121,6 +121,32 @@ def check_format_name(vec_file_format: str) -> str:
     return out_format
 
 
+def get_file_vec_extension(format: str):
+    """
+    A function to get the extension for a given file format
+    (NOTE, currently only GPKG, GeoJSON, ESRI Shapefile, KML, KMZ, GML are supported).
+
+    :param format: OGR string for the format.
+    :return: string
+
+    """
+    if format.lower() == "GPKG":
+        ext = "gpkg"
+    elif format.lower() == "geojson":
+        ext = "geojson"
+    elif format.lower() == "esri shapefile":
+        ext = "shp"
+    elif format.lower() == "KML":
+        ext = "kml"
+    elif format.lower() == "GML":
+        ext = "gml"
+    else:
+        raise rsgislib.RSGISPyException(
+            f"The extension for the format ({format}) specified is unknown."
+        )
+    return ext
+
+
 def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None) -> str:
     """
     A function which gets the WKT projection from the inputted vector file.
@@ -2067,15 +2093,15 @@ def perform_spatial_join(
         )
 
     base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
-    join_gpg_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
+    join_gpd_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
 
-    join_gpg_df = geopandas.sjoin(base_gpd_df, join_gpg_df, how=join_how, op=join_op)
+    join_gpd_df = geopandas.sjoin(base_gpd_df, join_gpd_df, how=join_how, op=join_op)
 
-    if len(join_gpg_df) > 0:
+    if len(join_gpd_df) > 0:
         if out_format == "GPKG":
-            join_gpg_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+            join_gpd_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
-            join_gpg_df.to_file(out_vec_file, driver=out_format)
+            join_gpd_df.to_file(out_vec_file, driver=out_format)
 
 
 def does_vmsk_img_intersect(
@@ -3209,3 +3235,112 @@ def rm_feat_att_duplicates(
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def match_closest_vec_pts(
+    vec_base_file: str,
+    vec_base_lyr: str,
+    vec_match_file: str,
+    vec_match_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GeoJSON",
+    tolerance=None,
+    cp_match_atts=False,
+    out_x_col="x_match",
+    out_y_col="y_match",
+    out_dist_col="dist_match",
+    out_att_prefix="match_",
+):
+    """
+    A function which finds the closest point between two vectors of point geometry.
+    There is an option to copy the attributes from the matched points to the output
+    in which case this can be used as a form of spatial join.
+
+    Note. this function is not intended to be used with large datasets and the full
+    distance matrix (i.e., every point to every other point) is calculated.
+
+    :param vec_base_file: Input base vector file which will be outputted
+    :param vec_base_lyr: Input base vector layer name.
+    :param vec_match_file: Input match vector file which will be matched to the base
+                          vector
+    :param vec_match_lyr: Input match vector layer name.
+    :param out_vec_file: the output vector file path
+    :param out_vec_lyr: the output vector layer name
+    :param out_format: the output format (Default: GeoJSON)
+    :param tolerance: a tolerance threshold where matches over this distance will not
+                      be outputted (i.e., the input vector will be subsetted).
+    :param cp_match_atts:
+    :param out_x_col: the output column name for the matched x coordinate from the
+                      vec_match_lyr. Default: x_match
+    :param out_y_col: the output column name for the matched y coordinate from the
+                      vec_match_lyr. Default: y_match
+    :param out_dist_col: the output column name for the distances between the base point
+                         and the matched point.
+    :param out_att_prefix:
+
+    """
+    import geopandas
+    import numpy
+    import rsgislib.tools.geometrytools
+
+    base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
+    match_gpd_df = geopandas.read_file(vec_match_file, layer=vec_match_lyr)
+
+    # calculate the distance matrix between all the points
+    dist_matrix = match_gpd_df.geometry.apply(lambda g: base_gpd_df.distance(g))
+
+    # find min distance for each feature in base
+    min_dists = dist_matrix.min()
+
+    out_x = list()
+    out_y = list()
+    out_dists = list()
+    match_atts = dict()
+    if cp_match_atts:
+        for match_col in match_gpd_df.columns:
+            if match_col != "geometry":
+                match_atts[match_col] = list()
+
+    for i, min_dist in enumerate(min_dists):
+        join_feat = numpy.where(dist_matrix[i].values == min_dist)[0]
+        if join_feat.shape[0] != 1:
+            raise rsgislib.RSGISPyException(
+                "Multiple features found - don't know what to do with that!"
+            )
+        join_feat = join_feat[0]
+
+        base_x = base_gpd_df.iloc[[i]].geometry.x.values[0]
+        base_y = base_gpd_df.iloc[[i]].geometry.y.values[0]
+
+        join_x = match_gpd_df.iloc[[join_feat]].geometry.x.values[0]
+        join_y = match_gpd_df.iloc[[join_feat]].geometry.y.values[0]
+        dist_val = rsgislib.tools.geometrytools.calc_pt_distance(
+            base_x, base_y, join_x, join_y
+        )
+
+        out_x.append(join_x)
+        out_y.append(join_y)
+        out_dists.append(dist_val)
+
+        if cp_match_atts:
+            for match_col in match_atts:
+                match_atts[match_col].append(
+                    match_gpd_df.iloc[[join_feat]][match_col].values[0]
+                )
+
+    base_gpd_df[out_x_col] = out_x
+    base_gpd_df[out_y_col] = out_y
+    base_gpd_df[out_dist_col] = out_dists
+
+    if cp_match_atts:
+        for match_col in match_atts:
+            base_gpd_df[f"{out_att_prefix}_{match_col}"] = match_atts[match_col]
+
+    if tolerance is not None:
+        base_gpd_df = base_gpd_df[base_gpd_df[out_dist_col] < tolerance]
+
+    if out_format == "GPKG":
+        base_gpd_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        base_gpd_df.to_file(out_vec_file, driver=out_format)

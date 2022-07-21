@@ -17,6 +17,7 @@ except ImportError:
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools")
 
+
 def test_get_gdal_raster_mpl_imshow_basic():
     import rsgislib.tools.plotting
 

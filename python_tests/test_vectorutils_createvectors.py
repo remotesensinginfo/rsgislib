@@ -289,8 +289,16 @@ def test_create_wgs84_vector_grid(tmp_path):
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorutils.createvectors.create_wgs84_vector_grid(out_vec_file, out_vec_lyr, 'GPKG', 1, 1, [
-        -5, 5, -5, 5], overlap=None, tile_name_prefix='test_')
+    rsgislib.vectorutils.createvectors.create_wgs84_vector_grid(
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        1,
+        1,
+        [-5, 5, -5, 5],
+        overlap=None,
+        tile_name_prefix="test_",
+    )
 
     assert os.path.exists(out_vec_file)
 
@@ -301,7 +309,15 @@ def test_create_wgs84_vector_grid_overlap(tmp_path):
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorutils.createvectors.create_wgs84_vector_grid(out_vec_file, out_vec_lyr, 'GPKG', 1, 1, [
-        -5, 5, -5, 5], overlap=0.0277777778, tile_name_prefix='test_')
+    rsgislib.vectorutils.createvectors.create_wgs84_vector_grid(
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        1,
+        1,
+        [-5, 5, -5, 5],
+        overlap=0.0277777778,
+        tile_name_prefix="test_",
+    )
 
     assert os.path.exists(out_vec_file)

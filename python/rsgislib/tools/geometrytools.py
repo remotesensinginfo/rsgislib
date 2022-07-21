@@ -496,3 +496,17 @@ def reproj_point(in_osr_proj_obj, out_osr_proj_obj, x, y):
         outX = point.GetX()
         outY = point.GetY()
     return outX, outY
+
+
+def calc_pt_distance(x1: float, y1: float, x2: float, y2: float) -> float:
+    """
+    Calculate the euclidean distance between two points
+
+    :param x1: x1 coordinate
+    :param y1: y1 coordinate
+    :param x2: x2 coordinate
+    :param y2: y2 coordinate
+    :return: euclidean distance
+
+    """
+    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)

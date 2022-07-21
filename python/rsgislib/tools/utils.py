@@ -568,6 +568,7 @@ def check_str(
 
     return str_val_tmp
 
+
 def create_ascii_text_file(input_file, output_file):
     """
     A function which will ensure that an input text file will
@@ -585,6 +586,7 @@ def create_ascii_text_file(input_file, output_file):
         out_txt_lst.append(out_line)
 
     write_list_to_file(out_txt_lst, output_file)
+
 
 def get_days_since(year: int, day_of_year: int, base_date: datetime.date) -> int:
     """

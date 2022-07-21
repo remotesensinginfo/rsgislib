@@ -8,6 +8,7 @@ Vector Attributes
 .. autofunction:: rsgislib.vectorutils.vector_maths
 .. autofunction:: rsgislib.vectorutils.copy_rat_cols_to_vector_lyr
 .. autofunction:: rsgislib.vectorutils.perform_spatial_join
+.. autofunction:: rsgislib.vectorutils.match_closest_vec_pts
 .. autoclass:: rsgislib.vectorutils.VecColVar
     :members:
 
@@ -25,6 +26,7 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.createvectors.create_bboxs_for_pts
 .. autofunction:: rsgislib.vectorutils.create_lines_of_points
 .. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
+.. autofunction:: rsgislib.vectorutils.create_vec_for_image
 
 
 

@@ -302,7 +302,13 @@ def delete_file_with_basename(input_file: str, print_rms=True):
         delete_file_silent(file)
 
 
-def rm_files_size_gt(file_path:str, file_srch:str, min_size:int, rm_file:bool=False, rm_use_basename:bool=False):
+def rm_files_size_gt(
+    file_path: str,
+    file_srch: str,
+    min_size: int,
+    rm_file: bool = False,
+    rm_use_basename: bool = False,
+):
     """
     A function which removes all the files from the search path which are
     greater than the specified size.

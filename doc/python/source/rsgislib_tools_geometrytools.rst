@@ -18,6 +18,7 @@ Testing
 Calculations
 --------------
 .. autofunction:: rsgislib.tools.geometrytools.calc_bbox_area
+.. autofunction:: rsgislib.tools.geometrytools.calc_pt_distance
 
 Compute New BBOX
 ------------------
