@@ -136,9 +136,9 @@ def get_file_vec_extension(format: str):
         ext = "geojson"
     elif format.lower() == "esri shapefile":
         ext = "shp"
-    elif format.lower() == "KML":
+    elif format.lower() == "kml":
         ext = "kml"
-    elif format.lower() == "GML":
+    elif format.lower() == "gml":
         ext = "gml"
     else:
         raise rsgislib.RSGISPyException(

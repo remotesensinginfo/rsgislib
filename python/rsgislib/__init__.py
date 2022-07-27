@@ -101,8 +101,8 @@ Options for image stretching / normalisation:
 
     * IMG_STRETCH_USER = 1
     * IMG_STRETCH_LINEAR = 2
-    * IMG_STRETCH_STDEV = 2
-    * IMG_STRECTH_CUMULATIVE = 3
+    * IMG_STRETCH_STDEV = 3
+    * IMG_STRECTH_CUMULATIVE = 4
 
 Options for vector geometry types:
 
@@ -208,8 +208,8 @@ GEOM_MPOLY = 6
 
 IMG_STRETCH_USER = 1
 IMG_STRETCH_LINEAR = 2
-IMG_STRETCH_STDEV = 2
-IMG_STRECTH_CUMULATIVE = 3
+IMG_STRETCH_STDEV = 3
+IMG_STRECTH_CUMULATIVE = 4
 
 
 def get_install_base_path() -> pathlib.PurePath:
