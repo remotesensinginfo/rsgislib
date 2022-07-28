@@ -3335,7 +3335,7 @@ def match_closest_vec_pts(
 
     if cp_match_atts:
         for match_col in match_atts:
-            base_gpd_df[f"{out_att_prefix}_{match_col}"] = match_atts[match_col]
+            base_gpd_df[f"{out_att_prefix}{match_col}"] = match_atts[match_col]
 
     if tolerance is not None:
         base_gpd_df = base_gpd_df[base_gpd_df[out_dist_col] < tolerance]

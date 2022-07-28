@@ -20,9 +20,15 @@ Overview Maps
 .. autofunction:: rsgislib.tools.mapping.get_overview_info
 .. autofunction:: rsgislib.tools.mapping.add_overview_maps
 
+Add Extras to Map
+-----------------------
+.. autofunction:: rsgislib.tools.mapping.draw_bboxes_to_axis
+.. autofunction:: rsgislib.tools.mapping.add_axis_label
+
 Utilities
 -----------
 .. autofunction:: rsgislib.tools.mapping.calc_y_fig_size
+
 
 
 * :ref:`genindex`

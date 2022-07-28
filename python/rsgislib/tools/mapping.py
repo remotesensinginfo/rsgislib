@@ -171,6 +171,132 @@ def add_contextily_basemap(
     )
 
 
+def draw_bboxes_to_axis(
+    ax: plt.axis,
+    bboxes: List[List[float]],
+    bbox_labels: List[str] = None,
+    rect_clr: str = "black",
+    line_width: float = 1,
+    fill_rect: bool = False,
+    clr_alpha: float = 1.0,
+    lbl_font_size=12,
+    lbl_font_weight="normal",
+    lbl_font_clr="black",
+    lbl_pos: str = "centre",
+    lbl_pos_buf: float = 0.0,
+):
+    """
+    This function can be used to draw a set of rectangles to an axis, where typically
+    the bboxes specify subset regions or areas of interest you are trying to highlight
+    to the person viewing the map.
+
+    :param ax: The matplotlib axis to which the bboxes will be drawn
+    :param bboxes: a list of bboxes (MinX, MaxX, MinY, MaxY) to be drawn on the axis.
+    :param bbox_labels: An optional list of labels for the bboxes
+    :param rect_clr: the colour for the bbox regions.
+    :param line_width: the width of the lines for the bboxes
+    :param fill_rect: boolean specifying whether to fill the bbox
+                      regions (Default: False)
+    :param clr_alpha: the alpha value for the bbox regions (Default: 1.0)
+    :param lbl_font_size: the font size (Default: 12).
+    :param lbl_font_weight: the weight of the font (i.e., normal or bold)
+    :param lbl_font_clr: the colour of the text (Default: black)
+    :param lbl_pos: Options: [None, above, below, left, right]. Default: None (centre)
+
+    """
+    from matplotlib.patches import Rectangle
+
+    if bbox_labels is not None:
+        if len(bboxes) != len(bbox_labels):
+            raise rsgislib.RSGISPyException(
+                "If labels are provided then the list length must be the same as bboxes."
+            )
+
+    for i, bbox in enumerate(bboxes):
+        width = bbox[1] - bbox[0]
+        height = bbox[3] - bbox[2]
+        bl_x = bbox[0]
+        bl_y = bbox[2]
+        rect = Rectangle(
+            (bl_x, bl_y),
+            width,
+            height,
+            fill=fill_rect,
+            color=rect_clr,
+            linewidth=line_width,
+            alpha=clr_alpha,
+        )
+        ax.add_patch(rect)
+        if bbox_labels is not None:
+            cx = bl_x + width / 2
+            cy = bl_y + height / 2
+
+            ha_val = "center"
+            va_val = "center"
+
+            if lbl_pos is not None:
+                if lbl_pos.lower() == "above":
+                    cy = bl_y + height + lbl_pos_buf
+                    va_val = "bottom"
+                elif lbl_pos.lower() == "below":
+                    cy = bl_y - lbl_pos_buf
+                    va_val = "top"
+                elif lbl_pos.lower() == "left":
+                    cx = bl_x - lbl_pos_buf
+                    ha_val = "right"
+                elif lbl_pos.lower() == "right":
+                    cx = bl_x + width + lbl_pos_buf
+                    ha_val = "left"
+
+            ax.annotate(
+                bbox_labels[i],
+                (cx, cy),
+                color=lbl_font_clr,
+                weight=lbl_font_weight,
+                fontsize=lbl_font_size,
+                ha=ha_val,
+                va=va_val,
+            )
+
+
+def add_axis_label(
+    ax: plt.axis,
+    lbl_text: str,
+    lbl_font_clr: str = "black",
+    lbl_font_weight: str = "normal",
+    lbl_font_size: int = 12,
+    fill_clr: str = "white",
+    padding=3.0,
+):
+    """
+    This function adds a label in the top-left corner of the axis. This function
+    would typically be used if you want to label a number of axes (e.g., a, b, c, etc.)
+
+    :param ax: The matplotlib axis to which the label will be added.
+    :param lbl_text: the label text to be written.
+    :param lbl_font_clr: the colour of the text (Default: black)
+    :param lbl_font_weight: the weight of the font (i.e., normal or bold)
+    :param lbl_font_size: the font size (Default: 12).
+    :param fill_clr: the colour the label area will be filled with (Default: white)
+    :param padding: the amount of padding around the text (Default: 3.0)
+
+    """
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+
+    ax.text(
+        xmin,
+        ymax,
+        lbl_text,
+        color=lbl_font_clr,
+        weight=lbl_font_weight,
+        fontsize=lbl_font_size,
+        ha="left",
+        va="top",
+        bbox=dict(facecolor=fill_clr, edgecolor="none", pad=padding),
+    )
+
+
 def create_vec_lyr_map(
     ax: plt.axis,
     gp_vecs: Union[geopandas.GeoDataFrame, List[geopandas.GeoDataFrame]],

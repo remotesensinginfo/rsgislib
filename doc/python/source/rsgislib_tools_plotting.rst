@@ -25,9 +25,17 @@ Visualise Raster Data
 .. autofunction:: rsgislib.tools.plotting.manual_stretch_np_arr
 .. autofunction:: rsgislib.tools.plotting.limit_range_np_arr
 
-Other
--------
+Legends
+--------
+.. autofunction:: rsgislib.tools.plotting.create_legend_info_dict
 .. autofunction:: rsgislib.tools.plotting.create_legend_img
+.. autofunction:: rsgislib.tools.plotting.create_legend_img_file
+.. autofunction:: rsgislib.tools.plotting.create_legend_img_mpl_ax
+
+Other
+------
+.. autofunction:: rsgislib.tools.plotting.gen_colour_lst
+.. autofunction:: rsgislib.tools.plotting.add_img_to_axis
 
 
 * :ref:`genindex`

@@ -1543,92 +1543,28 @@ def create_legend_img_file(
         char_width,
         bkgd_clr,
         title_height,
-        margin)
+        margin,
+    )
 
     img_obj.save(out_img_file)
 
-
-def create_legend_img_file(
-        out_img_file: str,
-        legend_info: Dict,
-        n_cols: int = 1,
-        box_size: Tuple[int] = (10, 20),
-        title_str: str = None,
-        font_size: int = 12,
-        font: str = "Arial",
-        font_clr: Tuple[int] = (0, 0, 0, 255),
-        col_width: int = None,
-        img_height: int = None,
-        char_width: int = 6,
-        bkgd_clr: Tuple[int] = (255, 255, 255, 255),
-        title_height: int = 16,
-        margin: int = 2,
-):
-    """
-    A function which uses the create_legend_img function to generate a legend
-    image file using the PIL module. Colours can be specified using any format
-    PIL supports (i.e., hex or list 3 or 4 values). The output image has an
-    alpha channel.
-
-    :param out_img_file: the output image file (Recommend output as PNG).
-    :param legend_info: dict using the class names as the key and value is the colour
-                        used for the class.
-    :param n_cols: the number of columns the classes are split between (Default: 1).
-    :param box_size: the size, in pixels, of the colour box for each class.
-                     Default: (10, 20)
-    :param title_str: An optional title for the legend. If None then no title,
-                      default: None
-    :param font_size: The size of the font to use for the legend (Default: 12)
-    :param font: Optionally, pass a ttf file or font name for the font to be used.
-                 Default: Arial
-    :param font_clr: The font colour (Default: (0, 0, 0, 255) i.e., black)
-    :param col_width: Override the calculated column width in pixels. (Default: None)
-    :param img_height: Override the calculated image height in pixels. (Default: None)
-    :param char_width: Define the number of pixels representing each character used
-                       for calculating column widths. Try changing this before
-                       overriding the column width. (Default: 6)
-    :param bkgd_clr: the background colour for the legend
-                     (Default: (255, 255, 255, 255) i.e., white). Note, this uses
-                     an alpha channel so specifying (255, 255, 255, 0) will provide
-                     a transparent background
-    :param title_height: Extra height in pixels for the title (Default: 16)
-    :param margin: The margin in pixels around the image each and between features
-                   (Default: 2)
-
-    """
-    img_obj = create_legend_img(
-        legend_info,
-        n_cols,
-        box_size,
-        title_str,
-        font_size,
-        font,
-        font_clr,
-        col_width,
-        img_height,
-        char_width,
-        bkgd_clr,
-        title_height,
-        margin)
-
-    img_obj.save(out_img_file)
 
 def create_legend_img_mpl_ax(
-        ax: plt.axis,
-        legend_info: Dict,
-        n_cols: int = 1,
-        box_size: Tuple[int] = (10, 20),
-        title_str: str = None,
-        font_size: int = 12,
-        font: str = "Arial",
-        font_clr: Tuple[int] = (0, 0, 0, 255),
-        col_width: int = None,
-        img_height: int = None,
-        char_width: int = 6,
-        bkgd_clr: Tuple[int] = (255, 255, 255, 255),
-        title_height: int = 16,
-        margin: int = 2,
-        turn_off_axis_feats=True,
+    ax: plt.axis,
+    legend_info: Dict,
+    n_cols: int = 1,
+    box_size: Tuple[int] = (10, 20),
+    title_str: str = None,
+    font_size: int = 12,
+    font: str = "Arial",
+    font_clr: Tuple[int] = (0, 0, 0, 255),
+    col_width: int = None,
+    img_height: int = None,
+    char_width: int = 6,
+    bkgd_clr: Tuple[int] = (255, 255, 255, 255),
+    title_height: int = 16,
+    margin: int = 2,
+    turn_off_axis_feats=True,
 ):
     """
     A function which uses the create_legend_img function to generate a legend
@@ -1679,22 +1615,30 @@ def create_legend_img_mpl_ax(
         char_width,
         bkgd_clr,
         title_height,
-        margin)
+        margin,
+    )
 
     ax.imshow(img_obj)
     if turn_off_axis_feats:
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['bottom'].set_visible(False)
-        ax.spines['left'].set_visible(False)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.spines["left"].set_visible(False)
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
 
-def create_legend_info_dict(input_img: str, cls_names_col: str, use_title_case=False,
-                            underscore_to_space=False, red_col: str = "Red",
-                            green_col: str = "Green", blue_col: str = "Blue",
-                            alpha_col: str = "Alpha",
-                            histogram_col: str = "Histogram") -> Dict[str, Tuple[int]]:
+
+def create_legend_info_dict(
+    input_img: str,
+    cls_names_col: str,
+    use_title_case=False,
+    underscore_to_space=False,
+    red_col: str = "Red",
+    green_col: str = "Green",
+    blue_col: str = "Blue",
+    alpha_col: str = "Alpha",
+    histogram_col: str = "Histogram",
+) -> Dict[str, Tuple[int]]:
     """
     A function which creates the legend_info dict for the create_legend_img function
     from an input image file with RAT. It assumes that the RAT contains a column with
@@ -1732,12 +1676,9 @@ def create_legend_info_dict(input_img: str, cls_names_col: str, use_title_case=F
 
     out_cls_info = dict()
 
-    for cls_name, red_val, green_val, blue_val, alpha_val, hist_val in zip(cls_names,
-                                                                           red_clrs,
-                                                                           green_clrs,
-                                                                           blue_clrs,
-                                                                           alpha_clrs,
-                                                                           histogram_vals):
+    for cls_name, red_val, green_val, blue_val, alpha_val, hist_val in zip(
+        cls_names, red_clrs, green_clrs, blue_clrs, alpha_clrs, histogram_vals
+    ):
         cls_name_str = str(cls_name.decode())
         if (cls_name_str != "") and (hist_val > 0):
 
@@ -1750,6 +1691,7 @@ def create_legend_info_dict(input_img: str, cls_names_col: str, use_title_case=F
             out_cls_info[cls_name_str] = (red_val, green_val, blue_val, alpha_val)
 
     return out_cls_info
+
 
 def gen_colour_lst(cmap_name: str, n_clrs: int, reverse: bool = False) -> List[str]:
     """
@@ -1782,3 +1724,29 @@ def gen_colour_lst(cmap_name: str, n_clrs: int, reverse: bool = False) -> List[s
     if reverse == True:
         clr_lst.reverse()
     return clr_lst
+
+
+def add_img_to_axis(ax: plt.axis, img_file_path: str, turn_off_axis_feats=True):
+    """
+    A function which renders an image file (e.g., PNG, JPG; anything PIL will read)
+    to a matplotlib axis. This can be useful for adding a separate legend or image
+    to a plot with multiple axes.
+
+    :param ax: The matplotlib axis to which to add the image to.
+    :param img_file_path: the file path to the input image.
+    :param turn_off_axis_feats: boolean specifying that the axis features (i.e.,
+                                ticks and border) should turned off (Default: True)
+
+    """
+    import PIL.Image
+
+    pil_img_obj = PIL.Image.open(img_file_path)
+    ax.imshow(pil_img_obj)
+    if turn_off_axis_feats:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+        ax.get_xaxis().set_ticks([])
+        ax.get_yaxis().set_ticks([])
+    pil_img_obj = None
