@@ -30,6 +30,9 @@ from ._imageregistration import *
 
 import rsgislib
 
+import numpy
+from osgeo import gdal
+
 METRIC_EUCLIDEAN = 1
 METRIC_SQDIFF = 2
 METRIC_MANHATTEN = 3
@@ -150,3 +153,105 @@ def warp_with_gcps_with_gdal(
 
     inFile = None
     outFile = None
+
+
+def add_pts_as_gcps_to_img(
+    input_img: str,
+    output_img: str,
+    vec_file: str,
+    vec_lyr: str = None,
+    gcp_x_col: str = "x_match",
+    gcp_y_col: str = "y_match",
+    gcp_z_col: str = None,
+    gcp_epsg: int = None,
+):
+    """
+    A function which uses a points vector layer to specify GCP locations within the
+    image with attributes to the vector layer used to specify the GCP spatial
+    location.
+
+    Note. input_img and output_img can be the same file path if you do not
+    want an new output image to be created (i.e., for the input file to be edited)
+
+    :param input_img: The input image file path
+    :param output_img: The output image path
+    :param vec_file: the vector file path
+    :param vec_lyr: the vector layer name
+    :param gcp_x_col: column within the vector layer specifying the GCP x coordinates
+    :param gcp_y_col: column within the vector layer specifying the GCP y coordinates
+    :param gcp_z_col: column within the vector layer specifying the GCP x coordinates.
+                      The Z coordinate is optional, Default is None.
+    :param gcp_epsg: Optionally specify an EPSG code for the projection the GCP points.
+                     If None (Default) then the projection of the input image will
+                     used.
+
+    """
+
+    import shutil
+    import geopandas
+    import rsgislib.imageutils
+    import rsgislib.vectorutils
+    import rsgislib.tools.projection
+
+    # Check the dataset geometry is points
+    if (
+        rsgislib.vectorutils.get_vec_lyr_geom_type(vec_file, vec_lyr)
+        != rsgislib.GEOM_PT
+    ):
+        raise rsgislib.RSGISPyException("Input vector layer must be a point dataset.")
+
+    gpd_pts_df = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    n_rows = len(gpd_pts_df)
+    print(n_rows)
+
+    pt_sp_x_lst = list()
+    pt_sp_y_lst = list()
+    gcp_sp_x_lst = list()
+    gcp_sp_y_lst = list()
+    gcp_sp_z_lst = list()
+
+    for i in range(n_rows):
+        pt_sp_x_lst.append(gpd_pts_df.iloc[[i]].geometry.x.values[0])
+        pt_sp_y_lst.append(gpd_pts_df.iloc[[i]].geometry.y.values[0])
+
+        gcp_sp_x_lst.append(gpd_pts_df.iloc[[i]][gcp_x_col].values[0])
+        gcp_sp_y_lst.append(gpd_pts_df.iloc[[i]][gcp_y_col].values[0])
+        gcp_sp_z = 0.0
+        if gcp_z_col is not None:
+            gcp_sp_z = gpd_pts_df.iloc[[i]][gcp_z_col].values[0]
+
+        gcp_sp_z_lst.append(gcp_sp_z)
+
+    pt_pxl_x_lst, pt_pxl_y_lst = rsgislib.imageutils.get_img_pxl_coords(
+        input_img, x_coords=numpy.array(pt_sp_x_lst), y_coords=numpy.array(pt_sp_y_lst)
+    )
+
+    gcps_lst = list()
+    for i in range(n_rows):
+        gcps_lst.append(
+            gdal.GCP(
+                gcp_sp_x_lst[i],
+                gcp_sp_y_lst[i],
+                gcp_sp_z_lst[i],
+                int(pt_pxl_x_lst[i]),
+                int(pt_pxl_y_lst[i]),
+            )
+        )
+
+    if gcp_epsg is None:
+        gcp_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
+
+    gcp_prj_obj = rsgislib.tools.projection.get_osr_prj_obj(gcp_epsg)
+
+    # Make a copy of the input image so edit does not change this image file.
+    if input_img != output_img:
+        shutil.copy(input_img, output_img)
+
+    img_ds = gdal.Open(output_img, gdal.GA_Update)
+    if img_ds is None:
+        raise rsgislib.RSGISPyException(
+            "Could not open raster image: {}".format(input_img)
+        )
+    img_ds.SetGCPs(gcps_lst, gcp_prj_obj)
+    img_ds = None
