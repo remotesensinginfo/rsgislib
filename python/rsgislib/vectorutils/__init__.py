@@ -209,7 +209,8 @@ def get_vec_feat_count(
     Get a count of the number of features in the vector layers.
 
     :param vec_file: is a string with the input vector file name and path.
-    :param vec_lyr: is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
+    :param vec_lyr: is the layer for which extent is to be calculated (Default: None).
+                    if None assume there is only one layer and that will be read.
     :param compute_count: is a boolean which specifies whether the layer extent
                          should be calculated (rather than estimated from header)
                          even if that operation is computationally expensive.
@@ -229,11 +230,72 @@ def get_vec_feat_count(
     return nFeats
 
 
+def get_vec_lyr_geom_type(vec_file: str, vec_lyr: str = None) -> int:
+    """
+    A function which returns an rsgislib.GEOM_XX value related to the vector
+    geometry type.
+
+    :param vec_file: is a string with the input vector file name and path.
+    :param vec_lyr: is the layer for which extent is to be calculated (Default: None).
+                    if None assume there is only one layer and that will be read.
+    :return: int representing the geometry type (rsgislib.GEOM_XX)
+
+    """
+    vec_ds_obj = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    if vec_ds_obj is None:
+        raise rsgislib.RSGISPyException(f"Could not open input file: {vec_file}")
+
+    if vec_lyr is None:
+        vec_lyr_obj = vec_ds_obj.GetLayer()
+    else:
+        vec_lyr_obj = vec_ds_obj.GetLayer(vec_lyr)
+
+    if vec_lyr_obj is None:
+        raise rsgislib.RSGISPyException(
+            f"Could not open vector layer ({vec_lyr}) in vector file {vec_file}"
+        )
+
+    vec_lyr_defn = vec_lyr_obj.GetLayerDefn()
+    geom_type = vec_lyr_defn.GetGeomType()
+    vec_ds_obj = None
+
+    out_geom_type = 0
+    if geom_type == ogr.wkbPolygon:
+        out_geom_type = rsgislib.GEOM_POLY
+    elif geom_type == ogr.wkbPolygon25D:
+        out_geom_type = rsgislib.GEOM_POLY
+    elif geom_type == ogr.wkbPoint:
+        out_geom_type = rsgislib.GEOM_PT
+    elif geom_type == ogr.wkbPoint25D:
+        out_geom_type = rsgislib.GEOM_PT
+    elif geom_type == ogr.wkbLineString:
+        out_geom_type = rsgislib.GEOM_LINE
+    elif geom_type == ogr.wkbLineString25D:
+        out_geom_type = rsgislib.GEOM_LINE
+    elif geom_type == ogr.wkbMultiPolygon:
+        out_geom_type = rsgislib.GEOM_MPOLY
+    elif geom_type == ogr.wkbMultiPolygon25D:
+        out_geom_type = rsgislib.GEOM_MPOLY
+    elif geom_type == ogr.wkbMultiPoint:
+        out_geom_type = rsgislib.GEOM_MPT
+    elif geom_type == ogr.wkbMultiPoint25D:
+        out_geom_type = rsgislib.GEOM_MPT
+    elif geom_type == ogr.wkbMultiLineString:
+        out_geom_type = rsgislib.GEOM_MLINE
+    elif geom_type == ogr.wkbMultiLineString25D:
+        out_geom_type = rsgislib.GEOM_MLINE
+    else:
+        raise Exception(
+            "Do not recognise Geometry Type: '{}'".format(
+                ogr.GeometryTypeToName(geom_type)
+            )
+        )
+
+    return out_geom_type
+
+
 def count_feats_per_att_val(
-    vec_file: str,
-    vec_lyr: str,
-    col_name: str,
-    out_df_dict: bool = False,
+    vec_file: str, vec_lyr: str, col_name: str, out_df_dict: bool = False,
 ) -> Dict:
     """
     A function which returns the count of features for each variable
