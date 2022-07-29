@@ -202,15 +202,13 @@ def add_pts_as_gcps_to_img(
 
     gpd_pts_df = geopandas.read_file(vec_file, layer=vec_lyr)
 
-    n_rows = len(gpd_pts_df)
-    print(n_rows)
-
     pt_sp_x_lst = list()
     pt_sp_y_lst = list()
     gcp_sp_x_lst = list()
     gcp_sp_y_lst = list()
     gcp_sp_z_lst = list()
 
+    n_rows = len(gpd_pts_df)
     for i in range(n_rows):
         pt_sp_x_lst.append(gpd_pts_df.iloc[[i]].geometry.x.values[0])
         pt_sp_y_lst.append(gpd_pts_df.iloc[[i]].geometry.y.values[0])
