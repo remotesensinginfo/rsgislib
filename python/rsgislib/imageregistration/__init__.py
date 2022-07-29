@@ -155,7 +155,7 @@ def warp_with_gcps_with_gdal(
     outFile = None
 
 
-def add_pts_as_gcps_to_img(
+def add_vec_pts_as_gcps_to_img(
     input_img: str,
     output_img: str,
     vec_file: str,
