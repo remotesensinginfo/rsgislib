@@ -39,6 +39,25 @@ def calc_y_fig_size(bbox: List[float], fig_x_size=Union[int, float]) -> float:
     return fig_y_size
 
 
+def define_axis_extent(ax: plt.axis, bbox: List[float]):
+    """
+    A function which defines the limits of the axis using the same bbox
+    as the other mapping functions.
+
+    Note. this function was written and is probably mainly used for defining
+    the axis limits when experimenting with the size/shape of the axis when
+    laying out multiple axes. However, it could be used to change the axis
+    limits from what the other functions have defined.
+
+    :param ax: The matplotlib axis for the limits to be set.
+    :param bbox: a bbox (MinX, MaxX, MinY, MaxY) to define the region of interest.
+
+    """
+    ax.set_aspect("equal", "box")
+    ax.set_xlim([bbox[0], bbox[1]])
+    ax.set_ylim([bbox[2], bbox[3]])
+
+
 def get_overview_info(
     roi_bbox: List[float],
     roi_epsg: int = 4236,
