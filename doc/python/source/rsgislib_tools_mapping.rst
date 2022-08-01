@@ -29,6 +29,7 @@ Utilities
 -----------
 .. autofunction:: rsgislib.tools.mapping.calc_y_fig_size
 .. autofunction:: rsgislib.tools.mapping.define_axis_extent
+.. autofunction:: rsgislib.tools.mapping.define_map_tick_spacing
 
 
 * :ref:`genindex`
