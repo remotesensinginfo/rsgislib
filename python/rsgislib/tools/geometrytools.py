@@ -321,13 +321,17 @@ def find_common_extent_on_grid(base_extent, base_grid, other_extent, full_contai
 
 def find_extent_on_grid(base_extent, base_grid, full_contain=True):
     """
-    A function which calculates the extent but defined on a grid with defined resolution.
-    Useful for finding extent on a particular image grid.
+    A function which calculates the extent but defined on a grid with defined
+    resolution. Useful for finding extent on a particular image grid.
 
-    :param base_extent: is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
+    :param base_extent: is a bbox (xMin, xMax, yMin, yMax) providing the base for
+                        the grid on which output will be defined.
     :param base_grid: the size of the (square) grid on which output will be defined.
-    :param full_contain: is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
-                                      False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
+    :param full_contain: is a boolean. True: moving output onto grid will increase
+                                       size of bbox (i.e., intersection fully contained)
+                                       False: move output onto grid will decrease size
+                                       of bbox (i.e., bbox fully contained within
+                                       intesection)
 
     :return: bbox (xMin, xMax, yMin, yMax)
 
@@ -337,8 +341,20 @@ def find_extent_on_grid(base_extent, base_grid, full_contain=True):
     yMin = base_extent[2]
     yMax = base_extent[3]
 
-    diffX = xMax - xMin
-    diffY = abs(yMax - yMin)
+    xMin_floor = int(math.floor(xMin))
+    yMax_ceil = int(math.ceil(yMax))
+
+    xMin_diff_floor = xMin - xMin_floor
+    yMax_diff_ceil = yMax_ceil - yMax
+
+    n_x_grid_cells = math.floor(xMin_diff_floor / base_grid)
+    n_y_grid_cells = math.floor(yMax_diff_ceil / base_grid)
+
+    xMinOut = xMin_floor + (n_x_grid_cells * base_grid)
+    yMaxOut = yMax_ceil - (n_y_grid_cells * base_grid)
+
+    diffX = xMax - xMinOut
+    diffY = abs(yMaxOut - yMin)
 
     nPxlX = 0.0
     nPxlY = 0.0
@@ -349,10 +365,10 @@ def find_extent_on_grid(base_extent, base_grid, full_contain=True):
         nPxlX = math.floor(diffX / base_grid)
         nPxlY = math.floor(diffY / base_grid)
 
-    xMaxOut = xMin + (nPxlX * base_grid)
-    yMinOut = yMax - (nPxlY * base_grid)
+    xMaxOut = xMinOut + (nPxlX * base_grid)
+    yMinOut = yMaxOut - (nPxlY * base_grid)
 
-    return [xMin, xMaxOut, yMinOut, yMax]
+    return [xMinOut, xMaxOut, yMinOut, yMaxOut]
 
 
 def find_extent_on_whole_num_grid(

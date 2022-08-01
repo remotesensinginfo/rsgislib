@@ -3332,14 +3332,17 @@ def match_closest_vec_pts(
     :param out_format: the output format (Default: GeoJSON)
     :param tolerance: a tolerance threshold where matches over this distance will not
                       be outputted (i.e., the input vector will be subsetted).
-    :param cp_match_atts:
+    :param cp_match_atts: Copy attributes from the matching vector layer.
     :param out_x_col: the output column name for the matched x coordinate from the
                       vec_match_lyr. Default: x_match
     :param out_y_col: the output column name for the matched y coordinate from the
                       vec_match_lyr. Default: y_match
     :param out_dist_col: the output column name for the distances between the base point
                          and the matched point.
-    :param out_att_prefix:
+    :param out_att_prefix: A prefix for matched attributes, if outputted
+                           (i.e., cp_match_atts = True)
+    :returns: boolean where True is outputted if some points are matched and
+              False if no points are matched.
 
     """
     import geopandas
@@ -3402,7 +3405,14 @@ def match_closest_vec_pts(
     if tolerance is not None:
         base_gpd_df = base_gpd_df[base_gpd_df[out_dist_col] < tolerance]
 
-    if out_format == "GPKG":
-        base_gpd_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        base_gpd_df.to_file(out_vec_file, driver=out_format)
+    found_match = False
+    if len(base_gpd_df) > 0:
+        if out_format == "GPKG":
+            base_gpd_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            base_gpd_df.to_file(out_vec_file, driver=out_format)
+        found_match = True
+
+    return found_match
+
+
