@@ -7,6 +7,7 @@ Endmembers
 
 .. autofunction:: rsgislib.imagecalc.specunmixing.extract_avg_endmembers
 .. autofunction:: rsgislib.imagecalc.specunmixing.read_endmembers_mtxt
+.. autofunction:: rsgislib.imagecalc.specunmixing.write_endmembers_mtxt
 .. autofunction:: rsgislib.imagecalc.specunmixing.plot_endmembers
 .. autofunction:: rsgislib.imagecalc.specunmixing.are_endmembers_equal
 .. autofunction:: rsgislib.imagecalc.specunmixing.calc_ppi

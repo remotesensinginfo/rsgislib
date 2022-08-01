@@ -58,6 +58,24 @@ def define_axis_extent(ax: plt.axis, bbox: List[float]):
     ax.set_ylim([bbox[2], bbox[3]])
 
 
+def define_map_tick_spacing(ax: plt.axis, tick_spacing: float):
+    """
+    A function which defines the tick spacing on both axis of the map.
+
+    If projection is WGS84 (EPSG:4326) then a tick spacing of 0.1 would
+    provide ticks every 0.1 degrees while if using UTM then a tick spacing
+    of 1000 will give a tick every 1km.
+
+    :param ax: The matplotlib axis for the tick spacing to be defined.
+    :param tick_spacing: the spacing between the ticks.
+
+    """
+    import matplotlib.ticker as ticker
+
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+
+
 def get_overview_info(
     roi_bbox: List[float],
     roi_epsg: int = 4236,
@@ -203,6 +221,8 @@ def draw_bboxes_to_axis(
     lbl_font_clr="black",
     lbl_pos: str = "centre",
     lbl_pos_buf: float = 0.0,
+    lbl_fill_clr: str = None,
+    lbl_padding: float = 3.0,
 ):
     """
     This function can be used to draw a set of rectangles to an axis, where typically
@@ -267,15 +287,29 @@ def draw_bboxes_to_axis(
                     cx = bl_x + width + lbl_pos_buf
                     ha_val = "left"
 
-            ax.annotate(
-                bbox_labels[i],
-                (cx, cy),
-                color=lbl_font_clr,
-                weight=lbl_font_weight,
-                fontsize=lbl_font_size,
-                ha=ha_val,
-                va=va_val,
-            )
+            if lbl_fill_clr is not None:
+                ax.annotate(
+                    bbox_labels[i],
+                    (cx, cy),
+                    color=lbl_font_clr,
+                    weight=lbl_font_weight,
+                    fontsize=lbl_font_size,
+                    ha=ha_val,
+                    va=va_val,
+                    bbox=dict(
+                        facecolor=lbl_fill_clr, edgecolor="none", pad=lbl_padding
+                    ),
+                )
+            else:
+                ax.annotate(
+                    bbox_labels[i],
+                    (cx, cy),
+                    color=lbl_font_clr,
+                    weight=lbl_font_weight,
+                    fontsize=lbl_font_size,
+                    ha=ha_val,
+                    va=va_val,
+                )
 
 
 def add_axis_label(
@@ -285,7 +319,7 @@ def add_axis_label(
     lbl_font_weight: str = "normal",
     lbl_font_size: int = 12,
     fill_clr: str = "white",
-    padding=3.0,
+    padding: float = 3.0,
 ):
     """
     This function adds a label in the top-left corner of the axis. This function

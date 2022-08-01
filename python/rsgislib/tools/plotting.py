@@ -1750,3 +1750,26 @@ def add_img_to_axis(ax: plt.axis, img_file_path: str, turn_off_axis_feats=True):
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
     pil_img_obj = None
+
+
+def update_y_tick_lbls(ax, multi=100000, integerize=False):
+    """
+    A function to update the y axis labels of a plot using a multiplier to
+    rescale the values within the labels. For example, if the multiplier was
+    100000 and the axis tick was 500000 then 5.0 will be outputted as the tick
+    label (or 5 if integerized).  You can then update the axis label with the
+    multiplier used (e.g., ax.set_ylabel(r"Freq. ($\times 100,000$)") )
+
+    :param ax: the matplotlib axis
+    :param multi: the multiplier to be used.
+    :param integerize: boolean to specify whether the values should be integerized
+
+    """
+    y_ticks = ax.get_yticks()
+    y_tick_lbls = []
+    for val in y_ticks:
+        val_out = val / multi
+        if integerize:
+            val_out = int(val_out)
+        y_tick_lbls.append(f"{val_out}")
+    ax.set_yticks(y_ticks, labels=y_tick_lbls)
