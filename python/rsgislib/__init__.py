@@ -99,6 +99,7 @@ Options for interpolating raster data:
 
 Options for image stretching / normalisation:
 
+    * IMG_STRETCH_NONE = 0
     * IMG_STRETCH_USER = 1
     * IMG_STRETCH_LINEAR = 2
     * IMG_STRETCH_STDEV = 3
@@ -206,6 +207,7 @@ GEOM_MPT = 4
 GEOM_MLINE = 5
 GEOM_MPOLY = 6
 
+IMG_STRETCH_NONE = 0
 IMG_STRETCH_USER = 1
 IMG_STRETCH_LINEAR = 2
 IMG_STRETCH_STDEV = 3

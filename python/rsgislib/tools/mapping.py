@@ -3,8 +3,7 @@
 The tools.mapping module contains functions for making maps with geospatial data.
 """
 
-from typing import Tuple, List, Dict, Union
-import os
+from typing import List, Dict, Union
 import math
 
 import rsgislib
@@ -13,6 +12,7 @@ import rsgislib.tools.plotting
 import rsgislib.imageutils
 
 import geopandas
+import numpy
 
 import matplotlib.pyplot as plt
 import matplotlib.colors
@@ -756,6 +756,111 @@ def create_choropleth_vec_lyr_map(
             distance_meters = rsgislib.tools.projection.great_circle_distance(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
+        ax.add_artist(ScaleBar(distance_meters))
+
+    if title_str is not None:
+        ax.title.set_text(title_str)
+
+
+def create_raster_cmap_img_map(
+    ax: plt.axis,
+    input_img: str,
+    img_band: int,
+    bbox: List[float] = None,
+    title_str: str = None,
+    show_scale_bar: bool = True,
+    use_grid: bool = False,
+    show_map_axis: bool = True,
+    cmap_name: str = "viridis",
+    norm_img_vals: bool = False,
+    use_log_norm: bool = False,
+    norm_vmin: float = None,
+    norm_vmax: float = None,
+    vals_under_white: bool = False,
+    print_norm_vals: bool = False,
+):
+    """
+    A function which displays a single band raster layer onto the axis provided
+    using a colour bar.
+
+    :param ax: The matplotlib axis to which to add the image to.
+    :param input_img: the file path for the input image
+    :param img_band: the image band within the file to be displayed.
+                     Note, band numbering starts at 1.
+    :param bbox: An optional bbox (MinX, MaxX, MinY, MaxY) specifying the
+                 spatial region to be displayed. If None then the whole image
+                 bbox will be used.
+    :param title_str: an optional title for the map (Default: None)
+    :param show_scale_bar: boolean specifying whether a scale bar should be added to
+                           the axis. Default: False
+    :param use_grid: boolean specifying whether a grid should be added to the axis.
+                     Default: False
+    :param show_map_axis: boolean specifying whether the axes should be shown
+                          Default: False
+    :param cmap_name: The name of the colour bar to use for the density plot
+                      Default: viridis
+    :param norm_img_vals: Boolean specifying whether the colour bar values should be
+                          normalised. Default: False
+    :param use_log_norm: Specify whether to use log normalisation for the plot
+                         instead of linear. (Default: False)
+    :param norm_vmin: the minimum value for the normalisation (default: None).
+                      If None then the minimum value will be calculated from the data.
+    :param norm_vmax: the maximum value for the normalisation (default: None).
+                      If None then the maximum value will be calculated from the data.
+    :param vals_under_white: Set pixels with values less than norm_vmin to white
+                             (i.e., mask / ignore). Can be useful if visualising
+                             counts or density estimates.
+    :param print_norm_vals: boolean specifying to print the normalisation min / max
+                            values. This is useful for debugging and finding a range
+                            of values before manually setting across a set of images.
+
+    """
+    if bbox is None:
+        bbox = rsgislib.imageutils.get_img_bbox(input_img)
+
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[img_band], bbox=bbox
+    )
+
+    c_cmap = plt.get_cmap(cmap_name).copy()
+    if norm_img_vals:
+        if norm_vmin is None:
+            norm_vmin = numpy.min(img_data)
+        if norm_vmax is None:
+            norm_vmax = numpy.max(img_data)
+
+        if vals_under_white:
+            matplotlib.colors.Colormap.set_under(c_cmap, color="white")
+
+        if use_log_norm:
+            c_norm = matplotlib.colors.LogNorm(vmin=norm_vmin, vmax=norm_vmax)
+        else:
+            c_norm = matplotlib.colors.Normalize(vmin=norm_vmin, vmax=norm_vmax)
+
+        if print_norm_vals:
+            print(f"{norm_vmin} - {norm_vmax}")
+    else:
+        c_norm = None
+
+    ax.imshow(img_data, extent=img_coords, cmap=c_cmap, norm=c_norm)
+    ax.set_xlim([img_coords[0], img_coords[1]])
+    ax.set_ylim([img_coords[2], img_coords[3]])
+
+    if use_grid:
+        ax.grid()
+
+    if not show_map_axis:
+        ax.set_axis_off()
+        ax.set_axis_off()
+
+    if show_scale_bar:
+        distance_meters = 1
+        img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
+        if img_epsg == 4326:
+            distance_meters = rsgislib.tools.projection.great_circle_distance(
+                wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+            )
+
         ax.add_artist(ScaleBar(distance_meters))
 
     if title_str is not None:

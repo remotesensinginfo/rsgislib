@@ -9,6 +9,7 @@ Map Vector Layers
 Map Raster Layers
 -------------------
 .. autofunction:: rsgislib.tools.mapping.create_raster_img_map
+.. autofunction:: rsgislib.tools.mapping.create_raster_cmap_img_map
 .. autofunction:: rsgislib.tools.mapping.create_thematic_raster_map
 
 Background Layers
