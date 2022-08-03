@@ -878,7 +878,7 @@ def sort_imgs_to_dirs_utm(input_imgs_dir: str, file_search_str: str, out_base_di
                 shutil.move(tmp_file, outFile)
 
 
-def natural_sort_file_names(in_file_lst):
+def natural_sort_file_names(in_file_lst: List[str]) -> List[str]:
     """
     A function which performs a natural sort of a list of files. For example,
     if you start file names with dates (YYYYMMDD) then this function will return
