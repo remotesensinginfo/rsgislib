@@ -596,10 +596,7 @@ def is_cmd_tool_avail(cmd_name: str, test_call_cmd: List[str] = None):
 
         try:
             rtn_info = subprocess.run(
-                test_call_cmd,
-                capture_output=True,
-                text=True,
-                check=True,
+                test_call_cmd, capture_output=True, text=True, check=True,
             )
             if rtn_info.returncode == 0:
                 return True
@@ -700,11 +697,11 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str) -> float:
     elif in_unit == "kb":
         file_size_bytes = in_size * 1024.0
     elif in_unit == "mb":
-        file_size_bytes = in_size * (1024.0**2)
+        file_size_bytes = in_size * (1024.0 ** 2)
     elif in_unit == "gb":
-        file_size_bytes = in_size * (1024.0**3)
+        file_size_bytes = in_size * (1024.0 ** 3)
     elif in_unit == "tb":
-        file_size_bytes = in_size * (1024.0**4)
+        file_size_bytes = in_size * (1024.0 ** 4)
     else:
         raise rsgislib.RSGISPyException("Input unit it not recognised.")
 
@@ -713,11 +710,11 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str) -> float:
     elif out_unit == "kb":
         out_file_size = file_size_bytes / 1024.0
     elif out_unit == "mb":
-        out_file_size = file_size_bytes / (1024.0**2)
+        out_file_size = file_size_bytes / (1024.0 ** 2)
     elif out_unit == "gb":
-        out_file_size = file_size_bytes / (1024.0**3)
+        out_file_size = file_size_bytes / (1024.0 ** 3)
     elif out_unit == "tb":
-        out_file_size = file_size_bytes / (1024.0**4)
+        out_file_size = file_size_bytes / (1024.0 ** 4)
     else:
         raise rsgislib.RSGISPyException("Output unit it not recognised.")
 
@@ -879,6 +876,30 @@ def sort_imgs_to_dirs_utm(input_imgs_dir: str, file_search_str: str, out_base_di
                 print("Moving: " + tmp_file)
                 outFile = os.path.join(out_dir, os.path.basename(tmp_file))
                 shutil.move(tmp_file, outFile)
+
+
+def natural_sort_file_names(in_file_lst):
+    """
+    A function which performs a natural sort of a list of files. For example,
+    if you start file names with dates (YYYYMMDD) then this function will return
+    the list of file names in date order (earliest first).
+
+    :param in_file_lst: the input list of file paths. The get_file_basename function
+                        is used to extract the file name which is used for the sort.
+    :return: the sorted list of names.
+
+    """
+    import re
+
+    def _natural_sort_key(s):
+        s = get_file_basename(s)
+        _nsre = re.compile("([0-9]+)")
+        return [
+            int(text) if text.isdigit() else text.lower() for text in _nsre.split(s)
+        ]
+
+    in_file_lst.sort(key=_natural_sort_key)
+    return in_file_lst
 
 
 def create_directory_archive(in_dir: str, out_arch: str, arch_format: str) -> str:

@@ -36,6 +36,7 @@ File Info
 Sorting
 --------
 .. autofunction:: rsgislib.tools.filetools.sort_imgs_to_dirs_utm
+.. autofunction:: rsgislib.tools.filetools.natural_sort_file_names
 
 Deleting
 ---------
