@@ -39,6 +39,10 @@ Chips Training Data
 .. autofunction:: rsgislib.classification.flip_ref_chip_hdf5_file
 .. autofunction:: rsgislib.classification.label_pxl_sample_chips
 
+Post Classification Refinement
+--------------------------------
+.. autofunction:: rsgislib.classification.fill_class_timeseries
+
 
 Utilities
 -----------

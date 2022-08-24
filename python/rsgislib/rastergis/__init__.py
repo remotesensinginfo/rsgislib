@@ -5,7 +5,7 @@ raster attribute tables.
 """
 import os
 import sys
-from typing import List
+from typing import List, Dict
 
 import numpy
 from osgeo import gdal
@@ -332,6 +332,45 @@ def set_class_names_colours(
     rat.writeColumn(rat_dataset, "Blue", blue_arr)
 
     rat_dataset = None
+
+
+def get_rat_colours(clumps_img: str, cls_column: str = None) -> Dict[Dict]:
+    """
+    A function which gets the colour table and optionally the
+    class names from the rat and returns it as a dict which
+    can be inputted into the rsgislib.rastergis.set_class_names_colours
+    function. This is useful for copying the class names and colours
+    between files. Output dict will have the following structure:
+
+    class_clr_info[1] = {'classname':'Forest', 'red':0, 'green':255, 'blue':0}
+    class_clr_info[2] = {'classname':'Water', 'red':0, 'green':0, 'blue':255}
+
+    :param clumps_img: Input clumps image
+    :param cls_column: Optionally a class names column can be provided.
+                       If None then ignored and output dict doesn't have
+                       a 'classname' field.
+    :return: dict of dicts
+
+    """
+    red_arr = get_column_data(clumps_img, col_name="Red")
+    grn_arr = get_column_data(clumps_img, col_name="Green")
+    blu_arr = get_column_data(clumps_img, col_name="Blue")
+    alp_arr = get_column_data(clumps_img, col_name="Alpha")
+
+    if cls_column is not None:
+        cls_names_arr = get_column_data(clumps_img, col_name=cls_column)
+
+    cls_info = dict()
+    for i in range(len(red_arr)):
+        cls_info[i] = dict()
+        cls_info[i]["red"] = int(red_arr[i])
+        cls_info[i]["green"] = int(grn_arr[i])
+        cls_info[i]["blue"] = int(blu_arr[i])
+        cls_info[i]["alpha"] = int(alp_arr[i])
+        if cls_column is not None:
+            cls_info[i]["classname"] = str(cls_names_arr[i].decode())
+
+    return cls_info
 
 
 def get_column_data(clumps_img: str, col_name: str) -> numpy.array:

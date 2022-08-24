@@ -6,7 +6,7 @@ The classification module provides classification functionality within RSGISLib.
 # import the C++ extension into this level
 from ._classification import *
 
-from typing import Dict
+from typing import List, Dict
 
 import rsgislib
 
@@ -1273,3 +1273,159 @@ def create_acc_pt_sets(
             tmp_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
             tmp_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def fill_class_timeseries(
+    input_imgs: List[str],
+    out_dir: str,
+    no_data_val: int = 0,
+    gdalformat="KEA",
+    out_img_ext="kea",
+    out_file_str="_filled",
+    double_direction: bool = True,
+    recheck_ends: bool = True,
+    n_iters: int = 3,
+    cls_names_col: str = "class_name",
+):
+    """
+    A function which will fill gaps within a time series of classification
+    using values from images either side of the input image. The function
+    initially goes through the images in the order they are within the input
+    list and then optionally (double_direction) goes back through in the reverse
+    direction before optionally rechecking the end images again (recheck_ends).
+    At can also be useful to apply this operation a number of times to fill all
+    gaps and therefore the n_iters (default 3) allows the the fill to be
+    iteratively applied.
+
+    :param input_imgs: list of input file paths
+    :param out_dir: output directory where the output images will be written
+    :param no_data_val: the no data value used within the input images (i.e.,
+                        regions to be filled.
+    :param gdalformat: the output file format. (default: KEA)
+    :param out_img_ext: the output file extension (default: kea)
+    :param out_file_str: an optional addition to the end of the output file name
+                         (Default: "_filled")
+    :param double_direction: Option to do the fill in both directions. If false then
+                             will just go through the order of the input list.
+                             (Default: True).
+    :param recheck_ends: Option to have the end images rechecked as these a missed
+                         if when they are the start image in the sequence.
+    :param n_iters: The number of iterations to be applied.
+    :param cls_names_col: If a KEA then the column name for the class column. Used
+                          for both the input and output images.
+
+    """
+    from rios import applier
+    from rios import cuiprogress
+
+    import rsgislib.rastergis
+    import rsgislib.imageutils
+    import rsgislib.tools.filetools
+
+    if len(input_imgs) < 2:
+        raise Exception("The list of input images must have at least 2 images.")
+
+    in_img_gdalformat = rsgislib.imageutils.get_gdal_format_name(input_imgs[0])
+    if in_img_gdalformat == "KEA":
+        cls_clr_info = rsgislib.rastergis.get_rat_colours(
+            input_imgs[0], cls_column=cls_names_col
+        )
+    else:
+        cls_clr_info = rsgislib.imageutils.get_colour_tab_info(input_imgs[0])
+
+    if gdalformat == "KEA":
+        for pxl_id in cls_clr_info:
+            if "classname" not in cls_clr_info[pxl_id]:
+                cls_clr_info[pxl_id]["classname"] = f"class_{pxl_id}"
+
+    in_files = applier.FilenameAssociations()
+    out_files = applier.FilenameAssociations()
+    out_imgs = list()
+    for i, img_file in enumerate(input_imgs):
+        img_basename = rsgislib.tools.filetools.get_file_basename(img_file)
+        in_files.__dict__[f"cls_in_{i}"] = img_file
+
+        out_img = os.path.join(out_dir, f"{img_basename}{out_file_str}.{out_img_ext}")
+        out_files.__dict__[f"cls_out_{i}"] = out_img
+        out_imgs.append(out_img)
+
+    other_args = applier.OtherInputs()
+    other_args.no_data_val = no_data_val
+    other_args.double_direction = double_direction
+    other_args.recheck_ends = recheck_ends
+    other_args.n_imgs = len(input_imgs)
+    other_args.n_iters = n_iters
+
+    try:
+        import tqdm
+
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    a_controls = applier.ApplierControls()
+    a_controls.progress = progress_bar
+    a_controls.drivername = gdalformat
+    a_controls.omitPyramids = True
+    a_controls.calcStats = False
+
+    # RIOS function to apply classifier
+    def _fill_cls_imgs(info, inputs, outputs, other_args):
+        """
+        Internal function for rios applier.
+        """
+        for i in range(other_args.n_iters):
+            for n in range(other_args.n_imgs):
+                nxt_n = n + 1
+                if n < other_args.n_imgs - 1:
+                    cls_arr = inputs.__dict__[f"cls_in_{n}"]
+                    nxt_cls_arr = inputs.__dict__[f"cls_in_{nxt_n}"]
+                    cls_arr[cls_arr == other_args.no_data_val] = nxt_cls_arr[
+                        cls_arr == other_args.no_data_val
+                    ]
+
+            if other_args.double_direction:
+                n_vals = list(range(other_args.n_imgs))
+                n_vals.reverse()
+                for n in n_vals:
+                    nxt_n = n - 1
+                    if n > 0:
+                        cls_arr = inputs.__dict__[f"cls_in_{n}"]
+                        nxt_cls_arr = inputs.__dict__[f"cls_in_{nxt_n}"]
+                        cls_arr[cls_arr == other_args.no_data_val] = nxt_cls_arr[
+                            cls_arr == other_args.no_data_val
+                        ]
+
+            if other_args.recheck_ends:
+                cls_arr = inputs.__dict__[f"cls_in_0"]
+                nxt_cls_arr = inputs.__dict__[f"cls_in_1"]
+                cls_arr[cls_arr == other_args.no_data_val] = nxt_cls_arr[
+                    cls_arr == other_args.no_data_val
+                ]
+
+                n = other_args.n_imgs - 1
+                nxt_n = n - 1
+                cls_arr = inputs.__dict__[f"cls_in_{n}"]
+                nxt_cls_arr = inputs.__dict__[f"cls_in_{nxt_n}"]
+                cls_arr[cls_arr == other_args.no_data_val] = nxt_cls_arr[
+                    cls_arr == other_args.no_data_val
+                ]
+
+        for n in range(other_args.n_imgs):
+            outputs.__dict__[f"cls_out_{n}"] = inputs.__dict__[f"cls_in_{n}"]
+
+    applier.apply(_fill_cls_imgs, in_files, out_files, other_args, controls=a_controls)
+
+    for out_img in out_imgs:
+        if gdalformat == "KEA":
+            rsgislib.rastergis.pop_rat_img_stats(
+                out_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            )
+            rsgislib.rastergis.set_class_names_colours(
+                out_img, class_names_col=cls_names_col, class_info_dict=cls_clr_info
+            )
+        else:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                out_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            )
+            rsgislib.imageutils.define_colour_table(out_img, cls_clr_info)

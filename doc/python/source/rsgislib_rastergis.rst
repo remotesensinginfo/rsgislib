@@ -79,6 +79,7 @@ Colour Tables
 ---------------
 .. autofunction:: rsgislib.rastergis.colour_rat_classes
 .. autofunction:: rsgislib.rastergis.set_class_names_colours
+.. autofunction:: rsgislib.rastergis.get_rat_colours
 
 Data Structures / Enums
 -----------------------

@@ -10,7 +10,7 @@ import rsgislib
 import os
 import math
 import shutil
-from typing import List
+from typing import List, Dict
 
 import numpy
 
@@ -372,6 +372,47 @@ def pop_thmt_img_stats(
         gdal_ds = None
 
 
+def get_colour_tab_info(input_img: str, img_band: int = 1) -> Dict[Dict]:
+    """
+    A function which returns the colour table info from an input image.
+    The output dict has the following structure:
+
+    clr_info[1] = {'red':0, 'green':255, 'blue':0, 'alpha': 255}
+    clr_info[2] = {'red':0, 'green':0, 'blue':255, 'alpha': 255}
+
+    :param input_img: the file path to the input image.
+    :param img_band: optional image band to be read - default is 1.
+    :return: dict of dicts with the colour table info.
+
+    """
+    gdal_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if gdal_ds is None:
+        raise Exception(f"Cannot open input image: {input_img}")
+
+    gdal_band = gdal_ds.GetRasterBand(img_band)
+    if gdal_band is None:
+        raise Exception(f"Cannot open input image band {gdal_band} in {input_img}")
+
+    gdal_clr_tab = gdal_band.GetColorTable()
+    if gdal_clr_tab is None:
+        raise Exception(f"Input does not have a colour table: {input_img}")
+
+    cls_info = dict()
+    for i in range(gdal_clr_tab.GetCount()):
+        clr_entry = gdal_clr_tab.GetColorEntry(i)
+
+        cls_info[i] = dict()
+        cls_info[i]["red"] = int(clr_entry[0])
+        cls_info[i]["green"] = int(clr_entry[1])
+        cls_info[i]["blue"] = int(clr_entry[2])
+        if len(clr_entry) > 3:
+            cls_info[i]["alpha"] = int(clr_entry[3])
+        else:
+            cls_info[i]["alpha"] = 255
+
+    return cls_info
+
+
 def define_colour_table(input_img: str, clr_lut: dict, img_band: int = 1):
     """
     A function which defines specific colours for image values for a colour
@@ -403,7 +444,13 @@ def define_colour_table(input_img: str, clr_lut: dict, img_band: int = 1):
     import rsgislib.tools.utils
 
     gdal_ds = gdal.Open(input_img, gdal.GA_Update)
+    if gdal_ds is None:
+        raise Exception(f"Cannot open input image: {input_img}")
+
     gdal_band = gdal_ds.GetRasterBand(img_band)
+    if gdal_band is None:
+        raise Exception(f"Cannot open input image band {gdal_band} in {input_img}")
+
     clr_tbl = gdal.ColorTable()
     for pxl_val in clr_lut:
         if isinstance(clr_lut[pxl_val], str):
