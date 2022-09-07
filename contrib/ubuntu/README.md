@@ -18,3 +18,7 @@ Copies of packages generated as above are hosted by Environment Systems Ltd (no 
 
  - https://envsys-public.s3.amazonaws.com/ubuntu/rsgislib/focal_ubuntugis_stable_rsgislib_5.0.10-1.deb
  - https://envsys-public.s3.amazonaws.com/ubuntu/rsgislib/focal_ubuntugis_unstable_rsgislib_5.0.10-1.deb
+
+You can get a listing of envsys-public s3 bucket here:
+
+https://envsys-public.s3.amazonaws.com/
