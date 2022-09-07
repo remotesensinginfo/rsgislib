@@ -44,7 +44,7 @@ RUN apt-get update -y && \
     cmake
 
 ARG KEALIB_DEB_URL=https://envsys-public.s3.amazonaws.com/ubuntu/kealib/focal_ubuntugis_stable_libkea_1.4.14-1.deb
-ARG RSGISLIB_VER=5.0.5
+ARG RSGISLIB_VER=5.0.10
 ARG PACKAGE_DIR=/usr/local/packages
 ARG RSGSILIB_PACKAGE_DIR=$PACKAGE_DIR/rsgislib_$RSGISLIB_VER-1
 ARG make_threads=7
