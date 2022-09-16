@@ -4,47 +4,57 @@ RSGISLib Raster GIS Module
 
 Utilities
 ----------
-
 .. autofunction:: rsgislib.rastergis.pop_rat_img_stats
 .. autofunction:: rsgislib.rastergis.collapse_rat
-.. autofunction:: rsgislib.rastergis.get_column_data
+.. autofunction:: rsgislib.rastergis.get_rat_length
+.. autofunction:: rsgislib.rastergis.get_rat_columns
+.. autofunction:: rsgislib.rastergis.get_rat_columns_info
+.. autofunction:: rsgislib.rastergis.check_string_col_valid
+
 
 Attribute Clumps
 -------------------
+.. autofunction:: rsgislib.rastergis.populate_rat_with_stats
+.. autofunction:: rsgislib.rastergis.populate_rat_with_cat_proportions
+.. autofunction:: rsgislib.rastergis.populate_rat_with_percentiles
+.. autofunction:: rsgislib.rastergis.populate_rat_with_mode
+.. autofunction:: rsgislib.rastergis.populate_rat_with_prop_valid_pxls
+.. autofunction:: rsgislib.rastergis.populate_rat_with_meanlit_stats
+.. autofunction:: rsgislib.rastergis.str_class_majority
+.. autofunction:: rsgislib.rastergis.define_class_names
+.. autofunction:: rsgislib.rastergis.set_column_data
+.. autofunction:: rsgislib.rastergis.create_uid_col
 
-.. autofunction:: rsgislib.rastergis.calc_border_length
+Calculate Spatial Relationships
+---------------------------------
+.. autofunction:: rsgislib.rastergis.calc_dist_to_classes
 .. autofunction:: rsgislib.rastergis.calc_dist_between_clumps
 .. autofunction:: rsgislib.rastergis.calc_dist_to_large_clumps
+.. autofunction:: rsgislib.rastergis.calc_border_length
 .. autofunction:: rsgislib.rastergis.calc_rel_border
 .. autofunction:: rsgislib.rastergis.calc_rel_diff_neigh_stats
 .. autofunction:: rsgislib.rastergis.define_border_clumps
 .. autofunction:: rsgislib.rastergis.define_clump_tile_positions
 .. autofunction:: rsgislib.rastergis.find_boundary_pixels
 .. autofunction:: rsgislib.rastergis.find_neighbours
-.. autofunction:: rsgislib.rastergis.populate_rat_with_cat_proportions
-.. autofunction:: rsgislib.rastergis.populate_rat_with_percentiles
-.. autofunction:: rsgislib.rastergis.populate_rat_with_stats
-.. autofunction:: rsgislib.rastergis.populate_rat_with_meanlit_stats
-.. autofunction:: rsgislib.rastergis.select_clumps_on_grid
 .. autofunction:: rsgislib.rastergis.clumps_spatial_location
 .. autofunction:: rsgislib.rastergis.clumps_spatial_extent
-.. autofunction:: rsgislib.rastergis.str_class_majority
-.. autofunction:: rsgislib.rastergis.populate_rat_with_mode
-.. autofunction:: rsgislib.rastergis.populate_rat_with_prop_valid_pxls
-.. autofunction:: rsgislib.rastergis.define_class_names
-.. autofunction:: rsgislib.rastergis.calc_dist_to_classes
-.. autofunction:: rsgislib.rastergis.set_column_data
-.. autofunction:: rsgislib.rastergis.create_uid_col
+
+Read RAT
+----------
+.. autofunction:: rsgislib.rastergis.get_column_data
+.. autofunction:: rsgislib.rastergis.read_rat_neighbours
 
 
 Sampling
 --------
 .. autofunction:: rsgislib.rastergis.histo_sampling
 .. autofunction:: rsgislib.rastergis.take_random_sample
+.. autofunction:: rsgislib.rastergis.select_clumps_on_grid
+
 
 Classification
 --------------
-
 .. autofunction:: rsgislib.rastergis.identify_small_units
 .. autofunction:: rsgislib.rastergis.class_split_fit_hist_gausian_mixture_model
 
