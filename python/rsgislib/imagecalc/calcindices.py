@@ -601,7 +601,7 @@ def calc_mvi(
                        (Default: KEA)
 
     """
-    expression = "abs(swir-green)!=0?abs(nir-green)/abs(swir-green):-999"
+    expression = "swir-green!=0?nir-green/swir-green:-999"
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
