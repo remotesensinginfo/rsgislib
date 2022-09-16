@@ -7,6 +7,7 @@ Projections
 .. autofunction:: rsgislib.tools.geometrytools.reproj_bbox
 .. autofunction:: rsgislib.tools.geometrytools.reproj_bbox_epsg
 .. autofunction:: rsgislib.tools.geometrytools.reproj_point
+.. autofunction:: rsgislib.tools.geometrytools.reproj_point_to_wgs84
 
 
 Testing

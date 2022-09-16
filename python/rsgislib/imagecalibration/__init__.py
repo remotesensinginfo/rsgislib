@@ -413,6 +413,17 @@ def get_esun_value(radiance, toaRefl, day, month, year, solarZenith):
     esun = step2 / math.cos(math.radians(solarZenith))
     return esun
 
+def visibility_to_aot(vis:float)->float:
+    """
+    A function which converts an estimate of visibility to
+    aerosol optical thickness (AOT)
+
+    :param vis: input visibility estimate
+    :return: output AOT estimate.
+
+    """
+    return (3.9449/vis)+0.08498
+
 
 """
 def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outImage, gdalformat, dataType, tmpDIR):

@@ -6,6 +6,7 @@ The tools.utils module contains some useful tools
 import datetime
 import os
 import string
+import math
 import json
 from typing import List, Union, Dict
 
@@ -56,6 +57,75 @@ def is_number(str_val: str) -> bool:
         except ValueError:
             return False
     return True
+
+
+def str_to_float(str_val:str, err_val:float=None)->float:
+    """
+    A function which converts a string to a float. If the string cannot be
+    converted to a float and an error value is provided that that will be
+    returned otherwise an exception will be thrown.
+
+    :param str_val: the string to be converted to a float.
+    :param err_val: the error value to be returned if the string cannot be converted
+                    to a float
+    :return: floating point value
+
+    """
+    str_val = str(str_val).strip()
+    try:
+        out_float = float(str_val)
+    except ValueError:
+        if not err_val is None:
+            out_float = float(err_val)
+        else:
+            raise rsgislib.RSGISPyException(f"Could not convert string to float: '{str_val}'.")
+    return out_float
+
+
+def str_to_int(str_val:str, err_val:int=None)->int:
+    """
+    A function which converts a string to a int. If the string cannot be
+    converted to a int then it will be attempted to be converted to a float and
+    then rounded to an int. If that is not possble and an error value is provided
+    that that will be returned otherwise an exception will be thrown.
+
+    :param str_val: the string to be converted to a int.
+    :param err_val: the error value to be returned if the string cannot be converted
+                    to a int
+    :return: integer value
+
+    """
+    str_val = str(str_val).strip()
+    try:
+        out_int = int(str_val)
+    except ValueError:
+        try:
+            tmp_float = float(str_val)
+            out_int = int(math.floor(tmp_float + 0.5))
+        except ValueError:
+            if not err_val is None:
+                out_int = int(err_val)
+            else:
+                raise rsgislib.RSGISPyException(f"Could not convert string to int: '{str_val}'.")
+    return out_int
+
+
+
+def str2Int(self, strVal, errVal=None):
+    strVal = str(strVal).strip()
+    outInt = 0
+    try:
+        outInt = int(strVal)
+    except ValueError:
+        try:
+            flVal = self.str2Float(strVal, errVal)
+            outInt = math.floor(flVal + 0.5)
+        except ARCSIException:
+            if not errVal is None:
+                outInt = int(errVal)
+            else:
+                raise ARCSIException("Could not convert string to int: \'" + strVal + '\'.')
+    return outInt
 
 
 def zero_pad_num_str(
@@ -620,6 +690,51 @@ def get_days_since_date(year: int, month: int, day, base_date: datetime.date) ->
         raise rsgislib.RSGISPyException("The year specified is before the base date.")
     date_val = datetime.date(year=int(year), month=int(month), day=int(day))
     return (date_val - base_date).days
+
+
+def find_month_end_date(year:int , month:int)-> int:
+    """
+    A function which returns the date of the last day of the month.
+
+    :param year: int for the year (e.g., 2019)
+    :param month: month (e.g., 9)
+    :return: last day of the month date
+
+    """
+    import calendar
+    cal = calendar.Calendar()
+    month_days = cal.monthdayscalendar(year, month)
+    max_day_month = numpy.array(month_days).flatten().max()
+    return max_day_month
+
+
+def is_summer_winter(lat:float, date:datetime.date)-> int:
+    """
+    A function which returns an integer specifying whether the date provided
+    is within the summer or winter for a given latitude.
+
+    Southern Hemisphere Winter: May - November
+    Northern Hemisphere Winter: March - October
+
+    :param lat: float for the latitude
+    :param date: a datetime.date object
+    :return: int (1 == summer; 2 == winter)
+
+    """
+    summer_winter = 0
+    if lat < 0:
+        # Southern Hemisphere
+        if (date.month > 4) & (date.month < 11):
+            summer_winter = 2 # Winter
+        else:
+            summer_winter = 1 # Summer
+    else:
+        # Northern Hemisphere
+        if (date.month > 3) & (date.month < 10):
+            summer_winter = 1 # Summer
+        else:
+            summer_winter = 2 # Winter
+    return summer_winter
 
 
 def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: List) -> bool:
