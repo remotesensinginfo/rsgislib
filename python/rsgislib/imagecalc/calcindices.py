@@ -615,21 +615,130 @@ def calc_mvi(
     else:
         rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
+def calc_evi(
+    input_img, img_blue_band, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA", g=2.5, c1=6.0, c2=7.5, l=1, refl_scale_factor=0.001
+):
+    """
+    Helper function to calculate Enhanced Vegetation Index (EVI)
+    G * ((NIR - Red) / (NIR + C1 * Red – C2 * BLue + L)).
+    Note the output no data value is -999.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_blue_band: is an int specifying the blue band in the input image
+                         (band indexing starts at 1)
+    :param img_green_band: is an int specifying the green band in the input image
+                         (band indexing starts at 1)
+    :param img_red_band: is an int specifying the red band in the input image
+                         (band indexing starts at 1)
+    :param img_nir_band: is an int specifying the nir band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = f"((nir*{refl_scale_factor})+{c1}*(red*{refl_scale_factor})" \
+                 f"–{c2}*(blue*{refl_scale_factor})+{l}))!=0?" \
+                 f"{g}*(((nir*{refl_scale_factor})-" \
+                 f"(red*{refl_scale_factor}))/((nir*{refl_scale_factor})+" \
+                 f"{c1}*(red*{refl_scale_factor})–{c2}*" \
+                 f"(blue*{refl_scale_factor})+{l})):-999"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+def calc_evi2(
+    input_img, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA", g=2.5, c=2.4, l=1, refl_scale_factor=0.001
+):
+    """
+    Helper function to calculate Enhanced Vegetation Index 2 (EVI2)
+    G * (nir - red)/(nir + 2.4 * red + 1).
+    Note the output no data value is -999.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_red_band: is an int specifying the red band in the input image
+                         (band indexing starts at 1)
+    :param img_nir_band: is an int specifying the nir band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = f"((nir*{refl_scale_factor})+{c}*(red*{refl_scale_factor})+{l})!=0:" \
+                 f"{g}*((nir*{refl_scale_factor})-(red*{refl_scale_factor}))/" \
+                 f"((nir*{refl_scale_factor})+{c}*(red*{refl_scale_factor})+{l}):-999"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+
+def calc_gndvi(
+    input_img, img_green_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA"
+):
+    """
+    Helper function to calculate Green Normalised difference Vegetation Index (GNDVI)
+    ((NIR-RED)/(NIR+RED)). Note the output no data value is -999.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_green_band: is an int specifying the green band in the input image
+                         (band indexing starts at 1)
+    :param img_nir_band: is an int specifying the nir band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = "(nir+green)!=0?(nir-green)/(nir+green):-999"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
 
 """
 http://bleutner.github.io/RStoolbox/rstbx-docu/spectralIndices.html
 Index	Description	Source	Bands	Formula
-CTVI		Perry1984	red, nir	
-DVI	Difference Vegetation Index	Richardson1977	red, nir	s * nir - red
-EVI	Enhanced Vegetation Index	Huete1999	red, nir, blue	G * ((nir - red)/(nir + C1 * red - C2 * blue + L_evi))
-EVI2	Two-band Enhanced Vegetation Index	Jiang 2008	red, nir	G * (nir - red)/(nir + 2.4 * red + 1)
+
 GEMI	Global Environmental Monitoring Index	Pinty1992	red, nir	(((nir^2 - red^2) * 2 + (nir * 1.5) + (red * 0.5))/(nir + red + 0.5)) * (1 - ((((nir^2 - red^2) * 2 + (nir * 1.5) + (red * 0.5))/(nir + red + 0.5)) * 0.25)) - ((red - 0.125)/(1 - red))
-GNDVI	Green Normalised Difference Vegetation Index	Gitelson1998	green, nir	(nir - green)/(nir + green)
 MNDWI	Modified Normalised Difference Water Index	Xu2006	green, swir2	(green - swir2)/(green + swir2)
 MSAVI	Modified Soil Adjusted Vegetation Index	Qi1994	red, nir	nir + 0.5 - (0.5 * sqrt((2 * nir + 1)^2 - 8 * (nir - (2 * red))))
 MSAVI2	Modified Soil Adjusted Vegetation Index 2	Qi1994	red, nir	(2 * (nir + 1) - sqrt((2 * nir + 1)^2 - 8 * (nir - red)))/2
 NBRI	Normalised Burn Ratio Index	Garcia1991	nir, swir3	(nir - swir3)/(nir + swir3)
-NDVI	Normalised Difference Vegetation Index	Rouse1974	red, nir	(nir - red)/(nir + red)
 NDVIC	Corrected Normalised Difference Vegetation Index	Nemani1993	red, nir, swir2	(nir - red)/(nir + red) * (1 - ((swir2 - swir2ccc)/(swir2coc - swir2ccc)))
 NDWI	Normalised Difference Water Index	McFeeters1996	green, nir	(green - nir)/(green + nir)
 NDWI2	Normalised Difference Water Index	Gao1996	nir, swir2	(nir - swir2)/(nir + swir2)
