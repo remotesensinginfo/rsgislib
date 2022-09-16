@@ -334,7 +334,7 @@ def set_class_names_colours(
     rat_dataset = None
 
 
-def get_rat_colours(clumps_img: str, cls_column: str = None) -> Dict[Dict]:
+def get_rat_colours(clumps_img: str, cls_column: str = None) -> Dict[str, Dict]:
     """
     A function which gets the colour table and optionally the
     class names from the rat and returns it as a dict which

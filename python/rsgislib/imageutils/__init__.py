@@ -372,7 +372,7 @@ def pop_thmt_img_stats(
         gdal_ds = None
 
 
-def get_colour_tab_info(input_img: str, img_band: int = 1) -> Dict[Dict]:
+def get_colour_tab_info(input_img: str, img_band: int = 1) -> Dict[str, Dict]:
     """
     A function which returns the colour table info from an input image.
     The output dict has the following structure:
