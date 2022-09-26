@@ -5,6 +5,8 @@ The tools.mapping module contains functions for making maps with geospatial data
 
 from typing import List, Dict, Union
 import math
+import os
+import shutil
 
 import rsgislib
 import rsgislib.tools.projection
@@ -206,6 +208,86 @@ def add_contextily_basemap(
         attribution=cx_attribution,
         attribution_size=cx_att_size,
     )
+
+def create_wmts_img_map(
+    ax: plt.axis,
+    wmts_url: str,
+    wmts_lyr: str,
+    bbox: List[float],
+    bbox_epsg: int,
+    wmts_zoom_level: int = None,
+    title_str: str = None,
+    show_scale_bar: bool = True,
+    use_grid: bool = False,
+    show_map_axis: bool = True,
+    tmp_dir:str = None,
+):
+    """
+    A function which downloading image from a WMTS service and adding it 
+
+    :param ax: The matplotlib axis to which to add the WMTS image to.
+    :param wmts_url: The url for the WMTS service
+    :param wmts_lyr: the layer within the WMTS to use.
+    :param bbox: The bbox (MinX, MaxX, MinY, MaxY) specifying the
+                 spatial region to be displayed.
+    :param bbox_epsg: the EPSG code of the inputted bbox, with will be the epsg
+                      for the outputted map.
+    :param wmts_zoom_level: Optionally, the zoom level from the WMTS. If None 
+                            then automatically defined.
+    :param title_str: an optional title for the map (Default: None)
+    :param show_scale_bar: boolean specifying whether a scale bar should be added to
+                           the axis. Default: False
+    :param use_grid: boolean specifying whether a grid should be added to the axis.
+                     Default: False
+    :param show_map_axis: boolean specifying whether the axes should be shown
+                          Default: False
+    :param tmp_dir: Optionally, a temporary directory for some intermediate files.
+                    If not specified, a tmp dir is created and removed in the local
+                    path from where the script is run from.
+
+    """
+    import rsgislib.tools.utils
+    from rsgislib.tools import wmts_tools
+    uid_str = rsgislib.tools.utils.uid_generator()
+    create_tmp_dir = False
+    if tmp_dir is None:
+        tmp_dir = f"tmp_{uid_str}"
+        if not os.path.exists(tmp_dir):
+            os.mkdir(tmp_dir)
+            create_tmp_dir = True
+
+    wmts_tmp_img = os.path.join(tmp_dir, f"wmts_tmp_img_{uid_str}.kea")
+    wmts_tools.get_wmts_as_img(wmts_url, wmts_lyr, bbox, bbox_epsg=bbox_epsg, output_img=wmts_tmp_img, gdalformat="KEA", zoom_level=wmts_zoom_level, tmp_dir=tmp_dir)
+
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(wmts_tmp_img, bands=[1,2,3])
+
+    ax.imshow(img_data, extent=img_coords)
+    ax.set_xlim([img_coords[0], img_coords[1]])
+    ax.set_ylim([img_coords[2], img_coords[3]])
+
+    if use_grid:
+        ax.grid()
+
+    if not show_map_axis:
+        ax.set_axis_off()
+        ax.set_axis_off()
+
+    if show_scale_bar:
+        distance_meters = 1
+        img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(wmts_tmp_img)
+        if img_epsg == 4326:
+            distance_meters = rsgislib.tools.projection.great_circle_distance(
+                wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+                )
+
+        ax.add_artist(ScaleBar(distance_meters))
+
+    if title_str is not None:
+        ax.title.set_text(title_str)
+
+    # If created remove the tmp directory
+    if create_tmp_dir:
+        shutil.rmtree(tmp_dir)
 
 
 def draw_bboxes_to_axis(
