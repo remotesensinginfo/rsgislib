@@ -75,6 +75,24 @@ def test_check_format_name_shp():
     assert "ESRI Shapefile" == rsgislib.vectorutils.check_format_name("ESRI Shapefile")
 
 
+def test_get_file_vec_extension_gpkg():
+    import rsgislib.vectorutils
+
+    assert "gpkg" == rsgislib.vectorutils.get_file_vec_extension("GPKG")
+
+
+def test_get_file_vec_extension_shp():
+    import rsgislib.vectorutils
+
+    assert "shp" == rsgislib.vectorutils.get_file_vec_extension("ESRI Shapefile")
+
+
+def test_get_file_vec_extension_geojson():
+    import rsgislib.vectorutils
+
+    assert "geojson" == rsgislib.vectorutils.get_file_vec_extension("GeoJSON")
+
+
 def test_get_proj_wkt_from_vec_osgb():
     import rsgislib.vectorutils
 

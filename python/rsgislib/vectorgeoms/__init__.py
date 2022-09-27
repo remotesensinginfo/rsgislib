@@ -133,7 +133,7 @@ def convert_polys_to_lines_gp(
             )
 
     if vec_line_lyr is None:
-        vec_line_lyr = os.path.splitext(os.path.basename(vec_line_lyr))[0]
+        vec_line_lyr = os.path.splitext(os.path.basename(vec_line_file))[0]
 
     data_gdf = geopandas.read_file(vec_poly_file, layer=vec_poly_lyr)
     if exterior_lines:

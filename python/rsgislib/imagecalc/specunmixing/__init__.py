@@ -112,6 +112,36 @@ def read_endmembers_mtxt(endmembers_file, gain=1, weight=None):
     return m, n, endmemarr
 
 
+def write_endmembers_mtxt(endmembers_np_arr, endmembers_file):
+    """
+    A function to creates endmembers mtxt file from a numpy array
+
+    :param endmembers_np_arr: Numpy array (m, n) with the endmembers.
+    :param endmembers_file: File path to the mtxt output file.
+
+    """
+    import rsgislib.tools.utils
+    arr_shp = endmembers_np_arr.shape
+    out_m = arr_shp[0]
+    out_n = arr_shp[1]
+
+    out_line_list = []
+    out_line_list.append(f"m={out_m}")
+    out_line_list.append(f"n={out_n}")
+
+    out_data = ""
+    first = True
+    for val in endmembers_np_arr.flatten():
+        if first:
+            first = False
+            out_data = f"{val}"
+        else:
+            out_data = f"{out_data},{val}"
+
+    out_line_list.append(out_data)
+
+    rsgislib.tools.utils.write_list_to_file(out_line_list, endmembers_file)
+
 def plot_endmembers(
     endmembers_file,
     endmember_names,

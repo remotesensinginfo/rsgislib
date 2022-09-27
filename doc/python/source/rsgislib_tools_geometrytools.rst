@@ -7,6 +7,7 @@ Projections
 .. autofunction:: rsgislib.tools.geometrytools.reproj_bbox
 .. autofunction:: rsgislib.tools.geometrytools.reproj_bbox_epsg
 .. autofunction:: rsgislib.tools.geometrytools.reproj_point
+.. autofunction:: rsgislib.tools.geometrytools.reproj_point_to_wgs84
 
 
 Testing
@@ -18,6 +19,7 @@ Testing
 Calculations
 --------------
 .. autofunction:: rsgislib.tools.geometrytools.calc_bbox_area
+.. autofunction:: rsgislib.tools.geometrytools.calc_pt_distance
 
 Compute New BBOX
 ------------------

@@ -64,29 +64,29 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
     {
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
 
-        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        PyObject *pBandName = PyObject_GetAttrString(o, "band_name");
         if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'band_name\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
             return nullptr;
         }
 
-        PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
+        PyObject *pFileName = PyObject_GetAttrString(o, "input_img");
         if( ( pFileName == nullptr ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fileName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'input_img\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pFileName);
             Py_DECREF(o);
             return nullptr;
         }
 
-        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "img_band");
         if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'img_band\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -94,10 +94,10 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
             return nullptr;
         }
         
-        PyObject *pLMin = PyObject_GetAttrString(o, "lMin");
+        PyObject *pLMin = PyObject_GetAttrString(o, "l_min");
         if( ( pLMin == nullptr ) || ( pLMin == Py_None ) || !RSGISPY_CHECK_FLOAT(pLMin) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'lMin\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'l_min\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -106,10 +106,10 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
             return nullptr;
         }
         
-        PyObject *pLMax = PyObject_GetAttrString(o, "lMax");
+        PyObject *pLMax = PyObject_GetAttrString(o, "l_max");
         if( ( pLMax == nullptr ) || ( pLMax == Py_None ) || !RSGISPY_CHECK_FLOAT(pLMax) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'lMax\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'l_max\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -119,10 +119,10 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
             return nullptr;
         }
         
-        PyObject *pQCalMin = PyObject_GetAttrString(o, "qCalMin");
+        PyObject *pQCalMin = PyObject_GetAttrString(o, "q_cal_min");
         if( ( pQCalMin == nullptr ) || ( pQCalMin == Py_None ) || !RSGISPY_CHECK_FLOAT(pQCalMin) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'qCalMin\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'q_cal_min\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -133,10 +133,10 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
             return nullptr;
         }
         
-        PyObject *pQCalMax = PyObject_GetAttrString(o, "qCalMax");
+        PyObject *pQCalMax = PyObject_GetAttrString(o, "q_cal_max");
         if( ( pQCalMax == nullptr ) || ( pQCalMax == Py_None ) || !RSGISPY_CHECK_FLOAT(pQCalMax) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'qCalMax\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'q_cal_max\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -206,29 +206,29 @@ static PyObject *ImageCalibration_landsat2RadianceMultiAdd(PyObject *self, PyObj
     {
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
-        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        PyObject *pBandName = PyObject_GetAttrString(o, "band_name");
         if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'band_name\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
             return nullptr;
         }
         
-        PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
+        PyObject *pFileName = PyObject_GetAttrString(o, "input_img");
         if( ( pFileName == nullptr ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fileName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'input_img\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pFileName);
             Py_DECREF(o);
             return nullptr;
         }
         
-        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "img_band");
         if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'img_band\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -236,7 +236,7 @@ static PyObject *ImageCalibration_landsat2RadianceMultiAdd(PyObject *self, PyObj
             return nullptr;
         }
         
-        PyObject *pAddVal = PyObject_GetAttrString(o, "addVal");
+        PyObject *pAddVal = PyObject_GetAttrString(o, "add_val");
         if( ( pAddVal == nullptr ) || ( pAddVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pAddVal) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'addVal\'" );
@@ -248,10 +248,10 @@ static PyObject *ImageCalibration_landsat2RadianceMultiAdd(PyObject *self, PyObj
             return nullptr;
         }
         
-        PyObject *pMultiVal = PyObject_GetAttrString(o, "multiVal");
+        PyObject *pMultiVal = PyObject_GetAttrString(o, "multi_val");
         if( ( pMultiVal == nullptr ) || ( pMultiVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pMultiVal) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'multiVal\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'multi_val\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -995,29 +995,29 @@ static PyObject *ImageCalibration_SaturatedPixelsMask(PyObject *self, PyObject *
     {
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
-        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        PyObject *pBandName = PyObject_GetAttrString(o, "band_name");
         if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'band_name\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
             return nullptr;
         }
         
-        PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
+        PyObject *pFileName = PyObject_GetAttrString(o, "input_img");
         if( ( pFileName == nullptr ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fileName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'input_img\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pFileName);
             Py_DECREF(o);
             return nullptr;
         }
         
-        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "img_band");
         if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'img_band\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -1025,10 +1025,10 @@ static PyObject *ImageCalibration_SaturatedPixelsMask(PyObject *self, PyObject *
             return nullptr;
         }
         
-        PyObject *pSatVal = PyObject_GetAttrString(o, "satVal");
+        PyObject *pSatVal = PyObject_GetAttrString(o, "sat_val");
         if( ( pSatVal == nullptr ) || ( pSatVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pSatVal) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'satVal\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'sat_val\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -1093,7 +1093,7 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
     {
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
-        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        PyObject *pBandName = PyObject_GetAttrString(o, "band_name");
         if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
@@ -1102,7 +1102,7 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
             return nullptr;
         }
         
-        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "img_band");
         if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
@@ -1189,29 +1189,29 @@ static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject 
     {
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
-        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        PyObject *pBandName = PyObject_GetAttrString(o, "band_name");
         if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'band_name\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
             return nullptr;
         }
         
-        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "img_band");
         if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'img_band\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_DECREF(o);
             return nullptr;
         }
         
-        PyObject *pAbsCalFact = PyObject_GetAttrString(o, "absCalFact");
+        PyObject *pAbsCalFact = PyObject_GetAttrString(o, "abs_cal_fact");
         if( ( pAbsCalFact == nullptr ) || ( pAbsCalFact == Py_None ) || !RSGISPY_CHECK_FLOAT(pAbsCalFact) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'absCalFact\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'abs_cal_fact\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_XDECREF(pAbsCalFact);
@@ -1219,10 +1219,10 @@ static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject 
             return nullptr;
         }
         
-        PyObject *pEffBandWidth = PyObject_GetAttrString(o, "effBandWidth");
+        PyObject *pEffBandWidth = PyObject_GetAttrString(o, "eff_bandwidth");
         if( ( pEffBandWidth == nullptr ) || ( pEffBandWidth == Py_None ) || !RSGISPY_CHECK_FLOAT(pEffBandWidth) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'effBandWidth\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'eff_bandwidth\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_XDECREF(pAbsCalFact);
@@ -1285,19 +1285,19 @@ static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args
     {
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
-        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        PyObject *pBandName = PyObject_GetAttrString(o, "band_name");
         if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'band_name\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
             return nullptr;
         }
         
-        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "img_band");
         if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'img_band\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_DECREF(o);
@@ -1669,13 +1669,13 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsLandsatRadianceGainsOffsets objects that define the inputs\n"
-"        * bandName - Name of image band in output file.\n"
-"        * fileName - input image file.\n"
-"        * bandIndex - Index (starting from 1) of the band in the image file.\n"
-"        * lMin - lMin value from Landsat header.\n"
-"        * lMax - lMax value from Landsat header.\n"
-"        * qCalMin - qCalMin value from Landsat header.\n"
-"        * qCalMax - qCalMax value from Landsat header.\n"
+"        * band_name - Name of image band in output file.\n"
+"        * input_img - input image file.\n"
+"        * img_band - Index (starting from 1) of the band in the image file.\n"
+"        * l_min - lMin value from Landsat header.\n"
+"        * l_max - lMax value from Landsat header.\n"
+"        * q_cal_min - qCalMin value from Landsat header.\n"
+"        * q_cal_max - qCalMax value from Landsat header.\n"
 "\n"},
 
 {"landsat_to_radiance_multi_add", (PyCFunction)ImageCalibration_landsat2RadianceMultiAdd, METH_VARARGS | METH_KEYWORDS,
@@ -1685,9 +1685,9 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsLandsatRadianceGainsOffsets objects that define the inputs\n"
-"        * bandName - Name of image band in output file.\n"
-"        * fileName - input image file.\n"
-"        * bandIndex - Index (starting from 1) of the band in the image file.\n"
+"        * band_name - Name of image band in output file.\n"
+"        * input_img - input image file.\n"
+"        * img_band - Index (starting from 1) of the band in the image file.\n"
 "        * addVal - RADIANCE_ADD value from Landsat header.\n"
 "        * multiVal - RADIANCE_MULT value from Landsat header.\n"
 "\n"},
@@ -1822,9 +1822,9 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param band_defs: is a sequence of rsgislib.imagecalibration.CmdsSaturatedPixel objects that define the inputs\n"
-"        *  bandName - Name of image band in output file.\n"
-"        *  fileName - input image file.\n"
-"        *  bandIndex - Index (starting from 1) of the band in the image file.\n"
+"        *  band_name - Name of image band in output file.\n"
+"        *  input_img - input image file.\n"
+"        *  img_band - Index (starting from 1) of the band in the image file.\n"
 "        *  satVal - Saturation value for the image band.\n"
 "\n"},
 
@@ -1838,8 +1838,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 ":param scale_factor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
 ":param band_defs: is a sequence of rsgislib.imagecalibration.CmdsLandsatThermalCoeffs objects that define the inputs\n"
-"        *  bandName - Name of image band in output file.\n"
-"        *  bandIndex - Index (starting from 1) of the band in the image file.\n"
+"        *  band_name - Name of image band in output file.\n"
+"        *  img_band - Index (starting from 1) of the band in the image file.\n"
 "        *  k1 - k1 coefficient from Landsat header.\n"
 "        *  k2 - k2 coefficient from Landsat header.\n"
 "\n"},
@@ -1852,10 +1852,10 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param band_defs: is a sequence of rsgislib.imagecalibration.CmdsWorldView2RadianceGainsOffsets objects that define the inputs\n"
-"                        * bandName - Name of image band in output file.\n"
-"                        * bandIndex - Index (starting from 1) of the band in the image file.\n"
-"                        * absCalFact - ABSCALFACTOR value from WorldView2 XML header.\n"
-"                        * effBandWidth - EFFECTIVEBANDWIDTH value from WorldView2 XML header.\n"
+"                        * band_name - Name of image band in output file.\n"
+"                        * img_band - Index (starting from 1) of the band in the image file.\n"
+"                        * abs_cal_fact - ABSCALFACTOR value from WorldView2 XML header.\n"
+"                        * eff_bandwidth - EFFECTIVEBANDWIDTH value from WorldView2 XML header.\n"
 "\n"},
 
 {"spot5_to_radiance", (PyCFunction)ImageCalibration_spot5ToRadiance, METH_VARARGS | METH_KEYWORDS,
@@ -1866,8 +1866,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param band_defs: is a sequence of rsgislib.imagecalibration.CmdsSPOT5RadianceGainsOffsets objects in order of the input image bands that define the inputs\n"
-"                        * bandName - Name of image band in output file.\n"
-"                        * bandIndex - Index (starting from 1) of the output image band order (i.e., to reorder the image bands).\n"
+"                        * band_name - Name of image band in output file.\n"
+"                        * img_band - Index (starting from 1) of the output image band order (i.e., to reorder the image bands).\n"
 "                        * gain - PHYSICAL_GAIN value from SPOT5 XML header.\n"
 "                        * bias - PHYSICAL_BIAS value from SPOT5 XML header.\n"
 "\n"},

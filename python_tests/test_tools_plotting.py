@@ -17,6 +17,7 @@ except ImportError:
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools")
 
+
 def test_get_gdal_raster_mpl_imshow_basic():
     import rsgislib.tools.plotting
 
@@ -171,7 +172,7 @@ def test_get_gdal_thematic_raster_mpl_imshow_patches():
 
 
 @pytest.mark.skipif(PIL_NOT_AVAIL, reason="PIL dependency not available")
-def test_create_legend_img(tmp_path):
+def test_create_legend_img_file(tmp_path):
     import rsgislib.tools.plotting
 
     years = [
@@ -208,7 +209,7 @@ def test_create_legend_img(tmp_path):
     out_file = os.path.join(tmp_path, "gmw_loss_legend.png")
     font_file = os.path.join(TOOLS_DATA_DIR, "Palatino Font.ttf")
 
-    rsgislib.tools.plotting.create_legend_img(
+    rsgislib.tools.plotting.create_legend_img_file(
         legend_info_dict,
         out_img_file=out_file,
         n_cols=4,

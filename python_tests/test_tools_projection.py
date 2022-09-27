@@ -66,6 +66,7 @@ def test_get_deg_coord_as_str_chars3():
     coords_str = rsgislib.tools.projection.get_deg_coord_as_str(-25, 60, n_chars=3)
     assert coords_str == "s250e600"
 
+
 def test_great_circle_distance_1():
     import rsgislib.tools.projection
 
@@ -75,6 +76,7 @@ def test_great_circle_distance_1():
 
     assert (dist_val - 3737404.124135579) < 1
 
+
 def test_great_circle_distance_2():
     import rsgislib.tools.projection
 
@@ -83,5 +85,3 @@ def test_great_circle_distance_2():
     dist_val = rsgislib.tools.projection.great_circle_distance(pt1, pt2)
 
     assert (dist_val - 3737404.124135579) < 1
-
-

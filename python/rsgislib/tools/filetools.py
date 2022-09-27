@@ -302,7 +302,13 @@ def delete_file_with_basename(input_file: str, print_rms=True):
         delete_file_silent(file)
 
 
-def rm_files_size_gt(file_path:str, file_srch:str, min_size:int, rm_file:bool=False, rm_use_basename:bool=False):
+def rm_files_size_gt(
+    file_path: str,
+    file_srch: str,
+    min_size: int,
+    rm_file: bool = False,
+    rm_use_basename: bool = False,
+):
     """
     A function which removes all the files from the search path which are
     greater than the specified size.
@@ -873,6 +879,30 @@ def sort_imgs_to_dirs_utm(input_imgs_dir: str, file_search_str: str, out_base_di
                 print("Moving: " + tmp_file)
                 outFile = os.path.join(out_dir, os.path.basename(tmp_file))
                 shutil.move(tmp_file, outFile)
+
+
+def natural_sort_file_names(in_file_lst: List[str]) -> List[str]:
+    """
+    A function which performs a natural sort of a list of files. For example,
+    if you start file names with dates (YYYYMMDD) then this function will return
+    the list of file names in date order (earliest first).
+
+    :param in_file_lst: the input list of file paths. The get_file_basename function
+                        is used to extract the file name which is used for the sort.
+    :return: the sorted list of names.
+
+    """
+    import re
+
+    def _natural_sort_key(s):
+        s = get_file_basename(s)
+        _nsre = re.compile("([0-9]+)")
+        return [
+            int(text) if text.isdigit() else text.lower() for text in _nsre.split(s)
+        ]
+
+    in_file_lst.sort(key=_natural_sort_key)
+    return in_file_lst
 
 
 def create_directory_archive(in_dir: str, out_arch: str, arch_format: str) -> str:

@@ -57,6 +57,11 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.calc_mask_img_pxl_val_prob
 .. autofunction:: rsgislib.imagecalc.calc_img_difference
 
+Thresholding
+--------------
+
+.. autofunction:: rsgislib.imagecalc.calc_split_win_thresholds
+
 Histogram
 ------------
 
@@ -99,6 +104,10 @@ Image Indices
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_nbr
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_bai
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_mvi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_gndvi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_evi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_evi2
+
 
 Equalivance
 -------------

@@ -3,9 +3,10 @@
 The tools.mapping module contains functions for making maps with geospatial data.
 """
 
-from typing import Tuple, List, Dict, Union
-import os
+from typing import List, Dict, Union
 import math
+import os
+import shutil
 
 import rsgislib
 import rsgislib.tools.projection
@@ -13,6 +14,7 @@ import rsgislib.tools.plotting
 import rsgislib.imageutils
 
 import geopandas
+import numpy
 
 import matplotlib.pyplot as plt
 import matplotlib.colors
@@ -37,6 +39,43 @@ def calc_y_fig_size(bbox: List[float], fig_x_size=Union[int, float]) -> float:
     bbox_xy_ratio = y_bbox_size / x_bbox_size
     fig_y_size = fig_x_size * bbox_xy_ratio
     return fig_y_size
+
+
+def define_axis_extent(ax: plt.axis, bbox: List[float]):
+    """
+    A function which defines the limits of the axis using the same bbox
+    as the other mapping functions.
+
+    Note. this function was written and is probably mainly used for defining
+    the axis limits when experimenting with the size/shape of the axis when
+    laying out multiple axes. However, it could be used to change the axis
+    limits from what the other functions have defined.
+
+    :param ax: The matplotlib axis for the limits to be set.
+    :param bbox: a bbox (MinX, MaxX, MinY, MaxY) to define the region of interest.
+
+    """
+    ax.set_aspect("equal", "box")
+    ax.set_xlim([bbox[0], bbox[1]])
+    ax.set_ylim([bbox[2], bbox[3]])
+
+
+def define_map_tick_spacing(ax: plt.axis, tick_spacing: float):
+    """
+    A function which defines the tick spacing on both axis of the map.
+
+    If projection is WGS84 (EPSG:4326) then a tick spacing of 0.1 would
+    provide ticks every 0.1 degrees while if using UTM then a tick spacing
+    of 1000 will give a tick every 1km.
+
+    :param ax: The matplotlib axis for the tick spacing to be defined.
+    :param tick_spacing: the spacing between the ticks.
+
+    """
+    import matplotlib.ticker as ticker
+
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
 
 
 def get_overview_info(
@@ -168,6 +207,248 @@ def add_contextily_basemap(
         source=cx_src,
         attribution=cx_attribution,
         attribution_size=cx_att_size,
+    )
+
+
+def create_wmts_img_map(
+    ax: plt.axis,
+    wmts_url: str,
+    wmts_lyr: str,
+    bbox: List[float],
+    bbox_epsg: int,
+    wmts_zoom_level: int = None,
+    title_str: str = None,
+    show_scale_bar: bool = True,
+    use_grid: bool = False,
+    show_map_axis: bool = True,
+    tmp_dir: str = None,
+    wmts_epsg: int = None,
+):
+    """
+    A function which downloading image from a WMTS service and adding it
+
+    :param ax: The matplotlib axis to which to add the WMTS image to.
+    :param wmts_url: The url for the WMTS service
+    :param wmts_lyr: the layer within the WMTS to use.
+    :param bbox: The bbox (MinX, MaxX, MinY, MaxY) specifying the
+                 spatial region to be displayed.
+    :param bbox_epsg: the EPSG code of the inputted bbox, with will be the epsg
+                      for the outputted map.
+    :param wmts_zoom_level: Optionally, the zoom level from the WMTS. If None
+                            then automatically defined.
+    :param title_str: an optional title for the map (Default: None)
+    :param show_scale_bar: boolean specifying whether a scale bar should be added to
+                           the axis. Default: False
+    :param use_grid: boolean specifying whether a grid should be added to the axis.
+                     Default: False
+    :param show_map_axis: boolean specifying whether the axes should be shown
+                          Default: False
+    :param tmp_dir: Optionally, a temporary directory for some intermediate files.
+                    If not specified, a tmp dir is created and removed in the local
+                    path from where the script is run from.
+    :param wmts_epsg: Provide the epsg code for the WMTS layer (probably 3857) if
+                      the code can't automatically find it.
+
+    """
+    import rsgislib.tools.utils
+    from rsgislib.tools import wmts_tools
+
+    uid_str = rsgislib.tools.utils.uid_generator()
+    create_tmp_dir = False
+    if tmp_dir is None:
+        tmp_dir = f"tmp_{uid_str}"
+        if not os.path.exists(tmp_dir):
+            os.mkdir(tmp_dir)
+            create_tmp_dir = True
+
+    wmts_tmp_img = os.path.join(tmp_dir, f"wmts_tmp_img_{uid_str}.kea")
+    wmts_tools.get_wmts_as_img(
+        wmts_url,
+        wmts_lyr,
+        bbox,
+        bbox_epsg=bbox_epsg,
+        output_img=wmts_tmp_img,
+        gdalformat="KEA",
+        zoom_level=wmts_zoom_level,
+        tmp_dir=tmp_dir,
+        wmts_epsg=wmts_epsg,
+    )
+
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        wmts_tmp_img, bands=[1, 2, 3]
+    )
+
+    ax.imshow(img_data, extent=img_coords)
+    ax.set_xlim([img_coords[0], img_coords[1]])
+    ax.set_ylim([img_coords[2], img_coords[3]])
+
+    if use_grid:
+        ax.grid()
+
+    if not show_map_axis:
+        ax.set_axis_off()
+        ax.set_axis_off()
+
+    if show_scale_bar:
+        distance_meters = 1
+        img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(wmts_tmp_img)
+        if img_epsg == 4326:
+            distance_meters = rsgislib.tools.projection.great_circle_distance(
+                wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+            )
+
+        ax.add_artist(ScaleBar(distance_meters))
+
+    if title_str is not None:
+        ax.title.set_text(title_str)
+
+    # Delete the downloaded image file.
+    rsgislib.imageutils.delete_gdal_layer(wmts_tmp_img)
+
+    # If created remove the tmp directory
+    if create_tmp_dir:
+        shutil.rmtree(tmp_dir)
+
+
+def draw_bboxes_to_axis(
+    ax: plt.axis,
+    bboxes: List[List[float]],
+    bbox_labels: List[str] = None,
+    rect_clr: str = "black",
+    line_width: float = 1,
+    fill_rect: bool = False,
+    clr_alpha: float = 1.0,
+    lbl_font_size=12,
+    lbl_font_weight="normal",
+    lbl_font_clr="black",
+    lbl_pos: str = "centre",
+    lbl_pos_buf: float = 0.0,
+    lbl_fill_clr: str = None,
+    lbl_padding: float = 3.0,
+):
+    """
+    This function can be used to draw a set of rectangles to an axis, where typically
+    the bboxes specify subset regions or areas of interest you are trying to highlight
+    to the person viewing the map.
+
+    :param ax: The matplotlib axis to which the bboxes will be drawn
+    :param bboxes: a list of bboxes (MinX, MaxX, MinY, MaxY) to be drawn on the axis.
+    :param bbox_labels: An optional list of labels for the bboxes
+    :param rect_clr: the colour for the bbox regions.
+    :param line_width: the width of the lines for the bboxes
+    :param fill_rect: boolean specifying whether to fill the bbox
+                      regions (Default: False)
+    :param clr_alpha: the alpha value for the bbox regions (Default: 1.0)
+    :param lbl_font_size: the font size (Default: 12).
+    :param lbl_font_weight: the weight of the font (i.e., normal or bold)
+    :param lbl_font_clr: the colour of the text (Default: black)
+    :param lbl_pos: Options: [None, above, below, left, right]. Default: None (centre)
+
+    """
+    from matplotlib.patches import Rectangle
+
+    if bbox_labels is not None:
+        if len(bboxes) != len(bbox_labels):
+            raise rsgislib.RSGISPyException(
+                "If labels are provided then the list length must be the same as bboxes."
+            )
+
+    for i, bbox in enumerate(bboxes):
+        width = bbox[1] - bbox[0]
+        height = bbox[3] - bbox[2]
+        bl_x = bbox[0]
+        bl_y = bbox[2]
+        rect = Rectangle(
+            (bl_x, bl_y),
+            width,
+            height,
+            fill=fill_rect,
+            color=rect_clr,
+            linewidth=line_width,
+            alpha=clr_alpha,
+        )
+        ax.add_patch(rect)
+        if bbox_labels is not None:
+            cx = bl_x + width / 2
+            cy = bl_y + height / 2
+
+            ha_val = "center"
+            va_val = "center"
+
+            if lbl_pos is not None:
+                if lbl_pos.lower() == "above":
+                    cy = bl_y + height + lbl_pos_buf
+                    va_val = "bottom"
+                elif lbl_pos.lower() == "below":
+                    cy = bl_y - lbl_pos_buf
+                    va_val = "top"
+                elif lbl_pos.lower() == "left":
+                    cx = bl_x - lbl_pos_buf
+                    ha_val = "right"
+                elif lbl_pos.lower() == "right":
+                    cx = bl_x + width + lbl_pos_buf
+                    ha_val = "left"
+
+            if lbl_fill_clr is not None:
+                ax.annotate(
+                    bbox_labels[i],
+                    (cx, cy),
+                    color=lbl_font_clr,
+                    weight=lbl_font_weight,
+                    fontsize=lbl_font_size,
+                    ha=ha_val,
+                    va=va_val,
+                    bbox=dict(
+                        facecolor=lbl_fill_clr, edgecolor="none", pad=lbl_padding
+                    ),
+                )
+            else:
+                ax.annotate(
+                    bbox_labels[i],
+                    (cx, cy),
+                    color=lbl_font_clr,
+                    weight=lbl_font_weight,
+                    fontsize=lbl_font_size,
+                    ha=ha_val,
+                    va=va_val,
+                )
+
+
+def add_axis_label(
+    ax: plt.axis,
+    lbl_text: str,
+    lbl_font_clr: str = "black",
+    lbl_font_weight: str = "normal",
+    lbl_font_size: int = 12,
+    fill_clr: str = "white",
+    padding: float = 3.0,
+):
+    """
+    This function adds a label in the top-left corner of the axis. This function
+    would typically be used if you want to label a number of axes (e.g., a, b, c, etc.)
+
+    :param ax: The matplotlib axis to which the label will be added.
+    :param lbl_text: the label text to be written.
+    :param lbl_font_clr: the colour of the text (Default: black)
+    :param lbl_font_weight: the weight of the font (i.e., normal or bold)
+    :param lbl_font_size: the font size (Default: 12).
+    :param fill_clr: the colour the label area will be filled with (Default: white)
+    :param padding: the amount of padding around the text (Default: 3.0)
+
+    """
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+
+    ax.text(
+        xmin,
+        ymax,
+        lbl_text,
+        color=lbl_font_clr,
+        weight=lbl_font_weight,
+        fontsize=lbl_font_size,
+        ha="left",
+        va="top",
+        bbox=dict(facecolor=fill_clr, edgecolor="none", pad=padding),
     )
 
 
@@ -577,6 +858,111 @@ def create_choropleth_vec_lyr_map(
             distance_meters = rsgislib.tools.projection.great_circle_distance(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
+        ax.add_artist(ScaleBar(distance_meters))
+
+    if title_str is not None:
+        ax.title.set_text(title_str)
+
+
+def create_raster_cmap_img_map(
+    ax: plt.axis,
+    input_img: str,
+    img_band: int,
+    bbox: List[float] = None,
+    title_str: str = None,
+    show_scale_bar: bool = True,
+    use_grid: bool = False,
+    show_map_axis: bool = True,
+    cmap_name: str = "viridis",
+    norm_img_vals: bool = False,
+    use_log_norm: bool = False,
+    norm_vmin: float = None,
+    norm_vmax: float = None,
+    vals_under_white: bool = False,
+    print_norm_vals: bool = False,
+):
+    """
+    A function which displays a single band raster layer onto the axis provided
+    using a colour bar.
+
+    :param ax: The matplotlib axis to which to add the image to.
+    :param input_img: the file path for the input image
+    :param img_band: the image band within the file to be displayed.
+                     Note, band numbering starts at 1.
+    :param bbox: An optional bbox (MinX, MaxX, MinY, MaxY) specifying the
+                 spatial region to be displayed. If None then the whole image
+                 bbox will be used.
+    :param title_str: an optional title for the map (Default: None)
+    :param show_scale_bar: boolean specifying whether a scale bar should be added to
+                           the axis. Default: False
+    :param use_grid: boolean specifying whether a grid should be added to the axis.
+                     Default: False
+    :param show_map_axis: boolean specifying whether the axes should be shown
+                          Default: False
+    :param cmap_name: The name of the colour bar to use for the density plot
+                      Default: viridis
+    :param norm_img_vals: Boolean specifying whether the colour bar values should be
+                          normalised. Default: False
+    :param use_log_norm: Specify whether to use log normalisation for the plot
+                         instead of linear. (Default: False)
+    :param norm_vmin: the minimum value for the normalisation (default: None).
+                      If None then the minimum value will be calculated from the data.
+    :param norm_vmax: the maximum value for the normalisation (default: None).
+                      If None then the maximum value will be calculated from the data.
+    :param vals_under_white: Set pixels with values less than norm_vmin to white
+                             (i.e., mask / ignore). Can be useful if visualising
+                             counts or density estimates.
+    :param print_norm_vals: boolean specifying to print the normalisation min / max
+                            values. This is useful for debugging and finding a range
+                            of values before manually setting across a set of images.
+
+    """
+    if bbox is None:
+        bbox = rsgislib.imageutils.get_img_bbox(input_img)
+
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        input_img, bands=[img_band], bbox=bbox
+    )
+
+    c_cmap = plt.get_cmap(cmap_name).copy()
+    if norm_img_vals:
+        if norm_vmin is None:
+            norm_vmin = numpy.min(img_data)
+        if norm_vmax is None:
+            norm_vmax = numpy.max(img_data)
+
+        if vals_under_white:
+            matplotlib.colors.Colormap.set_under(c_cmap, color="white")
+
+        if use_log_norm:
+            c_norm = matplotlib.colors.LogNorm(vmin=norm_vmin, vmax=norm_vmax)
+        else:
+            c_norm = matplotlib.colors.Normalize(vmin=norm_vmin, vmax=norm_vmax)
+
+        if print_norm_vals:
+            print(f"{norm_vmin} - {norm_vmax}")
+    else:
+        c_norm = None
+
+    ax.imshow(img_data, extent=img_coords, cmap=c_cmap, norm=c_norm)
+    ax.set_xlim([img_coords[0], img_coords[1]])
+    ax.set_ylim([img_coords[2], img_coords[3]])
+
+    if use_grid:
+        ax.grid()
+
+    if not show_map_axis:
+        ax.set_axis_off()
+        ax.set_axis_off()
+
+    if show_scale_bar:
+        distance_meters = 1
+        img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
+        if img_epsg == 4326:
+            distance_meters = rsgislib.tools.projection.great_circle_distance(
+                wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+            )
+
         ax.add_artist(ScaleBar(distance_meters))
 
     if title_str is not None:

@@ -99,10 +99,30 @@ Options for interpolating raster data:
 
 Options for image stretching / normalisation:
 
+    * IMG_STRETCH_NONE = 0
     * IMG_STRETCH_USER = 1
     * IMG_STRETCH_LINEAR = 2
-    * IMG_STRETCH_STDEV = 2
-    * IMG_STRECTH_CUMULATIVE = 3
+    * IMG_STRETCH_STDEV = 3
+    * IMG_STRECTH_CUMULATIVE = 4
+
+Options for vector geometry types:
+
+    * GEOM_PT = 1
+    * GEOM_LINE = 2
+    * GEOM_POLY = 3
+    * GEOM_MPT = 4
+    * GEOM_MLINE = 5
+    * GEOM_MPOLY = 6
+
+Available thresholding methods:
+
+    * THRES_METH_NONE = 0
+    * THRES_METH_OTSU = 1
+    * THRES_METH_YEN = 2
+    * THRES_METH_ISODATA = 3
+    * THRES_METH_CROSS_ENT = 4
+    * THRES_METH_LI = 5
+    * THRES_METH_KURT_SKEW = 6
 
 
 """
@@ -194,13 +214,23 @@ INTERP_MODE = 6
 GEOM_PT = 1
 GEOM_LINE = 2
 GEOM_POLY = 3
-GEOM_MLINE = 4
-GEOM_MPOLY = 5
+GEOM_MPT = 4
+GEOM_MLINE = 5
+GEOM_MPOLY = 6
 
+IMG_STRETCH_NONE = 0
 IMG_STRETCH_USER = 1
 IMG_STRETCH_LINEAR = 2
-IMG_STRETCH_STDEV = 2
-IMG_STRECTH_CUMULATIVE = 3
+IMG_STRETCH_STDEV = 3
+IMG_STRECTH_CUMULATIVE = 4
+
+THRES_METH_NONE = 0
+THRES_METH_OTSU = 1
+THRES_METH_YEN = 2
+THRES_METH_ISODATA = 3
+THRES_METH_CROSS_ENT = 4
+THRES_METH_LI = 5
+THRES_METH_KURT_SKEW = 6
 
 
 def get_install_base_path() -> pathlib.PurePath:
@@ -465,6 +495,8 @@ def is_notebook():
 
     """
     try:
+        from IPython import get_ipython
+
         shell = get_ipython().__class__.__name__
         if shell == "ZMQInteractiveShell":
             return True  # Jupyter notebook or qtconsole

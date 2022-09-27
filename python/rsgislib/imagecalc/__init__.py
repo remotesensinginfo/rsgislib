@@ -6,7 +6,7 @@ calculating on images.
 
 import math
 import os
-from typing import List, Union
+from typing import List, Dict
 
 import numpy
 from osgeo import gdal
@@ -1553,3 +1553,93 @@ def are_img_bands_equal(
 
     prop_pxls_eq = otherargs.n_eq_pxls / otherargs.n_pxls
     return (prop_pxls_eq >= prop_eql), prop_pxls_eq
+
+
+def calc_split_win_thresholds(
+    input_img: str,
+    win_size: int = 500,
+    thres_meth: int = rsgislib.THRES_METH_OTSU,
+    output_file: str = None,
+    no_data_val: float = None,
+    lower_valid: float = None,
+    upper_valid: float = None,
+    min_n_vals: int = 100,
+    **thres_kwrds,
+) -> Dict[int, List[float]]:
+    """
+    A function which undertakes a split window based thresholding where a threshold
+    is calculated for each window (tile) within the scene and a list of thresholds
+    is returned from which a single or range of thresholds can be calculated.
+
+    If you know the range of values within which the threshold should exist it
+    would probably be useful to use the upper and lower bounds thresholds to
+    limit the data used within the thresholding and therefore the thresholds
+    returned are more likely to be useful...
+
+    :param input_img: the input image
+    :param win_size: the window size
+    :param thres_meth: the thresholding method rsgislib.THRES_METH_*. Default if otsu
+                       thresholding. For details of other thresholding methods
+                       see rsgislib.tools.stats for function descriptions.
+    :param output_file: An optional JSON output file with a list of the thresholds
+                        for each band within the input file.
+    :param no_data_val: an optional no data value for the input image pixel values.
+                        If provided these values will be ignored in the input image.
+    :param lower_valid: a lower bounds for pixel values to be used for the analysis.
+    :param upper_valid: an upper bounds for pixel values to be used for the analysis.
+    :param min_n_vals: the minimum number of values used to calculate the threshold
+                       within a window.
+    :param thres_kwrds: some of the thresholding methods have arguments which need
+                        to be provided. Use this key words arguments to provide
+                        those inputs. See rsgislib.tools.stats for function inputs.
+    :return: dict of bands and a list of thresholds for the bands.
+
+    """
+    import rsgislib.imageutils
+    import rsgislib.tools.utils
+    import rsgislib.tools.stats
+    from rios.imagereader import ImageReader
+    import tqdm
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+    band_thresholds = dict()
+    for n in range(n_bands):
+        band_thresholds[n + 1] = list()
+
+    reader = ImageReader(input_img, windowxsize=win_size, windowysize=win_size)
+    for (info, block) in tqdm.tqdm(reader):
+        for n in range(n_bands):
+            data = block[n].flatten()
+            if no_data_val is not None:
+                data = data[data != no_data_val]
+            if lower_valid is not None:
+                data = data[data > lower_valid]
+            if upper_valid is not None:
+                data = data[data < upper_valid]
+            if data.shape[0] > min_n_vals:
+                if thres_meth == rsgislib.THRES_METH_OTSU:
+                    band_thres = rsgislib.tools.stats.calc_otsu_threshold(data)
+                elif thres_meth == rsgislib.THRES_METH_YEN:
+                    band_thres = rsgislib.tools.stats.calc_yen_threshold(data)
+                elif thres_meth == rsgislib.THRES_METH_ISODATA:
+                    band_thres = rsgislib.tools.stats.calc_isodata_threshold(data)
+                elif thres_meth == rsgislib.THRES_METH_CROSS_ENT:
+                    band_thres = rsgislib.tools.stats.calc_hist_cross_entropy(
+                        data, **thres_kwrds
+                    )
+                elif thres_meth == rsgislib.THRES_METH_LI:
+                    band_thres = rsgislib.tools.stats.calc_li_threshold(
+                        data, **thres_kwrds
+                    )
+                elif thres_meth == rsgislib.THRES_METH_KURT_SKEW:
+                    band_thres = rsgislib.tools.stats.calc_kurt_skew_threshold(
+                        data, **thres_kwrds
+                    )
+                else:
+                    raise rsgislib.RSGISPyException("Thresholding method unknown.")
+                band_thresholds[n + 1].append(band_thres)
+
+    if output_file is not None:
+        rsgislib.tools.utils.write_dict_to_json(band_thresholds, output_file)
+
+    return band_thresholds

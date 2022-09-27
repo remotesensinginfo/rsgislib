@@ -9,7 +9,9 @@ Map Vector Layers
 Map Raster Layers
 -------------------
 .. autofunction:: rsgislib.tools.mapping.create_raster_img_map
+.. autofunction:: rsgislib.tools.mapping.create_raster_cmap_img_map
 .. autofunction:: rsgislib.tools.mapping.create_thematic_raster_map
+.. autofunction:: rsgislib.tools.mapping.create_wmts_img_map
 
 Background Layers
 -------------------
@@ -20,9 +22,16 @@ Overview Maps
 .. autofunction:: rsgislib.tools.mapping.get_overview_info
 .. autofunction:: rsgislib.tools.mapping.add_overview_maps
 
+Add Extras to Map
+-----------------------
+.. autofunction:: rsgislib.tools.mapping.draw_bboxes_to_axis
+.. autofunction:: rsgislib.tools.mapping.add_axis_label
+
 Utilities
 -----------
 .. autofunction:: rsgislib.tools.mapping.calc_y_fig_size
+.. autofunction:: rsgislib.tools.mapping.define_axis_extent
+.. autofunction:: rsgislib.tools.mapping.define_map_tick_spacing
 
 
 * :ref:`genindex`

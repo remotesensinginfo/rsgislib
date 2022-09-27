@@ -46,6 +46,7 @@ Utilities
 .. autofunction:: rsgislib.imagecalibration.get_julian_day
 .. autofunction:: rsgislib.imagecalibration.calc_solar_distance
 .. autofunction:: rsgislib.imagecalibration.get_esun_value
+.. autofunction:: rsgislib.imagecalibration.visibility_to_aot
 
 Solar Angles
 -------------

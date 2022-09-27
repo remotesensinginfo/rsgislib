@@ -121,6 +121,32 @@ def check_format_name(vec_file_format: str) -> str:
     return out_format
 
 
+def get_file_vec_extension(format: str):
+    """
+    A function to get the extension for a given file format
+    (NOTE, currently only GPKG, GeoJSON, ESRI Shapefile, KML, KMZ, GML are supported).
+
+    :param format: OGR string for the format.
+    :return: string
+
+    """
+    if format.lower() == "gpkg":
+        ext = "gpkg"
+    elif format.lower() == "geojson":
+        ext = "geojson"
+    elif format.lower() == "esri shapefile":
+        ext = "shp"
+    elif format.lower() == "kml":
+        ext = "kml"
+    elif format.lower() == "gml":
+        ext = "gml"
+    else:
+        raise rsgislib.RSGISPyException(
+            f"The extension for the format ({format}) specified is unknown."
+        )
+    return ext
+
+
 def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None) -> str:
     """
     A function which gets the WKT projection from the inputted vector file.
@@ -183,7 +209,8 @@ def get_vec_feat_count(
     Get a count of the number of features in the vector layers.
 
     :param vec_file: is a string with the input vector file name and path.
-    :param vec_lyr: is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
+    :param vec_lyr: is the layer for which extent is to be calculated (Default: None).
+                    if None assume there is only one layer and that will be read.
     :param compute_count: is a boolean which specifies whether the layer extent
                          should be calculated (rather than estimated from header)
                          even if that operation is computationally expensive.
@@ -201,6 +228,70 @@ def get_vec_feat_count(
         raise rsgislib.RSGISPyException("Check layer name as did not open layer.")
     nFeats = inLayer.GetFeatureCount(compute_count)
     return nFeats
+
+
+def get_vec_lyr_geom_type(vec_file: str, vec_lyr: str = None) -> int:
+    """
+    A function which returns an rsgislib.GEOM_XX value related to the vector
+    geometry type.
+
+    :param vec_file: is a string with the input vector file name and path.
+    :param vec_lyr: is the layer for which extent is to be calculated (Default: None).
+                    if None assume there is only one layer and that will be read.
+    :return: int representing the geometry type (rsgislib.GEOM_XX)
+
+    """
+    vec_ds_obj = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    if vec_ds_obj is None:
+        raise rsgislib.RSGISPyException(f"Could not open input file: {vec_file}")
+
+    if vec_lyr is None:
+        vec_lyr_obj = vec_ds_obj.GetLayer()
+    else:
+        vec_lyr_obj = vec_ds_obj.GetLayer(vec_lyr)
+
+    if vec_lyr_obj is None:
+        raise rsgislib.RSGISPyException(
+            f"Could not open vector layer ({vec_lyr}) in vector file {vec_file}"
+        )
+
+    vec_lyr_defn = vec_lyr_obj.GetLayerDefn()
+    geom_type = vec_lyr_defn.GetGeomType()
+    vec_ds_obj = None
+
+    out_geom_type = 0
+    if geom_type == ogr.wkbPolygon:
+        out_geom_type = rsgislib.GEOM_POLY
+    elif geom_type == ogr.wkbPolygon25D:
+        out_geom_type = rsgislib.GEOM_POLY
+    elif geom_type == ogr.wkbPoint:
+        out_geom_type = rsgislib.GEOM_PT
+    elif geom_type == ogr.wkbPoint25D:
+        out_geom_type = rsgislib.GEOM_PT
+    elif geom_type == ogr.wkbLineString:
+        out_geom_type = rsgislib.GEOM_LINE
+    elif geom_type == ogr.wkbLineString25D:
+        out_geom_type = rsgislib.GEOM_LINE
+    elif geom_type == ogr.wkbMultiPolygon:
+        out_geom_type = rsgislib.GEOM_MPOLY
+    elif geom_type == ogr.wkbMultiPolygon25D:
+        out_geom_type = rsgislib.GEOM_MPOLY
+    elif geom_type == ogr.wkbMultiPoint:
+        out_geom_type = rsgislib.GEOM_MPT
+    elif geom_type == ogr.wkbMultiPoint25D:
+        out_geom_type = rsgislib.GEOM_MPT
+    elif geom_type == ogr.wkbMultiLineString:
+        out_geom_type = rsgislib.GEOM_MLINE
+    elif geom_type == ogr.wkbMultiLineString25D:
+        out_geom_type = rsgislib.GEOM_MLINE
+    else:
+        raise Exception(
+            "Do not recognise Geometry Type: '{}'".format(
+                ogr.GeometryTypeToName(geom_type)
+            )
+        )
+
+    return out_geom_type
 
 
 def count_feats_per_att_val(
@@ -2067,15 +2158,15 @@ def perform_spatial_join(
         )
 
     base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
-    join_gpg_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
+    join_gpd_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
 
-    join_gpg_df = geopandas.sjoin(base_gpd_df, join_gpg_df, how=join_how, op=join_op)
+    join_gpd_df = geopandas.sjoin(base_gpd_df, join_gpd_df, how=join_how, op=join_op)
 
-    if len(join_gpg_df) > 0:
+    if len(join_gpd_df) > 0:
         if out_format == "GPKG":
-            join_gpg_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+            join_gpd_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
-            join_gpg_df.to_file(out_vec_file, driver=out_format)
+            join_gpd_df.to_file(out_vec_file, driver=out_format)
 
 
 def does_vmsk_img_intersect(
@@ -3209,3 +3300,120 @@ def rm_feat_att_duplicates(
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def match_closest_vec_pts(
+    vec_base_file: str,
+    vec_base_lyr: str,
+    vec_match_file: str,
+    vec_match_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GeoJSON",
+    tolerance=None,
+    cp_match_atts=False,
+    out_x_col="x_match",
+    out_y_col="y_match",
+    out_dist_col="dist_match",
+    out_att_prefix="match_",
+):
+    """
+    A function which finds the closest point between two vectors of point geometry.
+    There is an option to copy the attributes from the matched points to the output
+    in which case this can be used as a form of spatial join.
+
+    Note. this function is not intended to be used with large datasets and the full
+    distance matrix (i.e., every point to every other point) is calculated.
+
+    :param vec_base_file: Input base vector file which will be outputted
+    :param vec_base_lyr: Input base vector layer name.
+    :param vec_match_file: Input match vector file which will be matched to the base
+                          vector
+    :param vec_match_lyr: Input match vector layer name.
+    :param out_vec_file: the output vector file path
+    :param out_vec_lyr: the output vector layer name
+    :param out_format: the output format (Default: GeoJSON)
+    :param tolerance: a tolerance threshold where matches over this distance will not
+                      be outputted (i.e., the input vector will be subsetted).
+    :param cp_match_atts: Copy attributes from the matching vector layer.
+    :param out_x_col: the output column name for the matched x coordinate from the
+                      vec_match_lyr. Default: x_match
+    :param out_y_col: the output column name for the matched y coordinate from the
+                      vec_match_lyr. Default: y_match
+    :param out_dist_col: the output column name for the distances between the base point
+                         and the matched point.
+    :param out_att_prefix: A prefix for matched attributes, if outputted
+                           (i.e., cp_match_atts = True)
+    :returns: boolean where True is outputted if some points are matched and
+              False if no points are matched.
+
+    """
+    import geopandas
+    import numpy
+    import rsgislib.tools.geometrytools
+
+    base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
+    match_gpd_df = geopandas.read_file(vec_match_file, layer=vec_match_lyr)
+
+    # calculate the distance matrix between all the points
+    dist_matrix = match_gpd_df.geometry.apply(lambda g: base_gpd_df.distance(g))
+
+    # find min distance for each feature in base
+    min_dists = dist_matrix.min()
+
+    out_x = list()
+    out_y = list()
+    out_dists = list()
+    match_atts = dict()
+    if cp_match_atts:
+        for match_col in match_gpd_df.columns:
+            if match_col != "geometry":
+                match_atts[match_col] = list()
+
+    for i, min_dist in enumerate(min_dists):
+        join_feat = numpy.where(dist_matrix[i].values == min_dist)[0]
+        if join_feat.shape[0] != 1:
+            raise rsgislib.RSGISPyException(
+                "Multiple features found - don't know what to do with that!"
+            )
+        join_feat = join_feat[0]
+
+        base_x = base_gpd_df.iloc[[i]].geometry.x.values[0]
+        base_y = base_gpd_df.iloc[[i]].geometry.y.values[0]
+
+        join_x = match_gpd_df.iloc[[join_feat]].geometry.x.values[0]
+        join_y = match_gpd_df.iloc[[join_feat]].geometry.y.values[0]
+        dist_val = rsgislib.tools.geometrytools.calc_pt_distance(
+            base_x, base_y, join_x, join_y
+        )
+
+        out_x.append(join_x)
+        out_y.append(join_y)
+        out_dists.append(dist_val)
+
+        if cp_match_atts:
+            for match_col in match_atts:
+                match_atts[match_col].append(
+                    match_gpd_df.iloc[[join_feat]][match_col].values[0]
+                )
+
+    base_gpd_df[out_x_col] = out_x
+    base_gpd_df[out_y_col] = out_y
+    base_gpd_df[out_dist_col] = out_dists
+
+    if cp_match_atts:
+        for match_col in match_atts:
+            base_gpd_df[f"{out_att_prefix}{match_col}"] = match_atts[match_col]
+
+    if tolerance is not None:
+        base_gpd_df = base_gpd_df[base_gpd_df[out_dist_col] < tolerance]
+
+    found_match = False
+    if len(base_gpd_df) > 0:
+        if out_format == "GPKG":
+            base_gpd_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            base_gpd_df.to_file(out_vec_file, driver=out_format)
+        found_match = True
+
+    return found_match

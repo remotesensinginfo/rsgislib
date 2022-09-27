@@ -977,7 +977,17 @@ def create_bboxs_for_pts(
     )
 
 
-def create_wgs84_vector_grid(out_vec_file:str, out_vec_lyr:str, out_format:str, grid_x:int, grid_y:int, bbox:List[float], overlap:float=None, tile_names_col:str='tile_names', tile_name_prefix:str=''):
+def create_wgs84_vector_grid(
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str,
+    grid_x: int,
+    grid_y: int,
+    bbox: List[float],
+    overlap: float = None,
+    tile_names_col: str = "tile_names",
+    tile_name_prefix: str = "",
+):
     """
     A function which creates a regular grid across a defined area using the
     WGS84 (EPSG:4326) projection.
@@ -1021,46 +1031,78 @@ def create_wgs84_vector_grid(out_vec_file:str, out_vec_lyr:str, out_format:str, 
         for j in range(n_x_cells):
             c_min_x = min_x + (j * grid_x)
             c_max_x = c_min_x + grid_x
-            lat_lon_str_name = rsgislib.tools.projection.get_deg_coord_as_str(lat=c_min_x, lon=c_max_y, n_chars=4)
+            lat_lon_str_name = rsgislib.tools.projection.get_deg_coord_as_str(
+                lat=c_min_x, lon=c_max_y, n_chars=4
+            )
             tile_names.append(f"{tile_name_prefix}{lat_lon_str_name}")
             if overlap is None:
                 bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
             else:
-                bboxs.append([c_min_x - overlap, c_max_x + overlap, c_min_y - overlap,
-                              c_max_y + overlap])
+                bboxs.append(
+                    [
+                        c_min_x - overlap,
+                        c_max_x + overlap,
+                        c_min_y - overlap,
+                        c_max_y + overlap,
+                    ]
+                )
         if x_remain > 0:
             c_min_x = min_x + (n_x_cells * grid_x)
             c_max_x = c_min_x + x_remain
-            lat_lon_str_name = rsgislib.tools.projection.get_deg_coord_as_str(lat=c_min_x, lon=c_max_y, n_chars=4)
+            lat_lon_str_name = rsgislib.tools.projection.get_deg_coord_as_str(
+                lat=c_min_x, lon=c_max_y, n_chars=4
+            )
             tile_names.append(f"{tile_name_prefix}{lat_lon_str_name}")
             if overlap is None:
                 bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
             else:
-                bboxs.append([c_min_x - overlap, c_max_x + overlap, c_min_y - overlap,
-                              c_max_y + overlap])
+                bboxs.append(
+                    [
+                        c_min_x - overlap,
+                        c_max_x + overlap,
+                        c_min_y - overlap,
+                        c_max_y + overlap,
+                    ]
+                )
     if y_remain > 0:
         c_max_y = max_y - (n_y_cells * grid_y)
         c_min_y = c_max_y - y_remain
         for j in range(n_x_cells):
             c_min_x = min_x + (j * grid_x)
             c_max_x = c_min_x + grid_x
-            lat_lon_str_name = rsgislib.tools.projection.get_deg_coord_as_str(lat=c_min_x, lon=c_max_y, n_chars=4)
+            lat_lon_str_name = rsgislib.tools.projection.get_deg_coord_as_str(
+                lat=c_min_x, lon=c_max_y, n_chars=4
+            )
             tile_names.append(f"{tile_name_prefix}{lat_lon_str_name}")
             if overlap is None:
                 bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
             else:
-                bboxs.append([c_min_x - overlap, c_max_x + overlap, c_min_y - overlap,
-                              c_max_y + overlap])
+                bboxs.append(
+                    [
+                        c_min_x - overlap,
+                        c_max_x + overlap,
+                        c_min_y - overlap,
+                        c_max_y + overlap,
+                    ]
+                )
         if x_remain > 0:
             c_min_x = min_x + (n_x_cells * grid_x)
             c_max_x = c_min_x + x_remain
-            lat_lon_str_name = rsgislib.tools.projection.get_deg_coord_as_str(lat=c_min_x, lon=c_max_y, n_chars=4)
+            lat_lon_str_name = rsgislib.tools.projection.get_deg_coord_as_str(
+                lat=c_min_x, lon=c_max_y, n_chars=4
+            )
             tile_names.append(f"{tile_name_prefix}{lat_lon_str_name}")
             if overlap is None:
                 bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
             else:
-                bboxs.append([c_min_x - overlap, c_max_x + overlap, c_min_y - overlap,
-                              c_max_y + overlap])
+                bboxs.append(
+                    [
+                        c_min_x - overlap,
+                        c_max_x + overlap,
+                        c_min_y - overlap,
+                        c_max_y + overlap,
+                    ]
+                )
 
     for bbox in bboxs:
         if bbox[2] < -180:
@@ -1069,6 +1111,122 @@ def create_wgs84_vector_grid(out_vec_file:str, out_vec_lyr:str, out_format:str, 
             bbox[3] = 180
 
     create_poly_vec_bboxs(out_vec_file, out_vec_lyr, out_format, epsg_code, bboxs)
-    rsgislib.vectorattrs.write_vec_column(out_vec_file, out_vec_lyr, tile_names_col, ogr.OFTString, tile_names)
+    rsgislib.vectorattrs.write_vec_column(
+        out_vec_file, out_vec_lyr, tile_names_col, ogr.OFTString, tile_names
+    )
 
 
+def create_vec_for_image(
+    input_imgs: List,
+    output_dir: str,
+    out_format: str = "GeoJSON",
+    geometry_type: int = rsgislib.GEOM_PT,
+    out_name_replace: dict = None,
+    out_file_ext=None,
+    del_exist_vec=False,
+):
+    """
+    A function which creates a simple (dummy) vector layer for each input images.
+    This function is intended to save time creating vector layers where a vector
+    layer is needed for a set of images but digitising some information.
+
+    A single geometry is added to the layer, for a point this is the image centre,
+    for a line this is from the TL to BR and for a polygon this is the bbox.
+
+    :param input_imgs: a list of input images.
+    :param output_dir: a directory where the output vector layers will be created
+    :param out_format: the output format for the vector layers (Default: GeoJSON)
+    :param geometry_type: the geometry type of the vector layers (rsgislib.GEOM_PT,
+                          rsgislib.GEOM_LINE or rsgislib.GEOM_POLY)
+                          Default: rsgislib.GEOM_PT
+    :param out_name_replace: a dictionary of replacement values for editing the input
+                             image file names. If None (default) then ignored. For
+                             example, {"_ortho", ""} will remove '_ortho' from the
+                             input file names.
+    :param out_file_ext: the output extension for the output files (e.g., geojson)
+                         If None (Default) then this will be created.
+    :param del_exist_vec: delete the vector files if they already exist (Default: False)
+
+    """
+    import rsgislib.tools.filetools
+    import rsgislib.imageutils
+    import rsgislib.vectorutils
+    from osgeo import ogr
+    from osgeo import osr
+    import tqdm
+
+    if out_file_ext is None:
+        out_file_ext = rsgislib.vectorutils.get_file_vec_extension(out_format)
+
+    out_geom_type = ogr.wkbPoint
+    if geometry_type == rsgislib.GEOM_PT:
+        out_geom_type = ogr.wkbPoint
+    elif geometry_type == rsgislib.GEOM_LINE:
+        out_geom_type = ogr.wkbLineString
+    elif geometry_type == rsgislib.GEOM_POLY:
+        out_geom_type = ogr.wkbPolygon
+    else:
+        rsgislib.RSGISPyException(
+            "Input geometry type was not recognised - only support "
+            "rsgislib.GEOM_PT, rsgislib.GEOM_LINE, rsgislib.GEOM_POLY"
+        )
+
+    # Create the output driver
+    out_driver = ogr.GetDriverByName(out_format)
+
+    for img in tqdm.tqdm(input_imgs):
+        basename = rsgislib.tools.filetools.get_file_basename(img, check_valid=True)
+        if out_name_replace is not None:
+            for rpl_in_str in out_name_replace:
+                basename = basename.replace(rpl_in_str, out_name_replace[rpl_in_str])
+
+        out_vec_file = os.path.join(output_dir, f"{basename}.{out_file_ext}")
+        out_vec_lyr = basename
+
+        if os.path.exists(out_vec_file):
+            if del_exist_vec:
+                driver = ogr.GetDriverByName(out_format)
+                driver.DeleteDataSource(out_vec_file)
+            else:
+                raise rsgislib.RSGISPyException("Output file already exists")
+
+        # create the spatial reference
+        img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(img)
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(int(img_epsg))
+
+        # Create the output vector source and layer
+        out_ds_obj = out_driver.CreateDataSource(out_vec_file)
+        out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, srs, geom_type=out_geom_type)
+        # Get the output Layer's Feature Definition
+        feat_defn_obj = out_lyr_obj.GetLayerDefn()
+
+        img_bbox = rsgislib.imageutils.get_img_bbox(img)
+
+        if geometry_type == rsgislib.GEOM_PT:
+            x_pt = img_bbox[0] + ((img_bbox[1] - img_bbox[0]) / 2)
+            y_pt = img_bbox[2] + ((img_bbox[3] - img_bbox[2]) / 2)
+            geom = ogr.Geometry(ogr.wkbPoint)
+            geom.AddPoint(x_pt, y_pt)
+        elif geometry_type == rsgislib.GEOM_LINE:
+            geom = ogr.Geometry(ogr.wkbLineString)
+            geom.AddPoint(img_bbox[0], img_bbox[3])
+            geom.AddPoint(img_bbox[1], img_bbox[2])
+        elif geometry_type == rsgislib.GEOM_POLY:
+            ring = ogr.Geometry(ogr.wkbLinearRing)
+            ring.AddPoint(img_bbox[0], img_bbox[3])
+            ring.AddPoint(img_bbox[1], img_bbox[3])
+            ring.AddPoint(img_bbox[1], img_bbox[2])
+            ring.AddPoint(img_bbox[0], img_bbox[2])
+            ring.AddPoint(img_bbox[0], img_bbox[3])
+            geom = ogr.Geometry(ogr.wkbPolygon)
+            geom.AddGeometry(ring)
+        else:
+            raise rsgislib.RSGISPyException("Do not recognise geometry type")
+
+        out_feat_obj = ogr.Feature(feat_defn_obj)
+        out_feat_obj.SetGeometry(geom)
+        out_lyr_obj.CreateFeature(out_feat_obj)
+        out_feat_obj = None
+        out_lyr_obj.SyncToDisk()
+        out_ds_obj = None

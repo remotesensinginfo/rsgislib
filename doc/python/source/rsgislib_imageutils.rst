@@ -97,6 +97,7 @@ Visualisation / Normalisation
 .. autofunction:: rsgislib.imageutils.set_img_thematic
 .. autofunction:: rsgislib.imageutils.set_img_not_thematic
 .. autofunction:: rsgislib.imageutils.define_colour_table
+.. autofunction:: rsgislib.imageutils.define_colour_table
 
 
 Masking
