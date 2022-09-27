@@ -2,11 +2,10 @@
 # This creates an Ubuntu derived base image to build
 # RSGISLib and package it as .deb
 # 
-# NOTE: The built package is designed to work on ubuntu focal with ubuntu-gis stable PPA
-# This is for the updated gdal versions available within that PPA.
+# NOTE: The built package is designed to work on ubuntu jammy
 #
-# Ubuntu 20.04 Bionic Beaver
-FROM ubuntu:focal
+# Ubuntu 22.04 Jammy Jellyfish
+FROM ubuntu:jammy
 
 MAINTAINER EnvSys <developers@envsys.co.uk>
 
@@ -22,7 +21,6 @@ WORKDIR $ROOTDIR/
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends software-properties-common && \
     add-apt-repository universe && \
-    add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable && \
     apt-get update -y && apt-get install --no-install-recommends -y \
     build-essential \
     python3-dev \
@@ -30,7 +28,7 @@ RUN apt-get update -y && \
     libgdal-dev \
     libhdf5-serial-dev \
     libgsl-dev \
-    libgsl23 \
+    libgsl27 \
     libgmp-dev \
     libboost-filesystem-dev \
     libboost-date-time-dev \
@@ -43,7 +41,7 @@ RUN apt-get update -y && \
     locales \
     cmake
 
-ARG KEALIB_DEB_URL=https://envsys-public.s3.amazonaws.com/ubuntu/kealib/focal_ubuntugis_unstable_libkea_1.4.14-1.deb
+ARG KEALIB_DEB_URL=https://envsys-public.s3.amazonaws.com/ubuntu/kealib/jammy_libkea_1.4.14-1.deb
 ARG RSGISLIB_VER=5.0.10
 ARG PACKAGE_DIR=/usr/local/packages
 ARG RSGSILIB_PACKAGE_DIR=$PACKAGE_DIR/rsgislib_$RSGISLIB_VER-1
@@ -62,6 +60,7 @@ COPY . /usr/local/src/rsgislib
 RUN mkdir -p $RSGSILIB_PACKAGE_DIR
 
 RUN cd /usr/local/src/rsgislib && \
+    mkdir build && cd build && \
     cmake \
     -D GDAL_INCLUDE_DIR=/usr/include/gdal \
     -D GDAL_LIB_PATH=/usr/lib/gdal \
@@ -69,16 +68,16 @@ RUN cd /usr/local/src/rsgislib && \
     -D HDF5_LIB_PATH=/usr/lib/x86_64-linux-gnu/hdf5/serial \
     -D CMAKE_VERBOSE_MAKEFILE=ON \
     -D CMAKE_INSTALL_PREFIX=/usr \
-    . && \
+    .. && \
     make -j "${make_threads}" && \
     make install DESTDIR=$RSGSILIB_PACKAGE_DIR && \
     make install && \
     ldconfig && \
-    mkdir -p $RSGSILIB_PACKAGE_DIR/usr/lib/python3.8/dist-packages/rsgislib-$RSGISLIB_VER.dist-info && \
-    touch $RSGSILIB_PACKAGE_DIR/usr/lib/python3.8/dist-packages/rsgislib-$RSGISLIB_VER.dist-info/METADATA
+    mkdir -p $RSGSILIB_PACKAGE_DIR/usr/lib/python3.10/dist-packages/rsgislib-$RSGISLIB_VER.dist-info && \
+    touch $RSGSILIB_PACKAGE_DIR/usr/lib/python3.10/dist-packages/rsgislib-$RSGISLIB_VER.dist-info/METADATA
     
 RUN mkdir $RSGSILIB_PACKAGE_DIR/DEBIAN
-COPY ./contrib/ubuntu/focal_ubuntugis_unstable/DEBIAN $RSGSILIB_PACKAGE_DIR/DEBIAN
+COPY ./contrib/ubuntu/jammy/DEBIAN $RSGSILIB_PACKAGE_DIR/DEBIAN
 RUN dpkg-deb --build $RSGSILIB_PACKAGE_DIR
 
 
