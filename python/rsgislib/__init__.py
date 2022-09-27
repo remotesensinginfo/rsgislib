@@ -495,8 +495,8 @@ def is_notebook():
 
     """
     try:
-        from IPython import get_ipython
-
+        # Do not import get_ipython as if it is a notebook it will
+        # already have been imported. 
         shell = get_ipython().__class__.__name__
         if shell == "ZMQInteractiveShell":
             return True  # Jupyter notebook or qtconsole
