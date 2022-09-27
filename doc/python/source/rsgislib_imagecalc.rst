@@ -57,6 +57,11 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.calc_mask_img_pxl_val_prob
 .. autofunction:: rsgislib.imagecalc.calc_img_difference
 
+Thresholding
+--------------
+
+.. autofunction:: rsgislib.imagecalc.calc_split_win_thresholds
+
 Histogram
 ------------
 
