@@ -13,15 +13,11 @@ from rsgislib import imagecalc
 from osgeo import gdal
 import numpy
 
-have_matplotlib = True
-try:
-    import matplotlib.pyplot as plt
-    import matplotlib.colors as mClrs
-    from matplotlib.patches import Patch
-    from matplotlib import rcParams
-    from matplotlib import gridspec
-except ImportError:
-    have_matplotlib = False
+import matplotlib.pyplot as plt
+import matplotlib.colors as mClrs
+from matplotlib.patches import Patch
+from matplotlib import rcParams
+from matplotlib import gridspec
 
 have_mpl_scatter_density = True
 try:
@@ -68,11 +64,6 @@ def plot_image_spectra(
 
     """
     import rsgislib.tools.filetools
-
-    if not have_matplotlib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required and could not be imported."
-        )
 
     dataset = gdal.Open(input_img, gdal.GA_ReadOnly)
     numBands = dataset.RasterCount
@@ -227,11 +218,6 @@ def plot_image_comparison(
         plotting.plot_image_comparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
 
     """
-    if not have_matplotlib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required and could not be imported."
-        )
-
     gdalformat = "KEA"
     tmpOutFile = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmp.kea"
     # tmpOutFileStch = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmpStch.kea"
@@ -371,11 +357,6 @@ def plot_image_histogram(
         plotting.plot_image_histogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
 
     """
-    if not have_matplotlib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required and could not be imported."
-        )
-
     if (imgMin is None) or (imgMax is None):
         # Calculate image 1 stats
         imgGDALDS = gdal.Open(input_img, gdal.GA_ReadOnly)
@@ -432,11 +413,6 @@ def residual_plot(y_true, residuals, out_file, out_format="PNG", title=None):
     :param title: A title for the plot. Optional, if None then ignored. (Default: None)
 
     """
-    if not have_matplotlib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required and could not be imported."
-        )
-
     if not isinstance(residuals, numpy.ndarray):
         residuals = numpy.array(residuals)
     if not isinstance(y_true, numpy.ndarray):
@@ -522,10 +498,6 @@ def residual_density_plot(
                             specified then must be a list of 2 values.
 
     """
-    if not have_matplotlib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required and could not be imported."
-        )
     if not have_mpl_scatter_density:
         raise rsgislib.RSGISPyException(
             "The mpl_scatter_density module is required and could not be imported."
@@ -606,10 +578,6 @@ def quantile_plot(residuals, ylabel, out_file, out_format="PNG", title=None):
     :param title: A title for the plot. Optional, if None then ignored. (Default: None)
 
     """
-    if not have_matplotlib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required and could not be imported."
-        )
     from scipy.stats import probplot
 
     if not isinstance(residuals, numpy.ndarray):
@@ -678,11 +646,6 @@ def plot_histogram_threshold(
 
     """
     import rsgislib
-
-    if not have_matplotlib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required and could not be imported."
-        )
     import rsgislib.tools.stats
 
     if n_bins is None:
@@ -1708,11 +1671,6 @@ def gen_colour_lst(cmap_name: str, n_clrs: int, reverse: bool = False) -> List[s
     :return: List of hex colour presentations
 
     """
-    if not have_matplotlib:
-        raise rsgislib.RSGISPyException(
-            "The matplotlib module is required and could not be imported."
-        )
-
     c_map = plt.cm.get_cmap(cmap_name)
     vals_arr = numpy.linspace(0, 1, n_clrs)
     clr_lst = list()
