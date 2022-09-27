@@ -32,7 +32,7 @@ def get_wmts_layer_list(wmts_url:str, name_filter:str=None)->List[str]:
     wmts_obj = None
     return wmts_lyrs
 
-def get_wmts_as_img(wmts_url:str, wmts_lyr:str, bbox:List[float], bbox_epsg:int, output_img:str, gdalformat="GTIFF", zoom_level:int=None, tmp_dir:str=None):
+def get_wmts_as_img(wmts_url:str, wmts_lyr:str, bbox:List[float], bbox_epsg:int, output_img:str, gdalformat="GTIFF", zoom_level:int=None, tmp_dir:str=None, wmts_epsg:int=None):
     """
     A function which retrieves an image (e.g., GTIFF) from a WMTS for a specified
     region of interest. Be care to ask for large areas at high zoom levels!
@@ -50,6 +50,8 @@ def get_wmts_as_img(wmts_url:str, wmts_lyr:str, bbox:List[float], bbox_epsg:int,
     :param tmp_dir: Optionally, a temporary directory for some intermediate files.
                     If not specified, a tmp dir is created and removed in the local
                     path from where the script is run from.
+    :param wmts_epsg: Provide the epsg code for the WMTS layer (probably 3857) if
+                      the code can't automatically find it.
 
     """
     from osgeo import gdal
@@ -71,7 +73,8 @@ def get_wmts_as_img(wmts_url:str, wmts_lyr:str, bbox:List[float], bbox_epsg:int,
     trans_opt = gdal.TranslateOptions(format="WMTS")
     gdal.Translate(out_tmp_xml, gdal_lyr_url, options=trans_opt)
 
-    wmts_epsg = rsgislib.imageutils.get_epsg_proj_from_img(out_tmp_xml)
+    if wmts_epsg is None:
+        wmts_epsg = rsgislib.imageutils.get_epsg_proj_from_img(out_tmp_xml)
     if wmts_epsg != bbox_epsg:
         wmts_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(bbox, bbox_epsg, wmts_epsg)
     else:

@@ -221,6 +221,7 @@ def create_wmts_img_map(
     use_grid: bool = False,
     show_map_axis: bool = True,
     tmp_dir:str = None,
+    wmts_epsg:int = None,
 ):
     """
     A function which downloading image from a WMTS service and adding it 
@@ -244,6 +245,8 @@ def create_wmts_img_map(
     :param tmp_dir: Optionally, a temporary directory for some intermediate files.
                     If not specified, a tmp dir is created and removed in the local
                     path from where the script is run from.
+    :param wmts_epsg: Provide the epsg code for the WMTS layer (probably 3857) if
+                      the code can't automatically find it.
 
     """
     import rsgislib.tools.utils
@@ -257,7 +260,7 @@ def create_wmts_img_map(
             create_tmp_dir = True
 
     wmts_tmp_img = os.path.join(tmp_dir, f"wmts_tmp_img_{uid_str}.kea")
-    wmts_tools.get_wmts_as_img(wmts_url, wmts_lyr, bbox, bbox_epsg=bbox_epsg, output_img=wmts_tmp_img, gdalformat="KEA", zoom_level=wmts_zoom_level, tmp_dir=tmp_dir)
+    wmts_tools.get_wmts_as_img(wmts_url, wmts_lyr, bbox, bbox_epsg=bbox_epsg, output_img=wmts_tmp_img, gdalformat="KEA", zoom_level=wmts_zoom_level, tmp_dir=tmp_dir, wmts_epsg=wmts_epsg)
 
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(wmts_tmp_img, bands=[1,2,3])
 
