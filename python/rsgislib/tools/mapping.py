@@ -209,6 +209,7 @@ def add_contextily_basemap(
         attribution_size=cx_att_size,
     )
 
+
 def create_wmts_img_map(
     ax: plt.axis,
     wmts_url: str,
@@ -220,11 +221,11 @@ def create_wmts_img_map(
     show_scale_bar: bool = True,
     use_grid: bool = False,
     show_map_axis: bool = True,
-    tmp_dir:str = None,
-    wmts_epsg:int = None,
+    tmp_dir: str = None,
+    wmts_epsg: int = None,
 ):
     """
-    A function which downloading image from a WMTS service and adding it 
+    A function which downloading image from a WMTS service and adding it
 
     :param ax: The matplotlib axis to which to add the WMTS image to.
     :param wmts_url: The url for the WMTS service
@@ -233,7 +234,7 @@ def create_wmts_img_map(
                  spatial region to be displayed.
     :param bbox_epsg: the EPSG code of the inputted bbox, with will be the epsg
                       for the outputted map.
-    :param wmts_zoom_level: Optionally, the zoom level from the WMTS. If None 
+    :param wmts_zoom_level: Optionally, the zoom level from the WMTS. If None
                             then automatically defined.
     :param title_str: an optional title for the map (Default: None)
     :param show_scale_bar: boolean specifying whether a scale bar should be added to
@@ -251,6 +252,7 @@ def create_wmts_img_map(
     """
     import rsgislib.tools.utils
     from rsgislib.tools import wmts_tools
+
     uid_str = rsgislib.tools.utils.uid_generator()
     create_tmp_dir = False
     if tmp_dir is None:
@@ -260,9 +262,21 @@ def create_wmts_img_map(
             create_tmp_dir = True
 
     wmts_tmp_img = os.path.join(tmp_dir, f"wmts_tmp_img_{uid_str}.kea")
-    wmts_tools.get_wmts_as_img(wmts_url, wmts_lyr, bbox, bbox_epsg=bbox_epsg, output_img=wmts_tmp_img, gdalformat="KEA", zoom_level=wmts_zoom_level, tmp_dir=tmp_dir, wmts_epsg=wmts_epsg)
+    wmts_tools.get_wmts_as_img(
+        wmts_url,
+        wmts_lyr,
+        bbox,
+        bbox_epsg=bbox_epsg,
+        output_img=wmts_tmp_img,
+        gdalformat="KEA",
+        zoom_level=wmts_zoom_level,
+        tmp_dir=tmp_dir,
+        wmts_epsg=wmts_epsg,
+    )
 
-    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(wmts_tmp_img, bands=[1,2,3])
+    img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
+        wmts_tmp_img, bands=[1, 2, 3]
+    )
 
     ax.imshow(img_data, extent=img_coords)
     ax.set_xlim([img_coords[0], img_coords[1]])
@@ -281,7 +295,7 @@ def create_wmts_img_map(
         if img_epsg == 4326:
             distance_meters = rsgislib.tools.projection.great_circle_distance(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
-                )
+            )
 
         ax.add_artist(ScaleBar(distance_meters))
 

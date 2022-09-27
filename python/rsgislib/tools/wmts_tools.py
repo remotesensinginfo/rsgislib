@@ -8,7 +8,8 @@ import os
 import shutil
 import rsgislib
 
-def get_wmts_layer_list(wmts_url:str, name_filter:str=None)->List[str]:
+
+def get_wmts_layer_list(wmts_url: str, name_filter: str = None) -> List[str]:
     """
     A function which uses the owslib module to retrieve the list of
     available layers from a WMTS service.
@@ -21,6 +22,7 @@ def get_wmts_layer_list(wmts_url:str, name_filter:str=None)->List[str]:
 
     """
     import owslib.wmts
+
     wmts_obj = owslib.wmts.WebMapTileService(wmts_url)
     wmts_lyrs = list(wmts_obj.contents)
     if name_filter is not None:
@@ -32,7 +34,18 @@ def get_wmts_layer_list(wmts_url:str, name_filter:str=None)->List[str]:
     wmts_obj = None
     return wmts_lyrs
 
-def get_wmts_as_img(wmts_url:str, wmts_lyr:str, bbox:List[float], bbox_epsg:int, output_img:str, gdalformat="GTIFF", zoom_level:int=None, tmp_dir:str=None, wmts_epsg:int=None):
+
+def get_wmts_as_img(
+    wmts_url: str,
+    wmts_lyr: str,
+    bbox: List[float],
+    bbox_epsg: int,
+    output_img: str,
+    gdalformat="GTIFF",
+    zoom_level: int = None,
+    tmp_dir: str = None,
+    wmts_epsg: int = None,
+):
     """
     A function which retrieves an image (e.g., GTIFF) from a WMTS for a specified
     region of interest. Be care to ask for large areas at high zoom levels!
@@ -76,7 +89,9 @@ def get_wmts_as_img(wmts_url:str, wmts_lyr:str, bbox:List[float], bbox_epsg:int,
     if wmts_epsg is None:
         wmts_epsg = rsgislib.imageutils.get_epsg_proj_from_img(out_tmp_xml)
     if wmts_epsg != bbox_epsg:
-        wmts_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(bbox, bbox_epsg, wmts_epsg)
+        wmts_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(
+            bbox, bbox_epsg, wmts_epsg
+        )
     else:
         wmts_bbox = bbox
 
@@ -119,7 +134,14 @@ def get_wmts_as_img(wmts_url:str, wmts_lyr:str, bbox:List[float], bbox_epsg:int,
     if wmts_epsg != bbox_epsg:
         out_tmp_img = os.path.join(tmp_dir, f"tmp_out_img_{uid_str}.kea")
         rsgislib.imageutils.gdal_translate(out_sub_tmp_xml, out_tmp_img, "KEA")
-        rsgislib.imageutils.gdal_warp(out_tmp_img, output_img, bbox_epsg, interp_method=rsgislib.INTERP_CUBIC, gdalformat=gdalformat, use_multi_threaded=False)
+        rsgislib.imageutils.gdal_warp(
+            out_tmp_img,
+            output_img,
+            bbox_epsg,
+            interp_method=rsgislib.INTERP_CUBIC,
+            gdalformat=gdalformat,
+            use_multi_threaded=False,
+        )
     else:
         rsgislib.imageutils.gdal_translate(out_sub_tmp_xml, output_img, gdalformat)
 

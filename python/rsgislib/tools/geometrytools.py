@@ -11,7 +11,11 @@ from osgeo import osr
 import rsgislib
 
 
-def reproj_bbox(bbox:List[float], in_osr_proj_obj:osr.SpatialReference(), out_osr_proj_obj:osr.SpatialReference())->List[float]:
+def reproj_bbox(
+    bbox: List[float],
+    in_osr_proj_obj: osr.SpatialReference(),
+    out_osr_proj_obj: osr.SpatialReference(),
+) -> List[float]:
     """
     A function to reproject a bounding box.
 
@@ -55,7 +59,7 @@ def reproj_bbox(bbox:List[float], in_osr_proj_obj:osr.SpatialReference(), out_os
     return [minX, maxX, minY, maxY]
 
 
-def reproj_bbox_epsg(bbox:List[float], in_epsg:int, out_epsg:int):
+def reproj_bbox_epsg(bbox: List[float], in_epsg: int, out_epsg: int):
     """
     A function to reproject a bounding box.
 
@@ -75,7 +79,7 @@ def reproj_bbox_epsg(bbox:List[float], in_epsg:int, out_epsg:int):
     return out_bbox
 
 
-def do_bboxes_intersect(bbox1:List[float], bbox2:List[float])->bool:
+def do_bboxes_intersect(bbox1: List[float], bbox2: List[float]) -> bool:
     """
     A function which tests whether two bboxes (MinX, MaxX, MinY, MaxY) intersect.
 
@@ -97,7 +101,7 @@ def do_bboxes_intersect(bbox1:List[float], bbox2:List[float])->bool:
     return intersect
 
 
-def does_bbox_contain(bbox1:List[float], bbox2:List[float])->bool:
+def does_bbox_contain(bbox1: List[float], bbox2: List[float]) -> bool:
     """
     A function which tests whether bbox1 contains bbox2.
 
@@ -119,7 +123,7 @@ def does_bbox_contain(bbox1:List[float], bbox2:List[float])->bool:
     return contains
 
 
-def calc_bbox_area(bbox:List[float])->float:
+def calc_bbox_area(bbox: List[float]) -> float:
     """
     Calculate the area of the bbox.
 
@@ -131,7 +135,7 @@ def calc_bbox_area(bbox:List[float])->float:
     return (bbox[1] - bbox[0]) * (bbox[3] - bbox[2])
 
 
-def bbox_equal(bbox1:List[float], bbox2:List[float])->bool:
+def bbox_equal(bbox1: List[float], bbox2: List[float]) -> bool:
     """
     A function which tests whether two bboxes (xMin, xMax, yMin, yMax) are equal.
 
@@ -151,7 +155,7 @@ def bbox_equal(bbox1:List[float], bbox2:List[float])->bool:
     return bbox_eql
 
 
-def bbox_intersection(bbox1:List[float], bbox2:List[float])->List[float]:
+def bbox_intersection(bbox1: List[float], bbox2: List[float]) -> List[float]:
     """
     A function which calculates the intersection of the two bboxes (xMin, xMax, yMin, yMax).
 
@@ -183,7 +187,7 @@ def bbox_intersection(bbox1:List[float], bbox2:List[float])->List[float]:
     return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
 
 
-def bboxes_intersection(bboxes:List[List[float]])->List[float]:
+def bboxes_intersection(bboxes: List[List[float]]) -> List[float]:
     """
     A function to find the intersection between a list of
     bboxes.
@@ -203,7 +207,7 @@ def bboxes_intersection(bboxes:List[List[float]])->List[float]:
     return inter_bbox
 
 
-def buffer_bbox(bbox:List[float], buf:float)->List[float]:
+def buffer_bbox(bbox: List[float], buf: float) -> List[float]:
     """
     Buffer the input BBOX by a set amount.
 
@@ -220,7 +224,7 @@ def buffer_bbox(bbox:List[float], buf:float)->List[float]:
     return out_bbox
 
 
-def find_bbox_union(bboxes:List[List[float]])->List[float]:
+def find_bbox_union(bboxes: List[List[float]]) -> List[float]:
     """
     A function which finds the union of all the bboxes inputted.
 
@@ -246,7 +250,7 @@ def find_bbox_union(bboxes:List[List[float]])->List[float]:
     return out_bbox
 
 
-def unwrap_wgs84_bbox(bbox:List[float])->List[List[float]]:
+def unwrap_wgs84_bbox(bbox: List[float]) -> List[List[float]]:
     """
     A function which unwraps a bbox if it projected in WGS84 and over the 180/-180 boundary.
 
@@ -265,7 +269,12 @@ def unwrap_wgs84_bbox(bbox:List[float])->List[List[float]]:
     return bboxes
 
 
-def find_common_extent_on_grid(base_extent:List[float], base_grid:float, other_extent:List[float], full_contain:bool=True)->List[float]:
+def find_common_extent_on_grid(
+    base_extent: List[float],
+    base_grid: float,
+    other_extent: List[float],
+    full_contain: bool = True,
+) -> List[float]:
     """
     A function which calculates the common extent between two extents but defines output on
     grid with defined resolutions. Useful for finding common extent on a particular image grid.
@@ -319,7 +328,9 @@ def find_common_extent_on_grid(base_extent:List[float], base_grid:float, other_e
     return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
 
 
-def find_extent_on_grid(base_extent:List[float], base_grid:float, full_contain:bool=True)->List[float]:
+def find_extent_on_grid(
+    base_extent: List[float], base_grid: float, full_contain: bool = True
+) -> List[float]:
     """
     A function which calculates the extent but defined on a grid with defined
     resolution. Useful for finding extent on a particular image grid.
@@ -372,8 +383,11 @@ def find_extent_on_grid(base_extent:List[float], base_grid:float, full_contain:b
 
 
 def find_extent_on_whole_num_grid(
-    base_extent:List[float], base_grid:float, full_contain:bool=True, round_vals:bool=None
-)->List[float]:
+    base_extent: List[float],
+    base_grid: float,
+    full_contain: bool = True,
+    round_vals: bool = None,
+) -> List[float]:
     """
     A function which calculates the extent but defined on a grid with defined resolution.
     Useful for finding extent on a particular image grid.
@@ -426,7 +440,7 @@ def find_extent_on_whole_num_grid(
     return out_bbox
 
 
-def get_bbox_grid(bbox:List[float], x_size:int, y_size:int)->List[List[float]]:
+def get_bbox_grid(bbox: List[float], x_size: int, y_size: int) -> List[List[float]]:
     """
     Create a grid with size x_size, y_size for the area represented by bbox.
 
@@ -490,7 +504,12 @@ def get_bbox_grid(bbox:List[float], x_size:int, y_size:int)->List[List[float]]:
     return bboxs
 
 
-def reproj_point(in_osr_proj_obj:osr.SpatialReference(), out_osr_proj_obj:osr.SpatialReference(), x:float, y:float) -> (float, float):
+def reproj_point(
+    in_osr_proj_obj: osr.SpatialReference(),
+    out_osr_proj_obj: osr.SpatialReference(),
+    x: float,
+    y: float,
+) -> (float, float):
     """
     Reproject a point from 'in_osr_proj_obj' to 'out_osr_proj_obj' where they are gdal
     osgeo.osr.SpatialReference objects.
@@ -517,7 +536,10 @@ def reproj_point(in_osr_proj_obj:osr.SpatialReference(), out_osr_proj_obj:osr.Sp
         outY = point.GetY()
     return outX, outY
 
-def reproj_point_to_wgs84(osr_proj_obj:osr.SpatialReference(), x:float, y:float) -> (float, float):
+
+def reproj_point_to_wgs84(
+    osr_proj_obj: osr.SpatialReference(), x: float, y: float
+) -> (float, float):
     """
     A function which reprojects a point to the WGS84 projection
 
@@ -528,8 +550,10 @@ def reproj_point_to_wgs84(osr_proj_obj:osr.SpatialReference(), x:float, y:float)
 
     """
     import rsgislib.tools.projection
+
     out_osr_proj_obj = rsgislib.tools.projection.get_osr_prj_obj(4326)
     return reproj_point(osr_proj_obj, out_osr_proj_obj, x, y)
+
 
 def calc_pt_distance(x1: float, y1: float, x2: float, y2: float) -> float:
     """

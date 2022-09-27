@@ -59,7 +59,7 @@ def is_number(str_val: str) -> bool:
     return True
 
 
-def str_to_float(str_val:str, err_val:float=None)->float:
+def str_to_float(str_val: str, err_val: float = None) -> float:
     """
     A function which converts a string to a float. If the string cannot be
     converted to a float and an error value is provided that that will be
@@ -78,11 +78,13 @@ def str_to_float(str_val:str, err_val:float=None)->float:
         if not err_val is None:
             out_float = float(err_val)
         else:
-            raise rsgislib.RSGISPyException(f"Could not convert string to float: '{str_val}'.")
+            raise rsgislib.RSGISPyException(
+                f"Could not convert string to float: '{str_val}'."
+            )
     return out_float
 
 
-def str_to_int(str_val:str, err_val:int=None)->int:
+def str_to_int(str_val: str, err_val: int = None) -> int:
     """
     A function which converts a string to a int. If the string cannot be
     converted to a int then it will be attempted to be converted to a float and
@@ -106,9 +108,10 @@ def str_to_int(str_val:str, err_val:int=None)->int:
             if not err_val is None:
                 out_int = int(err_val)
             else:
-                raise rsgislib.RSGISPyException(f"Could not convert string to int: '{str_val}'.")
+                raise rsgislib.RSGISPyException(
+                    f"Could not convert string to int: '{str_val}'."
+                )
     return out_int
-
 
 
 def str2Int(self, strVal, errVal=None):
@@ -124,7 +127,9 @@ def str2Int(self, strVal, errVal=None):
             if not errVal is None:
                 outInt = int(errVal)
             else:
-                raise ARCSIException("Could not convert string to int: \'" + strVal + '\'.')
+                raise ARCSIException(
+                    "Could not convert string to int: '" + strVal + "'."
+                )
     return outInt
 
 
@@ -692,7 +697,7 @@ def get_days_since_date(year: int, month: int, day, base_date: datetime.date) ->
     return (date_val - base_date).days
 
 
-def find_month_end_date(year:int , month:int)-> int:
+def find_month_end_date(year: int, month: int) -> int:
     """
     A function which returns the date of the last day of the month.
 
@@ -702,13 +707,14 @@ def find_month_end_date(year:int , month:int)-> int:
 
     """
     import calendar
+
     cal = calendar.Calendar()
     month_days = cal.monthdayscalendar(year, month)
     max_day_month = numpy.array(month_days).flatten().max()
     return max_day_month
 
 
-def is_summer_winter(lat:float, date:datetime.date)-> int:
+def is_summer_winter(lat: float, date: datetime.date) -> int:
     """
     A function which returns an integer specifying whether the date provided
     is within the summer or winter for a given latitude.
@@ -725,15 +731,15 @@ def is_summer_winter(lat:float, date:datetime.date)-> int:
     if lat < 0:
         # Southern Hemisphere
         if (date.month > 4) & (date.month < 11):
-            summer_winter = 2 # Winter
+            summer_winter = 2  # Winter
         else:
-            summer_winter = 1 # Summer
+            summer_winter = 1  # Summer
     else:
         # Northern Hemisphere
         if (date.month > 3) & (date.month < 10):
-            summer_winter = 1 # Summer
+            summer_winter = 1  # Summer
         else:
-            summer_winter = 2 # Winter
+            summer_winter = 2  # Winter
     return summer_winter
 
 

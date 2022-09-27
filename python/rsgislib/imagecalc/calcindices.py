@@ -615,8 +615,20 @@ def calc_mvi(
     else:
         rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
+
 def calc_evi(
-    input_img, img_blue_band, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA", g=2.5, c1=6.0, c2=7.5, l=1, refl_scale_factor=0.001
+    input_img,
+    img_blue_band,
+    img_red_band,
+    img_nir_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+    g=2.5,
+    c1=6.0,
+    c2=7.5,
+    l=1,
+    refl_scale_factor=0.001,
 ):
     """
     Helper function to calculate Enhanced Vegetation Index (EVI)
@@ -639,12 +651,14 @@ def calc_evi(
                        (Default: KEA)
 
     """
-    expression = f"((nir*{refl_scale_factor})+{c1}*(red*{refl_scale_factor})" \
-                 f"–{c2}*(blue*{refl_scale_factor})+{l}))!=0?" \
-                 f"{g}*(((nir*{refl_scale_factor})-" \
-                 f"(red*{refl_scale_factor}))/((nir*{refl_scale_factor})+" \
-                 f"{c1}*(red*{refl_scale_factor})–{c2}*" \
-                 f"(blue*{refl_scale_factor})+{l})):-999"
+    expression = (
+        f"((nir*{refl_scale_factor})+{c1}*(red*{refl_scale_factor})"
+        f"–{c2}*(blue*{refl_scale_factor})+{l}))!=0?"
+        f"{g}*(((nir*{refl_scale_factor})-"
+        f"(red*{refl_scale_factor}))/((nir*{refl_scale_factor})+"
+        f"{c1}*(red*{refl_scale_factor})–{c2}*"
+        f"(blue*{refl_scale_factor})+{l})):-999"
+    )
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
@@ -660,7 +674,16 @@ def calc_evi(
 
 
 def calc_evi2(
-    input_img, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA", g=2.5, c=2.4, l=1, refl_scale_factor=0.001
+    input_img,
+    img_red_band,
+    img_nir_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+    g=2.5,
+    c=2.4,
+    l=1,
+    refl_scale_factor=0.001,
 ):
     """
     Helper function to calculate Enhanced Vegetation Index 2 (EVI2)
@@ -679,9 +702,11 @@ def calc_evi2(
                        (Default: KEA)
 
     """
-    expression = f"((nir*{refl_scale_factor})+{c}*(red*{refl_scale_factor})+{l})!=0:" \
-                 f"{g}*((nir*{refl_scale_factor})-(red*{refl_scale_factor}))/" \
-                 f"((nir*{refl_scale_factor})+{c}*(red*{refl_scale_factor})+{l}):-999"
+    expression = (
+        f"((nir*{refl_scale_factor})+{c}*(red*{refl_scale_factor})+{l})!=0:"
+        f"{g}*((nir*{refl_scale_factor})-(red*{refl_scale_factor}))/"
+        f"((nir*{refl_scale_factor})+{c}*(red*{refl_scale_factor})+{l}):-999"
+    )
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
@@ -695,9 +720,13 @@ def calc_evi2(
         rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
-
 def calc_gndvi(
-    input_img, img_green_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA"
+    input_img,
+    img_green_band,
+    img_nir_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
 ):
     """
     Helper function to calculate Green Normalised difference Vegetation Index (GNDVI)
@@ -727,7 +756,6 @@ def calc_gndvi(
         rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
     else:
         rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
-
 
 
 """

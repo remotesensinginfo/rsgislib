@@ -413,7 +413,8 @@ def get_esun_value(radiance, toaRefl, day, month, year, solarZenith):
     esun = step2 / math.cos(math.radians(solarZenith))
     return esun
 
-def visibility_to_aot(vis:float)->float:
+
+def visibility_to_aot(vis: float) -> float:
     """
     A function which converts an estimate of visibility to
     aerosol optical thickness (AOT)
@@ -422,7 +423,7 @@ def visibility_to_aot(vis:float)->float:
     :return: output AOT estimate.
 
     """
-    return (3.9449/vis)+0.08498
+    return (3.9449 / vis) + 0.08498
 
 
 """

@@ -340,7 +340,7 @@ def create_cmr_dwnld_db(
 
     For the mine types, print a few of the granule list of the terminal (i.e.,
     pprint.pprint(granule_lst) and check what the mime type is for the download
-    you want. However, for GEDI data it is probably application/x-hdfeos. 
+    you want. However, for GEDI data it is probably application/x-hdfeos.
 
     :param db_json: The file path for the databases JSON file.
     :param granule_lst: List of granules from find_granules or find_all_granules
@@ -418,7 +418,7 @@ def cmr_download_file_http(
         with session_http.get(input_url, stream=True, headers=headers) as r:
             if rsgislib.tools.httptools.check_http_response(r, input_url):
                 total = int(r.headers.get("content-length", 0))
-                chunk_size = 2 ** 20
+                chunk_size = 2**20
                 n_chunks = int(total / chunk_size) + 1
 
                 with open(tmp_dwnld_path, "wb") as f:

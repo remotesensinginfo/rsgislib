@@ -46,7 +46,6 @@ import rsgislib.imageutils
 import rsgislib.rastergis
 
 
-
 def check_build_ls8_ls9_vrts(input_imgs, output_dir):
     """
     A function which checks for Landsat 8 (LS8) and Landsat 9 (LS9) images
@@ -66,7 +65,12 @@ def check_build_ls8_ls9_vrts(input_imgs, output_dir):
     img_bands = [2, 3, 4, 5, 6, 7]
     out_imgs = []
     for img in input_imgs:
-        if ("LS8" in os.path.basename(img)) or ("lc08" in os.path.basename(img)) or ("LS9" in os.path.basename(img)) or ("lc09" in os.path.basename(img)):
+        if (
+            ("LS8" in os.path.basename(img))
+            or ("lc08" in os.path.basename(img))
+            or ("LS9" in os.path.basename(img))
+            or ("lc09" in os.path.basename(img))
+        ):
             abs_img = os.path.abspath(img)
             basename = rsgislib.tools.filetools.get_file_basename(img)
             out_vrt_img = os.path.join(output_dir, f"{basename}_bsub.vrt")
@@ -205,8 +209,6 @@ def create_max_ndvi_composite(
         raise rsgislib.RSGISPyException("At least 2 input images are needed")
 
 
-
-
 def create_max_ndvi_ndwi_composite(
     ref_sp_img,
     input_imgs,
@@ -286,7 +288,9 @@ def create_max_ndvi_ndwi_composite(
                         f"consistent (Bands: {num_bands} and {band_count})"
                     )
 
-            same_proj = rsgislib.imageutils.do_gdal_layers_have_same_proj(ref_sp_img, img)
+            same_proj = rsgislib.imageutils.do_gdal_layers_have_same_proj(
+                ref_sp_img, img
+            )
             if rsgislib.imageutils.do_images_overlap(ref_sp_img, img):
                 if same_proj:
                     if rsgislib.imageutils.do_img_res_match(ref_sp_img, img):
@@ -376,8 +380,12 @@ def create_max_ndvi_ndwi_composite(
                 print("In Image (" + str(idx) + "):\t" + img)
                 img_lyrs[idx] = os.path.basename(img)
                 base_img_name = os.path.splitext(os.path.basename(img))[0]
-                ref_lyr_ndvi_img = os.path.join(ref_layers_path, f"{base_img_name}_ndvi.kea")
-                ref_lyr_ndwi_img = os.path.join(ref_layers_path, f"{base_img_name}_ndwi.kea")
+                ref_lyr_ndvi_img = os.path.join(
+                    ref_layers_path, f"{base_img_name}_ndvi.kea"
+                )
+                ref_lyr_ndwi_img = os.path.join(
+                    ref_layers_path, f"{base_img_name}_ndwi.kea"
+                )
                 rsgislib.imagecalc.calcindices.calc_ndvi(
                     img, r_band, n_band, ref_lyr_ndvi_img, False
                 )
@@ -389,8 +397,12 @@ def create_max_ndvi_ndwi_composite(
                     ref_layers_path, base_img_name + "_water_land_msk.kea"
                 )
                 band_defns = []
-                band_defns.append(rsgislib.imagecalc.BandDefn("ndvi", ref_lyr_ndvi_img, 1))
-                band_defns.append(rsgislib.imagecalc.BandDefn("ndwi", ref_lyr_ndwi_img, 1))
+                band_defns.append(
+                    rsgislib.imagecalc.BandDefn("ndvi", ref_lyr_ndvi_img, 1)
+                )
+                band_defns.append(
+                    rsgislib.imagecalc.BandDefn("ndwi", ref_lyr_ndwi_img, 1)
+                )
                 rsgislib.imagecalc.band_math(
                     ref_lyr_msk_img,
                     "ndvi<-1?0:ndvi>0.3?1:ndwi>0.01?2:1",
@@ -406,7 +418,13 @@ def create_max_ndvi_ndwi_composite(
                 ref_layers_path, uid_str + "_water_land_msk_stack.kea"
             )
             rsgislib.imageutils.stack_img_bands(
-                msk_imgs, None, ref_lyr_msk_stack_img, -1, -1, "KEA", rsgislib.TYPE_8UINT
+                msk_imgs,
+                None,
+                ref_lyr_msk_stack_img,
+                -1,
+                -1,
+                "KEA",
+                rsgislib.TYPE_8UINT,
             )
             if use_mode:
                 rsgislib.imagecalc.image_pixel_column_summary(
@@ -435,20 +453,30 @@ def create_max_ndvi_ndwi_composite(
             for img in in_images_sub_to_ref:
                 print(f"In Image ({idx}):\t{img}")
                 base_img_name = os.path.splitext(os.path.basename(img))[0]
-                ref_lyr_ndvi_img = os.path.join(ref_layers_path, f"{base_img_name}_ndvi.kea")
-                ref_lyr_ndwi_img = os.path.join(ref_layers_path, f"{base_img_name}_ndwi.kea")
+                ref_lyr_ndvi_img = os.path.join(
+                    ref_layers_path, f"{base_img_name}_ndvi.kea"
+                )
+                ref_lyr_ndwi_img = os.path.join(
+                    ref_layers_path, f"{base_img_name}_ndwi.kea"
+                )
                 ref_lyr_lcl_msk_img = os.path.join(
                     ref_layers_path, f"{base_img_name}_water_land_msk.kea"
                 )
 
-                ref_lyr_img = os.path.join(ref_layers_path, f"{base_img_name}_ref_hybrid.kea")
+                ref_lyr_img = os.path.join(
+                    ref_layers_path, f"{base_img_name}_ref_hybrid.kea"
+                )
                 band_defns = []
                 band_defns.append(
                     rsgislib.imagecalc.BandDefn("lmsk", ref_lyr_lcl_msk_img, 1)
                 )
                 band_defns.append(rsgislib.imagecalc.BandDefn("omsk", out_msk_img, 1))
-                band_defns.append(rsgislib.imagecalc.BandDefn("ndvi", ref_lyr_ndvi_img, 1))
-                band_defns.append(rsgislib.imagecalc.BandDefn("ndwi", ref_lyr_ndwi_img, 1))
+                band_defns.append(
+                    rsgislib.imagecalc.BandDefn("ndvi", ref_lyr_ndvi_img, 1)
+                )
+                band_defns.append(
+                    rsgislib.imagecalc.BandDefn("ndwi", ref_lyr_ndwi_img, 1)
+                )
                 rsgislib.imagecalc.band_math(
                     ref_lyr_img,
                     "lmsk==0?-999:omsk==1?ndvi:omsk==2?ndwi:-999",
@@ -479,7 +507,12 @@ def create_max_ndvi_ndwi_composite(
 
             # Create Composite Image
             rsgislib.imageutils.create_ref_img_composite_img(
-                in_images_sub_to_ref, out_comp_img, out_ref_img, gdalformat, datatype, 0.0
+                in_images_sub_to_ref,
+                out_comp_img,
+                out_ref_img,
+                gdalformat,
+                datatype,
+                0.0,
             )
 
             if calc_stats:
@@ -500,7 +533,9 @@ def create_max_ndvi_ndwi_composite(
             if not tmp_present:
                 shutil.rmtree(tmp_path, ignore_errors=True)
         else:
-            raise rsgislib.RSGISPyException(f"There were only {n_imgs} images which intersect with the reference image.")
+            raise rsgislib.RSGISPyException(
+                f"There were only {n_imgs} images which intersect with the reference image."
+            )
 
     elif len(input_imgs) == 1:
         print("Only 1 Input Image, Just Copying File to output")
@@ -510,6 +545,8 @@ def create_max_ndvi_ndwi_composite(
         rsgislib.imageutils.create_copy_img(
             ref_sp_img, out_comp_img, num_bands, 0, gdalformat, datatype
         )
-        rsgislib.imageutils.include_imgs_ind_img_intersect(out_comp_img, [input_imgs[0]])
+        rsgislib.imageutils.include_imgs_ind_img_intersect(
+            out_comp_img, [input_imgs[0]]
+        )
     else:
         raise rsgislib.RSGISPyException("List of input images was empty ")

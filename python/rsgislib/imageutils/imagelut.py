@@ -237,8 +237,8 @@ def query_file_lut(
     roi_file: str,
     roi_lyr: str,
     out_dest: str,
-    targz_out: bool=False,
-    cp_cmds: bool=False,
+    targz_out: bool = False,
+    cp_cmds: bool = False,
 ) -> List[str]:
     """
     A function which allows the file LUT to be queried (intersection) and commands

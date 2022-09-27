@@ -21,7 +21,7 @@ class StdImgBlockIterBatches:
     The iterator provides the data in batches (i.e., a number of blocks in one go)
     """
 
-    def __init__(self, img_info_lst, block_size:int, batch_size:int):
+    def __init__(self, img_info_lst, block_size: int, batch_size: int):
         """
 
         :param img_info_lst:
@@ -52,7 +52,7 @@ class StdImgBlockIterBatches:
         self.n_blocks = self.n_x_blocks * self.n_y_blocks
         print("N Blocks:  {}".format(self.n_blocks))
 
-        self.n_batches = math.floor(self.n_blocks/batch_size)
+        self.n_batches = math.floor(self.n_blocks / batch_size)
         self.remain_batch_blocks = False
         self.n_remain_batch_blocks = self.n_blocks - (self.n_batches * batch_size)
         if self.n_remain_batch_blocks > 0:
@@ -69,7 +69,7 @@ class StdImgBlockIterBatches:
         self.total_n_bands = 0
         for img in self.img_info_lst:
             self.img_info[img.name]["n_bands"] = len(img.bands)
-            self.total_n_bands  += len(img.bands)
+            self.total_n_bands += len(img.bands)
             self.img_info[img.name]["dataset"] = gdal.Open(
                 img.file_name, gdal.GA_ReadOnly
             )
@@ -89,7 +89,9 @@ class StdImgBlockIterBatches:
                         )
                     )
 
-        self.img_batch_arr = numpy.zeros((batch_size, self.total_n_bands, block_size, block_size), dtype=float)
+        self.img_batch_arr = numpy.zeros(
+            (batch_size, self.total_n_bands, block_size, block_size), dtype=float
+        )
 
         # Output image variables
         self.out_imgs_info = None
@@ -245,9 +247,17 @@ class StdImgBlockIterBatches:
         """
         if self.c_batch < self.n_batches:
             n_blocks_in_batch = self.batch_size
-            if (self.c_batch == self.n_batches-1) and self.remain_batch_blocks:
-                n_blocks_in_batch =  self.n_remain_batch_blocks
-                self.img_batch_arr = numpy.zeros((self.n_remain_batch_blocks, self.total_n_bands, self.block_size, self.block_size), dtype=float)
+            if (self.c_batch == self.n_batches - 1) and self.remain_batch_blocks:
+                n_blocks_in_batch = self.n_remain_batch_blocks
+                self.img_batch_arr = numpy.zeros(
+                    (
+                        self.n_remain_batch_blocks,
+                        self.total_n_bands,
+                        self.block_size,
+                        self.block_size,
+                    ),
+                    dtype=float,
+                )
 
             out_img_data_lst = []
             x_blocks_lst = []
@@ -269,20 +279,23 @@ class StdImgBlockIterBatches:
                             for img in self.img_info_lst:
                                 out_img_data[img.name] = dict()
                                 out_img_data[img.name]["pxl_x"] = (
-                                    self.img_info[img.name]["pxl_bbox"][1] - self.block_size
+                                    self.img_info[img.name]["pxl_bbox"][1]
+                                    - self.block_size
                                 )
                                 out_img_data[img.name]["pxl_y"] = (
-                                    self.img_info[img.name]["pxl_bbox"][2] - self.block_size
+                                    self.img_info[img.name]["pxl_bbox"][2]
+                                    - self.block_size
                                 )
                         else:
                             # Y End Case
                             for img in self.img_info_lst:
                                 out_img_data[img.name] = dict()
-                                out_img_data[img.name]["pxl_x"] = self.img_info[img.name][
-                                    "pxl_bbox"
-                                ][0] + (self.block_size * self.c_x_blocks)
+                                out_img_data[img.name]["pxl_x"] = self.img_info[
+                                    img.name
+                                ]["pxl_bbox"][0] + (self.block_size * self.c_x_blocks)
                                 out_img_data[img.name]["pxl_y"] = (
-                                    self.img_info[img.name]["pxl_bbox"][2] - self.block_size
+                                    self.img_info[img.name]["pxl_bbox"][2]
+                                    - self.block_size
                                 )
                     elif self.c_x_blocks == (self.n_x_blocks - 1):
                         # X End Case.
@@ -448,5 +461,7 @@ class StdImgBlockIterBatches:
 
         """
         for out_img in out_img_blocks:
-            for x_block, y_block, img_block in zip(x_blocks, y_blocks, out_img_blocks[out_img]):
-                self.write_sgl_block_to_image(x_block, y_block, {out_img:img_block})
+            for x_block, y_block, img_block in zip(
+                x_blocks, y_blocks, out_img_blocks[out_img]
+            ):
+                self.write_sgl_block_to_image(x_block, y_block, {out_img: img_block})
