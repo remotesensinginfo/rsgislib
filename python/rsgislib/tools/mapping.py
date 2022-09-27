@@ -285,6 +285,9 @@ def create_wmts_img_map(
     if title_str is not None:
         ax.title.set_text(title_str)
 
+    # Delete the downloaded image file.
+    rsgislib.imageutils.delete_gdal_layer(wmts_tmp_img)
+
     # If created remove the tmp directory
     if create_tmp_dir:
         shutil.rmtree(tmp_dir)
