@@ -223,6 +223,18 @@ def create_file_listings_db(
                            if you get errors then suggest that you try
                            setting this to True and trying again.
 
+    .. code:: python
+        create_file_listings_db(
+                db_json = "jaxa_scansar_south_america.json",
+                ftp_url = "ftp.something.com",
+                ftp_path ="path/to/files/",
+                ftp_user="something",
+                ftp_pass="else",
+                ftp_timeout = 300,
+                try_n_times = 5,
+                mlsd_not_avail = False,
+            )
+
     """
     import pysondb
     import tqdm
@@ -245,6 +257,68 @@ def create_file_listings_db(
 
     if len(db_data) > 0:
         lst_db.addMany(db_data)
+
+
+def filter_file_listings_db(
+        db_json: str,
+        filter_vals: List[str],
+        out_db_file: str,
+        filter_path=False
+        ):
+    """
+    A function which filters the database to find particular files of interest.
+    A list of strings is provided and comparison will be done using the python
+    'in' operator and at least one of the filter string has to be within the
+    file path/name for it to match.
+
+    :param db_json: file path for the JSON db file.
+    :param filter_vals: A list of strings which will be used to select files.
+    :param out_db_file: output file path for JSON db file.
+    :param filter_path: boolean, if true then filter will be applied to full
+                        path, if False then just the file name (default; False)
+
+    .. code:: python
+        roi_tiles = ["N00W067", "N00W066", "N00W065"]
+
+        filter_file_listings_db(
+            db_json="jaxa_scansar_south_america.json",
+            filter_vals = roi_tiles,
+            out_db_file="jaxa_scansar_south_america_roi_tiles.json",
+            filter_path = False)
+
+    """
+    import pysondb
+    import tqdm
+
+    lst_db = pysondb.getDb(db_json)
+
+    db_data = lst_db.getAll()
+
+    out_db_data = list()
+    for file_rcd in tqdm.tqdm(db_data):
+        file_to_filter = file_rcd["rmt_path"]
+        if not filter_path:
+            file_to_filter = os.path.basename(file_to_filter)
+
+        out_rcd = False
+        for val in filter_vals:
+            if val in file_to_filter:
+                out_rcd = True
+                break
+
+        if out_rcd:
+            out_db_data.append(
+                {
+                    "ftp_url":    file_rcd["ftp_url"],
+                    "rmt_path":   file_rcd["rmt_path"],
+                    "lcl_path":   file_rcd["lcl_path"],
+                    "downloaded": file_rcd["downloaded"],
+                    }
+                )
+
+    if len(db_data) > 0:
+        lst_out_db = pysondb.getDb(out_db_file)
+        lst_out_db.addMany(out_db_data)
 
 
 def download_ftp_file(
@@ -507,3 +581,5 @@ def upload_ftp_file(
     except:
         return False
     return True
+
+
