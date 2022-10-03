@@ -9,6 +9,7 @@ from ._classification import *
 from typing import List, Dict
 
 import rsgislib
+import rsgislib.imageutils
 
 
 class ClassSimpleInfoObj(object):
@@ -502,6 +503,97 @@ def create_train_valid_test_sets(
             rnd_seed,
             datatype,
         )
+
+
+def get_class_simple_info_objs(cls_info: Dict[
+    str, ClassInfoObj], sel_data: int = rsgislib.CLS_TRAIN_DATA) ->Dict[
+    str, ClassSimpleInfoObj]:
+    """
+    A function which creates a dict of ClassSimpleInfoObj objects from a dict
+    of ClassInfoObj objects where information such as colours and ids are copied
+    across.
+
+    :param cls_info: dict with the class name as the key and a ClassInfoObj as the
+                     value.
+    :param sel_data: Option to select whether the training, validation or testing
+                     hdf5 files are provided as the file_h5 values in the output.
+                     Option specified as rsgislib.CLS_*_DATA.
+    :return: dict with the class name as key and a ClassSimpleInfoObj object as value.
+    """
+    out_cls_info = dict()
+    for key in cls_info:
+        if sel_data == rsgislib.CLS_TRAIN_DATA:
+            h5_file = cls_info[key].train_file_h5
+        elif sel_data == rsgislib.CLS_VALID_DATA:
+            h5_file = cls_info[key].valid_file_h5
+        elif sel_data == rsgislib.CLS_TEST_DATA:
+            h5_file = cls_info[key].test_file_h5
+        else:
+            raise Exception("Must select either training, validation or testing dataset")
+
+        out_cls_info[key] = ClassSimpleInfoObj(id=cls_info[
+            key].id, file_h5=h5_file, red=cls_info[key].red, green=cls_info[
+            key].green, blue=cls_info[key].blue)
+    return out_cls_info
+
+
+def create_pandas_df(cls_train_info: Dict[
+    str, ClassSimpleInfoObj], img_band_info: List[
+    rsgislib.imageutils.ImageBandInfo]):
+    """
+    A function which takes a dict of ClassSimpleInfoObj objects and creates
+    a pandas data frame where the classes are specified using the id within the
+    ClassSimpleInfoObj object.
+
+    :param cls_train_info: dict where the class name is the value and a
+                           ClassSimpleInfoObj object is the value.
+    :param img_band_info: a list of rsgislib.imageutils.ImageBandInfo specifying the
+                          variable order within the HDF5 files. This is used to generate
+                          the column names in the dataframe.
+    :return: a pandas dataframe with the first column being the class and those after
+             the variables.
+
+    """
+    import h5py
+    import numpy
+    import pandas
+
+    num_vars = 0
+    num_vals = 0
+    first = True
+    for class_info_val in cls_train_info.values():
+        data_shp = h5py.File(class_info_val.file_h5, "r")["DATA/DATA"].shape
+        if first:
+            num_vars = data_shp[1]
+            first = False
+        num_vals += data_shp[0]
+
+    data_arr = numpy.zeros([num_vals, num_vars], dtype=float)
+    class_arr = numpy.zeros([num_vals], dtype=int)
+
+    row_init = 0
+    for key in cls_train_info:
+        # Open the dataset
+        f = h5py.File(cls_train_info[key].file_h5, "r")
+        num_rows = f["DATA/DATA"].shape[0]
+        # Copy data and populate classid array
+        data_arr[row_init: (row_init + num_rows)] = f["DATA/DATA"]
+        class_arr[row_init: (row_init + num_rows)] = cls_train_info[key].id
+        row_init += num_rows
+        f.close()
+
+    cls_id_df = pandas.DataFrame(data=class_arr, columns=[
+        "class_id"], dtype=numpy.int16)
+
+    col_names = []
+    for img_info in img_band_info:
+        for band in img_info.bands:
+            col_names.append(f"{img_info.name}_{band}")
+
+    data_vals_df = pandas.DataFrame(data=data_arr, columns=col_names, dtype=numpy.uint16)
+
+    data_cls_vals_df = pandas.concat((cls_id_df, data_vals_df), axis=1)
+    return data_cls_vals_df
 
 
 def get_num_samples(in_h5_file: str) -> int:
