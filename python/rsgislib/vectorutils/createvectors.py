@@ -1230,3 +1230,50 @@ def create_vec_for_image(
         out_feat_obj = None
         out_lyr_obj.SyncToDisk()
         out_ds_obj = None
+
+
+def create_hex_grid(bbox:List, bbox_epsg:int, hex_scale:int, out_vec_file:str, out_vec_lyr:str, out_format:str):
+    """
+    A function which uses the h3 library (https://uber.github.io/h3-py/intro.html)
+    to create a hexagon grid for the region of interest specified by the bbox.
+
+    :param bbox: the bbox (xMin, xMax, yMin, yMax) defining the region of interest.
+    :param bbox_epsg: the epsg code for the bbox.
+    :param hex_scale: the scale of the hexagons produced. A lower number will produce
+                      few hexagons. The scale is an integer value.
+    :param out_vec_file: The output vector file name and path
+    :param out_vec_lyr: The output vector layer name.
+    :param out_format: The output vector file format (e.g., GPKG or GeoJSON).
+
+    """
+    from h3 import h3
+    import geopandas
+    from shapely.geometry import Polygon
+    import rsgislib.tools.geometrytools
+
+    if bbox_epsg != 4326:
+        bbox_wgs84 = rsgislib.tools.geometrytools.reproj_bbox_epsg(bbox, bbox_epsg, 4326)
+    else:
+        bbox_wgs84 = bbox
+
+    bbox_poly = rsgislib.tools.geometrytools.get_bbox_geojson_poly(bbox_wgs84)
+
+    hexs = h3.polyfill(bbox_poly, hex_scale, geo_json_conformant=True)
+
+    polygonise = lambda hex_id: Polygon(h3.h3_to_geo_boundary(hex_id, geo_json=True))
+
+    all_polys = geopandas.GeoSeries(list(map(polygonise, hexs)), index=hexs, crs="EPSG:4326")
+    print("{} hexagons have been created.".format(all_polys.shape[0]))
+
+    if all_polys.shape[0] > 0:
+        h3_all = geopandas.GeoDataFrame({"geometry": all_polys, "hex_id": all_polys.index}, crs=all_polys.crs)
+
+        if bbox_epsg != 4326:
+            h3_all = h3_all.to_crs(f"EPSG:{bbox_epsg}")
+
+        if out_format == "GPKG":
+            h3_all.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            h3_all.to_file(out_vec_file, driver=out_format)
+    else:
+        print("No file created as there were no hexagons created")

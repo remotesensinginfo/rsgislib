@@ -226,6 +226,7 @@ def apply_sklearn_classifier(
     gdalformat: str = "KEA",
     class_clr_names: bool = True,
     out_score_img: str = None,
+    ignore_consec_cls_ids: bool = False,
 ):
     """
     This function uses a trained classifier and applies it to the provided input image.
@@ -257,6 +258,11 @@ def apply_sklearn_classifier(
                           classifiers and therefore might produce an error if called
                           on a model which doesn't have this function. For example,
                           sklearn.svm.SVC.
+    :param ignore_consec_cls_ids: A boolean to specify whether to ignore that the
+                                  class ids should be consecutive and the out_ids
+                                  used to specify other non-consecutive ids. This
+                                  has some risks but allows more flexibility when using
+                                  the function.
 
     """
     create_out_score_img = False
@@ -266,12 +272,13 @@ def apply_sklearn_classifier(
     n_classes = len(cls_train_info)
     cls_id_lut = numpy.zeros(n_classes)
     for cls_name in cls_train_info:
-        if cls_train_info[cls_name].id >= n_classes:
-            raise rsgislib.RSGISPyException(
-                "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    cls_name, cls_train_info[cls_name].id
+        if not ignore_consec_cls_ids:
+            if cls_train_info[cls_name].id >= n_classes:
+                raise rsgislib.RSGISPyException(
+                    "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
+                        cls_name, cls_train_info[cls_name].id
+                    )
                 )
-            )
         cls_id_lut[cls_train_info[cls_name].id] = cls_train_info[cls_name].out_id
 
     in_files = applier.FilenameAssociations()

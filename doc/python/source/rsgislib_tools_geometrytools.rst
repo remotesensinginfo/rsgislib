@@ -34,6 +34,11 @@ Compute New BBOX
 .. autofunction:: rsgislib.tools.geometrytools.get_bbox_grid
 
 
+Representation
+---------------
+.. autofunction:: rsgislib.tools.geometrytools.get_bbox_geojson_poly
+
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

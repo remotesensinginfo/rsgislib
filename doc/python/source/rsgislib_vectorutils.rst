@@ -26,7 +26,7 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.create_lines_of_points
 .. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
 .. autofunction:: rsgislib.vectorutils.create_vec_for_image
-
+.. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid
 
 Vector I/O
 ----------------
