@@ -1,6 +1,11 @@
 RSGISLib HTTP Tools
 =======================
 
+Check URLs
+------------
+.. autofunction:: rsgislib.tools.httptools.check_url_exists
+
+
 Access HTTP APIs
 ------------------
 .. autofunction:: rsgislib.tools.httptools.check_http_response
