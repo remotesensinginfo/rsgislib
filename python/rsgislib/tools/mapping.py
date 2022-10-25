@@ -967,3 +967,5 @@ def create_raster_cmap_img_map(
 
     if title_str is not None:
         ax.title.set_text(title_str)
+
+    return c_cmap, c_norm
