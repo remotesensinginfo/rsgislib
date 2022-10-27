@@ -26,7 +26,8 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.create_lines_of_points
 .. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
 .. autofunction:: rsgislib.vectorutils.create_vec_for_image
-.. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid
+.. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_bbox
+.. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_polys
 
 Vector I/O
 ----------------
@@ -62,6 +63,7 @@ Merge Vectors
 
 Vector Select / Subset
 -----------------------
+.. autofunction:: rsgislib.vectorutils.spatial_select_gp
 .. autofunction:: rsgislib.vectorutils.get_att_lst_select_feats
 .. autofunction:: rsgislib.vectorutils.get_att_lst_select_feats_lyr_objs
 .. autofunction:: rsgislib.vectorutils.get_att_lst_select_bbox_feats

@@ -1232,7 +1232,14 @@ def create_vec_for_image(
         out_ds_obj = None
 
 
-def create_hex_grid(bbox:List, bbox_epsg:int, hex_scale:int, out_vec_file:str, out_vec_lyr:str, out_format:str):
+def create_hex_grid_bbox(
+    bbox: List,
+    bbox_epsg: int,
+    hex_scale: int,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str,
+):
     """
     A function which uses the h3 library (https://uber.github.io/h3-py/intro.html)
     to create a hexagon grid for the region of interest specified by the bbox.
@@ -1252,7 +1259,9 @@ def create_hex_grid(bbox:List, bbox_epsg:int, hex_scale:int, out_vec_file:str, o
     import rsgislib.tools.geometrytools
 
     if bbox_epsg != 4326:
-        bbox_wgs84 = rsgislib.tools.geometrytools.reproj_bbox_epsg(bbox, bbox_epsg, 4326)
+        bbox_wgs84 = rsgislib.tools.geometrytools.reproj_bbox_epsg(
+            bbox, bbox_epsg, 4326
+        )
     else:
         bbox_wgs84 = bbox
 
@@ -1262,11 +1271,15 @@ def create_hex_grid(bbox:List, bbox_epsg:int, hex_scale:int, out_vec_file:str, o
 
     polygonise = lambda hex_id: Polygon(h3.h3_to_geo_boundary(hex_id, geo_json=True))
 
-    all_polys = geopandas.GeoSeries(list(map(polygonise, hexs)), index=hexs, crs="EPSG:4326")
+    all_polys = geopandas.GeoSeries(
+        list(map(polygonise, hexs)), index=hexs, crs="EPSG:4326"
+    )
     print("{} hexagons have been created.".format(all_polys.shape[0]))
 
     if all_polys.shape[0] > 0:
-        h3_all = geopandas.GeoDataFrame({"geometry": all_polys, "hex_id": all_polys.index}, crs=all_polys.crs)
+        h3_all = geopandas.GeoDataFrame(
+            {"geometry": all_polys, "hex_id": all_polys.index}, crs=all_polys.crs
+        )
 
         if bbox_epsg != 4326:
             h3_all = h3_all.to_crs(f"EPSG:{bbox_epsg}")
@@ -1277,3 +1290,108 @@ def create_hex_grid(bbox:List, bbox_epsg:int, hex_scale:int, out_vec_file:str, o
             h3_all.to_file(out_vec_file, driver=out_format)
     else:
         print("No file created as there were no hexagons created")
+
+
+def create_hex_grid_poly(poly_series, hex_scale: int):
+    """
+    A function which creates a set of hexagons using the h3 library
+    (https://uber.github.io/h3-py/intro.html) for the polygon provided
+    as a geoseries. The geoseries must have a length of 1. Used by
+    the function create_hex_grid_polys. The polygon must be in EPSG:4326
+    (WGS84) projection.
+
+    :param poly_series: polygon provided as geopandas
+    :param hex_scale: 1 - 8 is probably appropriate.
+    :return: geopandas dataframe with hexagons.
+
+    """
+    from h3 import h3
+    from shapely.geometry import Polygon, MultiPolygon
+    import geopandas
+
+    geom = poly_series.geometry
+
+    if geom.has_z:
+        if geom.geom_type == "Polygon":
+            lines = [xy[:2] for xy in list(geom.exterior.coords)]
+            geom = Polygon(lines)
+        elif geom.geom_type == "MultiPolygon":
+            new_multi_p = []
+            for ap in geom:
+                lines = [xy[:2] for xy in list(ap.exterior.coords)]
+                new_p = Polygon(lines)
+                new_multi_p.append(new_p)
+            geom = MultiPolygon(new_multi_p)
+
+    hexs = h3.polyfill(geom.__geo_interface__, hex_scale, geo_json_conformant=True)
+
+    polygonise = lambda hex_id: Polygon(h3.h3_to_geo_boundary(hex_id, geo_json=True))
+
+    all_polys = geopandas.GeoSeries(
+        list(map(polygonise, hexs)), index=hexs, crs="EPSG:4326"
+    )
+
+    if all_polys.shape[0] > 0:
+        h3_all = geopandas.GeoDataFrame(
+            {"geometry": all_polys, "hex_id": all_polys.index}, crs=all_polys.crs
+        )
+    else:
+        h3_all = None
+    return h3_all
+
+
+def create_hex_grid_polys(
+    vec_in_file: str,
+    vec_in_lyr: str,
+    hex_scale: int,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str,
+):
+    """
+    A function which uses the h3 library (https://uber.github.io/h3-py/intro.html)
+    to create a hexagon grid for the region of interest provided by polygon(s) in
+    the input vector layer. If the input layer is not EPSG:4326 (WGS84) it will
+    be reprojected and the resulting hexagon grid reprojected back to the projection
+    of the input vector layer.
+
+    :param vec_in_file: Input vector file
+    :param vec_in_lyr: Input vector layer name
+    :param hex_scale: the scale of the hexagons produced. A lower number will produce
+                      few hexagons. The scale is an integer value.
+    :param out_vec_file: The output vector file name and path
+    :param out_vec_lyr: The output vector layer name.
+    :param out_format: The output vector file format (e.g., GPKG or GeoJSON).
+
+    """
+    import pandas
+    import geopandas
+
+    polys_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
+    crs_in_obj = polys_gpdf.crs
+
+    reproj_poly = False
+    if crs_in_obj.to_epsg() != 4326:
+        print("Reprojecting to EPSG:4326")
+        polys_gpdf = polys_gpdf.to_crs(f"EPSG:4326")
+        reproj_poly = True
+
+    hex_lst = list()
+    for i in tqdm.tqdm(range(len(polys_gpdf))):
+        hex_tmp_gpdf = create_hex_grid_poly(polys_gpdf.iloc[i], hex_scale)
+        if hex_tmp_gpdf is not None:
+            hex_lst.append(hex_tmp_gpdf)
+
+    if len(hex_lst) > 0:
+        hex_gpdf = pandas.concat(hex_lst)
+
+        if len(hex_gpdf) > 0:
+            if reproj_poly:
+                print("Reproject hexagon output")
+                hex_gpdf = hex_gpdf.to_crs(crs_in_obj)
+
+            print("Output Vector File")
+            if out_format == "GPKG":
+                hex_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+            else:
+                hex_gpdf.to_file(out_vec_file, driver=out_format)

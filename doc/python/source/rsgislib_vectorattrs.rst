@@ -19,7 +19,6 @@ Add Columns
 .. autofunction:: rsgislib.vectorattrs.add_string_col
 .. autofunction:: rsgislib.vectorattrs.create_name_col
 
-
 Calculate Column Values
 --------------------------
 .. autofunction:: rsgislib.vectorattrs.pop_bbox_cols
@@ -37,6 +36,10 @@ Sort By Attributes
 Change Attribute Values
 ------------------------
 .. autofunction:: rsgislib.vectorattrs.find_replace_str_vec_lyr
+
+Geometry Intersections
+-----------------------
+.. autofunction:: rsgislib.vectorattrs.count_pt_intersects
 
 
 * :ref:`genindex`

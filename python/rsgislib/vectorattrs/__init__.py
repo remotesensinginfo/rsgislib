@@ -923,3 +923,72 @@ def find_replace_str_vec_lyr(
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def count_pt_intersects(
+    vec_in_file: str,
+    vec_in_lyr: str,
+    vec_pts_file: str,
+    vec_pts_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_count_col: str = "n_points",
+    tmp_col_name: str = "tmp_join_fid",
+):
+    """
+    A function which counts the number of points intersecting a set of polygons
+    adding the count to each polygon as a new column.
+
+    :param vec_in_file: the input polygons vector file path.
+    :param vec_in_lyr: the input polygons vector layer name
+    :param vec_pts_file: the points vector file path
+    :param vec_pts_lyr: the points vector layer name
+    :param out_vec_file: the output vector file path
+    :param out_vec_lyr: the output vector layer name
+    :param out_format: the output vector format (e.g., GPKG).
+    :param out_count_col: the output column name (default: n_points)
+    :param tmp_col_name: The name of a temporary column added to the input layer
+                         used to ensure there are no duplicated features in the output
+                         layer. The default name is: "tmp_sel_join_fid".
+
+    """
+    import geopandas
+
+    print("Read vector layers")
+    in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
+    pts_gpdf = geopandas.read_file(vec_pts_file, layer=vec_pts_lyr)
+
+    # Add column with unique id for each row.
+    col_names = in_gpdf.columns.values.tolist()
+    drop_col_names = []
+    if "index_left" in col_names:
+        drop_col_names.append("index_left")
+    if "index_right" in col_names:
+        drop_col_names.append("index_right")
+    if len(drop_col_names) > 0:
+        in_gpdf.drop(columns=drop_col_names, inplace=True)
+    in_gpdf[tmp_col_name] = numpy.arange(1, (in_gpdf.shape[0]) + 1, 1, dtype=int)
+
+    print("Perform Count")
+    in_count_gpdf = in_gpdf.merge(
+        in_gpdf.sjoin(pts_gpdf)
+        .groupby(tmp_col_name)
+        .size()
+        .rename(out_count_col)
+        .reset_index()
+    )
+    col_names = in_count_gpdf.columns.values.tolist()
+    drop_col_names = []
+    if "index_left" in col_names:
+        drop_col_names.append("index_left")
+    if "index_right" in col_names:
+        drop_col_names.append("index_right")
+    drop_col_names.append(tmp_col_name)
+    in_count_gpdf.drop(columns=drop_col_names, inplace=True)
+
+    print("Export")
+    if out_format == "GPKG":
+        in_count_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        in_count_gpdf.to_file(out_vec_file, driver=out_format)

@@ -1559,6 +1559,60 @@ def export_spatial_select_feats(
         raise e
 
 
+def spatial_select_gp(
+    vec_in_file: str,
+    vec_in_lyr: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    tmp_col_name: str = "tmp_sel_join_fid",
+):
+    """
+    A function which spatial selects features from the input vector layer which
+    intersects the ROI vector layer. This function is implemented using geopandas
+    and is generally faster than the export_spatial_select_feats or
+    select_intersect_feats functions.
+
+    :param vec_in_file: the input vector file path.
+    :param vec_in_lyr: the input vector layer name
+    :param vec_roi_file: the roi vector file path
+    :param vec_roi_lyr: the roi vector layer name
+    :param out_vec_file: the output vector file path
+    :param out_vec_lyr: the output vector layer name
+    :param out_format: the output vector format (e.g., GPKG).
+    :param tmp_col_name: The name of a temporary column added to the input layer
+                         used to ensure there are no duplicated features in the output
+                         layer. The default name is: "tmp_sel_join_fid".
+
+    """
+    import numpy
+    import geopandas
+
+    print("Read vector layers")
+    in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
+    roi_gpdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
+
+    # Add column with unique id for each row.
+    in_gpdf[tmp_col_name] = numpy.arange(1, (in_gpdf.shape[0]) + 1, 1, dtype=int)
+
+    print("Perform Selection")
+    in_sel_gpdf = geopandas.sjoin(
+        in_gpdf, roi_gpdf, how="inner", predicate="intersects"
+    )
+    # Remove any duplicate features using the tmp column
+    in_sel_gpdf.drop_duplicates(subset=[tmp_col_name], inplace=True)
+    # Remove the tmp column
+    in_sel_gpdf.drop(columns=[tmp_col_name, "index_right"], inplace=True)
+
+    print("Export")
+    if out_format == "GPKG":
+        in_sel_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        in_sel_gpdf.to_file(out_vec_file, driver=out_format)
+
+
 def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> List[str]:
     """
     A function which returns a list of columns from the input vector layer.
