@@ -24,6 +24,7 @@ Calculate Column Values
 .. autofunction:: rsgislib.vectorattrs.pop_bbox_cols
 .. autofunction:: rsgislib.vectorattrs.add_geom_bbox_cols
 .. autofunction:: rsgislib.vectorattrs.add_unq_numeric_col
+.. autofunction:: rsgislib.vectorattrs.calc_npts_in_radius
 
 Get Column Summaries
 ----------------------

@@ -992,3 +992,54 @@ def count_pt_intersects(
         in_count_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         in_count_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def calc_npts_in_radius(
+    vec_in_file: str,
+    vec_in_lyr: str,
+    radius: float,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_col_name: str = "n_pts_r",
+):
+    """
+    A function which calculate the number of points intersecting within a
+    radius of each point.
+
+    :param vec_in_file: Input vector file path (must be points geometry)
+    :param vec_in_lyr: Input vector layer (must be points geometry)
+    :param radius: the search radius
+    :param out_vec_file: Output vector file path
+    :param out_vec_lyr: Output vector layer
+    :param out_format: output vector format (Default: GPKG)
+    :param out_col_name: output column name (Default: n_pts_r)
+
+    """
+    import geopandas
+    import scipy.spatial
+
+    print("Read Vector")
+    in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
+
+    print("Build Index")
+    tree = scipy.spatial.KDTree(list(zip(in_gpdf.geometry.x, in_gpdf.geometry.y)))
+
+    print("Perform Query")
+    n_pts = tree.query_ball_point(
+        list(zip(in_gpdf.geometry.x, in_gpdf.geometry.y)),
+        r=radius,
+        p=2.0,
+        eps=0,
+        workers=-1,
+        return_sorted=None,
+        return_length=True,
+    )
+
+    in_gpdf[out_col_name] = n_pts - 1  # -1 as each point will have found itself.
+
+    print("Export")
+    if out_format == "GPKG":
+        in_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        in_gpdf.to_file(out_vec_file, driver=out_format)
