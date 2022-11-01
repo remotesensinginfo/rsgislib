@@ -1002,6 +1002,7 @@ def calc_npts_in_radius(
     out_vec_lyr: str,
     out_format: str = "GPKG",
     out_col_name: str = "n_pts_r",
+    n_cores=1,
 ):
     """
     A function which calculate the number of points intersecting within a
@@ -1014,6 +1015,8 @@ def calc_npts_in_radius(
     :param out_vec_lyr: Output vector layer
     :param out_format: output vector format (Default: GPKG)
     :param out_col_name: output column name (Default: n_pts_r)
+    :param n_cores: the number of cores to be used for the query. If -1 is
+                    passed then all available cores will be used.
 
     """
     import geopandas
@@ -1031,7 +1034,7 @@ def calc_npts_in_radius(
         r=radius,
         p=2.0,
         eps=0,
-        workers=-1,
+        workers=n_cores,
         return_sorted=None,
         return_length=True,
     )
