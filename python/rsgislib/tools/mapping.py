@@ -461,6 +461,7 @@ def create_vec_lyr_map(
     vec_line_clrs: Union[str, List[str]] = "black",
     vec_line_widths: Union[float, List[float]] = 0.25,
     vec_fill_alphas: Union[float, List[float]] = 1.0,
+    vec_markersize: Union[str, float] = None,
     show_scale_bar: bool = True,
     use_grid: bool = False,
     show_map_axis: bool = True,
@@ -487,6 +488,10 @@ def create_vec_lyr_map(
                             to be used for the vector layer(s). (Default: 0.25)
     :param vec_fill_alphas: either a single float or list of floats for the alpha
                             value(s) for the vector layers. (Default: 1)
+    :parma vec_markersize: if the vector layer has point geometries then this variable
+                           allows the size of the points to be defined as either a 
+                           constant (float) or using column from the vector layer
+                           (string).
     :param show_scale_bar: boolean specifying whether a scale bar should be added to
                            the axis. Default: False
     :param use_grid: boolean specifying whether a grid should be added to the axis.
@@ -558,6 +563,7 @@ def create_vec_lyr_map(
             edgecolor=vec_line_clr,
             linewidth=vec_line_width,
             alpha=vec_fill_alpha,
+            markersize=vec_markersize,
         )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
@@ -780,6 +786,7 @@ def create_choropleth_vec_lyr_map(
     vec_line_clr: str = "black",
     vec_line_width: float = 0.25,
     vec_fill_alpha: float = 1.0,
+    vec_markersize: Union[str, float] = None,
     show_scale_bar: bool = True,
     use_grid: bool = False,
     show_map_axis: bool = True,
@@ -807,6 +814,10 @@ def create_choropleth_vec_lyr_map(
                             to be used for the vector layer(s). (Default: 0.25)
     :param vec_fill_alphas: either a single float or list of floats for the alpha
                             value(s) for the vector layers. (Default: 1)
+    :parma vec_markersize: if the vector layer has point geometries then this variable
+                           allows the size of the points to be defined as either a 
+                           constant (float) or using column from the vector layer
+                           (string).
     :param show_scale_bar: boolean specifying whether a scale bar should be added to
                            the axis. Default: False
     :param use_grid: boolean specifying whether a grid should be added to the axis.
@@ -819,7 +830,7 @@ def create_choropleth_vec_lyr_map(
                        Default: False
 
     """
-    if vec_fill_cmap is not None:
+    if vec_fill_cmap is None:
         vec_fill_cmap = matplotlib.cm.get_cmap("viridis")
 
     if sub_in_vec:
@@ -839,6 +850,7 @@ def create_choropleth_vec_lyr_map(
         edgecolor=vec_line_clr,
         linewidth=vec_line_width,
         alpha=vec_fill_alpha,
+        markersize=vec_markersize,
     )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
