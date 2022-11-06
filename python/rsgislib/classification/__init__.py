@@ -505,9 +505,9 @@ def create_train_valid_test_sets(
         )
 
 
-def get_class_simple_info_objs(cls_info: Dict[
-    str, ClassInfoObj], sel_data: int = rsgislib.CLS_TRAIN_DATA) ->Dict[
-    str, ClassSimpleInfoObj]:
+def get_class_simple_info_objs(
+    cls_info: Dict[str, ClassInfoObj], sel_data: int = rsgislib.CLS_TRAIN_DATA
+) -> Dict[str, ClassSimpleInfoObj]:
     """
     A function which creates a dict of ClassSimpleInfoObj objects from a dict
     of ClassInfoObj objects where information such as colours and ids are copied
@@ -529,17 +529,24 @@ def get_class_simple_info_objs(cls_info: Dict[
         elif sel_data == rsgislib.CLS_TEST_DATA:
             h5_file = cls_info[key].test_file_h5
         else:
-            raise Exception("Must select either training, validation or testing dataset")
+            raise Exception(
+                "Must select either training, validation or testing dataset"
+            )
 
-        out_cls_info[key] = ClassSimpleInfoObj(id=cls_info[
-            key].id, file_h5=h5_file, red=cls_info[key].red, green=cls_info[
-            key].green, blue=cls_info[key].blue)
+        out_cls_info[key] = ClassSimpleInfoObj(
+            id=cls_info[key].id,
+            file_h5=h5_file,
+            red=cls_info[key].red,
+            green=cls_info[key].green,
+            blue=cls_info[key].blue,
+        )
     return out_cls_info
 
 
-def create_pandas_df(cls_train_info: Dict[
-    str, ClassSimpleInfoObj], img_band_info: List[
-    rsgislib.imageutils.ImageBandInfo]):
+def create_pandas_df(
+    cls_train_info: Dict[str, ClassSimpleInfoObj],
+    img_band_info: List[rsgislib.imageutils.ImageBandInfo],
+):
     """
     A function which takes a dict of ClassSimpleInfoObj objects and creates
     a pandas data frame where the classes are specified using the id within the
@@ -577,20 +584,23 @@ def create_pandas_df(cls_train_info: Dict[
         f = h5py.File(cls_train_info[key].file_h5, "r")
         num_rows = f["DATA/DATA"].shape[0]
         # Copy data and populate classid array
-        data_arr[row_init: (row_init + num_rows)] = f["DATA/DATA"]
-        class_arr[row_init: (row_init + num_rows)] = cls_train_info[key].id
+        data_arr[row_init : (row_init + num_rows)] = f["DATA/DATA"]
+        class_arr[row_init : (row_init + num_rows)] = cls_train_info[key].id
         row_init += num_rows
         f.close()
 
-    cls_id_df = pandas.DataFrame(data=class_arr, columns=[
-        "class_id"], dtype=numpy.int16)
+    cls_id_df = pandas.DataFrame(
+        data=class_arr, columns=["class_id"], dtype=numpy.int16
+    )
 
     col_names = []
     for img_info in img_band_info:
         for band in img_info.bands:
             col_names.append(f"{img_info.name}_{band}")
 
-    data_vals_df = pandas.DataFrame(data=data_arr, columns=col_names, dtype=numpy.uint16)
+    data_vals_df = pandas.DataFrame(
+        data=data_arr, columns=col_names, dtype=numpy.uint16
+    )
 
     data_cls_vals_df = pandas.concat((cls_id_df, data_vals_df), axis=1)
     return data_cls_vals_df

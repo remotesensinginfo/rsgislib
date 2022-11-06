@@ -41,6 +41,7 @@ Change Attribute Values
 Geometry Intersections
 -----------------------
 .. autofunction:: rsgislib.vectorattrs.count_pt_intersects
+.. autofunction:: rsgislib.vectorattrs.annotate_vec_selection
 
 
 * :ref:`genindex`

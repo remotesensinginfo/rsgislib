@@ -346,7 +346,7 @@ def calc_acc_metrics_vecsamples(
         img_hist_col = "Histogram"
         out_json_file = "Sonoma_county_class_acc_metrics.json"
 
-        classaccuracymetrics.calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr,
+        classaccuracymetrics.calc_acc_metrics_vecsamples(vec_in_file, vec_in_lyr,
                                                          ref_col, cls_col, cls_img,
                                                          img_cls_name_col, img_hist_col,
                                                          out_json_file)

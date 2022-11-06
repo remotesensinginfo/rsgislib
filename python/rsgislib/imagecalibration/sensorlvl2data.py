@@ -295,6 +295,7 @@ def create_stacked_sref_ls_oli_cl2_lv2_img(
         if not inc_full_qa_pxl_img:
             rsgislib.imageutils.delete_gdal_layer(qa_pxl_mband_img)
 
+
 def create_stacked_sref_ls_4_5_7_lv2_img(
     input_file: str,
     out_dir: str,

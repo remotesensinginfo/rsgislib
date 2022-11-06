@@ -268,8 +268,8 @@ def find_pt_to_side(
 
 
 def create_orthg_lines(
-    in_vec_file: str,
-    in_vec_lyr: str,
+    vec_in_file: str,
+    vec_in_lyr: str,
     out_vec_file: str,
     out_vec_lyr: str = None,
     pt_step: float = 1000,
@@ -282,9 +282,9 @@ def create_orthg_lines(
     A function to create a set of lines which are orthogonal to the lines of the input
     vector file.
 
-    :param in_vec_file: The inputted vector file path - this should be a
+    :param vec_in_file: The inputted vector file path - this should be a
                         polyline vector file
-    :param in_vec_lyr: The name of the vector layer
+    :param vec_in_lyr: The name of the vector layer
     :param out_vec_file: The output vector file path - this will be a polyline
                          vector file
     :param out_vec_lyr: The name of the output vector layer (if None then created
@@ -312,15 +312,15 @@ def create_orthg_lines(
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
-    vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
+    vec_ds_obj = gdal.OpenEx(vec_in_file, gdal.OF_VECTOR)
     if vec_ds_obj is None:
         raise rsgislib.RSGISPyException(
-            "Could not open vector file: {}".format(in_vec_file)
+            "Could not open vector file: {}".format(vec_in_file)
         )
-    vec_lyr_obj = vec_ds_obj.GetLayer(in_vec_lyr)
+    vec_lyr_obj = vec_ds_obj.GetLayer(vec_in_lyr)
     if vec_lyr_obj is None:
         raise rsgislib.RSGISPyException(
-            "Could not open vector layer: {}".format(in_vec_lyr)
+            "Could not open vector layer: {}".format(vec_in_lyr)
         )
     vec_spat_ref = vec_lyr_obj.GetSpatialRef()
 

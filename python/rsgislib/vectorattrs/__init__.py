@@ -1046,3 +1046,62 @@ def calc_npts_in_radius(
         in_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         in_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def annotate_vec_selection(
+    vec_in_file: str,
+    vec_in_lyr: str,
+    vec_sel_file: str,
+    vec_sel_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_col_name: str = "sel_feats",
+    out_format: str = "GPKG",
+    tmp_col_name: str = "tmp_sel_join_fid",
+):
+    """
+
+    A function which spatial selects features from the input vector layer which
+    intersects the selection vector layer populating a column within the output
+    vector layer specifying which features intersect.
+
+    :param vec_in_file: the input vector file path.
+    :param vec_in_lyr: the input vector layer name
+    :param vec_sel_file: the selection vector file path
+    :param vec_sel_lyr: the selection vector layer name
+    :param out_vec_file: the output vector file path
+    :param out_vec_lyr: the output vector layer name
+    :param out_col_name: the output boolean column specifying those features which
+                         intersect with the vec_sel_lyr layer.
+    :param out_format: the output vector format (e.g., GPKG).
+    :param tmp_col_name: The name of a temporary column added to the input layer
+                         used to ensure there are no duplicated features in the output
+                         layer. The default name is: "tmp_sel_join_fid".
+
+    """
+    import geopandas
+    import numpy
+
+    print("Read vector layers")
+    in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
+    sel_gpdf = geopandas.read_file(vec_sel_file, layer=vec_sel_lyr)
+
+    # Add column with unique id for each row.
+    in_gpdf[tmp_col_name] = numpy.arange(1, (in_gpdf.shape[0]) + 1, 1, dtype=int)
+
+    print("Perform Selection")
+    in_sel_gpdf = geopandas.sjoin(
+        in_gpdf, sel_gpdf, how="inner", predicate="intersects"
+    )
+    # Remove any duplicate features using the tmp column
+    in_sel_gpdf.drop_duplicates(subset=[tmp_col_name], inplace=True)
+    # Create new column with the selection populated as True.
+    in_gpdf[out_col_name] = in_gpdf[tmp_col_name].isin(in_sel_gpdf[tmp_col_name].values)
+    # Remove the tmp column
+    in_gpdf.drop(columns=[tmp_col_name], inplace=True)
+
+    print("Export")
+    if out_format == "GPKG":
+        in_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        in_gpdf.to_file(out_vec_file, driver=out_format)
