@@ -41,12 +41,17 @@ RUN apt-get update -y && \
     libhdf5-dev \
     wget \
     locales \
-    cmake
+    cmake \
+    python3-pip \
+    python3-venv && \
+    pip3 install --upgrade pip && pip3 install build
 
 ARG KEALIB_DEB_URL=https://envsys-public.s3.amazonaws.com/ubuntu/kealib/focal_ubuntugis_stable_libkea_1.4.14-1.deb
-ARG RSGISLIB_VER=5.0.10
+ARG RSGISLIB_VER=5.0.11
 ARG PACKAGE_DIR=/usr/local/packages
-ARG RSGSILIB_PACKAGE_DIR=$PACKAGE_DIR/rsgislib_$RSGISLIB_VER-1
+ARG RSGISLIB_PACKAGE_DIR=$PACKAGE_DIR/rsgislib_$RSGISLIB_VER-1
+ARG RSGISLIB_PYTHON_PACKAGE_DIR=$PACKAGE_DIR/python3-rsgislib_$RSGISLIB_VER-1
+ARG RSGISLIB_PYTHON_PIP_PACKAGE_DIR=$PACKAGE_DIR/py-rsgislib
 ARG make_threads=7
 
 # Install kealib
@@ -59,7 +64,7 @@ RUN cd /usr/local/src && \
 RUN mkdir /usr/local/src/rsgislib
 COPY . /usr/local/src/rsgislib
 
-RUN mkdir -p $RSGSILIB_PACKAGE_DIR
+RUN mkdir -p $RSGISLIB_PACKAGE_DIR
 
 RUN cd /usr/local/src/rsgislib && \
     cmake \
@@ -71,14 +76,23 @@ RUN cd /usr/local/src/rsgislib && \
     -D CMAKE_INSTALL_PREFIX=/usr \
     . && \
     make -j "${make_threads}" && \
-    make install DESTDIR=$RSGSILIB_PACKAGE_DIR && \
+    make install DESTDIR=$RSGISLIB_PACKAGE_DIR && \
     make install && \
     ldconfig && \
-    mkdir -p $RSGSILIB_PACKAGE_DIR/usr/lib/python3.8/dist-packages/rsgislib-$RSGISLIB_VER.dist-info && \
-    touch $RSGSILIB_PACKAGE_DIR/usr/lib/python3.8/dist-packages/rsgislib-$RSGISLIB_VER.dist-info/METADATA
-    
-RUN mkdir $RSGSILIB_PACKAGE_DIR/DEBIAN
-COPY ./contrib/ubuntu/focal_ubuntugis_stable/DEBIAN $RSGSILIB_PACKAGE_DIR/DEBIAN
-RUN dpkg-deb --build $RSGSILIB_PACKAGE_DIR
+    mkdir -p $RSGISLIB_PYTHON_PACKAGE_DIR/usr/lib/ && \
+    mv $RSGISLIB_PACKAGE_DIR/usr/lib/python3 $RSGISLIB_PYTHON_PACKAGE_DIR/usr/lib/
+
+COPY ./contrib/rsgislib_py $RSGISLIB_PYTHON_PIP_PACKAGE_DIR
+RUN cp -r $RSGISLIB_PYTHON_PACKAGE_DIR/usr/lib/python3/dist-packages/rsgislib $RSGISLIB_PYTHON_PIP_PACKAGE_DIR && \
+    python3 -m build $RSGISLIB_PYTHON_PIP_PACKAGE_DIR && cp $RSGISLIB_PYTHON_PIP_PACKAGE_DIR/dist/* $PACKAGE_DIR
 
 
+RUN mkdir -p $RSGISLIB_PYTHON_PACKAGE_DIR/usr/lib/python3.8/dist-packages/rsgislib-$RSGISLIB_VER.dist-info && \
+    touch $RSGISLIB_PYTHON_PACKAGE_DIR/usr/lib/python3.8/dist-packages/rsgislib-$RSGISLIB_VER.dist-info/METADATA && \
+    mkdir $RSGISLIB_PACKAGE_DIR/DEBIAN $RSGISLIB_PYTHON_PACKAGE_DIR/DEBIAN
+
+COPY ./contrib/ubuntu/focal_ubuntugis_stable/DEBIAN $RSGISLIB_PACKAGE_DIR/DEBIAN
+COPY ./contrib/ubuntu/focal_ubuntugis_stable/DEBIAN_py $RSGISLIB_PYTHON_PACKAGE_DIR/DEBIAN
+RUN ls $PACKAGE_DIR
+RUN dpkg-deb --build $RSGISLIB_PACKAGE_DIR
+RUN dpkg-deb --build $RSGISLIB_PYTHON_PACKAGE_DIR

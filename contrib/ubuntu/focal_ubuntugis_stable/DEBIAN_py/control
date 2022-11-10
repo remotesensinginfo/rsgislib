@@ -1,0 +1,11 @@
+Package: python-rsgislib
+Version: 5.0.11-1
+Section: science
+Priority: optional
+Architecture: amd64
+Depends: rsgislib
+Maintainer: Environment Systems Ltd. (developers@envsys.co.uk)
+Description: The python bindings of The Raster GIS Library by
+ Pete Bunting et al.  A collection of tools for processing remote
+ sensing and GIS datasets.  For more details see the project
+ website: http://rsgislib.org/
