@@ -612,7 +612,7 @@ def add_numeric_col_lut(
     vec_file: str,
     vec_lyr: str,
     ref_col: str,
-    val_lut: dict,
+    val_lut: Dict,
     out_col: str,
     out_vec_file: str,
     out_vec_lyr: str,

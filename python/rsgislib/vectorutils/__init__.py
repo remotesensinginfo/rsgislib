@@ -2772,7 +2772,7 @@ def drop_rows_by_attribute(
     vec_file: str,
     vec_lyr: str,
     sub_col: str,
-    sub_vals: list,
+    sub_vals: List,
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
