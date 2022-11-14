@@ -1,18 +1,46 @@
 # To build .deb packages
 
-Run the following command **from the root of the repository**
-
-`docker build . -f contrib/ubuntu/focal_ubuntugis_stable/Dockerfile -t rsgislib_focal_deb_builder`
-
-This creates a docker image which should have:
+There is a single Dockerfile that will build:
 
 * rsgislib - A debian package without the python files
 * python3-rsgislib - A debian package containing the python files for rsgislib
 * python pip packages - A wheel and source package that can be installed with pip
 
-in /usr/local/packages from where you can copy it out, e.g.,
+in /usr/local/packages from where you can copy it out.  It will build packages
+against some combination of ubuntu releases and ubuntugis (or not) PPAs depending
+on the build args used.  At the moment, you can run the following from the root of
+the repo:
 
-`docker run --rm --entrypoint cat rsgislib_focal_deb_builder /usr/local/packages/rsgislib_5.0.11-1.deb > /tmp/rsgislib_5.0.11-1.deb`
+```
+docker build . \
+    --build-arg=CODENAME=focal \
+    --build-arg=REPO=ubuntugis_stable \
+    -f contrib/ubuntu/Dockerfile \
+    -t rsgislib_focal_stable
+
+docker build . \
+    --build-arg=CODENAME=focal \
+    --build-arg=REPO=ubuntugis_unstable \
+    -f contrib/ubuntu/Dockerfile \
+    -t rsgislib_focal_unstable
+
+docker build . \
+    --build-arg=CODENAME=jammy \
+    --build-arg=REPO=none \
+    -f contrib/ubuntu/Dockerfile \
+    -t rsgislib_jammy
+```
+
+More may be added in the future, but you should be able to build against other
+versions of ubuntu or ubuntugis by inspecting the contents of `contrib/ubuntu`
+and adapting to your needs.
+
+Copy out the packages so built:
+
+```
+docker run --rm --entrypoint cat rsgislib_focal_stable \
+    /usr/local/packages/<the_package_name> > /tmp/<the_package_name>
+```
 
 ## Notes:
 
