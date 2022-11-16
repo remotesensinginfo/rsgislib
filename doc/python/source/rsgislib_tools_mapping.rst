@@ -5,6 +5,7 @@ Map Vector Layers
 -------------------
 .. autofunction:: rsgislib.tools.mapping.create_vec_lyr_map
 .. autofunction:: rsgislib.tools.mapping.create_choropleth_vec_lyr_map
+.. autofunction:: rsgislib.tools.mapping.create_vec_pt_density_map
 
 Map Raster Layers
 -------------------

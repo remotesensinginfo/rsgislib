@@ -200,6 +200,9 @@ def add_contextily_basemap(
     """
     import contextily
 
+    if cx_zoom_lvl is None:
+        cx_zoom_lvl = "auto"
+
     contextily.add_basemap(
         ax,
         zoom=cx_zoom_lvl,
@@ -489,7 +492,7 @@ def create_vec_lyr_map(
     :param vec_fill_alphas: either a single float or list of floats for the alpha
                             value(s) for the vector layers. (Default: 1)
     :parma vec_markersize: if the vector layer has point geometries then this variable
-                           allows the size of the points to be defined as either a 
+                           allows the size of the points to be defined as either a
                            constant (float) or using column from the vector layer
                            (string).
     :param show_scale_bar: boolean specifying whether a scale bar should be added to
@@ -815,7 +818,7 @@ def create_choropleth_vec_lyr_map(
     :param vec_fill_alphas: either a single float or list of floats for the alpha
                             value(s) for the vector layers. (Default: 1)
     :parma vec_markersize: if the vector layer has point geometries then this variable
-                           allows the size of the points to be defined as either a 
+                           allows the size of the points to be defined as either a
                            constant (float) or using column from the vector layer
                            (string).
     :param show_scale_bar: boolean specifying whether a scale bar should be added to
@@ -897,6 +900,13 @@ def create_raster_cmap_img_map(
     A function which displays a single band raster layer onto the axis provided
     using a colour bar.
 
+    Colour bar information is returned. Note to add the colour bar to your plot
+    you'll want to use code such as:
+
+    c_cmap, c_norm =  mapping.create_raster_cmap_img_map(...)
+    fig.colorbar(matplotlib.cm.ScalarMappable(norm=c_norm, cmap=c_cmap),
+                 label='Some Data', ax=ax1)
+
     :param ax: The matplotlib axis to which to add the image to.
     :param input_img: the file path for the input image
     :param img_band: the image band within the file to be displayed.
@@ -927,6 +937,8 @@ def create_raster_cmap_img_map(
     :param print_norm_vals: boolean specifying to print the normalisation min / max
                             values. This is useful for debugging and finding a range
                             of values before manually setting across a set of images.
+    :return: The colour map and normalisation so a colour bar can be created.
+             (c_cmap, c_norm)
 
     """
     if bbox is None:
@@ -981,3 +993,127 @@ def create_raster_cmap_img_map(
         ax.title.set_text(title_str)
 
     return c_cmap, c_norm
+
+
+def create_vec_pt_density_map(
+    ax: plt.axis,
+    gp_vec: geopandas.GeoDataFrame,
+    bbox: List[float],
+    title_str: str = None,
+    cmap_name: str = "viridis",
+    use_log_norm: bool = False,
+    density_norm_vmin: float = 1,
+    density_norm_vmax: float = None,
+    density_dpi: int = 72,
+    show_scale_bar: bool = True,
+    use_grid: bool = False,
+    show_map_axis: bool = True,
+    sub_in_vec: bool = False,
+):
+    """
+    A function which adds a vector layer(s) to a matplotlib axis as a density plot.
+    Therefore, the vector layer needs to a points layer.
+
+    Note. there are geopandas functions to calculate centroids or representative
+    points if your dataset is not a points file.
+
+    Colour bar information is returned. Note to add the colour bar to your plot
+    you'll want to use code such as:
+
+    c_cmap, c_norm =  mapping.create_vec_pt_density_map(...)
+    fig.colorbar(matplotlib.cm.ScalarMappable(norm=c_norm, cmap=c_cmap),
+                 label='Some Data', ax=ax1)
+
+    :param ax: The matplotlib axis to which to add the vector layer. Note, the axis
+               must be created with the option projection='scatter_density' which
+               requires the mpl_scatter_density module to be available.
+    :param gp_vec: a geopandas dataframe with the data - must be a points geometry
+                   type.
+    :param bbox: a bbox (MinX, MaxX, MinY, MaxY) for the region to be displayed
+    :param title_str: an optional title for the map (Default: None)
+    :param cmap_name: either a single string or list of strings with the colours
+                          for filling the vectors. (Default: grey)
+    :param norm_img_vals: Boolean specifying whether the colour bar values should be
+                          normalised. Default: False
+    :param use_log_norm: Specify whether to use log normalisation for the plot
+                         instead of linear. (Default: False)
+    :param density_norm_vmin: the minimum value for the normalisation (default: 1).
+    :param density_norm_vmax: the maximum value for the normalisation (default: None).
+                              If None then the maximum value will be automatically
+                              defined.
+    :param density_dpi: the dots per inch used for displaying the density plot. The
+                        lower the value the large the bins (pixels) used for defining
+                        the density plot.
+    :param show_scale_bar: boolean specifying whether a scale bar should be added to
+                           the axis. Default: False
+    :param use_grid: boolean specifying whether a grid should be added to the axis.
+                     Default: False
+    :param show_map_axis: boolean specifying whether the axes should be shown
+                          Default: False
+    :param sub_in_vec: boolean specifying whether the vector layer should be
+                       spatially subset before displaying as for large vector
+                       layers this can make the processing much faster.
+                       Default: False
+    :return: The colour map and normalisation so a colour bar can be created.
+             (c_cmap, c_norm)
+
+    """
+    # Import to ensure the module is available.
+    import mpl_scatter_density
+
+    if sub_in_vec:
+        min_x_sub = math.floor(bbox[0] - 4)
+        max_x_sub = math.ceil(bbox[1] + 4)
+        min_y_sub = math.floor(bbox[2] - 4)
+        max_y_sub = math.ceil(bbox[3] + 4)
+        gp_vec_sub = gp_vec.cx[min_x_sub:max_x_sub, min_y_sub:max_y_sub]
+    else:
+        gp_vec_sub = gp_vec
+
+    c_cmap = plt.get_cmap(cmap_name).copy()
+    # Make any values below normalisation transparent so background can be seen.
+    matplotlib.colors.Colormap.set_under(c_cmap, color=[1, 1, 1, 0])
+
+    if use_log_norm:
+        c_norm = matplotlib.colors.LogNorm(
+            vmin=density_norm_vmin, vmax=density_norm_vmax
+        )
+    else:
+        c_norm = matplotlib.colors.Normalize(
+            vmin=density_norm_vmin, vmax=density_norm_vmax
+        )
+
+    density_info = ax.scatter_density(
+        gp_vec_sub["geometry"].x,
+        gp_vec_sub["geometry"].y,
+        dpi=density_dpi,
+        norm=c_norm,
+        cmap=c_cmap,
+        zorder=10,
+    )
+
+    ax.set_xlim([bbox[0], bbox[1]])
+    ax.set_ylim([bbox[2], bbox[3]])
+
+    if use_grid:
+        ax.grid()
+
+    if not show_map_axis:
+        ax.set_axis_off()
+        ax.set_axis_off()
+
+    if show_scale_bar:
+        distance_meters = 1
+        vec_crs = str(gp_vec.crs)
+        vec_epsg = int(vec_crs.split(":")[1])
+        if vec_epsg == 4326:
+            distance_meters = rsgislib.tools.projection.great_circle_distance(
+                wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
+            )
+        ax.add_artist(ScaleBar(distance_meters))
+
+    if title_str is not None:
+        ax.title.set_text(title_str)
+
+    return c_cmap, c_norm
+    # return density_info
