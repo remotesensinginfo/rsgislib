@@ -19,6 +19,16 @@ Add Columns
 .. autofunction:: rsgislib.vectorattrs.add_string_col
 .. autofunction:: rsgislib.vectorattrs.create_name_col
 
+Column Utilities
+------------------
+.. autofunction:: rsgislib.vectorattrs.drop_vec_cols
+.. autofunction:: rsgislib.vectorattrs.rename_vec_cols
+
+Joins
+--------
+.. autofunction:: rsgislib.vectorattrs.perform_spatial_join
+
+
 Calculate Column Values
 --------------------------
 .. autofunction:: rsgislib.vectorattrs.pop_bbox_cols

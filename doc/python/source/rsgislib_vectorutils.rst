@@ -6,10 +6,16 @@ Vector Attributes
 --------------------
 .. autofunction:: rsgislib.vectorutils.vector_maths
 .. autofunction:: rsgislib.vectorutils.copy_rat_cols_to_vector_lyr
-.. autofunction:: rsgislib.vectorutils.perform_spatial_join
 .. autofunction:: rsgislib.vectorutils.match_closest_vec_pts
 .. autoclass:: rsgislib.vectorutils.VecColVar
     :members:
+
+Vector Projections
+----------------------
+.. autofunction:: rsgislib.vectorutils.get_proj_wkt_from_vec
+.. autofunction:: rsgislib.vectorutils.get_proj_epsg_from_vec
+.. autofunction:: rsgislib.vectorutils.redefine_vec_lyr_proj
+.. autofunction:: rsgislib.vectorutils.reproj_vec_lyr_gp
 
 
 Create Vectors
@@ -99,8 +105,6 @@ Vector / Raster Tests
 
 Vector Info
 -------------
-.. autofunction:: rsgislib.vectorutils.get_proj_wkt_from_vec
-.. autofunction:: rsgislib.vectorutils.get_proj_epsg_from_vec
 .. autofunction:: rsgislib.vectorutils.get_vec_feat_count
 .. autofunction:: rsgislib.vectorutils.count_feats_per_att_val
 .. autofunction:: rsgislib.vectorutils.get_vec_lyrs_lst

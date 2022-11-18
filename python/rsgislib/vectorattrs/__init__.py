@@ -1105,3 +1105,131 @@ def annotate_vec_selection(
         in_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         in_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def perform_spatial_join(
+    vec_base_file: str,
+    vec_base_lyr: str,
+    vec_join_file: str,
+    vec_join_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    join_how: str = "inner",
+    join_op: str = "within",
+):
+    """
+    A function to perform a spatial join between two vector layers. This function
+    uses geopandas so this needs to be installed. You also need to have the rtree
+    package to generate the index used to perform the intersection.
+
+    For more information see: http://geopandas.org/mergingdata.html#spatial-joins
+
+    :param vec_base_file: the base vector file with the geometries which will
+                          be outputted.
+    :param vec_base_lyr: the layer name for the base vector.
+    :param vec_join_file: the vector with the attributes which will be joined to
+                          the base vector geometries.
+    :param vec_join_lyr: the layer name for the join vector.
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the layer name for the output vector.
+    :param out_format: The output vector file format (Default GPKG)
+    :param join_how: Specifies the type of join that will occur and which geometry
+                     is retained. The options are [left, right, inner]. The default
+                     is 'inner'
+    :param join_op: Defines whether or not to join the attributes of one object
+                    to another. The options are [intersects, within, contains]
+                    and default is 'within'
+
+    """
+    import geopandas
+
+    if join_how not in ["left", "right", "inner"]:
+        raise rsgislib.RSGISPyException("The join_how specified is not valid.")
+    if join_op not in ["intersects", "within", "contains"]:
+        raise rsgislib.RSGISPyException("The join_op specified is not valid.")
+
+    # Try importing rtree to provide useful error message as
+    # will be used in sjoin but if not present
+    # the error message is not very user friendly:
+    # AttributeError: 'NoneType' object has no attribute 'intersection'
+    try:
+        import rtree
+    except ImportError:
+        raise rsgislib.RSGISPyException(
+            "The rtree module was not available for "
+            "import this is required by geopandas to "
+            "perform a join."
+        )
+
+    base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
+    join_gpd_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
+
+    join_gpd_df = geopandas.sjoin(base_gpd_df, join_gpd_df, how=join_how, op=join_op)
+
+    if len(join_gpd_df) > 0:
+        if out_format == "GPKG":
+            join_gpd_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            join_gpd_df.to_file(out_vec_file, driver=out_format)
+
+
+def drop_vec_cols(vec_file: str, vec_lyr: str, drop_cols: List[
+    str], out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG", chk_cols_present: bool = True):
+    """
+    A function which allows vector columns to be removed from the layer.
+
+    param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param drop_cols: List of columns to remove from layer
+    :param out_vec_file: the output vector file
+    :param out_vec_lyr: the output vector layer
+    :param out_format: the output vector format (Default: GPKG)
+    :param chk_cols_present: boolean (default: True) to check that the columns to be
+                             removed are present and remove those from the list
+                             which are not present.
+
+    """
+    import geopandas
+    data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    if chk_cols_present:
+        drop_cols_chk = list()
+        for col in data_gpdf.columns:
+            if col in drop_cols:
+                drop_cols_chk.append(col)
+    else:
+        drop_cols_chk = drop_cols
+
+    if len(drop_cols_chk) > 0:
+        data_gpdf.drop(columns=drop_cols_chk, inplace=True)
+
+    if out_format == "GPKG":
+        data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def rename_vec_cols(vec_file: str, vec_lyr: str, rname_cols_lut: Dict[
+    str, str], out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG"):
+    """
+    A function which allows vector column to be renamed.
+
+    param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param rname_cols_lut: dict look up for the columns to be renamed.
+                          Format: {"orig_name": "new_name"}
+    :param out_vec_file: the output vector file
+    :param out_vec_lyr: the output vector layer
+    :param out_format: the output vector format (Default: GPKG)
+
+    """
+    import geopandas
+    data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    data_gpdf.rename(columns=rname_cols_lut, inplace=True)
+
+    if out_format == "GPKG":
+        data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gpdf.to_file(out_vec_file, driver=out_format)

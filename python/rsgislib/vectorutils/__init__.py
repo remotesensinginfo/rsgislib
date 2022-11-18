@@ -2156,71 +2156,7 @@ def copy_rat_cols_to_vector_lyr(
     clumps_img_ds = None
 
 
-def perform_spatial_join(
-    vec_base_file: str,
-    vec_base_lyr: str,
-    vec_join_file: str,
-    vec_join_lyr: str,
-    out_vec_file: str,
-    out_vec_lyr: str,
-    out_format: str = "GPKG",
-    join_how: str = "inner",
-    join_op: str = "within",
-):
-    """
-    A function to perform a spatial join between two vector layers. This function
-    uses geopandas so this needs to be installed. You also need to have the rtree
-    package to generate the index used to perform the intersection.
 
-    For more information see: http://geopandas.org/mergingdata.html#spatial-joins
-
-    :param vec_base_file: the base vector file with the geometries which will
-                          be outputted.
-    :param vec_base_lyr: the layer name for the base vector.
-    :param vec_join_file: the vector with the attributes which will be joined to
-                          the base vector geometries.
-    :param vec_join_lyr: the layer name for the join vector.
-    :param out_vec_file: the output vector file.
-    :param out_vec_lyr: the layer name for the output vector.
-    :param out_format: The output vector file format (Default GPKG)
-    :param join_how: Specifies the type of join that will occur and which geometry
-                     is retained. The options are [left, right, inner]. The default
-                     is 'inner'
-    :param join_op: Defines whether or not to join the attributes of one object
-                    to another. The options are [intersects, within, contains]
-                    and default is 'within'
-
-    """
-    import geopandas
-
-    if join_how not in ["left", "right", "inner"]:
-        raise rsgislib.RSGISPyException("The join_how specified is not valid.")
-    if join_op not in ["intersects", "within", "contains"]:
-        raise rsgislib.RSGISPyException("The join_op specified is not valid.")
-
-    # Try importing rtree to provide useful error message as
-    # will be used in sjoin but if not present
-    # the error message is not very user friendly:
-    # AttributeError: 'NoneType' object has no attribute 'intersection'
-    try:
-        import rtree
-    except ImportError:
-        raise rsgislib.RSGISPyException(
-            "The rtree module was not available for "
-            "import this is required by geopandas to "
-            "perform a join."
-        )
-
-    base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
-    join_gpd_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
-
-    join_gpd_df = geopandas.sjoin(base_gpd_df, join_gpd_df, how=join_how, op=join_op)
-
-    if len(join_gpd_df) > 0:
-        if out_format == "GPKG":
-            join_gpd_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-        else:
-            join_gpd_df.to_file(out_vec_file, driver=out_format)
 
 
 def does_vmsk_img_intersect(
@@ -3471,3 +3407,53 @@ def match_closest_vec_pts(
         found_match = True
 
     return found_match
+
+
+def redefine_vec_lyr_proj(vec_file: str, vec_lyr: str, epsg_code: int, out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG"):
+    """
+    A function which (re-)defines the projection of a vector layer without
+    reprojecting. This is useful if for some reason the projection is either
+    incorrectly represented or not properly defined for some reason.
+
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param epsg_code: the epsg code for the projection you are defining the layer to.
+    :param out_vec_file: the output vector file
+    :param out_vec_lyr: the output vector layer
+    :param out_format: the output vector format (Default: GPKG)
+
+    """
+    import geopandas
+    data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gpdf = data_gpdf.set_crs(epsg=epsg_code, allow_override=True)
+
+    if out_format == "GPKG":
+        data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def reproj_vec_lyr_gp(vec_file: str, vec_lyr: str, epsg_code: int, out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG"):
+    """
+    A function which re-projects of a vector layer to a new projection
+    using GeoPandas.
+
+    Note. this function loads the layer into memory you can use also use
+    vector_translate for reprojection if you do not want that behaviour.
+
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param epsg_code: the epsg code for the projection you are defining the layer to.
+    :param out_vec_file: the output vector file
+    :param out_vec_lyr: the output vector layer
+    :param out_format: the output vector format (Default: GPKG)
+
+    """
+    import geopandas
+    data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gpdf = data_gpdf.to_crs(epsg=epsg_code)
+
+    if out_format == "GPKG":
+        data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gpdf.to_file(out_vec_file, driver=out_format)
