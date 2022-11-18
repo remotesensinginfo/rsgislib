@@ -2156,9 +2156,6 @@ def copy_rat_cols_to_vector_lyr(
     clumps_img_ds = None
 
 
-
-
-
 def does_vmsk_img_intersect(
     input_vmsk_img: str,
     vec_roi_file: str,
@@ -3409,7 +3406,14 @@ def match_closest_vec_pts(
     return found_match
 
 
-def redefine_vec_lyr_proj(vec_file: str, vec_lyr: str, epsg_code: int, out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG"):
+def redefine_vec_lyr_proj(
+    vec_file: str,
+    vec_lyr: str,
+    epsg_code: int,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
     """
     A function which (re-)defines the projection of a vector layer without
     reprojecting. This is useful if for some reason the projection is either
@@ -3424,6 +3428,7 @@ def redefine_vec_lyr_proj(vec_file: str, vec_lyr: str, epsg_code: int, out_vec_f
 
     """
     import geopandas
+
     data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     data_gpdf = data_gpdf.set_crs(epsg=epsg_code, allow_override=True)
 
@@ -3433,7 +3438,14 @@ def redefine_vec_lyr_proj(vec_file: str, vec_lyr: str, epsg_code: int, out_vec_f
         data_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def reproj_vec_lyr_gp(vec_file: str, vec_lyr: str, epsg_code: int, out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG"):
+def reproj_vec_lyr_gp(
+    vec_file: str,
+    vec_lyr: str,
+    epsg_code: int,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
     """
     A function which re-projects of a vector layer to a new projection
     using GeoPandas.
@@ -3450,6 +3462,7 @@ def reproj_vec_lyr_gp(vec_file: str, vec_lyr: str, epsg_code: int, out_vec_file:
 
     """
     import geopandas
+
     data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     data_gpdf = data_gpdf.to_crs(epsg=epsg_code)
 

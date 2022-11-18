@@ -1174,8 +1174,15 @@ def perform_spatial_join(
             join_gpd_df.to_file(out_vec_file, driver=out_format)
 
 
-def drop_vec_cols(vec_file: str, vec_lyr: str, drop_cols: List[
-    str], out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG", chk_cols_present: bool = True):
+def drop_vec_cols(
+    vec_file: str,
+    vec_lyr: str,
+    drop_cols: List[str],
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    chk_cols_present: bool = True,
+):
     """
     A function which allows vector columns to be removed from the layer.
 
@@ -1191,6 +1198,7 @@ def drop_vec_cols(vec_file: str, vec_lyr: str, drop_cols: List[
 
     """
     import geopandas
+
     data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
     if chk_cols_present:
@@ -1210,8 +1218,14 @@ def drop_vec_cols(vec_file: str, vec_lyr: str, drop_cols: List[
         data_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def rename_vec_cols(vec_file: str, vec_lyr: str, rname_cols_lut: Dict[
-    str, str], out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG"):
+def rename_vec_cols(
+    vec_file: str,
+    vec_lyr: str,
+    rname_cols_lut: Dict[str, str],
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
     """
     A function which allows vector column to be renamed.
 
@@ -1225,6 +1239,7 @@ def rename_vec_cols(vec_file: str, vec_lyr: str, rname_cols_lut: Dict[
 
     """
     import geopandas
+
     data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
     data_gpdf.rename(columns=rname_cols_lut, inplace=True)
