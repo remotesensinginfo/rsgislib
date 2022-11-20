@@ -4364,7 +4364,7 @@ def create_raster_tiles_bbox(
         y_top = bbox[3] - (tile_y_size * y)
         y_bot = y_top - tile_y_size
         for x in range(x_n_tiles):
-            x_lft = bbox[0] - (tile_x_size * x)
+            x_lft = bbox[0] + (tile_x_size * x)
             x_rht = x_lft + tile_x_size
 
             tile_bbox = [x_lft, x_rht, y_bot, y_top]
