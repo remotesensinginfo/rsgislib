@@ -3134,3 +3134,62 @@ def bbox_intersects_index(rt_idx, geom_lst: list, bbox: list) -> bool:
             bbox_intersects = True
             break
     return bbox_intersects
+
+
+def buffer_vec_layer_gp(
+    vec_file: str,
+    vec_lyr: str,
+    buf_dist: float,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
+    buf_res: int = 16,
+    buf_sgl_sided: bool = False,
+):
+    """
+    A function which performs a buffer on the inputted vector layer using
+    geopandas.
+
+    :param vec_file: Input vector file path.
+    :param vec_lyr: Input vector layer name.
+    :param buf_dist: radius of the buffer in the units of the projection.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name.
+    :param out_format: The output file format of the vector file.
+    :param del_exist_vec: remove output file if it exists.
+    :param buf_res: resolution of the buffer around each vertex.
+    :param buf_sgl_sided: Option to just buffer a single side of the vector. If
+                          buf_dist is positive it indicates the left-hand side
+                          while is buf_dist is negative it indicates the
+                          right-hand side.
+
+    """
+    import geopandas
+
+    if os.path.exists(out_vec_file):
+        if del_exist_vec:
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
+        else:
+            raise rsgislib.RSGISPyException(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    # Perform Buffer
+    data_buf_gdf = data_gdf.buffer(distance=buf_dist, resolution=buf_res, single_sided=buf_sgl_sided)
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            raise rsgislib.RSGISPyException(
+                "If output format is GPKG then an output layer is required."
+            )
+        data_buf_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_buf_gdf.to_file(out_vec_file, driver=out_format)
+
+
