@@ -4300,3 +4300,90 @@ def mask_all_band_zero_vals(
         outputs.outimage[(inputs.image <= 0) & vld_msk] = otherargs.out_val
 
     applier.apply(_applyzeronodata, infiles, outfiles, otherargs, controls=aControls)
+
+
+def create_raster_tiles_bbox(
+    bbox: List[float],
+    tile_x_size: float,
+    tile_y_size: float,
+    out_img_res: float,
+    out_epsg: int,
+    out_tile_dir: str,
+    out_tile_name: str = "base_tile_{}",
+    out_img_ext: str = "kea",
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_8UINT,
+    out_img_pxl_val: float = 0,
+    out_img_n_bands: int = 1,
+):
+    """
+    A function which creates a set of raster tiles for a region defined by a
+    bbox.
+
+    :param bbox: the bounding box (xMin, xMax, yMin, yMax) for the whole
+                 region for which the tiles are generated.
+    :param tile_x_size: the size of the tiles in x axis in the units of the
+                        projection (e.g., metres or degrees)
+    :param tile_y_size: the size of the tiles in y axis in the units of the
+                        projection (e.g., metres or degrees)
+    :param out_img_res: the output image tile pixel resolution
+    :param out_epsg: the output projection (which needs to match the bbox).
+    :param out_tile_dir: the output directory path.
+    :param out_tile_name: the base name for the output image tiles - note must
+                          include {} which will be replace with the tile x and y
+                          numbering. (Default: "base_tile_{}")
+    :param out_img_ext: the output image file extension (Default: kea)
+    :param gdalformat: the output gdal image format (Default: KEA)
+    :param datatype: the output image data type (Default: rsgislib.TYPE_8UINT)
+    :param out_img_pxl_val: the output image pixel values (Default: 0)
+    :param out_img_n_bands: the number of output image bands (Default: 1)
+
+    """
+    import rsgislib.tools.projection
+
+    bbox_width = bbox[1] - bbox[0]
+    bbox_height = bbox[3] - bbox[2]
+
+    if bbox_width < 0:
+        raise rsgislib.RSGISPyException("The width of the bbox is negative")
+
+    if bbox_height < 0:
+        raise rsgislib.RSGISPyException("The height of the bbox is negative")
+
+    print(f"BBOX DIMS: {bbox_width} x {bbox_height}")
+
+    x_n_tiles = int(math.ceil(bbox_width / tile_x_size))
+    y_n_tiles = int(math.ceil(bbox_height / tile_y_size))
+    tot_n_tiles = x_n_tiles * y_n_tiles
+    print(f"Tiles: {x_n_tiles} x {y_n_tiles} = {tot_n_tiles}")
+
+    wkt_str = rsgislib.tools.projection.get_wkt_from_epsg_code(out_epsg)
+
+    n_tile = 0
+    for y in range(y_n_tiles):
+        y_top = bbox[3] - (tile_y_size * y)
+        y_bot = y_top - tile_y_size
+        for x in range(x_n_tiles):
+            x_lft = bbox[0] + (tile_x_size * x)
+            x_rht = x_lft + tile_x_size
+
+            tile_bbox = [x_lft, x_rht, y_bot, y_top]
+            print("{} of {}: {}".format(n_tile, tot_n_tiles, tile_bbox))
+            tile_unq_name = f"{x}_{y}"
+            out_tile_file_name = out_tile_name.format(tile_unq_name)
+            out_tile_img = os.path.join(
+                out_tile_dir, f"{out_tile_file_name}.{out_img_ext}"
+            )
+
+            create_blank_img_from_bbox(
+                tile_bbox,
+                wkt_str=wkt_str,
+                output_img=out_tile_img,
+                out_img_res=out_img_res,
+                out_img_pxl_val=out_img_pxl_val,
+                out_img_n_bands=out_img_n_bands,
+                gdalformat=gdalformat,
+                datatype=datatype,
+                snap_to_grid=False,
+            )
+            n_tile += 1

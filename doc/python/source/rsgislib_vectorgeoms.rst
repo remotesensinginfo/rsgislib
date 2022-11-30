@@ -24,6 +24,7 @@ Calculate New Geometries
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_intersection
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_difference
 .. autofunction:: rsgislib.vectorgeoms.clip_vec_lyr
+.. autofunction:: rsgislib.vectorgeoms.buffer_vec_layer_gp
 
 Edit Geometries
 -----------------

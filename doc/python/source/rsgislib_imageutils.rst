@@ -80,6 +80,7 @@ Tile
 -------
 .. autofunction:: rsgislib.imageutils.create_tiles
 .. autofunction:: rsgislib.imageutils.create_tiles_multi_core
+.. autofunction:: rsgislib.imageutils.create_raster_tiles_bbox
 .. autofunction:: rsgislib.imageutils.tilingutils.create_min_data_tiles
 .. autofunction:: rsgislib.imageutils.tilingutils.create_tiles_from_masks
 .. autofunction:: rsgislib.imageutils.tilingutils.create_tile_mask_images_from_shp
