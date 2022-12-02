@@ -4575,19 +4575,22 @@ def polyfill_nan_data_values(
             for pxl_idx in range(img_flat.shape[0]):
                 if numpy.isnan(img_flat[pxl_idx]).any():
                     finite_msk = numpy.isfinite(img_flat[pxl_idx])
-                    x_vals = otherargs.band_vals[finite_msk]
-                    y_vals = img_flat[pxl_idx][finite_msk]
-                    poly_coefs = numpy.polyfit(x_vals, y_vals, deg=otherargs.polyorder)
-                    pred_vals = numpy.polyval(poly_coefs, otherargs.band_vals)
-                    if otherargs.mean_abs_diff is not None:
-                        pxl_mean = numpy.nanmean(img_flat[pxl_idx])
-                        pred_vals_diff = numpy.abs(pred_vals - pxl_mean)
-                        pred_vals[pred_vals_diff > otherargs.mean_abs_diff] = pxl_mean
-                    repl_idxs = numpy.arange(0, pred_vals.shape[0])[
-                        numpy.invert(finite_msk)
-                    ]
-                    img_flat[pxl_idx][repl_idxs] = pred_vals[repl_idxs]
-                    img_flat_fill_arr[ID[pxl_idx]] = pred_vals
+                    if numpy.sum(finite_msk) > otherargs.polyorder:
+                        x_vals = otherargs.band_vals[finite_msk]
+                        y_vals = img_flat[pxl_idx][finite_msk]
+                        poly_coefs = numpy.polyfit(x_vals, y_vals, deg=otherargs.polyorder)
+                        pred_vals = numpy.polyval(poly_coefs, otherargs.band_vals)
+                        if otherargs.mean_abs_diff is not None:
+                            pxl_mean = numpy.nanmean(img_flat[pxl_idx])
+                            pred_vals_diff = numpy.abs(pred_vals - pxl_mean)
+                            pred_vals[pred_vals_diff > otherargs.mean_abs_diff] = pxl_mean
+                        repl_idxs = numpy.arange(0, pred_vals.shape[0])[
+                            numpy.invert(finite_msk)
+                        ]
+                        img_flat[pxl_idx][repl_idxs] = pred_vals[repl_idxs]
+                        img_flat_fill_arr[ID[pxl_idx]] = pred_vals
+                    else:
+                        img_flat_fill_arr[ID[pxl_idx]][...] = numpy.nan
                 else:
                     img_flat_fill_arr[ID[pxl_idx]] = img_flat[pxl_idx]
 
