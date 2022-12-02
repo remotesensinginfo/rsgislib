@@ -3181,7 +3181,9 @@ def buffer_vec_layer_gp(
 
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     # Perform Buffer
-    data_buf_gdf = data_gdf.buffer(distance=buf_dist, resolution=buf_res, single_sided=buf_sgl_sided)
+    data_buf_gdf = data_gdf.buffer(
+        distance=buf_dist, resolution=buf_res, single_sided=buf_sgl_sided
+    )
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
@@ -3191,5 +3193,3 @@ def buffer_vec_layer_gp(
         data_buf_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_buf_gdf.to_file(out_vec_file, driver=out_format)
-
-

@@ -229,11 +229,18 @@ Image I/O
 .. autofunction:: rsgislib.imageutils.generate_random_pxl_vals_img
 
 
+Pixel Smoothing / Filling
+--------------------------
+.. autofunction:: rsgislib.imageutils.spectral_smoothing
+.. autofunction:: rsgislib.imageutils.mask_outliners_data_values
+.. autofunction:: rsgislib.imageutils.polyfill_nan_data_values
+
+
 Other
 ------
 .. autofunction:: rsgislib.imageutils.gen_sampling_grid
 .. autofunction:: rsgislib.imageutils.whiten_image
-.. autofunction:: rsgislib.imageutils.spectral_smoothing
+
 
 
 Get Image Metadata

@@ -4387,3 +4387,228 @@ def create_raster_tiles_bbox(
                 snap_to_grid=False,
             )
             n_tile += 1
+
+
+def mask_outliners_data_values(
+    input_img: str,
+    valid_msk_img: str,
+    valid_msk_val: int,
+    output_img: str,
+    lower: int = 5,
+    upper: int = 95,
+    gdalformat: str = "KEA",
+    calc_stats: bool = True,
+):
+    """
+    This function masks outliners (assigning them to nan; output pixel type must
+    therefore be Float32). Outliners are defined using an upper and lower percentile.
+
+
+    :param input_img: input image file.
+    :param valid_msk_img: an image file representing the valid data region
+    :param valid_msk_val: image pixel value in the mask for the valid data region
+    :param output_img: the output image file
+    :param lower: the lower percentile threshold (value: 0-100)
+    :param upper: the upper percentile threshold (value: 0-100)
+    :param gdalformat: the output file format. (Default: KEA)
+    :param calc_stats: Boolean specifying whether to calculate pyramids and
+                       metadata stats (Default: True)
+
+    """
+    from rios import applier
+
+    try:
+        import tqdm
+
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    np_dtype = rsgislib.get_numpy_datatype(rsgislib.TYPE_32FLOAT)
+    in_no_date = get_img_no_data_value(input_img)
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    infiles.valid_msk = valid_msk_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.valid_msk_val = valid_msk_val
+    otherargs.lower = lower
+    otherargs.upper = upper
+    otherargs.in_no_date = in_no_date
+    otherargs.np_dtype = np_dtype
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyFill(info, inputs, outputs, otherargs):
+        if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(
+                -1, inputs.image.shape[0]
+            )
+
+            ID = numpy.arange(img_flat.shape[0])
+            n_feats = ID.shape[0]
+
+            ID = ID[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
+            img_flat = img_flat[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
+
+            img_flat_out_arr = numpy.zeros(
+                [n_feats, inputs.image.shape[0]], dtype=otherargs.np_dtype
+            )
+            img_flat_out_arr[...] = in_no_date
+            for pxl_idx in range(img_flat.shape[0]):
+                percentiles = numpy.nanpercentile(
+                    img_flat[pxl_idx], [otherargs.lower, otherargs.upper]
+                )
+                img_flat[pxl_idx][img_flat[pxl_idx] < percentiles[0]] = numpy.nan
+                img_flat[pxl_idx][img_flat[pxl_idx] > percentiles[1]] = numpy.nan
+                img_flat_out_arr[ID[pxl_idx]] = img_flat[pxl_idx]
+
+            out_arr = img_flat_out_arr.reshape(
+                inputs.image.shape[1], inputs.image.shape[2], inputs.image.shape[0]
+            )
+            out_arr = numpy.moveaxis(out_arr, 2, 0)
+            outputs.outimage = out_arr
+        else:
+            outputs.outimage = numpy.zeros_like(inputs.image, dtype=otherargs.np_dtype)
+
+    applier.apply(_applyFill, infiles, outfiles, otherargs, controls=aControls)
+
+    if calc_stats:
+        use_no_data = True
+        if in_no_date is None:
+            use_no_data = False
+            in_no_date = 0.0
+        pop_img_stats(
+            output_img,
+            use_no_data=use_no_data,
+            no_data_val=in_no_date,
+            calc_pyramids=True,
+        )
+
+
+def polyfill_nan_data_values(
+    input_img: str,
+    band_vals: List[float],
+    valid_msk_img: str,
+    valid_msk_val: int,
+    output_img: str,
+    polyorder: int = 3,
+    mean_abs_diff: float = None,
+    gdalformat: str = "KEA",
+    calc_stats: bool = True,
+):
+    """
+    This function fills missing data along (defined as nan values) the y-axis
+    (i.e., along the bands).
+
+
+    :param input_img: input image file.
+    :param valid_msk_img: an image file representing the valid data region
+    :param valid_msk_val: image pixel value in the mask for the valid data region
+    :param output_img: the output image file
+    :param polyorder: the order of the polynomial (Default: 3)
+    :param mean_abs_diff: Optional parameter to calculate the absolute mean difference
+                        between the predict values have the mean of the original
+                        pixel values. This threshold can be used to replace any
+                        predicted values which are > than the thresholds specified
+                        with the mean.
+    :param gdalformat: the output file format. (Default: KEA)
+    :param calc_stats: Boolean specifying whether to calculate pyramids and
+                       metadata stats (Default: True)
+
+    """
+    from rios import applier
+
+    try:
+        import tqdm
+
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    np_dtype = rsgislib.get_numpy_datatype(rsgislib.TYPE_32FLOAT)
+    in_no_date = get_img_no_data_value(input_img)
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    infiles.valid_msk = valid_msk_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.valid_msk_val = valid_msk_val
+    otherargs.polyorder = polyorder
+    otherargs.mean_abs_diff = mean_abs_diff
+    otherargs.band_vals = numpy.array(band_vals)
+    otherargs.in_no_date = in_no_date
+    otherargs.np_dtype = np_dtype
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyFill(info, inputs, outputs, otherargs):
+        if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(
+                -1, inputs.image.shape[0]
+            )
+
+            ID = numpy.arange(img_flat.shape[0])
+            n_feats = ID.shape[0]
+
+            ID = ID[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
+            img_flat = img_flat[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
+
+            img_flat_fill_arr = numpy.zeros(
+                [n_feats, inputs.image.shape[0]], dtype=otherargs.np_dtype
+            )
+            img_flat_fill_arr[...] = in_no_date
+            for pxl_idx in range(img_flat.shape[0]):
+                if numpy.isnan(img_flat[pxl_idx]).any():
+                    finite_msk = numpy.isfinite(img_flat[pxl_idx])
+                    x_vals = otherargs.band_vals[finite_msk]
+                    y_vals = img_flat[pxl_idx][finite_msk]
+                    poly_coefs = numpy.polyfit(x_vals, y_vals, deg=otherargs.polyorder)
+                    pred_vals = numpy.polyval(poly_coefs, otherargs.band_vals)
+                    if otherargs.mean_abs_diff is not None:
+                        pxl_mean = numpy.nanmean(img_flat[pxl_idx])
+                        pred_vals_diff = numpy.abs(pred_vals - pxl_mean)
+                        pred_vals[pred_vals_diff > otherargs.mean_abs_diff] = pxl_mean
+                    repl_idxs = numpy.arange(0, pred_vals.shape[0])[
+                        numpy.invert(finite_msk)
+                    ]
+                    img_flat[pxl_idx][repl_idxs] = pred_vals[repl_idxs]
+                    img_flat_fill_arr[ID[pxl_idx]] = pred_vals
+                else:
+                    img_flat_fill_arr[ID[pxl_idx]] = img_flat[pxl_idx]
+
+            out_arr = img_flat_fill_arr.reshape(
+                inputs.image.shape[1], inputs.image.shape[2], inputs.image.shape[0]
+            )
+            out_arr = numpy.moveaxis(out_arr, 2, 0)
+            outputs.outimage = out_arr
+        else:
+            outputs.outimage = numpy.zeros_like(inputs.image, dtype=otherargs.np_dtype)
+
+    applier.apply(_applyFill, infiles, outfiles, otherargs, controls=aControls)
+
+    if calc_stats:
+        use_no_data = True
+        if in_no_date is None:
+            use_no_data = False
+            in_no_date = 0.0
+        pop_img_stats(
+            output_img,
+            use_no_data=use_no_data,
+            no_data_val=in_no_date,
+            calc_pyramids=True,
+        )
