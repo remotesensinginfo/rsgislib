@@ -29,6 +29,9 @@ Pixel Training Data
 .. autofunction:: rsgislib.classification.get_class_info_dict
 .. autofunction:: rsgislib.classification.get_num_samples
 .. autofunction:: rsgislib.classification.plot_train_data
+.. autofunction:: rsgislib.classification.convert_cls_smpls_to_pandas_df
+.. autofunction:: rsgislib.classification.convert_mutli_cls_smpls_to_pandas_df
+
 
 Chips Training Data
 --------------------
