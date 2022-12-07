@@ -573,6 +573,7 @@ def add_unq_numeric_col(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
+    lut_json_file: str = None,
 ):
     """
     A function which adds a numeric column based off an existing column in
@@ -585,10 +586,12 @@ def add_unq_numeric_col(
     :param out_vec_file: Output vector file
     :param out_vec_lyr: output vector layer name.
     :param out_format: output file format (default GPKG).
+    :param lut_json_file: an optional output LUT file.
 
     """
     import geopandas
     import rsgislib.vectorutils
+    import rsgislib.tools.utils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
 
@@ -596,10 +599,15 @@ def add_unq_numeric_col(
     unq_vals = base_gpdf[unq_col].unique()
 
     base_gpdf[out_col] = numpy.zeros((base_gpdf.shape[0]), dtype=int)
+    lut = dict()
+    lut["id"] = dict()
+    lut["val"] = dict()
     num_unq_val = 1
     for unq_val in unq_vals:
         sel_rows = base_gpdf[unq_col] == unq_val
         base_gpdf.loc[sel_rows, out_col] = num_unq_val
+        lut["id"][num_unq_val] = unq_val
+        lut["val"][unq_val] = num_unq_val
         num_unq_val += 1
 
     if out_format == "GPKG":
@@ -607,12 +615,15 @@ def add_unq_numeric_col(
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
+    if lut_json_file is not None:
+        rsgislib.tools.utils.write_dict_to_json(lut, lut_json_file)
+
 
 def add_numeric_col_lut(
     vec_file: str,
     vec_lyr: str,
     ref_col: str,
-    val_lut: dict,
+    val_lut: Dict,
     out_col: str,
     out_vec_file: str,
     out_vec_lyr: str,
@@ -923,3 +934,328 @@ def find_replace_str_vec_lyr(
         base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def count_pt_intersects(
+    vec_in_file: str,
+    vec_in_lyr: str,
+    vec_pts_file: str,
+    vec_pts_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_count_col: str = "n_points",
+    tmp_col_name: str = "tmp_join_fid",
+):
+    """
+    A function which counts the number of points intersecting a set of polygons
+    adding the count to each polygon as a new column.
+
+    :param vec_in_file: the input polygons vector file path.
+    :param vec_in_lyr: the input polygons vector layer name
+    :param vec_pts_file: the points vector file path
+    :param vec_pts_lyr: the points vector layer name
+    :param out_vec_file: the output vector file path
+    :param out_vec_lyr: the output vector layer name
+    :param out_format: the output vector format (e.g., GPKG).
+    :param out_count_col: the output column name (default: n_points)
+    :param tmp_col_name: The name of a temporary column added to the input layer
+                         used to ensure there are no duplicated features in the output
+                         layer. The default name is: "tmp_sel_join_fid".
+
+    """
+    import geopandas
+
+    print("Read vector layers")
+    in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
+    pts_gpdf = geopandas.read_file(vec_pts_file, layer=vec_pts_lyr)
+
+    # Add column with unique id for each row.
+    col_names = in_gpdf.columns.values.tolist()
+    drop_col_names = []
+    if "index_left" in col_names:
+        drop_col_names.append("index_left")
+    if "index_right" in col_names:
+        drop_col_names.append("index_right")
+    if len(drop_col_names) > 0:
+        in_gpdf.drop(columns=drop_col_names, inplace=True)
+    in_gpdf[tmp_col_name] = numpy.arange(1, (in_gpdf.shape[0]) + 1, 1, dtype=int)
+
+    print("Perform Count")
+    in_count_gpdf = in_gpdf.merge(
+        in_gpdf.sjoin(pts_gpdf)
+        .groupby(tmp_col_name)
+        .size()
+        .rename(out_count_col)
+        .reset_index()
+    )
+    col_names = in_count_gpdf.columns.values.tolist()
+    drop_col_names = []
+    if "index_left" in col_names:
+        drop_col_names.append("index_left")
+    if "index_right" in col_names:
+        drop_col_names.append("index_right")
+    drop_col_names.append(tmp_col_name)
+    in_count_gpdf.drop(columns=drop_col_names, inplace=True)
+
+    print("Export")
+    if out_format == "GPKG":
+        in_count_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        in_count_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def calc_npts_in_radius(
+    vec_in_file: str,
+    vec_in_lyr: str,
+    radius: float,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_col_name: str = "n_pts_r",
+    n_cores=1,
+):
+    """
+    A function which calculate the number of points intersecting within a
+    radius of each point.
+
+    :param vec_in_file: Input vector file path (must be points geometry)
+    :param vec_in_lyr: Input vector layer (must be points geometry)
+    :param radius: the search radius
+    :param out_vec_file: Output vector file path
+    :param out_vec_lyr: Output vector layer
+    :param out_format: output vector format (Default: GPKG)
+    :param out_col_name: output column name (Default: n_pts_r)
+    :param n_cores: the number of cores to be used for the query. If -1 is
+                    passed then all available cores will be used.
+
+    """
+    import geopandas
+    import scipy.spatial
+
+    print("Read Vector")
+    in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
+
+    print("Build Index")
+    tree = scipy.spatial.KDTree(list(zip(in_gpdf.geometry.x, in_gpdf.geometry.y)))
+
+    print("Perform Query")
+    n_pts = tree.query_ball_point(
+        list(zip(in_gpdf.geometry.x, in_gpdf.geometry.y)),
+        r=radius,
+        p=2.0,
+        eps=0,
+        workers=n_cores,
+        return_sorted=None,
+        return_length=True,
+    )
+
+    in_gpdf[out_col_name] = n_pts - 1  # -1 as each point will have found itself.
+
+    print("Export")
+    if out_format == "GPKG":
+        in_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        in_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def annotate_vec_selection(
+    vec_in_file: str,
+    vec_in_lyr: str,
+    vec_sel_file: str,
+    vec_sel_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_col_name: str = "sel_feats",
+    out_format: str = "GPKG",
+    tmp_col_name: str = "tmp_sel_join_fid",
+):
+    """
+
+    A function which spatial selects features from the input vector layer which
+    intersects the selection vector layer populating a column within the output
+    vector layer specifying which features intersect.
+
+    :param vec_in_file: the input vector file path.
+    :param vec_in_lyr: the input vector layer name
+    :param vec_sel_file: the selection vector file path
+    :param vec_sel_lyr: the selection vector layer name
+    :param out_vec_file: the output vector file path
+    :param out_vec_lyr: the output vector layer name
+    :param out_col_name: the output boolean column specifying those features which
+                         intersect with the vec_sel_lyr layer.
+    :param out_format: the output vector format (e.g., GPKG).
+    :param tmp_col_name: The name of a temporary column added to the input layer
+                         used to ensure there are no duplicated features in the output
+                         layer. The default name is: "tmp_sel_join_fid".
+
+    """
+    import geopandas
+    import numpy
+
+    print("Read vector layers")
+    in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
+    sel_gpdf = geopandas.read_file(vec_sel_file, layer=vec_sel_lyr)
+
+    # Add column with unique id for each row.
+    in_gpdf[tmp_col_name] = numpy.arange(1, (in_gpdf.shape[0]) + 1, 1, dtype=int)
+
+    print("Perform Selection")
+    in_sel_gpdf = geopandas.sjoin(
+        in_gpdf, sel_gpdf, how="inner", predicate="intersects"
+    )
+    # Remove any duplicate features using the tmp column
+    in_sel_gpdf.drop_duplicates(subset=[tmp_col_name], inplace=True)
+    # Create new column with the selection populated as True.
+    in_gpdf[out_col_name] = in_gpdf[tmp_col_name].isin(in_sel_gpdf[tmp_col_name].values)
+    # Remove the tmp column
+    in_gpdf.drop(columns=[tmp_col_name], inplace=True)
+
+    print("Export")
+    if out_format == "GPKG":
+        in_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        in_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def perform_spatial_join(
+    vec_base_file: str,
+    vec_base_lyr: str,
+    vec_join_file: str,
+    vec_join_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    join_how: str = "inner",
+    join_op: str = "within",
+):
+    """
+    A function to perform a spatial join between two vector layers. This function
+    uses geopandas so this needs to be installed. You also need to have the rtree
+    package to generate the index used to perform the intersection.
+
+    For more information see: http://geopandas.org/mergingdata.html#spatial-joins
+
+    :param vec_base_file: the base vector file with the geometries which will
+                          be outputted.
+    :param vec_base_lyr: the layer name for the base vector.
+    :param vec_join_file: the vector with the attributes which will be joined to
+                          the base vector geometries.
+    :param vec_join_lyr: the layer name for the join vector.
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the layer name for the output vector.
+    :param out_format: The output vector file format (Default GPKG)
+    :param join_how: Specifies the type of join that will occur and which geometry
+                     is retained. The options are [left, right, inner]. The default
+                     is 'inner'
+    :param join_op: Defines whether or not to join the attributes of one object
+                    to another. The options are [intersects, within, contains]
+                    and default is 'within'
+
+    """
+    import geopandas
+
+    if join_how not in ["left", "right", "inner"]:
+        raise rsgislib.RSGISPyException("The join_how specified is not valid.")
+    if join_op not in ["intersects", "within", "contains"]:
+        raise rsgislib.RSGISPyException("The join_op specified is not valid.")
+
+    # Try importing rtree to provide useful error message as
+    # will be used in sjoin but if not present
+    # the error message is not very user friendly:
+    # AttributeError: 'NoneType' object has no attribute 'intersection'
+    try:
+        import rtree
+    except ImportError:
+        raise rsgislib.RSGISPyException(
+            "The rtree module was not available for "
+            "import this is required by geopandas to "
+            "perform a join."
+        )
+
+    base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
+    join_gpd_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
+
+    join_gpd_df = geopandas.sjoin(base_gpd_df, join_gpd_df, how=join_how, op=join_op)
+
+    if len(join_gpd_df) > 0:
+        if out_format == "GPKG":
+            join_gpd_df.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            join_gpd_df.to_file(out_vec_file, driver=out_format)
+
+
+def drop_vec_cols(
+    vec_file: str,
+    vec_lyr: str,
+    drop_cols: List[str],
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    chk_cols_present: bool = True,
+):
+    """
+    A function which allows vector columns to be removed from the layer.
+
+    param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param drop_cols: List of columns to remove from layer
+    :param out_vec_file: the output vector file
+    :param out_vec_lyr: the output vector layer
+    :param out_format: the output vector format (Default: GPKG)
+    :param chk_cols_present: boolean (default: True) to check that the columns to be
+                             removed are present and remove those from the list
+                             which are not present.
+
+    """
+    import geopandas
+
+    data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    if chk_cols_present:
+        drop_cols_chk = list()
+        for col in data_gpdf.columns:
+            if col in drop_cols:
+                drop_cols_chk.append(col)
+    else:
+        drop_cols_chk = drop_cols
+
+    if len(drop_cols_chk) > 0:
+        data_gpdf.drop(columns=drop_cols_chk, inplace=True)
+
+    if out_format == "GPKG":
+        data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def rename_vec_cols(
+    vec_file: str,
+    vec_lyr: str,
+    rname_cols_lut: Dict[str, str],
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which allows vector column to be renamed.
+
+    param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param rname_cols_lut: dict look up for the columns to be renamed.
+                          Format: {"orig_name": "new_name"}
+    :param out_vec_file: the output vector file
+    :param out_vec_lyr: the output vector layer
+    :param out_format: the output vector format (Default: GPKG)
+
+    """
+    import geopandas
+
+    data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    data_gpdf.rename(columns=rname_cols_lut, inplace=True)
+
+    if out_format == "GPKG":
+        data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gpdf.to_file(out_vec_file, driver=out_format)

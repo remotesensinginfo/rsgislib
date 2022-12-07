@@ -31,6 +31,19 @@ class RSGISPyResponseException(rsgislib.RSGISPyException):
         )
 
 
+def check_url_exists(url: str) -> bool:
+    """
+    A function which checks whether a url exists on a remote server (i.e., does
+    not return a 404 or similar error code).
+
+    :param url: the URL on the remote server.
+    :return: boolean, true is url exists
+
+    """
+    r = requests.head(url)
+    return r.status_code == requests.codes.ok
+
+
 def check_http_response(response: requests.Response, url: str) -> bool:
     """
     Check the HTTP response and raise an exception with appropriate error message

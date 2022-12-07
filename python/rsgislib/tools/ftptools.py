@@ -260,11 +260,8 @@ def create_file_listings_db(
 
 
 def filter_file_listings_db(
-        db_json: str,
-        filter_vals: List[str],
-        out_db_file: str,
-        filter_path=False
-        ):
+    db_json: str, filter_vals: List[str], out_db_file: str, filter_path=False
+):
     """
     A function which filters the database to find particular files of interest.
     A list of strings is provided and comparison will be done using the python
@@ -309,12 +306,12 @@ def filter_file_listings_db(
         if out_rcd:
             out_db_data.append(
                 {
-                    "ftp_url":    file_rcd["ftp_url"],
-                    "rmt_path":   file_rcd["rmt_path"],
-                    "lcl_path":   file_rcd["lcl_path"],
+                    "ftp_url": file_rcd["ftp_url"],
+                    "rmt_path": file_rcd["rmt_path"],
+                    "lcl_path": file_rcd["lcl_path"],
                     "downloaded": file_rcd["downloaded"],
-                    }
-                )
+                }
+            )
 
     if len(db_data) > 0:
         lst_out_db = pysondb.getDb(out_db_file)
@@ -581,5 +578,3 @@ def upload_ftp_file(
     except:
         return False
     return True
-
-

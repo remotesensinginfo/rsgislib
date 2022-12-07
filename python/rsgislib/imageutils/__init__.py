@@ -4300,3 +4300,318 @@ def mask_all_band_zero_vals(
         outputs.outimage[(inputs.image <= 0) & vld_msk] = otherargs.out_val
 
     applier.apply(_applyzeronodata, infiles, outfiles, otherargs, controls=aControls)
+
+
+def create_raster_tiles_bbox(
+    bbox: List[float],
+    tile_x_size: float,
+    tile_y_size: float,
+    out_img_res: float,
+    out_epsg: int,
+    out_tile_dir: str,
+    out_tile_name: str = "base_tile_{}",
+    out_img_ext: str = "kea",
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_8UINT,
+    out_img_pxl_val: float = 0,
+    out_img_n_bands: int = 1,
+):
+    """
+    A function which creates a set of raster tiles for a region defined by a
+    bbox.
+
+    :param bbox: the bounding box (xMin, xMax, yMin, yMax) for the whole
+                 region for which the tiles are generated.
+    :param tile_x_size: the size of the tiles in x axis in the units of the
+                        projection (e.g., metres or degrees)
+    :param tile_y_size: the size of the tiles in y axis in the units of the
+                        projection (e.g., metres or degrees)
+    :param out_img_res: the output image tile pixel resolution
+    :param out_epsg: the output projection (which needs to match the bbox).
+    :param out_tile_dir: the output directory path.
+    :param out_tile_name: the base name for the output image tiles - note must
+                          include {} which will be replace with the tile x and y
+                          numbering. (Default: "base_tile_{}")
+    :param out_img_ext: the output image file extension (Default: kea)
+    :param gdalformat: the output gdal image format (Default: KEA)
+    :param datatype: the output image data type (Default: rsgislib.TYPE_8UINT)
+    :param out_img_pxl_val: the output image pixel values (Default: 0)
+    :param out_img_n_bands: the number of output image bands (Default: 1)
+
+    """
+    import rsgislib.tools.projection
+
+    bbox_width = bbox[1] - bbox[0]
+    bbox_height = bbox[3] - bbox[2]
+
+    if bbox_width < 0:
+        raise rsgislib.RSGISPyException("The width of the bbox is negative")
+
+    if bbox_height < 0:
+        raise rsgislib.RSGISPyException("The height of the bbox is negative")
+
+    print(f"BBOX DIMS: {bbox_width} x {bbox_height}")
+
+    x_n_tiles = int(math.ceil(bbox_width / tile_x_size))
+    y_n_tiles = int(math.ceil(bbox_height / tile_y_size))
+    tot_n_tiles = x_n_tiles * y_n_tiles
+    print(f"Tiles: {x_n_tiles} x {y_n_tiles} = {tot_n_tiles}")
+
+    wkt_str = rsgislib.tools.projection.get_wkt_from_epsg_code(out_epsg)
+
+    n_tile = 0
+    for y in range(y_n_tiles):
+        y_top = bbox[3] - (tile_y_size * y)
+        y_bot = y_top - tile_y_size
+        for x in range(x_n_tiles):
+            x_lft = bbox[0] + (tile_x_size * x)
+            x_rht = x_lft + tile_x_size
+
+            tile_bbox = [x_lft, x_rht, y_bot, y_top]
+            print("{} of {}: {}".format(n_tile, tot_n_tiles, tile_bbox))
+            tile_unq_name = f"{x}_{y}"
+            out_tile_file_name = out_tile_name.format(tile_unq_name)
+            out_tile_img = os.path.join(
+                out_tile_dir, f"{out_tile_file_name}.{out_img_ext}"
+            )
+
+            create_blank_img_from_bbox(
+                tile_bbox,
+                wkt_str=wkt_str,
+                output_img=out_tile_img,
+                out_img_res=out_img_res,
+                out_img_pxl_val=out_img_pxl_val,
+                out_img_n_bands=out_img_n_bands,
+                gdalformat=gdalformat,
+                datatype=datatype,
+                snap_to_grid=False,
+            )
+            n_tile += 1
+
+
+def mask_outliners_data_values(
+    input_img: str,
+    valid_msk_img: str,
+    valid_msk_val: int,
+    output_img: str,
+    lower: int = 5,
+    upper: int = 95,
+    gdalformat: str = "KEA",
+    calc_stats: bool = True,
+):
+    """
+    This function masks outliners (assigning them to nan; output pixel type must
+    therefore be Float32). Outliners are defined using an upper and lower percentile.
+
+
+    :param input_img: input image file.
+    :param valid_msk_img: an image file representing the valid data region
+    :param valid_msk_val: image pixel value in the mask for the valid data region
+    :param output_img: the output image file
+    :param lower: the lower percentile threshold (value: 0-100)
+    :param upper: the upper percentile threshold (value: 0-100)
+    :param gdalformat: the output file format. (Default: KEA)
+    :param calc_stats: Boolean specifying whether to calculate pyramids and
+                       metadata stats (Default: True)
+
+    """
+    from rios import applier
+
+    try:
+        import tqdm
+
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    np_dtype = rsgislib.get_numpy_datatype(rsgislib.TYPE_32FLOAT)
+    in_no_date = get_img_no_data_value(input_img)
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    infiles.valid_msk = valid_msk_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.valid_msk_val = valid_msk_val
+    otherargs.lower = lower
+    otherargs.upper = upper
+    otherargs.in_no_date = in_no_date
+    otherargs.np_dtype = np_dtype
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyFill(info, inputs, outputs, otherargs):
+        if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(
+                -1, inputs.image.shape[0]
+            )
+
+            ID = numpy.arange(img_flat.shape[0])
+            n_feats = ID.shape[0]
+
+            ID = ID[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
+            img_flat = img_flat[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
+
+            img_flat_out_arr = numpy.zeros(
+                [n_feats, inputs.image.shape[0]], dtype=otherargs.np_dtype
+            )
+            img_flat_out_arr[...] = in_no_date
+            for pxl_idx in range(img_flat.shape[0]):
+                percentiles = numpy.nanpercentile(
+                    img_flat[pxl_idx], [otherargs.lower, otherargs.upper]
+                )
+                img_flat[pxl_idx][img_flat[pxl_idx] < percentiles[0]] = numpy.nan
+                img_flat[pxl_idx][img_flat[pxl_idx] > percentiles[1]] = numpy.nan
+                img_flat_out_arr[ID[pxl_idx]] = img_flat[pxl_idx]
+
+            out_arr = img_flat_out_arr.reshape(
+                inputs.image.shape[1], inputs.image.shape[2], inputs.image.shape[0]
+            )
+            out_arr = numpy.moveaxis(out_arr, 2, 0)
+            outputs.outimage = out_arr
+        else:
+            outputs.outimage = numpy.zeros_like(inputs.image, dtype=otherargs.np_dtype)
+
+    applier.apply(_applyFill, infiles, outfiles, otherargs, controls=aControls)
+
+    if calc_stats:
+        use_no_data = True
+        if in_no_date is None:
+            use_no_data = False
+            in_no_date = 0.0
+        pop_img_stats(
+            output_img,
+            use_no_data=use_no_data,
+            no_data_val=in_no_date,
+            calc_pyramids=True,
+        )
+
+
+def polyfill_nan_data_values(
+    input_img: str,
+    band_vals: List[float],
+    valid_msk_img: str,
+    valid_msk_val: int,
+    output_img: str,
+    polyorder: int = 3,
+    mean_abs_diff: float = None,
+    gdalformat: str = "KEA",
+    calc_stats: bool = True,
+):
+    """
+    This function fills missing data along (defined as nan values) the y-axis
+    (i.e., along the bands).
+
+
+    :param input_img: input image file.
+    :param valid_msk_img: an image file representing the valid data region
+    :param valid_msk_val: image pixel value in the mask for the valid data region
+    :param output_img: the output image file
+    :param polyorder: the order of the polynomial (Default: 3)
+    :param mean_abs_diff: Optional parameter to calculate the absolute mean difference
+                        between the predict values have the mean of the original
+                        pixel values. This threshold can be used to replace any
+                        predicted values which are > than the thresholds specified
+                        with the mean.
+    :param gdalformat: the output file format. (Default: KEA)
+    :param calc_stats: Boolean specifying whether to calculate pyramids and
+                       metadata stats (Default: True)
+
+    """
+    from rios import applier
+
+    try:
+        import tqdm
+
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    np_dtype = rsgislib.get_numpy_datatype(rsgislib.TYPE_32FLOAT)
+    in_no_date = get_img_no_data_value(input_img)
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    infiles.valid_msk = valid_msk_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.valid_msk_val = valid_msk_val
+    otherargs.polyorder = polyorder
+    otherargs.mean_abs_diff = mean_abs_diff
+    otherargs.band_vals = numpy.array(band_vals)
+    otherargs.in_no_date = in_no_date
+    otherargs.np_dtype = np_dtype
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyFill(info, inputs, outputs, otherargs):
+        if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(
+                -1, inputs.image.shape[0]
+            )
+
+            ID = numpy.arange(img_flat.shape[0])
+            n_feats = ID.shape[0]
+
+            ID = ID[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
+            img_flat = img_flat[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
+
+            img_flat_fill_arr = numpy.zeros(
+                [n_feats, inputs.image.shape[0]], dtype=otherargs.np_dtype
+            )
+            img_flat_fill_arr[...] = in_no_date
+            for pxl_idx in range(img_flat.shape[0]):
+                if numpy.isnan(img_flat[pxl_idx]).any():
+                    finite_msk = numpy.isfinite(img_flat[pxl_idx])
+                    if numpy.sum(finite_msk) > otherargs.polyorder:
+                        x_vals = otherargs.band_vals[finite_msk]
+                        y_vals = img_flat[pxl_idx][finite_msk]
+                        poly_coefs = numpy.polyfit(x_vals, y_vals, deg=otherargs.polyorder)
+                        pred_vals = numpy.polyval(poly_coefs, otherargs.band_vals)
+                        if otherargs.mean_abs_diff is not None:
+                            pxl_mean = numpy.nanmean(img_flat[pxl_idx])
+                            pred_vals_diff = numpy.abs(pred_vals - pxl_mean)
+                            pred_vals[pred_vals_diff > otherargs.mean_abs_diff] = pxl_mean
+                        repl_idxs = numpy.arange(0, pred_vals.shape[0])[
+                            numpy.invert(finite_msk)
+                        ]
+                        img_flat[pxl_idx][repl_idxs] = pred_vals[repl_idxs]
+                        img_flat_fill_arr[ID[pxl_idx]] = pred_vals
+                    else:
+                        img_flat_fill_arr[ID[pxl_idx]][...] = numpy.nan
+                else:
+                    img_flat_fill_arr[ID[pxl_idx]] = img_flat[pxl_idx]
+
+            out_arr = img_flat_fill_arr.reshape(
+                inputs.image.shape[1], inputs.image.shape[2], inputs.image.shape[0]
+            )
+            out_arr = numpy.moveaxis(out_arr, 2, 0)
+            outputs.outimage = out_arr
+        else:
+            outputs.outimage = numpy.zeros_like(inputs.image, dtype=otherargs.np_dtype)
+
+    applier.apply(_applyFill, infiles, outfiles, otherargs, controls=aControls)
+
+    if calc_stats:
+        use_no_data = True
+        if in_no_date is None:
+            use_no_data = False
+            in_no_date = 0.0
+        pop_img_stats(
+            output_img,
+            use_no_data=use_no_data,
+            no_data_val=in_no_date,
+            calc_pyramids=True,
+        )

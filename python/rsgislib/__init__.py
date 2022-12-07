@@ -125,6 +125,14 @@ Available thresholding methods:
     * THRES_METH_KURT_SKEW = 6
 
 
+Options for classification datasets:
+
+    * CLS_ALL_DATA = 0
+    * CLS_TRAIN_DATA = 1
+    * CLS_VALID_DATA = 2
+    * CLS_TEST_DATA = 3
+
+
 """
 from __future__ import print_function
 
@@ -231,6 +239,11 @@ THRES_METH_ISODATA = 3
 THRES_METH_CROSS_ENT = 4
 THRES_METH_LI = 5
 THRES_METH_KURT_SKEW = 6
+
+CLS_ALL_DATA = 0
+CLS_TRAIN_DATA = 1
+CLS_VALID_DATA = 2
+CLS_TEST_DATA = 3
 
 
 def get_install_base_path() -> pathlib.PurePath:

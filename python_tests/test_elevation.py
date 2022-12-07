@@ -29,7 +29,7 @@ def test_slope(tmp_path):
     output_img = os.path.join(tmp_path, "out_slope.kea")
     out_angle_unit = "degrees"
     gdalformat = "KEA"
-    rsgislib.elevation.slope(input_img, output_img, out_angle_unit, gdalformat)
+    rsgislib.elevation.slope(input_img, output_img, gdalformat, out_angle_unit)
 
     slope_ref_img = os.path.join(DATA_DIR, "SRTM_aber_slope_deg.kea")
     img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(output_img, slope_ref_img)
@@ -46,7 +46,7 @@ def test_slope_pxl_res_img(tmp_path):
     out_angle_unit = "degrees"
     gdalformat = "KEA"
     rsgislib.elevation.slope_pxl_res_img(
-        in_dem_img, in_pxl_res_img, output_img, out_angle_unit, gdalformat
+        in_dem_img, in_pxl_res_img, output_img, gdalformat, out_angle_unit
     )
 
     slope_ref_img = os.path.join(DATA_DIR, "AberSRTM_4326_slope.kea")

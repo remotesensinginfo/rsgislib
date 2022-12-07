@@ -843,66 +843,6 @@ def test_check_validate_geometries(tmp_path):
     assert os.path.exists(out_vec_file)
 
 
-@pytest.mark.skipif(
-    (GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL),
-    reason="geopandas or rtree dependencies not available",
-)
-def test_perform_spatial_join_empty(tmp_path):
-    import rsgislib.vectorutils
-
-    vec_base_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
-    vec_base_lyr = "aber_osgb_multi_polys"
-
-    vec_join_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
-    vec_join_lyr = "sample_pts"
-
-    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
-    out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.perform_spatial_join(
-        vec_base_file,
-        vec_base_lyr,
-        vec_join_file,
-        vec_join_lyr,
-        out_vec_file,
-        out_vec_lyr,
-        out_format="GPKG",
-        join_how="inner",
-        join_op="within",
-    )
-
-    assert not os.path.exists(out_vec_file)
-
-
-@pytest.mark.skipif(
-    (GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL),
-    reason="geopandas or rtree dependencies not available",
-)
-def test_perform_spatial_join(tmp_path):
-    import rsgislib.vectorutils
-
-    vec_join_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
-    vec_join_lyr = "cls_grass_smpls"
-
-    vec_base_file = os.path.join(REGRESS_DATA_DIR, "sample_pts.geojson")
-    vec_base_lyr = "sample_pts"
-
-    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
-    out_vec_lyr = "out_vec"
-    rsgislib.vectorutils.perform_spatial_join(
-        vec_base_file,
-        vec_base_lyr,
-        vec_join_file,
-        vec_join_lyr,
-        out_vec_file,
-        out_vec_lyr,
-        out_format="GPKG",
-        join_how="inner",
-        join_op="within",
-    )
-
-    assert os.path.exists(out_vec_file)
-
-
 def test_does_vmsk_img_intersect(tmp_path):
     import rsgislib.vectorutils
 

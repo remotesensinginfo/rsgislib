@@ -293,7 +293,7 @@ endif(MSVC)
 
 include_directories(${GDAL_INCLUDE_DIR})
 if (MSVC)
-  set(GDAL_LIBRARIES -LIBPATH:${GDAL_LIB_PATH} gdal_i.lib)
+  set(GDAL_LIBRARIES -LIBPATH:${GDAL_LIB_PATH} gdal.lib)
 else()
   set(GDAL_LIBRARIES -L${GDAL_LIB_PATH} -lgdal)
 endif(MSVC)

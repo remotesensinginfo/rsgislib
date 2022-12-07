@@ -1,1 +1,5 @@
-docker/Dockerfile
+python_tests
+build
+.git
+contrib/ubuntu/Dockerfile
+contrib/ubuntu/build.sh

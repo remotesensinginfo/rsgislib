@@ -19,12 +19,22 @@ Add Columns
 .. autofunction:: rsgislib.vectorattrs.add_string_col
 .. autofunction:: rsgislib.vectorattrs.create_name_col
 
+Column Utilities
+------------------
+.. autofunction:: rsgislib.vectorattrs.drop_vec_cols
+.. autofunction:: rsgislib.vectorattrs.rename_vec_cols
+
+Joins
+--------
+.. autofunction:: rsgislib.vectorattrs.perform_spatial_join
+
 
 Calculate Column Values
 --------------------------
 .. autofunction:: rsgislib.vectorattrs.pop_bbox_cols
 .. autofunction:: rsgislib.vectorattrs.add_geom_bbox_cols
 .. autofunction:: rsgislib.vectorattrs.add_unq_numeric_col
+.. autofunction:: rsgislib.vectorattrs.calc_npts_in_radius
 
 Get Column Summaries
 ----------------------
@@ -37,6 +47,11 @@ Sort By Attributes
 Change Attribute Values
 ------------------------
 .. autofunction:: rsgislib.vectorattrs.find_replace_str_vec_lyr
+
+Geometry Intersections
+-----------------------
+.. autofunction:: rsgislib.vectorattrs.count_pt_intersects
+.. autofunction:: rsgislib.vectorattrs.annotate_vec_selection
 
 
 * :ref:`genindex`

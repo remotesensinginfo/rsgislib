@@ -80,6 +80,7 @@ Tile
 -------
 .. autofunction:: rsgislib.imageutils.create_tiles
 .. autofunction:: rsgislib.imageutils.create_tiles_multi_core
+.. autofunction:: rsgislib.imageutils.create_raster_tiles_bbox
 .. autofunction:: rsgislib.imageutils.tilingutils.create_min_data_tiles
 .. autofunction:: rsgislib.imageutils.tilingutils.create_tiles_from_masks
 .. autofunction:: rsgislib.imageutils.tilingutils.create_tile_mask_images_from_shp
@@ -228,11 +229,18 @@ Image I/O
 .. autofunction:: rsgislib.imageutils.generate_random_pxl_vals_img
 
 
+Pixel Smoothing / Filling
+--------------------------
+.. autofunction:: rsgislib.imageutils.spectral_smoothing
+.. autofunction:: rsgislib.imageutils.mask_outliners_data_values
+.. autofunction:: rsgislib.imageutils.polyfill_nan_data_values
+
+
 Other
 ------
 .. autofunction:: rsgislib.imageutils.gen_sampling_grid
 .. autofunction:: rsgislib.imageutils.whiten_image
-.. autofunction:: rsgislib.imageutils.spectral_smoothing
+
 
 
 Get Image Metadata

@@ -33,6 +33,15 @@ Compute New BBOX
 .. autofunction:: rsgislib.tools.geometrytools.find_extent_on_whole_num_grid
 .. autofunction:: rsgislib.tools.geometrytools.get_bbox_grid
 
+Compute Points
+----------------
+.. autofunction:: rsgislib.tools.geometrytools.get_bbox_centre_pt
+
+Representation
+---------------
+.. autofunction:: rsgislib.tools.geometrytools.get_bbox_geojson_poly
+
+
 
 * :ref:`genindex`
 * :ref:`modindex`

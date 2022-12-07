@@ -6,10 +6,16 @@ Vector Attributes
 --------------------
 .. autofunction:: rsgislib.vectorutils.vector_maths
 .. autofunction:: rsgislib.vectorutils.copy_rat_cols_to_vector_lyr
-.. autofunction:: rsgislib.vectorutils.perform_spatial_join
 .. autofunction:: rsgislib.vectorutils.match_closest_vec_pts
 .. autoclass:: rsgislib.vectorutils.VecColVar
     :members:
+
+Vector Projections
+----------------------
+.. autofunction:: rsgislib.vectorutils.get_proj_wkt_from_vec
+.. autofunction:: rsgislib.vectorutils.get_proj_epsg_from_vec
+.. autofunction:: rsgislib.vectorutils.redefine_vec_lyr_proj
+.. autofunction:: rsgislib.vectorutils.reproj_vec_lyr_gp
 
 
 Create Vectors
@@ -26,7 +32,8 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.create_lines_of_points
 .. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
 .. autofunction:: rsgislib.vectorutils.create_vec_for_image
-
+.. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_bbox
+.. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_polys
 
 Vector I/O
 ----------------
@@ -62,6 +69,7 @@ Merge Vectors
 
 Vector Select / Subset
 -----------------------
+.. autofunction:: rsgislib.vectorutils.spatial_select_gp
 .. autofunction:: rsgislib.vectorutils.get_att_lst_select_feats
 .. autofunction:: rsgislib.vectorutils.get_att_lst_select_feats_lyr_objs
 .. autofunction:: rsgislib.vectorutils.get_att_lst_select_bbox_feats
@@ -97,8 +105,6 @@ Vector / Raster Tests
 
 Vector Info
 -------------
-.. autofunction:: rsgislib.vectorutils.get_proj_wkt_from_vec
-.. autofunction:: rsgislib.vectorutils.get_proj_epsg_from_vec
 .. autofunction:: rsgislib.vectorutils.get_vec_feat_count
 .. autofunction:: rsgislib.vectorutils.count_feats_per_att_val
 .. autofunction:: rsgislib.vectorutils.get_vec_lyrs_lst

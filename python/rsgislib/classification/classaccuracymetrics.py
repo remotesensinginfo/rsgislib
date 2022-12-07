@@ -346,7 +346,7 @@ def calc_acc_metrics_vecsamples(
         img_hist_col = "Histogram"
         out_json_file = "Sonoma_county_class_acc_metrics.json"
 
-        classaccuracymetrics.calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr,
+        classaccuracymetrics.calc_acc_metrics_vecsamples(vec_in_file, vec_in_lyr,
                                                          ref_col, cls_col, cls_img,
                                                          img_cls_name_col, img_hist_col,
                                                          out_json_file)
@@ -1282,6 +1282,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
     conf_inter: int = 95,
     conf_thres: float = 0.05,
     out_plot_file: str = None,
+    out_stats_file: str = None,
     sample_frac: float = 0.2,
     sample_n_smps: int = None,
     bootstrap_n: int = 1000,
@@ -1314,6 +1315,9 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
                           (default) then no plot will be produced. Otherwise, a file
                           path and name. File format can be PNG or PDF. Use file
                           extension of the output file to specify.
+    :param out_stats_file: Optionally, output a JSON file will all the stats for
+                           each set which can be used to do your own analysis
+                           of the results of the sets.
     :param sample_frac: The fraction of the whole dataset selected for each
                         bootstrap iteration. If sample_n_smps is not None.
     :param sample_n_smps: Rather than a fraction of the dataset the number of
@@ -1353,6 +1357,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
     i = 0
     tmp_vec_files = list()
     vecs_dict = list()
+    stats_info = dict()
     for vec_file, vec_lyr in zip(vec_files, vec_lyrs):
         vecs_dict.append({"file": vec_file, "layer": vec_lyr})
         if first:
@@ -1393,7 +1398,9 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
         f1_scr_intervals_rgn.append(inter_rng)
         f1_scr_intervals_min.append(intervals[0])
         f1_scr_intervals_max.append(intervals[1])
-        n_pts.append(rsgislib.vectorutils.get_vec_feat_count(c_vec_file, c_vec_lyr))
+        lcl_n_pts = rsgislib.vectorutils.get_vec_feat_count(c_vec_file, c_vec_lyr)
+        n_pts.append(lcl_n_pts)
+        stats_info[lcl_n_pts] = calc_metrics
 
         if (inter_rng < conf_thres) and (not conf_thres_met):
             conf_thres_met = True
@@ -1404,6 +1411,9 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
     for tmp_vec_file in tmp_vec_files:
         if os.path.exists(tmp_vec_file):
             rsgislib.vectorutils.delete_vector_file(tmp_vec_file)
+
+    if out_stats_file is not None:
+        rsgislib.tools.utils.write_dict_to_json(stats_info, out_stats_file)
 
     if out_plot_file is not None:
         import matplotlib.pyplot as plt

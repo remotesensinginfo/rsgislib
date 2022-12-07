@@ -43,7 +43,7 @@ static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args, PyObject *k
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("unit"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutUnit;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:slope", kwlist, &pszInputImage, &pszOutputFile, &pszOutUnit, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:slope", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat, &pszOutUnit))
     {
         return nullptr;
     }
@@ -79,10 +79,10 @@ static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args, PyObject *k
 static PyObject *Elevation_calcSlopePxlResImg(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_pxl_res_img"),
-                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("unit"),
-                             RSGIS_PY_C_TEXT("gdalformat"), nullptr};
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("unit"), nullptr};
     const char *pszInDEMImage, *pszInPxlResImage, *pszOutputFile, *pszGDALFormat, *pszOutUnit;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssss:slope_pxl_res_img", kwlist, &pszInDEMImage, &pszInPxlResImage, &pszOutputFile, &pszOutUnit, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssss:slope_pxl_res_img", kwlist, &pszInDEMImage, &pszInPxlResImage, &pszOutputFile, &pszGDALFormat, &pszOutUnit))
     {
         return nullptr;
     }
@@ -375,7 +375,7 @@ static PyMethodDef ElevationMethods[] = {
 ":param unit: is a string specifying the output unit ('degrees' or 'radians').\n"},
 
 {"slope_pxl_res_img", (PyCFunction)Elevation_calcSlopePxlResImg, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.elevation.slope_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, unit, gdalformat)\n"
+"rsgislib.elevation.slope_pxl_res_img(in_dem_img, in_pxl_res_img, output_img, gdalformat, unit)\n"
 "Calculates a slope layer given an input elevation model and external pixel \n"
 "resolution image, which allows the slope to be calculated for images in \n"
 "projections (e.g., EPSG:4326) which do not use the same units as the \n"

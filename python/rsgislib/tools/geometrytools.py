@@ -3,7 +3,7 @@
 The tools.geometrytool module contains functions for manipulating and moving files around.
 """
 
-from typing import List
+from typing import List, Dict
 import math
 from osgeo import ogr
 from osgeo import osr
@@ -502,6 +502,40 @@ def get_bbox_grid(bbox: List[float], x_size: int, y_size: int) -> List[List[floa
             bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
 
     return bboxs
+
+
+def get_bbox_geojson_poly(bbox: List) -> Dict:
+    """
+    Get the bbox (xMin, xMax, yMin, yMax) represented as a GeoJSON polygon
+    using dict and list.
+
+    :param bbox: (xMin, xMax, yMin, yMax)
+    :return: a dict with the geojson polygon representation of the bbox.
+
+    """
+    bbox_poly = dict()
+    bbox_poly["coordinates"] = list()
+    bbox_poly["coordinates"].append([])
+    bbox_poly["coordinates"][0].append([bbox[0], bbox[3]])  # TL
+    bbox_poly["coordinates"][0].append([bbox[1], bbox[3]])  # TR
+    bbox_poly["coordinates"][0].append([bbox[1], bbox[2]])  # BR
+    bbox_poly["coordinates"][0].append([bbox[0], bbox[2]])  # BL
+    bbox_poly["coordinates"][0].append([bbox[0], bbox[3]])  # TL
+    bbox_poly["type"] = "Polygon"
+
+    return bbox_poly
+
+
+def get_bbox_centre_pt(bbox: List) -> List:
+    """
+    Function which returns the centre point of a bbox (xMin, xMax, yMin, yMax)
+
+    :param bbox: the bbox (xMin, xMax, yMin, yMax)
+    :return: the centre point [xPt, yPt]
+    """
+    x_pt = bbox[0] + (bbox[1] - bbox[0]) / 2
+    y_pt = bbox[2] + (bbox[3] - bbox[2]) / 2
+    return [x_pt, y_pt]
 
 
 def reproj_point(
