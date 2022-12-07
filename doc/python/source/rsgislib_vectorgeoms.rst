@@ -25,13 +25,19 @@ Calculate New Geometries
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_difference
 .. autofunction:: rsgislib.vectorgeoms.clip_vec_lyr
 .. autofunction:: rsgislib.vectorgeoms.buffer_vec_layer_gp
+.. autofunction:: rsgislib.vectorgeoms.split_vec_by_grid
 
 Edit Geometries
 -----------------
 .. autofunction:: rsgislib.vectorgeoms.simplify_geometries
 .. autofunction:: rsgislib.vectorgeoms.delete_polygon_holes
-.. autofunction:: rsgislib.vectorgeoms.remove_polygon_area
 .. autofunction:: rsgislib.vectorgeoms.shiftxy_vec_lyr
+
+
+Remove Geometries
+-------------------
+.. autofunction:: rsgislib.vectorgeoms.rm_polys_area
+
 
 Geometry Tests
 ----------------

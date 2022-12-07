@@ -2070,108 +2070,6 @@ def get_poly_hole_area(vec_file: str, vec_lyr: str):
     return hole_areas
 
 
-def remove_polygon_area(
-    vec_file: str,
-    vec_lyr: str,
-    out_format: str,
-    out_vec_file: str,
-    out_vec_lyr: str,
-    area_thres: float,
-    del_exist_vec: bool = False,
-):
-    """
-    Delete polygons with an area below a defined threshold.
-
-    :param vec_file: input vector file
-    :param vec_lyr: input vector layer within the input file.
-    :param out_format: the format driver for the output vector
-                       file (e.g., GPKG, ESRI Shapefile).
-    :param out_vec_file: output file path for the vector.
-    :param out_vec_lyr: output vector layer name.
-    :param area_thres: threshold below which polygons are removed.
-    :param del_exist_vec: remove output file if it exists.
-    """
-    import tqdm
-
-    if os.path.exists(out_vec_file):
-        if del_exist_vec:
-            rsgislib.vectorutils.delete_vector_file(out_vec_file)
-        else:
-            raise rsgislib.RSGISPyException(
-                "The output vector file ({}) already exists, "
-                "remove it and re-run.".format(out_vec_file)
-            )
-
-    vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
-    if vecDS is None:
-        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
-
-    vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
-    if vec_lyr_obj is None:
-        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
-    lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
-    geom_type = vec_lyr_obj.GetGeomType()
-
-    out_driver = ogr.GetDriverByName(out_format)
-    result_ds = out_driver.CreateDataSource(out_vec_file)
-    if result_ds is None:
-        raise rsgislib.RSGISPyException("Could not open '{}'".format(out_vec_file))
-
-    result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=geom_type)
-    if result_lyr is None:
-        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
-
-    featDefn = result_lyr.GetLayerDefn()
-
-    openTransaction = False
-    vec_lyr_obj.ResetReading()
-    n_feats = vec_lyr_obj.GetFeatureCount(True)
-    counter = 0
-    pbar = tqdm.tqdm(total=n_feats)
-    vec_lyr_obj.ResetReading()
-    feat = vec_lyr_obj.GetNextFeature()
-    while feat is not None:
-        if not openTransaction:
-            result_lyr.StartTransaction()
-            openTransaction = True
-
-        geom_ref = feat.GetGeometryRef()
-        if geom_ref.GetGeometryName().lower() == "multipolygon":
-            out_geom = ogr.Geometry(ogr.wkbMultiPolygon)
-            n_geoms = 0
-            for i in range(0, geom_ref.GetGeometryCount()):
-                g = geom_ref.GetGeometryRef(i)
-                if g.Area() > area_thres:
-                    out_geom.AddGeometry(g)
-                    n_geoms += 1
-            if n_geoms > 0:
-                outFeat = ogr.Feature(featDefn)
-                outFeat.SetGeometry(out_geom)
-                result_lyr.CreateFeature(outFeat)
-        elif geom_ref.GetGeometryName().lower() == "polygon":
-            if geom_ref.Area() > area_thres:
-                outFeat = ogr.Feature(featDefn)
-                outFeat.SetGeometry(geom_ref)
-                result_lyr.CreateFeature(outFeat)
-
-        if ((counter % 20000) == 0) and openTransaction:
-            result_lyr.CommitTransaction()
-            openTransaction = False
-
-        feat = vec_lyr_obj.GetNextFeature()
-        counter = counter + 1
-        pbar.update(1)
-
-    if openTransaction:
-        result_lyr.CommitTransaction()
-        openTransaction = False
-    result_lyr.SyncToDisk()
-    pbar.close()
-
-    vecDS = None
-    result_ds = None
-
-
 def vec_lyr_intersection(
     vec_file: str,
     vec_lyr: str,
@@ -3193,3 +3091,109 @@ def buffer_vec_layer_gp(
         data_buf_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_buf_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def split_vec_by_grid(
+    vec_file: str,
+    vec_lyr: str,
+    x_grid_size: float,
+    y_grid_size: float,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which splits an inputted vector using a regular grid across the
+    whole area - note this function internally generates a geopandas dataframe
+    with a grid covering the whole area so for a set of sparse features covering
+    a large area with a small grid size this function will be pretty inefficient.
+
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param x_grid_size: grid size in x-axis. Unit is dependent on projection.
+    :param y_grid_size: grid size in x-axis. Unit is dependent on projection.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer
+    :param out_format: Output vector format.
+
+    """
+    import geopandas
+    from shapely.geometry import Polygon
+    import numpy
+
+    in_vec_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    print("Create Grid")
+    xmin, ymin, xmax, ymax = in_vec_gdf.total_bounds
+
+    cols = list(numpy.arange(xmin, xmax + x_grid_size, x_grid_size))
+    rows = list(numpy.arange(ymin, ymax + y_grid_size, y_grid_size))
+
+    polygons = []
+    for x in cols[:-1]:
+        for y in rows[:-1]:
+            polygons.append(
+                Polygon(
+                    [
+                        (x, y),
+                        (x + x_grid_size, y),
+                        (x + x_grid_size, y + y_grid_size),
+                        (x, y + y_grid_size),
+                    ]
+                )
+            )
+
+    grid_gdf = geopandas.GeoDataFrame({"geometry": polygons})
+    grid_gdf = grid_gdf.set_crs(in_vec_gdf.crs, allow_override=True)
+
+    print("Perform Intersection")
+    vec_split_gdf = in_vec_gdf.overlay(grid_gdf, how="intersection")
+    grid_gdf = None
+
+    print("Export")
+    if out_format == "GPKG":
+        vec_split_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        vec_split_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def rm_polys_area(
+    vec_file: str,
+    vec_lyr: str,
+    area_thres: float,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    less_than: bool = True,
+):
+    """
+    A function which removes polygons with a size less than or greater
+    than a defined threshold.
+
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param area_thres: the area threshold used to remove features
+    :param out_vec_file: the output vector file
+    :param out_vec_lyr: the output vector layer
+    :param out_format: the output vector format
+    :param less_than: boolean specifying whether threshold is less than or greater than.
+                      Default: True (i.e., less than).
+
+    """
+    import geopandas
+
+    print("Read Vector")
+    in_vec_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    print("Make Selection")
+    if less_than:
+        area_msk = in_vec_gdf.area < area_thres
+    else:
+        area_msk = in_vec_gdf.area > area_thres
+    vec_sel_gdf = in_vec_gdf.loc[area_msk]
+
+    print("Export")
+    if out_format == "GPKG":
+        vec_sel_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        vec_sel_gdf.to_file(out_vec_file, driver=out_format)
