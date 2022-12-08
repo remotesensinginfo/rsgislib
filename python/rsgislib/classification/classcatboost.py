@@ -8,11 +8,9 @@ import h5py
 import numpy
 from sklearn.metrics import accuracy_score
 
-from osgeo import gdal
-
 from rios import applier
 from rios import cuiprogress
-from rios import rat
+#from rios import rat
 
 HAVE_CATBOOST = True
 try:
@@ -21,7 +19,7 @@ except ImportError:
     HAVE_CATBOOST = False
 
 
-def get_catboost_mdl(mdl_file: str = None, mdl_format:str="json"):
+def get_catboost_mdl(mdl_file: str = None, mdl_format: str = "json"):
     """
     A function which creates a default catboost classifier and optionally
     loads an existing model is available.
@@ -166,24 +164,25 @@ def apply_catboost_binary_classifier(
     """
     This function applies a trained binary (i.e., two classes) catboost model.
     The function train_catboost_binary_classifier can be used to train such as model.
-    The output image will contain the probability of membership to the class of
-    interest. You will need to threshold this image to get a final hard classification.
-    Alternative, a hard class output image and threshold can be applied to this image.
 
-    :param mdl_cls_obj: a trained xgboost binary model which can be loaded with lgb.Booster(model_file=model_file).
-    :param in_msk_img: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                    valid data regions (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
-                       Can be used to create a heirachical classification.
-    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                        rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) to identify which images and bands are to
-                        be used for the classification so it adheres to the training data.
-    :param out_prob_img: output image file with the classification probabilities - this image is scaled by
-                       multiplying by 10000.
-    :param gdalformat: is the output image format - all GDAL supported formats are supported.
-    :param out_class_img: Optional output image which will contain the hard classification, defined with a threshold on the
-                        probability image.
-    :param class_thres: The threshold used to define the hard classification. Default is 5000 (i.e., probability of 0.5).
+
+    :param mdl_cls_obj: a trained catboost binary model. Can be loaded from disk using
+                        the get_catboost_mdl function.
+    :param in_msk_img: is an image file providing a mask to specify where should
+                       be classified. Simplest mask is all the valid data regions
+                       (rsgislib.imageutils.gen_valid_mask)
+    :param img_mask_val: the pixel value within the in_msk_img to limit the region
+                         to which the classification is applied. Can be used to
+                         create a hierarchical classification.
+    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects
+                          (also used within
+                          rsgislib.zonalstats.extract_zone_img_band_values_to_hdf)
+                          to identify which images and bands are to be used for the
+                          classification so it adheres to the training data.
+    :param out_class_img: output image file with the hard classification output.
+    :param gdalformat: is the output image format (default: KEA)
+    :param out_prob_img: Optional output image which contains the probabilities
+                         for the two classes.
 
     """
     if not HAVE_CATBOOST:
@@ -192,7 +191,10 @@ def apply_catboost_binary_classifier(
     def _applyCatBClassifier(info, inputs, outputs, otherargs):
         out_class_vals = numpy.zeros_like(inputs.img_mask, dtype=numpy.uint16)
         if otherargs.out_probs:
-            out_class_probs = numpy.zeros((2, inputs.img_mask.shape[1], inputs.img_mask.shape[2]), dtype=numpy.float32)
+            out_class_probs = numpy.zeros(
+                (2, inputs.img_mask.shape[1], inputs.img_mask.shape[2]),
+                dtype=numpy.float32,
+            )
         if numpy.any(inputs.img_mask == otherargs.msk_val):
             out_class_vals = out_class_vals.flatten()
             if otherargs.out_probs:
@@ -233,7 +235,6 @@ def apply_catboost_binary_classifier(
                         inputs.img_mask.shape[2],
                     )
                 )
-
 
         outputs.out_image = out_class_vals
         if otherargs.out_probs:
