@@ -569,7 +569,7 @@ def test_get_poly_hole_area():
     assert (len(areas) == 1) and (abs(areas[0] - 524701) < 1)
 
 
-def test_remove_polygon_area(tmp_path):
+def test_rm_polys_area_lessthan(tmp_path):
     import rsgislib.vectorgeoms
 
     vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
@@ -578,14 +578,36 @@ def test_remove_polygon_area(tmp_path):
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
-    rsgislib.vectorgeoms.remove_polygon_area(
+    rsgislib.vectorgeoms.rm_polys_area(
         vec_file,
         vec_lyr,
-        "GPKG",
-        out_vec_file,
-        out_vec_lyr,
         area_thres=10000,
-        del_exist_vec=False,
+        out_vec_file=out_vec_file,
+        out_vec_lyr=out_vec_lyr,
+        out_format="GPKG",
+        less_than=True,
+    )
+
+    assert os.path.exists(out_vec_file)
+
+
+def test_rm_polys_area_greatthan(tmp_path):
+    import rsgislib.vectorgeoms
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_lyr = "aber_osgb_multi_polys"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorgeoms.rm_polys_area(
+        vec_file,
+        vec_lyr,
+        area_thres=10000,
+        out_vec_file=out_vec_file,
+        out_vec_lyr=out_vec_lyr,
+        out_format="GPKG",
+        less_than=False,
     )
 
     assert os.path.exists(out_vec_file)
