@@ -11,6 +11,7 @@ The classification functions are available within a number of sub-modules for in
    rsgislib_classification_classsklearn
    rsgislib_classification_classlightgbm
    rsgislib_classification_classxgboost
+   rsgislib_classification_classcatboost
    rsgislib_classification_classkeraspxl
    rsgislib_classification_classkeraschips
    rsgislib_classification_classratutils
