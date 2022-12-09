@@ -946,10 +946,15 @@ def count_pt_intersects(
     out_format: str = "GPKG",
     out_count_col: str = "n_points",
     tmp_col_name: str = "tmp_join_fid",
+    vec_in_epsg: int = None,
+    vec_pts_epsg: int = None,
 ):
     """
     A function which counts the number of points intersecting a set of polygons
     adding the count to each polygon as a new column.
+
+    Note, defining epsg codes for the datasets does not reproject the datasets
+    but just makes sure that correct projection is being used.
 
     :param vec_in_file: the input polygons vector file path.
     :param vec_in_lyr: the input polygons vector layer name
@@ -962,6 +967,9 @@ def count_pt_intersects(
     :param tmp_col_name: The name of a temporary column added to the input layer
                          used to ensure there are no duplicated features in the output
                          layer. The default name is: "tmp_sel_join_fid".
+    :param vec_in_epsg: Optionally provide the epsg code for the input vector layer.
+    :param vec_pts_epsg: Optionally provide the epsg code for the selection
+                         vector layer.
 
     """
     import geopandas
@@ -969,6 +977,11 @@ def count_pt_intersects(
     print("Read vector layers")
     in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
     pts_gpdf = geopandas.read_file(vec_pts_file, layer=vec_pts_lyr)
+
+    if vec_in_epsg is not None:
+        in_gpdf = in_gpdf.set_crs(epsg=vec_in_epsg, allow_override=True)
+    if vec_pts_epsg is not None:
+        pts_gpdf = pts_gpdf.set_crs(epsg=vec_pts_epsg, allow_override=True)
 
     # Add column with unique id for each row.
     col_names = in_gpdf.columns.values.tolist()
@@ -1069,12 +1082,17 @@ def annotate_vec_selection(
     out_col_name: str = "sel_feats",
     out_format: str = "GPKG",
     tmp_col_name: str = "tmp_sel_join_fid",
+    vec_in_epsg: int = None,
+    vec_sel_epsg: int = None,
 ):
     """
 
     A function which spatial selects features from the input vector layer which
     intersects the selection vector layer populating a column within the output
     vector layer specifying which features intersect.
+
+    Note, defining epsg codes for the datasets does not reproject the datasets
+    but just makes sure that correct projection is being used.
 
     :param vec_in_file: the input vector file path.
     :param vec_in_lyr: the input vector layer name
@@ -1088,6 +1106,9 @@ def annotate_vec_selection(
     :param tmp_col_name: The name of a temporary column added to the input layer
                          used to ensure there are no duplicated features in the output
                          layer. The default name is: "tmp_sel_join_fid".
+    :param vec_in_epsg: Optionally provide the epsg code for the input vector layer.
+    :param vec_sel_epsg: Optionally provide the epsg code for the selection
+                         vector layer.
 
     """
     import geopandas
@@ -1096,6 +1117,11 @@ def annotate_vec_selection(
     print("Read vector layers")
     in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
     sel_gpdf = geopandas.read_file(vec_sel_file, layer=vec_sel_lyr)
+
+    if vec_in_epsg is not None:
+        in_gpdf = in_gpdf.set_crs(epsg=vec_in_epsg, allow_override=True)
+    if vec_sel_epsg is not None:
+        sel_gpdf = sel_gpdf.set_crs(epsg=vec_sel_epsg, allow_override=True)
 
     # Add column with unique id for each row.
     in_gpdf[tmp_col_name] = numpy.arange(1, (in_gpdf.shape[0]) + 1, 1, dtype=int)
@@ -1118,6 +1144,7 @@ def annotate_vec_selection(
         in_gpdf.to_file(out_vec_file, driver=out_format)
 
 
+
 def perform_spatial_join(
     vec_base_file: str,
     vec_base_lyr: str,
@@ -1128,11 +1155,16 @@ def perform_spatial_join(
     out_format: str = "GPKG",
     join_how: str = "inner",
     join_op: str = "within",
+    vec_base_epsg: int = None,
+    vec_join_epsg: int = None,
 ):
     """
     A function to perform a spatial join between two vector layers. This function
     uses geopandas so this needs to be installed. You also need to have the rtree
     package to generate the index used to perform the intersection.
+
+    Note, defining epsg codes for the datasets does not reproject the datasets
+    but just makes sure that correct projection is being used.
 
     For more information see: http://geopandas.org/mergingdata.html#spatial-joins
 
@@ -1151,6 +1183,8 @@ def perform_spatial_join(
     :param join_op: Defines whether or not to join the attributes of one object
                     to another. The options are [intersects, within, contains]
                     and default is 'within'
+    :param vec_base_epsg: Optionally provide the epsg code for the base vector layer.
+    :param vec_join_epsg: Optionally provide the epsg code for the join vector layer.
 
     """
     import geopandas
@@ -1175,6 +1209,11 @@ def perform_spatial_join(
 
     base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)
     join_gpd_df = geopandas.read_file(vec_join_file, layer=vec_join_lyr)
+
+    if vec_base_epsg is not None:
+        base_gpd_df = base_gpd_df.set_crs(epsg=vec_base_epsg, allow_override=True)
+    if vec_join_epsg is not None:
+        join_gpd_df = join_gpd_df.set_crs(epsg=vec_join_epsg, allow_override=True)
 
     join_gpd_df = geopandas.sjoin(base_gpd_df, join_gpd_df, how=join_how, op=join_op)
 

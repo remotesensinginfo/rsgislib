@@ -1568,12 +1568,17 @@ def spatial_select_gp(
     out_vec_lyr: str,
     out_format: str = "GPKG",
     tmp_col_name: str = "tmp_sel_join_fid",
+    vec_in_epsg: int = None,
+    vec_roi_epsg: int = None,
 ):
     """
     A function which spatial selects features from the input vector layer which
     intersects the ROI vector layer. This function is implemented using geopandas
     and is generally faster than the export_spatial_select_feats or
     select_intersect_feats functions.
+
+    Note, defining epsg codes for the datasets does not reproject the datasets
+    but just makes sure that correct projection is being used.
 
     :param vec_in_file: the input vector file path.
     :param vec_in_lyr: the input vector layer name
@@ -1585,6 +1590,8 @@ def spatial_select_gp(
     :param tmp_col_name: The name of a temporary column added to the input layer
                          used to ensure there are no duplicated features in the output
                          layer. The default name is: "tmp_sel_join_fid".
+    :param vec_in_epsg: Optionally provide the epsg code for the input vector layer.
+    :param vec_roi_epsg: Optionally provide the epsg code for the roi vector layer.
 
     """
     import numpy
@@ -1593,6 +1600,11 @@ def spatial_select_gp(
     print("Read vector layers")
     in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
     roi_gpdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
+
+    if vec_in_epsg is not None:
+        in_gpdf = in_gpdf.set_crs(epsg=vec_in_epsg, allow_override=True)
+    if vec_roi_epsg is not None:
+        roi_gpdf = roi_gpdf.set_crs(epsg=vec_roi_epsg, allow_override=True)
 
     # Add column with unique id for each row.
     in_gpdf[tmp_col_name] = numpy.arange(1, (in_gpdf.shape[0]) + 1, 1, dtype=int)
