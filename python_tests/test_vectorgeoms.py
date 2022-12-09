@@ -581,7 +581,7 @@ def test_rm_polys_area_lessthan(tmp_path):
     rsgislib.vectorgeoms.rm_polys_area(
         vec_file,
         vec_lyr,
-        area_thres=10000,
+        area_thres=2000000,
         out_vec_file=out_vec_file,
         out_vec_lyr=out_vec_lyr,
         out_format="GPKG",
@@ -603,7 +603,7 @@ def test_rm_polys_area_greatthan(tmp_path):
     rsgislib.vectorgeoms.rm_polys_area(
         vec_file,
         vec_lyr,
-        area_thres=10000,
+        area_thres=2000000,
         out_vec_file=out_vec_file,
         out_vec_lyr=out_vec_lyr,
         out_format="GPKG",

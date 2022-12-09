@@ -3192,8 +3192,9 @@ def rm_polys_area(
         area_msk = in_vec_gdf.area > area_thres
     vec_sel_gdf = in_vec_gdf.loc[area_msk]
 
-    print("Export")
-    if out_format == "GPKG":
-        vec_sel_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        vec_sel_gdf.to_file(out_vec_file, driver=out_format)
+    if len(vec_sel_gdf) > 0:
+        print("Export")
+        if out_format == "GPKG":
+            vec_sel_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            vec_sel_gdf.to_file(out_vec_file, driver=out_format)
