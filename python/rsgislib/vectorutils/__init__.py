@@ -11,7 +11,7 @@ import sys
 import shutil
 import subprocess
 import math
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from osgeo import gdal
 from osgeo import osr
@@ -2762,7 +2762,7 @@ def drop_rows_by_attribute(
 
 
 def merge_vector_files(
-    vec_files: list,
+    vec_files: List[str],
     out_vec_file: str,
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
@@ -2782,32 +2782,35 @@ def merge_vector_files(
     """
     import tqdm
     import geopandas
+    import pandas
+    import rsgislib.tools.filetools
 
-    first = True
+    if len(vec_files) == 0:
+        raise rsgislib.RSGISPyException("At least 1 layer(s) needs to be provided.")
+
+    gp_lyrs = list()
     for vec_file in tqdm.tqdm(vec_files):
         lyrs = get_vec_lyrs_lst(vec_file)
         for lyr in lyrs:
-            if first:
-                data_gdf = geopandas.read_file(vec_file, layer=lyr)
-                if out_epsg is not None:
-                    data_gdf = data_gdf.to_crs(epsg=out_epsg)
-                first = False
-            else:
-                tmp_data_gdf = geopandas.read_file(vec_file, layer=lyr)
-                if out_epsg is not None:
-                    tmp_data_gdf = tmp_data_gdf.to_crs(epsg=out_epsg)
+            data_gdf = geopandas.read_file(vec_file, layer=lyr)
+            if out_epsg is not None:
+                data_gdf = data_gdf.to_crs(epsg=out_epsg)
+            if len(data_gdf) > 0:
+                gp_lyrs.append(data_gdf)
 
-                data_gdf = data_gdf.append(tmp_data_gdf)
+    if len(gp_lyrs) > 1:
+        data_gdf = pandas.concat(gp_lyrs)
+    elif len(gp_lyrs) == 1:
+        data_gdf = gp_lyrs[0]
+    else:
+        raise rsgislib.RSGISPyException("No layers with data were provided")
 
-    if not first:
-        if out_format == "GPKG":
-            if out_vec_lyr is None:
-                raise rsgislib.RSGISPyException(
-                    "If output format is GPKG then an output layer is required."
-                )
-            data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-        else:
-            data_gdf.to_file(out_vec_file, driver=out_format)
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(out_vec_file, check_valid=True)
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def merge_vector_layers(
@@ -3484,4 +3487,38 @@ def reproj_vec_lyr_gp(
         data_gpdf.to_file(out_vec_file, driver=out_format)
 
 
+def rm_attrib_duplicates(vec_file: str, vec_lyr: str, dup_col: Union[str, List[str]], out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG", keep_rows: str = 'First'):
+    """
+    A function which removes rows where a duplicate values within a column(s)
+    within the attribute table exists. Either the First or Last feature can
+    be kept or all duplicate features can be removed.
 
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param dup_col: a single column or list of columns used to define whether
+                    a feature is a duplicate or not.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer
+    :param out_format: output vector format (Default: GPKG)
+    :param keep_rows: Whether to keep 'First', 'Last' or 'RemoveAll' when a
+                      duplicate is found.
+
+    """
+    if keep_rows not in ["First", "Last", "RemoveAll"]:
+        raise rsgislib.RSGISPyException("keep_rows option must be one of: First, Last, RemoveAll")
+
+    import geopandas
+    data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    keep_val = "first"
+    if keep_rows == "Last":
+        keep_val = "last"
+    elif keep_rows == "RemoveAll":
+        keep_val = False
+
+    data_gpdf.drop_duplicates(subset=dup_col, keep=keep_val, inplace=True, ignore_index=False)
+
+    if out_format == "GPKG":
+        data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gpdf.to_file(out_vec_file, driver=out_format)
