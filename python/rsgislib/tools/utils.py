@@ -58,7 +58,13 @@ def is_number(str_val: str) -> bool:
             return False
     return True
 
-def similar_numeric_vals(val_a:Union[numpy.array, float, int], val_b:Union[numpy.array, float, int], eql_thres:Union[float, int] = 0.1, abs_diff:bool =True) -> bool:
+
+def similar_numeric_vals(
+    val_a: Union[numpy.array, float, int],
+    val_b: Union[numpy.array, float, int],
+    eql_thres: Union[float, int] = 0.1,
+    abs_diff: bool = True,
+) -> bool:
     """
     A function which tests whether two number have a similar value within
     a threshold. To calculate the difference: val_a - val_b. If using arrays
@@ -131,6 +137,7 @@ def str_to_int(str_val: str, err_val: int = None) -> int:
                     f"Could not convert string to int: '{str_val}'."
                 )
     return out_int
+
 
 def zero_pad_num_str(
     num_val: float,

@@ -1144,7 +1144,6 @@ def annotate_vec_selection(
         in_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-
 def perform_spatial_join(
     vec_base_file: str,
     vec_base_lyr: str,

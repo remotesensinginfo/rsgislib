@@ -10,7 +10,8 @@ from sklearn.metrics import accuracy_score
 
 from rios import applier
 from rios import cuiprogress
-#from rios import rat
+
+# from rios import rat
 
 HAVE_CATBOOST = True
 try:

@@ -3045,7 +3045,7 @@ def buffer_vec_layer_gp(
     buf_res: int = 16,
     buf_sgl_sided: bool = False,
     cap_style: int = 1,
-    join_style: int =1,
+    join_style: int = 1,
 ):
     """
     A function which performs a buffer on the inputted vector layer using
@@ -3070,9 +3070,13 @@ def buffer_vec_layer_gp(
     import geopandas
 
     if cap_style not in [1, 2, 3]:
-        raise rsgislib.RSGISPyException("cap_style must be one of round = 1, flat = 2 or square = 3")
+        raise rsgislib.RSGISPyException(
+            "cap_style must be one of round = 1, flat = 2 or square = 3"
+        )
     if join_style not in [1, 2, 3]:
-        raise rsgislib.RSGISPyException("join_style must be one of mitre = 1, flat = 2, bevel = 3")
+        raise rsgislib.RSGISPyException(
+            "join_style must be one of mitre = 1, flat = 2, bevel = 3"
+        )
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -3089,7 +3093,11 @@ def buffer_vec_layer_gp(
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     # Perform Buffer
     data_buf_gdf = data_gdf.buffer(
-        distance=buf_dist, resolution=buf_res, single_sided=buf_sgl_sided, cap_style=cap_style, join_style=join_style,
+        distance=buf_dist,
+        resolution=buf_res,
+        single_sided=buf_sgl_sided,
+        cap_style=cap_style,
+        join_style=join_style,
     )
 
     if out_format == "GPKG":

@@ -2807,7 +2807,9 @@ def merge_vector_files(
 
     if out_format == "GPKG":
         if out_vec_lyr is None:
-            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(out_vec_file, check_valid=True)
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                out_vec_file, check_valid=True
+            )
         data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gdf.to_file(out_vec_file, driver=out_format)
@@ -3487,7 +3489,15 @@ def reproj_vec_lyr_gp(
         data_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def rm_attrib_duplicates(vec_file: str, vec_lyr: str, dup_col: Union[str, List[str]], out_vec_file: str, out_vec_lyr: str, out_format: str = "GPKG", keep_rows: str = 'First'):
+def rm_attrib_duplicates(
+    vec_file: str,
+    vec_lyr: str,
+    dup_col: Union[str, List[str]],
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    keep_rows: str = "First",
+):
     """
     A function which removes rows where a duplicate values within a column(s)
     within the attribute table exists. Either the First or Last feature can
@@ -3505,9 +3515,12 @@ def rm_attrib_duplicates(vec_file: str, vec_lyr: str, dup_col: Union[str, List[s
 
     """
     if keep_rows not in ["First", "Last", "RemoveAll"]:
-        raise rsgislib.RSGISPyException("keep_rows option must be one of: First, Last, RemoveAll")
+        raise rsgislib.RSGISPyException(
+            "keep_rows option must be one of: First, Last, RemoveAll"
+        )
 
     import geopandas
+
     data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
     keep_val = "first"
@@ -3516,7 +3529,9 @@ def rm_attrib_duplicates(vec_file: str, vec_lyr: str, dup_col: Union[str, List[s
     elif keep_rows == "RemoveAll":
         keep_val = False
 
-    data_gpdf.drop_duplicates(subset=dup_col, keep=keep_val, inplace=True, ignore_index=False)
+    data_gpdf.drop_duplicates(
+        subset=dup_col, keep=keep_val, inplace=True, ignore_index=False
+    )
 
     if out_format == "GPKG":
         data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
