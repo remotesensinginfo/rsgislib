@@ -58,6 +58,25 @@ def is_number(str_val: str) -> bool:
             return False
     return True
 
+def similar_numeric_vals(val_a:Union[numpy.array, float, int], val_b:Union[numpy.array, float, int], eql_thres:Union[float, int] = 0.1, abs_diff:bool =True) -> bool:
+    """
+    A function which tests whether two number have a similar value within
+    a threshold. To calculate the difference: val_a - val_b. If using arrays
+    they must have the same length.
+
+    :param val_a: the first value can also be a numpy array
+    :param val_b: the second value can also be a numpy array
+    :param eql_thres: the threshold below which the numbers are similar.
+    :param abs_diff: use the absolute difference between the two values.
+    :return: boolean; True values are similar. False values are not similar.
+
+    """
+    if abs_diff:
+        diff = numpy.abs(val_a - val_b)
+    else:
+        diff = val_a - val_b
+    return diff < eql_thres
+
 
 def str_to_float(str_val: str, err_val: float = None) -> float:
     """
@@ -112,26 +131,6 @@ def str_to_int(str_val: str, err_val: int = None) -> int:
                     f"Could not convert string to int: '{str_val}'."
                 )
     return out_int
-
-
-def str2Int(self, strVal, errVal=None):
-    strVal = str(strVal).strip()
-    outInt = 0
-    try:
-        outInt = int(strVal)
-    except ValueError:
-        try:
-            flVal = self.str2Float(strVal, errVal)
-            outInt = math.floor(flVal + 0.5)
-        except ARCSIException:
-            if not errVal is None:
-                outInt = int(errVal)
-            else:
-                raise ARCSIException(
-                    "Could not convert string to int: '" + strVal + "'."
-                )
-    return outInt
-
 
 def zero_pad_num_str(
     num_val: float,
