@@ -263,8 +263,12 @@ def calc_class_pt_accuracy_metrics(
 
     cohen_kappa = sklearn.metrics.cohen_kappa_score(ref_samples, pred_samples)
     acc_metrics["cohen_kappa"] = cohen_kappa
+    acc_metrics["bal_accuracy_score"] = sklearn.metrics.balanced_accuracy_score(ref_samples, pred_samples)
+    acc_metrics["matthews_corrcoef"] = sklearn.metrics.matthews_corrcoef(ref_samples, pred_samples)
+    acc_metrics["hamming_loss"] = sklearn.metrics.hamming_loss(ref_samples, pred_samples)
 
     cm = sklearn.metrics.confusion_matrix(ref_samples, pred_samples)
+    cm = cm.T
     user_accuracy = [(row[idx] / row.sum()) * 100 for idx, row in enumerate(cm)]
     producer_accuracy = [(col[idx] / col.sum()) * 100 for idx, col in enumerate(cm.T)]
     cls_conf_intervals = dict()
@@ -289,10 +293,15 @@ def calc_class_pt_accuracy_metrics(
     for conf_int_const in conf_int_consts:
         overall_acc_conf_interval.append(conf_int_const * conf_int_part1)
     acc_metrics["accuracy_conf_interval"] = overall_acc_conf_interval
-
+    
+    omission = [100 - prod_val for prod_val in producer_accuracy]
+    commission = [100 - user_val for user_val in user_accuracy]
+    
     acc_metrics["confusion_matrix"] = cm.tolist()
     acc_metrics["user_accuracy"] = user_accuracy
     acc_metrics["producer_accuracy"] = producer_accuracy
+    acc_metrics["omission"] = omission
+    acc_metrics["commission"] = commission
 
     return acc_metrics
 
@@ -635,7 +644,7 @@ def calc_acc_ptonly_metrics_vecsamples(
     cls_col: str,
     out_json_file: str = None,
     out_csv_file: str = None,
-):
+) -> Dict:
     """
     A function which calculates classification accuracy metrics using a set of
     reference samples in a vector file.
@@ -650,10 +659,11 @@ def calc_acc_ptonly_metrics_vecsamples(
                           are written to a JSON file (Default=None).
     :param out_csv_file: if specified the generated metrics and confusion matrix
                          are written to a CSV file (Default=None).
+    :return: dict (matching JSON output) with the classification accuracy stats
 
     .. code:: python
 
-        vec_file = "Sonoma_county_classification_refPoints.gpkg"
+        vec_file = "sonoma_county_classification_ref_pts.gpkg"
         vec_lyr = "ref_points"
         ref_col = "reference_classes"
         cls_col = "classes"
@@ -664,7 +674,7 @@ def calc_acc_ptonly_metrics_vecsamples(
 
         classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples(vec_file, vec_lyr,
                                                                 ref_col, cls_col,
-                                                                out_json_file=None,
+                                                                out_json_file,
                                                                 out_csv_file=None)
 
     """
@@ -721,6 +731,9 @@ def calc_acc_ptonly_metrics_vecsamples(
             # Overall Accuracy
             acc_metrics_writer.writerow(["overall accuracy", acc_metrics["accuracy"]])
             acc_metrics_writer.writerow(["cohen kappa", acc_metrics["cohen_kappa"]])
+            acc_metrics_writer.writerow(["balanced accuracy score", acc_metrics["bal_accuracy_score"]])
+            acc_metrics_writer.writerow(["matthews correlation coefficient", acc_metrics["matthews_corrcoef"]])
+            acc_metrics_writer.writerow(["hamming loss", acc_metrics["hamming_loss"]])
             acc_metrics_writer.writerow([""])
 
             # Overall Accuracy Confidence Intervals
@@ -784,28 +797,32 @@ def calc_acc_ptonly_metrics_vecsamples(
             cm_top_row = [""]
             for cls_name in unq_cls_names:
                 cm_top_row.append(cls_name)
-            cm_top_row.append("User Acc")
+            cm_top_row.append("Users")
+            cm_top_row.append("Commission")
             acc_metrics_writer.writerow(cm_top_row)
-            for cls_name, cm_row, user_acc in zip(
+            for cls_name, cm_row, user_acc, com_val in zip(
                 unq_cls_names,
                 acc_metrics["confusion_matrix"],
                 acc_metrics["user_accuracy"],
+                acc_metrics["commission"],
             ):
                 row = [cls_name]
                 for val in cm_row:
                     row.append(val)
                 row.append(user_acc)
+                row.append(com_val)
                 acc_metrics_writer.writerow(row)
-            cm_bot_row = ["Producer"]
+            cm_bot_row = ["Producers"]
             for prod_val in acc_metrics["producer_accuracy"]:
+                cm_bot_row.append(prod_val)
+            acc_metrics_writer.writerow(cm_bot_row)
+            cm_bot_row = ["Omission"]
+            for prod_val in acc_metrics["omission"]:
                 cm_bot_row.append(prod_val)
             acc_metrics_writer.writerow(cm_bot_row)
             acc_metrics_writer.writerow([""])
 
-    if (out_json_file is None) and (out_csv_file is None):
-        import pprint
-
-        pprint.pprint(acc_metrics)
+    return acc_metrics
 
 
 def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
@@ -817,7 +834,7 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     sample_frac: float = 0.2,
     sample_n_smps: int = None,
     bootstrap_n: int = 1000,
-) -> dict:
+) -> Dict:
     """
     A function which calculates classification accuracy metric confidence intervals
     using a bootstrapping approach. This function uses a set of reference samples in
@@ -893,6 +910,9 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
 
     accuracy_scores = list()
     cohen_kappa_scores = list()
+    bal_accuracy_scores = list()
+    matthews_corrcoef_scores = list()
+    hamming_loss_scores = list()
     macro_avg_f1_scores = list()
     macro_avg_precision = list()
     macro_avg_recall = list()
@@ -908,10 +928,15 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
         cls_stats[cls]["support"] = list()
         cls_stats[cls]["producer_accuracy"] = list()
         cls_stats[cls]["user_accuracy"] = list()
+        cls_stats[cls]["commission"] = list()
+        cls_stats[cls]["omission"] = list()
 
     for acc_metrics in acc_metrics_runs:
         accuracy_scores.append(acc_metrics["accuracy"])
         cohen_kappa_scores.append(acc_metrics["cohen_kappa"])
+        bal_accuracy_scores.append(acc_metrics["bal_accuracy_score"])
+        matthews_corrcoef_scores.append(acc_metrics["matthews_corrcoef"])
+        hamming_loss_scores.append(acc_metrics["hamming_loss"])
         macro_avg_f1_scores.append(acc_metrics["macro avg"]["f1-score"])
         macro_avg_precision.append(acc_metrics["macro avg"]["precision"])
         macro_avg_recall.append(acc_metrics["macro avg"]["recall"])
@@ -929,6 +954,9 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
             )
             cls_stats[cls]["user_accuracy"].append(acc_metrics["user_accuracy"][i])
 
+            cls_stats[cls]["commission"].append(acc_metrics["commission"][i])
+            cls_stats[cls]["omission"].append(acc_metrics["omission"][i])
+
     conf_inters = [0.5, 2.5, 5, 50, 95, 97.5, 99.5]
 
     accuracy_scores_inters = numpy.percentile(accuracy_scores, conf_inters)
@@ -936,6 +964,15 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
 
     cohen_kappa_scores_inters = numpy.percentile(cohen_kappa_scores, conf_inters)
     cohen_kappa_scores_mean = numpy.mean(cohen_kappa_scores)
+
+    bal_accuracy_scores_inters = numpy.percentile(bal_accuracy_scores, conf_inters)
+    bal_accuracy_scores_mean = numpy.mean(bal_accuracy_scores)
+
+    matthews_corrcoef_scores_inters = numpy.percentile(matthews_corrcoef_scores, conf_inters)
+    matthews_corrcoef_scores_mean = numpy.mean(matthews_corrcoef_scores)
+
+    hamming_loss_scores_inters = numpy.percentile(hamming_loss_scores, conf_inters)
+    hamming_loss_scores_mean = numpy.mean(hamming_loss_scores)
 
     macro_avg_f1_scores_inters = numpy.percentile(macro_avg_f1_scores, conf_inters)
     macro_avg_f1_scores_mean = numpy.mean(macro_avg_f1_scores)
@@ -996,6 +1033,20 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
             cls_stats[cls]["user_accuracy"]
         )
 
+        cls_inter_stats[cls]["commission inters"] = numpy.percentile(
+            cls_stats[cls]["commission"], conf_inters
+            )
+        cls_inter_stats[cls]["commission mean"] = numpy.mean(
+            cls_stats[cls]["commission"]
+            )
+
+        cls_inter_stats[cls]["omission inters"] = numpy.percentile(
+            cls_stats[cls]["omission"], conf_inters
+            )
+        cls_inter_stats[cls]["omission mean"] = numpy.mean(
+            cls_stats[cls]["omission"]
+            )
+
     out_interv_stats = dict()
     out_interv_stats["accuracy"] = dict()
     out_interv_stats["accuracy"]["mean"] = float(accuracy_scores_mean)
@@ -1028,6 +1079,54 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
         float(cohen_kappa_scores_inters[0]),
         float(cohen_kappa_scores_inters[6]),
     ]
+
+    out_interv_stats["bal_accuracy_score"] = dict()
+    out_interv_stats["bal_accuracy_score"]["mean"] = float(bal_accuracy_scores_mean)
+    out_interv_stats["bal_accuracy_score"]["median"] = float(bal_accuracy_scores_inters[3])
+    out_interv_stats["bal_accuracy_score"]["90th"] = [
+        float(bal_accuracy_scores_inters[2]),
+        float(bal_accuracy_scores_inters[4]),
+        ]
+    out_interv_stats["bal_accuracy_score"]["95th"] = [
+        float(bal_accuracy_scores_inters[1]),
+        float(bal_accuracy_scores_inters[5]),
+        ]
+    out_interv_stats["bal_accuracy_score"]["99th"] = [
+        float(bal_accuracy_scores_inters[0]),
+        float(bal_accuracy_scores_inters[6]),
+        ]
+
+    out_interv_stats["matthews_corrcoef"] = dict()
+    out_interv_stats["matthews_corrcoef"]["mean"] = float(matthews_corrcoef_scores_mean)
+    out_interv_stats["matthews_corrcoef"]["median"] = float(matthews_corrcoef_scores_inters[3])
+    out_interv_stats["matthews_corrcoef"]["90th"] = [
+        float(matthews_corrcoef_scores_inters[2]),
+        float(matthews_corrcoef_scores_inters[4]),
+        ]
+    out_interv_stats["matthews_corrcoef"]["95th"] = [
+        float(matthews_corrcoef_scores_inters[1]),
+        float(matthews_corrcoef_scores_inters[5]),
+        ]
+    out_interv_stats["matthews_corrcoef"]["99th"] = [
+        float(matthews_corrcoef_scores_inters[0]),
+        float(matthews_corrcoef_scores_inters[6]),
+        ]
+
+    out_interv_stats["hamming_loss"] = dict()
+    out_interv_stats["hamming_loss"]["mean"] = float(hamming_loss_scores_mean)
+    out_interv_stats["hamming_loss"]["median"] = float(hamming_loss_scores_inters[3])
+    out_interv_stats["hamming_loss"]["90th"] = [
+        float(hamming_loss_scores_inters[2]),
+        float(hamming_loss_scores_inters[4]),
+        ]
+    out_interv_stats["hamming_loss"]["95th"] = [
+        float(hamming_loss_scores_inters[1]),
+        float(hamming_loss_scores_inters[5]),
+        ]
+    out_interv_stats["hamming_loss"]["99th"] = [
+        float(hamming_loss_scores_inters[0]),
+        float(hamming_loss_scores_inters[6]),
+        ]
 
     out_interv_stats["macro avg"] = dict()
     out_interv_stats["macro avg"]["f1-score"] = dict()
@@ -1264,6 +1363,46 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
             float(cls_inter_stats[cls]["user_accuracy inters"][0]),
             float(cls_inter_stats[cls]["user_accuracy inters"][6]),
         ]
+
+        out_interv_stats[cls]["commission"] = dict()
+        out_interv_stats[cls]["commission"]["mean"] = float(
+            cls_inter_stats[cls]["commission mean"]
+            )
+        out_interv_stats[cls]["commission"]["median"] = float(
+            cls_inter_stats[cls]["commission inters"][3]
+            )
+        out_interv_stats[cls]["commission"]["90th"] = [
+            float(cls_inter_stats[cls]["commission inters"][2]),
+            float(cls_inter_stats[cls]["commission inters"][4]),
+            ]
+        out_interv_stats[cls]["commission"]["95th"] = [
+            float(cls_inter_stats[cls]["commission inters"][1]),
+            float(cls_inter_stats[cls]["commission inters"][5]),
+            ]
+        out_interv_stats[cls]["commission"]["99th"] = [
+            float(cls_inter_stats[cls]["commission inters"][0]),
+            float(cls_inter_stats[cls]["commission inters"][6]),
+            ]
+
+        out_interv_stats[cls]["omission"] = dict()
+        out_interv_stats[cls]["omission"]["mean"] = float(
+            cls_inter_stats[cls]["omission mean"]
+            )
+        out_interv_stats[cls]["omission"]["median"] = float(
+            cls_inter_stats[cls]["omission inters"][3]
+            )
+        out_interv_stats[cls]["omission"]["90th"] = [
+            float(cls_inter_stats[cls]["omission inters"][2]),
+            float(cls_inter_stats[cls]["omission inters"][4]),
+            ]
+        out_interv_stats[cls]["omission"]["95th"] = [
+            float(cls_inter_stats[cls]["omission inters"][1]),
+            float(cls_inter_stats[cls]["omission inters"][5]),
+            ]
+        out_interv_stats[cls]["omission"]["99th"] = [
+            float(cls_inter_stats[cls]["omission inters"][0]),
+            float(cls_inter_stats[cls]["omission inters"][6]),
+            ]
 
     if out_json_file is not None:
         import rsgislib.tools.utils
