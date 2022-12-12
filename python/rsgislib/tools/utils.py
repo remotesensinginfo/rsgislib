@@ -3,6 +3,7 @@
 The tools.utils module contains some useful tools
 """
 
+import collections.abc
 import datetime
 import os
 import string
@@ -77,11 +78,22 @@ def similar_numeric_vals(
     :return: boolean; True values are similar. False values are not similar.
 
     """
+    if isinstance(val_a, collections.abc.Sequence):
+        val_a = numpy.array(val_a)
+    if isinstance(val_b, collections.abc.Sequence):
+        val_b = numpy.array(val_b)
+
     if abs_diff:
         diff = numpy.abs(val_a - val_b)
     else:
         diff = val_a - val_b
-    return diff < eql_thres
+
+    similar = diff < eql_thres
+
+    if type(similar).__name__ == "ndarray":
+        similar = similar.all()
+
+    return similar
 
 
 def str_to_float(str_val: str, err_val: float = None) -> float:
@@ -318,7 +330,7 @@ def write_data_to_file(data_val, out_file: str):
         raise e
 
 
-def write_dict_to_json(data_dict: dict, out_file: str):
+def write_dict_to_json(data_dict: Dict, out_file: str):
     """
     Write some data to a JSON file. The data would commonly be structured as a dict
     but could also be a list.
@@ -339,7 +351,7 @@ def write_dict_to_json(data_dict: dict, out_file: str):
         )
 
 
-def write_dict_to_json_gz(data_dict: dict, out_file: str, encoding: str = "utf-8"):
+def write_dict_to_json_gz(data_dict: Dict, out_file: str, encoding: str = "utf-8"):
     """
     Write some data to a JSON file compressed with gzip. The data would commonly be
     structured as a dict but could also be a list.
@@ -395,7 +407,7 @@ def read_gz_json_to_dict(input_file: str, encoding: str = "utf-8") -> Dict:
     return data
 
 
-def create_var_list(in_vals_lsts: dict, val_dict: dict = None) -> List[Dict]:
+def create_var_list(in_vals_lsts: Dict, val_dict: Dict = None) -> List[Dict]:
     """
     A function which will produce a list of dictionaries with all the combinations
     of the input variables listed (i.e., the powerset).
@@ -749,7 +761,7 @@ def is_summer_winter(lat: float, date: datetime.date) -> int:
     return summer_winter
 
 
-def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: List) -> bool:
+def dict_struct_does_path_exist(dict_struct_obj: Dict, tree_sequence: List) -> bool:
     """
     A function which tests whether a path exists within JSON file.
 
@@ -772,7 +784,7 @@ def dict_struct_does_path_exist(dict_struct_obj: dict, tree_sequence: List) -> b
 
 
 def dict_struct_get_str_value(
-    dict_struct_obj: dict, tree_sequence: List, valid_values: List = None
+    dict_struct_obj: Dict, tree_sequence: List, valid_values: List = None
 ) -> str:
     """
     A function which retrieves a single string value from a JSON structure.
@@ -803,7 +815,7 @@ def dict_struct_get_str_value(
     return curr_dict_struct_obj
 
 
-def dict_struct_get_boolean_value(dict_struct_obj: dict, tree_sequence: List) -> bool:
+def dict_struct_get_boolean_value(dict_struct_obj: Dict, tree_sequence: List) -> bool:
     """
     A function which retrieves a single boolean value from a JSON structure.
 
@@ -830,7 +842,7 @@ def dict_struct_get_boolean_value(dict_struct_obj: dict, tree_sequence: List) ->
 
 
 def dict_struct_get_date_value(
-    dict_struct_obj: dict, tree_sequence: List, date_format: str = "%Y-%m-%d"
+    dict_struct_obj: Dict, tree_sequence: List, date_format: str = "%Y-%m-%d"
 ) -> datetime.datetime:
     """
     A function which retrieves a single date value from a JSON structure.
@@ -881,7 +893,7 @@ def dict_struct_get_date_value(
 
 
 def dict_struct_get_datetime_value(
-    dict_struct_obj: dict,
+    dict_struct_obj: Dict,
     tree_sequence: List,
     date_time_format: str = "%Y-%m-%dT%H:%M:%S.%f",
 ):
@@ -934,7 +946,7 @@ def dict_struct_get_datetime_value(
 
 
 def dict_struct_get_str_list_value(
-    dict_struct_obj: dict, tree_sequence: List, valid_values: List = None
+    dict_struct_obj: Dict, tree_sequence: List, valid_values: List = None
 ) -> List[str]:
     """
     A function which retrieves a list of string values from a JSON structure.
@@ -972,7 +984,7 @@ def dict_struct_get_str_list_value(
 
 
 def dict_struct_get_numeric_value(
-    dict_struct_obj: dict,
+    dict_struct_obj: Dict,
     tree_sequence: List,
     valid_lower: float = None,
     valid_upper: float = None,
@@ -997,20 +1009,13 @@ def dict_struct_get_numeric_value(
             raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
 
     out_value = 0.0
-    if (type(curr_dict_struct_obj).__name__ == "int") or (
-        type(curr_dict_struct_obj).__name__ == "float"
-    ):
-        out_value = curr_dict_struct_obj
-    elif type(curr_dict_struct_obj).__name__ == "str":
-        if curr_dict_struct_obj.isnumeric():
+    if is_number(curr_dict_struct_obj):
+        if "int" in type(curr_dict_struct_obj).__name__:
+            out_value = int(curr_dict_struct_obj)
+        elif "float" in type(curr_dict_struct_obj).__name__:
             out_value = float(curr_dict_struct_obj)
         else:
-            try:
-                out_value = float(curr_dict_struct_obj)
-            except:
-                raise rsgislib.RSGISPyException(
-                    "The identified value is not numeric '{}'".format(steps_str)
-                )
+            out_value = float(curr_dict_struct_obj)
     else:
         raise rsgislib.RSGISPyException(
             "The identified value is not numeric '{}'".format(steps_str)
@@ -1029,7 +1034,7 @@ def dict_struct_get_numeric_value(
     return out_value
 
 
-def dict_struct_get_list_value(dict_struct_obj: dict, tree_sequence: List) -> List:
+def dict_struct_get_list_value(dict_struct_obj: Dict, tree_sequence: List) -> List:
     """
     A function which retrieves a list of values from a JSON structure.
 
