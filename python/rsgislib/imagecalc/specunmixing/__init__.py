@@ -121,6 +121,7 @@ def write_endmembers_mtxt(endmembers_np_arr, endmembers_file):
 
     """
     import rsgislib.tools.utils
+
     arr_shp = endmembers_np_arr.shape
     out_m = arr_shp[0]
     out_n = arr_shp[1]
@@ -141,6 +142,7 @@ def write_endmembers_mtxt(endmembers_np_arr, endmembers_file):
     out_line_list.append(out_data)
 
     rsgislib.tools.utils.write_list_to_file(out_line_list, endmembers_file)
+
 
 def plot_endmembers(
     endmembers_file,

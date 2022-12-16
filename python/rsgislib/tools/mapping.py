@@ -132,7 +132,7 @@ def add_overview_maps(
     fill_clr="white",
     line_clr="black",
     line_width=0.25,
-):
+) -> plt.axis:
     """
     Add an overview map in the top-left corner of the map.
 
@@ -153,6 +153,7 @@ def add_overview_maps(
                      Default: white
     :param line_clr: the colour of the lines of the overview layer. Default: black
     :param line_width: the line width of the lines of the overview layer. Default: 0.25
+    :return: return the matplotlib axis for the overview map.
 
     """
     ax_over = ax.inset_axes(
@@ -167,6 +168,7 @@ def add_overview_maps(
         ax_over.scatter(overview_pt[0], overview_pt[1], color=pt_clr, s=pt_size)
     ax_over.set_xlim([overview_bbox[0], overview_bbox[1]])
     ax_over.set_ylim([overview_bbox[2], overview_bbox[3]])
+    return ax_over
 
 
 def add_contextily_basemap(
@@ -226,6 +228,7 @@ def create_wmts_img_map(
     show_map_axis: bool = True,
     tmp_dir: str = None,
     wmts_epsg: int = None,
+    scale_bar_loc: str = "upper right",
 ):
     """
     A function which downloading image from a WMTS service and adding it
@@ -251,6 +254,11 @@ def create_wmts_img_map(
                     path from where the script is run from.
     :param wmts_epsg: Provide the epsg code for the WMTS layer (probably 3857) if
                       the code can't automatically find it.
+    :param scale_bar_loc: the location on the plot of the scale bar. Options defined
+                          by the matplotlib-scalebar module. But must be one of:
+                          upper right, upper left, lower left, lower right, right,
+                          center left, center right, lower center, upper center
+                          or center. Default: upper right
 
     """
     import rsgislib.tools.utils
@@ -300,7 +308,7 @@ def create_wmts_img_map(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
 
-        ax.add_artist(ScaleBar(distance_meters))
+        ax.add_artist(ScaleBar(distance_meters, location=scale_bar_loc))
 
     if title_str is not None:
         ax.title.set_text(title_str)
@@ -469,6 +477,7 @@ def create_vec_lyr_map(
     use_grid: bool = False,
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
+    scale_bar_loc: str = "upper right",
 ):
     """
     A function which adds vector layer(s) to a matplotlib axis. This function
@@ -505,6 +514,11 @@ def create_vec_lyr_map(
                        spatially subset before displaying as for large vector
                        layers this can make the processing much faster.
                        Default: False
+    :param scale_bar_loc: the location on the plot of the scale bar. Options defined
+                          by the matplotlib-scalebar module. But must be one of:
+                          upper right, upper left, lower left, lower right, right,
+                          center left, center right, lower center, upper center
+                          or center. Default: upper right
 
     """
     n_vec_lyrs = 1
@@ -586,7 +600,7 @@ def create_vec_lyr_map(
             distance_meters = rsgislib.tools.projection.great_circle_distance(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
-        ax.add_artist(ScaleBar(distance_meters))
+        ax.add_artist(ScaleBar(distance_meters, location=scale_bar_loc))
 
     if title_str is not None:
         ax.title.set_text(title_str)
@@ -605,6 +619,7 @@ def create_raster_img_map(
     img_no_data_val: float = None,
     stch_min_max_vals: Union[Dict, List[Dict]] = None,
     stch_n_stdevs: float = 2.0,
+    scale_bar_loc: str = "upper right",
 ):
     """
     A function which displays a stretched raster layer onto the axis provided.
@@ -635,6 +650,11 @@ def create_raster_img_map(
     :param stch_n_stdevs: If using the rsgislib.IMG_STRETCH_STDEV stretch then
                           this is the number of standard deviations parameters.
                           See rsgislib.tools.plotting.stdev_stretch_np_arr
+    :param scale_bar_loc: the location on the plot of the scale bar. Options defined
+                          by the matplotlib-scalebar module. But must be one of:
+                          upper right, upper left, lower left, lower right, right,
+                          center left, center right, lower center, upper center
+                          or center. Default: upper right
 
     """
     if bbox is None:
@@ -690,7 +710,7 @@ def create_raster_img_map(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
 
-        ax.add_artist(ScaleBar(distance_meters))
+        ax.add_artist(ScaleBar(distance_meters, location=scale_bar_loc))
 
     if title_str is not None:
         ax.title.set_text(title_str)
@@ -705,6 +725,7 @@ def create_thematic_raster_map(
     show_scale_bar: bool = True,
     use_grid: bool = False,
     show_map_axis: bool = True,
+    scale_bar_loc: str = "upper right",
 ):
     """
     A function which displays a thematic raster layer onto the axis provided
@@ -724,6 +745,11 @@ def create_thematic_raster_map(
                      Default: False
     :param show_map_axis: boolean specifying whether the axes should be shown
                           Default: False
+    :param scale_bar_loc: the location on the plot of the scale bar. Options defined
+                          by the matplotlib-scalebar module. But must be one of:
+                          upper right, upper left, lower left, lower right, right,
+                          center left, center right, lower center, upper center
+                          or center. Default: upper right
 
     """
     input_imgs = list()
@@ -772,7 +798,7 @@ def create_thematic_raster_map(
             distance_meters = rsgislib.tools.projection.great_circle_distance(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
-        ax.add_artist(ScaleBar(distance_meters))
+        ax.add_artist(ScaleBar(distance_meters, location=scale_bar_loc))
 
     if title_str is not None:
         ax.title.set_text(title_str)
@@ -794,6 +820,7 @@ def create_choropleth_vec_lyr_map(
     use_grid: bool = False,
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
+    scale_bar_loc: str = "upper right",
 ):
     """
     A function which adds a vector layer to a matplotlib axis. This function
@@ -831,6 +858,11 @@ def create_choropleth_vec_lyr_map(
                        spatially subset before displaying as for large vector
                        layers this can make the processing much faster.
                        Default: False
+    :param scale_bar_loc: the location on the plot of the scale bar. Options defined
+                          by the matplotlib-scalebar module. But must be one of:
+                          upper right, upper left, lower left, lower right, right,
+                          center left, center right, lower center, upper center
+                          or center. Default: upper right
 
     """
     if vec_fill_cmap is None:
@@ -873,7 +905,7 @@ def create_choropleth_vec_lyr_map(
             distance_meters = rsgislib.tools.projection.great_circle_distance(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
-        ax.add_artist(ScaleBar(distance_meters))
+        ax.add_artist(ScaleBar(distance_meters, location=scale_bar_loc))
 
     if title_str is not None:
         ax.title.set_text(title_str)
@@ -895,6 +927,7 @@ def create_raster_cmap_img_map(
     norm_vmax: float = None,
     vals_under_white: bool = False,
     print_norm_vals: bool = False,
+    scale_bar_loc: str = "upper right",
 ):
     """
     A function which displays a single band raster layer onto the axis provided
@@ -937,6 +970,11 @@ def create_raster_cmap_img_map(
     :param print_norm_vals: boolean specifying to print the normalisation min / max
                             values. This is useful for debugging and finding a range
                             of values before manually setting across a set of images.
+    :param scale_bar_loc: the location on the plot of the scale bar. Options defined
+                          by the matplotlib-scalebar module. But must be one of:
+                          upper right, upper left, lower left, lower right, right,
+                          center left, center right, lower center, upper center
+                          or center. Default: upper right
     :return: The colour map and normalisation so a colour bar can be created.
              (c_cmap, c_norm)
 
@@ -987,7 +1025,7 @@ def create_raster_cmap_img_map(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
 
-        ax.add_artist(ScaleBar(distance_meters))
+        ax.add_artist(ScaleBar(distance_meters, location=scale_bar_loc))
 
     if title_str is not None:
         ax.title.set_text(title_str)
@@ -1009,6 +1047,7 @@ def create_vec_pt_density_map(
     use_grid: bool = False,
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
+    scale_bar_loc: str = "upper right",
 ):
     """
     A function which adds a vector layer(s) to a matplotlib axis as a density plot.
@@ -1054,6 +1093,11 @@ def create_vec_pt_density_map(
                        spatially subset before displaying as for large vector
                        layers this can make the processing much faster.
                        Default: False
+    :param scale_bar_loc: the location on the plot of the scale bar. Options defined
+                          by the matplotlib-scalebar module. But must be one of:
+                          upper right, upper left, lower left, lower right, right,
+                          center left, center right, lower center, upper center
+                          or center. Default: upper right
     :return: The colour map and normalisation so a colour bar can be created.
              (c_cmap, c_norm)
 
@@ -1110,7 +1154,7 @@ def create_vec_pt_density_map(
             distance_meters = rsgislib.tools.projection.great_circle_distance(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
-        ax.add_artist(ScaleBar(distance_meters))
+        ax.add_artist(ScaleBar(distance_meters, location=scale_bar_loc))
 
     if title_str is not None:
         ax.title.set_text(title_str)
