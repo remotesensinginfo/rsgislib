@@ -478,6 +478,7 @@ def create_vec_lyr_map(
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
     scale_bar_loc: str = "upper right",
+    plot_zorders: Union[float, List[float]] = 1
 ):
     """
     A function which adds vector layer(s) to a matplotlib axis. This function
@@ -519,6 +520,10 @@ def create_vec_lyr_map(
                           upper right, upper left, lower left, lower right, right,
                           center left, center right, lower center, upper center
                           or center. Default: upper right
+    :param plot_zorders: the drawing order of artists is determined by their
+                        zorder attribute, which is a floating point number.
+                        Artists with higher zorder are drawn on top.
+                        https://matplotlib.org/stable/gallery/misc/zorder_demo.html
 
     """
     n_vec_lyrs = 1
@@ -574,6 +579,15 @@ def create_vec_lyr_map(
         else:
             vec_fill_alpha = vec_fill_alphas
 
+        if type(plot_zorders) is list:
+            if len(plot_zorders) != n_vec_lyrs:
+                raise rsgislib.RSGISPyException(
+                    "Number of fill colours not same as number of vector layers"
+                )
+            plot_zorder = plot_zorders[i]
+        else:
+            plot_zorder = plot_zorders
+
         gp_vec_sub.plot(
             ax=ax,
             color=vec_fill_clr,
@@ -581,6 +595,7 @@ def create_vec_lyr_map(
             linewidth=vec_line_width,
             alpha=vec_fill_alpha,
             markersize=vec_markersize,
+            zorder=plot_zorder,
         )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
@@ -821,6 +836,7 @@ def create_choropleth_vec_lyr_map(
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
     scale_bar_loc: str = "upper right",
+    plot_zorder:int = 1
 ):
     """
     A function which adds a vector layer to a matplotlib axis. This function
@@ -863,6 +879,10 @@ def create_choropleth_vec_lyr_map(
                           upper right, upper left, lower left, lower right, right,
                           center left, center right, lower center, upper center
                           or center. Default: upper right
+    :param plot_zorder: the drawing order of artists is determined by their
+                        zorder attribute, which is a floating point number.
+                        Artists with higher zorder are drawn on top.
+                        https://matplotlib.org/stable/gallery/misc/zorder_demo.html
 
     """
     if vec_fill_cmap is None:
@@ -886,6 +906,7 @@ def create_choropleth_vec_lyr_map(
         linewidth=vec_line_width,
         alpha=vec_fill_alpha,
         markersize=vec_markersize,
+        zorder=plot_zorder,
     )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
@@ -1048,6 +1069,7 @@ def create_vec_pt_density_map(
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
     scale_bar_loc: str = "upper right",
+    plot_zorder: float = 1
 ):
     """
     A function which adds a vector layer(s) to a matplotlib axis as a density plot.
@@ -1098,6 +1120,10 @@ def create_vec_pt_density_map(
                           upper right, upper left, lower left, lower right, right,
                           center left, center right, lower center, upper center
                           or center. Default: upper right
+    :param plot_zorder: the drawing order of artists is determined by their
+                        zorder attribute, which is a floating point number.
+                        Artists with higher zorder are drawn on top.
+                        https://matplotlib.org/stable/gallery/misc/zorder_demo.html
     :return: The colour map and normalisation so a colour bar can be created.
              (c_cmap, c_norm)
 
@@ -1133,7 +1159,7 @@ def create_vec_pt_density_map(
         dpi=density_dpi,
         norm=c_norm,
         cmap=c_cmap,
-        zorder=10,
+        zorder=plot_zorder,
     )
 
     ax.set_xlim([bbox[0], bbox[1]])
