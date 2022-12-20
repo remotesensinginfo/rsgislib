@@ -2134,21 +2134,21 @@ def resample_img_to_match(
     if datatype is None:
         datatype = get_gdal_datatype_from_img(in_process_img)
 
-    interpolationMethod = gdal.GRA_NearestNeighbour
+    gdal_interp_method = gdal.GRA_NearestNeighbour
     if interp_method == rsgislib.INTERP_BILINEAR:
-        interpolationMethod = gdal.GRA_Bilinear
+        gdal_interp_method = gdal.GRA_Bilinear
     elif interp_method == rsgislib.INTERP_LANCZOS:
-        interpolationMethod = gdal.GRA_Lanczos
+        gdal_interp_method = gdal.GRA_Lanczos
     elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        interpolationMethod = gdal.GRA_CubicSpline
+        gdal_interp_method = gdal.GRA_CubicSpline
     elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        interpolationMethod = gdal.GRA_NearestNeighbour
+        gdal_interp_method = gdal.GRA_NearestNeighbour
     elif interp_method == rsgislib.INTERP_CUBIC:
-        interpolationMethod = gdal.GRA_Cubic
+        gdal_interp_method = gdal.GRA_Cubic
     elif interp_method == rsgislib.INTERP_AVERAGE:
-        interpolationMethod = gdal.GRA_Average
+        gdal_interp_method = gdal.GRA_Average
     elif interp_method == rsgislib.INTERP_MODE:
-        interpolationMethod = gdal.GRA_Mode
+        gdal_interp_method = gdal.GRA_Mode
     else:
         raise rsgislib.RSGISPyException(
             "Interpolation method was not recognised or known."
@@ -2177,7 +2177,7 @@ def resample_img_to_match(
     if multicore:
         if haveNoData:
             wrpOpts = gdal.WarpOptions(
-                resampleAlg=interpolationMethod,
+                resampleAlg=gdal_interp_method,
                 srcNodata=no_data_val,
                 dstNodata=no_data_val,
                 multithread=True,
@@ -2185,12 +2185,12 @@ def resample_img_to_match(
             )
         else:
             wrpOpts = gdal.WarpOptions(
-                resampleAlg=interpolationMethod, multithread=True, callback=callback
+                resampleAlg=gdal_interp_method, multithread=True, callback=callback
             )
     else:
         if haveNoData:
             wrpOpts = gdal.WarpOptions(
-                resampleAlg=interpolationMethod,
+                resampleAlg=gdal_interp_method,
                 srcNodata=no_data_val,
                 dstNodata=no_data_val,
                 multithread=False,
@@ -2198,7 +2198,7 @@ def resample_img_to_match(
             )
         else:
             wrpOpts = gdal.WarpOptions(
-                resampleAlg=interpolationMethod, multithread=False, callback=callback
+                resampleAlg=gdal_interp_method, multithread=False, callback=callback
             )
 
     gdal.Warp(outFile, inFile, options=wrpOpts)
@@ -2252,21 +2252,21 @@ def reproject_image(
     import rsgislib.tools.utils
     import rsgislib.tools.geometrytools
 
-    eResampleAlg = gdal.GRA_NearestNeighbour
+    gdal_interp_method = gdal.GRA_NearestNeighbour
     if interp_method == rsgislib.INTERP_BILINEAR:
-        eResampleAlg = gdal.GRA_Bilinear
+        gdal_interp_method = gdal.GRA_Bilinear
     elif interp_method == rsgislib.INTERP_LANCZOS:
-        eResampleAlg = gdal.GRA_Lanczos
+        gdal_interp_method = gdal.GRA_Lanczos
     elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        eResampleAlg = gdal.GRA_CubicSpline
+        gdal_interp_method = gdal.GRA_CubicSpline
     elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        eResampleAlg = gdal.GRA_NearestNeighbour
+        gdal_interp_method = gdal.GRA_NearestNeighbour
     elif interp_method == rsgislib.INTERP_CUBIC:
-        eResampleAlg = gdal.GRA_Cubic
+        gdal_interp_method = gdal.GRA_Cubic
     elif interp_method == rsgislib.INTERP_AVERAGE:
-        eResampleAlg = gdal.GRA_Average
+        gdal_interp_method = gdal.GRA_Average
     elif interp_method == rsgislib.INTERP_MODE:
-        eResampleAlg = gdal.GRA_Mode
+        gdal_interp_method = gdal.GRA_Mode
     else:
         raise rsgislib.RSGISPyException(
             "Interpolation method was not recognised or known."
@@ -2427,7 +2427,7 @@ def reproject_image(
     wrpOpts = []
     if multicore:
         wrpOpts = gdal.WarpOptions(
-            resampleAlg=eResampleAlg,
+            resampleAlg=gdal_interp_method,
             srcNodata=no_data_val,
             dstNodata=no_data_val,
             multithread=True,
@@ -2435,7 +2435,7 @@ def reproject_image(
         )
     else:
         wrpOpts = gdal.WarpOptions(
-            resampleAlg=eResampleAlg,
+            resampleAlg=gdal_interp_method,
             srcNodata=no_data_val,
             dstNodata=no_data_val,
             multithread=False,
@@ -2479,21 +2479,21 @@ def gdal_warp(
     in_epsg = get_epsg_proj_from_img(input_img)
     img_data_type = get_gdal_datatype_from_img(input_img)
 
-    eResampleAlg = gdal.GRA_NearestNeighbour
+    gdal_interp_method = gdal.GRA_NearestNeighbour
     if interp_method == rsgislib.INTERP_BILINEAR:
-        eResampleAlg = gdal.GRA_Bilinear
+        gdal_interp_method = gdal.GRA_Bilinear
     elif interp_method == rsgislib.INTERP_LANCZOS:
-        eResampleAlg = gdal.GRA_Lanczos
+        gdal_interp_method = gdal.GRA_Lanczos
     elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        eResampleAlg = gdal.GRA_CubicSpline
+        gdal_interp_method = gdal.GRA_CubicSpline
     elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        eResampleAlg = gdal.GRA_NearestNeighbour
+        gdal_interp_method = gdal.GRA_NearestNeighbour
     elif interp_method == rsgislib.INTERP_CUBIC:
-        eResampleAlg = gdal.GRA_Cubic
+        gdal_interp_method = gdal.GRA_Cubic
     elif interp_method == rsgislib.INTERP_AVERAGE:
-        eResampleAlg = gdal.GRA_Average
+        gdal_interp_method = gdal.GRA_Average
     elif interp_method == rsgislib.INTERP_MODE:
-        eResampleAlg = gdal.GRA_Mode
+        gdal_interp_method = gdal.GRA_Mode
     else:
         raise rsgislib.RSGISPyException(
             "Interpolation method was not recognised or known."
@@ -2510,7 +2510,7 @@ def gdal_warp(
         format=gdalformat,
         srcSRS="EPSG:{}".format(in_epsg),
         dstSRS="EPSG:{}".format(out_epsg),
-        resampleAlg=eResampleAlg,
+        resampleAlg=gdal_interp_method,
         srcNodata=in_no_data_val,
         dstNodata=in_no_data_val,
         callback=callback,
@@ -3200,7 +3200,13 @@ def create_stack_images_vrt(input_imgs: list, out_vrt_file: str):
 
 
 def create_mosaic_images_vrt(
-    input_imgs: list, out_vrt_file: str, vrt_extent: list = None
+    input_imgs: list,
+    out_vrt_file: str,
+    vrt_extent: List = None,
+    vrt_out_res_x: float = None,
+    vrt_out_res_y: float = None,
+    interp_method: int = rsgislib.INTERP_NEAREST_NEIGHBOUR,
+    align_out_pxls: bool = False,
 ):
     """
     A function which creates a GDAL VRT file from a set of input images by mosaicking
@@ -3210,7 +3216,18 @@ def create_mosaic_images_vrt(
     :param out_vrt_file: The output file location for the VRT.
     :param vrt_extent: An optional (If None then ignored) extent
                        (minX, minY, maxX, maxY) for the VRT image.
+    :param vrt_out_res_x: An optional (If None then ignored) set defining the
+                          x resolution of the output VRT.
+    :param vrt_out_res_y: An optional (If None then ignored) set defining the
+                          y resolution of the output VRT.
+    :param interp_method: define the interpolation algorithm used when resampling
+                          is required.
+    :param align_out_pxls: align the output pixels to force output bounds to be
+                           multiple of output resolution.
+
     """
+    import osgeo.gdal as gdal
+
     try:
         import tqdm
 
@@ -3218,10 +3235,49 @@ def create_mosaic_images_vrt(
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress
-    if vrt_extent is not None:
-        build_vrt_opt = gdal.BuildVRTOptions(outputBounds=vrt_extent, callback=callback)
+
+    # resolution – ‘highest’, ‘lowest’, ‘average’, ‘user’.
+    res_source = "average"
+    if (vrt_out_res_x is None) and (vrt_out_res_y is None):
+        res_source = "average"
+    elif (vrt_out_res_x is not None) and (vrt_out_res_y is not None):
+        res_source = "user"
+        if vrt_out_res_y < 0:
+            vrt_out_res_y = vrt_out_res_y * (-1)
     else:
-        build_vrt_opt = gdal.BuildVRTOptions(callback=callback)
+        raise rsgislib.RSGISPyException(
+            "The X and Y resolution cannot be defined independently."
+        )
+
+    gdal_interp_method = gdal.GRA_NearestNeighbour
+    if interp_method == rsgislib.INTERP_BILINEAR:
+        gdal_interp_method = gdal.GRA_Bilinear
+    elif interp_method == rsgislib.INTERP_LANCZOS:
+        gdal_interp_method = gdal.GRA_Lanczos
+    elif interp_method == rsgislib.INTERP_CUBICSPLINE:
+        gdal_interp_method = gdal.GRA_CubicSpline
+    elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
+        gdal_interp_method = gdal.GRA_NearestNeighbour
+    elif interp_method == rsgislib.INTERP_CUBIC:
+        gdal_interp_method = gdal.GRA_Cubic
+    elif interp_method == rsgislib.INTERP_AVERAGE:
+        gdal_interp_method = gdal.GRA_Average
+    elif interp_method == rsgislib.INTERP_MODE:
+        gdal_interp_method = gdal.GRA_Mode
+    else:
+        raise rsgislib.RSGISPyException(
+            "Interpolation method was not recognised or known."
+        )
+
+    build_vrt_opt = gdal.BuildVRTOptions(
+        resolution=res_source,
+        outputBounds=vrt_extent,
+        xRes=vrt_out_res_x,
+        yRes=vrt_out_res_y,
+        targetAlignedPixels=align_out_pxls,
+        resampleAlg=gdal_interp_method,
+        callback=callback,
+    )
     gdal.BuildVRT(out_vrt_file, input_imgs, options=build_vrt_opt)
 
 
