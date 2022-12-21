@@ -4,7 +4,7 @@ Tools for creating vector layers.
 """
 
 import os
-from typing import List
+from typing import List, Dict
 
 from osgeo import gdal
 from osgeo import ogr
@@ -1121,9 +1121,9 @@ def create_vec_for_image(
     output_dir: str,
     out_format: str = "GeoJSON",
     geometry_type: int = rsgislib.GEOM_PT,
-    out_name_replace: dict = None,
-    out_file_ext=None,
-    del_exist_vec=False,
+    out_name_replace: Dict = None,
+    out_file_ext: str = None,
+    del_exist_vec: bool = False,
 ):
     """
     A function which creates a simple (dummy) vector layer for each input images.
