@@ -53,8 +53,8 @@ namespace rsgis{ namespace cmds {
         switch( rsgisType )
         {
             case rsgis::rsgis_8int:
-                gdalType = 14;//GDT_Int8;
-                break;
+                //gdalType = GDT_Int8; // Introduced GDAL 3.7
+                //break;
             case rsgis::rsgis_8uint:
                 gdalType = GDT_Byte;
                 break;
@@ -65,7 +65,7 @@ namespace rsgis{ namespace cmds {
                 gdalType = GDT_Int32;
                 break;
             case rsgis::rsgis_64int:
-                gdalType = 13;//GDT_Int64;
+                gdalType = GDT_Int64; // Introduced GDAL 3.5
                 break;
             case rsgis::rsgis_16uint:
                 gdalType = GDT_UInt16;
@@ -74,7 +74,7 @@ namespace rsgis{ namespace cmds {
                 gdalType = GDT_UInt32;
                 break;
             case rsgis::rsgis_64uint:
-                gdalType = 12;//GDT_UInt64;
+                gdalType = GDT_UInt64; // Introduced GDAL 3.5
                 break;
             case rsgis::rsgis_32float:
                 gdalType = GDT_Float32;
