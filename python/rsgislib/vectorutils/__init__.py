@@ -338,7 +338,7 @@ def count_feats_per_att_val(
 
 
 def merge_vectors_to_gpkg(
-    in_vec_files: list, out_vec_file: str, out_vec_lyr: str, exists: bool = False
+    in_vec_files: List, out_vec_file: str, out_vec_lyr: str, exists: bool = False
 ):
     """
     Function which will merge a list of vector files into an single output GeoPackage (GPKG) file using ogr2ogr.
@@ -511,7 +511,7 @@ def merge_vector_lyrs_to_gpkg(
 
 
 def merge_vectors_to_gpkg_ind_lyrs(
-    in_vec_files: list,
+    in_vec_files: List,
     out_vec_file: str,
     rename_dup_lyrs: bool = False,
     geom_type: str = None,
@@ -1058,8 +1058,8 @@ def reproj_vec_lyr_obj(
 
 
 def get_att_lst_select_feats(
-    vec_file: str, vec_lyr: str, att_names: list, vec_sel_file: str, vec_sel_lyr: str
-) -> list:
+    vec_file: str, vec_lyr: str, att_names: List, vec_sel_file: str, vec_sel_lyr: str
+) -> List:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1161,8 +1161,8 @@ def get_att_lst_select_feats(
 
 
 def get_att_lst_select_feats_lyr_objs(
-    vec_lyr_obj: ogr.Layer, att_names: list, vec_sel_lyr_obj: ogr.Layer
-) -> list:
+    vec_lyr_obj: ogr.Layer, att_names: List, vec_sel_lyr_obj: ogr.Layer
+) -> List:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1246,8 +1246,8 @@ def get_att_lst_select_feats_lyr_objs(
 
 
 def get_att_lst_select_bbox_feats(
-    vec_file: str, vec_lyr: str, att_names: list, bbox: list, bbox_epsg: int = None
-) -> list:
+    vec_file: str, vec_lyr: str, att_names: List, bbox: List, bbox_epsg: int = None
+) -> List:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1278,8 +1278,8 @@ def get_att_lst_select_bbox_feats(
 
 
 def get_att_lst_select_bbox_feats_lyr_objs(
-    vec_lyr_obj: ogr.Layer, att_names: list, bbox: list, bbox_epsg: int = None
-) -> list:
+    vec_lyr_obj: ogr.Layer, att_names: List, bbox: List, bbox_epsg: int = None
+) -> List:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1652,7 +1652,7 @@ def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> List[str]:
 
 
 def subset_envs_vec_lyr_obj(
-    vec_lyr_obj: ogr.Layer, bbox: list, epsg: int = None
+    vec_lyr_obj: ogr.Layer, bbox: List, epsg: int = None
 ) -> (ogr.DataSource, ogr.Layer):
     """
     Function to get an ogr vector layer for the defined bounding box. The returned
@@ -1857,7 +1857,7 @@ def open_gdal_vec_lyr(
 
 
 def get_mem_vec_lyr_subset(
-    vec_file: str, vec_lyr: str, bbox: list
+    vec_file: str, vec_lyr: str, bbox: List
 ) -> (ogr.DataSource, ogr.Layer):
     """
     Function to get an ogr vector layer for the defined bounding box. The returned
@@ -1892,7 +1892,7 @@ def write_vec_lyr_to_file(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str,
-    options: list = [],
+    options: List = [],
     replace: bool = False,
 ):
     """
@@ -1939,7 +1939,7 @@ def create_copy_vector_lyr(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str,
-    options: list = [],
+    options: List = [],
     replace: bool = False,
     in_memory: bool = False,
 ):
@@ -1996,9 +1996,9 @@ def copy_rat_cols_to_vector_lyr(
     vec_lyr: str,
     rat_row_col: str,
     clumps_img: str,
-    ratcols: list,
-    out_col_names: list = None,
-    out_col_types: list = None,
+    ratcols: List,
+    out_col_names: List = None,
+    out_col_types: List = None,
 ):
     """
     A function to copy columns from RAT to a vector layer. Note, the vector layer
@@ -2274,7 +2274,7 @@ def does_vmsk_img_intersect(
 
 
 def merge_to_multi_layer_vec(
-    input_file_lyrs: list,
+    input_file_lyrs: List,
     out_vec_file: str,
     out_format: str = "GPKG",
     overwrite: bool = True,
@@ -2315,8 +2315,8 @@ def vector_translate(
     out_vec_file: str,
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
-    drv_create_opts: list = [],
-    lyr_create_opts: list = [],
+    drv_create_opts: List = [],
+    lyr_create_opts: List = [],
     access_mode: str = None,
     src_srs: osr.SpatialReference = None,
     dst_srs: osr.SpatialReference = None,
@@ -2408,8 +2408,8 @@ def reproj_wgs84_vec_to_utm(
     out_vec_lyr: str = None,
     use_hemi: bool = True,
     out_format: str = "GPKG",
-    drv_create_opts: list = [],
-    lyr_create_opts: list = [],
+    drv_create_opts: List = [],
+    lyr_create_opts: List = [],
     access_mode: str = "overwrite",
     del_exist_vec: bool = False,
 ):
@@ -2650,7 +2650,7 @@ def subset_by_attribute(
     vec_file: str,
     vec_lyr: str,
     sub_col: str,
-    sub_vals: list,
+    sub_vals: List,
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
@@ -2772,7 +2772,7 @@ def merge_vector_files(
     A function which merges the input files into a single output file using geopandas.
     If the input files have multiple layers they are all merged into the output file.
 
-    :param vec_files: list of input files
+    :param vec_files: List of input files
     :param out_vec_file: output vector file.
     :param out_vec_lyr: output vector layer.
     :param out_format: output file format.
@@ -2816,7 +2816,7 @@ def merge_vector_files(
 
 
 def merge_vector_layers(
-    vecs_dict: list,
+    vecs_dict: List,
     out_vec_file: str,
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
@@ -2826,7 +2826,7 @@ def merge_vector_layers(
     A function which merges the input vector layers into a single output
     file using geopandas.
 
-    :param vecs_dict: list of dicts with keys [{'file': '/file/path/to/file.gpkg',
+    :param vecs_dict: List of dicts with keys [{'file': '/file/path/to/file.gpkg',
                          'layer': 'layer_name'}] providing the file paths and
                          layer names.
     :param out_vec_file: output vector file.
@@ -2943,7 +2943,7 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres: float = 350):
                 out_gdf.loc[i_geom, "geometry"] = Polygon(out_coords, holes=out_holes)
                 i_geom += 1
             elif row["geometry"].geom_type == "MultiPolygon":
-                for poly in row["geometry"]:
+                for poly in row["geometry"].geoms:
                     for coord in poly.exterior.coords:
                         if coord[0] < 0:
                             n_west += 1
@@ -2993,7 +2993,7 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres: float = 350):
 
 
 def merge_utm_vecs_wgs84(
-    in_vec_files: list,
+    in_vec_files: List,
     out_vec_file: str,
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
@@ -3054,7 +3054,7 @@ def merge_utm_vecs_wgs84(
                 "installed version was not be found."
             )
 
-    first = True
+    out_gdfs_lst = list()
     for file in tqdm.tqdm(in_vec_files):
         lyrs = get_vec_lyrs_lst(file)
         for lyr in lyrs:
@@ -3106,13 +3106,10 @@ def merge_utm_vecs_wgs84(
                         data_gdf = geopd_check_polys_wgs84_bounds_geometry(
                             data_gdf, width_thres
                         )
-                    if first:
-                        out_gdf = data_gdf
-                        first = False
-                    else:
-                        out_gdf = out_gdf.append(data_gdf)
+                    out_gdfs_lst.append(data_gdf)
 
-    if not first:
+    if len(out_gdfs_lst) > 0:
+        out_gdf = pandas.concat(out_gdfs_lst)
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
