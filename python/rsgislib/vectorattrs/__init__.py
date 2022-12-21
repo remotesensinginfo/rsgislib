@@ -1026,7 +1026,7 @@ def calc_npts_in_radius(
     out_vec_lyr: str,
     out_format: str = "GPKG",
     out_col_name: str = "n_pts_r",
-    n_cores=1,
+    n_cores: int = 1,
 ):
     """
     A function which calculate the number of points intersecting within a
