@@ -142,6 +142,7 @@ import sys
 import pathlib
 
 from osgeo import gdal
+from osgeo import gdalconst
 
 gdal.UseExceptions()
 
@@ -421,6 +422,23 @@ def get_gdal_datatype(rsgislib_datatype: int) -> int:
         out_dt = gdal.GDT_Float32
     elif rsgislib_datatype == TYPE_64FLOAT:
         out_dt = gdal.GDT_Float64
+    elif rsgislib_datatype == TYPE_64INT:
+        if hasattr(gdalconst, "GDT_Int64"):
+            out_dt = gdal.GDT_Int64
+        else:
+            raise RSGISPyException("GDT_Int64 not available in your GDAL installation.")
+    elif rsgislib_datatype == TYPE_64UINT:
+        if hasattr(gdalconst, "GDT_UInt64"):
+            out_dt = gdal.GDT_UInt64
+        else:
+            raise RSGISPyException(
+                "GDT_UInt64 not available in your GDAL installation."
+            )
+    elif rsgislib_datatype == TYPE_8INT:
+        if hasattr(gdalconst, "GDT_Int8"):
+            out_dt = gdal.GDT_Int8
+        else:
+            raise RSGISPyException("GDT_Int8 not available in your GDAL installation.")
     else:
         raise RSGISPyException(
             f"The data type '{rsgislib_datatype}' is unknown / not supported."

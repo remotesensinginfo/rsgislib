@@ -47,10 +47,14 @@ namespace rsgis{ namespace cmds {
 
     inline GDALDataType RSGIS_to_GDAL_Type( rsgis::RSGISLibDataType rsgisType )
     {
+        // Hard coded some enum values to allow building with older versions
+        // of GDAL. Not the best solution.
         GDALDataType gdalType = GDT_Unknown;
         switch( rsgisType )
         {
             case rsgis::rsgis_8int:
+                gdalType = 14;//GDT_Int8;
+                break;
             case rsgis::rsgis_8uint:
                 gdalType = GDT_Byte;
                 break;
@@ -60,11 +64,17 @@ namespace rsgis{ namespace cmds {
             case rsgis::rsgis_32int:
                 gdalType = GDT_Int32;
                 break;
+            case rsgis::rsgis_64int:
+                gdalType = 13;//GDT_Int64;
+                break;
             case rsgis::rsgis_16uint:
                 gdalType = GDT_UInt16;
                 break;
             case rsgis::rsgis_32uint:
                 gdalType = GDT_UInt32;
+                break;
+            case rsgis::rsgis_64uint:
+                gdalType = 12;//GDT_UInt64;
                 break;
             case rsgis::rsgis_32float:
                 gdalType = GDT_Float32;
