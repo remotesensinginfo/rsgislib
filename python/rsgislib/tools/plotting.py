@@ -964,6 +964,7 @@ def linear_stretch_np_arr(
         arr_data_out[arr_data == no_data_val] = numpy.nan
     else:
         arr_data_out = arr_data.copy()
+        arr_data_out = arr_data_out.astype(float)
 
     if len(arr_shp) == 2:
         min_val = numpy.nanmin(arr_data_out)
@@ -1056,6 +1057,7 @@ def cumulative_stretch_np_arr(
         arr_data_out[arr_data == no_data_val] = numpy.nan
     else:
         arr_data_out = arr_data.copy()
+        arr_data_out = arr_data_out.astype(float)
 
     if len(arr_shp) == 2:
         min_val, max_val = numpy.nanpercentile(arr_data_out, [lower, upper])
@@ -1145,6 +1147,7 @@ def stdev_stretch_np_arr(
         arr_data_out[arr_data == no_data_val] = numpy.nan
     else:
         arr_data_out = arr_data.copy()
+        arr_data_out = arr_data_out.astype(float)
 
     if len(arr_shp) == 2:
         min_val = numpy.nanmin(arr_data_out)
@@ -1267,6 +1270,7 @@ def manual_stretch_np_arr(
         arr_data_out[arr_data == no_data_val] = numpy.nan
     else:
         arr_data_out = arr_data.copy()
+        arr_data_out = arr_data_out.astype(float)
 
     if len(arr_shp) == 2:
         if type(min_max_vals) is not dict:
