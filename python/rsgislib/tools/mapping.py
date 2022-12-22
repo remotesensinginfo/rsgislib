@@ -706,7 +706,11 @@ def create_raster_img_map(
         print("No stretch is being used - is this what you intended?!")
         img_data_strch = img_data
 
-    ax.imshow(img_data_strch, extent=img_coords)
+    clr_map = None
+    if len(img_bands) == 1:
+        clr_map = "gist_gray"
+
+    ax.imshow(img_data_strch, cmap=clr_map, extent=img_coords)
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
 
