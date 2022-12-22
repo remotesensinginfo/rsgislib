@@ -569,6 +569,7 @@ def test_get_poly_hole_area():
     assert (len(areas) == 1) and (abs(areas[0] - 524701) < 1)
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_rm_polys_area_lessthan(tmp_path):
     import rsgislib.vectorgeoms
 
@@ -591,6 +592,7 @@ def test_rm_polys_area_lessthan(tmp_path):
     assert os.path.exists(out_vec_file)
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_rm_polys_area_greatthan(tmp_path):
     import rsgislib.vectorgeoms
 
