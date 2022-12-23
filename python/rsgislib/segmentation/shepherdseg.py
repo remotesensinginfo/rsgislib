@@ -37,8 +37,10 @@
 # Import shutil
 # Import the collections module
 import collections
+
 # Import the python JSON module
 import json
+
 # Import the python OS module
 import os
 import shutil
@@ -48,12 +50,16 @@ import osgeo.gdal as gdal
 
 # Import the rsgislib module
 import rsgislib
+
 # Import the image calc module from rsgislib
 import rsgislib.imagecalc
+
 # Import the image utilities module from rsgislib
 import rsgislib.imageutils
+
 # Import the image rastergis module from rsgislib
 import rsgislib.rastergis
+
 # Import the image segmentation module from rsgislib
 import rsgislib.segmentation
 

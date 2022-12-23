@@ -14,8 +14,10 @@ from osgeo import gdal, ogr, osr
 
 # Import the RSGISLib module
 import rsgislib
+
 # Import the RSGISLib Image Utils module
 import rsgislib.imageutils
+
 # Import the RSGISLib RasterGIS module
 import rsgislib.rastergis
 

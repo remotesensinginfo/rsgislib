@@ -140,8 +140,7 @@ def create_search_obj(regrs_obj, regrs_params, n_runs=250, n_cv=5, n_cores=1):
              or RandomizedSearchCV)
 
     """
-    from sklearn.model_selection import (GridSearchCV, ParameterGrid,
-                                         RandomizedSearchCV)
+    from sklearn.model_selection import GridSearchCV, ParameterGrid, RandomizedSearchCV
 
     if len(ParameterGrid(regrs_params)) > n_runs:
         skl_srch_obj = GridSearchCV(
