@@ -4,16 +4,16 @@ The tools file manipulation module contains functions for manipulating and
 moving files around.
 """
 
+import datetime
+import errno
 # Import modules
 import glob
 import os
-import sys
-import errno
-import tempfile
 import shutil
-import datetime
+import sys
+import tempfile
 import time
-from typing import Union, List
+from typing import List, Union
 
 import rsgislib
 

@@ -37,14 +37,12 @@
 from __future__ import print_function
 
 import numpy
-
-from rios import applier
-from rios import cuiprogress
+from rios import applier, cuiprogress
 
 import rsgislib
-import rsgislib.rastergis
-import rsgislib.imageutils
 import rsgislib.imagecalc
+import rsgislib.imageutils
+import rsgislib.rastergis
 
 
 def find_class_pyod_outliers(

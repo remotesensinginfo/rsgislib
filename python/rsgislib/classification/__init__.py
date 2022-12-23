@@ -3,14 +3,14 @@
 The classification module provides classification functionality within RSGISLib.
 """
 
-# import the C++ extension into this level
-from ._classification import *
-
-from typing import List, Dict
+from typing import Dict, List
 
 import rsgislib
 import rsgislib.imageutils
 from rsgislib.imageutils import ImageBandInfo
+
+# import the C++ extension into this level
+from ._classification import *
 
 
 class ClassSimpleInfoObj(object):
@@ -243,6 +243,7 @@ def get_class_info_dict(
 
     """
     import os
+
     import rsgislib.tools.filetools
 
     cls_smpls_fnl_info = dict()
@@ -299,13 +300,14 @@ def get_class_training_data(
     :return: dictionary of ClassSimpleInfoObj objects.
 
     """
+    import os
+    import random
+    import shutil
+
     import rsgislib.tools.filetools
     import rsgislib.tools.utils
     import rsgislib.vectorutils.createrasters
     import rsgislib.zonalstats
-    import os
-    import random
-    import shutil
 
     # Get valid mask, rasterised to this
     uid_str = rsgislib.tools.utils.uid_generator()
@@ -392,12 +394,13 @@ def get_class_training_chips_data(
     :return: dictionary of ClassSimpleInfoObj objects.
 
     """
-    import rsgislib.tools.filetools
-    import rsgislib.tools.utils
-    import rsgislib.vectorutils
     import os
     import random
     import shutil
+
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
+    import rsgislib.vectorutils
 
     # Get valid mask, rasterised to this
     uid_str = rsgislib.tools.utils.uid_generator()
@@ -585,10 +588,11 @@ def split_sample_train_valid_test(
                      then the output data type will be float32.
 
     """
-    import rsgislib.tools.utils
-    import rsgislib.tools.filetools
-    import rsgislib.zonalstats
     import os
+
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
+    import rsgislib.zonalstats
 
     uid_str = rsgislib.tools.utils.uid_generator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
@@ -670,10 +674,11 @@ def split_chip_sample_train_valid_test(
                      then the output data type will be float32.
 
     """
-    import rsgislib.tools.utils
-    import rsgislib.tools.filetools
-    import rsgislib.zonalstats
     import os
+
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
+    import rsgislib.zonalstats
 
     uid_str = rsgislib.tools.utils.uid_generator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
@@ -756,11 +761,12 @@ def split_chip_sample_ref_train_valid_test(
                      then the output data type will be float32.
 
     """
+    import os
+
     import rsgislib
     import rsgislib.tools.filetools
     import rsgislib.tools.utils
     from rsgislib.zonalstats import split_sample_ref_chip_hdf5_file
-    import os
 
     uid_str = rsgislib.tools.utils.uid_generator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
@@ -826,9 +832,10 @@ def flip_chip_hdf5_file(input_h5_file, output_h5_file, datatype=None):
                      then the output data type will be float32.
 
     """
-    import tqdm
     import h5py
     import numpy
+    import tqdm
+
     import rsgislib
 
     if datatype is None:
@@ -896,9 +903,10 @@ def flip_ref_chip_hdf5_file(input_h5_file, output_h5_file, datatype=None):
                      data type will be float32.
 
     """
-    import tqdm
     import h5py
     import numpy
+    import tqdm
+
     import rsgislib
 
     if datatype is None:
@@ -1019,12 +1027,14 @@ def label_pxl_sample_chips(
         label_pxl_sample_chips(sample_pxls_img, cls_msk_img, output_image, 'KEA', 21, cls_lut)
 
     """
-    import rsgislib.rastergis
+    import math
+
+    import numpy
+    import tqdm
     from rios.imagereader import ImageReader
     from rios.imagewriter import ImageWriter
-    import tqdm
-    import numpy
-    import math
+
+    import rsgislib.rastergis
 
     chip_size_odd = False
     if (chip_size % 2) != 0:
@@ -1122,12 +1132,14 @@ def plot_train_data(
                       otherwise call 'Var #1', 'Var #2' ... 'Var #N' etc.
 
     """
-    import plotly.express as px
-    import pandas
-    import h5py
-    import tqdm
     import os
+
+    import h5py
     import numpy
+    import pandas
+    import plotly.express as px
+    import tqdm
+
     import rsgislib.tools.utils
 
     if not os.path.exists(out_plots_dir):
@@ -1267,8 +1279,9 @@ def create_acc_pt_sets(
                      the shuffling is the same between runs.
 
     """
-    import geopandas
     import math
+
+    import geopandas
     import numpy
     import tqdm
 
@@ -1353,11 +1366,10 @@ def fill_class_timeseries(
                           for both the input and output images.
 
     """
-    from rios import applier
-    from rios import cuiprogress
+    from rios import applier, cuiprogress
 
-    import rsgislib.rastergis
     import rsgislib.imageutils
+    import rsgislib.rastergis
     import rsgislib.tools.filetools
 
     if len(input_imgs) < 2:

@@ -33,17 +33,16 @@
 #
 ###########################################################################
 
-import rsgislib
-from rsgislib import imageutils
-from rsgislib import imagefilter
-
 import glob
-import os.path
-import os
-import shutil
 import math
-from multiprocessing import Pool
+import os
+import os.path
+import shutil
 from abc import ABCMeta, abstractmethod
+from multiprocessing import Pool
+
+import rsgislib
+from rsgislib import imagefilter, imageutils
 
 
 class RSGISAbstractFilter:

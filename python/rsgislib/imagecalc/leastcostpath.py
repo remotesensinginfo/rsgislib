@@ -32,9 +32,8 @@
 #
 ############################################################################
 
-from osgeo import gdal
-from osgeo import osr
 import numpy
+from osgeo import gdal, osr
 
 
 def _coord2pixelOffset(rasterfn, x, y):

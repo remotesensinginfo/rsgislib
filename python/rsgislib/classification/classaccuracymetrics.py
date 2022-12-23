@@ -35,7 +35,7 @@
 
 import math
 import os
-from typing import List, Tuple, Dict
+from typing import Dict, List, Tuple
 
 import numpy
 
@@ -667,9 +667,9 @@ def calc_acc_metrics_vecsamples_img(
                                                          out_json_file)
 
     """
-    import rsgislib.vectorattrs
-    import rsgislib.rastergis
     import rsgislib.imageutils
+    import rsgislib.rastergis
+    import rsgislib.vectorattrs
 
     # Read columns from vector file.
     ref_vals = numpy.array(
@@ -956,8 +956,9 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     :return: dict with mean/median and bootstrap intervals.
 
     """
-    import tqdm
     import numpy.random
+    import tqdm
+
     import rsgislib.vectorattrs
 
     # Read columns from vector file.
@@ -1941,9 +1942,10 @@ def calc_sampled_acc_metrics(
                     then be passed a position parameter of 1.
 
     """
-    import rsgislib.classification.classaccuracymetrics
-    import tqdm
     import matplotlib.pyplot as plt
+    import tqdm
+
+    import rsgislib.classification.classaccuracymetrics
 
     cls_names = sorted(cls_names, key=str.lower)
     n_tot_pts = ref_samples.shape[0]

@@ -3,28 +3,24 @@
 The vector utils module performs geometry / attribute table operations on vectors.
 """
 
-# import the C++ extension into this level
-from ._vectorutils import *
-
+import math
 import os
-import sys
 import shutil
 import subprocess
-import math
-from typing import List, Dict, Union
+import sys
+from typing import Dict, List, Union
 
-from osgeo import gdal
-from osgeo import osr
-from osgeo import ogr
+from osgeo import gdal, ogr, osr
 
 # Import the RSGISLib module
 import rsgislib
-
 # Import the RSGISLib Image Utils module
 import rsgislib.imageutils
-
 # Import the RSGISLib RasterGIS module
 import rsgislib.rastergis
+
+# import the C++ extension into this level
+from ._vectorutils import *
 
 gdal.UseExceptions()
 
@@ -84,6 +80,7 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
 
     """
     from osgeo import gdal
+
     import rsgislib.tools.filetools
 
     if os.path.exists(vec_file):
@@ -527,8 +524,8 @@ def merge_vectors_to_gpkg_ind_lyrs(
                       (e.g., 'POLYGON'). Same options as ogr2ogr.
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_vec_file):
         raise rsgislib.RSGISPyException(
@@ -1591,8 +1588,8 @@ def spatial_select_gp(
     :param vec_roi_epsg: Optionally provide the epsg code for the roi vector layer.
 
     """
-    import numpy
     import geopandas
+    import numpy
 
     print("Read vector layers")
     in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
@@ -2188,9 +2185,9 @@ def does_vmsk_img_intersect(
 
     """
     import rsgislib.imagecalc
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
     import rsgislib.tools.geometrytools
+    import rsgislib.tools.utils
     import rsgislib.vectorutils.createrasters
 
     # Does the input image BBOX intersect the BBOX of the ROI vector?
@@ -2429,12 +2426,14 @@ def reproj_wgs84_vec_to_utm(
     :param del_exist_vec: remove output file if it exists.
 
     """
-    import rsgislib.tools.utm
-    import rsgislib.tools.projection
-    import rsgislib.vectorgeoms
-    from osgeo import gdal
     import os
+
     import tqdm
+    from osgeo import gdal
+
+    import rsgislib.tools.projection
+    import rsgislib.tools.utm
+    import rsgislib.vectorgeoms
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -2583,9 +2582,11 @@ def split_by_attribute(
                           being ascii characters.
 
     """
+    import os
+
     import geopandas
     import tqdm
-    import os
+
     import rsgislib.tools.utils
 
     if multi_layers:
@@ -2777,9 +2778,10 @@ def merge_vector_files(
                      used to define the output projection.
 
     """
-    import tqdm
     import geopandas
     import pandas
+    import tqdm
+
     import rsgislib.tools.filetools
 
     if len(vec_files) == 0:
@@ -2833,8 +2835,8 @@ def merge_vector_layers(
                      used to define the output projection.
 
     """
-    import tqdm
     import geopandas
+    import tqdm
 
     first = True
     for vec_info in tqdm.tqdm(vecs_dict):
@@ -2886,8 +2888,8 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres: float = 350):
     :returns: geopandas dataframe
 
     """
-    from shapely.geometry import Polygon, LinearRing
     import geopandas
+    from shapely.geometry import LinearRing, Polygon
 
     out_gdf = geopandas.GeoDataFrame()
     out_gdf["geometry"] = None
@@ -3020,11 +3022,12 @@ def merge_utm_vecs_wgs84(
     """
     import geopandas
     import pandas
-    import rsgislib.tools.utm
-    import rsgislib.tools.utils
-    import rsgislib.tools.geometrytools
-    import rsgislib.vectorgeoms
     import tqdm
+
+    import rsgislib.tools.geometrytools
+    import rsgislib.tools.utils
+    import rsgislib.tools.utm
+    import rsgislib.vectorgeoms
 
     if n_hemi_utm_file is None:
         n_hemi_utm_file = os.path.join(
@@ -3224,8 +3227,8 @@ def create_train_test_smpls(
     :param rnd_seed: A seed for the random number generator.
 
     """
-    import rsgislib.vectorattrs
     import rsgislib.tools.filetools
+    import rsgislib.vectorattrs
 
     created_tmp_dir = False
     if not os.path.exists(tmp_dir):
@@ -3348,6 +3351,7 @@ def match_closest_vec_pts(
     """
     import geopandas
     import numpy
+
     import rsgislib.tools.geometrytools
 
     base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)

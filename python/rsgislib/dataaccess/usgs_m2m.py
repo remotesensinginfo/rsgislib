@@ -5,11 +5,11 @@ Tools for accessing (searching and downloading) datasets from the USGS
 """
 
 import datetime
-from typing import List, Dict
+from typing import Dict, List
 
 import rsgislib
-import rsgislib.tools.utils
 import rsgislib.tools.httptools
+import rsgislib.tools.utils
 
 DATA_PRODUCTS = {
     "landsat_tm_c1": "5e83d08fd9932768",

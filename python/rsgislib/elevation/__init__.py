@@ -41,6 +41,7 @@ def fft_dem_fusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20):
     # TODO Add checks that images are covering the same geographic area etc. Same number of pixels as well?
     import numpy
     from osgeo import gdal
+
     import rsgislib
     import rsgislib.imageutils
 

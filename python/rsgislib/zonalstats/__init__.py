@@ -41,21 +41,19 @@ respect to the method of intersection. The options for intersection are:
 * METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within pixel
 """
 
-# import the C++ extension into this level
-from ._zonalstats import *
-
 import math
 import sys
 from typing import List
 
-from osgeo import gdal
-from osgeo import ogr
-from osgeo import osr
 import numpy
 import tqdm
+from osgeo import gdal, ogr, osr
 
 import rsgislib
 import rsgislib.imageutils
+
+# import the C++ extension into this level
+from ._zonalstats import *
 
 gdal.UseExceptions()
 
@@ -1716,9 +1714,9 @@ def extract_chip_zone_image_band_values_to_hdf(
 
     """
     # Import the RIOS image reader
-    from rios.imagereader import ImageReader
     import h5py
     import tqdm
+    from rios.imagereader import ImageReader
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -2156,9 +2154,9 @@ def extract_ref_chip_zone_image_band_values_to_hdf(
 
     """
     # Import the RIOS image reader
-    from rios.imagereader import ImageReader
     import h5py
     import tqdm
+    from rios.imagereader import ImageReader
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT

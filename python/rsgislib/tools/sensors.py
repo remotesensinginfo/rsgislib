@@ -2,8 +2,8 @@
 """
 The tools and utilities for specific sensors.
 """
-import os
 import datetime
+import os
 
 import rsgislib
 

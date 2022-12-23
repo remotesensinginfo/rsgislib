@@ -5,13 +5,14 @@ The tools.utils module contains some useful tools
 
 import collections.abc
 import datetime
+import json
+import math
 import os
 import string
-import math
-import json
-from typing import List, Union, Dict
+from typing import Dict, List, Union
 
 import numpy
+
 import rsgislib
 
 

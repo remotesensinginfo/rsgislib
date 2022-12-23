@@ -2,8 +2,8 @@
 """
 The tools.projection module contains some useful tools for working with projections.
 """
-from typing import List
 import math
+from typing import List
 
 import numpy
 from osgeo import osr

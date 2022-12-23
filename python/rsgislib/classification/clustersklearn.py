@@ -34,20 +34,16 @@
 #
 ###########################################################################
 
+import numpy
+import tqdm
+from osgeo import gdal
+from rios.imagereader import ImageReader
+from rios.imagewriter import ImageWriter
+from sklearn.cluster import MiniBatchKMeans
+
 import rsgislib
 import rsgislib.imageutils
 import rsgislib.rastergis
-
-import tqdm
-
-import numpy
-
-from osgeo import gdal
-
-from sklearn.cluster import MiniBatchKMeans
-
-from rios.imagereader import ImageReader
-from rios.imagewriter import ImageWriter
 
 
 def img_pixel_sample_cluster(

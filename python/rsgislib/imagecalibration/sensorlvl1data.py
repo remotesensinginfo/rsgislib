@@ -33,8 +33,9 @@
 #
 ############################################################################
 
-import rsgislib
 import math
+
+import rsgislib
 
 
 def create_stacked_toa_ls_oli_cl2_lv1_img(
@@ -70,13 +71,14 @@ def create_stacked_toa_ls_oli_cl2_lv1_img(
 
     """
     import os
+
+    import rsgislib.imagecalc
+    import rsgislib.imagecalibration.sensorlvl2data
+    import rsgislib.imageutils
+    import rsgislib.rastergis
     import rsgislib.tools.filetools
     import rsgislib.tools.sensors
     import rsgislib.tools.utils
-    import rsgislib.imagecalc
-    import rsgislib.imageutils
-    import rsgislib.rastergis
-    import rsgislib.imagecalibration.sensorlvl2data
 
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)

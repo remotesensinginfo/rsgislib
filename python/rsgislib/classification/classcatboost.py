@@ -1,15 +1,13 @@
 from typing import List
 
+import h5py
+import numpy
+from rios import applier, cuiprogress
+from sklearn.metrics import accuracy_score
+
 import rsgislib
 import rsgislib.imageutils
 import rsgislib.rastergis
-
-import h5py
-import numpy
-from sklearn.metrics import accuracy_score
-
-from rios import applier
-from rios import cuiprogress
 
 # from rios import rat
 

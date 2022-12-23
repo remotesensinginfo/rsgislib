@@ -33,15 +33,14 @@
 ###########################################################################
 
 import glob
-import os.path
+import multiprocessing
 import os
+import os.path
 import shutil
 from multiprocessing import Pool
-import multiprocessing
 
 import rsgislib
-from rsgislib import segmentation
-from rsgislib import imageutils
+from rsgislib import imageutils, segmentation
 
 ################################ Clumping Functions ################################
 
@@ -67,8 +66,8 @@ def perform_clumping_single_thread(
                        internally and therefore needs to be available.
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     createdTmp = False
     if not os.path.exists(tmp_dir):
@@ -160,8 +159,8 @@ def perform_clumping_multi_process(
                     clumping processing.
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     createdTmp = False
     if not os.path.exists(tmp_dir):
@@ -259,8 +258,8 @@ def perform_union_clumping_single_thread(
                        internally and therefore needs to be available.
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     createdTmp = False
     if not os.path.exists(tmp_dir):
@@ -356,8 +355,8 @@ def perform_union_clumping_multi_process(
                     clumping processing.
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     createdTmp = False
     if not os.path.exists(tmp_dir):

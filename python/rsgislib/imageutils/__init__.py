@@ -3,21 +3,19 @@
 The imageutils module contains general utilities for applying to images.
 """
 
-# import the C++ extension into this level
-from ._imageutils import *
-import rsgislib
-
-import os
 import math
+import os
 import shutil
-from typing import List, Dict
+from typing import Dict, List
 
 import numpy
-
-from osgeo import gdal
-from osgeo import osr
-
+from osgeo import gdal, osr
 from rios import applier
+
+import rsgislib
+
+# import the C++ extension into this level
+from ._imageutils import *
 
 gdal.UseExceptions()
 
@@ -922,6 +920,7 @@ def get_img_subset_pxl_bbox(input_img: str, sub_bbox: List[float]) -> List[int]:
 
     """
     import math
+
     import rsgislib.tools.geometrytools
 
     img_bbox = get_img_bbox(input_img)
@@ -1843,8 +1842,8 @@ def create_blank_img_from_ref_vector(
 
     """
 
-    import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorutils
 
     baseExtent = rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
     xMin, xMax, yMin, yMax = rsgislib.tools.geometrytools.find_extent_on_grid(
@@ -1907,8 +1906,8 @@ def create_copy_img_vec_extent_snap_to_grid(
                       vector file extent by.
 
     """
-    import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorutils
 
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
         vec_file, vec_lyr=vec_lyr, compute_if_exp=True
@@ -2249,8 +2248,8 @@ def reproject_image(
                          "COMPRESS=LZW", "BIGTIFF=YES"]
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.geometrytools
+    import rsgislib.tools.utils
 
     gdal_interp_method = gdal.GRA_NearestNeighbour
     if interp_method == rsgislib.INTERP_BILINEAR:
@@ -2603,6 +2602,7 @@ def create_tiles_multi_core(
 
     """
     import multiprocessing
+
     import rsgislib.tools.filetools
 
     if not (
@@ -2732,8 +2732,9 @@ def calc_wgs84_pixel_area(
                         Scale=2590000(sq miles), Scale=0.0929022668(sq feet)
 
     """
-    import rsgislib.tools.projection
     from rios import applier
+
+    import rsgislib.tools.projection
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -2962,8 +2963,8 @@ def extract_img_pxl_sample(
 
     """
     # Import the RIOS image reader
-    from rios.imagereader import ImageReader
     import tqdm
+    from rios.imagereader import ImageReader
 
     first = True
     reader = ImageReader(input_img, windowxsize=200, windowysize=200)
@@ -3009,8 +3010,8 @@ def extract_img_pxl_vals_in_msk(
 
     """
     # Import the RIOS image reader
-    from rios.imagereader import ImageReader
     import tqdm
+    from rios.imagereader import ImageReader
 
     outArr = None
     first = True
@@ -3066,8 +3067,9 @@ def combine_binary_masks(
 
     """
     import json
-    import rsgislib.tools.utils
+
     import rsgislib.imagecalc
+    import rsgislib.tools.utils
 
     try:
         import tqdm
@@ -3326,8 +3328,8 @@ def subset_to_vec(
                      be specified.
     """
     import rsgislib
-    import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorutils
 
     if vec_epsg is None:
         vec_epsg = rsgislib.vectorutils.get_proj_epsg_from_vec(
@@ -3404,9 +3406,9 @@ def subset_to_geoms_bbox(
     :param out_img_ext: output image file extension (e.g., kea)
 
     """
-    import rsgislib.vectorgeoms
-    import rsgislib.vectorattrs
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorattrs
+    import rsgislib.vectorgeoms
 
     if datatype is None:
         datatype = get_rsgislib_datatype_from_img(input_img)
@@ -3482,11 +3484,11 @@ def mask_img_with_vec(
 
     """
     import rsgislib
-    import rsgislib.vectorutils
-    import rsgislib.vectorutils.createrasters
+    import rsgislib.tools.filetools
     import rsgislib.tools.geometrytools
     import rsgislib.tools.utils
-    import rsgislib.tools.filetools
+    import rsgislib.vectorutils
+    import rsgislib.vectorutils.createrasters
 
     # Does the input image BBOX intersect the BBOX of the ROI vector?
     if vec_epsg is None:
@@ -3569,8 +3571,8 @@ def create_valid_mask(
     :param tmp_dir: A directory for temporary outputs created during the processing.
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     if len(img_band_info) == 1:
         no_data_val = get_img_no_data_value(img_band_info[0].file_name)
@@ -4169,8 +4171,8 @@ def spectral_smoothing(
                        metadata stats (Default: True)
 
     """
-    from rios import applier
     import scipy.signal
+    from rios import applier
 
     try:
         import tqdm
@@ -4257,8 +4259,9 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
     :param gdalformat: the output image file format (default: KEA).
 
     """
-    import rsgislib.tools.projection
     from rios import applier
+
+    import rsgislib.tools.projection
 
     try:
         import tqdm

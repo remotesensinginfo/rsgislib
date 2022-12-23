@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import pprint
 import math
+import pprint
 
 import numpy
 from osgeo import gdal

@@ -3,14 +3,12 @@
 The vector attributes module performs attribute table operations on vectors.
 """
 
-from typing import Union, List, Dict
 import math
-
-from osgeo import gdal
-import osgeo.ogr
-from osgeo import ogr
+from typing import Dict, List, Union
 
 import numpy
+import osgeo.ogr
+from osgeo import gdal, ogr
 
 import rsgislib
 
@@ -428,6 +426,7 @@ def add_geom_bbox_cols(
 
     """
     import geopandas
+
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -496,6 +495,7 @@ def create_name_col(
     """
     import geopandas
     import tqdm
+
     import rsgislib.tools.utils
     import rsgislib.vectorutils
 
@@ -590,8 +590,9 @@ def add_unq_numeric_col(
 
     """
     import geopandas
-    import rsgislib.vectorutils
+
     import rsgislib.tools.utils
+    import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
 
@@ -645,6 +646,7 @@ def add_numeric_col_lut(
 
     """
     import geopandas
+
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -690,6 +692,7 @@ def add_numeric_col(
 
     """
     import geopandas
+
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -728,6 +731,7 @@ def add_string_col(
 
     """
     import geopandas
+
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -785,6 +789,7 @@ def add_fid_col(
 
     """
     import geopandas
+
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -824,6 +829,7 @@ def get_vec_cols_as_array(
 
     """
     import geopandas
+
     import rsgislib.tools.stats
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
@@ -862,6 +868,7 @@ def sort_vec_lyr(
 
     """
     import geopandas
+
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
@@ -916,6 +923,7 @@ def find_replace_str_vec_lyr(
 
     """
     import geopandas
+
     import rsgislib.vectorutils
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)

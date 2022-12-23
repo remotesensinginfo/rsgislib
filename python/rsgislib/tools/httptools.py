@@ -2,16 +2,16 @@
 """
 The tools.httptools
 """
-from typing import Dict
 import json
 import os
+from typing import Dict
 
-import tqdm
 import requests
+import tqdm
 
 import rsgislib
-import rsgislib.tools.utils
 import rsgislib.tools.filetools
+import rsgislib.tools.utils
 
 
 class RSGISPyResponseException(rsgislib.RSGISPyException):

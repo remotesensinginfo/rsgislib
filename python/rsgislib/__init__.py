@@ -136,13 +136,12 @@ Options for classification datasets:
 """
 from __future__ import print_function
 
-import time
 import datetime
-import sys
 import pathlib
+import sys
+import time
 
-from osgeo import gdal
-from osgeo import gdalconst
+from osgeo import gdal, gdalconst
 
 gdal.UseExceptions()
 
@@ -257,8 +256,8 @@ def get_install_base_path() -> pathlib.PurePath:
              installation.
 
     """
-    import site
     import platform
+    import site
 
     site_path_str = site.getsitepackages()[0]
     site_path = pathlib.PurePath(site_path_str)

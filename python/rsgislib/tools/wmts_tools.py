@@ -3,9 +3,10 @@
 The tools.wmts_tools module contains some useful tools for
 working with WMTS tile services
 """
-from typing import List
 import os
 import shutil
+from typing import List
+
 import rsgislib
 
 
@@ -67,11 +68,13 @@ def get_wmts_as_img(
                       the code can't automatically find it.
 
     """
-    from osgeo import gdal
-    import rsgislib.imageutils
-    import rsgislib.tools.utils
-    import rsgislib.tools.geometrytools
     import xml.etree.ElementTree as ET
+
+    from osgeo import gdal
+
+    import rsgislib.imageutils
+    import rsgislib.tools.geometrytools
+    import rsgislib.tools.utils
 
     uid_str = rsgislib.tools.utils.uid_generator()
     create_tmp_dir = False

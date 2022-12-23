@@ -1,7 +1,7 @@
-import time
-import os
-from typing import Dict, List
 import ftplib
+import os
+import time
+from typing import Dict, List
 
 import rsgislib
 import rsgislib.tools.filetools

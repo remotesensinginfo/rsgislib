@@ -36,20 +36,15 @@
 
 from __future__ import print_function
 
-import rsgislib
-import rsgislib.imageutils
-import rsgislib.imagecalc
-import rsgislib.rastergis
-
-import numpy
-
 import h5py
-
+import numpy
 from osgeo import gdal
+from rios import applier, cuiprogress, rat
 
-from rios import applier
-from rios import cuiprogress
-from rios import rat
+import rsgislib
+import rsgislib.imagecalc
+import rsgislib.imageutils
+import rsgislib.rastergis
 
 HAVE_XGBOOST = True
 try:
@@ -57,12 +52,10 @@ try:
 except ImportError:
     HAVE_XGBOOST = False
 
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import accuracy_score
-
 import gc
-
 import json
+
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 
 def optimise_xgboost_binary_classifier(
@@ -97,8 +90,8 @@ def optimise_xgboost_binary_classifier(
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
-    from skopt.space import Real, Integer
     from skopt import gp_minimize
+    from skopt.space import Integer, Real
 
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, "r")
@@ -399,8 +392,8 @@ def train_opt_xgboost_binary_classifier(
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
-    from skopt.space import Real, Integer
     from skopt import gp_minimize
+    from skopt.space import Integer, Real
 
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, "r")
@@ -736,8 +729,8 @@ def optimise_xgboost_multiclass_classifier(
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
-    from skopt.space import Real, Integer
     from skopt import gp_minimize
+    from skopt.space import Integer, Real
 
     rnd_obj = numpy.random.RandomState(rnd_seed)
 
@@ -1048,8 +1041,8 @@ def train_opt_xgboost_multiclass_classifier(
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
-    from skopt.space import Real, Integer
     from skopt import gp_minimize
+    from skopt.space import Integer, Real
 
     n_classes = len(cls_info_dict)
     for clsname in cls_info_dict:

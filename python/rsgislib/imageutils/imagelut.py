@@ -39,8 +39,7 @@ RSGISLib.
 import os
 from typing import List
 
-from osgeo import gdal
-from osgeo import ogr
+from osgeo import gdal, ogr
 
 gdal.UseExceptions()
 
@@ -83,6 +82,7 @@ def create_img_extent_lut(
 
     """
     import tqdm
+
     import rsgislib.imageutils
     import rsgislib.vectorutils.createvectors
 

@@ -35,19 +35,17 @@
 ###########################################################################
 
 import glob
-import os
 import json
+import os
 import shutil
 
 from osgeo import gdal
 from rios import rat
 
 import rsgislib
+from rsgislib import imageutils, rastergis, segmentation
 from rsgislib.imageutils import tilingutils
 from rsgislib.segmentation import shepherdseg
-from rsgislib import rastergis
-from rsgislib import imageutils
-from rsgislib import segmentation
 
 
 class RSGISTiledShepherdSegmentationSingleThread(object):
@@ -501,8 +499,8 @@ def perform_tiled_segmentation(
         tiledsegsingle.perform_tiled_segmentation(inputImage, clumpsImage, tmpDIR='rsgislibsegtmp', tileWidth=2000, tileHeight=2000, validDataThreshold=0.3, numClusters=60, minPxls=100, distThres=100, bands=[4,5,3], sampling=100, kmMaxIter=200)
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     createdTmp = False
     if not os.path.exists(tmp_dir):

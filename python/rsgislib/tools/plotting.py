@@ -3,21 +3,18 @@
 The tools.plotting module contains functions for extracting and plotting remote sensing data.
 """
 
-from typing import Tuple, List, Dict, Union
 import os
+from typing import Dict, List, Tuple, Union
+
+import matplotlib.colors as mClrs
+import matplotlib.pyplot as plt
+import numpy
+from matplotlib import gridspec, rcParams
+from matplotlib.patches import Patch
+from osgeo import gdal
 
 import rsgislib
-from rsgislib import zonalstats
-from rsgislib import imagecalc
-
-from osgeo import gdal
-import numpy
-
-import matplotlib.pyplot as plt
-import matplotlib.colors as mClrs
-from matplotlib.patches import Patch
-from matplotlib import rcParams
-from matplotlib import gridspec
+from rsgislib import imagecalc, zonalstats
 
 have_mpl_scatter_density = True
 try:
@@ -1378,6 +1375,7 @@ def create_legend_img(
 
     """
     import math
+
     from PIL import Image, ImageDraw, ImageFont
 
     n_cls = len(legend_info)

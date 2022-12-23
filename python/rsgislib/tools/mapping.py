@@ -3,23 +3,22 @@
 The tools.mapping module contains functions for making maps with geospatial data.
 """
 
-from typing import List, Dict, Union
 import math
 import os
 import shutil
-
-import rsgislib
-import rsgislib.tools.projection
-import rsgislib.tools.plotting
-import rsgislib.imageutils
+from typing import Dict, List, Union
 
 import geopandas
-import numpy
-
-import matplotlib.pyplot as plt
-import matplotlib.colors
 import matplotlib.cm
+import matplotlib.colors
+import matplotlib.pyplot as plt
+import numpy
 from matplotlib_scalebar.scalebar import ScaleBar
+
+import rsgislib
+import rsgislib.imageutils
+import rsgislib.tools.plotting
+import rsgislib.tools.projection
 
 
 def calc_y_fig_size(bbox: List[float], fig_x_size=Union[int, float]) -> float:

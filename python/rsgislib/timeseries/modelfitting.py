@@ -34,16 +34,12 @@
 #
 ###########################################################################
 
-import sys
 import json
+import sys
 from datetime import datetime
 
 import numpy
-
-from rios import applier
-from rios import fileinfo
-from rios import cuiprogress
-
+from rios import applier, cuiprogress, fileinfo
 from sklearn import linear_model
 
 import rsgislib

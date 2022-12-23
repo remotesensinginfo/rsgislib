@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-import rsgislib
-import rsgislib.imageutils
-import rsgislib.imagecalc
-import rsgislib.rastergis
-
+import numpy
 from osgeo import gdal
 
-import numpy
+import rsgislib
+import rsgislib.imagecalc
+import rsgislib.imageutils
+import rsgislib.rastergis
 
 HAVE_SKI_SEG = True
 try:

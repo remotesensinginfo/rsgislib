@@ -33,29 +33,21 @@
 #
 ###########################################################################
 
-from typing import List, Dict
+from typing import Dict, List
 
+import h5py
 import numpy
-
 from osgeo import gdal
+from rios import applier, cuiprogress, rat, ratapplier
+from sklearn.base import BaseEstimator
+from sklearn.model_selection._search import BaseSearchCV
 
 import rsgislib
-import rsgislib.imageutils
 import rsgislib.imagecalc
+import rsgislib.imageutils
 import rsgislib.rastergis
 from rsgislib.classification import ClassInfoObj
 from rsgislib.imageutils import ImageBandInfo
-
-
-from sklearn.model_selection._search import BaseSearchCV
-from sklearn.base import BaseEstimator
-
-import h5py
-
-from rios import applier
-from rios import cuiprogress
-from rios import rat
-from rios import ratapplier
 
 
 def perform_sklearn_classifier_param_search(

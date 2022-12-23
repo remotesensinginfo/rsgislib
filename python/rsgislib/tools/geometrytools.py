@@ -3,10 +3,10 @@
 The tools.geometrytool module contains functions for manipulating and moving files around.
 """
 
-from typing import List, Dict
 import math
-from osgeo import ogr
-from osgeo import osr
+from typing import Dict, List
+
+from osgeo import ogr, osr
 
 import rsgislib
 

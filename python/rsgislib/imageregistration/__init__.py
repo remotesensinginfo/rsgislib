@@ -25,13 +25,13 @@ GCP Output Types:
 
 """
 
-# import the C++ extension into this level
-from ._imageregistration import *
+import numpy
+from osgeo import gdal
 
 import rsgislib
 
-import numpy
-from osgeo import gdal
+# import the C++ extension into this level
+from ._imageregistration import *
 
 METRIC_EUCLIDEAN = 1
 METRIC_SQDIFF = 2
@@ -79,8 +79,9 @@ def warp_with_gcps_with_gdal(
                              cores should be used for the warping.
 
     """
-    import rsgislib.imageutils
     from osgeo import gdal
+
+    import rsgislib.imageutils
 
     if not rsgislib.imageutils.has_gcps(in_process_img):
         raise rsgislib.RSGISPyException(
@@ -188,10 +189,12 @@ def add_vec_pts_as_gcps_to_img(
     """
 
     import shutil
+
     import geopandas
+
     import rsgislib.imageutils
-    import rsgislib.vectorutils
     import rsgislib.tools.projection
+    import rsgislib.vectorutils
 
     # Check the dataset geometry is points
     if (

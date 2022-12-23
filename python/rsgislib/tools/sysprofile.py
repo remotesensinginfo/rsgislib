@@ -23,8 +23,9 @@ def create_mem_cpu_profile(out_file, interval=3, duration=600):
                      run for. (default: 600 seconds; 10 mins)
 
     """
-    import psutil
     import time
+
+    import psutil
     import tqdm
 
     n_steps = int(duration / interval)
@@ -72,8 +73,8 @@ def plot_mem_cpu_profile(
 
     """
 
-    import pandas
     import matplotlib.pyplot as plt
+    import pandas
 
     cols_dtypes = {
         "timestamp": float,

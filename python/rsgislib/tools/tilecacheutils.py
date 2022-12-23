@@ -360,8 +360,10 @@ def convert_between_tms_xyz(tiles_dir):
 
     """
     import os
-    import rsgislib.tools.utils
+
     import tqdm
+
+    import rsgislib.tools.utils
 
     c_pwd = os.getcwd()
     in_zoom_dirs = []

@@ -3,14 +3,12 @@
 The vector geometries module performs geometric operations on vectors.
 """
 
-import os
 import math
+import os
 from typing import List
 
-from osgeo import gdal
-from osgeo import ogr
-
 import tqdm
+from osgeo import gdal, ogr
 
 import rsgislib
 import rsgislib.vectorutils
@@ -1663,6 +1661,7 @@ def explode_vec_files(
 
     """
     import tqdm
+
     import rsgislib.tools.filetools
 
     for vec_file in tqdm.tqdm(in_vec_files):
@@ -3136,8 +3135,8 @@ def split_vec_by_grid(
 
     """
     import geopandas
-    from shapely.geometry import Polygon
     import numpy
+    from shapely.geometry import Polygon
 
     in_vec_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
 

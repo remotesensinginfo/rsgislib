@@ -7,10 +7,10 @@ For obtaining the correct parameters for each function it is recomented that rat
 More details on ARCSI are avaialble from https://remotesensing.info/arcsi
 """
 
+import rsgislib
+
 # import the C++ extension into this level
 from ._imagecalibration import *
-
-import rsgislib
 
 
 class ElevLUTFeat(object):
@@ -101,10 +101,11 @@ def perform_dos_calc(
         rsgislib.imagecalibration.perform_dos_calc("LS5TM_20110701_lat52lon421_r24p204_rad_toa.kea", 'LS5TM_20110701_lat52lon421_r24p204_rad_toa_dos.kea")
 
     """
+    import collections
+
     import rsgislib
     import rsgislib.imagecalc
     import rsgislib.imageutils
-    import collections
 
     outDataType = rsgislib.imageutils.get_rsgislib_datatype_from_img(inputFile)
 
@@ -176,16 +177,18 @@ def calc_clear_sky_regions(
 
     """
 
-    import rsgislib
-    import rsgislib.imagecalc
-    import rsgislib.imageutils
-    import rsgislib.segmentation
-    import rsgislib.rastergis
-    import rsgislib.imagemorphology
     import os
+
+    import numpy
     from osgeo import gdal
     from rios import rat
-    import numpy
+
+    import rsgislib
+    import rsgislib.imagecalc
+    import rsgislib.imagemorphology
+    import rsgislib.imageutils
+    import rsgislib.rastergis
+    import rsgislib.segmentation
 
     if morphSize % 2 == 0:
         raise rsgislib.RSGISPyException(
@@ -400,8 +403,9 @@ def get_esun_value(radiance, toaRefl, day, month, year, solarZenith):
     :param solarZenith: input the solar zenith angle for the acquisition.
     :returns: esun radiance
     """
-    import rsgislib.imagecalibration
     import math
+
+    import rsgislib.imagecalibration
 
     julianDay = rsgislib.imagecalibration.get_julian_day(year, month, day)
     solarDist = rsgislib.imagecalibration.calc_solar_distance(julianDay)

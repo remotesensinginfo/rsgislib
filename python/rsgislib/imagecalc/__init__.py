@@ -6,7 +6,7 @@ calculating on images.
 
 import math
 import os
-from typing import List, Dict
+from typing import Dict, List
 
 import numpy
 from osgeo import gdal
@@ -327,9 +327,10 @@ def calc_dist_to_img_vals_tiled(
     import glob
     import shutil
     from multiprocessing import Pool
+
     import rsgislib.imageutils
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     have_list_vals = False
     if isinstance(pxl_vals, list):
@@ -527,6 +528,7 @@ def count_pxls_of_val(input_img: str, vals: List[int], img_band: int = None):
 
     """
     from rios.imagereader import ImageReader
+
     import rsgislib.imageutils
 
     if vals is None:
@@ -603,6 +605,7 @@ def get_pca_eigen_vector(
               explained variance
     """
     from sklearn.decomposition import PCA
+
     import rsgislib.imageutils
 
     # Read input data from image file.
@@ -729,10 +732,12 @@ def perform_image_mnf(
     :returns: array with the ratio of the explained variance
 
     """
-    from sklearn.decomposition import PCA
-    import rsgislib.tools.filetools
-    import rsgislib.imageutils
     import shutil
+
+    from sklearn.decomposition import PCA
+
+    import rsgislib.imageutils
+    import rsgislib.tools.filetools
 
     created_tmp_dir = False
     if not os.path.exists(tmp_dir):
@@ -968,9 +973,10 @@ def calc_imgs_pxl_mode(input_imgs, output_img, gdalformat, no_data_val=0):
     :param gdalformat: the GDAL image file format of the output image file.
 
     """
-    import rsgislib.imageutils
     import scipy.stats
     from rios import applier
+
+    import rsgislib.imageutils
 
     datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_imgs[0])
     numpyDT = rsgislib.get_numpy_datatype(datatype)
@@ -1033,8 +1039,9 @@ def calc_img_basic_stats_for_ref_region(
     :param gdalformat: the output image file format. Default KEA.
 
     """
-    import rsgislib.imageutils
     from rios import applier
+
+    import rsgislib.imageutils
 
     first = True
     n_bands = 0
@@ -1257,12 +1264,12 @@ def calc_fill_regions_knn(
                      output image.
 
     """
-    import rsgislib.imageutils
-    from rios import applier
-
+    import rtree
     import scipy
     import scipy.stats
-    import rtree
+    from rios import applier
+
+    import rsgislib.imageutils
 
     if not rsgislib.imageutils.do_gdal_layers_have_same_proj(
         in_ref_img, in_fill_regions_img
@@ -1415,8 +1422,9 @@ def are_imgs_equal(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
     :return: Boolean (match), float (proportion of pixels which matched)
 
     """
-    import rsgislib.imageutils
     from rios import applier
+
+    import rsgislib.imageutils
 
     if rsgislib.imageutils.get_img_band_count(
         in_ref_img
@@ -1488,8 +1496,9 @@ def are_img_bands_equal(
     :return: Boolean (match), float (proportion of pixels which matched)
 
     """
-    import rsgislib.imageutils
     from rios import applier
+
+    import rsgislib.imageutils
 
     n_ref_bands = rsgislib.imageutils.get_img_band_count(in_ref_img)
     n_cmp_bands = rsgislib.imageutils.get_img_band_count(in_cmp_img)
@@ -1587,11 +1596,12 @@ def calc_split_win_thresholds(
     :return: dict of bands and a list of thresholds for the bands.
 
     """
-    import rsgislib.imageutils
-    import rsgislib.tools.utils
-    import rsgislib.tools.stats
-    from rios.imagereader import ImageReader
     import tqdm
+    from rios.imagereader import ImageReader
+
+    import rsgislib.imageutils
+    import rsgislib.tools.stats
+    import rsgislib.tools.utils
 
     n_bands = rsgislib.imageutils.get_img_band_count(input_img)
     band_thresholds = dict()

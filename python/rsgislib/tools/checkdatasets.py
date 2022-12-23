@@ -5,9 +5,8 @@ The tools.validate_datesets module contains functions for checking that datasets
 
 import os
 
-from osgeo import gdal
-from osgeo import osr
 import numpy
+from osgeo import gdal, osr
 
 import rsgislib
 import rsgislib.tools.filetools

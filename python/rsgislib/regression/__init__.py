@@ -20,8 +20,9 @@ def get_regression_stats(ref_data, pred_data, n_vars=1):
     :return: list of dicts
 
     """
-    import sklearn.metrics
     import numpy
+    import sklearn.metrics
+
     import rsgislib.tools.stats
 
     ref_data_shp = ref_data.shape
