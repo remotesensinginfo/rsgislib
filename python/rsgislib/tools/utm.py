@@ -253,7 +253,7 @@ def to_latlon(
     n = R / ep_sin_sqrt
     r = (1 - E) / ep_sin
 
-    c = _E * p_cos**2
+    c = _E * p_cos ** 2
     c2 = c * c
 
     d = x / (n * K0)
@@ -333,8 +333,8 @@ def from_latlon(
     central_lon = zone_number_to_central_longitude(zone_number)
     central_lon_rad = numpy.radians(central_lon)
 
-    n = R / numpy.sqrt(1 - E * lat_sin**2)
-    c = E_P2 * lat_cos**2
+    n = R / numpy.sqrt(1 - E * lat_sin ** 2)
+    c = E_P2 * lat_cos ** 2
 
     a = lat_cos * (lon_rad - central_lon_rad)
     a2 = a * a
@@ -367,7 +367,7 @@ def from_latlon(
         * lat_tan
         * (
             a2 / 2
-            + a4 / 24 * (5 - lat_tan2 + 9 * c + 4 * c**2)
+            + a4 / 24 * (5 - lat_tan2 + 9 * c + 4 * c ** 2)
             + a6 / 720 * (61 - 58 * lat_tan2 + lat_tan4 + 600 * c - 330 * E_P2)
         )
     )

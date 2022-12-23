@@ -596,10 +596,7 @@ def is_cmd_tool_avail(cmd_name: str, test_call_cmd: List[str] = None):
 
         try:
             rtn_info = subprocess.run(
-                test_call_cmd,
-                capture_output=True,
-                text=True,
-                check=True,
+                test_call_cmd, capture_output=True, text=True, check=True,
             )
             if rtn_info.returncode == 0:
                 return True
@@ -700,11 +697,11 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str) -> float:
     elif in_unit == "kb":
         file_size_bytes = in_size * 1024.0
     elif in_unit == "mb":
-        file_size_bytes = in_size * (1024.0**2)
+        file_size_bytes = in_size * (1024.0 ** 2)
     elif in_unit == "gb":
-        file_size_bytes = in_size * (1024.0**3)
+        file_size_bytes = in_size * (1024.0 ** 3)
     elif in_unit == "tb":
-        file_size_bytes = in_size * (1024.0**4)
+        file_size_bytes = in_size * (1024.0 ** 4)
     else:
         raise rsgislib.RSGISPyException("Input unit it not recognised.")
 
@@ -713,11 +710,11 @@ def convert_file_size_units(in_size: int, in_unit: str, out_unit: str) -> float:
     elif out_unit == "kb":
         out_file_size = file_size_bytes / 1024.0
     elif out_unit == "mb":
-        out_file_size = file_size_bytes / (1024.0**2)
+        out_file_size = file_size_bytes / (1024.0 ** 2)
     elif out_unit == "gb":
-        out_file_size = file_size_bytes / (1024.0**3)
+        out_file_size = file_size_bytes / (1024.0 ** 3)
     elif out_unit == "tb":
-        out_file_size = file_size_bytes / (1024.0**4)
+        out_file_size = file_size_bytes / (1024.0 ** 4)
     else:
         raise rsgislib.RSGISPyException("Output unit it not recognised.")
 

@@ -295,10 +295,7 @@ def get_vec_lyr_geom_type(vec_file: str, vec_lyr: str = None) -> int:
 
 
 def count_feats_per_att_val(
-    vec_file: str,
-    vec_lyr: str,
-    col_name: str,
-    out_df_dict: bool = False,
+    vec_file: str, vec_lyr: str, col_name: str, out_df_dict: bool = False,
 ) -> Dict:
     """
     A function which returns the count of features for each variable

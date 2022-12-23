@@ -477,7 +477,7 @@ def create_vec_lyr_map(
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
     scale_bar_loc: str = "upper right",
-    plot_zorders: Union[float, List[float]] = 1
+    plot_zorders: Union[float, List[float]] = 1,
 ):
     """
     A function which adds vector layer(s) to a matplotlib axis. This function
@@ -634,7 +634,7 @@ def create_raster_img_map(
     stch_min_max_vals: Union[Dict, List[Dict]] = None,
     stch_n_stdevs: float = 2.0,
     scale_bar_loc: str = "upper right",
-    plot_zorder:float = 1,
+    plot_zorder: float = 1,
 ):
     """
     A function which displays a stretched raster layer onto the axis provided.
@@ -749,7 +749,7 @@ def create_thematic_raster_map(
     use_grid: bool = False,
     show_map_axis: bool = True,
     scale_bar_loc: str = "upper right",
-    plot_zorders: Union[float, List[float]] = 1
+    plot_zorders: Union[float, List[float]] = 1,
 ):
     """
     A function which displays a thematic raster layer onto the axis provided
@@ -788,7 +788,9 @@ def create_thematic_raster_map(
 
     if isinstance(plot_zorders, list):
         if len(plot_zorders) != len(input_imgs):
-            raise rsgislib.RSGISPyException("The number of zorders provided does not match the number of input images.")
+            raise rsgislib.RSGISPyException(
+                "The number of zorders provided does not match the number of input images."
+            )
     else:
         tmp_plot_zorder = plot_zorders
         plot_zorders = list()
@@ -818,7 +820,9 @@ def create_thematic_raster_map(
     ax.set_xlim([img_coords_scns[0][0], img_coords_scns[0][1]])
     ax.set_ylim([img_coords_scns[0][2], img_coords_scns[0][3]])
 
-    for img_data_arr, img_coords, plot_zorder in zip(img_data_arr_scns, img_coords_scns, lcl_plot_zorders):
+    for img_data_arr, img_coords, plot_zorder in zip(
+        img_data_arr_scns, img_coords_scns, lcl_plot_zorders
+    ):
         ax.imshow(img_data_arr, extent=img_coords, zorder=plot_zorder)
 
     if use_grid:
@@ -858,7 +862,7 @@ def create_choropleth_vec_lyr_map(
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
     scale_bar_loc: str = "upper right",
-    plot_zorder:float = 1,
+    plot_zorder: float = 1,
 ):
     """
     A function which adds a vector layer to a matplotlib axis. This function
@@ -971,7 +975,7 @@ def create_raster_cmap_img_map(
     vals_under_white: bool = False,
     print_norm_vals: bool = False,
     scale_bar_loc: str = "upper right",
-    plot_zorder:float = 1,
+    plot_zorder: float = 1,
 ):
     """
     A function which displays a single band raster layer onto the axis provided

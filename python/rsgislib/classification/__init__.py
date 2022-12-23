@@ -1576,10 +1576,7 @@ def convert_mutli_cls_smpls_to_pandas_df(
         data=class_arr, columns=[class_id_col], dtype=numpy.int16
     )
 
-    data_vals_df = pandas.DataFrame(
-        data=data_arr,
-        columns=col_names,
-    )
+    data_vals_df = pandas.DataFrame(data=data_arr, columns=col_names,)
 
     data_cls_vals_df = pandas.concat((cls_id_df, data_vals_df), axis=1)
     return data_cls_vals_df

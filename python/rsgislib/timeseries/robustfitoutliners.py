@@ -35,7 +35,7 @@ class RobustModel(object):
         self.residuals = band_data - predicted
 
         # Get overall RMSE of model
-        self.RMSE = numpy.sqrt(numpy.mean(self.residuals**2))
+        self.RMSE = numpy.sqrt(numpy.mean(self.residuals ** 2))
 
     def prepareXData(self, datetimes):
         rescaled = datetimes - numpy.min(self.datetimes)

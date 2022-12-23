@@ -89,7 +89,7 @@ def degrees_to_metres(
     radlat = numpy.deg2rad(latitude)
 
     Rsq = (ellipse[0] * numpy.cos(radlat)) ** 2 + (ellipse[1] * numpy.sin(radlat)) ** 2
-    Mlat = (ellipse[0] * ellipse[1]) ** 2 / (Rsq**1.5)
+    Mlat = (ellipse[0] * ellipse[1]) ** 2 / (Rsq ** 1.5)
     Nlon = ellipse[0] ** 2 / numpy.sqrt(Rsq)
     x_size = numpy.pi / 180 * numpy.cos(radlat) * Nlon * lon_size
     y_size = numpy.pi / 180 * Mlat * lat_size
@@ -121,7 +121,7 @@ def metres_to_degrees(latitude: float, x_size: float, y_size: float) -> (float, 
     radlat = numpy.deg2rad(latitude)
 
     Rsq = (ellipse[0] * numpy.cos(radlat)) ** 2 + (ellipse[1] * numpy.sin(radlat)) ** 2
-    Mlat = (ellipse[0] * ellipse[1]) ** 2 / (Rsq**1.5)
+    Mlat = (ellipse[0] * ellipse[1]) ** 2 / (Rsq ** 1.5)
     Nlon = ellipse[0] ** 2 / numpy.sqrt(Rsq)
     lon_size = x_size / (numpy.pi / 180 * numpy.cos(radlat) * Nlon)
     lat_size = y_size / (numpy.pi / 180 * Mlat)
