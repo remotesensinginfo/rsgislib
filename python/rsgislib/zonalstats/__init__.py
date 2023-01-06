@@ -1532,14 +1532,9 @@ def ext_point_band_values(
                     y_pt = feat_geom.GetY()
 
                     if pt_reprj:
-                        if veclyr_spatial_ref.EPSGTreatsAsLatLong():
-                            x_pt, y_pt = rsgislib.tools.geometrytools.reproj_point(
-                                veclyr_spatial_ref, img_spatial_ref, y_pt, x_pt
-                            )
-                        else:
-                            x_pt, y_pt = rsgislib.tools.geometrytools.reproj_point(
-                                veclyr_spatial_ref, img_spatial_ref, x_pt, y_pt
-                            )
+                        x_pt, y_pt = rsgislib.tools.geometrytools.reproj_point(
+                            veclyr_spatial_ref, img_spatial_ref, x_pt, y_pt
+                        )
 
                     x_pt_off = float(x_pt - imgGeoTrans[0])
                     y_pt_off = float(y_pt - imgGeoTrans[3])
