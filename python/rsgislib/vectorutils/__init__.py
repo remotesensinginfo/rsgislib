@@ -1641,9 +1641,9 @@ def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> List[str]:
     if vec_lyr_obj is None:
         raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
-    lyrDefn = vec_lyr_obj.GetLayerDefn()
-    for i in range(lyrDefn.GetFieldCount()):
-        atts.append(lyrDefn.GetFieldDefn(i).GetName())
+    lyr_defn = vec_lyr_obj.GetLayerDefn()
+    for i in range(lyr_defn.GetFieldCount()):
+        atts.append(lyr_defn.GetFieldDefn(i).GetName())
     return atts
 
 
@@ -1910,6 +1910,10 @@ def write_vec_lyr_to_file(
             delete_vector_file(out_vec_file)
 
         if os.path.exists(out_vec_file) and (not replace):
+            print(
+                "Warning: some drivers (e.g., GeoJSON) might have problems "
+                "re-adding layer to existing file: write_vec_lyr_to_file."
+            )
             vecDS = gdal.OpenEx(out_vec_file, gdal.GA_Update)
         else:
             outdriver = ogr.GetDriverByName(out_format)

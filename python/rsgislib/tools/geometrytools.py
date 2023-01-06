@@ -548,17 +548,18 @@ def reproj_point(
     Reproject a point from 'in_osr_proj_obj' to 'out_osr_proj_obj' where they are gdal
     osgeo.osr.SpatialReference objects.
 
-    :param in_osr_proj_obj: an osr.SpatialReference() object representing input projection.
-    :param out_osr_proj_obj: an osr.SpatialReference() object representing output projection.
+    :param in_osr_proj_obj: an osr.SpatialReference() object representing input
+                            projection.
+    :param out_osr_proj_obj: an osr.SpatialReference() object representing output
+                             projection.
     :param x: the x coordinate to be reprojected
     :param y: the y coordinate to be reprojected
     :return: x, y.
     """
-
     if in_osr_proj_obj.EPSGTreatsAsLatLong():
-        wktPt = "POINT(%s %s)" % (y, x)
+        wktPt = f"POINT({y} {x})"
     else:
-        wktPt = "POINT(%s %s)" % (x, y)
+        wktPt = f"POINT({x} {y})"
     point = ogr.CreateGeometryFromWkt(wktPt)
     point.AssignSpatialReference(in_osr_proj_obj)
     point.TransformTo(out_osr_proj_obj)

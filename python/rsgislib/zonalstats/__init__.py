@@ -1485,8 +1485,8 @@ def ext_point_band_values(
             epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
         else:
             epsg_vec_spatial = vec_def_epsg
-            veclyr_spatial_ref = osr.SpatialReference()
-            veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
+        veclyr_spatial_ref = osr.SpatialReference()
+        veclyr_spatial_ref.ImportFromEPSG(int(epsg_vec_spatial))
         pt_reprj = False
         if epsg_vec_spatial != epsg_img_spatial:
             if reproj_vec:
