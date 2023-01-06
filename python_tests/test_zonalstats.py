@@ -105,6 +105,53 @@ def test_ext_point_band_values_file_reproj(tmp_path):
     assert vals_eq
 
 
+def test_ext_point_band_values_file_reproj_specepsg(tmp_path):
+    import rsgislib.zonalstats
+    import rsgislib.vectorutils
+    import rsgislib.vectorattrs
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
+    vec_file = os.path.join(
+        ZONALSTATS_DATA_DIR, "sen2_20210527_aber_wgs84_pt_samples.geojson"
+    )
+    vec_lyr = "sen2_20210527_aber_wgs84_pt_samples"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
+    out_vec_lyr = "out_vec"
+    rsgislib.vectorutils.create_copy_vector_lyr(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        "GEOJSON",
+        replace=True,
+        in_memory=True,
+    )
+
+    rsgislib.zonalstats.ext_point_band_values_file(
+        out_vec_file,
+        out_vec_lyr,
+        input_img,
+        1,
+        0,
+        1000,
+        0,
+        "testcolval",
+        reproj_vec=True,
+        vec_def_epsg=4326,
+    )
+
+    vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcolval")
+    print(vals)
+    ref_vals = [33.0, 188.0, 34.0, 26.0, 79.0, 67.0]
+    vals_eq = True
+    for val, ref_val in zip(vals, ref_vals):
+        if abs(val - ref_val) > 1:
+            vals_eq = False
+            break
+    assert vals_eq
+
+
 def test_calc_zonal_band_stats_test_poly_pts_file_Min(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.vectorutils
