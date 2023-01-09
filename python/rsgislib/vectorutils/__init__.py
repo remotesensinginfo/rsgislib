@@ -2793,6 +2793,7 @@ def merge_vector_files(
     if len(vec_files) == 0:
         raise rsgislib.RSGISPyException("At least 1 layer(s) needs to be provided.")
 
+    print("Read Data")
     gp_lyrs = list()
     for vec_file in tqdm.tqdm(vec_files):
         lyrs = get_vec_lyrs_lst(vec_file)
@@ -2803,6 +2804,7 @@ def merge_vector_files(
             if len(data_gdf) > 0:
                 gp_lyrs.append(data_gdf)
 
+    print("Perform Merge")
     if len(gp_lyrs) > 1:
         data_gdf = pandas.concat(gp_lyrs)
     elif len(gp_lyrs) == 1:
@@ -2810,6 +2812,7 @@ def merge_vector_files(
     else:
         raise rsgislib.RSGISPyException("No layers with data were provided")
 
+    print("Export")
     if out_format == "GPKG":
         if out_vec_lyr is None:
             out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
