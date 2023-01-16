@@ -401,9 +401,9 @@ def download_curl_ftp_file(
         curl.setopt(pycurl.TIMEOUT, ftp_timeout)
         curl.setopt(pycurl.FTP_RESPONSE_TIMEOUT, 600)
         curl.setopt(pycurl.NOSIGNAL, 1)
-        if (not ftp_user is None) and (not ftp_pass is None):
+        if (ftp_user is not None) and (ftp_pass is not None):
             curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_ANY)
-            curl.setopt(pycurl.USERPWD, ftp_user + ":" + ftp_pass)
+            curl.setopt(pycurl.USERPWD, f"{ftp_user}:{ftp_pass}")
         curl.setopt(pycurl.WRITEDATA, fp)
         if print_info:
             print("Starting download of {}".format(full_path_url))
