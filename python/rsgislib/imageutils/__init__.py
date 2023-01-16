@@ -3,21 +3,19 @@
 The imageutils module contains general utilities for applying to images.
 """
 
-# import the C++ extension into this level
-from ._imageutils import *
-import rsgislib
-
-import os
 import math
+import os
 import shutil
-from typing import List, Dict
+from typing import Dict, List
 
 import numpy
-
-from osgeo import gdal
-from osgeo import osr
-
+from osgeo import gdal, osr
 from rios import applier
+
+import rsgislib
+
+# import the C++ extension into this level
+from ._imageutils import *
 
 gdal.UseExceptions()
 
@@ -922,6 +920,7 @@ def get_img_subset_pxl_bbox(input_img: str, sub_bbox: List[float]) -> List[int]:
 
     """
     import math
+
     import rsgislib.tools.geometrytools
 
     img_bbox = get_img_bbox(input_img)
@@ -1843,8 +1842,8 @@ def create_blank_img_from_ref_vector(
 
     """
 
-    import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorutils
 
     baseExtent = rsgislib.vectorutils.get_vec_layer_extent(vec_file, vec_lyr)
     xMin, xMax, yMin, yMax = rsgislib.tools.geometrytools.find_extent_on_grid(
@@ -1907,8 +1906,8 @@ def create_copy_img_vec_extent_snap_to_grid(
                       vector file extent by.
 
     """
-    import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorutils
 
     vec_bbox = rsgislib.vectorutils.get_vec_layer_extent(
         vec_file, vec_lyr=vec_lyr, compute_if_exp=True
@@ -2134,21 +2133,21 @@ def resample_img_to_match(
     if datatype is None:
         datatype = get_gdal_datatype_from_img(in_process_img)
 
-    interpolationMethod = gdal.GRA_NearestNeighbour
+    gdal_interp_method = gdal.GRA_NearestNeighbour
     if interp_method == rsgislib.INTERP_BILINEAR:
-        interpolationMethod = gdal.GRA_Bilinear
+        gdal_interp_method = gdal.GRA_Bilinear
     elif interp_method == rsgislib.INTERP_LANCZOS:
-        interpolationMethod = gdal.GRA_Lanczos
+        gdal_interp_method = gdal.GRA_Lanczos
     elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        interpolationMethod = gdal.GRA_CubicSpline
+        gdal_interp_method = gdal.GRA_CubicSpline
     elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        interpolationMethod = gdal.GRA_NearestNeighbour
+        gdal_interp_method = gdal.GRA_NearestNeighbour
     elif interp_method == rsgislib.INTERP_CUBIC:
-        interpolationMethod = gdal.GRA_Cubic
+        gdal_interp_method = gdal.GRA_Cubic
     elif interp_method == rsgislib.INTERP_AVERAGE:
-        interpolationMethod = gdal.GRA_Average
+        gdal_interp_method = gdal.GRA_Average
     elif interp_method == rsgislib.INTERP_MODE:
-        interpolationMethod = gdal.GRA_Mode
+        gdal_interp_method = gdal.GRA_Mode
     else:
         raise rsgislib.RSGISPyException(
             "Interpolation method was not recognised or known."
@@ -2177,7 +2176,7 @@ def resample_img_to_match(
     if multicore:
         if haveNoData:
             wrpOpts = gdal.WarpOptions(
-                resampleAlg=interpolationMethod,
+                resampleAlg=gdal_interp_method,
                 srcNodata=no_data_val,
                 dstNodata=no_data_val,
                 multithread=True,
@@ -2185,12 +2184,12 @@ def resample_img_to_match(
             )
         else:
             wrpOpts = gdal.WarpOptions(
-                resampleAlg=interpolationMethod, multithread=True, callback=callback
+                resampleAlg=gdal_interp_method, multithread=True, callback=callback
             )
     else:
         if haveNoData:
             wrpOpts = gdal.WarpOptions(
-                resampleAlg=interpolationMethod,
+                resampleAlg=gdal_interp_method,
                 srcNodata=no_data_val,
                 dstNodata=no_data_val,
                 multithread=False,
@@ -2198,7 +2197,7 @@ def resample_img_to_match(
             )
         else:
             wrpOpts = gdal.WarpOptions(
-                resampleAlg=interpolationMethod, multithread=False, callback=callback
+                resampleAlg=gdal_interp_method, multithread=False, callback=callback
             )
 
     gdal.Warp(outFile, inFile, options=wrpOpts)
@@ -2249,24 +2248,24 @@ def reproject_image(
                          "COMPRESS=LZW", "BIGTIFF=YES"]
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.geometrytools
+    import rsgislib.tools.utils
 
-    eResampleAlg = gdal.GRA_NearestNeighbour
+    gdal_interp_method = gdal.GRA_NearestNeighbour
     if interp_method == rsgislib.INTERP_BILINEAR:
-        eResampleAlg = gdal.GRA_Bilinear
+        gdal_interp_method = gdal.GRA_Bilinear
     elif interp_method == rsgislib.INTERP_LANCZOS:
-        eResampleAlg = gdal.GRA_Lanczos
+        gdal_interp_method = gdal.GRA_Lanczos
     elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        eResampleAlg = gdal.GRA_CubicSpline
+        gdal_interp_method = gdal.GRA_CubicSpline
     elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        eResampleAlg = gdal.GRA_NearestNeighbour
+        gdal_interp_method = gdal.GRA_NearestNeighbour
     elif interp_method == rsgislib.INTERP_CUBIC:
-        eResampleAlg = gdal.GRA_Cubic
+        gdal_interp_method = gdal.GRA_Cubic
     elif interp_method == rsgislib.INTERP_AVERAGE:
-        eResampleAlg = gdal.GRA_Average
+        gdal_interp_method = gdal.GRA_Average
     elif interp_method == rsgislib.INTERP_MODE:
-        eResampleAlg = gdal.GRA_Mode
+        gdal_interp_method = gdal.GRA_Mode
     else:
         raise rsgislib.RSGISPyException(
             "Interpolation method was not recognised or known."
@@ -2427,7 +2426,7 @@ def reproject_image(
     wrpOpts = []
     if multicore:
         wrpOpts = gdal.WarpOptions(
-            resampleAlg=eResampleAlg,
+            resampleAlg=gdal_interp_method,
             srcNodata=no_data_val,
             dstNodata=no_data_val,
             multithread=True,
@@ -2435,7 +2434,7 @@ def reproject_image(
         )
     else:
         wrpOpts = gdal.WarpOptions(
-            resampleAlg=eResampleAlg,
+            resampleAlg=gdal_interp_method,
             srcNodata=no_data_val,
             dstNodata=no_data_val,
             multithread=False,
@@ -2479,21 +2478,21 @@ def gdal_warp(
     in_epsg = get_epsg_proj_from_img(input_img)
     img_data_type = get_gdal_datatype_from_img(input_img)
 
-    eResampleAlg = gdal.GRA_NearestNeighbour
+    gdal_interp_method = gdal.GRA_NearestNeighbour
     if interp_method == rsgislib.INTERP_BILINEAR:
-        eResampleAlg = gdal.GRA_Bilinear
+        gdal_interp_method = gdal.GRA_Bilinear
     elif interp_method == rsgislib.INTERP_LANCZOS:
-        eResampleAlg = gdal.GRA_Lanczos
+        gdal_interp_method = gdal.GRA_Lanczos
     elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        eResampleAlg = gdal.GRA_CubicSpline
+        gdal_interp_method = gdal.GRA_CubicSpline
     elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        eResampleAlg = gdal.GRA_NearestNeighbour
+        gdal_interp_method = gdal.GRA_NearestNeighbour
     elif interp_method == rsgislib.INTERP_CUBIC:
-        eResampleAlg = gdal.GRA_Cubic
+        gdal_interp_method = gdal.GRA_Cubic
     elif interp_method == rsgislib.INTERP_AVERAGE:
-        eResampleAlg = gdal.GRA_Average
+        gdal_interp_method = gdal.GRA_Average
     elif interp_method == rsgislib.INTERP_MODE:
-        eResampleAlg = gdal.GRA_Mode
+        gdal_interp_method = gdal.GRA_Mode
     else:
         raise rsgislib.RSGISPyException(
             "Interpolation method was not recognised or known."
@@ -2510,7 +2509,7 @@ def gdal_warp(
         format=gdalformat,
         srcSRS="EPSG:{}".format(in_epsg),
         dstSRS="EPSG:{}".format(out_epsg),
-        resampleAlg=eResampleAlg,
+        resampleAlg=gdal_interp_method,
         srcNodata=in_no_data_val,
         dstNodata=in_no_data_val,
         callback=callback,
@@ -2603,6 +2602,7 @@ def create_tiles_multi_core(
 
     """
     import multiprocessing
+
     import rsgislib.tools.filetools
 
     if not (
@@ -2732,8 +2732,9 @@ def calc_wgs84_pixel_area(
                         Scale=2590000(sq miles), Scale=0.0929022668(sq feet)
 
     """
-    import rsgislib.tools.projection
     from rios import applier
+
+    import rsgislib.tools.projection
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -2962,8 +2963,8 @@ def extract_img_pxl_sample(
 
     """
     # Import the RIOS image reader
-    from rios.imagereader import ImageReader
     import tqdm
+    from rios.imagereader import ImageReader
 
     first = True
     reader = ImageReader(input_img, windowxsize=200, windowysize=200)
@@ -3009,8 +3010,8 @@ def extract_img_pxl_vals_in_msk(
 
     """
     # Import the RIOS image reader
-    from rios.imagereader import ImageReader
     import tqdm
+    from rios.imagereader import ImageReader
 
     outArr = None
     first = True
@@ -3066,8 +3067,9 @@ def combine_binary_masks(
 
     """
     import json
-    import rsgislib.tools.utils
+
     import rsgislib.imagecalc
+    import rsgislib.tools.utils
 
     try:
         import tqdm
@@ -3200,7 +3202,13 @@ def create_stack_images_vrt(input_imgs: list, out_vrt_file: str):
 
 
 def create_mosaic_images_vrt(
-    input_imgs: list, out_vrt_file: str, vrt_extent: list = None
+    input_imgs: list,
+    out_vrt_file: str,
+    vrt_extent: List = None,
+    vrt_out_res_x: float = None,
+    vrt_out_res_y: float = None,
+    interp_method: int = rsgislib.INTERP_NEAREST_NEIGHBOUR,
+    align_out_pxls: bool = False,
 ):
     """
     A function which creates a GDAL VRT file from a set of input images by mosaicking
@@ -3210,7 +3218,18 @@ def create_mosaic_images_vrt(
     :param out_vrt_file: The output file location for the VRT.
     :param vrt_extent: An optional (If None then ignored) extent
                        (minX, minY, maxX, maxY) for the VRT image.
+    :param vrt_out_res_x: An optional (If None then ignored) set defining the
+                          x resolution of the output VRT.
+    :param vrt_out_res_y: An optional (If None then ignored) set defining the
+                          y resolution of the output VRT.
+    :param interp_method: define the interpolation algorithm used when resampling
+                          is required.
+    :param align_out_pxls: align the output pixels to force output bounds to be
+                           multiple of output resolution.
+
     """
+    import osgeo.gdal as gdal
+
     try:
         import tqdm
 
@@ -3218,10 +3237,49 @@ def create_mosaic_images_vrt(
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress
-    if vrt_extent is not None:
-        build_vrt_opt = gdal.BuildVRTOptions(outputBounds=vrt_extent, callback=callback)
+
+    # resolution – ‘highest’, ‘lowest’, ‘average’, ‘user’.
+    res_source = "average"
+    if (vrt_out_res_x is None) and (vrt_out_res_y is None):
+        res_source = "average"
+    elif (vrt_out_res_x is not None) and (vrt_out_res_y is not None):
+        res_source = "user"
+        if vrt_out_res_y < 0:
+            vrt_out_res_y = vrt_out_res_y * (-1)
     else:
-        build_vrt_opt = gdal.BuildVRTOptions(callback=callback)
+        raise rsgislib.RSGISPyException(
+            "The X and Y resolution cannot be defined independently."
+        )
+
+    gdal_interp_method = gdal.GRA_NearestNeighbour
+    if interp_method == rsgislib.INTERP_BILINEAR:
+        gdal_interp_method = gdal.GRA_Bilinear
+    elif interp_method == rsgislib.INTERP_LANCZOS:
+        gdal_interp_method = gdal.GRA_Lanczos
+    elif interp_method == rsgislib.INTERP_CUBICSPLINE:
+        gdal_interp_method = gdal.GRA_CubicSpline
+    elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
+        gdal_interp_method = gdal.GRA_NearestNeighbour
+    elif interp_method == rsgislib.INTERP_CUBIC:
+        gdal_interp_method = gdal.GRA_Cubic
+    elif interp_method == rsgislib.INTERP_AVERAGE:
+        gdal_interp_method = gdal.GRA_Average
+    elif interp_method == rsgislib.INTERP_MODE:
+        gdal_interp_method = gdal.GRA_Mode
+    else:
+        raise rsgislib.RSGISPyException(
+            "Interpolation method was not recognised or known."
+        )
+
+    build_vrt_opt = gdal.BuildVRTOptions(
+        resolution=res_source,
+        outputBounds=vrt_extent,
+        xRes=vrt_out_res_x,
+        yRes=vrt_out_res_y,
+        targetAlignedPixels=align_out_pxls,
+        resampleAlg=gdal_interp_method,
+        callback=callback,
+    )
     gdal.BuildVRT(out_vrt_file, input_imgs, options=build_vrt_opt)
 
 
@@ -3270,8 +3328,8 @@ def subset_to_vec(
                      be specified.
     """
     import rsgislib
-    import rsgislib.vectorutils
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorutils
 
     if vec_epsg is None:
         vec_epsg = rsgislib.vectorutils.get_proj_epsg_from_vec(
@@ -3348,9 +3406,9 @@ def subset_to_geoms_bbox(
     :param out_img_ext: output image file extension (e.g., kea)
 
     """
-    import rsgislib.vectorgeoms
-    import rsgislib.vectorattrs
     import rsgislib.tools.geometrytools
+    import rsgislib.vectorattrs
+    import rsgislib.vectorgeoms
 
     if datatype is None:
         datatype = get_rsgislib_datatype_from_img(input_img)
@@ -3426,11 +3484,11 @@ def mask_img_with_vec(
 
     """
     import rsgislib
-    import rsgislib.vectorutils
-    import rsgislib.vectorutils.createrasters
+    import rsgislib.tools.filetools
     import rsgislib.tools.geometrytools
     import rsgislib.tools.utils
-    import rsgislib.tools.filetools
+    import rsgislib.vectorutils
+    import rsgislib.vectorutils.createrasters
 
     # Does the input image BBOX intersect the BBOX of the ROI vector?
     if vec_epsg is None:
@@ -3513,8 +3571,8 @@ def create_valid_mask(
     :param tmp_dir: A directory for temporary outputs created during the processing.
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     if len(img_band_info) == 1:
         no_data_val = get_img_no_data_value(img_band_info[0].file_name)
@@ -4113,8 +4171,8 @@ def spectral_smoothing(
                        metadata stats (Default: True)
 
     """
-    from rios import applier
     import scipy.signal
+    from rios import applier
 
     try:
         import tqdm
@@ -4201,8 +4259,9 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
     :param gdalformat: the output image file format (default: KEA).
 
     """
-    import rsgislib.tools.projection
     from rios import applier
+
+    import rsgislib.tools.projection
 
     try:
         import tqdm

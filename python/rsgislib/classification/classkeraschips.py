@@ -35,21 +35,17 @@
 
 from __future__ import print_function
 
-import rsgislib
-import rsgislib.rastergis
-import rsgislib.imagecalc
-
-import tqdm
-
-import numpy
-
 import h5py
-
+import numpy
+import tqdm
 from osgeo import gdal
-
+from rios import rat
 from rios.imagereader import ImageReader
 from rios.imagewriter import ImageWriter
-from rios import rat
+
+import rsgislib
+import rsgislib.imagecalc
+import rsgislib.rastergis
 
 
 def train_keras_chips_pixel_classifier(

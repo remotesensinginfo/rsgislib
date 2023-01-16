@@ -34,16 +34,12 @@
 #
 ###########################################################################
 
-import sys
 import json
+import sys
 from datetime import datetime
 
 import numpy
-
-from rios import applier
-from rios import fileinfo
-from rios import cuiprogress
-
+from rios import applier, cuiprogress, fileinfo
 from sklearn import linear_model
 
 import rsgislib
@@ -131,7 +127,7 @@ class MakeSeasonTrendModel(object):
         self.coefficients = self.model.coef_
         self.residuals = self.band_data - self.predicted
         # Get overall RMSE of model
-        self.RMSE = numpy.sqrt(numpy.mean(self.residuals**2))
+        self.RMSE = numpy.sqrt(numpy.mean(self.residuals ** 2))
 
     def fit_lasso_model(self, cv, alpha):
         """

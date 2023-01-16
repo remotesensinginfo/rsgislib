@@ -55,18 +55,15 @@ These utilities allow for a more 'intelligent tiling process to be carried out:
 #
 ############################################################################
 
-import sys
-import math
 import glob
+import math
 import os.path
 import shutil
+import sys
 
 import rsgislib
-from rsgislib import segmentation
-from rsgislib import rastergis
-from rsgislib import imageutils
-from rsgislib import vectorutils
 import rsgislib.tools.filetools
+from rsgislib import imageutils, rastergis, segmentation, vectorutils
 
 haveGDALPy = True
 try:

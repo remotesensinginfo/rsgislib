@@ -3,19 +3,14 @@
 The vector utils module performs geometry / attribute table operations on vectors.
 """
 
-# import the C++ extension into this level
-from ._vectorutils import *
-
+import math
 import os
-import sys
 import shutil
 import subprocess
-import math
-from typing import List, Dict, Union
+import sys
+from typing import Dict, List, Union
 
-from osgeo import gdal
-from osgeo import osr
-from osgeo import ogr
+from osgeo import gdal, ogr, osr
 
 # Import the RSGISLib module
 import rsgislib
@@ -25,6 +20,9 @@ import rsgislib.imageutils
 
 # Import the RSGISLib RasterGIS module
 import rsgislib.rastergis
+
+# import the C++ extension into this level
+from ._vectorutils import *
 
 gdal.UseExceptions()
 
@@ -84,6 +82,7 @@ def delete_vector_file(vec_file: str, feedback: bool = True):
 
     """
     from osgeo import gdal
+
     import rsgislib.tools.filetools
 
     if os.path.exists(vec_file):
@@ -295,10 +294,7 @@ def get_vec_lyr_geom_type(vec_file: str, vec_lyr: str = None) -> int:
 
 
 def count_feats_per_att_val(
-    vec_file: str,
-    vec_lyr: str,
-    col_name: str,
-    out_df_dict: bool = False,
+    vec_file: str, vec_lyr: str, col_name: str, out_df_dict: bool = False,
 ) -> Dict:
     """
     A function which returns the count of features for each variable
@@ -338,7 +334,7 @@ def count_feats_per_att_val(
 
 
 def merge_vectors_to_gpkg(
-    in_vec_files: list, out_vec_file: str, out_vec_lyr: str, exists: bool = False
+    in_vec_files: List, out_vec_file: str, out_vec_lyr: str, exists: bool = False
 ):
     """
     Function which will merge a list of vector files into an single output GeoPackage (GPKG) file using ogr2ogr.
@@ -511,7 +507,7 @@ def merge_vector_lyrs_to_gpkg(
 
 
 def merge_vectors_to_gpkg_ind_lyrs(
-    in_vec_files: list,
+    in_vec_files: List,
     out_vec_file: str,
     rename_dup_lyrs: bool = False,
     geom_type: str = None,
@@ -530,8 +526,8 @@ def merge_vectors_to_gpkg_ind_lyrs(
                       (e.g., 'POLYGON'). Same options as ogr2ogr.
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_vec_file):
         raise rsgislib.RSGISPyException(
@@ -1058,8 +1054,8 @@ def reproj_vec_lyr_obj(
 
 
 def get_att_lst_select_feats(
-    vec_file: str, vec_lyr: str, att_names: list, vec_sel_file: str, vec_sel_lyr: str
-) -> list:
+    vec_file: str, vec_lyr: str, att_names: List, vec_sel_file: str, vec_sel_lyr: str
+) -> List:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1161,8 +1157,8 @@ def get_att_lst_select_feats(
 
 
 def get_att_lst_select_feats_lyr_objs(
-    vec_lyr_obj: ogr.Layer, att_names: list, vec_sel_lyr_obj: ogr.Layer
-) -> list:
+    vec_lyr_obj: ogr.Layer, att_names: List, vec_sel_lyr_obj: ogr.Layer
+) -> List:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1246,8 +1242,8 @@ def get_att_lst_select_feats_lyr_objs(
 
 
 def get_att_lst_select_bbox_feats(
-    vec_file: str, vec_lyr: str, att_names: list, bbox: list, bbox_epsg: int = None
-) -> list:
+    vec_file: str, vec_lyr: str, att_names: List, bbox: List, bbox_epsg: int = None
+) -> List:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1278,8 +1274,8 @@ def get_att_lst_select_bbox_feats(
 
 
 def get_att_lst_select_bbox_feats_lyr_objs(
-    vec_lyr_obj: ogr.Layer, att_names: list, bbox: list, bbox_epsg: int = None
-) -> list:
+    vec_lyr_obj: ogr.Layer, att_names: List, bbox: List, bbox_epsg: int = None
+) -> List:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1594,8 +1590,8 @@ def spatial_select_gp(
     :param vec_roi_epsg: Optionally provide the epsg code for the roi vector layer.
 
     """
-    import numpy
     import geopandas
+    import numpy
 
     print("Read vector layers")
     in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
@@ -1645,14 +1641,14 @@ def get_vec_lyr_cols(vec_file: str, vec_lyr: str) -> List[str]:
     if vec_lyr_obj is None:
         raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
-    lyrDefn = vec_lyr_obj.GetLayerDefn()
-    for i in range(lyrDefn.GetFieldCount()):
-        atts.append(lyrDefn.GetFieldDefn(i).GetName())
+    lyr_defn = vec_lyr_obj.GetLayerDefn()
+    for i in range(lyr_defn.GetFieldCount()):
+        atts.append(lyr_defn.GetFieldDefn(i).GetName())
     return atts
 
 
 def subset_envs_vec_lyr_obj(
-    vec_lyr_obj: ogr.Layer, bbox: list, epsg: int = None
+    vec_lyr_obj: ogr.Layer, bbox: List, epsg: int = None
 ) -> (ogr.DataSource, ogr.Layer):
     """
     Function to get an ogr vector layer for the defined bounding box. The returned
@@ -1857,7 +1853,7 @@ def open_gdal_vec_lyr(
 
 
 def get_mem_vec_lyr_subset(
-    vec_file: str, vec_lyr: str, bbox: list
+    vec_file: str, vec_lyr: str, bbox: List
 ) -> (ogr.DataSource, ogr.Layer):
     """
     Function to get an ogr vector layer for the defined bounding box. The returned
@@ -1892,7 +1888,7 @@ def write_vec_lyr_to_file(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str,
-    options: list = [],
+    options: List = [],
     replace: bool = False,
 ):
     """
@@ -1914,6 +1910,10 @@ def write_vec_lyr_to_file(
             delete_vector_file(out_vec_file)
 
         if os.path.exists(out_vec_file) and (not replace):
+            print(
+                "Warning: some drivers (e.g., GeoJSON) might have problems "
+                "re-adding layer to existing file: write_vec_lyr_to_file."
+            )
             vecDS = gdal.OpenEx(out_vec_file, gdal.GA_Update)
         else:
             outdriver = ogr.GetDriverByName(out_format)
@@ -1939,7 +1939,7 @@ def create_copy_vector_lyr(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str,
-    options: list = [],
+    options: List = [],
     replace: bool = False,
     in_memory: bool = False,
 ):
@@ -1996,9 +1996,9 @@ def copy_rat_cols_to_vector_lyr(
     vec_lyr: str,
     rat_row_col: str,
     clumps_img: str,
-    ratcols: list,
-    out_col_names: list = None,
-    out_col_types: list = None,
+    ratcols: List,
+    out_col_names: List = None,
+    out_col_types: List = None,
 ):
     """
     A function to copy columns from RAT to a vector layer. Note, the vector layer
@@ -2191,9 +2191,9 @@ def does_vmsk_img_intersect(
 
     """
     import rsgislib.imagecalc
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
     import rsgislib.tools.geometrytools
+    import rsgislib.tools.utils
     import rsgislib.vectorutils.createrasters
 
     # Does the input image BBOX intersect the BBOX of the ROI vector?
@@ -2274,7 +2274,7 @@ def does_vmsk_img_intersect(
 
 
 def merge_to_multi_layer_vec(
-    input_file_lyrs: list,
+    input_file_lyrs: List,
     out_vec_file: str,
     out_format: str = "GPKG",
     overwrite: bool = True,
@@ -2315,8 +2315,8 @@ def vector_translate(
     out_vec_file: str,
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
-    drv_create_opts: list = [],
-    lyr_create_opts: list = [],
+    drv_create_opts: List = [],
+    lyr_create_opts: List = [],
     access_mode: str = None,
     src_srs: osr.SpatialReference = None,
     dst_srs: osr.SpatialReference = None,
@@ -2408,8 +2408,8 @@ def reproj_wgs84_vec_to_utm(
     out_vec_lyr: str = None,
     use_hemi: bool = True,
     out_format: str = "GPKG",
-    drv_create_opts: list = [],
-    lyr_create_opts: list = [],
+    drv_create_opts: List = [],
+    lyr_create_opts: List = [],
     access_mode: str = "overwrite",
     del_exist_vec: bool = False,
 ):
@@ -2432,12 +2432,14 @@ def reproj_wgs84_vec_to_utm(
     :param del_exist_vec: remove output file if it exists.
 
     """
-    import rsgislib.tools.utm
-    import rsgislib.tools.projection
-    import rsgislib.vectorgeoms
-    from osgeo import gdal
     import os
+
     import tqdm
+    from osgeo import gdal
+
+    import rsgislib.tools.projection
+    import rsgislib.tools.utm
+    import rsgislib.vectorgeoms
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -2586,9 +2588,11 @@ def split_by_attribute(
                           being ascii characters.
 
     """
+    import os
+
     import geopandas
     import tqdm
-    import os
+
     import rsgislib.tools.utils
 
     if multi_layers:
@@ -2650,7 +2654,7 @@ def subset_by_attribute(
     vec_file: str,
     vec_lyr: str,
     sub_col: str,
-    sub_vals: list,
+    sub_vals: List,
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
@@ -2772,7 +2776,7 @@ def merge_vector_files(
     A function which merges the input files into a single output file using geopandas.
     If the input files have multiple layers they are all merged into the output file.
 
-    :param vec_files: list of input files
+    :param vec_files: List of input files
     :param out_vec_file: output vector file.
     :param out_vec_lyr: output vector layer.
     :param out_format: output file format.
@@ -2780,14 +2784,16 @@ def merge_vector_files(
                      used to define the output projection.
 
     """
-    import tqdm
     import geopandas
     import pandas
+    import tqdm
+
     import rsgislib.tools.filetools
 
     if len(vec_files) == 0:
         raise rsgislib.RSGISPyException("At least 1 layer(s) needs to be provided.")
 
+    print("Read Data")
     gp_lyrs = list()
     for vec_file in tqdm.tqdm(vec_files):
         lyrs = get_vec_lyrs_lst(vec_file)
@@ -2798,6 +2804,7 @@ def merge_vector_files(
             if len(data_gdf) > 0:
                 gp_lyrs.append(data_gdf)
 
+    print("Perform Merge")
     if len(gp_lyrs) > 1:
         data_gdf = pandas.concat(gp_lyrs)
     elif len(gp_lyrs) == 1:
@@ -2805,6 +2812,7 @@ def merge_vector_files(
     else:
         raise rsgislib.RSGISPyException("No layers with data were provided")
 
+    print("Export")
     if out_format == "GPKG":
         if out_vec_lyr is None:
             out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
@@ -2816,7 +2824,7 @@ def merge_vector_files(
 
 
 def merge_vector_layers(
-    vecs_dict: list,
+    vecs_dict: List,
     out_vec_file: str,
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
@@ -2826,7 +2834,7 @@ def merge_vector_layers(
     A function which merges the input vector layers into a single output
     file using geopandas.
 
-    :param vecs_dict: list of dicts with keys [{'file': '/file/path/to/file.gpkg',
+    :param vecs_dict: List of dicts with keys [{'file': '/file/path/to/file.gpkg',
                          'layer': 'layer_name'}] providing the file paths and
                          layer names.
     :param out_vec_file: output vector file.
@@ -2836,8 +2844,8 @@ def merge_vector_layers(
                      used to define the output projection.
 
     """
-    import tqdm
     import geopandas
+    import tqdm
 
     first = True
     for vec_info in tqdm.tqdm(vecs_dict):
@@ -2889,8 +2897,8 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres: float = 350):
     :returns: geopandas dataframe
 
     """
-    from shapely.geometry import Polygon, LinearRing
     import geopandas
+    from shapely.geometry import LinearRing, Polygon
 
     out_gdf = geopandas.GeoDataFrame()
     out_gdf["geometry"] = None
@@ -2943,7 +2951,7 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres: float = 350):
                 out_gdf.loc[i_geom, "geometry"] = Polygon(out_coords, holes=out_holes)
                 i_geom += 1
             elif row["geometry"].geom_type == "MultiPolygon":
-                for poly in row["geometry"]:
+                for poly in row["geometry"].geoms:
                     for coord in poly.exterior.coords:
                         if coord[0] < 0:
                             n_west += 1
@@ -2993,7 +3001,7 @@ def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres: float = 350):
 
 
 def merge_utm_vecs_wgs84(
-    in_vec_files: list,
+    in_vec_files: List,
     out_vec_file: str,
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
@@ -3023,11 +3031,12 @@ def merge_utm_vecs_wgs84(
     """
     import geopandas
     import pandas
-    import rsgislib.tools.utm
-    import rsgislib.tools.utils
-    import rsgislib.tools.geometrytools
-    import rsgislib.vectorgeoms
     import tqdm
+
+    import rsgislib.tools.geometrytools
+    import rsgislib.tools.utils
+    import rsgislib.tools.utm
+    import rsgislib.vectorgeoms
 
     if n_hemi_utm_file is None:
         n_hemi_utm_file = os.path.join(
@@ -3054,7 +3063,7 @@ def merge_utm_vecs_wgs84(
                 "installed version was not be found."
             )
 
-    first = True
+    out_gdfs_lst = list()
     for file in tqdm.tqdm(in_vec_files):
         lyrs = get_vec_lyrs_lst(file)
         for lyr in lyrs:
@@ -3106,13 +3115,10 @@ def merge_utm_vecs_wgs84(
                         data_gdf = geopd_check_polys_wgs84_bounds_geometry(
                             data_gdf, width_thres
                         )
-                    if first:
-                        out_gdf = data_gdf
-                        first = False
-                    else:
-                        out_gdf = out_gdf.append(data_gdf)
+                    out_gdfs_lst.append(data_gdf)
 
-    if not first:
+    if len(out_gdfs_lst) > 0:
+        out_gdf = pandas.concat(out_gdfs_lst)
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
@@ -3230,8 +3236,8 @@ def create_train_test_smpls(
     :param rnd_seed: A seed for the random number generator.
 
     """
-    import rsgislib.vectorattrs
     import rsgislib.tools.filetools
+    import rsgislib.vectorattrs
 
     created_tmp_dir = False
     if not os.path.exists(tmp_dir):
@@ -3354,6 +3360,7 @@ def match_closest_vec_pts(
     """
     import geopandas
     import numpy
+
     import rsgislib.tools.geometrytools
 
     base_gpd_df = geopandas.read_file(vec_base_file, layer=vec_base_lyr)

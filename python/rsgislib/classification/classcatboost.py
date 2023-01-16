@@ -1,15 +1,13 @@
 from typing import List
 
+import h5py
+import numpy
+from rios import applier, cuiprogress
+from sklearn.metrics import accuracy_score
+
 import rsgislib
 import rsgislib.imageutils
 import rsgislib.rastergis
-
-import h5py
-import numpy
-from sklearn.metrics import accuracy_score
-
-from rios import applier
-from rios import cuiprogress
 
 # from rios import rat
 
@@ -230,11 +228,7 @@ def apply_catboost_binary_classifier(
                 out_class_probs[ID] = cls_probs
                 out_class_probs = out_class_probs.T
                 out_class_probs = out_class_probs.reshape(
-                    (
-                        2,
-                        inputs.img_mask.shape[1],
-                        inputs.img_mask.shape[2],
-                    )
+                    (2, inputs.img_mask.shape[1], inputs.img_mask.shape[2],)
                 )
 
         outputs.out_image = out_class_vals

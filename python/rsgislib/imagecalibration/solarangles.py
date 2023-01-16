@@ -33,8 +33,8 @@
 #
 ############################################################################
 
-from osgeo import osr
 import numpy
+from osgeo import osr
 
 
 def get_solar_irr_convention_solar_azimuth_from_usgs(solarAz):
@@ -97,8 +97,8 @@ def calc_solar_azimuth_zenith(inputImg, inImgDateTime, outputImg, gdalformat):
     :param gdalformat: output file format (e.g., KEA)
     """
     import Pysolar
-    from rios import applier
-    from rios import cuiprogress
+    from rios import applier, cuiprogress
+
     import rsgislib
 
     try:

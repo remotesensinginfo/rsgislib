@@ -35,7 +35,7 @@
 
 import math
 import os
-from typing import List, Tuple, Dict
+from typing import Dict, List, Tuple
 
 import numpy
 
@@ -45,7 +45,7 @@ import rsgislib.tools.utils
 
 def cls_quantity_accuracy(
     y_true: numpy.array, y_pred: numpy.array, cls_area: numpy.array
-) -> dict:
+) -> Dict:
     """
     A function to calculate quantity allocation & disagreement for a
     land cover classification. The labels must be integers from 1 - N,
@@ -85,6 +85,7 @@ def cls_quantity_accuracy(
 
     # create confusion matrix:
     cm = confusion_matrix(y_true, y_pred)
+    cm = cm.T
 
     # convert absolute areas into proportional areas:
     prop_area = (cls_area / cls_area.sum()).reshape(
@@ -92,9 +93,7 @@ def cls_quantity_accuracy(
     )  # same as Comparison Total (see Ref.)
 
     # normalise the confusion matrix by proportional area:
-    norm_cm = cm.astype(float) / cm.sum(axis=1)[
-        :,
-    ].reshape(-1, 1)
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -122,7 +121,7 @@ def calc_class_accuracy_metrics(
     pred_samples: numpy.array,
     cls_area: numpy.array,
     cls_names: numpy.array,
-) -> dict:
+) -> Dict:
     """
     A function which calculates a set of classification accuracy metrics for a set
     of reference and predicted samples. the area classified for each
@@ -149,6 +148,15 @@ def calc_class_accuracy_metrics(
 
     cohen_kappa = sklearn.metrics.cohen_kappa_score(ref_samples, pred_samples)
     acc_metrics["cohen_kappa"] = cohen_kappa
+    acc_metrics["bal_accuracy_score"] = sklearn.metrics.balanced_accuracy_score(
+        ref_samples, pred_samples
+    )
+    acc_metrics["matthews_corrcoef"] = sklearn.metrics.matthews_corrcoef(
+        ref_samples, pred_samples
+    )
+    acc_metrics["hamming_loss"] = sklearn.metrics.hamming_loss(
+        ref_samples, pred_samples
+    )
 
     # Calculate weighted f1-score using area mapped
     sum_area = 0.0
@@ -173,6 +181,7 @@ def calc_class_accuracy_metrics(
     }
 
     cm = sklearn.metrics.confusion_matrix(ref_samples, pred_samples)
+    cm = cm.T
     user_accuracy = [(row[idx] / row.sum()) * 100 for idx, row in enumerate(cm)]
     producer_accuracy = [(col[idx] / col.sum()) * 100 for idx, col in enumerate(cm.T)]
     cls_conf_intervals = dict()
@@ -203,9 +212,7 @@ def calc_class_accuracy_metrics(
         -1, 1
     )  # same as Comparison Total (see Ref.)
     # normalise the confusion matrix by proportional area:
-    norm_cm = cm.astype(float) / cm.sum(axis=1)[
-        :,
-    ].reshape(-1, 1)
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -239,7 +246,7 @@ def calc_class_accuracy_metrics(
 
 def calc_class_pt_accuracy_metrics(
     ref_samples: numpy.array, pred_samples: numpy.array, cls_names: numpy.array
-) -> dict:
+) -> Dict:
     """
     A function which calculates a set of classification accuracy metrics for a set
     of reference and predicted samples.
@@ -317,12 +324,10 @@ def calc_acc_metrics_vecsamples(
     vec_lyr: str,
     ref_col: str,
     cls_col: str,
-    cls_img: str,
-    img_cls_name_col: str = "ClassName",
-    img_hist_col: str = "Histogram",
+    cls_area_dict: Dict[str, float],
     out_json_file: str = None,
     out_csv_file: str = None,
-):
+) -> Dict:
     """
     A function which calculates classification accuracy metrics using a set of
     reference samples in a vector file and the classification image defining
@@ -334,18 +339,14 @@ def calc_acc_metrics_vecsamples(
     :param ref_col: the name of the reference classification column in the
                     input vector file.
     :param cls_col: the name of the classification column in the input vector file.
-    :param cls_img: an image of the classification from which the area
-                    (pixel counts) of each class are extracted to normalise the
-                    confusion matrix. Should have a RAT with class names and histogram.
-    :param img_cls_name_col: The name of the column in the image attribute table which
-                             specifies the class name.
-    :param img_hist_col: The name of the column in the image attribute table which
-                         contains the histogram (i.e., number of pixels within
-                         the class).
+    :param cls_area_dict: A dictionary with the class names as keys and areas as
+                          the values These are used to normalise the accuracy metrics
+                          to the area of each class.
     :param out_json_file: if specified the generated metrics and confusion matrix
                           are written to a JSON file (Default=None).
     :param out_csv_file: if specified the generated metrics and confusion matrix
                          are written to a CSV file (Default=None).
+    :return: dict (matching JSON output) with the classification accuracy stats
 
     Example:
 
@@ -367,10 +368,7 @@ def calc_acc_metrics_vecsamples(
                                                          out_json_file)
 
     """
-    import rsgislib.tools.utils
     import rsgislib.vectorattrs
-    import rsgislib.rastergis
-    import rsgislib.imageutils
 
     # Read columns from vector file.
     ref_vals = numpy.array(
@@ -389,9 +387,14 @@ def calc_acc_metrics_vecsamples(
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
     cls_id_lut = dict()
+    n_clses = 0
     for cls_id, cls_name in enumerate(unq_cls_names):
         cls_name_lut[cls_name] = cls_id
         cls_id_lut[cls_id] = cls_name
+        n_clses = cls_id
+
+    if n_clses < 2:
+        raise rsgislib.RSGISPyException("Must have at least two classes.")
 
     # Create cls_id arrays
     ref_int_vals = numpy.zeros_like(ref_vals, dtype=int)
@@ -400,60 +403,22 @@ def calc_acc_metrics_vecsamples(
         ref_int_vals[ref_vals == cls_name] = cls_name_lut[cls_name]
         cls_int_vals[cls_vals == cls_name] = cls_name_lut[cls_name]
 
-    try:
-        rat_cols = rsgislib.rastergis.get_rat_columns(cls_img)
-    except:
-        raise rsgislib.RSGISPyException("The input image does not have a RAT...")
-
-    if img_cls_name_col not in rat_cols:
-        raise rsgislib.RSGISPyException(
-            "The RAT does not contain the class name column specified ('{}')".format(
-                img_cls_name_col
+    cls_id_areas = numpy.zeros(n_clses + 1, dtype=float)
+    tot_area = 0
+    for cls_name in unq_cls_names:
+        if cls_name not in cls_area_dict:
+            raise rsgislib.RSGISPyException(
+                f"Class '{cls_name}' is within the samples but not in the areas dict"
             )
-        )
-    if img_hist_col not in rat_cols:
-        raise rsgislib.RSGISPyException(
-            "The RAT does not contain the histogram column specified ('{}')".format(
-                img_hist_col
-            )
-        )
-
-    img_hist_data = rsgislib.rastergis.get_column_data(cls_img, img_hist_col)
-    img_clsname_data = rsgislib.rastergis.get_column_data(cls_img, img_cls_name_col)
-    img_clsname_data[0] = ""
-
-    pxl_size_x, pxl_size_y = rsgislib.imageutils.get_img_res(cls_img, abs_vals=True)
-    pxl_area = pxl_size_x * pxl_size_y
-
-    # Find the class areas (pixel counts)
-    cls_pxl_count_dict = dict()
-    cls_area_dict = dict()
-    tot_area = 0.0
-    cls_pxl_counts = numpy.zeros_like(unq_cls_names, dtype=int)
-    for i, cls_name in enumerate(img_clsname_data):
-        cls_name_str = str(cls_name.decode())
-        cls_name_str = rsgislib.tools.utils.check_str(cls_name_str, rm_non_ascii=True)
-        if (i > 0) and (len(cls_name_str) > 0):
-            if cls_name_str not in unq_cls_names:
-                raise rsgislib.RSGISPyException(
-                    "Class ('{}') found in image which was "
-                    "not in point samples...".format(cls_name_str)
-                )
-            cls_pxl_counts[cls_name_lut[cls_name_str]] = img_hist_data[i]
-            cls_pxl_count_dict[cls_name_str] = img_hist_data[i]
-            cls_area_dict[cls_name_str] = img_hist_data[i] * pxl_area
-            tot_area = tot_area + (img_hist_data[i] * pxl_area)
+        cls_id_areas[cls_name_lut[cls_name]] = cls_area_dict[cls_name]
+        tot_area += cls_area_dict[cls_name]
 
     acc_metrics = calc_class_accuracy_metrics(
-        ref_int_vals, cls_int_vals, cls_pxl_counts, unq_cls_names
+        ref_int_vals, cls_int_vals, cls_id_areas, unq_cls_names
     )
-
-    acc_metrics["pixel_count"] = cls_pxl_count_dict
-    acc_metrics["pixel_area"] = cls_area_dict
+    acc_metrics["class_area"] = cls_area_dict
 
     if out_json_file is not None:
-        import rsgislib.tools.utils
-
         rsgislib.tools.utils.write_dict_to_json(acc_metrics, out_json_file)
 
     if out_csv_file is not None:
@@ -470,6 +435,13 @@ def calc_acc_metrics_vecsamples(
             # Overall Accuracy
             acc_metrics_writer.writerow(["overall accuracy", acc_metrics["accuracy"]])
             acc_metrics_writer.writerow(["cohen kappa", acc_metrics["cohen_kappa"]])
+            acc_metrics_writer.writerow(
+                ["balanced accuracy score", acc_metrics["bal_accuracy_score"]]
+            )
+            acc_metrics_writer.writerow(
+                ["matthews correlation coefficient", acc_metrics["matthews_corrcoef"]]
+            )
+            acc_metrics_writer.writerow(["hamming loss", acc_metrics["hamming_loss"]])
             acc_metrics_writer.writerow([""])
 
             # Overall Accuracy Confidence Intervals
@@ -546,7 +518,7 @@ def calc_acc_metrics_vecsamples(
             )
             acc_metrics_writer.writerow(
                 [
-                    "weighted (pixel) avg",
+                    "weighted (sample) avg",
                     acc_metrics["weighted avg"]["f1-score"],
                     acc_metrics["weighted avg"]["precision"],
                     acc_metrics["weighted avg"]["recall"],
@@ -624,23 +596,143 @@ def calc_acc_metrics_vecsamples(
 
             acc_metrics_writer.writerow([""])
             acc_metrics_writer.writerow(
-                ["class", "pixel count", "pixel area", "Est. Prop. Area", "Est. Area"]
+                ["class", "pixel area", "Est. Prop. Area", "Est. Area"]
             )
             for i, cls_name in enumerate(unq_cls_names):
                 acc_metrics_writer.writerow(
                     [
                         cls_name,
-                        cls_pxl_count_dict[cls_name],
                         cls_area_dict[cls_name],
                         acc_metrics["est_prop_cls_area"][i],
                         (tot_area * acc_metrics["est_prop_cls_area"][i]),
                     ]
                 )
 
-    if (out_json_file is None) and (out_csv_file is None):
-        import pprint
+    return acc_metrics
 
-        pprint.pprint(acc_metrics)
+
+def calc_acc_metrics_vecsamples_img(
+    vec_file: str,
+    vec_lyr: str,
+    ref_col: str,
+    cls_col: str,
+    cls_img: str,
+    img_cls_name_col: str = "ClassName",
+    img_hist_col: str = "Histogram",
+    out_json_file: str = None,
+    out_csv_file: str = None,
+) -> Dict:
+    """
+    A function which calculates classification accuracy metrics using a set of
+    reference samples in a vector file and the classification image defining
+    the area classified.
+    This would be often be used alongside the ClassAccuracy QGIS plugin.
+
+    :param vec_file: the input vector file with the reference points
+    :param vec_lyr: the input vector layer name with the reference points.
+    :param ref_col: the name of the reference classification column in the
+                    input vector file.
+    :param cls_col: the name of the classification column in the input vector file.
+    :param cls_img: an image of the classification from which the area
+                    (pixel counts) of each class are extracted to normalise the
+                    confusion matrix. Should have a RAT with class names and histogram.
+    :param img_cls_name_col: The name of the column in the image attribute table which
+                             specifies the class name.
+    :param img_hist_col: The name of the column in the image attribute table which
+                         contains the histogram (i.e., number of pixels within
+                         the class).
+    :param out_json_file: if specified the generated metrics and confusion matrix
+                          are written to a JSON file (Default=None).
+    :param out_csv_file: if specified the generated metrics and confusion matrix
+                         are written to a CSV file (Default=None).
+    :return: dict (matching JSON output) with the classification accuracy stats
+
+    Example:
+
+        import rsgislib
+        from rsgislib.classification import classaccuracymetrics
+
+        vec_file = "Sonoma_county_classification_refPoints.gpkg"
+        vec_lyr = "ref_points"
+        ref_col = "reference_classes"
+        cls_col = "classes"
+        cls_img = "Sonoma_county_Landsat8_2015_utm_RandomForest.kea"
+        img_cls_name_col = "RF_classes"
+        img_hist_col = "Histogram"
+        out_json_file = "Sonoma_county_class_acc_metrics.json"
+
+        classaccuracymetrics.calc_acc_metrics_vecsamples(vec_in_file, vec_in_lyr,
+                                                         ref_col, cls_col, cls_img,
+                                                         img_cls_name_col, img_hist_col,
+                                                         out_json_file)
+
+    """
+    import rsgislib.imageutils
+    import rsgislib.rastergis
+    import rsgislib.vectorattrs
+
+    # Read columns from vector file.
+    ref_vals = numpy.array(
+        rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, ref_col)
+    )
+    cls_vals = numpy.array(
+        rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, cls_col)
+    )
+
+    # Find unique class values
+    unq_cls_names = numpy.unique(
+        numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
+    )
+    unq_cls_names.sort()
+
+    try:
+        rat_cols = rsgislib.rastergis.get_rat_columns(cls_img)
+    except:
+        raise rsgislib.RSGISPyException("The input image does not have a RAT...")
+
+    if img_cls_name_col not in rat_cols:
+        raise rsgislib.RSGISPyException(
+            "The RAT does not contain the class name column specified ('{}')".format(
+                img_cls_name_col
+            )
+        )
+    if img_hist_col not in rat_cols:
+        raise rsgislib.RSGISPyException(
+            "The RAT does not contain the histogram column specified ('{}')".format(
+                img_hist_col
+            )
+        )
+
+    img_hist_data = rsgislib.rastergis.get_column_data(cls_img, img_hist_col)
+    img_clsname_data = rsgislib.rastergis.get_column_data(cls_img, img_cls_name_col)
+    img_clsname_data[0] = ""
+
+    pxl_size_x, pxl_size_y = rsgislib.imageutils.get_img_res(cls_img, abs_vals=True)
+    pxl_area = pxl_size_x * pxl_size_y
+
+    # Find the class areas (pixel counts)
+    cls_area_dict = dict()
+    for i, cls_name in enumerate(img_clsname_data):
+        cls_name_str = str(cls_name.decode())
+        cls_name_str = rsgislib.tools.utils.check_str(cls_name_str, rm_non_ascii=True)
+        if (i > 0) and (len(cls_name_str) > 0):
+            if cls_name_str not in unq_cls_names:
+                raise rsgislib.RSGISPyException(
+                    "Class ('{}') found in image which was "
+                    "not in point samples...".format(cls_name_str)
+                )
+            cls_area_dict[cls_name_str] = img_hist_data[i] * pxl_area
+
+    acc_metrics = calc_acc_metrics_vecsamples(
+        vec_file=vec_file,
+        vec_lyr=vec_lyr,
+        ref_col=ref_col,
+        cls_col=cls_col,
+        cls_area_dict=cls_area_dict,
+        out_json_file=out_json_file,
+        out_csv_file=out_csv_file,
+    )
+    return acc_metrics
 
 
 def calc_acc_ptonly_metrics_vecsamples(
@@ -719,8 +811,6 @@ def calc_acc_ptonly_metrics_vecsamples(
     )
 
     if out_json_file is not None:
-        import rsgislib.tools.utils
-
         rsgislib.tools.utils.write_dict_to_json(acc_metrics, out_json_file)
 
     if out_csv_file is not None:
@@ -866,8 +956,9 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     :return: dict with mean/median and bootstrap intervals.
 
     """
-    import tqdm
     import numpy.random
+    import tqdm
+
     import rsgislib.vectorattrs
 
     # Read columns from vector file.
@@ -1419,16 +1510,14 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
         ]
 
     if out_json_file is not None:
-        import rsgislib.tools.utils
-
         rsgislib.tools.utils.write_dict_to_json(out_interv_stats, out_json_file)
 
     return out_interv_stats
 
 
 def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
-    vec_files: list,
-    vec_lyrs: list,
+    vec_files: List,
+    vec_lyrs: List,
     ref_col: str,
     cls_col: str,
     tmp_dir: str,
@@ -1483,7 +1572,6 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
              intervals.
 
     """
-    import rsgislib.tools.utils
     import rsgislib.vectorutils
 
     uid_str = rsgislib.tools.utils.uid_generator()
@@ -1585,7 +1673,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
 
 
 def summarise_multi_acc_ptonly_metrics(
-    acc_json_files: list, out_acc_json_sum_file: str
+    acc_json_files: List, out_acc_json_sum_file: str
 ):
     """
     A function which takes a list of JSON files outputted from the
@@ -1599,8 +1687,6 @@ def summarise_multi_acc_ptonly_metrics(
     :param out_acc_json_sum_file: file path the output JSON file.
 
     """
-    import rsgislib.tools.utils
-
     out_dict = dict()
     out_dict["accuracy"] = {"values": []}
     out_dict["cohen_kappa"] = {"values": []}
@@ -1856,9 +1942,10 @@ def calc_sampled_acc_metrics(
                     then be passed a position parameter of 1.
 
     """
-    import rsgislib.classification.classaccuracymetrics
-    import tqdm
     import matplotlib.pyplot as plt
+    import tqdm
+
+    import rsgislib.classification.classaccuracymetrics
 
     cls_names = sorted(cls_names, key=str.lower)
     n_tot_pts = ref_samples.shape[0]

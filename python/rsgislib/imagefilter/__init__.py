@@ -3,9 +3,10 @@
 Contains image filtering functionality for rsgislib
 """
 
+import os
+
 # import the C++ extension into this level
 from ._imagefilter import *
-import os
 
 
 class FilterParameters:

@@ -3,23 +3,22 @@
 The tools.mapping module contains functions for making maps with geospatial data.
 """
 
-from typing import List, Dict, Union
 import math
 import os
 import shutil
-
-import rsgislib
-import rsgislib.tools.projection
-import rsgislib.tools.plotting
-import rsgislib.imageutils
+from typing import Dict, List, Union
 
 import geopandas
-import numpy
-
-import matplotlib.pyplot as plt
-import matplotlib.colors
 import matplotlib.cm
+import matplotlib.colors
+import matplotlib.pyplot as plt
+import numpy
 from matplotlib_scalebar.scalebar import ScaleBar
+
+import rsgislib
+import rsgislib.imageutils
+import rsgislib.tools.plotting
+import rsgislib.tools.projection
 
 
 def calc_y_fig_size(bbox: List[float], fig_x_size=Union[int, float]) -> float:
@@ -290,8 +289,8 @@ def create_wmts_img_map(
     )
 
     ax.imshow(img_data, extent=img_coords)
-    ax.set_xlim([img_coords[0], img_coords[1]])
-    ax.set_ylim([img_coords[2], img_coords[3]])
+    ax.set_xlim([bbox[0], bbox[1]])
+    ax.set_ylim([bbox[2], bbox[3]])
 
     if use_grid:
         ax.grid()
@@ -302,8 +301,7 @@ def create_wmts_img_map(
 
     if show_scale_bar:
         distance_meters = 1
-        img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(wmts_tmp_img)
-        if img_epsg == 4326:
+        if bbox_epsg == 4326:
             distance_meters = rsgislib.tools.projection.great_circle_distance(
                 wgs84_p1=[bbox[0], bbox[3]], wgs84_p2=[bbox[0] + 1, bbox[3]]
             )
@@ -478,6 +476,7 @@ def create_vec_lyr_map(
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
     scale_bar_loc: str = "upper right",
+    plot_zorders: Union[float, List[float]] = 1,
 ):
     """
     A function which adds vector layer(s) to a matplotlib axis. This function
@@ -519,6 +518,10 @@ def create_vec_lyr_map(
                           upper right, upper left, lower left, lower right, right,
                           center left, center right, lower center, upper center
                           or center. Default: upper right
+    :param plot_zorders: the drawing order of artists is determined by their
+                        zorder attribute, which is a floating point number.
+                        Artists with higher zorder are drawn on top.
+                        https://matplotlib.org/stable/gallery/misc/zorder_demo.html
 
     """
     n_vec_lyrs = 1
@@ -574,6 +577,15 @@ def create_vec_lyr_map(
         else:
             vec_fill_alpha = vec_fill_alphas
 
+        if type(plot_zorders) is list:
+            if len(plot_zorders) != n_vec_lyrs:
+                raise rsgislib.RSGISPyException(
+                    "Number of fill colours not same as number of vector layers"
+                )
+            plot_zorder = plot_zorders[i]
+        else:
+            plot_zorder = plot_zorders
+
         gp_vec_sub.plot(
             ax=ax,
             color=vec_fill_clr,
@@ -581,6 +593,7 @@ def create_vec_lyr_map(
             linewidth=vec_line_width,
             alpha=vec_fill_alpha,
             markersize=vec_markersize,
+            zorder=plot_zorder,
         )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
@@ -620,6 +633,7 @@ def create_raster_img_map(
     stch_min_max_vals: Union[Dict, List[Dict]] = None,
     stch_n_stdevs: float = 2.0,
     scale_bar_loc: str = "upper right",
+    plot_zorder: float = 1,
 ):
     """
     A function which displays a stretched raster layer onto the axis provided.
@@ -655,6 +669,10 @@ def create_raster_img_map(
                           upper right, upper left, lower left, lower right, right,
                           center left, center right, lower center, upper center
                           or center. Default: upper right
+    :param plot_zorder: the drawing order of artists is determined by their
+                        zorder attribute, which is a floating point number.
+                        Artists with higher zorder are drawn on top.
+                        https://matplotlib.org/stable/gallery/misc/zorder_demo.html
 
     """
     if bbox is None:
@@ -691,7 +709,11 @@ def create_raster_img_map(
         print("No stretch is being used - is this what you intended?!")
         img_data_strch = img_data
 
-    ax.imshow(img_data_strch, extent=img_coords)
+    clr_map = None
+    if len(img_bands) == 1:
+        clr_map = "gist_gray"
+
+    ax.imshow(img_data_strch, cmap=clr_map, extent=img_coords, zorder=plot_zorder)
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
 
@@ -726,6 +748,7 @@ def create_thematic_raster_map(
     use_grid: bool = False,
     show_map_axis: bool = True,
     scale_bar_loc: str = "upper right",
+    plot_zorders: Union[float, List[float]] = 1,
 ):
     """
     A function which displays a thematic raster layer onto the axis provided
@@ -750,6 +773,10 @@ def create_thematic_raster_map(
                           upper right, upper left, lower left, lower right, right,
                           center left, center right, lower center, upper center
                           or center. Default: upper right
+    :param plot_zorders: the drawing order of artists is determined by their
+                        zorder attribute, which is a floating point number.
+                        Artists with higher zorder are drawn on top.
+                        https://matplotlib.org/stable/gallery/misc/zorder_demo.html
 
     """
     input_imgs = list()
@@ -758,15 +785,25 @@ def create_thematic_raster_map(
     else:
         input_imgs = input_img
 
+    if isinstance(plot_zorders, list):
+        if len(plot_zorders) != len(input_imgs):
+            raise rsgislib.RSGISPyException(
+                "The number of zorders provided does not match the number of input images."
+            )
+    else:
+        tmp_plot_zorder = plot_zorders
+        plot_zorders = list()
+        for input_img in input_imgs:
+            plot_zorders.append(tmp_plot_zorder)
+
     if bbox is None:
         bbox = rsgislib.imageutils.get_img_bbox(input_imgs[0])
-
-    img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_imgs[0])
 
     img_data_arr_scns = list()
     img_coords_scns = list()
     lgd_patches_scns = list()
-    for input_img in input_imgs:
+    lcl_plot_zorders = list()
+    for i, input_img in enumerate(input_imgs):
         (
             img_data_arr,
             img_coords,
@@ -777,12 +814,15 @@ def create_thematic_raster_map(
         img_data_arr_scns.append(img_data_arr)
         img_coords_scns.append(img_coords)
         lgd_patches_scns.append(lgd_patches)
+        lcl_plot_zorders.append(plot_zorders[i])
 
     ax.set_xlim([img_coords_scns[0][0], img_coords_scns[0][1]])
     ax.set_ylim([img_coords_scns[0][2], img_coords_scns[0][3]])
 
-    for img_data_arr, img_coords in zip(img_data_arr_scns, img_coords_scns):
-        ax.imshow(img_data_arr, extent=img_coords)
+    for img_data_arr, img_coords, plot_zorder in zip(
+        img_data_arr_scns, img_coords_scns, lcl_plot_zorders
+    ):
+        ax.imshow(img_data_arr, extent=img_coords, zorder=plot_zorder)
 
     if use_grid:
         ax.grid()
@@ -821,6 +861,7 @@ def create_choropleth_vec_lyr_map(
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
     scale_bar_loc: str = "upper right",
+    plot_zorder: float = 1,
 ):
     """
     A function which adds a vector layer to a matplotlib axis. This function
@@ -863,6 +904,10 @@ def create_choropleth_vec_lyr_map(
                           upper right, upper left, lower left, lower right, right,
                           center left, center right, lower center, upper center
                           or center. Default: upper right
+    :param plot_zorder: the drawing order of artists is determined by their
+                        zorder attribute, which is a floating point number.
+                        Artists with higher zorder are drawn on top.
+                        https://matplotlib.org/stable/gallery/misc/zorder_demo.html
 
     """
     if vec_fill_cmap is None:
@@ -886,6 +931,7 @@ def create_choropleth_vec_lyr_map(
         linewidth=vec_line_width,
         alpha=vec_fill_alpha,
         markersize=vec_markersize,
+        zorder=plot_zorder,
     )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
@@ -928,6 +974,7 @@ def create_raster_cmap_img_map(
     vals_under_white: bool = False,
     print_norm_vals: bool = False,
     scale_bar_loc: str = "upper right",
+    plot_zorder: float = 1,
 ):
     """
     A function which displays a single band raster layer onto the axis provided
@@ -975,6 +1022,10 @@ def create_raster_cmap_img_map(
                           upper right, upper left, lower left, lower right, right,
                           center left, center right, lower center, upper center
                           or center. Default: upper right
+    :param plot_zorder: the drawing order of artists is determined by their
+                        zorder attribute, which is a floating point number.
+                        Artists with higher zorder are drawn on top.
+                        https://matplotlib.org/stable/gallery/misc/zorder_demo.html
     :return: The colour map and normalisation so a colour bar can be created.
              (c_cmap, c_norm)
 
@@ -1006,7 +1057,7 @@ def create_raster_cmap_img_map(
     else:
         c_norm = None
 
-    ax.imshow(img_data, extent=img_coords, cmap=c_cmap, norm=c_norm)
+    ax.imshow(img_data, extent=img_coords, cmap=c_cmap, norm=c_norm, zorder=plot_zorder)
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
 
@@ -1048,6 +1099,7 @@ def create_vec_pt_density_map(
     show_map_axis: bool = True,
     sub_in_vec: bool = False,
     scale_bar_loc: str = "upper right",
+    plot_zorder: float = 1,
 ):
     """
     A function which adds a vector layer(s) to a matplotlib axis as a density plot.
@@ -1098,6 +1150,10 @@ def create_vec_pt_density_map(
                           upper right, upper left, lower left, lower right, right,
                           center left, center right, lower center, upper center
                           or center. Default: upper right
+    :param plot_zorder: the drawing order of artists is determined by their
+                        zorder attribute, which is a floating point number.
+                        Artists with higher zorder are drawn on top.
+                        https://matplotlib.org/stable/gallery/misc/zorder_demo.html
     :return: The colour map and normalisation so a colour bar can be created.
              (c_cmap, c_norm)
 
@@ -1133,7 +1189,7 @@ def create_vec_pt_density_map(
         dpi=density_dpi,
         norm=c_norm,
         cmap=c_cmap,
-        zorder=10,
+        zorder=plot_zorder,
     )
 
     ax.set_xlim([bbox[0], bbox[1]])

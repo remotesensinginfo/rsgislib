@@ -44,9 +44,7 @@ from datetime import datetime
 
 import numpy
 import statsmodels.api
-
-from rios import fileinfo
-from rios import applier
+from rios import applier, fileinfo
 
 
 class RLMRemoveOutliers(object):

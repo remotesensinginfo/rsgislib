@@ -31,9 +31,10 @@ def create_random_int_img(
     :param calc_stats: calculate image statistics and pyramids
 
     """
-    import rsgislib.imageutils
-    from rios import applier
     import numpy.random
+    from rios import applier
+
+    import rsgislib.imageutils
 
     rsgislib.imageutils.createBlankImagePy(
         output_img,

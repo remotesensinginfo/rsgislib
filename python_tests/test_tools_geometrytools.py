@@ -19,6 +19,8 @@ def test_reproj_point_OSGB_UTM():
         in_osr_proj_obj, out_osr_proj_obj, osgb_x, osgb_y
     )
 
+    print(f"X: {utm_x} Y: {utm_y}")
+
     ref_utm_x = 425966.1
     ref_utm_y = 5807642.0
     assert (abs(ref_utm_x - utm_x) < 2) and (abs(ref_utm_y - utm_y) < 2)
@@ -44,6 +46,8 @@ def test_reproj_point_OSGB_WGS84():
     lon, lat = rsgislib.tools.geometrytools.reproj_point(
         in_osr_proj_obj, out_osr_proj_obj, osgb_x, osgb_y
     )
+
+    print(f"lon: {lon} lat: {lat}")
 
     ref_lon = -4.0885
     ref_lat = 52.4140
@@ -71,12 +75,14 @@ def test_reproj_point_WGS84_OSGB():
         in_osr_proj_obj, out_osr_proj_obj, lon, lat
     )
 
+    print(f"X: {osgb_x} Y: {osgb_y}")
+
     ref_osgb_x = 258051.3
     ref_osgb_y = 281606.4
     assert (abs(ref_osgb_x - osgb_x) < 2) and (abs(ref_osgb_y - osgb_y) < 2)
 
 
-def test_reproj_point_WGS84_UTM():
+def test_reproj_point_WGS84_UTM_1():
     import rsgislib.tools.geometrytools
     from osgeo import osr
 
@@ -93,8 +99,58 @@ def test_reproj_point_WGS84_UTM():
         in_osr_proj_obj, out_osr_proj_obj, lon, lat
     )
 
+    print(f"X: {utm_x} Y: {utm_y}")
+
     ref_utm_x = 425966.3
     ref_utm_y = 5807643.4
+    assert (abs(ref_utm_x - utm_x) < 0.1) and (abs(ref_utm_y - utm_y) < 0.1)
+
+
+def test_reproj_point_WGS84_UTM_2():
+    import rsgislib.tools.geometrytools
+    from osgeo import osr
+
+    in_osr_proj_obj = osr.SpatialReference()
+    in_osr_proj_obj.ImportFromEPSG(4326)
+
+    out_osr_proj_obj = osr.SpatialReference()
+    out_osr_proj_obj.ImportFromEPSG(32702)
+
+    lon = -170.6827
+    lat = -14.2655
+
+    utm_x, utm_y = rsgislib.tools.geometrytools.reproj_point(
+        in_osr_proj_obj, out_osr_proj_obj, lon, lat
+    )
+
+    print(f"X: {utm_x} Y: {utm_y}")
+
+    ref_utm_x = 534225.924
+    ref_utm_y = 8422887.035
+    assert (abs(ref_utm_x - utm_x) < 0.1) and (abs(ref_utm_y - utm_y) < 0.1)
+
+
+def test_reproj_point_WGS84_UTM_3():
+    import rsgislib.tools.geometrytools
+    from osgeo import osr
+
+    in_osr_proj_obj = osr.SpatialReference()
+    in_osr_proj_obj.ImportFromEPSG(4326)
+
+    out_osr_proj_obj = osr.SpatialReference()
+    out_osr_proj_obj.ImportFromEPSG(32602)
+
+    lon = -170.6827
+    lat = -14.2655
+
+    utm_x, utm_y = rsgislib.tools.geometrytools.reproj_point(
+        in_osr_proj_obj, out_osr_proj_obj, lon, lat
+    )
+
+    print(f"X: {utm_x} Y: {utm_y}")
+
+    ref_utm_x = 534225.924
+    ref_utm_y = -1577112.965
     assert (abs(ref_utm_x - utm_x) < 0.1) and (abs(ref_utm_y - utm_y) < 0.1)
 
 
@@ -114,6 +170,8 @@ def test_reproj_point_UTM_WGS84():
     lon, lat = rsgislib.tools.geometrytools.reproj_point(
         in_osr_proj_obj, out_osr_proj_obj, utm_x, utm_y
     )
+
+    print(f"lon: {lon} lat: {lat}")
 
     ref_lon = -4.0885
     ref_lat = 52.4140
@@ -141,6 +199,8 @@ def test_reproj_point_NZTM_WGS84():
         in_osr_proj_obj, out_osr_proj_obj, nztm_x, nztm_y
     )
 
+    print(f"lon: {lon} lat: {lat}")
+
     ref_lon = 175.6240
     ref_lat = -40.3730
     assert (abs(ref_lat - lat) < 0.001) and (abs(ref_lon - lon) < 0.001)
@@ -167,6 +227,8 @@ def test_reproj_point_NZTM_UTM():
         in_osr_proj_obj, out_osr_proj_obj, nztm_x, nztm_y
     )
 
+    print(f"X: {utm_x} Y: {utm_y}")
+
     ref_utm_x = 383187.9
     ref_utm_y = 5529929.6
     assert (abs(ref_utm_x - utm_x) < 0.1) and (abs(ref_utm_y - utm_y) < 0.1)
@@ -190,6 +252,8 @@ def test_reproj_point_to_wgs84_osgb():
         in_osr_proj_obj, osgb_x, osgb_y
     )
 
+    print(f"lon: {lon} lat: {lat}")
+
     ref_lon = -4.0885
     ref_lat = 52.4140
     assert (abs(ref_lon - lon) < 0.001) and (abs(ref_lat - lat) < 0.001)
@@ -208,6 +272,8 @@ def test_reproj_point_to_wgs84_utm():
     lon, lat = rsgislib.tools.geometrytools.reproj_point_to_wgs84(
         in_osr_proj_obj, utm_x, utm_y
     )
+
+    print(f"lon: {lon} lat: {lat}")
 
     ref_lon = -4.0885
     ref_lat = 52.4140
@@ -231,6 +297,8 @@ def test_reproj_point_to_wgs84_nztm():
     lon, lat = rsgislib.tools.geometrytools.reproj_point_to_wgs84(
         in_osr_proj_obj, nztm_x, nztm_y
     )
+
+    print(f"lon: {lon} lat: {lat}")
 
     ref_lon = 175.6240
     ref_lat = -40.3730

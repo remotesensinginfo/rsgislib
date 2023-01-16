@@ -5,7 +5,7 @@ raster attribute tables.
 """
 import os
 import sys
-from typing import List, Dict
+from typing import Dict, List
 
 import numpy
 from osgeo import gdal
@@ -116,8 +116,9 @@ def export_cols_to_gdal_img(
 
     """
     import os
-    import rsgislib.tools.filetools
+
     import rsgislib.imageutils
+    import rsgislib.tools.filetools
 
     if tmp_dir is None:
         tmp_dir = os.path.split(output_img)[0]
@@ -464,8 +465,9 @@ def check_string_col_valid(
 
     """
     import numpy
-    import rsgislib.tools.utils
     from rios import ratapplier
+
+    import rsgislib.tools.utils
 
     def _ratapplier_check_string_col_valid(info, inputs, outputs, otherargs):
         str_col_vals = getattr(inputs.inrat, otherargs.str_col)
@@ -601,8 +603,9 @@ def take_random_sample(
     :param rnd_seed: is the seed for the random number generation (optional;
                      default is 0).
     """
-    import rsgislib
     from rios import rat
+
+    import rsgislib
 
     if (sample_ratio <= 0) or (sample_ratio >= 1):
         raise rsgislib.RSGISPyException("Input sample ratio must be between 0 and 1.")
@@ -693,9 +696,11 @@ def identify_small_units(
 
     """
     import shutil
+
     from rios import rat
-    import rsgislib.tools.filetools
+
     import rsgislib.segmentation
+    import rsgislib.tools.filetools
 
     if len(out_col_name) != len(small_clumps_thres):
         raise rsgislib.RSGISPyException(
@@ -839,14 +844,16 @@ def calc_dist_to_classes(
                    used. (Default: -1)
 
     """
-    import multiprocessing
-    import math
     import glob
+    import math
+    import multiprocessing
     import shutil
+
     from rios import rat
-    import rsgislib.tools.utils
-    import rsgislib.tools.filetools
+
     import rsgislib.imageutils
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     tmp_present = True
     if not os.path.exists(tmp_dir):
@@ -989,8 +996,9 @@ def calc_dist_between_clumps(
 
     """
     import shutil
-    import rsgislib.tools.utils
+
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
     import rsgislib.vectorutils
 
     tmp_present = True
@@ -1049,9 +1057,11 @@ def calc_dist_to_large_clumps(
 
     """
     import shutil
+
+    from rios import rat
+
     import rsgislib.tools.utils
     import rsgislib.vectorutils
-    from rios import rat
 
     tmp_present = True
     if not os.path.exists(tmp_dir):

@@ -140,9 +140,7 @@ def create_search_obj(regrs_obj, regrs_params, n_runs=250, n_cv=5, n_cores=1):
              or RandomizedSearchCV)
 
     """
-    from sklearn.model_selection import ParameterGrid
-    from sklearn.model_selection import RandomizedSearchCV
-    from sklearn.model_selection import GridSearchCV
+    from sklearn.model_selection import GridSearchCV, ParameterGrid, RandomizedSearchCV
 
     if len(ParameterGrid(regrs_params)) > n_runs:
         skl_srch_obj = GridSearchCV(
@@ -186,6 +184,7 @@ def perform_search_param_opt(
 
     """
     import json
+
     import numpy
 
     if data_scaler is not None:
@@ -229,11 +228,12 @@ def perform_kfold_fit(
     :return: acc_metrics, residuals
 
     """
-    from sklearn.model_selection import KFold, RepeatedKFold
-    import sklearn.metrics
     import numpy
-    import rsgislib.tools.stats
+    import sklearn.metrics
     import tqdm
+    from sklearn.model_selection import KFold, RepeatedKFold
+
+    import rsgislib.tools.stats
 
     if repeats > 1:
         kf = RepeatedKFold(n_splits=n_splits, n_repeats=repeats)
@@ -368,9 +368,9 @@ def apply_regress_sklearn_mdl(
 
     """
 
-    from rios import applier
-    from rios import cuiprogress
     import numpy
+    from rios import applier, cuiprogress
+
     import rsgislib.imageutils
 
     try:

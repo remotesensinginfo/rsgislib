@@ -41,20 +41,19 @@ respect to the method of intersection. The options for intersection are:
 * METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within pixel
 """
 
-# import the C++ extension into this level
-from ._zonalstats import *
-
 import math
 import sys
 from typing import List
 
-from osgeo import gdal
-from osgeo import ogr
-from osgeo import osr
 import numpy
 import tqdm
+from osgeo import gdal, ogr, osr
 
 import rsgislib
+import rsgislib.imageutils
+
+# import the C++ extension into this level
+from ._zonalstats import *
 
 gdal.UseExceptions()
 
@@ -73,22 +72,22 @@ METHOD_POLYAREAINPIXEL = 9  # Percent of polygon area that is within pixel
 
 
 def calc_zonal_band_stats_file(
-    vec_file,
-    vec_lyr,
-    input_img,
-    img_band,
-    min_thres,
-    max_thres,
-    out_no_data_val,
-    min_field=None,
-    max_field=None,
-    mean_field=None,
-    stddev_field=None,
-    sum_field=None,
-    count_field=None,
-    mode_field=None,
-    median_field=None,
-    vec_def_epsg=None,
+    vec_file: str,
+    vec_lyr: str,
+    input_img: str,
+    img_band: int,
+    min_thres: float,
+    max_thres: float,
+    out_no_data_val: float,
+    min_field: str = None,
+    max_field: str = None,
+    mean_field: str = None,
+    stddev_field: str = None,
+    sum_field: str = None,
+    count_field: str = None,
+    mode_field: str = None,
+    median_field: str = None,
+    vec_def_epsg: int = None,
 ):
     """
     A function which calculates zonal statistics for a particular image band.
@@ -165,21 +164,21 @@ def calc_zonal_band_stats_file(
 
 
 def calc_zonal_band_stats(
-    vec_lyr_obj,
-    input_img,
-    img_band,
-    min_thres,
-    max_thres,
-    out_no_data_val,
-    min_field=None,
-    max_field=None,
-    mean_field=None,
-    stddev_field=None,
-    sum_field=None,
-    count_field=None,
-    mode_field=None,
-    median_field=None,
-    vec_def_epsg=None,
+    vec_lyr_obj: ogr.Layer,
+    input_img: str,
+    img_band: int,
+    min_thres: float,
+    max_thres: float,
+    out_no_data_val: float,
+    min_field: str = None,
+    max_field: str = None,
+    mean_field: str = None,
+    stddev_field: str = None,
+    sum_field: str = None,
+    count_field: str = None,
+    mode_field: str = None,
+    median_field: str = None,
+    vec_def_epsg: int = None,
 ):
     """
     A function which calculates zonal statistics for a particular image band.
@@ -523,7 +522,12 @@ def calc_zonal_band_stats(
 
 
 def calc_zonal_poly_pts_band_stats_file(
-    vec_file, vec_lyr, input_img, img_band, out_field, vec_def_epsg=None
+    vec_file: str,
+    vec_lyr: str,
+    input_img: str,
+    img_band: int,
+    out_field: str,
+    vec_def_epsg: int = None,
 ):
     """
     A funtion which extracts zonal stats for a polygon using the polygon centroid.
@@ -565,7 +569,11 @@ def calc_zonal_poly_pts_band_stats_file(
 
 
 def calc_zonal_poly_pts_band_stats(
-    vec_lyr_obj, input_img, img_band, out_field, vec_def_epsg=None
+    vec_lyr_obj: ogr.Layer,
+    input_img: str,
+    img_band: int,
+    out_field: str,
+    vec_def_epsg: int = None,
 ):
     """
     A funtion which extracts zonal stats for a polygon using the polygon centroid.
@@ -772,24 +780,24 @@ def calc_zonal_poly_pts_band_stats(
 
 
 def calc_zonal_band_stats_test_poly_pts_file(
-    vec_file,
-    vec_lyr,
-    input_img,
-    img_band,
-    min_thres,
-    max_thres,
-    out_no_data_val,
-    percentile=None,
-    percentile_field=None,
-    min_field=None,
-    max_field=None,
-    mean_field=None,
-    stddev_field=None,
-    sum_field=None,
-    count_field=None,
-    mode_field=None,
-    median_field=None,
-    vec_def_epsg=None,
+    vec_file: str,
+    vec_lyr: str,
+    input_img: str,
+    img_band: int,
+    min_thres: float,
+    max_thres: float,
+    out_no_data_val: float,
+    percentile: float = None,
+    percentile_field: str = None,
+    min_field: str = None,
+    max_field: str = None,
+    mean_field: str = None,
+    stddev_field: str = None,
+    sum_field: str = None,
+    count_field: str = None,
+    mode_field: str = None,
+    median_field: str = None,
+    vec_def_epsg: int = None,
 ):
     """
     A function which calculates zonal statistics for a particular image band. If
@@ -876,23 +884,23 @@ def calc_zonal_band_stats_test_poly_pts_file(
 
 
 def calc_zonal_band_stats_test_poly_pts(
-    vec_lyr_obj,
-    input_img,
-    img_band,
-    min_thres,
-    max_thres,
-    out_no_data_val,
-    percentile=None,
-    percentile_field=None,
-    min_field=None,
-    max_field=None,
-    mean_field=None,
-    stddev_field=None,
-    sum_field=None,
-    count_field=None,
-    mode_field=None,
-    median_field=None,
-    vec_def_epsg=None,
+    vec_lyr_obj: ogr.Layer,
+    input_img: str,
+    img_band: int,
+    min_thres: float,
+    max_thres: float,
+    out_no_data_val: float,
+    percentile: float = None,
+    percentile_field: str = None,
+    min_field: str = None,
+    max_field: str = None,
+    mean_field: str = None,
+    stddev_field: str = None,
+    sum_field: str = None,
+    count_field: str = None,
+    mode_field: str = None,
+    median_field: str = None,
+    vec_def_epsg: int = None,
 ):
     """
     A function which calculates zonal statistics for a particular image band. If
@@ -1320,16 +1328,16 @@ def calc_zonal_band_stats_test_poly_pts(
 
 
 def ext_point_band_values_file(
-    vec_file,
-    vec_lyr,
-    input_img,
-    img_band,
-    min_thres,
-    max_thres,
-    out_no_data_val,
-    out_field,
-    reproj_vec=False,
-    vec_def_epsg=None,
+    vec_file: str,
+    vec_lyr: str,
+    input_img: str,
+    img_band: int,
+    min_thres: float,
+    max_thres: float,
+    out_no_data_val: float,
+    out_field: str,
+    reproj_vec: bool = False,
+    vec_def_epsg: int = None,
 ):
     """
     A function which extracts point values for an input vector file for a
@@ -1388,15 +1396,15 @@ def ext_point_band_values_file(
 
 
 def ext_point_band_values(
-    vec_lyr_obj,
-    input_img,
-    img_band,
-    min_thres,
-    max_thres,
-    out_no_data_val,
-    out_field,
-    reproj_vec=False,
-    vec_def_epsg=None,
+    vec_lyr_obj: ogr.Layer,
+    input_img: str,
+    img_band: int,
+    min_thres: float,
+    max_thres: float,
+    out_no_data_val: float,
+    out_field: str,
+    reproj_vec: bool = False,
+    vec_def_epsg: int = None,
 ):
     """
     A function which extracts point values for an input vector file for a
@@ -1477,8 +1485,8 @@ def ext_point_band_values(
             epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
         else:
             epsg_vec_spatial = vec_def_epsg
-            veclyr_spatial_ref = osr.SpatialReference()
-            veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
+        veclyr_spatial_ref = osr.SpatialReference()
+        veclyr_spatial_ref.ImportFromEPSG(int(epsg_vec_spatial))
         pt_reprj = False
         if epsg_vec_spatial != epsg_img_spatial:
             if reproj_vec:
@@ -1524,14 +1532,9 @@ def ext_point_band_values(
                     y_pt = feat_geom.GetY()
 
                     if pt_reprj:
-                        if veclyr_spatial_ref.EPSGTreatsAsLatLong():
-                            x_pt, y_pt = rsgislib.tools.geometrytools.reproj_point(
-                                veclyr_spatial_ref, img_spatial_ref, y_pt, x_pt
-                            )
-                        else:
-                            x_pt, y_pt = rsgislib.tools.geometrytools.reproj_point(
-                                veclyr_spatial_ref, img_spatial_ref, x_pt, y_pt
-                            )
+                        x_pt, y_pt = rsgislib.tools.geometrytools.reproj_point(
+                            veclyr_spatial_ref, img_spatial_ref, x_pt, y_pt
+                        )
 
                     x_pt_off = float(x_pt - imgGeoTrans[0])
                     y_pt_off = float(y_pt - imgGeoTrans[3])
@@ -1595,7 +1598,9 @@ def ext_point_band_values(
         raise e
 
 
-def merge_extracted_hdf5_data(h5_files, out_h5_file, datatype=None):
+def merge_extracted_hdf5_data(
+    h5_files: List[str], out_h5_file: str, datatype: int = None
+):
     """
     A function to merge a list of HDF files (e.g., from
     rsgislib.zonalstats.extractZoneImageBandValues2HDF)
@@ -1672,13 +1677,13 @@ def merge_extracted_hdf5_data(h5_files, out_h5_file, datatype=None):
 
 
 def extract_chip_zone_image_band_values_to_hdf(
-    input_image_info,
-    image_mask,
-    mask_value,
-    chip_size,
-    output_hdf,
-    rotate_chips=None,
-    datatype=None,
+    input_image_info: List[rsgislib.imageutils.ImageBandInfo],
+    image_mask: str,
+    mask_value: int,
+    chip_size: int,
+    output_hdf: str,
+    rotate_chips: List[float] = None,
+    datatype: int = None,
 ):
     """
     A function which extracts a chip/window of image pixel values. The expectation is
@@ -1704,9 +1709,9 @@ def extract_chip_zone_image_band_values_to_hdf(
 
     """
     # Import the RIOS image reader
-    from rios.imagereader import ImageReader
     import h5py
     import tqdm
+    from rios.imagereader import ImageReader
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -1903,7 +1908,12 @@ def extract_chip_zone_image_band_values_to_hdf(
 
 
 def split_sample_chip_hdf5_file(
-    input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None
+    input_h5_file: str,
+    sample_h5_file: str,
+    remain_h5_file: str,
+    sample_size: int,
+    rnd_seed: int,
+    datatype: int = None,
 ):
     """
     A function to split the HDF5 outputs from the
@@ -2012,7 +2022,9 @@ def split_sample_chip_hdf5_file(
     fSampleH5Out.close()
 
 
-def merge_extracted_hdf5_chip_data(h5_files, out_h5_file, datatype=None):
+def merge_extracted_hdf5_chip_data(
+    h5_files: List[str], out_h5_file: str, datatype: int = None
+):
     """
     A function to merge a list of HDF files
     (e.g., from rsgislib.zonalstats.extract_chip_zone_image_band_values_to_hdf)
@@ -2099,15 +2111,15 @@ def merge_extracted_hdf5_chip_data(h5_files, out_h5_file, datatype=None):
 
 
 def extract_ref_chip_zone_image_band_values_to_hdf(
-    input_image_info,
-    ref_img,
-    ref_img_band,
-    image_mask,
-    mask_value,
-    chip_size,
-    output_hdf,
-    rotate_chips=None,
-    datatype=None,
+    input_image_info: List[rsgislib.imageutils.ImageBandInfo],
+    ref_img: str,
+    ref_img_band: int,
+    image_mask: str,
+    mask_value: int,
+    chip_size: int,
+    output_hdf: str,
+    rotate_chips: List[float] = None,
+    datatype: int = None,
 ):
     """
     A function which extracts a chip/window of image pixel values. The expectation is
@@ -2137,9 +2149,9 @@ def extract_ref_chip_zone_image_band_values_to_hdf(
 
     """
     # Import the RIOS image reader
-    from rios.imagereader import ImageReader
     import h5py
     import tqdm
+    from rios.imagereader import ImageReader
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -2357,7 +2369,12 @@ def extract_ref_chip_zone_image_band_values_to_hdf(
 
 
 def split_sample_ref_chip_hdf5_file(
-    input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None
+    input_h5_file: str,
+    sample_h5_file: str,
+    remain_h5_file: str,
+    sample_size: int,
+    rnd_seed: int,
+    datatype: int = None,
 ):
     """
     A function to split the HDF5 outputs from the
@@ -2484,7 +2501,9 @@ def split_sample_ref_chip_hdf5_file(
     fSampleH5Out.close()
 
 
-def merge_extracted_hdf5_chip_ref_data(h5_files, out_h5_file, datatype=None):
+def merge_extracted_hdf5_chip_ref_data(
+    h5_files: List[str], out_h5_file: str, datatype: int = None
+):
     """
     A function to merge a list of HDF files
     (e.g., from rsgislib.zonalstats.extract_ref_chip_zone_image_band_values_to_hdf)
@@ -2581,7 +2600,11 @@ def merge_extracted_hdf5_chip_ref_data(h5_files, out_h5_file, datatype=None):
 
 
 def msk_h5_smpls_to_finite_values(
-    input_h5, output_h5, datatype=None, lower_limit=None, upper_limit=None
+    input_h5: str,
+    output_h5: str,
+    datatype: int = None,
+    lower_limit: float = None,
+    upper_limit: float = None,
 ):
     """
     A function to remove values from a HDF5 sample file which are not finite.

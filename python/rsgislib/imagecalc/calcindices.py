@@ -34,8 +34,8 @@
 ###########################################################################
 
 import rsgislib
-import rsgislib.imageutils
 import rsgislib.imagecalc
+import rsgislib.imageutils
 
 
 def calc_ndvi(
@@ -369,8 +369,8 @@ def calc_brightness_scaled(
                          0-1 (Default: 1000 to match rsgislib/arcsi)
 
     """
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     uid_str = rsgislib.tools.utils.uid_generator()
     basename = rsgislib.tools.filetools.get_file_basename(output_img)

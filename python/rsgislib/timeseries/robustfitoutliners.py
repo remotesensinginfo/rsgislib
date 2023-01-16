@@ -6,9 +6,7 @@ from datetime import datetime
 
 import numpy
 import statsmodels.api
-from rios import fileinfo
-from rios import applier
-from rios import cuiprogress
+from rios import applier, cuiprogress, fileinfo
 
 import rsgislib
 
@@ -35,7 +33,7 @@ class RobustModel(object):
         self.residuals = band_data - predicted
 
         # Get overall RMSE of model
-        self.RMSE = numpy.sqrt(numpy.mean(self.residuals**2))
+        self.RMSE = numpy.sqrt(numpy.mean(self.residuals ** 2))
 
     def prepareXData(self, datetimes):
         rescaled = datetimes - numpy.min(self.datetimes)
@@ -233,6 +231,7 @@ def create_datejson_file(image_list, out_msk_dir, out_json_file, gdal_format="KE
     """
     import datetime
     import os.path
+
     import rsgislib.tools.filetools
 
     out_img_ext = rsgislib.imageutils.get_file_img_extension(gdal_format)

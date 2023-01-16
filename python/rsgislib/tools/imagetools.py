@@ -3,10 +3,12 @@
 The tools.imagetools module contains functions for doing simple non-spatial
 image processing.
 """
-from typing import List
 import os
 import shutil
+from typing import List
+
 import tqdm
+
 import rsgislib.tools.filetools
 import rsgislib.tools.utils
 
@@ -227,10 +229,11 @@ def split_photos_by_time(
 
     """
 
+    import datetime
+
+    import tqdm
     from PIL import Image
     from PIL.ExifTags import TAGS
-    import datetime
-    import tqdm
 
     img_dt_lut = dict()
     for img_file in input_imgs:

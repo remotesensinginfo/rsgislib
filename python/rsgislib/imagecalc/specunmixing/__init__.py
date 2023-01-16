@@ -34,12 +34,13 @@
 
 import os
 
-from osgeo import gdal
 import numpy
+from osgeo import gdal
+
+import rsgislib
 
 # import the C++ extension into this level
 from ._specunmixing import *
-import rsgislib
 
 
 class ImageEndmemberInfo(object):
@@ -283,10 +284,10 @@ def spec_unmix_spts_ucls(
             http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
 
     """
+    import pysptools.abundance_maps.amaps
     from rios import applier
 
     import rsgislib.imageutils
-    import pysptools.abundance_maps.amaps
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -404,9 +405,10 @@ def spec_unmix_spts_nnls(
             http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
 
     """
-    from rios import applier
-    import rsgislib.imageutils
     import pysptools.abundance_maps.amaps
+    from rios import applier
+
+    import rsgislib.imageutils
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -513,9 +515,10 @@ def spec_unmix_spts_fcls(
                        stats (Default: True)
 
     """
-    from rios import applier
-    import rsgislib.imageutils
     import pysptools.abundance_maps.amaps
+    from rios import applier
+
+    import rsgislib.imageutils
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -627,11 +630,12 @@ def spec_unmix_pymcr_nnls(
             http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
 
     """
-    from rios import applier
-    import rsgislib.imageutils
+    from pymcr.constraints import ConstraintNonneg
     from pymcr.mcr import McrAR
     from pymcr.regressors import NNLS
-    from pymcr.constraints import ConstraintNonneg
+    from rios import applier
+
+    import rsgislib.imageutils
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -742,11 +746,12 @@ def spec_unmix_pymcr_fcls(
                        stats (Default: True)
 
     """
-    from rios import applier
-    import rsgislib.imageutils
+    from pymcr.constraints import ConstraintNonneg, ConstraintNorm
     from pymcr.mcr import McrAR
     from pymcr.regressors import NNLS
-    from pymcr.constraints import ConstraintNonneg, ConstraintNorm
+    from rios import applier
+
+    import rsgislib.imageutils
 
     try:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -1114,10 +1119,10 @@ def summarise_multi_endmember_linear_unmixing(
 
     """
 
-    from rsgislib.tools import filetools
     import rsgislib.imagecalc
     import rsgislib.imageutils
     import rsgislib.rastergis
+    from rsgislib.tools import filetools
 
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
@@ -1316,8 +1321,9 @@ def calc_ppi(
                        the output image.
     """
     # Check gdal is available
-    import rsgislib.imageutils
     import tqdm
+
+    import rsgislib.imageutils
 
     imgDS = gdal.Open(input_img)
     if imgDS is None:

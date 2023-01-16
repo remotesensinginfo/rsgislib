@@ -4,13 +4,10 @@ Tools for creating vector layers.
 """
 
 import os
-from typing import List
-
-from osgeo import gdal
-from osgeo import ogr
-from osgeo import osr
+from typing import Dict, List
 
 import tqdm
+from osgeo import gdal, ogr, osr
 
 import rsgislib
 
@@ -142,8 +139,9 @@ def vectorise_pxls_to_pts(
     :param del_exist_vec: remove output file if it exists.
 
     """
-    from rios import applier
     import geopandas
+    from rios import applier
+
     import rsgislib.imageutils
     import rsgislib.vectorutils
 
@@ -242,11 +240,11 @@ def extract_image_footprint(
                       command after -t_srs. E.g., -t_srs epsg:4326
     """
     gdal.UseExceptions()
-    import rsgislib.tools.utils
-    import rsgislib.tools.filetools
     import rsgislib.imageutils
-    import rsgislib.vectorutils
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
     import rsgislib.vectorattrs
+    import rsgislib.vectorutils
 
     if not rsgislib.tools.filetools.does_path_exists_or_creatable(out_vec_file):
         raise rsgislib.RSGISPyException(
@@ -460,8 +458,8 @@ def define_grid(
                      projected northern hemisphere (e.g., as with landsat or
                      sentinel-2). Default is False.
     """
-    import rsgislib.tools.utm
     import rsgislib.tools.geometrytools
+    import rsgislib.tools.utm
 
     if (out_epsg_code is not None) and utm_grid:
         raise rsgislib.RSGISPyException(
@@ -784,10 +782,9 @@ def write_pts_to_vec(
     :param lyr_opts: Options passed when create the layer Default: []. Common value
                      might be ["OVERWRITE=YES"]
     """
+    from osgeo import gdal, ogr, osr
+
     import rsgislib.vectorutils
-    from osgeo import ogr
-    from osgeo import gdal
-    from osgeo import osr
 
     try:
         if len(pts_x) != len(pts_y):
@@ -1004,6 +1001,7 @@ def create_wgs84_vector_grid(
 
     """
     import math
+
     import rsgislib.tools.projection
     import rsgislib.vectorattrs
 
@@ -1121,9 +1119,9 @@ def create_vec_for_image(
     output_dir: str,
     out_format: str = "GeoJSON",
     geometry_type: int = rsgislib.GEOM_PT,
-    out_name_replace: dict = None,
-    out_file_ext=None,
-    del_exist_vec=False,
+    out_name_replace: Dict = None,
+    out_file_ext: str = None,
+    del_exist_vec: bool = False,
 ):
     """
     A function which creates a simple (dummy) vector layer for each input images.
@@ -1148,12 +1146,12 @@ def create_vec_for_image(
     :param del_exist_vec: delete the vector files if they already exist (Default: False)
 
     """
-    import rsgislib.tools.filetools
-    import rsgislib.imageutils
-    import rsgislib.vectorutils
-    from osgeo import ogr
-    from osgeo import osr
     import tqdm
+    from osgeo import ogr, osr
+
+    import rsgislib.imageutils
+    import rsgislib.tools.filetools
+    import rsgislib.vectorutils
 
     if out_file_ext is None:
         out_file_ext = rsgislib.vectorutils.get_file_vec_extension(out_format)
@@ -1253,9 +1251,10 @@ def create_hex_grid_bbox(
     :param out_format: The output vector file format (e.g., GPKG or GeoJSON).
 
     """
-    from h3 import h3
     import geopandas
+    from h3 import h3
     from shapely.geometry import Polygon
+
     import rsgislib.tools.geometrytools
 
     if bbox_epsg != 4326:
@@ -1305,9 +1304,9 @@ def create_hex_grid_poly(poly_series, hex_scale: int):
     :return: geopandas dataframe with hexagons.
 
     """
-    from h3 import h3
-    from shapely.geometry import Polygon, MultiPolygon
     import geopandas
+    from h3 import h3
+    from shapely.geometry import MultiPolygon, Polygon
 
     geom = poly_series.geometry
 
@@ -1364,8 +1363,8 @@ def create_hex_grid_polys(
     :param out_format: The output vector file format (e.g., GPKG or GeoJSON).
 
     """
-    import pandas
     import geopandas
+    import pandas
 
     polys_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
     crs_in_obj = polys_gpdf.crs

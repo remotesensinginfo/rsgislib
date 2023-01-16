@@ -6,15 +6,15 @@ EOSDIS Common Metadata Repository API (https://cmr.earthdata.nasa.gov/search/)
 """
 
 import datetime
-from typing import Union, List, Dict
 import os
+from typing import Dict, List, Union
 
 import requests
 import requests.utils
 
 import rsgislib
-import rsgislib.tools.utils
 import rsgislib.tools.httptools
+import rsgislib.tools.utils
 
 # CMR_OPS = "https://cmr.earthdata.nasa.gov/search/"
 # CMR_UAT = "https://cmr.uat.earthdata.nasa.gov/search/"
@@ -403,6 +403,7 @@ def cmr_download_file_http(
 
     """
     import tqdm
+
     import rsgislib.tools.httptools
 
     session_http = SessionWithHeaderNASARedirection(username, password)
@@ -418,7 +419,7 @@ def cmr_download_file_http(
         with session_http.get(input_url, stream=True, headers=headers) as r:
             if rsgislib.tools.httptools.check_http_response(r, input_url):
                 total = int(r.headers.get("content-length", 0))
-                chunk_size = 2**20
+                chunk_size = 2 ** 20
                 n_chunks = int(total / chunk_size) + 1
 
                 with open(tmp_dwnld_path, "wb") as f:
@@ -456,8 +457,9 @@ def download_granules_use_dwnld_db(
 
     """
     import pysondb
-    import rsgislib.tools.utils
+
     import rsgislib.tools.httptools
+    import rsgislib.tools.utils
 
     username, password = rsgislib.tools.utils.get_username_password(user_pass_file)
 

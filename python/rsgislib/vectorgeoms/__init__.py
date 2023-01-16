@@ -3,13 +3,12 @@
 The vector geometries module performs geometric operations on vectors.
 """
 
-import os
 import math
-
-from osgeo import gdal
-from osgeo import ogr
+import os
+from typing import List
 
 import tqdm
+from osgeo import gdal, ogr
 
 import rsgislib
 import rsgislib.vectorutils
@@ -1399,7 +1398,7 @@ def vec_lyr_union_gp(
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def get_vec_lyr_as_pts(vec_file: str, vec_lyr: str) -> list:
+def get_vec_lyr_as_pts(vec_file: str, vec_lyr: str) -> List:
     """
     Get a list of points from the vectors within an input file.
 
@@ -1641,7 +1640,7 @@ def explode_vec_lyr(
 
 
 def explode_vec_files(
-    in_vec_files: list,
+    in_vec_files: List,
     output_dir: str,
     out_format: str = "GPKG",
     out_vec_ext: str = "gpkg",
@@ -1662,6 +1661,7 @@ def explode_vec_files(
 
     """
     import tqdm
+
     import rsgislib.tools.filetools
 
     for vec_file in tqdm.tqdm(in_vec_files):
@@ -2407,7 +2407,7 @@ def clip_vec_lyr(
         cliped_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def get_geom_pts(geom: ogr.Geometry, pts_lst: list = None) -> list:
+def get_geom_pts(geom: ogr.Geometry, pts_lst: List = None) -> List:
     """
     Recursive function which extracts all the points within the an OGR geometry.
 
@@ -2848,7 +2848,7 @@ def vec_crosses_vec(
     return does_cross
 
 
-def get_geoms_as_bboxs(vec_file: str, vec_lyr: str) -> list:
+def get_geoms_as_bboxs(vec_file: str, vec_lyr: str) -> List:
     """
     A function which returns a list of bounding boxes for each feature
     within the vector layer.
@@ -2876,7 +2876,7 @@ def get_geoms_as_bboxs(vec_file: str, vec_lyr: str) -> list:
     return bboxs
 
 
-def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: list) -> bool:
+def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: List) -> bool:
     """
     A function which tests whether a feature within an inputted vector layer intersects
     with a bounding box.
@@ -2999,7 +2999,7 @@ def create_rtree_index(vec_file: str, vec_lyr: str):
     return idx_obj, geom_lst
 
 
-def bbox_intersects_index(rt_idx, geom_lst: list, bbox: list) -> bool:
+def bbox_intersects_index(rt_idx, geom_lst: List, bbox: List) -> bool:
     """
     A function which tests for intersection between the geometries and the bounding box
     using a spatial index.
@@ -3135,8 +3135,8 @@ def split_vec_by_grid(
 
     """
     import geopandas
-    from shapely.geometry import Polygon
     import numpy
+    from shapely.geometry import Polygon
 
     in_vec_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
 

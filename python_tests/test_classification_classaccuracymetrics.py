@@ -38,7 +38,7 @@ def test_calc_acc_ptonly_metrics_vecsamples(tmp_path):
 
 
 @pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
-def test_calc_acc_ptonly_metrics_vecsamples_test_vals(tmp_path):
+def test_calc_acc_ptonly_metrics_vecsamples_test_vals():
     from rsgislib.classification.classaccuracymetrics import (
         calc_acc_ptonly_metrics_vecsamples,
     )
@@ -250,7 +250,7 @@ def test_summarise_multi_acc_ptonly_metrics(tmp_path):
 
 
 @pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
-def test_calc_acc_metrics_vecsamples(tmp_path):
+def test_calc_acc_metrics_vecsamples_img(tmp_path):
     import rsgislib.classification.classaccuracymetrics
 
     vec_file = os.path.join(CLASS_ACC_DATA_DIR, "cls_acc_assessment_pts_ref.geojson")
@@ -261,7 +261,7 @@ def test_calc_acc_metrics_vecsamples(tmp_path):
     out_json_file = os.path.join(tmp_path, "out_acc_stats.json")
     out_csv_file = os.path.join(tmp_path, "out_acc_stats.csv")
 
-    rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples(
+    rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples_img(
         vec_file=vec_file,
         vec_lyr=vec_lyr,
         ref_col="ref_pts",
@@ -274,6 +274,206 @@ def test_calc_acc_metrics_vecsamples(tmp_path):
     )
 
     assert os.path.exists(out_json_file) and os.path.exists(out_csv_file)
+
+
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
+def test_calc_acc_metrics_vecsamples(tmp_path):
+    import rsgislib.classification.classaccuracymetrics
+
+    vec_file = os.path.join(CLASS_ACC_DATA_DIR, "acc_ass_smpls_test_vals.geojson")
+    vec_lyr = "acc_ass_smpls_test_vals"
+
+    ref_col = "ref_smpls"
+    cls_col = "img_smpls"
+
+    cls_areas = dict()
+    cls_areas["forest"] = 20000
+    cls_areas["grass"] = 50000
+    cls_areas["urban"] = 5000
+    cls_areas["other"] = 10000
+
+    out_json_file = os.path.join(tmp_path, "out_acc_stats.json")
+    out_csv_file = os.path.join(tmp_path, "out_acc_stats.csv")
+
+    rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples(
+        vec_file=vec_file,
+        vec_lyr=vec_lyr,
+        ref_col=ref_col,
+        cls_col=cls_col,
+        cls_area_dict=cls_areas,
+        out_json_file=out_json_file,
+        out_csv_file=out_csv_file,
+    )
+
+    assert os.path.exists(out_json_file) and os.path.exists(out_csv_file)
+
+
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
+def test_calc_acc_metrics_vecsamples_test_vals(tmp_path):
+    from rsgislib.classification.classaccuracymetrics import calc_acc_metrics_vecsamples
+    from rsgislib.tools.utils import (
+        similar_numeric_vals,
+        dict_struct_get_numeric_value,
+        dict_struct_get_str_list_value,
+    )
+
+    vec_file = os.path.join(CLASS_ACC_DATA_DIR, "acc_ass_smpls_test_vals.geojson")
+    vec_lyr = "acc_ass_smpls_test_vals"
+
+    ref_col = "ref_smpls"
+    cls_col = "img_smpls"
+
+    cls_areas = dict()
+    cls_areas["forest"] = 20000
+    cls_areas["grass"] = 50000
+    cls_areas["urban"] = 5000
+    cls_areas["other"] = 10000
+
+    acc_rslt = calc_acc_metrics_vecsamples(
+        vec_file=vec_file,
+        vec_lyr=vec_lyr,
+        ref_col=ref_col,
+        cls_col=cls_col,
+        cls_area_dict=cls_areas,
+        out_json_file=None,
+        out_csv_file=None,
+    )
+
+    thres_vals = dict()
+    thres_vals["accuracy"] = {
+        "path": ["accuracy"],
+        "val": 0.8476,
+        "thres": 0.05,
+        "list": False,
+    }
+    thres_vals["bal_accuracy_score"] = {
+        "path": ["bal_accuracy_score"],
+        "val": 0.8516,
+        "thres": 0.05,
+        "list": False,
+    }
+    thres_vals["cohen_kappa"] = {
+        "path": ["cohen_kappa"],
+        "val": 0.773,
+        "thres": 0.05,
+        "list": False,
+    }
+    thres_vals["forest_f1"] = {
+        "path": ["forest", "f1-score"],
+        "val": 0.814,
+        "thres": 0.05,
+        "list": False,
+    }
+    thres_vals["grass_f1"] = {
+        "path": ["grass", "f1-score"],
+        "val": 0.8696,
+        "thres": 0.05,
+        "list": False,
+    }
+    thres_vals["other_f1"] = {
+        "path": ["other", "f1-score"],
+        "val": 0.7407,
+        "thres": 0.05,
+        "list": False,
+    }
+    thres_vals["urban_f1"] = {
+        "path": ["urban", "f1-score"],
+        "val": 0.921,
+        "thres": 0.05,
+        "list": False,
+    }
+    thres_vals["allocation_disagreement"] = {
+        "path": ["quantity_metrics", "Allocation Disagreement (A)"],
+        "val": 0.131,
+        "thres": 0.01,
+        "list": False,
+    }
+    thres_vals["proportion_correct"] = {
+        "path": ["quantity_metrics", "Proportion Correct (C)"],
+        "val": 0.852,
+        "thres": 0.01,
+        "list": False,
+    }
+    thres_vals["quantity_disagreement"] = {
+        "path": ["quantity_metrics", "Quantity Disagreement (Q)"],
+        "val": 0.0168,
+        "thres": 0.01,
+        "list": False,
+    }
+    thres_vals["total_disagreement"] = {
+        "path": ["quantity_metrics", "Total Disagreement (D)"],
+        "val": 0.1479,
+        "thres": 0.01,
+        "list": False,
+    }
+    thres_vals["weighted_area_avg_f1_score"] = {
+        "path": ["weighted area avg", "f1-score"],
+        "val": 0.8444,
+        "thres": 0.01,
+        "list": False,
+    }
+    thres_vals["weighted_area_avg_precision"] = {
+        "path": ["weighted area avg", "precision"],
+        "val": 0.8521,
+        "thres": 0.01,
+        "list": False,
+    }
+    thres_vals["weighted_area_avg_recall"] = {
+        "path": ["weighted area avg", "recall"],
+        "val": 0.8392,
+        "thres": 0.01,
+        "list": False,
+    }
+    thres_vals["weighted_area_avg_support"] = {
+        "path": ["weighted area avg", "support"],
+        "val": 85000,
+        "thres": 1.0,
+        "list": False,
+    }
+    thres_vals["omission"] = {
+        "path": ["omission"],
+        "val": [0.058, 0.059, 0.020, 0.011],
+        "thres": 0.01,
+        "list": True,
+    }
+    thres_vals["commission"] = {
+        "path": ["commission"],
+        "val": [0.048, 0.058, 0.037, 0.005],
+        "thres": 0.01,
+        "list": True,
+    }
+    thres_vals["producer_accuracy"] = {
+        "path": ["producer_accuracy"],
+        "val": [83.3, 84.0, 80.0, 93.3],
+        "thres": 1.0,
+        "list": True,
+    }
+    thres_vals["user_accuracy"] = {
+        "path": ["user_accuracy"],
+        "val": [79.62, 90.13, 68.97, 90.91],
+        "thres": 1.0,
+        "list": True,
+    }
+
+    vals_corr = True
+
+    for cls in thres_vals:
+        print(thres_vals[cls]["path"])
+        if thres_vals[cls]["list"]:
+            cls_val = dict_struct_get_str_list_value(acc_rslt, thres_vals[cls]["path"])
+        else:
+            cls_val = dict_struct_get_numeric_value(acc_rslt, thres_vals[cls]["path"])
+
+        if not similar_numeric_vals(
+            cls_val, thres_vals[cls]["val"], eql_thres=thres_vals[cls]["thres"]
+        ):
+            vals_corr = False
+            print("\tFAILED")
+            break
+        else:
+            print("\tOK")
+
+    assert vals_corr
 
 
 def test_create_norm_modelled_err_matrix():
@@ -339,10 +539,9 @@ def test_calc_sampled_acc_metrics(tmp_path):
         [0.0, 0.02, 0.0, 0.03],
     ]
 
-    (
-        ref_samples,
-        pred_samples,
-    ) = classaccuracymetrics.create_modelled_acc_pts(err_mtx_unit_area, cls_lst, 2500)
+    (ref_samples, pred_samples,) = classaccuracymetrics.create_modelled_acc_pts(
+        err_mtx_unit_area, cls_lst, 2500
+    )
 
     smpls_lst = [500, 1000, 1500, 2000]
 

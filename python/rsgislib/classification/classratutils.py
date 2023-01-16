@@ -35,8 +35,8 @@
 ###########################################################################
 import os
 
-from osgeo import gdal
 import numpy
+from osgeo import gdal
 from rios import rat
 
 import rsgislib
@@ -66,12 +66,13 @@ def populate_clumps_with_class_training(
     :param rat_band: The band within the input image the RAT is associated with.
 
     """
+    import shutil
+
     import rsgislib.imageutils
     import rsgislib.rastergis
-    import rsgislib.vectorutils.createrasters
-    import rsgislib.tools.utils
     import rsgislib.tools.filetools
-    import shutil
+    import rsgislib.tools.utils
+    import rsgislib.vectorutils.createrasters
 
     createdDIR = False
     if not os.path.isdir(tmp_dir):

@@ -35,18 +35,13 @@
 
 from __future__ import print_function
 
+import h5py
+import numpy
+from osgeo import gdal
+from rios import applier, cuiprogress, rat
+
 import rsgislib
 import rsgislib.rastergis
-
-import numpy
-
-import h5py
-
-from osgeo import gdal
-
-from rios import applier
-from rios import cuiprogress
-from rios import rat
 
 
 def train_keras_pixel_classifier(

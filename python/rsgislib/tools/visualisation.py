@@ -7,14 +7,14 @@ The tools.visualisation module contains functions for aiding visualisation of da
 import os
 import shutil
 import subprocess
-from typing import Union, List
+from typing import List, Union
 
 import rsgislib
 import rsgislib.imageutils
-import rsgislib.tools.utils
 import rsgislib.tools.filetools
 import rsgislib.tools.projection
 import rsgislib.tools.tilecacheutils
+import rsgislib.tools.utils
 
 
 def create_kmz_img(
@@ -1338,8 +1338,8 @@ def burn_in_binary_msk(
                        has image bands. Default, if None is 255.
 
     """
-    from rios import applier
     import numpy
+    from rios import applier
 
     n_img_bands = rsgislib.imageutils.get_img_band_count(base_image)
     if msk_colour is None:

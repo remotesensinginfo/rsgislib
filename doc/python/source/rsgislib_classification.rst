@@ -65,6 +65,7 @@ Accuracy Assessment Samples
 Accuracy Assessment Stats
 ----------------------------
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples
+.. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples_img
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets

@@ -74,11 +74,11 @@ def create_stacked_sref_ls_oli_cl2_lv2_img(
 
     """
 
-    import rsgislib.tools.filetools
-    import rsgislib.tools.utils
     import rsgislib.imagecalc
     import rsgislib.imageutils
     import rsgislib.rastergis
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
@@ -325,11 +325,11 @@ def create_stacked_sref_ls_4_5_7_lv2_img(
 
     """
 
-    import rsgislib.tools.filetools
-    import rsgislib.tools.utils
     import rsgislib.imagecalc
     import rsgislib.imageutils
     import rsgislib.rastergis
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
 
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
@@ -561,6 +561,7 @@ def parse_landsat_c2_qa_pixel_img(
 
     """
     from rios import applier
+
     import rsgislib.imagecalc
     import rsgislib.imageutils
 
@@ -759,10 +760,10 @@ def create_stacked_sen2_esa_l2a_img(
                            when resampling the image data. Default: False
 
     """
+    import rsgislib.imagecalc
+    import rsgislib.imageutils
     import rsgislib.tools.filetools
     import rsgislib.tools.utils
-    import rsgislib.imageutils
-    import rsgislib.imagecalc
 
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)

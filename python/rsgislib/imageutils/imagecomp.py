@@ -35,9 +35,9 @@
 import os
 import shutil
 
+import numpy
 import osgeo.gdal
 import rios.rat
-import numpy
 
 import rsgislib
 import rsgislib.imagecalc

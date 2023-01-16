@@ -34,8 +34,8 @@ def calc_pandas_vif(df, cols=None):
 
     """
     # Import the linear model module.
-    import sklearn.linear_model
     import pandas
+    import sklearn.linear_model
 
     # If the cols is None then get a list of all the columns
     if cols is None:
@@ -154,10 +154,10 @@ def corr_feature_selection(df, dep_vars, ind_vars, n_min_clusters=3, n_max_clust
     :return: list of column names for good predictor variables
 
     """
-    import tqdm
     import scipy.stats
     import sklearn.cluster
     import sklearn.metrics
+    import tqdm
 
     # Create a list for sorting the correlations for each dependent variable
     corr_data = list()
@@ -260,9 +260,10 @@ def lassolars_feature_selection(df, dep_vars, ind_vars, alpha_val=None):
 
     """
     import warnings
-    import sklearn.linear_model
-    import sklearn.feature_selection
+
     import sklearn.exceptions
+    import sklearn.feature_selection
+    import sklearn.linear_model
 
     # Create the nd array from the pandas data range with all the predictor
     # variables listed.
@@ -703,7 +704,7 @@ def calc_yen_threshold(data) -> float:
     # Calculate probability mass function
     pmf = hist.astype(numpy.float32) / hist.sum()
     p1 = numpy.cumsum(pmf)  # Cumulative normalized histogram
-    p1_sq = numpy.cumsum(pmf**2)
+    p1_sq = numpy.cumsum(pmf ** 2)
     # Get cumsum calculated from end of squared array:
     p2_sq = numpy.cumsum(pmf[::-1] ** 2)[::-1]
     # P2_sq indexes is shifted +1. I assume, with P1[:-1] it's help avoid
