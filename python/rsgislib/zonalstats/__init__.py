@@ -1540,12 +1540,12 @@ def ext_point_band_values(
                     if x_pt_off == 0.0:
                         x_pxl = 0
                     else:
-                        x_pxl = int(math.floor(x_pt_off / pixel_width))# - 1
+                        x_pxl = int(math.floor(x_pt_off / pixel_width))
 
                     if y_pt_off == 0.0:
                         y_pxl = 0
                     else:
-                        y_pxl = int(math.floor(y_pt_off / pixel_height))# - 1
+                        y_pxl = int(math.floor(y_pt_off / pixel_height))
 
                     if x_pxl < 0:
                         pt_in_img = False
