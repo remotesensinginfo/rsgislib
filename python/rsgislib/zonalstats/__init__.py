@@ -1488,16 +1488,14 @@ def ext_point_band_values(
         veclyr_spatial_ref = osr.SpatialReference()
         veclyr_spatial_ref.ImportFromEPSG(int(epsg_vec_spatial))
         pt_reprj = False
-        if epsg_vec_spatial != epsg_img_spatial:
+        if int(epsg_vec_spatial) != int(epsg_img_spatial):
             if reproj_vec:
                 pt_reprj = True
             else:
                 raise rsgislib.RSGISPyException(
-                    "Input vector and image datasets are in different "
-                    "projections (EPSG:{} / EPSG:{})."
-                    "You can select option to reproject.".format(
-                        epsg_vec_spatial, epsg_img_spatial
-                    )
+                    f"Input vector and image datasets are in different "
+                    f"projections (EPSG:{epsg_vec_spatial} / EPSG:{epsg_img_spatial})."
+                    f"You can select option to reproject."
                 )
 
         found = False
@@ -1542,12 +1540,12 @@ def ext_point_band_values(
                     if x_pt_off == 0.0:
                         x_pxl = 0
                     else:
-                        x_pxl = int(x_pt_off / pixel_width) - 1
+                        x_pxl = int(math.floor(x_pt_off / pixel_width))# - 1
 
                     if y_pt_off == 0.0:
                         y_pxl = 0
                     else:
-                        y_pxl = int(y_pt_off / pixel_height) - 1
+                        y_pxl = int(math.floor(y_pt_off / pixel_height))# - 1
 
                     if x_pxl < 0:
                         pt_in_img = False

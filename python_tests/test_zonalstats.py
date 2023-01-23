@@ -49,7 +49,7 @@ def test_ext_point_band_values_file(tmp_path):
 
     vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcolval")
     print(vals)
-    ref_vals = [39.0, 35.0, 124.0, 63.0, 36.0, 34.0]
+    ref_vals = [41.0, 35.0, 119.0, 66.0, 38.0, 34.0]
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
         if abs(val - ref_val) > 0.0001:
@@ -96,7 +96,7 @@ def test_ext_point_band_values_file_reproj(tmp_path):
 
     vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcolval")
     print(vals)
-    ref_vals = [33.0, 188.0, 34.0, 26.0, 79.0, 67.0]
+    ref_vals = [31.0, 264.0, 34.0, 28.0, 95.0, 66.0]
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
         if abs(val - ref_val) > 1:
@@ -132,7 +132,7 @@ def test_ext_point_band_values_file_reproj_specepsg(tmp_path):
         out_vec_file,
         out_vec_lyr,
         input_img,
-        1,
+        2,
         0,
         1000,
         0,
@@ -143,7 +143,7 @@ def test_ext_point_band_values_file_reproj_specepsg(tmp_path):
 
     vals = rsgislib.vectorattrs.read_vec_column(out_vec_file, out_vec_lyr, "testcolval")
     print(vals)
-    ref_vals = [33.0, 188.0, 34.0, 26.0, 79.0, 67.0]
+    ref_vals = [60.0, 304.0, 63.0, 38.0, 100.0, 65.0]
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
         if abs(val - ref_val) > 1:
