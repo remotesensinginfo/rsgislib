@@ -1568,7 +1568,7 @@ def spatial_select_gp(
     vec_roi_epsg: int = None,
 ):
     """
-    A function which spatial selects features from the input vector layer which
+    A function which spatially selects features from the input vector layer which
     intersects the ROI vector layer. This function is implemented using geopandas
     and is generally faster than the export_spatial_select_feats or
     select_intersect_feats functions.
@@ -3544,3 +3544,45 @@ def rm_attrib_duplicates(
         data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def spatial_select_bbox(
+        vec_file: str,
+        vec_lyr: str,
+        bbox: List[float],
+        out_vec_file: str,
+        out_vec_lyr: str,
+        out_format: str = "GPKG",
+        vec_in_epsg: int = None,
+):
+    """
+    A function which spatially subsets the vector layer to the bbox
+    [xMin, xMax, yMin, yMax] provided. The function uses geopandas.
+
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer
+    :param out_format: output vector format (Default: GPKG)
+    :param vec_in_epsg: Optionally, the EPSG code of the input vector layer can be
+                        specified to ensure the output file has the correct projection.
+
+    """
+
+    import geopandas
+    print("Read vector layer")
+    in_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    if vec_in_epsg is not None:
+        in_gdf = in_gdf.set_crs(epsg=vec_in_epsg, allow_override=True)
+
+    print("Subset")
+    sub_gdf = in_gdf.cx[bbox[0]:bbox[1], bbox[2]:bbox[3]]
+
+    print("Export")
+    if out_format == "GPKG":
+        sub_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        sub_gdf.to_file(out_vec_file, driver=out_format)
+
