@@ -29,19 +29,49 @@
 #
 ##############################################
 
-import os
-import rsgislib.tools.filetools
 import argparse
+import os
+
+import rsgislib.tools.filetools
 
 # Get input parameters
 parser = argparse.ArgumentParser()
-parser.add_argument("-i", "--input", type=str, required=True, help="Input file for which the hash will be created for.")
-parser.add_argument("-b", '--blocksize', required=False, type=int, default=4096,
-                    help="Block size used to calculate the file hash, default is 4096 bytes")
-parser.add_argument("-o", '--outhash', required=False,
-                    choices=['SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512', 'MD5', 'Blake2B', 'Blake2S', 'SHA3_224',
-                             'SHA3_256', 'SHA3_384', 'SHA3_512'], default='SHA256',
-                    help="The hash to calculate; default: SHA256")
+parser.add_argument(
+    "-i",
+    "--input",
+    type=str,
+    required=True,
+    help="Input file for which the hash will be created for.",
+)
+parser.add_argument(
+    "-b",
+    "--blocksize",
+    required=False,
+    type=int,
+    default=4096,
+    help="Block size used to calculate the file hash, default is 4096 bytes",
+)
+parser.add_argument(
+    "-o",
+    "--outhash",
+    required=False,
+    choices=[
+        "SHA1",
+        "SHA224",
+        "SHA256",
+        "SHA384",
+        "SHA512",
+        "MD5",
+        "Blake2B",
+        "Blake2S",
+        "SHA3_224",
+        "SHA3_256",
+        "SHA3_384",
+        "SHA3_512",
+    ],
+    default="SHA256",
+    help="The hash to calculate; default: SHA256",
+)
 
 args = parser.parse_args()
 
@@ -49,29 +79,29 @@ input_file = args.input
 if not os.path.exists(input_file):
     raise Exception("The input file does not exist.")
 
-if args.outhash == 'SHA1':
+if args.outhash == "SHA1":
     hash = rsgislib.tools.filetools.create_sha1_hash(input_file, args.blocksize)
-elif args.outhash == 'SHA224':
+elif args.outhash == "SHA224":
     hash = rsgislib.tools.filetools.create_sha224_hash(input_file, args.blocksize)
-elif args.outhash == 'SHA256':
+elif args.outhash == "SHA256":
     hash = rsgislib.tools.filetools.create_sha256_hash(input_file, args.blocksize)
-elif args.outhash == 'SHA384':
+elif args.outhash == "SHA384":
     hash = rsgislib.tools.filetools.create_sha384_hash(input_file, args.blocksize)
-elif args.outhash == 'SHA512':
+elif args.outhash == "SHA512":
     hash = rsgislib.tools.filetools.create_sha512_hash(input_file, args.blocksize)
-elif args.outhash == 'MD5':
+elif args.outhash == "MD5":
     hash = rsgislib.tools.filetools.create_md5_hash(input_file, args.blocksize)
-elif args.outhash == 'Blake2B':
+elif args.outhash == "Blake2B":
     hash = rsgislib.tools.filetools.create_blake2b_hash(input_file, args.blocksize)
-elif args.outhash == 'Blake2S':
+elif args.outhash == "Blake2S":
     hash = rsgislib.tools.filetools.create_blake2s_hash(input_file, args.blocksize)
-elif args.outhash == 'SHA3_224':
+elif args.outhash == "SHA3_224":
     hash = rsgislib.tools.filetools.create_sha3_224_hash(input_file, args.blocksize)
-elif args.outhash == 'SHA3_256':
+elif args.outhash == "SHA3_256":
     hash = rsgislib.tools.filetools.create_sha3_256_hash(input_file, args.blocksize)
-elif args.outhash == 'SHA3_384':
+elif args.outhash == "SHA3_384":
     hash = rsgislib.tools.filetools.create_sha3_384_hash(input_file, args.blocksize)
-elif args.outhash == 'SHA3_512':
+elif args.outhash == "SHA3_512":
     hash = rsgislib.tools.filetools.create_sha3_512_hash(input_file, args.blocksize)
 else:
     raise Exception("The hash choice is unknown.")

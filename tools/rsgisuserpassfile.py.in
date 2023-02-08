@@ -30,10 +30,10 @@
 #
 #############################################
 
-import rsgislib.tools.utils
 import argparse
 import getpass
 
+import rsgislib.tools.utils
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

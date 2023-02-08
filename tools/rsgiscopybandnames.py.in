@@ -11,7 +11,7 @@
 # furnished to do so, subject to the following conditions:
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,13 +33,23 @@
 #
 #############################################################################
 
-import rsgislib.imageutils
 import argparse
 
+import rsgislib.imageutils
+
 parser = argparse.ArgumentParser()
-parser.add_argument("-r", "--refimg", dest="ref_img", type=str, required=True, help="Input reference image")
-parser.add_argument("-o", "--outimg", dest="out_img", type=str, required=True, help="Output image.")
-args = parser.parse_args() 
+parser.add_argument(
+    "-r",
+    "--refimg",
+    dest="ref_img",
+    type=str,
+    required=True,
+    help="Input reference image",
+)
+parser.add_argument(
+    "-o", "--outimg", dest="out_img", type=str, required=True, help="Output image."
+)
+args = parser.parse_args()
 
 band_names = rsgislib.imageutils.get_band_names(args.ref_img)
 rsgislib.imageutils.set_band_names(args.out_img, band_names)

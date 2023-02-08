@@ -11,7 +11,7 @@
 # furnished to do so, subject to the following conditions:
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,37 +36,82 @@
 
 import argparse
 import os
+
 import rsgislib.imageutils
 import rsgislib.rastergis
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     The command line user interface
     """
-    parser = argparse.ArgumentParser(prog='rsgiscalcimgstats.py', description='''Calculate image statistics and pyramids''')
+    parser = argparse.ArgumentParser(
+        prog="rsgiscalcimgstats.py",
+        description="""Calculate image statistics and pyramids""",
+    )
 
-    parser.add_argument("-i", "--image", type=str, required=True, help='''The image on which stats and pyramids are to calculated.''')
-    parser.add_argument("-t", "--thematic", action='store_true', default=False, help='''The image is thermatic, calc stats and pyramids accordingly.''')    
-    parser.add_argument("-p", "--nopyramids", action='store_true', default=False, help='''Do not calculate image pyramids.''')
-    parser.add_argument("-n", "--nodata", type=float, required=True, default=0.0, help='''No data value for the input image for when calculating stats''')
-    parser.add_argument("-c", "--noclrtab", action='store_true', default=False, help='''Do not add a colour table (only for thematic images)''')    
+    parser.add_argument(
+        "-i",
+        "--image",
+        type=str,
+        required=True,
+        help="""The image on which stats and pyramids are to calculated.""",
+    )
+    parser.add_argument(
+        "-t",
+        "--thematic",
+        action="store_true",
+        default=False,
+        help="""The image is thermatic, calc stats and pyramids accordingly.""",
+    )
+    parser.add_argument(
+        "-p",
+        "--nopyramids",
+        action="store_true",
+        default=False,
+        help="""Do not calculate image pyramids.""",
+    )
+    parser.add_argument(
+        "-n",
+        "--nodata",
+        type=float,
+        required=True,
+        default=0.0,
+        help="""No data value for the input image for when calculating stats""",
+    )
+    parser.add_argument(
+        "-c",
+        "--noclrtab",
+        action="store_true",
+        default=False,
+        help="""Do not add a colour table (only for thematic images)""",
+    )
 
     # Call the parser to parse the arguments.
     args = parser.parse_args()
-    
+
     input_img = args.image
-    pyramids = not args.nopyramids        
-    
+    pyramids = not args.nopyramids
+
     if args.thematic:
         clr_tab = not args.noclrtab
         ignore_zeros = False
         if args.nodata == 0.0:
             ignore_zeros = True
         if os.path.splitext(input_img)[1].lower() == "kea":
-            rsgislib.rastergis.pop_rat_img_stats(clumps_img=input_img, add_clr_tab=clr_tab, calc_pyramids=pyramids, ignore_zero=ignore_zeros)
+            rsgislib.rastergis.pop_rat_img_stats(
+                clumps_img=input_img,
+                add_clr_tab=clr_tab,
+                calc_pyramids=pyramids,
+                ignore_zero=ignore_zeros,
+            )
         else:
-            rsgislib.imageutils.pop_thmt_img_stats(input_img, add_clr_tab=clr_tab, calc_pyramids=pyramids, ignore_zero=ignore_zeros)
+            rsgislib.imageutils.pop_thmt_img_stats(
+                input_img,
+                add_clr_tab=clr_tab,
+                calc_pyramids=pyramids,
+                ignore_zero=ignore_zeros,
+            )
     else:
-        rsgislib.imageutils.pop_img_stats(input_img, use_no_data=True, no_data_val=args.nodata, calc_pyramids=pyramids)
-
+        rsgislib.imageutils.pop_img_stats(
+            input_img, use_no_data=True, no_data_val=args.nodata, calc_pyramids=pyramids
+        )

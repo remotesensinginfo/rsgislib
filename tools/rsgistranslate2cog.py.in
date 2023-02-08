@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #############################################
-# rsgistranslate2tif.py
+# rsgistranslate2cog.py
 #
 #  Copyright 2020 RSGISLib.
 #
@@ -20,18 +20,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Purpose:  Using gdal_translate converts a single input image to GEOTIFF
-#           tiling, compressing and copying any image overviews.
+# Purpose:  Using gdal_translate converts a single input image to a COG (GTIFF).
 #
 # Author: Pete Bunting
 # Email: petebunting@mac.com
-# Date: 29/05/2020
+# Date: 8/2/2023
 # Version: 1.0
 #
 #############################################
 
 import argparse
 import subprocess
+
+import rsgislib.imageutils
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -43,11 +44,13 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    over_resample = "CUBIC"
+    if rsgislib.imageutils.is_img_thematic(args.input):
+        over_resample = "NEAREST"
+
     cmd = (
-        "gdal_translate -of GTIFF -co TILED=YES -co COMPRESS=LZW -co "
-        "BIGTIFF=IF_SAFER -co COPY_SRC_OVERVIEWS=YES  {} {}".format(
-            args.input, args.output
-        )
+        f"gdal_translate -of COG -co COMPRESS=LZW -co BIGTIFF=IF_SAFER "
+        f"-co OVERVIEW_RESAMPLING={over_resample} {args.input} {args.output}"
     )
     print("Running: '{}'".format(cmd))
     try:

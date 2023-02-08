@@ -20,18 +20,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Purpose:  Get information on vector files/layers. 
+# Purpose:  Get information on vector files/layers.
 #
 # Author: Pete Bunting
 # Email: petebunting@mac.com
 # Date: 02/01/2019
 # Version: 1.0
-# 
+#
 #############################################
 
 import argparse
-import rsgislib.rastergis
+
 import rsgislib.imageutils
+import rsgislib.rastergis
 
 if __name__ == "__main__":
 
@@ -52,8 +53,6 @@ if __name__ == "__main__":
     band_names = rsgislib.imageutils.get_band_names(args.img)
     for band, band_name in enumerate(band_names):
         print(f"\tBand {band+1}: {band_name}")
-        if rsgislib.imageutils.is_img_thematic(args.img, band+1):
-            rat_cols = rsgislib.rastergis.get_rat_columns(args.img, band+1)
+        if rsgislib.imageutils.is_img_thematic(args.img, band + 1):
+            rat_cols = rsgislib.rastergis.get_rat_columns(args.img, band + 1)
             print(f"\t RAT cols: {rat_cols}")
-
-

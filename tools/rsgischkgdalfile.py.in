@@ -26,31 +26,89 @@
 # Email: petebunting@mac.com
 # Date: 22/12/2021
 # Version: 2.0
-# 
+#
 #############################################
 
-import rsgislib.tools.checkdatasets
 import argparse
 import glob
 
+import rsgislib.tools.checkdatasets
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser( description="A utility which can be used to check whether a GDAL "
-                                                  "compatible file is valid and if there are any errors or warnings.")
-    parser.add_argument("-i", "--input", type=str, required=True, help="Input file search path (i.e., '/path/to/*.kea')")
-    parser.add_argument("--vec", action='store_true', default=False, help="Specify that the input file is a "
-                                                                          "vector layer (otherwise assumed "
-                                                                          "to be a raster).")
-    parser.add_argument("--rmerr", action='store_true', default=False, help="Delete error files from system.")
-    parser.add_argument("--printnames", action='store_true', default=False, help="Print file names as checking")
-    parser.add_argument("--printerrs", action='store_true', default=False,
-                        help="Print the error messages for the images")
-    parser.add_argument("--nbands", type=int, default=0,
-                        help="Check the number of bands is correct. Ignored if 0; Default.")
-    parser.add_argument("--epsg", type=int, default=0, help="The EPSG code for the projection of the images.")
-    parser.add_argument("--chkproj", action='store_true', default=False, help="Check that a projection is defined")
-    parser.add_argument("--readimg", action='store_true', default=False, help="Check the image by reading part of it.")
-    parser.add_argument("--chksum", action='store_true', default=False, help="Check the image by calculating a checksum from the image pixel values.")
-    parser.add_argument("--vecmulti", action='store_true', default=False, help="Specifies that the vector file has multiple files (e.g., shapefile) and they should all be deleted if error and --rmerr is selected.")
+    parser = argparse.ArgumentParser(
+        description="A utility which can be used to check whether a GDAL "
+        "compatible file is valid and if there are any errors or warnings."
+    )
+    parser.add_argument(
+        "-i",
+        "--input",
+        type=str,
+        required=True,
+        help="Input file search path (i.e., '/path/to/*.kea')",
+    )
+    parser.add_argument(
+        "--vec",
+        action="store_true",
+        default=False,
+        help="Specify that the input file is a "
+        "vector layer (otherwise assumed "
+        "to be a raster).",
+    )
+    parser.add_argument(
+        "--rmerr",
+        action="store_true",
+        default=False,
+        help="Delete error files from system.",
+    )
+    parser.add_argument(
+        "--printnames",
+        action="store_true",
+        default=False,
+        help="Print file names as checking",
+    )
+    parser.add_argument(
+        "--printerrs",
+        action="store_true",
+        default=False,
+        help="Print the error messages for the images",
+    )
+    parser.add_argument(
+        "--nbands",
+        type=int,
+        default=0,
+        help="Check the number of bands is correct. Ignored if 0; Default.",
+    )
+    parser.add_argument(
+        "--epsg",
+        type=int,
+        default=0,
+        help="The EPSG code for the projection of the images.",
+    )
+    parser.add_argument(
+        "--chkproj",
+        action="store_true",
+        default=False,
+        help="Check that a projection is defined",
+    )
+    parser.add_argument(
+        "--readimg",
+        action="store_true",
+        default=False,
+        help="Check the image by reading part of it.",
+    )
+    parser.add_argument(
+        "--chksum",
+        action="store_true",
+        default=False,
+        help="Check the image by calculating a checksum from the image pixel values.",
+    )
+    parser.add_argument(
+        "--vecmulti",
+        action="store_true",
+        default=False,
+        help="Specifies that the vector file has multiple files (e.g., shapefile) "
+             "and they should all be deleted if error and --rmerr is selected.",
+    )
 
     args = parser.parse_args()
     print(args.input)
@@ -62,8 +120,28 @@ if __name__ == "__main__":
     files = glob.glob(args.input)
     print("File Checks ({} Files Found):".format(len(files)))
     if args.vec:
-        rsgislib.tools.checkdatasets.run_check_gdal_vector_files(files, chk_proj=chk_projection, epsg_code=args.epsg, max_file_size=None, rm_err=args.rmerr, print_err=True, multi_file=args.vecmulti, print_file_names=args.printnames)
+        rsgislib.tools.checkdatasets.run_check_gdal_vector_files(
+            files,
+            chk_proj=chk_projection,
+            epsg_code=args.epsg,
+            max_file_size=None,
+            rm_err=args.rmerr,
+            print_err=True,
+            multi_file=args.vecmulti,
+            print_file_names=args.printnames,
+        )
     else:
-        rsgislib.tools.checkdatasets.run_check_gdal_image_files(files, check_bands=True, n_bands=args.nbands, chk_proj=chk_projection, epsg_code=args.epsg, read_img=args.readimg, smpl_n_pxls=10, calc_chk_sum=args.chksum, rm_err=args.rmerr, print_err=args.printerrs, print_file_names=args.printnames)
+        rsgislib.tools.checkdatasets.run_check_gdal_image_files(
+            files,
+            check_bands=True,
+            n_bands=args.nbands,
+            chk_proj=chk_projection,
+            epsg_code=args.epsg,
+            read_img=args.readimg,
+            smpl_n_pxls=10,
+            calc_chk_sum=args.chksum,
+            rm_err=args.rmerr,
+            print_err=args.printerrs,
+            print_file_names=args.printnames,
+        )
     print("Finish Checks")
-

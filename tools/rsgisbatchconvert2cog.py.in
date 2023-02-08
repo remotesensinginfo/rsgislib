@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #############################################
-# rsgisbatchconvert2tif.py
+# rsgisbatchconvert2cog.py
 #
 #  Copyright 2020 RSGISLib.
 #
@@ -20,12 +20,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Purpose:  Batch convert a set of images to GEOTIFFs tiling, compressing
-#           and copying any image overviews.
+# Purpose:  Batch convert a set of images to COGs
 #
 # Author: Pete Bunting
 # Email: petebunting@mac.com
-# Date: 29/05/2020
+# Date: 8/2/2023
 # Version: 1.0
 #
 #############################################
@@ -35,6 +34,7 @@ import glob
 import os.path
 import subprocess
 
+import rsgislib.imageutils
 import rsgislib.tools.filetools
 import rsgislib.tools.utils
 
@@ -46,21 +46,21 @@ if __name__ == "__main__":
         type=str,
         required=True,
         help="A search string where for the input files (e.g., './images/*.kea'). "
-             "The search string much contain at least one * wildcard.",
+        "The search string much contain at least one * wildcard.",
     )
     parser.add_argument(
         "-o",
         "--output",
         type=str,
         required=True,
-        help="Output directory where output GeoTIFF files will be written.",
+        help="Output directory where output COG (i.e., GTIFF) files will be written.",
     )
     parser.add_argument(
         "--chkimgs",
         action="store_true",
         default=False,
         help="Only convert images which are not already "
-             "present in the output directory.",
+        "present in the output directory.",
     )
 
     args = parser.parse_args()
@@ -72,14 +72,15 @@ if __name__ == "__main__":
         basename = rsgislib.tools.utils.check_str(
             basename, rm_non_ascii=True, rm_dashs=False, rm_spaces=True, rm_punc=True
         )
-
+        over_resample = "CUBIC"
+        if rsgislib.imageutils.is_img_thematic(img):
+            over_resample = "NEAREST"
         out_img = os.path.join(args.output, "{}.tif".format(basename))
         if not (args.chkimgs and os.path.exists(out_img)):
             cmd = (
-                "gdal_translate -of GTIFF -co TILED=YES -co COMPRESS=LZW -co "
-                "BIGTIFF=IF_SAFER -co COPY_SRC_OVERVIEWS=YES  {} {}".format(
-                    img, out_img
-                )
+                f"gdal_translate -of COG -co COMPRESS=LZW "
+                f"-co OVERVIEW_RESAMPLING={over_resample} "
+                f"-co BIGTIFF=IF_SAFER {img} {out_img}"
             )
             print("Running: '{}'".format(cmd))
             try:

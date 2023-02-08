@@ -11,7 +11,7 @@
 # furnished to do so, subject to the following conditions:
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 #
-# Purpose:  A command to convert an input image to a tile cache for web visualisation 
+# Purpose:  A command to convert an input image to a tile cache for web visualisation
 #
 # Author: Pete Bunting
 # Email: pfb@aber.ac.uk
@@ -34,20 +34,76 @@
 #############################################################################
 
 
-import rsgislib.tools.visualisation
 import argparse
 
-parser = argparse.ArgumentParser(prog='rsgisimg2webtiles.py', description='''Create a KMZ file of the input image...''')
+import rsgislib.tools.visualisation
 
-parser.add_argument("-i", "--input", type=str, required=True, help='Input image.')
-parser.add_argument("-o", "--output", type=str, required=True, help='Output directory within which the tile cache can be found.')
-parser.add_argument("-b", "--bands", type=str, required=True, help='Comma seperated set of bands. Either single or r,g,b.')
-parser.add_argument("-z", "--zoom", type=str, default="2-10", help='What zoom levels do you wish to be calculated, e.g., 2-10, 1-12.')
-parser.add_argument("-r", "--resample", type=str, default="average", choices=['average', 'near', 'bilinear', 'cubic', 'cubicspline', 'lanczos', 'antialias'], help='Method of resampling to produce the tile cache; Default: average')
-parser.add_argument("-f", "--finite", action='store_true', default=False, help='Apply a finite mask to the input image before stretching.')
-parser.add_argument("--xyz", action='store_true', default=False, help='Output the tile cache in XYZ format rather than TMS.')
+parser = argparse.ArgumentParser(
+    prog="rsgisimg2webtiles.py",
+    description="""Create a KMZ file of the input image...""",
+)
+
+parser.add_argument("-i", "--input", type=str, required=True, help="Input image.")
+parser.add_argument(
+    "-o",
+    "--output",
+    type=str,
+    required=True,
+    help="Output directory within which the tile cache can be found.",
+)
+parser.add_argument(
+    "-b",
+    "--bands",
+    type=str,
+    required=True,
+    help="Comma seperated set of bands. Either single or r,g,b.",
+)
+parser.add_argument(
+    "-z",
+    "--zoom",
+    type=str,
+    default="2-10",
+    help="What zoom levels do you wish to be calculated, e.g., 2-10, 1-12.",
+)
+parser.add_argument(
+    "-r",
+    "--resample",
+    type=str,
+    default="average",
+    choices=[
+        "average",
+        "near",
+        "bilinear",
+        "cubic",
+        "cubicspline",
+        "lanczos",
+        "antialias",
+    ],
+    help="Method of resampling to produce the tile cache; Default: average",
+)
+parser.add_argument(
+    "-f",
+    "--finite",
+    action="store_true",
+    default=False,
+    help="Apply a finite mask to the input image before stretching.",
+)
+parser.add_argument(
+    "--xyz",
+    action="store_true",
+    default=False,
+    help="Output the tile cache in XYZ format rather than TMS.",
+)
 
 # Call the parser to parse the arguments.
 args = parser.parse_args()
 
-rsgislib.tools.visualisation.create_webtiles_img_no_stats_msk(args.input, args.output, args.bands, args.zoom, args.resample, args.finite, tms=(not args.xyz))
+rsgislib.tools.visualisation.create_webtiles_img_no_stats_msk(
+    args.input,
+    args.output,
+    args.bands,
+    args.zoom,
+    args.resample,
+    args.finite,
+    tms=(not args.xyz),
+)
