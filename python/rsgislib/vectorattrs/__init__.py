@@ -590,6 +590,7 @@ def add_unq_numeric_col(
 
     """
     import geopandas
+    import pandas
 
     import rsgislib.tools.utils
     import rsgislib.vectorutils
@@ -605,6 +606,13 @@ def add_unq_numeric_col(
     lut["val"] = dict()
     num_unq_val = 1
     for unq_val in unq_vals:
+        if pandas.api.types.is_integer_dtype(unq_val):
+            unq_val = int(unq_val)
+        elif pandas.api.types.is_float_dtype(unq_val):
+            unq_val = float(unq_val)
+        elif pandas.api.types.is_string_dtype(unq_val):
+            unq_val = str(unq_val)
+
         sel_rows = base_gpdf[unq_col] == unq_val
         base_gpdf.loc[sel_rows, out_col] = num_unq_val
         lut["id"][num_unq_val] = unq_val
