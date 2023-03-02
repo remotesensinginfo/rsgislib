@@ -5,11 +5,13 @@ Training Functions
 ---------------------
 
 .. autofunction:: rsgislib.classification.classcatboost.train_catboost_binary_classifier
+.. autofunction:: rsgislib.classification.classcatboost.train_catboost_multiclass_classifier
 
 Classify Functions
 ---------------------
 
 .. autofunction:: rsgislib.classification.classcatboost.apply_catboost_binary_classifier
+.. autofunction:: rsgislib.classification.classcatboost.apply_catboost_multiclass_classifier
 
 Utilities
 -----------
