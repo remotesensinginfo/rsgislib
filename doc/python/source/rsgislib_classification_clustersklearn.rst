@@ -28,7 +28,7 @@ Clustering using samples, the imgSamp parameter specifies the size of the sample
     rsgislib.classification.clustersklearn.img_pixel_sample_cluster(input_img, output_img, gdalformat='KEA', noDataVal=0, imgSamp=100, clusterer=sklclusterer)
 
 
-Function Specifications
+Pixel Clustering
 ------------------------
 
 .. autofunction:: rsgislib.classification.clustersklearn.img_pixel_sample_cluster
@@ -36,5 +36,7 @@ Function Specifications
 .. autofunction:: rsgislib.classification.clustersklearn.img_pixel_cluster
 
 
+RAT Clustering
+---------------
 
-
+.. autofunction:: rsgislib.classification.clustersklearn.cluster_sklearn_rat

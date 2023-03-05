@@ -228,7 +228,11 @@ def apply_catboost_binary_classifier(
                 out_class_probs[ID] = cls_probs
                 out_class_probs = out_class_probs.T
                 out_class_probs = out_class_probs.reshape(
-                    (2, inputs.img_mask.shape[1], inputs.img_mask.shape[2],)
+                    (
+                        2,
+                        inputs.img_mask.shape[1],
+                        inputs.img_mask.shape[2],
+                    )
                 )
 
         outputs.out_image = out_class_vals
@@ -289,7 +293,10 @@ def apply_catboost_binary_classifier(
 
 
 def train_catboost_multiclass_classifier(
-    mdl_cls_obj, cls_info_dict, cat_cols: List = None, out_mdl_file: str = None,
+    mdl_cls_obj,
+    cls_info_dict,
+    cat_cols: List = None,
+    out_mdl_file: str = None,
     verbose_training: bool = False,
 ):
     """
@@ -389,7 +396,7 @@ def train_catboost_multiclass_classifier(
         cat_features=cat_cols,
         eval_set=(vaild_np, vaild_lbl_np),
         verbose=verbose_training,
-        )
+    )
     print("Finished Training")
 
     pred_test = mdl_cls_obj.predict(data=test_np)
@@ -554,6 +561,3 @@ def apply_catboost_multiclass_classifier(
         rat.writeColumn(ratDataset, "Blue", blue)
         rat.writeColumn(ratDataset, "class_names", class_names)
         ratDataset = None
-
-
-
