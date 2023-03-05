@@ -4,6 +4,7 @@ The Raster GIS module contains functions for attributing and manipulating
 raster attribute tables.
 """
 import os
+import shutil
 import sys
 from typing import Dict, List
 
@@ -1166,3 +1167,76 @@ def calc_dist_to_large_clumps(
 
     if not tmp_present:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+def populate_rat_with_cat_vec_lyr(
+    clumps_img: str,
+    out_col_name: str,
+    vec_file: str,
+    vec_lyr: str,
+    vec_att_col: str = None,
+    no_data_val: int = 0,
+    mode_use_no_data: bool = True,
+    tmp_dir: str = "tmp_dir",
+):
+    """
+    A function which populates a vector layer to a raster attribute table.
+    This function rasterises the vector layer to the same pixel grid as the
+    clumps file and then using the mode to populate the clumps. If a vector
+    attribute column is provided then that column will be rasterised otherwise
+    a binary mask will be used.
+
+    :param clumps_img: Input clumps file path.
+    :param out_col_name: the output column name.
+    :param vec_file: input vector file path
+    :param vec_lyr: input vector layer
+    :param vec_att_col: optional attribute within the vector layer to be used
+                        to populate the clumps image. This must be an integer
+                        variable.
+    :param no_data_val: the no data value to use.
+    :param mode_use_no_data: use the no data value when calculating the mode.
+    :param tmp_dir: a temporary directory to outputs. If tmp_dir path does not
+                    exist it will be created and then deleted at the end of
+                    the function.
+
+    """
+    import rsgislib
+    import rsgislib.imageutils
+    import rsgislib.rastergis
+    import rsgislib.tools.utils
+    import rsgislib.vectorutils.createrasters
+
+    created_tmp_dir = False
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+        created_tmp_dir = True
+
+    uid_str = rsgislib.tools.utils.uid_generator()
+
+    vec_img_file = os.path.join(tmp_dir, f"vec_tmp_img_{uid_str}.kea")
+    rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
+        vec_file,
+        vec_lyr,
+        input_img=clumps_img,
+        output_img=vec_img_file,
+        gdalformat="KEA",
+        burn_val=1,
+        datatype=rsgislib.TYPE_32INT,
+        att_column=vec_att_col,
+        use_vec_extent=False,
+        thematic=True,
+        no_data_val=no_data_val,
+    )
+
+    rsgislib.rastergis.populate_rat_with_mode(
+        input_img=vec_img_file,
+        clumps_img=clumps_img,
+        out_cols_name=out_col_name,
+        use_no_data=(not mode_use_no_data),
+        no_data_val=no_data_val,
+        out_no_data=no_data_val,
+    )
+
+    rsgislib.imageutils.delete_gdal_layer(vec_img_file)
+    if created_tmp_dir:
+        shutil.rmtree(tmp_dir)

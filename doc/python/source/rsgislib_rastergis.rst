@@ -20,6 +20,7 @@ Attribute Clumps
 .. autofunction:: rsgislib.rastergis.populate_rat_with_mode
 .. autofunction:: rsgislib.rastergis.populate_rat_with_prop_valid_pxls
 .. autofunction:: rsgislib.rastergis.populate_rat_with_meanlit_stats
+.. autofunction:: rsgislib.rastergis.populate_rat_with_cat_vec_lyr
 .. autofunction:: rsgislib.rastergis.str_class_majority
 .. autofunction:: rsgislib.rastergis.define_class_names
 .. autofunction:: rsgislib.rastergis.set_column_data
