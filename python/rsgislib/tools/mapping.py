@@ -885,7 +885,7 @@ def create_choropleth_vec_lyr_map(
                             to be used for the vector layer(s). (Default: 0.25)
     :param vec_fill_alphas: either a single float or list of floats for the alpha
                             value(s) for the vector layers. (Default: 1)
-    :parma vec_markersize: if the vector layer has point geometries then this variable
+    :param vec_markersize: if the vector layer has point geometries then this variable
                            allows the size of the points to be defined as either a
                            constant (float) or using column from the vector layer
                            (string).
