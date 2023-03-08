@@ -20,10 +20,22 @@ class RSGISNumpyArrayEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, numpy.integer):
             return int(obj)
-        elif isinstance(obj, numpy.floating):
+        elif isinstance(obj, (numpy.floating, numpy.complexfloating)):
             return float(obj)
         elif isinstance(obj, numpy.ndarray):
             return obj.tolist()
+        elif isinstance(obj, numpy.bool_):
+            return bool(obj)
+        elif isinstance(obj, numpy.string_):
+            return str(obj)
+        elif isinstance(obj, (numpy.void)):
+            return None
+        elif isinstance(obj, (datetime.datetime, datetime.date)):
+            return obj.isoformat()
+        if isinstance(obj, datetime.timedelta):
+            return str(obj)
+        if hasattr(obj, 'to_json'):
+            return obj.to_json()
         else:
             return super(RSGISNumpyArrayEncoder, self).default(obj)
 

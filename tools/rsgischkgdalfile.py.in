@@ -109,6 +109,12 @@ if __name__ == "__main__":
         help="Specifies that the vector file has multiple files (e.g., shapefile) "
              "and they should all be deleted if error and --rmerr is selected.",
     )
+    parser.add_argument(
+        "--nosort",
+        action="store_true",
+        default=False,
+        help="Do not sort the list of files.",
+        )
 
     args = parser.parse_args()
     print(args.input)
@@ -118,6 +124,13 @@ if __name__ == "__main__":
         chk_projection = True
 
     files = glob.glob(args.input)
+    if not args.nosort:
+        try:
+            from natsort import os_sorted
+            files = os_sorted(files)
+        except ModuleNotFoundError:
+            files = sorted(files)
+
     print("File Checks ({} Files Found):".format(len(files)))
     if args.vec:
         rsgislib.tools.checkdatasets.run_check_gdal_vector_files(

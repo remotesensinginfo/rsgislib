@@ -93,7 +93,9 @@ def cls_quantity_accuracy(
     )  # same as Comparison Total (see Ref.)
 
     # normalise the confusion matrix by proportional area:
-    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[
+        :,
+    ].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)
@@ -212,7 +214,9 @@ def calc_class_accuracy_metrics(
         -1, 1
     )  # same as Comparison Total (see Ref.)
     # normalise the confusion matrix by proportional area:
-    norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[
+        :,
+    ].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
     comp_total = norm_cm.sum(axis=1)  # same as proportional area
     ref_total = norm_cm.sum(axis=0)

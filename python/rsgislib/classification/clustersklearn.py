@@ -34,6 +34,8 @@
 #
 ###########################################################################
 
+from typing import List
+
 import numpy
 import tqdm
 from osgeo import gdal
@@ -325,3 +327,99 @@ def img_pixel_cluster(
             calc_pyramids=True,
             ignore_zero=True,
         )
+
+
+def cluster_sklearn_rat(
+    clumps_img: str,
+    variables: List[str],
+    sk_clusterer=MiniBatchKMeans(
+        n_clusters=60, init="k-means++", max_iter=100, batch_size=100
+    ),
+    out_col: str = "OutClass",
+    roi_col: str = None,
+    roi_val: int = 1,
+    sub_sample: float = None,
+):
+    """
+    A function which will apply an scikit-learn clustering (i.e., unsupervised
+    classification) within a Raster Attribute Table (RAT).
+
+    :param clumps_img: is the clumps image on which the clustering is to
+                       be performed
+    :param variables: is an array of column names which are to be used for
+                      the clustering
+    :param sk_clusterer: an instance of a scikit-learn clustering algorithm
+
+    :param out_col: is the output column
+    :param roi_col: is a column name for a column which specifies the region
+                    to be clustered. If None ignored (Default: None)
+    :param roi_val: is a int value used within the roi_col to select a
+                    region to be clustered (Default: 1)
+    :param sub_sample: Subsample the data for fitting the clusterer. Provide
+                       the proprotion (0-1) to be used for the clustering.
+
+    """
+    import math
+
+    import numpy
+    import numpy.random
+    from osgeo import gdal
+    from rios import rat
+
+    rat_cols = rsgislib.rastergis.get_rat_columns(clumps_img)
+    if (roi_col is not None) and (roi_col not in rat_cols):
+        raise Exception(f"The ROI column ({roi_col}) is not present.")
+
+    for var in variables:
+        if var not in rat_cols:
+            raise Exception(f"Variable column ({var}) is not present.")
+
+    if sub_sample is not None:
+        if (sub_sample < 0) or (sub_sample > 1):
+            raise Exception(f"Subsample ({sub_sample}) must be between 0 and 1.")
+
+    rat_ds = gdal.Open(clumps_img, gdal.GA_Update)
+    if rat_ds is None:
+        raise rsgislib.RSGISPyException("Could not open the inputted clumps image.")
+
+    vars_lst = list()
+    for var in variables:
+        var_arr = rat.readColumn(rat_ds, var)
+        vars_lst.append(var_arr)
+
+    vars_arr = numpy.vstack(vars_lst).T
+    print(vars_arr.shape)
+
+    row_id = numpy.arange(vars_lst[0].shape[0])
+    out_cls_vals = numpy.zeros((vars_lst[0].shape[0]))
+    print(row_id.shape)
+
+    if roi_col is not None:
+        roi_arr = rat.readColumn(rat_ds, roi_col)
+        vars_arr = vars_arr[roi_arr == roi_val]
+        row_id = row_id[roi_arr == roi_val]
+
+    print(vars_arr.shape)
+    print(row_id.shape)
+
+    if sub_sample is not None:
+        n_feats = row_id.shape[0]
+        n_sampls_feats = int(math.floor(n_feats * sub_sample))
+        vars_smpl_arr = numpy.random.choice(
+            vars_arr, size=n_sampls_feats, replace=False
+        )
+    else:
+        vars_smpl_arr = vars_arr
+
+    print("Fit Clusterer")
+    sk_clusterer.fit(vars_smpl_arr)
+
+    print("Apply Clusterer")
+    out_pred = sk_clusterer.predict(vars_arr) + 1
+
+    if row_id.shape[0] > 0:
+        out_cls_vals[row_id] = out_pred
+
+    # Write output column
+    rat.writeColumn(rat_ds, out_col, out_cls_vals.astype(int))
+    rat_ds = None

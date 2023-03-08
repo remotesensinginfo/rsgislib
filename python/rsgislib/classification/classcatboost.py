@@ -2,14 +2,14 @@ from typing import List
 
 import h5py
 import numpy
-from rios import applier, cuiprogress
+from osgeo import gdal
+from rios import applier, cuiprogress, rat
 from sklearn.metrics import accuracy_score
 
 import rsgislib
 import rsgislib.imageutils
 import rsgislib.rastergis
-
-# from rios import rat
+import rsgislib.tools.utils
 
 HAVE_CATBOOST = True
 try:
@@ -228,7 +228,11 @@ def apply_catboost_binary_classifier(
                 out_class_probs[ID] = cls_probs
                 out_class_probs = out_class_probs.T
                 out_class_probs = out_class_probs.reshape(
-                    (2, inputs.img_mask.shape[1], inputs.img_mask.shape[2],)
+                    (
+                        2,
+                        inputs.img_mask.shape[1],
+                        inputs.img_mask.shape[2],
+                    )
                 )
 
         outputs.out_image = out_class_vals
@@ -286,3 +290,274 @@ def apply_catboost_binary_classifier(
         rsgislib.imageutils.pop_img_stats(
             out_prob_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
+
+
+def train_catboost_multiclass_classifier(
+    mdl_cls_obj,
+    cls_info_dict,
+    cat_cols: List = None,
+    out_mdl_file: str = None,
+    verbose_training: bool = False,
+):
+    """
+    A function which performs a bayesian optimisation of the hyper-parameters for a
+    multiclass catboost classifier producing a full trained model at the end. A dict
+    of class information, as ClassInfoObj objects, is defined with the training data.
+
+    This function requires that xgboost modules to be installed.
+
+    :param mdl_cls_obj: The catboost model object.
+    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj
+                          objects defining the training data.
+    :param cat_cols: list of indexes for variables which are categorical.
+    :param out_mdl_file: An optional path for a JSON file to save the catboost
+                         model to disk.
+    :param verbose_training: a boolean to specifying whether a verbose output
+                             should be provided during training (Default: False)
+
+    """
+    if not HAVE_CATBOOST:
+        raise rsgislib.RSGISPyException("Do not have catboost module installed.")
+
+    n_classes = len(cls_info_dict)
+    for clsname in cls_info_dict:
+        if cls_info_dict[clsname].id >= n_classes:
+            raise rsgislib.RSGISPyException(
+                "ClassInfoObj '{}' id ({}) is not consecutive "
+                "starting from 0.".format(clsname, cls_info_dict[clsname].id)
+            )
+
+    cls_data_dict = {}
+    train_data_lst = []
+    train_lbls_lst = []
+    valid_data_lst = []
+    valid_lbls_lst = []
+    test_data_lst = []
+    test_lbls_lst = []
+    cls_ids = []
+    n_classes = 0
+    for clsname in cls_info_dict:
+        sgl_cls_info = {}
+        print("Reading Class {} Training".format(clsname))
+        f = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        sgl_cls_info["train_n_rows"] = f["DATA/DATA"].shape[0]
+        sgl_cls_info["train_data"] = numpy.array(f["DATA/DATA"])
+        sgl_cls_info["train_data_lbls"] = numpy.zeros(
+            sgl_cls_info["train_n_rows"], dtype=int
+        )
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
+        f.close()
+        train_data_lst.append(sgl_cls_info["train_data"])
+        train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
+
+        print("Reading Class {} Validation".format(clsname))
+        f = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        sgl_cls_info["valid_n_rows"] = f["DATA/DATA"].shape[0]
+        sgl_cls_info["valid_data"] = numpy.array(f["DATA/DATA"])
+        sgl_cls_info["valid_data_lbls"] = numpy.zeros(
+            sgl_cls_info["valid_n_rows"], dtype=int
+        )
+        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
+        f.close()
+        valid_data_lst.append(sgl_cls_info["valid_data"])
+        valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
+
+        print("Reading Class {} Testing".format(clsname))
+        f = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
+        sgl_cls_info["test_n_rows"] = f["DATA/DATA"].shape[0]
+        sgl_cls_info["test_data"] = numpy.array(f["DATA/DATA"])
+        sgl_cls_info["test_data_lbls"] = numpy.zeros(
+            sgl_cls_info["test_n_rows"], dtype=int
+        )
+        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[clsname].id
+        f.close()
+        test_data_lst.append(sgl_cls_info["test_data"])
+        test_lbls_lst.append(sgl_cls_info["test_data_lbls"])
+
+        cls_data_dict[clsname] = sgl_cls_info
+        cls_ids.append(cls_info_dict[clsname].id)
+        n_classes = n_classes + 1
+
+    print("Finished Reading Data")
+
+    vaild_np = numpy.concatenate(valid_data_lst)
+    vaild_lbl_np = numpy.concatenate(valid_lbls_lst)
+
+    train_np = numpy.concatenate(train_data_lst)
+    train_lbl_np = numpy.concatenate(train_lbls_lst)
+
+    test_np = numpy.concatenate(test_data_lst)
+    test_lbl_np = numpy.concatenate(test_lbls_lst)
+
+    print("Start Training...")
+    mdl_cls_obj.fit(
+        train_np,
+        train_lbl_np,
+        cat_features=cat_cols,
+        eval_set=(vaild_np, vaild_lbl_np),
+        verbose=verbose_training,
+    )
+    print("Finished Training")
+
+    pred_test = mdl_cls_obj.predict(data=test_np)
+    test_acc = accuracy_score(test_lbl_np, pred_test)
+    print("Testing Accuracy: {}".format(test_acc))
+
+    pred_train = mdl_cls_obj.predict(data=train_np)
+    train_acc = accuracy_score(train_lbl_np, pred_train)
+    print("Training Accuracy: {}".format(train_acc))
+
+    if out_mdl_file is not None:
+        mdl_cls_obj.save_model(out_mdl_file, format="json")
+
+
+def apply_catboost_multiclass_classifier(
+    class_train_info,
+    mdl_cls_obj,
+    in_msk_img,
+    img_msk_val,
+    img_file_info,
+    out_cls_img,
+    gdalformat,
+    class_clr_names=True,
+):
+    """
+    This function applies a trained multiple classes catboost model. The function
+    train_catboost_multiclass_classifier can be used to train such as model.
+
+    :param class_train_info: dict (where the key is the class name) of
+                             rsgislib.classification.ClassInfoObj objects which will
+                             be used to train the classifier (i.e.,
+                             train_catboost_multiclass_classifier()), provide pixel
+                             value id and RGB class values.
+    :param mdl_cls_obj: a trained catboost binary model. Can be loaded from disk using
+                        the get_catboost_mdl function.
+    :param in_msk_img: is an image file providing a mask to specify where should be
+                       classified. Simplest mask is all the valid data regions
+                       (rsgislib.imageutils.gen_valid_mask)
+    :param img_msk_val: the pixel value within the imgMask to limit the region to
+                        which the classification is applied. Can be used to create
+                        a hierarchical classification.
+    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used
+                          within rsgislib.zonalstats.extract_zone_img_band_values_to_hdf)
+                          to identify which images and bands are to be used for the
+                          classification so it adheres to the training data.
+    :param out_cls_img: Output image which will contain the hard classification
+                          defined as the maximum probability.
+    :param gdalformat: is the output image format - all GDAL supported formats are
+                       supported.
+    :param class_clr_names: default is True and therefore a colour table will the
+                            colours specified in ClassInfoObj and a class_names
+                            (from classTrainInfo) column will be added to the
+                            output file.
+
+
+    """
+    if not HAVE_CATBOOST:
+        raise rsgislib.RSGISPyException("Do not have catboost module installed.")
+
+    def _applyCatBClassifier(info, inputs, outputs, otherargs):
+        out_class_id_vals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
+        if numpy.any(inputs.imageMask == otherargs.mskVal):
+            n_pxls = inputs.imageMask.shape[1] * inputs.imageMask.shape[2]
+            out_class_id_vals = out_class_id_vals.flatten()
+            img_msk_vals = inputs.imageMask.flatten()
+            cls_vars = numpy.zeros(
+                (n_pxls, otherargs.numClassVars), dtype=numpy.float32
+            )
+            # Array index which can be used to populate the output array following masking etc.
+            ID = numpy.arange(img_msk_vals.shape[0])
+            cls_vars_idx = 0
+            for img_file in otherargs.imgFileInfo:
+                img_arr = inputs.__dict__[img_file.name]
+                for band in img_file.bands:
+                    cls_vars[..., cls_vars_idx] = img_arr[(band - 1)].flatten()
+                    cls_vars_idx = cls_vars_idx + 1
+            cls_vars = cls_vars[img_msk_vals == otherargs.mskVal]
+            ID = ID[img_msk_vals == otherargs.mskVal]
+            preds_idxs = otherargs.classifier.predict(cls_vars)
+            preds_cls_ids = numpy.zeros_like(preds_idxs, dtype=numpy.uint16)
+            for cld_id, idx in zip(
+                otherargs.cls_id_lut, numpy.arange(0, len(otherargs.cls_id_lut))
+            ):
+                preds_cls_ids[preds_idxs == idx] = cld_id
+            preds_cls_ids = preds_cls_ids.flatten()
+            out_class_id_vals[ID] = preds_cls_ids
+            out_class_id_vals = numpy.expand_dims(
+                out_class_id_vals.reshape(
+                    (inputs.imageMask.shape[1], inputs.imageMask.shape[2])
+                ),
+                axis=0,
+            )
+
+        outputs.out_cls_img = out_class_id_vals
+
+    infiles = applier.FilenameAssociations()
+    infiles.imageMask = in_msk_img
+    numClassVars = 0
+    for imgFile in img_file_info:
+        infiles.__dict__[imgFile.name] = imgFile.file_name
+        numClassVars = numClassVars + len(imgFile.bands)
+
+    n_classes = len(class_train_info)
+    cls_id_lut = numpy.zeros(n_classes)
+    for clsname in class_train_info:
+        if class_train_info[clsname].id >= n_classes:
+            raise rsgislib.RSGISPyException(
+                "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
+                    clsname, class_train_info[clsname].id
+                )
+            )
+        cls_id_lut[class_train_info[clsname].id] = class_train_info[clsname].out_id
+
+    outfiles = applier.FilenameAssociations()
+    outfiles.out_cls_img = out_cls_img
+    otherargs = applier.OtherInputs()
+    otherargs.classifier = mdl_cls_obj
+    otherargs.mskVal = img_msk_val
+    otherargs.numClassVars = numClassVars
+    otherargs.imgFileInfo = img_file_info
+    otherargs.n_classes = n_classes
+    otherargs.cls_id_lut = cls_id_lut
+
+    try:
+        import tqdm
+
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+    print("Applying the Classifier")
+    applier.apply(
+        _applyCatBClassifier, infiles, outfiles, otherargs, controls=aControls
+    )
+    print("Completed Classification")
+
+    if class_clr_names:
+        rsgislib.rastergis.pop_rat_img_stats(
+            out_cls_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+        )
+        ratDataset = gdal.Open(out_cls_img, gdal.GA_Update)
+        red = rat.readColumn(ratDataset, "Red")
+        green = rat.readColumn(ratDataset, "Green")
+        blue = rat.readColumn(ratDataset, "Blue")
+        class_names = numpy.empty_like(red, dtype=numpy.dtype("a255"))
+        class_names[...] = ""
+
+        for classKey in class_train_info:
+            print("Apply Colour to class '" + classKey + "'")
+            red[class_train_info[classKey].out_id] = class_train_info[classKey].red
+            green[class_train_info[classKey].out_id] = class_train_info[classKey].green
+            blue[class_train_info[classKey].out_id] = class_train_info[classKey].blue
+            class_names[class_train_info[classKey].out_id] = classKey
+
+        rat.writeColumn(ratDataset, "Red", red)
+        rat.writeColumn(ratDataset, "Green", green)
+        rat.writeColumn(ratDataset, "Blue", blue)
+        rat.writeColumn(ratDataset, "class_names", class_names)
+        ratDataset = None
