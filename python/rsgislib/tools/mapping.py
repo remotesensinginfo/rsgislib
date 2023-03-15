@@ -744,6 +744,7 @@ def create_thematic_raster_map(
     bbox: List[float] = None,
     title_str: str = None,
     alpha_backgd: bool = True,
+    img_alpha: float = 1.0,
     show_scale_bar: bool = True,
     use_grid: bool = False,
     show_map_axis: bool = True,
@@ -762,6 +763,8 @@ def create_thematic_raster_map(
     :param title_str: an optional title for the map (Default: None)
     :param alpha_backgd: boolean specifying that the background (i.e., 0)
                          value will be transparent and not shown.
+    :param img_alpha: a float specifying the alpha transparency value for all the image
+                      layers provided. Default: 1.0 (i.e., not transparent)
     :param show_scale_bar: boolean specifying whether a scale bar should be added to
                            the axis. Default: False
     :param use_grid: boolean specifying whether a grid should be added to the axis.
@@ -822,7 +825,7 @@ def create_thematic_raster_map(
     for img_data_arr, img_coords, plot_zorder in zip(
         img_data_arr_scns, img_coords_scns, lcl_plot_zorders
     ):
-        ax.imshow(img_data_arr, extent=img_coords, zorder=plot_zorder)
+        ax.imshow(img_data_arr, extent=img_coords, alpha=img_alpha, zorder=plot_zorder)
 
     if use_grid:
         ax.grid()
