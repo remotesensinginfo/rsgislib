@@ -17,6 +17,7 @@ Add Columns
 .. autofunction:: rsgislib.vectorattrs.add_numeric_col_lut
 .. autofunction:: rsgislib.vectorattrs.add_numeric_col
 .. autofunction:: rsgislib.vectorattrs.add_string_col
+.. autofunction:: rsgislib.vectorattrs.add_string_col_lut
 .. autofunction:: rsgislib.vectorattrs.create_name_col
 
 Column Utilities
