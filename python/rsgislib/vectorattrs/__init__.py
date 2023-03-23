@@ -757,6 +757,52 @@ def add_string_col(
         base_gpdf.to_file(out_vec_file, driver=out_format)
 
 
+def add_string_col_lut(
+    vec_file: str,
+    vec_lyr: str,
+    ref_col: str,
+    val_lut: Dict,
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which adds a string (text) column based off an existing column in the
+    vector file, using an dict LUT to define the values.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param ref_col: The column within which the unique values will be identified.
+    :param val_lut: A dict LUT (key should be value in ref_col and value be the
+                    value outputted to out_col).
+    :param out_col: The output numeric column
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: output vector layer name.
+    :param out_format: output file format (default GPKG).
+
+    """
+    import geopandas
+
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
+
+    # Open vector file
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    # Add output column
+    base_gpdf[out_col] = numpy.zeros((base_gpdf.shape[0]), dtype=numpy.unicode_)
+    # Loop values in LUT
+    for lut_key in val_lut:
+        sel_rows = base_gpdf[ref_col] == lut_key
+        base_gpdf.loc[sel_rows, out_col] = val_lut[lut_key]
+
+    if out_format == "GPKG":
+        base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(out_vec_file, driver=out_format)
+
+
 def get_unq_col_values(vec_file: str, vec_lyr: str, col_name: str) -> numpy.array:
     """
     A function which splits a vector layer by an attribute value into either
