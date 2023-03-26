@@ -18,6 +18,7 @@ from ._imagecalc import *
 
 gdal.UseExceptions()
 
+
 # define our own classes
 class BandDefn(object):
     """
@@ -549,7 +550,7 @@ def count_pxls_of_val(input_img: str, vals: List[int], img_band: int = None):
     outVals = numpy.zeros(numVals, dtype=numpy.int64)
 
     reader = ImageReader(input_img)
-    for (info, block) in reader:
+    for info, block in reader:
         for idx in range(numVals):
             if img_band is None:
                 outVals[idx] = outVals[idx] + (block == vals[idx]).sum()
@@ -958,6 +959,87 @@ def calc_histograms_for_msk_vals(
     mskArr = None
 
     return hist_dict
+
+
+def calc_sum_stats_msk_vals(
+    input_img: str,
+    img_band: int,
+    img_msk: str,
+    msk_band: int,
+    msk_vals: List[int] = None,
+    use_no_data: bool = True,
+    no_data_val: float = None,
+    out_no_data_val: float = -9999,
+):
+    """
+    A function which reads the image bands (values and mask) into memory
+    calculate standard summary statistics (min, max, mean, std dev, median)
+
+    :param input_img: image values image file path.
+    :param img_band: values image band
+    :param img_msk: file path for image mask.
+    :param msk_band: mask image band
+    :param msk_vals: a list of values within the mask can be provided to just consider
+                    a limited number of mask values when calculating the histograms.
+                    If None (default) then calculated for all mask values.
+    :param use_no_data: Use no data value for the input image.
+    :param no_data_val: no data value for the input image (if None then read from
+                        input image header)
+    :param out_no_data_val: output no data value written to output dict if there are
+                            no valid pixel values.
+    :return: returns a dict summary statistics (Min, Max, Mean, Std Dev, Median)
+
+    """
+    import rsgislib.imageutils
+
+    if use_no_data and (no_data_val is None):
+        no_data_val = rsgislib.imageutils.get_img_no_data_value(
+            input_img, img_band=img_band
+        )
+
+    img_vals_ds = gdal.Open(input_img)
+    img_vals_band = img_vals_ds.GetRasterBand(img_band)
+    vals_arr = img_vals_band.ReadAsArray()
+    img_vals_ds = None
+
+    img_msk_ds = gdal.Open(img_msk)
+    img_msk_band = img_msk_ds.GetRasterBand(msk_band)
+    msk_arr = img_msk_band.ReadAsArray()
+    img_msk_ds = None
+
+    if msk_vals is None:
+        uniq_vals = numpy.unique(msk_arr)
+        uniq_vals = uniq_vals[uniq_vals != 0]
+    else:
+        uniq_vals = msk_vals
+
+    pxls_vals_lst = list()
+    for msk_val in uniq_vals:
+        pxls_vals_lst.append(vals_arr[msk_arr == msk_val])
+
+    stats_dict = dict()
+    stats_dict["min"] = out_no_data_val
+    stats_dict["max"] = out_no_data_val
+    stats_dict["mean"] = out_no_data_val
+    stats_dict["stddev"] = out_no_data_val
+    stats_dict["median"] = out_no_data_val
+
+    pxls_vals = numpy.stack(pxls_vals_lst).flatten()
+    if use_no_data:
+        pxls_vals = pxls_vals[pxls_vals != no_data_val]
+
+    if len(pxls_vals) > 0:
+        stats_dict["min"] = pxls_vals.min()
+        stats_dict["max"] = pxls_vals.max()
+        stats_dict["mean"] = pxls_vals.mean()
+        stats_dict["stddev"] = pxls_vals.std()
+        stats_dict["median"] = numpy.median(pxls_vals)
+
+    vals_arr = None
+    msk_arr = None
+    pxls_vals = None
+
+    return stats_dict
 
 
 def calc_imgs_pxl_mode(input_imgs, output_img, gdalformat, no_data_val=0):
@@ -1609,7 +1691,7 @@ def calc_split_win_thresholds(
         band_thresholds[n + 1] = list()
 
     reader = ImageReader(input_img, windowxsize=win_size, windowysize=win_size)
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         for n in range(n_bands):
             data = block[n].flatten()
             if no_data_val is not None:

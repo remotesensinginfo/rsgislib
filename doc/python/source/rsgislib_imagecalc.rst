@@ -35,6 +35,7 @@ Statistical Summary
 .. autofunction:: rsgislib.imagecalc.get_unique_values
 .. autofunction:: rsgislib.imagecalc.calc_imgs_pxl_mode
 .. autofunction:: rsgislib.imagecalc.calc_img_basic_stats_for_ref_region
+.. autofunction:: rsgislib.imagecalc.calc_sum_stats_msk_vals
 .. autoclass:: rsgislib.imagecalc.StatsSummary
 
 Update Pixel Values
