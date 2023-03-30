@@ -2025,7 +2025,8 @@ def create_img_for_each_vec_feat(
     out_img_res: float,
     gdalformat: str,
     datatype: int,
-    snap_to_grid: int = False,
+    snap_to_grid: bool = False,
+    ignore_exist: bool = True,
 ):
     """
     A function to create a set of image files representing the extent of each
@@ -2043,8 +2044,10 @@ def create_img_for_each_vec_feat(
     :param gdalformat: output image file format.
     :param datatype: is a rsgislib.TYPE_* value providing the data type of the
                      output image.
-    :param snap_to_grid: optional variable to snap the image to a grid of whole
-                         numbers with respect to the image pixel resolution.
+    :param snap_to_grid: snap the output image to a grid of whole numbers
+                         with respect to the image pixel resolution.
+    :param ignore_exist: ignore outputs which already exist and therefore
+                         only create those which don't exist.
     """
 
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
@@ -2083,21 +2086,26 @@ def create_img_for_each_vec_feat(
         if geom is not None:
             env = geom.GetEnvelope()
             tilebasename = feat.GetFieldAsString(feat_idx)
-            outputImg = os.path.join(
+            output_img = os.path.join(
                 out_img_path, "{0}.{1}".format(tilebasename, out_img_ext)
             )
-            print(outputImg)
-            create_blank_img_from_bbox(
-                env,
-                wktstr,
-                outputImg,
-                out_img_res,
-                out_img_pxl_val,
-                out_img_n_bands,
-                gdalformat,
-                datatype,
-                snap_to_grid,
-            )
+            create_out_file = True
+            if ignore_exist and os.path.exists(output_img):
+                create_out_file = False
+
+            if create_out_file:
+                print(output_img)
+                create_blank_img_from_bbox(
+                    env,
+                    wktstr,
+                    output_img,
+                    out_img_res,
+                    out_img_pxl_val,
+                    out_img_n_bands,
+                    gdalformat,
+                    datatype,
+                    snap_to_grid,
+                )
 
 
 def resample_img_to_match(
