@@ -719,7 +719,7 @@ def calc_acc_metrics_vecsamples_img(
     for i, cls_name in enumerate(img_clsname_data):
         cls_name_str = str(cls_name.decode())
         cls_name_str = rsgislib.tools.utils.check_str(cls_name_str, rm_non_ascii=True)
-        if (i > 0) and (len(cls_name_str) > 0):
+        if (i > 0) and (len(cls_name_str) > 0) and (img_hist_data[i] > 0):
             if cls_name_str not in unq_cls_names:
                 raise rsgislib.RSGISPyException(
                     "Class ('{}') found in image which was "
