@@ -63,6 +63,12 @@ if __name__ == "__main__":
         default=False,
         help="Print the projection of the vector layer.",
     )
+    parser.add_argument(
+        "--bbox",
+        action="store_true",
+        default=False,
+        help="Print the bounding box of the vector layer.",
+        )
     args = parser.parse_args()
 
     if args.lyrs:
@@ -82,3 +88,9 @@ if __name__ == "__main__":
     if args.proj:
         proj_wkt = rsgislib.vectorutils.get_proj_wkt_from_vec(args.vecfile, args.veclyr)
         print(proj_wkt)
+
+    if args.bbox:
+        bbox = rsgislib.vectorutils.get_vec_layer_extent(args.vecfile, args.veclyr)
+        print(f"[xMin, xMax, yMin, yMax]: {bbox}")
+        print(f"Width: {bbox[1]-bbox[0]}")
+        print(f"Height: {bbox[3] - bbox[2]}")
