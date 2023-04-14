@@ -463,10 +463,13 @@ def create_name_col(
     postfix: str = "",
     coords_lat_lon: bool = True,
     int_coords: bool = True,
+    coord_gain: float = 0.0,
     zero_x_pad: int = 0,
     zero_y_pad: int = 0,
     round_n_digts: int = 0,
     non_neg: bool = False,
+    replace_dec_pt: bool = True,
+    dec_pt_val: str = "",
 ):
     """
     A function which creates a column in the vector layer which can define a name
@@ -485,12 +488,18 @@ def create_name_col(
     :param postfix: A postfix to the name
     :param coords_lat_lon: A boolean specifying if the coordinates are lat / long
     :param int_coords: A boolean specifying whether to integerise the coordinates.
+    :param coord_gain: Apply a gain to the coordinate before integerise.
+                       Default = 0.0 (i.e., no gain)
     :param zero_x_pad: If larger than zero then the X coordinate will be zero padded.
     :param zero_y_pad: If larger than zero then the Y coordinate will be zero padded.
     :param round_n_digts: If larger than zero then the coordinates will be rounded
                           to n significant digits
     :param non_neg: boolean specifying whether an negative coordinates should be
                     made positive. (Default: False)
+    :param replace_dec_pt: replace the decimal point with another string.
+                           Default: True
+    :param dec_pt_val: the value used instead of a decimal point. Default: ""
+                       i.e., empty string so decimal point is removed.
 
     """
     import geopandas
@@ -520,26 +529,26 @@ def create_name_col(
 
         if zero_x_pad > 0:
             x_col_val_str = rsgislib.tools.utils.zero_pad_num_str(
-                x_col_val,
+                x_col_val * coord_gain,
                 str_len=zero_x_pad,
                 round_num=False,
                 round_n_digts=round_n_digts,
                 integerise=int_coords,
             )
         else:
-            x_col_val = int(x_col_val)
+            x_col_val = int(x_col_val * coord_gain)
             x_col_val_str = "{}".format(x_col_val)
 
         if zero_y_pad > 0:
             y_col_val_str = rsgislib.tools.utils.zero_pad_num_str(
-                y_col_val,
+                y_col_val * coord_gain,
                 str_len=zero_y_pad,
                 round_num=False,
                 round_n_digts=round_n_digts,
                 integerise=int_coords,
             )
         else:
-            y_col_val = int(y_col_val)
+            y_col_val = int(y_col_val * coord_gain)
             y_col_val_str = "{}".format(y_col_val)
 
         if coords_lat_lon:
@@ -554,6 +563,9 @@ def create_name_col(
             )
         else:
             name = "{}E{}N{}{}".format(prefix, x_col_val_str, y_col_val_str, postfix)
+
+        if replace_dec_pt:
+            name = name.replace(".", dec_pt_val)
 
         names.append(name)
 
