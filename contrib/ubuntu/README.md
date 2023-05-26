@@ -29,6 +29,12 @@ docker build . \
     --build-arg=REPO=none \
     -f contrib/ubuntu/Dockerfile \
     -t rsgislib_jammy
+
+docker build . \
+    --build-arg=CODENAME=jammy \
+    --build-arg=REPO=ubuntugis_unstable \
+    -f contrib/ubuntu/Dockerfile \
+    -t rsgislib_jammy_unstable
 ```
 
 More may be added in the future, but you should be able to build against other
@@ -43,6 +49,14 @@ docker run --rm --entrypoint cat rsgislib_focal_stable \
 ```
 
 ## Notes:
+
+### What version of rsgislib
+
+The version of rsgislib that will be built with the process depends entirely on what commit you have checked
+out.  If you want to build 5.0.13, you will need to checkout that tag.  What versions of rsgislib you can build
+against which version of ubuntugis and ubuntu can be a little tricky.  Out of the box for example, 5.0.13 requires
+GDAL 3.6, and therefore must be built against ubuntu jammy with ubuntugis_unstable.  You may have to
+tweak these build scripts for your purposes.
 
 The process relies on fetching and installing a companion .deb of kealib to build against. This is hosted by Environment Systems Ltd in a public S3 Bucket. This part of the build could be replaced by building from source locally if required.
 
