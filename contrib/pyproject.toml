@@ -3,7 +3,7 @@ requires = ["setuptools"]
 
 [project]
 name = "rsgislib"
-version = "5.0.11"
+version = "5.0.13"
 description = "Python bindings for rsgislib"
 license = {text = "GNU General Public License Version 3"}
 dependencies = [
