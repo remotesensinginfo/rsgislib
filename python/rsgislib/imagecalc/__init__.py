@@ -1727,3 +1727,62 @@ def calc_split_win_thresholds(
         rsgislib.tools.utils.write_dict_to_json(band_thresholds, output_file)
 
     return band_thresholds
+
+
+def count_imgs_int_val_occur(
+    input_imgs: List[str], output_img: str, bin_vals: List[int], gdalformat: str = "KEA"
+):
+    """
+    Function which calculates the histogram for each pixel across all the input
+    images and bands within the those images.
+
+    Note, when the list of input images is very large (i.e., over 200) an error
+    cannot occur but if you stack the images into a VRT then more images can be
+    processed.
+
+    :param input_imgs: the list of images
+    :param output_img: the output image file name and path. The number
+                       of bands with be equal to the length of the
+                       bin_vals lists.
+    :param bin_vals: list of integer bin used to calculate the histograms
+    :param gdalformat: the GDAL image file format of the output image file.
+
+    """
+    from rios import applier
+
+    try:
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.images = input_imgs
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.bin_vals = bin_vals
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyCalcPxlValCount(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        image_data = numpy.concatenate(inputs.images, axis=0).astype(numpy.int32)
+        val_count_arrs = []
+        for val in otherargs.bin_vals:
+            val_count_arrs.append(
+                numpy.expand_dims(
+                    numpy.count_nonzero(image_data == val, axis=0), axis=0
+                )
+            )
+        outputs.outimage = numpy.concatenate(val_count_arrs, axis=0).astype(numpy.int32)
+
+    applier.apply(
+        _applyCalcPxlValCount, infiles, outfiles, otherargs, controls=aControls
+    )

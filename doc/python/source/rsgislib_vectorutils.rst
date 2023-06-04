@@ -85,11 +85,13 @@ Vector Select / Subset
 .. autofunction:: rsgislib.vectorutils.spatial_select_bbox
 
 
+
 Vector Split
 ---------------
 .. autofunction:: rsgislib.vectorutils.split_vec_lyr
 .. autofunction:: rsgislib.vectorutils.split_by_attribute
 .. autofunction:: rsgislib.vectorutils.split_feats_to_mlyrs
+.. autofunction:: rsgislib.vectorutils.create_n_random_subsets
 .. autofunction:: rsgislib.vectorutils.split_vec_lyr_random_subset
 .. autofunction:: rsgislib.vectorutils.create_train_test_smpls
 
@@ -125,4 +127,3 @@ Vectors Utilities
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

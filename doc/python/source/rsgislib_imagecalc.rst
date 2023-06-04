@@ -36,6 +36,7 @@ Statistical Summary
 .. autofunction:: rsgislib.imagecalc.calc_imgs_pxl_mode
 .. autofunction:: rsgislib.imagecalc.calc_img_basic_stats_for_ref_region
 .. autofunction:: rsgislib.imagecalc.calc_sum_stats_msk_vals
+.. autofunction:: rsgislib.imagecalc.count_imgs_int_val_occur
 .. autoclass:: rsgislib.imagecalc.StatsSummary
 
 Update Pixel Values
@@ -125,4 +126,3 @@ Least Cost Path
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

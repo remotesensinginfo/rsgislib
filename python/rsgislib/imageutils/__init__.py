@@ -2390,7 +2390,6 @@ def reproject_image(
     outHeight = int(round((yMax - yMin) / outRes)) + 1
 
     if snap_to_grid:
-
         xLeft = outTLX % outRes
         yLeft = outTLY % outRes
 
@@ -2976,7 +2975,7 @@ def extract_img_pxl_sample(
 
     first = True
     reader = ImageReader(input_img, windowxsize=200, windowysize=200)
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         blkShape = block.shape
         blkBands = block.reshape((blkShape[0], (blkShape[1] * blkShape[2])))
 
@@ -3024,7 +3023,7 @@ def extract_img_pxl_vals_in_msk(
     outArr = None
     first = True
     reader = ImageReader([input_img, in_msk_img], windowxsize=200, windowysize=200)
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         blk_img = block[0]
         blk_msk = block[1].flatten()
         blk_img_shape = blk_img.shape
@@ -4686,3 +4685,82 @@ def polyfill_nan_data_values(
             no_data_val=in_no_date,
             calc_pyramids=True,
         )
+
+
+def grid_scattered_pts(
+    vec_file: str,
+    vec_lyr: str,
+    vec_col: str,
+    input_img: str,
+    output_img: str,
+    gdal_grid_alg: str = None,
+    no_data_val: float = 0.0,
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_32FLOAT,
+):
+    """
+    A function which uses the GDAL grid function to create a regular grid
+    (i.e., raster) from an irregular grid of points within a raster layer.
+
+    See gdal_grid documentation for the algorithm options:
+
+    Available algorithms and parameters with their defaults:
+    Inverse distance to a power (default)
+        invdist:power=2.0:smoothing=0.0:radius1=0.0:radius2=0.0:angle=0.0:max_points=0:min_points=0:nodata=0.0
+    Inverse distance to a power with nearest neighbor search
+        invdistnn:power=2.0:radius=1.0:max_points=12:min_points=0:nodata=0
+    Moving average
+        average:radius1=0.0:radius2=0.0:angle=0.0:min_points=0:nodata=0.0
+    Nearest neighbor
+        nearest:radius1=0.0:radius2=0.0:angle=0.0:nodata=0.0
+    Various data metrics
+        <metric name>:radius1=0.0:radius2=0.0:angle=0.0:min_points=0:nodata=0.0
+        possible metrics are:
+            minimum
+            maximum
+            range
+            count
+            average_distance
+            average_distance_pts
+    Linear
+        linear:radius=-1.0:nodata=0.0
+
+    :param vec_file: input vector file path.
+    :param vec_lyr: input vector layer name.
+    :param vec_col: column within the input vector layer with the values
+                    to be interpolated across the region of interest.
+    :param input_img: an input image which defines the region of interest,
+                      pixel resolution and projection of the output image.
+    :param output_img: The output image file path.
+    :param gdal_grid_alg: the gdal formatted string with the algorithm options.
+    :param no_data_val: the output no data value (Default: 0.0)
+    :param gdalformat: the output image format (Default: KEA)
+    :param datatype: the output image data type (Default: Float 32)
+
+    """
+    import rsgislib.vectorutils
+    from osgeo import gdal
+
+    x_img_size, y_img_size = get_img_size(input_img)
+    base_img_bbox = get_img_bbox(input_img)
+
+    vec_ds_obj, vec_lyr_obj = rsgislib.vectorutils.open_gdal_vec_lyr(vec_file, vec_lyr)
+
+    grid_opts = {
+        "format": gdalformat,
+        "outputType": rsgislib.get_gdal_datatype(datatype),
+        "width": x_img_size,
+        "height": y_img_size,
+        "outputBounds": [
+            base_img_bbox[0],
+            base_img_bbox[3],
+            base_img_bbox[1],
+            base_img_bbox[2],
+        ],
+        "noData": no_data_val,
+        "algorithm": gdal_grid_alg,
+        "layers": vec_lyr,
+        "zfield": vec_col,
+    }
+    gdal.Grid(output_img, vec_ds_obj, **grid_opts)
+    vec_ds_obj = None

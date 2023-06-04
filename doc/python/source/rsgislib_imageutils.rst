@@ -146,6 +146,7 @@ Create
 .. autofunction:: rsgislib.imageutils.create_img_for_each_vec_feat
 .. autofunction:: rsgislib.imageutils.gdal_translate
 .. autofunction:: rsgislib.imageutils.create_copy_img_vec_extent
+.. autofunction:: rsgislib.imageutils.grid_scattered_pts
 
 Create VRT
 ------------
@@ -258,4 +259,3 @@ Get Image Metadata
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

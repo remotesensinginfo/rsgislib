@@ -294,7 +294,10 @@ def get_vec_lyr_geom_type(vec_file: str, vec_lyr: str = None) -> int:
 
 
 def count_feats_per_att_val(
-    vec_file: str, vec_lyr: str, col_name: str, out_df_dict: bool = False,
+    vec_file: str,
+    vec_lyr: str,
+    col_name: str,
+    out_df_dict: bool = False,
 ) -> Dict:
     """
     A function which returns the count of features for each variable
@@ -3547,13 +3550,13 @@ def rm_attrib_duplicates(
 
 
 def spatial_select_bbox(
-        vec_file: str,
-        vec_lyr: str,
-        bbox: List[float],
-        out_vec_file: str,
-        out_vec_lyr: str,
-        out_format: str = "GPKG",
-        vec_in_epsg: int = None,
+    vec_file: str,
+    vec_lyr: str,
+    bbox: List[float],
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    vec_in_epsg: int = None,
 ):
     """
     A function which spatially subsets the vector layer to the bbox
@@ -3571,6 +3574,7 @@ def spatial_select_bbox(
     """
 
     import geopandas
+
     print("Read vector layer")
     in_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
@@ -3578,7 +3582,7 @@ def spatial_select_bbox(
         in_gdf = in_gdf.set_crs(epsg=vec_in_epsg, allow_override=True)
 
     print("Subset")
-    sub_gdf = in_gdf.cx[bbox[0]:bbox[1], bbox[2]:bbox[3]]
+    sub_gdf = in_gdf.cx[bbox[0] : bbox[1], bbox[2] : bbox[3]]
 
     print("Export")
     if out_format == "GPKG":
@@ -3586,3 +3590,67 @@ def spatial_select_bbox(
     else:
         sub_gdf.to_file(out_vec_file, driver=out_format)
 
+
+def create_n_random_subsets(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_dir: str,
+    out_vec_base: str,
+    out_vec_ext: str,
+    out_format: str = "GPKG",
+    n_subs: int = 10,
+    smpl_frac: float = 0.5,
+    n_smpl: int = None,
+    replacement: bool = False,
+    rnd_seed: int = None,
+):
+    """
+    A function which creates n random subsets of the features within a vector
+    layer. This is useful when running a bootstrapping process or similar.
+
+    :param vec_file: input vector file path
+    :param vec_lyr: input vector layer name
+    :param out_vec_dir: output directory path
+    :param out_vec_base: output base file name
+    :param out_vec_ext: output file extension for the vector files (e.g., gpkg)
+    :param out_format: output vector file format (Default: GPKG)
+    :param n_subs: the number of subsets to generate (Default: 10).
+    :param smpl_frac: the fraction of the whole data to take as the subset. Note,
+                      if n_smpl is defined it will be used over smpl_frac. (Defualt: 10)
+    :param n_smpl: the number of samples to take from the input layer for each subset
+                   (Default: None). Note, if n_smpl is defined (i.e., not None) then
+                   smpl_frac will be ignored.
+    :param replacement: Boolean specifying whether the random subset is selected with
+                        replacement (Default: False)
+    :param rnd_seed: A seed for the random selection. Default: None.
+
+    """
+    import geopandas
+    import tqdm
+
+    if not os.path.exists(out_vec_dir):
+        os.mkdir(out_vec_dir)
+
+    base_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    for i in tqdm.tqdm(range(n_subs)):
+        if n_smpl is not None:
+            sub_gdf = base_gdf.sample(
+                n=n_subs, frac=None, replace=replacement, random_state=rnd_seed, axis=0
+            )
+        else:
+            sub_gdf = base_gdf.sample(
+                n=None,
+                frac=smpl_frac,
+                replace=replacement,
+                random_state=rnd_seed,
+                axis=0,
+            )
+
+        out_vec_lyr = f"{out_vec_base}_{i}"
+        out_vec_file = os.path.join(out_vec_dir, f"{out_vec_lyr}.{out_vec_ext}")
+
+        if out_format == "GPKG":
+            sub_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            sub_gdf.to_file(out_vec_file, driver=out_format)
