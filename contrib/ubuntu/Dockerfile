@@ -4,8 +4,8 @@ FROM ubuntu:$CODENAME
 
 ARG CODENAME
 ARG REPO=none
-ARG KEALIB_DEB_URL=https://envsys-public.s3.amazonaws.com/ubuntu/kealib/${CODENAME}_${REPO}_libkea_1.4.14-1.deb
-ARG RSGISLIB_VER=5.0.11
+ARG KEALIB_DEB_URL=https://envsys-public.s3.amazonaws.com/ubuntu/kealib/${CODENAME}_${REPO}_libkea_1.5.1-1.deb
+ARG RSGISLIB_VER=5.0.13
 ARG PACKAGE_DIR=/usr/local/packages
 ARG RSGISLIB_PACKAGE_DIR=$PACKAGE_DIR/rsgislib_$RSGISLIB_VER-1
 ARG RSGISLIB_PYTHON_PACKAGE_DIR=$PACKAGE_DIR/python3-rsgislib_$RSGISLIB_VER-1
