@@ -54,7 +54,6 @@ class MakeSeasonTrendModel(object):
     """
 
     def __init__(self, datetimes, band_data):
-
         self.T = 365.25
         self.pi_val_simple = (2 * numpy.pi) / self.T
         self.pi_val_advanced = (4 * numpy.pi) / self.T
@@ -127,7 +126,7 @@ class MakeSeasonTrendModel(object):
         self.coefficients = self.model.coef_
         self.residuals = self.band_data - self.predicted
         # Get overall RMSE of model
-        self.RMSE = numpy.sqrt(numpy.mean(self.residuals ** 2))
+        self.RMSE = numpy.sqrt(numpy.mean(self.residuals**2))
 
     def fit_lasso_model(self, cv, alpha):
         """

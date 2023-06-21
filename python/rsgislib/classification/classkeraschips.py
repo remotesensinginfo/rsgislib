@@ -236,7 +236,7 @@ def apply_keras_chips_pixel_classifier(
     )
     feat2cls = None
 
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         classMskArr = block[0]
 
         blk_shape = classMskArr.shape

@@ -401,7 +401,6 @@ def calc_zonal_band_stats(
                         src_array = None
 
                     if (src_array is not None) and havepxls:
-
                         # calculate new geotransform of the feature subset
                         subGeoTrans = (
                             (imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1])),
@@ -1133,7 +1132,6 @@ def calc_zonal_band_stats_test_poly_pts(
                         src_array = None
 
                     if (src_array is not None) and havepxls:
-
                         # calculate new geotransform of the feature subset
                         subGeoTrans = (
                             (imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1])),
@@ -1743,7 +1741,7 @@ def extract_chip_zone_image_band_values_to_hdf(
     ######################################################################
     nFeats = 0
     reader = ImageReader(image_mask, windowxsize=200, windowysize=200)
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         nFeats = nFeats + numpy.sum(block[0] == mask_value)
     ######################################################################
     if rotate:
@@ -1787,7 +1785,7 @@ def extract_chip_zone_image_band_values_to_hdf(
         layerselection=inImgBands,
     )
     iFeat = 0
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         classMskArr = block[0]
         blkShape = classMskArr.shape
 
@@ -2182,7 +2180,7 @@ def extract_ref_chip_zone_image_band_values_to_hdf(
     ######################################################################
     nFeats = 0
     reader = ImageReader(image_mask, windowxsize=200, windowysize=200)
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         nFeats = nFeats + numpy.sum(block[0] == mask_value)
     ######################################################################
     if rotate:
@@ -2233,7 +2231,7 @@ def extract_ref_chip_zone_image_band_values_to_hdf(
         layerselection=inImgBands,
     )
     iFeat = 0
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         classMskArr = block[0]
         blkShape = classMskArr.shape
 

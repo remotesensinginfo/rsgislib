@@ -34,7 +34,7 @@ class RSGISNumpyArrayEncoder(json.JSONEncoder):
             return obj.isoformat()
         if isinstance(obj, datetime.timedelta):
             return str(obj)
-        if hasattr(obj, 'to_json'):
+        if hasattr(obj, "to_json"):
             return obj.to_json()
         else:
             return super(RSGISNumpyArrayEncoder, self).default(obj)

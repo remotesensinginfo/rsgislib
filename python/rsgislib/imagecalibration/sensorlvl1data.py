@@ -129,47 +129,61 @@ def create_stacked_toa_ls_oli_cl2_lv1_img(
     )
 
     b1_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_1"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_1"],
     )
     b2_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_2"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_2"],
     )
     b3_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_3"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_3"],
     )
     b4_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_4"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_4"],
     )
     b5_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_5"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_5"],
     )
     b6_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_6"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_6"],
     )
     b7_multi = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_7"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_MULT_BAND_7"],
     )
 
     b1_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_1"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_1"],
     )
     b2_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_2"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_2"],
     )
     b3_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_3"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_3"],
     )
     b4_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_4"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_4"],
     )
     b5_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_5"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_5"],
     )
     b6_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_6"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_6"],
     )
     b7_add = rsgislib.tools.utils.dict_struct_get_numeric_value(
-        ls8_head_info, ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_7"],
+        ls8_head_info,
+        ["LEVEL1_RADIOMETRIC_RESCALING", "REFLECTANCE_ADD_BAND_7"],
     )
 
     solor_elev = rsgislib.tools.utils.dict_struct_get_numeric_value(
@@ -206,7 +220,11 @@ def create_stacked_toa_ls_oli_cl2_lv1_img(
             band["multi"], band["add"], math.sin(math.radians(solor_elev)), scale_factor
         )
         rsgislib.imagecalc.image_math(
-            band["img"], out_img_band, exp, "KEA", rsgislib.TYPE_32INT,
+            band["img"],
+            out_img_band,
+            exp,
+            "KEA",
+            rsgislib.TYPE_32INT,
         )
         sref_bands.append(out_img_band)
 

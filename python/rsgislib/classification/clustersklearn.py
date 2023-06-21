@@ -100,7 +100,7 @@ def img_pixel_sample_cluster(
     print("Apply to whole image:")
     reader = ImageReader(input_img, windowxsize=200, windowysize=200)
     writer = None
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         blkShape = block.shape
         blkBands = block.reshape((blkShape[0], (blkShape[1] * blkShape[2]))).T
         ID = numpy.arange(blkBands.shape[0])
@@ -183,7 +183,7 @@ def img_pixel_tiled_cluster(
 
     reader = ImageReader(input_img, windowxsize=tile_x_size, windowysize=tile_y_size)
     writer = None
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         blkShape = block.shape
         blkBands = block.reshape((blkShape[0], (blkShape[1] * blkShape[2]))).T
         ID = numpy.arange(blkBands.shape[0])

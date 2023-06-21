@@ -66,8 +66,10 @@ def check_http_response(response: requests.Response, url: str) -> bool:
             try:
                 excpt_msg = response.json()["error"]["message"]["value"]
             except:
-                excpt_msg = "Unknown error ('{0}'), check url in a web browser: '{1}'".format(
-                    response.reason, url
+                excpt_msg = (
+                    "Unknown error ('{0}'), check url in a web browser: '{1}'".format(
+                        response.reason, url
+                    )
                 )
         api_error = RSGISPyResponseException(excpt_msg, response)
         api_error.__cause__ = None
@@ -166,7 +168,7 @@ def download_file_http(
         ) as r:
             if check_http_response(r, input_url):
                 total = int(r.headers.get("content-length", 0))
-                chunk_size = 2 ** 20
+                chunk_size = 2**20
                 n_chunks = int(total / chunk_size) + 1
 
                 with open(tmp_dwnld_path, "wb") as f:

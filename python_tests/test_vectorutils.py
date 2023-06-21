@@ -29,6 +29,7 @@ CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
 IMGUTILS_DATA_DIR = os.path.join(DATA_DIR, "imageutils")
 REGRESS_DATA_DIR = os.path.join(DATA_DIR, "regression")
 
+
 # TODO - workout what is happening on Windows.
 @pytest.mark.skipif(on_windows, reason="Problems on Windows removing files")
 def test_delete_vector_file(tmp_path):
@@ -359,10 +360,10 @@ def test_split_vec_lyr(tmp_path):
     vec_lyr = "cls_forest_smpls"
 
     rsgislib.vectorutils.split_vec_lyr(
-        vec_file, vec_lyr, 2, "GPKG", tmp_path, "out_vec", "gpkg"
+        vec_file, vec_lyr, 2, "GeoJSON", tmp_path, "out_vec", "geojson"
     )
 
-    out_files = glob.glob(os.path.join(tmp_path, "out_vec*.gpkg"))
+    out_files = glob.glob(os.path.join(tmp_path, "out_vec*.geojson"))
     assert len(out_files) == 5
 
 
@@ -538,7 +539,7 @@ def test_export_spatial_select_feats(tmp_path):
     vec_roi_file = os.path.join(VECTORUTILS_DATA_DIR, "cls_grass_smpls.gpkg")
     vec_roi_lyr = "cls_grass_smpls"
 
-    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_file = os.path.join(tmp_path, "out_vec.geojson")
     out_vec_lyr = "out_vec"
 
     rsgislib.vectorutils.export_spatial_select_feats(
@@ -548,7 +549,7 @@ def test_export_spatial_select_feats(tmp_path):
         vec_roi_lyr,
         out_vec_file,
         out_vec_lyr,
-        out_format="GPKG",
+        out_format="GeoJSON",
     )
 
     assert os.path.exists(out_vec_file)

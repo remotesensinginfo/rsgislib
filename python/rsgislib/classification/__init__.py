@@ -1059,7 +1059,7 @@ def label_pxl_sample_chips(
         overlap=img_win_h_size,
         layerselection=inImgBands,
     )
-    for (info, block) in tqdm.tqdm(reader):
+    for info, block in tqdm.tqdm(reader):
         samples_msk_arr = block[0]
         blk_shp = samples_msk_arr.shape
 

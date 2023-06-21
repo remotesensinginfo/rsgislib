@@ -202,7 +202,6 @@ def vectorise_pxls_to_pts(
     applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
 
     if len(pt_x_lst) > 0:
-
         gdf = geopandas.GeoDataFrame(
             geometry=geopandas.points_from_xy(pt_x_lst, pt_y_lst),
             crs="EPSG:{}".format(out_epsg_code),
@@ -942,7 +941,6 @@ def create_bboxs_for_pts(
     in_feature = vec_lyr_obj.GetNextFeature()
     out_bboxs = list()
     while in_feature:
-
         geom = in_feature.GetGeometryRef()
         if geom is not None:
             pt_x = geom.GetX()

@@ -1646,7 +1646,6 @@ def create_legend_info_dict(
     ):
         cls_name_str = str(cls_name.decode())
         if (cls_name_str != "") and (hist_val > 0):
-
             if underscore_to_space:
                 cls_name_str = cls_name_str.replace("_", " ")
 

@@ -49,7 +49,6 @@ from rios import applier, fileinfo
 
 class RLMRemoveOutliers(object):
     def __init__(self, toa_data, results):
-
         self.T = 365.25
         self.pi_val = (2 * numpy.pi) / self.T
         self.toa_data = toa_data

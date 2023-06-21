@@ -2848,40 +2848,40 @@ def merge_vector_layers(
 
     """
     import geopandas
+    import pandas
     import tqdm
+    import rsgislib.tools.filetools
 
-    first = True
+    gp_lyrs = list()
     for vec_info in tqdm.tqdm(vecs_dict):
         if ("file" in vec_info) and ("layer" in vec_info):
-            if first:
-                data_gdf = geopandas.read_file(
-                    vec_info["file"], layer=vec_info["layer"]
-                )
-                if out_epsg is not None:
-                    data_gdf = data_gdf.to_crs(epsg=out_epsg)
-                first = False
-            else:
-                tmp_data_gdf = geopandas.read_file(
-                    vec_info["file"], layer=vec_info["layer"]
-                )
-                if out_epsg is not None:
-                    tmp_data_gdf = tmp_data_gdf.to_crs(epsg=out_epsg)
-
-                data_gdf = data_gdf.append(tmp_data_gdf)
+            data_gdf = geopandas.read_file(vec_info["file"], layer=vec_info["layer"])
+            if out_epsg is not None:
+                data_gdf = data_gdf.to_crs(epsg=out_epsg)
+            if len(data_gdf) > 0:
+                gp_lyrs.append(data_gdf)
         else:
             raise rsgislib.RSGISPyException(
                 "The inputs should be a list of dicts with keys 'file' and 'layer'."
             )
 
-    if not first:
-        if out_format == "GPKG":
-            if out_vec_lyr is None:
-                raise rsgislib.RSGISPyException(
-                    "If output format is GPKG then an output layer is required."
-                )
-            data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-        else:
-            data_gdf.to_file(out_vec_file, driver=out_format)
+    print("Perform Merge")
+    if len(gp_lyrs) > 1:
+        data_gdf = pandas.concat(gp_lyrs)
+    elif len(gp_lyrs) == 1:
+        data_gdf = gp_lyrs[0]
+    else:
+        raise rsgislib.RSGISPyException("No layers with data were provided")
+
+    print("Export")
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                out_vec_file, check_valid=True
+            )
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def geopd_check_polys_wgs84_bounds_geometry(data_gdf, width_thres: float = 350):

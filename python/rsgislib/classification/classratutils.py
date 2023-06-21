@@ -86,7 +86,6 @@ def populate_clumps_with_class_training(
     classNamesDict = dict()
 
     for cls_info in classes_info:
-
         tmp_cls_img = os.path.join(
             tmp_dir, "{}_{}.kea".format(cls_info.class_name, uid)
         )
