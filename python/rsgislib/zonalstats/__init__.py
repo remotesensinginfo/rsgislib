@@ -1624,52 +1624,52 @@ def merge_extracted_hdf5_data(
         datatype = rsgislib.TYPE_32FLOAT
 
     first = True
-    numVars = 0
-    numVals = 0
-    for h5File in h5_files:
-        fH5 = h5py.File(h5File, "r")
-        dataShp = fH5["DATA/DATA"].shape
+    num_vars = 0
+    num_vals = 0
+    for h5_file in h5_files:
+        f_h5 = h5py.File(h5_file, "r")
+        data_shp = f_h5["DATA/DATA"].shape
         if first:
-            numVars = dataShp[1]
+            num_vars = data_shp[1]
             first = False
-        elif numVars is not dataShp[1]:
+        elif num_vars != data_shp[1]:
             raise rsgislib.RSGISPyException(
                 "The number of variables within the "
                 "inputted HDF5 files was not the same."
             )
-        numVals += dataShp[0]
-        fH5.close()
+        num_vals += data_shp[0]
+        f_h5.close()
 
-    dataArr = numpy.zeros([numVals, numVars], dtype=float)
+    data_arr = numpy.zeros([num_vals, num_vars], dtype=float)
 
-    rowInit = 0
-    for h5File in h5_files:
-        fH5 = h5py.File(h5File, "r")
-        numRows = fH5["DATA/DATA"].shape[0]
-        dataArr[rowInit : (rowInit + numRows)] = fH5["DATA/DATA"]
-        rowInit += numRows
-        fH5.close()
+    row_init = 0
+    for h5_file in h5_files:
+        f_h5 = h5py.File(h5_file, "r")
+        num_rows = f_h5["DATA/DATA"].shape[0]
+        data_arr[row_init : (row_init + num_rows)] = f_h5["DATA/DATA"]
+        row_init += num_rows
+        f_h5.close()
 
     chunk_len = 1000
-    if numVals < chunk_len:
-        chunk_len = numVals
+    if num_vals < chunk_len:
+        chunk_len = num_vals
 
     h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
-    fH5Out = h5py.File(out_h5_file, "w")
-    dataGrp = fH5Out.create_group("DATA")
-    metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset(
+    f_h5_out = h5py.File(out_h5_file, "w")
+    data_grp = f_h5_out.create_group("DATA")
+    meta_grp = f_h5_out.create_group("META-DATA")
+    data_grp.create_dataset(
         "DATA",
-        data=dataArr,
-        chunks=(chunk_len, numVars),
+        data=data_arr,
+        chunks=(chunk_len, num_vars),
         compression="gzip",
         shuffle=True,
         dtype=h5_dtype,
     )
-    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describDS[0] = "Merged".encode()
-    fH5Out.close()
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describ_ds[0] = "Merged".encode()
+    f_h5_out.close()
 
 
 def extract_chip_zone_image_band_values_to_hdf(
