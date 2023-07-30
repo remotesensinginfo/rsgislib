@@ -79,38 +79,37 @@ def read_endmembers_mtxt(endmembers_file, gain=1, weight=None):
     :param weight: Optional (if None ignored) to provide a weight to implement the
                    approach of Scarth et al (2010) adding a weight to the least squares
                    optimisation to get the abundances to sum to 1.
-    :return: [m, n, endmemarr]; m size, n size and a numpy array with the end members
+    :return: [m, n, end_mem_arr]; m size, n size and a numpy array with the end members
 
     """
-    dataList = []
-    dataFile = open(endmembers_file, "r")
-    for line in dataFile:
+    data_lst = []
+    data_file_obj = open(endmembers_file, "r")
+    for line in data_file_obj:
         line = line.strip()
         if line != "":
-            dataList.append(line)
-    dataFile.close()
-    m = int(dataList[0].split("=")[-1])
-    n = int(dataList[1].split("=")[-1])
-    endmemarr = numpy.zeros((m, n))
-    datavals = dataList[2].split(",")
+            data_lst.append(line)
+    data_file_obj.close()
+    m = int(data_lst[0].split("=")[-1])
+    n = int(data_lst[1].split("=")[-1])
+    end_mem_arr = numpy.zeros((m, n))
+    data_vals_lst = data_lst[2].split(",")
 
     i = 0
-
     for n_idx in range(n):
         for m_idx in range(m):
-            endmemarr[m_idx, n_idx] = float(datavals[i])
+            end_mem_arr[m_idx, n_idx] = float(data_vals_lst[i])
             i += 1
 
     if gain > 1:
-        endmemarr = endmemarr / gain
+        end_mem_arr = end_mem_arr / gain
 
     if weight is not None:
         weights = numpy.empty([m, 1])
         weights[...] = weight
-        endmemarr = numpy.hstack([endmemarr, weights])
+        end_mem_arr = numpy.hstack([end_mem_arr, weights])
         n += 1
 
-    return m, n, endmemarr
+    return m, n, end_mem_arr
 
 
 def write_endmembers_mtxt(endmembers_np_arr, endmembers_file):
@@ -132,13 +131,15 @@ def write_endmembers_mtxt(endmembers_np_arr, endmembers_file):
     out_line_list.append(f"n={out_n}")
 
     out_data = ""
-    first = True
-    for val in endmembers_np_arr.flatten():
-        if first:
-            first = False
-            out_data = f"{val}"
-        else:
-            out_data = f"{out_data},{val}"
+    i = 0
+    for n_idx in range(out_n):
+        for m_idx in range(out_m):
+            flt_val = float(endmembers_np_arr[m_idx, n_idx])
+            if i == 0:
+                out_data = f"{flt_val}"
+            else:
+                out_data = f"{out_data},{flt_val}"
+            i += 1
 
     out_line_list.append(out_data)
 

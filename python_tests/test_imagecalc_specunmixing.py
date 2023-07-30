@@ -274,6 +274,157 @@ def test_are_endmembers_equal_False():
     )
 
 
+def test_write_endmembers_mtxt(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+
+    endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
+
+    n_endmembers, n_bands, endmembers = specunmixing.read_endmembers_mtxt(
+        endmembers_file, gain=1, weight=None
+    )
+
+    test_endmembers_file = os.path.join(tmp_path, "sen2_endmembers_test.mtxt")
+    specunmixing.write_endmembers_mtxt(endmembers, test_endmembers_file)
+
+    assert specunmixing.are_endmembers_equal(endmembers_file, test_endmembers_file)
+
+
+def test_write_endmembers_mtxt_np_arr_2_10(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+    import numpy
+
+    endmembers_ref = numpy.array(
+        [
+            [305, 696, 409, 1394, 3874, 4465, 4636, 4841, 2341, 1077],
+            [2200, 2874, 3448, 3463, 3581, 3696, 3846, 3699, 4546, 4524],
+        ]
+    )
+
+    test_endmembers_file = os.path.join(tmp_path, "sen2_endmembers_test1.mtxt")
+    specunmixing.write_endmembers_mtxt(endmembers_ref, test_endmembers_file)
+
+    n_endmembers, n_bands, endmembers_read_in = specunmixing.read_endmembers_mtxt(
+        test_endmembers_file, gain=1, weight=None
+    )
+
+    if n_endmembers != 2:
+        assert False
+    if n_bands != 10:
+        assert False
+
+    assert numpy.array_equal(endmembers_ref, endmembers_read_in)
+
+
+def test_write_endmembers_mtxt_np_arr_3_10(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+    import numpy
+
+    endmembers_ref = numpy.array(
+        [
+            [305, 696, 409, 1394, 3874, 4465, 4636, 4841, 2341, 1077],
+            [2200, 2874, 3448, 3463, 3581, 3696, 3846, 3699, 4546, 4524],
+            [2205, 2879, 3453, 3468, 3586, 3701, 3851, 3704, 4551, 4529],
+        ]
+    )
+
+    test_endmembers_file = os.path.join(tmp_path, "sen2_endmembers_test1.mtxt")
+    specunmixing.write_endmembers_mtxt(endmembers_ref, test_endmembers_file)
+
+    n_endmembers, n_bands, endmembers_read_in = specunmixing.read_endmembers_mtxt(
+        test_endmembers_file, gain=1, weight=None
+    )
+
+    if n_endmembers != 3:
+        assert False
+    if n_bands != 10:
+        assert False
+
+    assert numpy.array_equal(endmembers_ref, endmembers_read_in)
+
+
+def test_write_endmembers_mtxt_np_arr_4_10(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+    import numpy
+
+    endmembers_ref = numpy.array(
+        [
+            [305, 696, 409, 1394, 3874, 4465, 4636, 4841, 2341, 1077],
+            [2200, 2874, 3448, 3463, 3581, 3696, 3846, 3699, 4546, 4524],
+            [2205, 2879, 3453, 3468, 3586, 3701, 3851, 3704, 4551, 4529],
+            [2215, 2889, 3463, 3478, 3596, 3711, 3861, 3714, 4561, 4539],
+        ]
+    )
+
+    test_endmembers_file = os.path.join(tmp_path, "sen2_endmembers_test1.mtxt")
+    specunmixing.write_endmembers_mtxt(endmembers_ref, test_endmembers_file)
+
+    n_endmembers, n_bands, endmembers_read_in = specunmixing.read_endmembers_mtxt(
+        test_endmembers_file, gain=1, weight=None
+    )
+
+    if n_endmembers != 4:
+        assert False
+    if n_bands != 10:
+        assert False
+
+    assert numpy.array_equal(endmembers_ref, endmembers_read_in)
+
+
+def test_write_endmembers_mtxt_np_arr_3_5(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+    import numpy
+
+    endmembers_ref = numpy.array(
+        [
+            [305, 696, 409, 1394, 3874],
+            [2200, 2874, 3448, 3463, 3581],
+            [2205, 2879, 3453, 3468, 3586],
+        ]
+    )
+
+    test_endmembers_file = os.path.join(tmp_path, "sen2_endmembers_test1.mtxt")
+    specunmixing.write_endmembers_mtxt(endmembers_ref, test_endmembers_file)
+
+    n_endmembers, n_bands, endmembers_read_in = specunmixing.read_endmembers_mtxt(
+        test_endmembers_file, gain=1, weight=None
+    )
+
+    if n_endmembers != 3:
+        assert False
+    if n_bands != 5:
+        assert False
+
+    assert numpy.array_equal(endmembers_ref, endmembers_read_in)
+
+
+def test_write_endmembers_mtxt_np_arr_4_8(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+    import numpy
+
+    endmembers_ref = numpy.array(
+        [
+            [305, 696, 409, 1394, 3874, 4465, 4636, 4841],
+            [2200, 2874, 3448, 3463, 3581, 3696, 3846, 3699],
+            [2205, 2879, 3453, 3468, 3586, 3701, 3851, 3704],
+            [2215, 2889, 3463, 3478, 3596, 3711, 3861, 3714],
+        ]
+    )
+
+    test_endmembers_file = os.path.join(tmp_path, "sen2_endmembers_test1.mtxt")
+    specunmixing.write_endmembers_mtxt(endmembers_ref, test_endmembers_file)
+
+    n_endmembers, n_bands, endmembers_read_in = specunmixing.read_endmembers_mtxt(
+        test_endmembers_file, gain=1, weight=None
+    )
+
+    if n_endmembers != 4:
+        assert False
+    if n_bands != 8:
+        assert False
+
+    assert numpy.array_equal(endmembers_ref, endmembers_read_in)
+
+
 def test_extract_avg_endmembers(tmp_path):
     from rsgislib.imagecalc import specunmixing
 
