@@ -120,6 +120,17 @@ class ImageBandInfo(object):
         self.name = name
         self.bands = bands
 
+    def __repr__(self):
+        return repr((self.name, self.bands, self.file_name))
+
+    def __str__(self):
+        str_val = "Image {} [Bands: {}] - {}".format(
+                self.name,
+                self.bands,
+            self.file_name,
+        )
+        return str_val
+
 
 # Define Class for time series fill
 class RSGISTimeseriesFillInfo(object):
@@ -3572,7 +3583,7 @@ def create_valid_mask(
     for all the input images.
 
     :param img_band_info: A list of rsgislib.imageutils.ImageBandInfo objects to
-                          define the images and and bands of interest.
+                          define the images and bands of interest.
     :param out_msk_file: A output image file and path
     :param gdalformat: The output file format.
     :param tmp_dir: A directory for temporary outputs created during the processing.
