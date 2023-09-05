@@ -49,6 +49,7 @@ Extracting Pixels to HDF5
 .. autofunction:: rsgislib.zonalstats.random_sample_hdf5_file
 .. autofunction:: rsgislib.zonalstats.split_sample_hdf5_file
 .. autofunction:: rsgislib.zonalstats.merge_extracted_hdf5_data
+.. autofunction:: rsgislib.zonalstats.merge_extracted_hdf5_vars_data
 
 Extracting Image Chips to HDF5
 -------------------------------

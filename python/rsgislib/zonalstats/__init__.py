@@ -1620,6 +1620,9 @@ def merge_extracted_hdf5_data(
     """
     import h5py
 
+    if len(h5_files) == 0:
+        raise rsgislib.RSGISPyException("The list of input files is empty.")
+
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
 
@@ -1648,6 +1651,80 @@ def merge_extracted_hdf5_data(
         num_rows = f_h5["DATA/DATA"].shape[0]
         data_arr[row_init : (row_init + num_rows)] = f_h5["DATA/DATA"]
         row_init += num_rows
+        f_h5.close()
+
+    chunk_len = 1000
+    if num_vals < chunk_len:
+        chunk_len = num_vals
+
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
+
+    f_h5_out = h5py.File(out_h5_file, "w")
+    data_grp = f_h5_out.create_group("DATA")
+    meta_grp = f_h5_out.create_group("META-DATA")
+    data_grp.create_dataset(
+        "DATA",
+        data=data_arr,
+        chunks=(chunk_len, num_vars),
+        compression="gzip",
+        shuffle=True,
+        dtype=h5_dtype,
+    )
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describ_ds[0] = "Merged".encode()
+    f_h5_out.close()
+
+def merge_extracted_hdf5_vars_data(
+    h5_files: List[str], out_h5_file: str, datatype: int = None
+):
+    """
+    A function to merge a list of HDF files (e.g., from
+    rsgislib.zonalstats.extractZoneImageBandValues2HDF)
+    with the same number of features (i.e., rows) but
+    different number of variables into a single file.
+    For example, if class training regions have been
+    sourced from multiple images (e.g., months)
+
+    :param h5_files: a list of input files.
+    :param out_h5_file: the output file.
+    :param datatype: is the data type used for the output HDF5 file
+                     (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
+
+    """
+    import h5py
+
+    if len(h5_files) == 0:
+        raise rsgislib.RSGISPyException("The list of input files is empty.")
+
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+
+    first = True
+    num_vars = 0
+    num_vals = 0
+    for h5file in h5_files:
+        f_h5 = h5py.File(h5file, "r")
+        data_shp = f_h5["DATA/DATA"].shape
+        if first:
+            num_vals = data_shp[0]
+            first = False
+        elif num_vals != data_shp[0]:
+            raise rsgislib.RSGISPyException(
+                "The number of samples within the "
+                "inputted HDF5 files were not the same."
+            )
+        num_vars += data_shp[1]
+        f_h5.close()
+
+    data_arr = numpy.zeros([num_vals, num_vars], dtype=float)
+
+    var_init = 0
+    for h5file in h5_files:
+        f_h5 = h5py.File(h5file, "r")
+        lcl_num_vars = f_h5["DATA/DATA"].shape[1]
+        data_arr[:,var_init:var_init+lcl_num_vars] = f_h5["DATA/DATA"]
+        var_init += lcl_num_vars
         f_h5.close()
 
     chunk_len = 1000
