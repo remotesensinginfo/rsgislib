@@ -111,6 +111,7 @@ namespace rsgis{namespace classifier{
         void generateRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed);
         void generateStratifiedRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed);
         void generateStratifiedRandomPointsVecOutUsePxlLst(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed);
+        void generateStratifiedRandomPointsVecOutUsePxlLstPropPts(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int minNumPts, unsigned int seed);
         void popClassInfo2Vec(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, bool addRefCol, std::string vecProcessCol, bool addProcessCol);
         
         ~RSGISGenAccuracyPoints();
@@ -123,12 +124,13 @@ namespace rsgis{namespace classifier{
     class DllExport RSGISExtractClassPxllocs : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISExtractClassPxllocs(std::vector<std::pair<double, double> > **classPxlLst, unsigned long numClasses);
+        RSGISExtractClassPxllocs(std::vector<std::pair<double, double> > **classPxlLst, unsigned long numClasses, std::map<unsigned int, unsigned int> pxlValLUT);
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, OGREnvelope extent);
         ~RSGISExtractClassPxllocs();
     private:
         std::vector<std::pair<double, double> > **classPxlLst;
         unsigned long numClasses;
+        std::map<unsigned int, unsigned int> pxlValLUT;
     };
 		
 }}

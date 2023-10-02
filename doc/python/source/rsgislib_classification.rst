@@ -57,6 +57,7 @@ Accuracy Assessment Samples
 ----------------------------
 .. autofunction:: rsgislib.classification.generate_random_accuracy_pts
 .. autofunction:: rsgislib.classification.generate_stratified_random_accuracy_pts
+.. autofunction:: rsgislib.classification.generate_stratified_prop_random_accuracy_pts
 .. autofunction:: rsgislib.classification.pop_class_info_accuracy_pts
 .. autofunction:: rsgislib.classification.create_acc_pt_sets
 .. autofunction:: rsgislib.classification.classaccuracymetrics.create_modelled_acc_pts
