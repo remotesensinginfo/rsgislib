@@ -13,3 +13,7 @@ Sort Images
 -----------------
 .. autofunction:: rsgislib.tools.imagetools.split_photos_by_time
 
+PDF Utilities
+-----------------
+.. autofunction:: rsgislib.tools.imagetools.extract_images_from_pdf
+

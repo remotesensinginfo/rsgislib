@@ -300,3 +300,32 @@ def split_photos_by_time(
             os.mkdir(out_dir_path)
         for img in tqdm.tqdm(img_cluster.images):
             shutil.copy(img, out_dir_path)
+
+
+
+def extract_images_from_pdf(input_pdf, output_dir):
+    """
+    A function which extracts the images from a PDF file and files them
+    to a directory as PNG image files.
+
+    Note this function requires the fitz module to be installed:
+
+    pip install fitz
+
+    The fitz module also requires the PyMuPDF module which is not installed by pip.
+
+    pip install PyMuPDF
+
+    :param input_pdf: the path to the input PDF file.
+    :param output_dir: the output directory where the images will be stored.
+
+    """
+    import fitz
+    doc = fitz.Document(input_pdf)
+
+    for i in tqdm.tqdm(range(len(doc)), desc="pages"):
+        for img in tqdm.tqdm(doc.get_page_images(i), desc="Page"):
+            xref = img[0]
+            image = doc.extract_image(xref)
+            pix = fitz.Pixmap(doc, xref)
+            pix.save(os.path.join(output_dir, f"p{i}_{xref}.png"))
