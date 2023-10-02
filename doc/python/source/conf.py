@@ -39,7 +39,7 @@ extensions = [
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.githubpages',
-    'sphinxcontrib.yt'
+#    'sphinxcontrib.yt'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

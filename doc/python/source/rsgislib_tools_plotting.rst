@@ -36,10 +36,9 @@ Other
 ------
 .. autofunction:: rsgislib.tools.plotting.gen_colour_lst
 .. autofunction:: rsgislib.tools.plotting.add_img_to_axis
-.. autofunction:: rsgislib.tools.update_y_tick_lbls
+.. autofunction:: rsgislib.tools.plotting.update_y_tick_lbls
 
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
