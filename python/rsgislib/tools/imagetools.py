@@ -302,7 +302,6 @@ def split_photos_by_time(
             shutil.copy(img, out_dir_path)
 
 
-
 def extract_images_from_pdf(input_pdf, output_dir):
     """
     A function which extracts the images from a PDF file and files them
@@ -321,6 +320,7 @@ def extract_images_from_pdf(input_pdf, output_dir):
 
     """
     import fitz
+
     doc = fitz.Document(input_pdf)
 
     for i in tqdm.tqdm(range(len(doc)), desc="pages"):

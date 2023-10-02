@@ -1095,8 +1095,9 @@ def calc_imgs_pxl_mode(input_imgs, output_img, gdalformat, no_data_val=0):
     applier.apply(_applyCalcMode, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calc_imgs_pxl_percentiles(input_imgs, percentiles, output_img, gdalformat,
-                              no_data_val=0):
+def calc_imgs_pxl_percentiles(
+    input_imgs, percentiles, output_img, gdalformat, no_data_val=0
+):
     """
     Function which calculates percentiles on a per-pixel basis for a
     group of images. Note, all bands in all the input images are used
@@ -1153,7 +1154,9 @@ def calc_imgs_pxl_percentiles(input_imgs, percentiles, output_img, gdalformat,
         percentiles_arr = numpy.nanpercentile(image_data, otherargs.percentiles, axis=0)
         outputs.outimage = percentiles_arr.astype(otherargs.numpyDT)
 
-    applier.apply(_applyCalcPercentile, infiles, outfiles, otherargs, controls=aControls)
+    applier.apply(
+        _applyCalcPercentile, infiles, outfiles, otherargs, controls=aControls
+    )
 
 
 def calc_img_basic_stats_for_ref_region(

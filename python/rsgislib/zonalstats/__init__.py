@@ -1674,6 +1674,7 @@ def merge_extracted_hdf5_data(
     describ_ds[0] = "Merged".encode()
     f_h5_out.close()
 
+
 def merge_extracted_hdf5_vars_data(
     h5_files: List[str], out_h5_file: str, datatype: int = None
 ):
@@ -1723,7 +1724,7 @@ def merge_extracted_hdf5_vars_data(
     for h5file in h5_files:
         f_h5 = h5py.File(h5file, "r")
         lcl_num_vars = f_h5["DATA/DATA"].shape[1]
-        data_arr[:,var_init:var_init+lcl_num_vars] = f_h5["DATA/DATA"]
+        data_arr[:, var_init : var_init + lcl_num_vars] = f_h5["DATA/DATA"]
         var_init += lcl_num_vars
         f_h5.close()
 

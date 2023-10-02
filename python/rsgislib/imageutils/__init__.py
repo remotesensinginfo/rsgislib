@@ -125,8 +125,8 @@ class ImageBandInfo(object):
 
     def __str__(self):
         str_val = "Image {} [Bands: {}] - {}".format(
-                self.name,
-                self.bands,
+            self.name,
+            self.bands,
             self.file_name,
         )
         return str_val
