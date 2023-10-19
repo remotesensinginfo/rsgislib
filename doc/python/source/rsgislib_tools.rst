@@ -22,9 +22,9 @@ RSGISLib Tools
    rsgislib_tools_visualisation
    rsgislib_tools_ftptools
    rsgislib_tools_httptools
+   rsgislib_tools_wmts_tools
 
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

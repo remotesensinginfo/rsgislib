@@ -36,11 +36,11 @@ Other
 ------
 .. autofunction:: rsgislib.tools.plotting.gen_colour_lst
 .. autofunction:: rsgislib.tools.plotting.add_img_to_axis
-.. autofunction:: rsgislib.tools.update_y_tick_lbls
-.. autofunction:: rsgislib.tools.hide_matplotlib_axis_border
+.. autofunction:: rsgislib.tools.plotting.update_y_tick_lbls
+.. autofunction:: rsgislib.tools.plotting.hide_matplotlib_axis_border
+
 
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

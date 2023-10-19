@@ -311,6 +311,100 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+
+        void executeGenerateStratifiedPropRandomAccuracyPts(std::string classImage, std::string outputVecFile, std::string outputVecLyr, std::string outVecFormat, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int minNumPts, unsigned int seed, bool del_exist_vec)
+        {
+            try
+            {
+                GDALAllRegister();
+                OGRRegisterAll();
+
+                GDALDataset *imgDataset = (GDALDataset *) GDALOpenShared(classImage.c_str(), GA_ReadOnly);
+                if(imgDataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + classImage;
+                    throw RSGISCmdException(message.c_str());
+                }
+
+                rsgis::utils::RSGISFileUtils fileUtils;
+                rsgis::vec::RSGISVectorUtils vecUtils;
+
+                outputVecFile = boost::filesystem::absolute(outputVecFile).string();
+
+                GDALDriver *vecDriver = NULL;
+                GDALDataset *outputVecDS = NULL;
+                OGRLayer *outputVecLyrObj = NULL;
+                OGRSpatialReference* ogrSpatialRef = NULL;
+
+                if(outVecFormat == "ESRI Shapefile")
+                {
+                    std::string outputDIR = fileUtils.getFileDirectoryPath(outputVecFile);
+                    if (vecUtils.checkDIR4SHP(outputDIR, outputVecLyr))
+                    {
+                        if (del_exist_vec)
+                        {
+                            vecUtils.deleteSHP(outputDIR, outputVecLyr);
+                        }
+                        else
+                        {
+                            throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
+                        }
+                    }
+                }
+                else
+                {
+                    if(fileUtils.checkFilePresent(outputVecFile))
+                    {
+                        if(del_exist_vec)
+                        {
+                            fileUtils.removeFileIfPresent(outputVecFile);
+                        }
+                        else
+                        {
+                            throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
+                        }
+                    }
+                }
+                ogrSpatialRef = new OGRSpatialReference(imgDataset->GetProjectionRef());
+
+                /////////////////////////////////////
+                //
+                // Create Output Shapfile.
+                //
+                /////////////////////////////////////
+                vecDriver = GetGDALDriverManager()->GetDriverByName(outVecFormat.c_str());
+                if( vecDriver == NULL )
+                {
+                    throw rsgis::vec::RSGISVectorOutputException("Vector driver not available: " + outVecFormat);
+                }
+                outputVecDS = vecDriver->Create(outputVecFile.c_str(), 0, 0, 0, GDT_Unknown, NULL );
+                if( outputVecDS == NULL )
+                {
+                    std::string message = std::string("Could not create vector file ") + outputVecFile;
+                    throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+                }
+                outputVecLyrObj = outputVecDS->CreateLayer(outputVecLyr.c_str(), ogrSpatialRef, wkbPoint, NULL );
+                if( outputVecLyrObj == NULL )
+                {
+                    std::string message = std::string("Could not create vector layer ") + outputVecLyr;
+                    throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+                }
+
+                rsgis::classifier::RSGISGenAccuracyPoints genAccPts;
+                genAccPts.generateStratifiedRandomPointsVecOutUsePxlLstPropPts(imgDataset, outputVecLyrObj, classImgCol, classImgVecCol, classRefVecCol, numPts, minNumPts, seed);
+
+                GDALClose(imgDataset);
+                GDALClose(outputVecDS);
+            }
+            catch(rsgis::RSGISException &e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+            catch(std::exception &e)
+            {
+                throw RSGISCmdException(e.what());
+            }
+        }
     
     void executePopClassInfoAccuracyPts(std::string classImage, std::string vecFile, std::string vecLyr, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, bool addRefCol, std::string processVecCol, bool addProcessCol)
     {

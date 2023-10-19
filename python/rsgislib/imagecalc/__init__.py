@@ -1095,6 +1095,70 @@ def calc_imgs_pxl_mode(input_imgs, output_img, gdalformat, no_data_val=0):
     applier.apply(_applyCalcMode, infiles, outfiles, otherargs, controls=aControls)
 
 
+def calc_imgs_pxl_percentiles(
+    input_imgs, percentiles, output_img, gdalformat, no_data_val=0
+):
+    """
+    Function which calculates percentiles on a per-pixel basis for a
+    group of images. Note, all bands in all the input images are used
+    for the analysis.
+
+    :param input_imgs: the list of images - note all bands are used.
+    :param percentiles: a list of percentiles (0-100) to be calculated.
+    :param output_img: the output image file name and path (will be
+                       same dimensions as the input and then number of
+                       bands will be the same at the number of percentiles.)
+    :param gdalformat: the GDAL image file format of the output image file.
+
+    """
+    from rios import applier
+
+    for percent in percentiles:
+        if percent < 0:
+            raise Exception(f"Percentile is less than 0 ({percent})")
+        elif percent > 100:
+            raise Exception(f"Percentile is greater than 100 ({percent})")
+
+    import rsgislib.imageutils
+
+    datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_imgs[0])
+    numpyDT = rsgislib.get_numpy_datatype(datatype)
+
+    try:
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.images = input_imgs
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.numpyDT = numpyDT
+    otherargs.percentiles = percentiles
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyCalcPercentile(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        image_data = numpy.concatenate(inputs.images, axis=0).astype(numpy.float32)
+        image_data[image_data == otherargs.no_data_val] = numpy.nan
+        percentiles_arr = numpy.nanpercentile(image_data, otherargs.percentiles, axis=0)
+        outputs.outimage = percentiles_arr.astype(otherargs.numpyDT)
+
+    applier.apply(
+        _applyCalcPercentile, infiles, outfiles, otherargs, controls=aControls
+    )
+
+
 def calc_img_basic_stats_for_ref_region(
     in_ref_img, in_stats_imgs, output_img, gdalformat="KEA"
 ):

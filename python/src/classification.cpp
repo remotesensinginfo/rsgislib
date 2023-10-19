@@ -185,6 +185,43 @@ static PyObject *Classification_GenStratifiedRandomAccuracyPts(PyObject *self, P
     Py_RETURN_NONE;
 }
 
+static PyObject *Classification_GenStratifiedPropRandomAccuracyPts(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("out_vec_file"),
+                             RSGIS_PY_C_TEXT("out_vec_lyr"), RSGIS_PY_C_TEXT("out_format"),
+                             RSGIS_PY_C_TEXT("rat_class_col"), RSGIS_PY_C_TEXT("vec_class_col"),
+                             RSGIS_PY_C_TEXT("vec_ref_col"), RSGIS_PY_C_TEXT("num_pts"),
+                             RSGIS_PY_C_TEXT("min_num_pts"),
+                             RSGIS_PY_C_TEXT("seed"), RSGIS_PY_C_TEXT("del_exist_vec"), nullptr};
+    const char *pszInputImage, *pszOutputVecFile, *pszOutputVecLyr, *pszFormat, *pszClassImgCol, *pszClassImgVecCol, *pszClassRefVecCol;
+    int numPts, minNumPts;
+    int del_exist_vec = false;
+    int seed = 10;
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssssii|ii:generate_stratified_prop_random_accuracy_pts", kwlist, &pszInputImage,
+                                     &pszOutputVecFile, &pszOutputVecLyr, &pszFormat, &pszClassImgCol, &pszClassImgVecCol,
+                                     &pszClassRefVecCol, &numPts, &minNumPts, &seed, &del_exist_vec))
+    {
+        return nullptr;
+    }
+
+    try
+    {
+        rsgis::cmds::executeGenerateStratifiedPropRandomAccuracyPts(std::string(pszInputImage), std::string(pszOutputVecFile),
+                                                                std::string(pszOutputVecLyr), std::string(pszFormat),
+                                                                std::string(pszClassImgCol), std::string(pszClassImgVecCol),
+                                                                std::string(pszClassRefVecCol), numPts, minNumPts,
+                                                                seed, del_exist_vec);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return nullptr;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),
@@ -267,9 +304,9 @@ static PyMethodDef ClassificationMethods[] = {
 ":param out_vec_file: is a string containing the name and path of the output vector file.\n"
 ":param out_vec_lyr: is a string containing the vector file layer name.\n"
 ":param out_format: the output vector file format (e.g., GPKG)\n"
-":param rat_class_col: is a string speciyfing the name of the column in the image file containing the class names.\n"
-":param vec_class_col: is a string specifiying the output column in the vector file for the classified class names.\n"
-":param vec_ref_col: is a string specifiying an output column in the vector file which can be used in the accuracy assessment for the reference data.\n"
+":param rat_class_col: is a string specifying the name of the column in the image file containing the class names.\n"
+":param vec_class_col: is a string specifying the output column in the vector file for the classified class names.\n"
+":param vec_ref_col: is a string specifying an output column in the vector file which can be used in the accuracy assessment for the reference data.\n"
 ":param num_pts: is an int specifying the total number of points which should be created.\n"
 ":param seed: is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
 ":param del_exist_vec: is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
@@ -283,10 +320,29 @@ static PyMethodDef ClassificationMethods[] = {
 ":param out_vec_file: is a string containing the name and path of the output vector file.\n"
 ":param out_vec_lyr: is a string containing the vector file layer name.\n"
 ":param out_format: the output vector file format (e.g., GPKG)\n"
-":param rat_class_col: is a string speciyfing the name of the column in the image file containing the class names.\n"
-":param vec_class_col: is a string specifiying the output column in the vector file for the classified class names.\n"
-":param vec_ref_col: is a string specifiying an output column in the vector file which can be used in the accuracy assessment for the reference data.\n"
+":param rat_class_col: is a string specifying the name of the column in the image file containing the class names.\n"
+":param vec_class_col: is a string specifying the output column in the vector file for the classified class names.\n"
+":param vec_ref_col: is a string specifying an output column in the vector file which can be used in the accuracy assessment for the reference data.\n"
 ":param num_pts: is an int specifying the number of points for each class which should be created.\n"
+":param seed: is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
+":param del_exist_vec: is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
+":param use_pxl_lst: is a bool, if there are only a small number of pixels then creating a list of all the pixel locations will speed up processing. (Optional: Default False)\n"
+},
+
+{"generate_stratified_prop_random_accuracy_pts", (PyCFunction)Classification_GenStratifiedPropRandomAccuracyPts, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.classification.generate_stratified_prop_random_accuracy_pts(input_img, out_vec_file, out_vec_lyr, out_format, rat_class_col, vec_class_col, vec_ref_col, num_pts, min_num_pts, seed, del_exist_vec)\n"
+"Generates a set of stratified random points for accuracy assessment with the number of\n"
+" point per class proportional to the area mapped."
+"\n"
+":param input_img: is a string containing the name and path of the input image with attribute table.\n"
+":param out_vec_file: is a string containing the name and path of the output vector file.\n"
+":param out_vec_lyr: is a string containing the vector file layer name.\n"
+":param out_format: the output vector file format (e.g., GPKG)\n"
+":param rat_class_col: is a string specifying the name of the column in the image file containing the class names.\n"
+":param vec_class_col: is a string specifying the output column in the vector file for the classified class names.\n"
+":param vec_ref_col: is a string specifying an output column in the vector file which can be used in the accuracy assessment for the reference data.\n"
+":param num_pts: is the total number of points to be created (note, with rounding this might not be the exact output).\n"
+":param min_num_pts: is the minimum number of points to be created for each class.\n"
 ":param seed: is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
 ":param del_exist_vec: is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
 ":param use_pxl_lst: is a bool, if there are only a small number of pixels then creating a list of all the pixel locations will speed up processing. (Optional: Default False)\n"

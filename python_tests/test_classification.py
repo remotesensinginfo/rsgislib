@@ -407,6 +407,7 @@ def test_create_acc_pt_sets(tmp_path):
 
 def test_generate_random_accuracy_pts(tmp_path):
     import rsgislib.classification
+    import rsgislib.vectorutils
 
     input_img = os.path.join(CLASSIFICATION_DATA_DIR, "gmw_acc_roi_1_cls.kea")
 
@@ -426,11 +427,41 @@ def test_generate_random_accuracy_pts(tmp_path):
         del_exist_vec=False,
     )
 
-    assert os.path.exists(out_vec_file)
+    n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+
+    assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
 def test_generate_stratified_random_accuracy_pts(tmp_path):
     import rsgislib.classification
+    import rsgislib.vectorutils
+
+    input_img = os.path.join(CLASSIFICATION_DATA_DIR, "gmw_acc_roi_1_cls.kea")
+
+    out_vec_file = os.path.join(tmp_path, "out_vecs.gpkg")
+    out_vec_lyr = "out_vecs"
+
+    rsgislib.classification.generate_stratified_random_accuracy_pts(
+        input_img,
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        "cls_name",
+        "gmw_v2_cls",
+        "ref_cls",
+        1000,
+        42,
+        False,
+        False,
+    )
+
+    n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+
+    assert os.path.exists(out_vec_file) and (n_pts > 0)
+
+def test_generate_stratified_random_accuracy_pts_pxllst(tmp_path):
+    import rsgislib.classification
+    import rsgislib.vectorutils
 
     input_img = os.path.join(CLASSIFICATION_DATA_DIR, "gmw_acc_roi_1_cls.kea")
 
@@ -451,7 +482,144 @@ def test_generate_stratified_random_accuracy_pts(tmp_path):
         True,
     )
 
-    assert os.path.exists(out_vec_file)
+    n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+
+    assert os.path.exists(out_vec_file) and (n_pts > 0)
+
+def test_generate_stratified_prop_random_accuracy_pts(tmp_path):
+    import rsgislib.classification
+    import rsgislib.vectorutils
+
+    input_img = os.path.join(CLASSIFICATION_DATA_DIR, "gmw_acc_roi_1_cls.kea")
+
+    out_vec_file = os.path.join(tmp_path, "out_vecs.gpkg")
+    out_vec_lyr = "out_vecs"
+
+    rsgislib.classification.generate_stratified_prop_random_accuracy_pts(
+        input_img,
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        "cls_name",
+        "gmw_v2_cls",
+        "ref_cls",
+        100,
+        10,
+        42,
+        False,
+    )
+
+    n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+
+    assert os.path.exists(out_vec_file) and (n_pts > 0)
+
+def test_generate_random_accuracy_pts_clslut(tmp_path):
+    import rsgislib.classification
+    import rsgislib.vectorutils
+
+    input_img = os.path.join(CLASSIFICATION_DATA_DIR, "cls_1985_amazon_manaus_img.kea")
+
+    out_vec_file = os.path.join(tmp_path, "out_vecs.gpkg")
+    out_vec_lyr = "out_vecs"
+
+    rsgislib.classification.generate_random_accuracy_pts(
+        input_img,
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        "class_names",
+        "img_cls",
+        "ref_cls",
+        1000,
+        42,
+        del_exist_vec=False,
+    )
+
+    n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+
+    assert os.path.exists(out_vec_file) and (n_pts > 0)
+
+
+def test_generate_stratified_random_accuracy_pts_clslut(tmp_path):
+    import rsgislib.classification
+    import rsgislib.vectorutils
+
+    input_img = os.path.join(CLASSIFICATION_DATA_DIR, "cls_1985_amazon_manaus_img.kea")
+
+    out_vec_file = os.path.join(tmp_path, "out_vecs.gpkg")
+    out_vec_lyr = "out_vecs"
+
+    rsgislib.classification.generate_stratified_random_accuracy_pts(
+        input_img,
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        "class_names",
+        "img_cls",
+        "ref_cls",
+        1000,
+        42,
+        False,
+        False,
+    )
+
+    n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+
+    assert os.path.exists(out_vec_file) and (n_pts > 0)
+
+def test_generate_stratified_random_accuracy_pts_pxllst_clslut(tmp_path):
+    import rsgislib.classification
+    import rsgislib.vectorutils
+
+    input_img = os.path.join(CLASSIFICATION_DATA_DIR, "cls_1985_amazon_manaus_img.kea")
+
+    out_vec_file = os.path.join(tmp_path, "out_vecs.gpkg")
+    out_vec_lyr = "out_vecs"
+
+    rsgislib.classification.generate_stratified_random_accuracy_pts(
+        input_img,
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        "class_names",
+        "img_cls",
+        "ref_cls",
+        1000,
+        42,
+        False,
+        True,
+    )
+
+    n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+
+    assert os.path.exists(out_vec_file) and (n_pts > 0)
+
+def test_generate_stratified_prop_random_accuracy_pts_clslut(tmp_path):
+    import rsgislib.classification
+    import rsgislib.vectorutils
+
+    input_img = os.path.join(CLASSIFICATION_DATA_DIR, "cls_1985_amazon_manaus_img.kea")
+
+    out_vec_file = os.path.join(tmp_path, "out_vecs.gpkg")
+    out_vec_lyr = "out_vecs"
+
+    rsgislib.classification.generate_stratified_prop_random_accuracy_pts(
+        input_img,
+        out_vec_file,
+        out_vec_lyr,
+        "GPKG",
+        "class_names",
+        "img_cls",
+        "ref_cls",
+        100,
+        10,
+        42,
+        False,
+    )
+
+    n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+
+    assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
 def test_pop_class_info_accuracy_pts_only_cls_col(tmp_path):
