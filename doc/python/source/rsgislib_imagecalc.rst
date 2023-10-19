@@ -106,6 +106,7 @@ Image Indices
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_nbr
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_bai
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_mvi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_remi
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_gndvi
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_evi
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_evi2

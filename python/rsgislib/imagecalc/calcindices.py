@@ -758,6 +758,61 @@ def calc_gndvi(
         rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
+def calc_remi(
+    input_img,
+    img_green_band,
+    img_red_band,
+    img_re_band,
+    img_swir_band,
+    output_img,
+    calc_stats=True,
+    gdalformat="KEA",
+):
+    """
+    Helper function to calculate Red-Edge Mangrove Index (REMI)
+    ((REDEDGE-RED)/(SWIR1+GREEN)). Note the output no data value is -999.
+    Red-edge band is typically the 6th (5 ignoring coastal Band) Sentinel-2
+    band (740 nm).
+
+    Chen, Z., Zhang, M., Zhang, H., Liu, Y., 2023. Mapping mangrove using a
+    red-edge mangrove index (REMI) based on Sentinel-2 multispectral images.
+    IEEE Trans. Geosci. Remote Sens. PP, 1–1.
+    https://doi.org/10.1109/tgrs.2023.3323741
+
+    :param input_img: is a string specifying the input image file.
+    :param img_green_band: is an int specifying the green band in the input image
+                         (band indexing starts at 1)
+    :param img_red_band: is an int specifying the red band in the input image
+                         (band indexing starts at 1)
+    :param img_re_band: is an int specifying the red-edge band in the input image
+                         (band indexing starts at 1)
+    :param img_swir_band: is an int specifying the swir1 band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = "(swir+green)!=0?(re-red)/(swir+green):-999"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("re", input_img, img_re_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+#red-edge mangrove index (REMI) (red edge-red)/(SWIR1-green)
+
 """
 http://bleutner.github.io/RStoolbox/rstbx-docu/spectralIndices.html
 Index	Description	Source	Bands	Formula
