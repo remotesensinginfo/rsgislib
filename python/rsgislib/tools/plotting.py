@@ -1732,3 +1732,17 @@ def update_y_tick_lbls(ax, multi=100000, integerize=False):
             val_out = int(val_out)
         y_tick_lbls.append(f"{val_out}")
     ax.set_yticks(y_ticks, labels=y_tick_lbls)
+
+def hide_matplotlib_axis_border(ax):
+    """
+    For a matplotlib axis set the border and x,y axis' as invisible.
+
+    :param ax: the matplotlib axis
+
+    """
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
