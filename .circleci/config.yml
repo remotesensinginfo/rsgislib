@@ -46,7 +46,6 @@ jobs:
           destination: pytest_reports
       - codecov/upload:
           file: pytest_reports/coverage.xml
-      - sonarcloud/scan
       - run:
           name: build documentation
           command: |
@@ -67,5 +66,5 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - build_and_test:
-          context: SonarCloud
+      - build_and_test
+
