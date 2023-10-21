@@ -15,6 +15,11 @@ Image Plots
 .. autofunction:: rsgislib.tools.plotting.plot_image_histogram
 
 
+Vector Plots
+---------------
+.. autofunction:: rsgislib.tools.plotting.plot_vec_fields
+
+
 Visualise Raster Data
 -----------------------
 .. autofunction:: rsgislib.tools.plotting.get_gdal_raster_mpl_imshow

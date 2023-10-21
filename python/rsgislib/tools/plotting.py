@@ -657,6 +657,56 @@ def plot_histogram_threshold(
     plt.savefig(out_file, format=out_format, dpi=plot_dpi)
 
 
+def plot_vec_fields(
+    vec_file: str,
+    vec_lyr: str,
+    out_plot_file: str,
+    x_plt_field: str,
+    y_plt_field: str,
+    x_lbl: str,
+    y_lbl: str,
+    title: str,
+    plt_width: int = 18,
+    plt_height: int = 6,
+    plt_line: bool = True,
+):
+    """
+    A function which plots two variables from a vector layer.
+
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer name
+    :param out_plot_file: output plot file name - specify format with extension.
+    :param x_plt_field: name of the field used for x-axis
+    :param y_plt_field: name of the field used for the y-axis
+    :param x_lbl: label for the x-axis
+    :param y_lbl: label for the y-axis
+    :param title: title of the plot
+    :param plt_width: optionally specify the figure width
+    :param plt_height: optionally specify the figure height
+    :param plt_line: if true (default) then drawn as line plot otherwise a scatter
+                     plot.
+
+
+    """
+    import geopandas
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    x_vals = data_gdf[x_plt_field].values
+    y_vals = data_gdf[y_plt_field].values
+
+    fig, ax = plt.subplots(figsize=(plt_width, plt_height))
+    if plt_line:
+        ax.plot(x_vals, y_vals)
+    else:
+        ax.scatter(x_vals, y_vals)
+    ax.set_xlabel(x_lbl)
+    ax.set_ylabel(y_lbl)
+    ax.set_title(title)
+    fig.tight_layout()
+    plt.savefig(out_plot_file)
+
+
 def get_gdal_raster_mpl_imshow(
     input_img: str, bands: List[int] = None, bbox: List[float] = None
 ) -> Tuple[numpy.array, List[float]]:
@@ -1733,6 +1783,7 @@ def update_y_tick_lbls(ax, multi=100000, integerize=False):
         y_tick_lbls.append(f"{val_out}")
     ax.set_yticks(y_ticks, labels=y_tick_lbls)
 
+
 def hide_matplotlib_axis_border(ax):
     """
     For a matplotlib axis set the border and x,y axis' as invisible.
@@ -1742,7 +1793,7 @@ def hide_matplotlib_axis_border(ax):
     """
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.spines['left'].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["left"].set_visible(False)
