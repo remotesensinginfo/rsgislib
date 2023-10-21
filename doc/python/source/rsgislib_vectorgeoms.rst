@@ -26,6 +26,7 @@ Calculate New Geometries
 .. autofunction:: rsgislib.vectorgeoms.clip_vec_lyr
 .. autofunction:: rsgislib.vectorgeoms.buffer_vec_layer_gp
 .. autofunction:: rsgislib.vectorgeoms.split_vec_by_grid
+.. autofunction:: rsgislib.vectorgeoms.split_lines_to_reg_pts
 
 Edit Geometries
 -----------------
@@ -73,4 +74,3 @@ Calculate Geometry Info
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

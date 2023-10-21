@@ -428,6 +428,162 @@ def create_orthg_lines(
     vec_ds_obj = None
 
 
+def split_lines_to_reg_pts(
+    vec_in_file: str,
+    vec_in_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    pt_step: float = 1000,
+    out_format: str = "GPKG",
+    del_exist_vec: bool = False,
+):
+    """
+    A function which splits a line vector layer into a set of points at a
+    regular intervals (defined by pt_step). The outputted points are attributed
+    with a unique ID, line ID, X and Y coordinate and distance from the start
+    of the line.
+
+    :param vec_in_file: The inputted vector file path - this should be a
+                        polyline vector file
+    :param vec_in_lyr: The name of the vector layer
+    :param out_vec_file: The output vector file path - this will be a points
+                         vector file
+    :param out_vec_lyr: The name of the output vector layer (if None then created
+                        as the same as the file name)
+    :param pt_step: The steps (in the unit of the coordinate system) along lines
+                    in the layer at which points are created.
+    :param out_format: The output file format of the vector file.
+    :param del_exist_vec: remove output file if it exists.
+
+    """
+    if os.path.exists(out_vec_file):
+        if del_exist_vec:
+            rsgislib.vectorutils.delete_vector_file(out_vec_file)
+        else:
+            raise rsgislib.RSGISPyException(
+                "The output vector file ({}) already exists, "
+                "remove it and re-run.".format(out_vec_file)
+            )
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    vec_ds_obj = gdal.OpenEx(vec_in_file, gdal.OF_VECTOR)
+    if vec_ds_obj is None:
+        raise rsgislib.RSGISPyException(
+            "Could not open vector file: {}".format(vec_in_file)
+        )
+    vec_lyr_obj = vec_ds_obj.GetLayer(vec_in_lyr)
+    if vec_lyr_obj is None:
+        raise rsgislib.RSGISPyException(
+            "Could not open vector layer: {}".format(vec_in_lyr)
+        )
+    vec_spat_ref = vec_lyr_obj.GetSpatialRef()
+
+    out_vec_drv = gdal.GetDriverByName(out_format)
+    if out_vec_drv is None:
+        raise rsgislib.RSGISPyException(
+            "Driver ('{}') has not be recognised.".format(out_format)
+        )
+
+    out_ds_obj = out_vec_drv.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
+    out_lyr_obj = out_ds_obj.CreateLayer(
+        out_vec_lyr, vec_spat_ref, geom_type=ogr.wkbPoint
+    )
+    uid_field = ogr.FieldDefn("uid", ogr.OFTInteger)
+    out_lyr_obj.CreateField(uid_field)
+    line_id_field = ogr.FieldDefn("line_id", ogr.OFTInteger)
+    out_lyr_obj.CreateField(line_id_field)
+    x_field = ogr.FieldDefn("pt_x", ogr.OFTReal)
+    out_lyr_obj.CreateField(x_field)
+    y_field = ogr.FieldDefn("pt_y", ogr.OFTReal)
+    out_lyr_obj.CreateField(y_field)
+    dist_field = ogr.FieldDefn("dist", ogr.OFTReal)
+    out_lyr_obj.CreateField(dist_field)
+    feat_defn = out_lyr_obj.GetLayerDefn()
+
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    open_transaction = False
+    counter = 0
+    pt_uid = 1
+    line_id = 1
+    p_pt = ogr.Geometry(ogr.wkbPoint)
+    p_pt.AddPoint(0.0, 0.0)
+    c_pt = ogr.Geometry(ogr.wkbPoint)
+    c_pt.AddPoint(0.0, 0.0)
+    c_dist = 0.0
+    line_dist = 0.0
+    first_pt = True
+    in_feature = vec_lyr_obj.GetNextFeature()
+    while in_feature:
+        if not open_transaction:
+            out_lyr_obj.StartTransaction()
+            open_transaction = True
+
+        geom = in_feature.GetGeometryRef()
+        if geom is not None:
+            pts = geom.GetPoints()
+            first_pt = True
+            c_dist = 0.0
+            line_dist = 0.0
+            for pt in pts:
+                if first_pt:
+                    p_pt.SetPoint(0, pt[0], pt[1])
+                    c_pt.SetPoint(0, pt[0], pt[1])
+                    first_pt = False
+                else:
+                    p_pt.SetPoint(0, c_pt.GetX(), c_pt.GetY())
+                    c_pt.SetPoint(0, pt[0], pt[1])
+                    n_step = 0
+                    step_c_dist = c_dist
+                    while True:
+                        if (
+                            (p_pt.Distance(c_pt) + step_c_dist) - (pt_step * n_step)
+                        ) > pt_step:
+                            pt_at_dist = ((pt_step * n_step) + pt_step) - step_c_dist
+                            ptx, pty = get_pt_on_line(p_pt, c_pt, pt_at_dist)
+                            base_pt = ogr.Geometry(ogr.wkbPoint)
+                            base_pt.AddPoint(ptx, pty)
+                            out_feat = ogr.Feature(feat_defn)
+                            out_feat.SetGeometry(base_pt)
+                            out_feat.SetField("uid", pt_uid)
+                            out_feat.SetField("line_id", line_id)
+                            out_feat.SetField("pt_x", ptx)
+                            out_feat.SetField("pt_y", pty)
+                            out_feat.SetField("dist", line_dist)
+                            out_lyr_obj.CreateFeature(out_feat)
+                            out_feat = None
+                            pt_uid = pt_uid + 1
+                            n_step = n_step + 1
+                            line_dist = line_dist + pt_step
+                        else:
+                            if n_step == 0:
+                                c_dist = c_dist + p_pt.Distance(c_pt)
+                            else:
+                                c_dist = (p_pt.Distance(c_pt) + step_c_dist) - (
+                                    pt_step * n_step
+                                )
+                            break
+
+        if ((counter % 20000) == 0) and open_transaction:
+            out_lyr_obj.CommitTransaction()
+            open_transaction = False
+
+        in_feature = vec_lyr_obj.GetNextFeature()
+        counter = counter + 1
+        line_id = line_id + 1
+        pbar.update(1)
+
+    if open_transaction:
+        out_lyr_obj.CommitTransaction()
+        open_transaction = False
+    pbar.close()
+    out_lyr_obj.SyncToDisk()
+    out_ds_obj = None
+    vec_ds_obj = None
+
+
 def closest_line_intersection(
     vec_line_file: str,
     vec_line_lyr: str,
