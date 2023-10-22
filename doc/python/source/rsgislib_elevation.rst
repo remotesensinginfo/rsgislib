@@ -17,6 +17,7 @@ Flitering
 .. autofunction:: rsgislib.elevation.dtm_aspect_median_filter
 .. autofunction:: rsgislib.elevation.fill_dem_soille_gratin_1994
 .. autofunction:: rsgislib.elevation.plane_fit_detreat_dem
+.. autofunction:: rsgislib.elevation.resampling_detread_dem
 
 Masking
 --------
@@ -42,4 +43,3 @@ Fusion
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

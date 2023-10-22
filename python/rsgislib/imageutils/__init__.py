@@ -2152,25 +2152,7 @@ def resample_img_to_match(
     if datatype is None:
         datatype = get_gdal_datatype_from_img(in_process_img)
 
-    gdal_interp_method = gdal.GRA_NearestNeighbour
-    if interp_method == rsgislib.INTERP_BILINEAR:
-        gdal_interp_method = gdal.GRA_Bilinear
-    elif interp_method == rsgislib.INTERP_LANCZOS:
-        gdal_interp_method = gdal.GRA_Lanczos
-    elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        gdal_interp_method = gdal.GRA_CubicSpline
-    elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        gdal_interp_method = gdal.GRA_NearestNeighbour
-    elif interp_method == rsgislib.INTERP_CUBIC:
-        gdal_interp_method = gdal.GRA_Cubic
-    elif interp_method == rsgislib.INTERP_AVERAGE:
-        gdal_interp_method = gdal.GRA_Average
-    elif interp_method == rsgislib.INTERP_MODE:
-        gdal_interp_method = gdal.GRA_Mode
-    else:
-        raise rsgislib.RSGISPyException(
-            "Interpolation method was not recognised or known."
-        )
+    gdal_interp_method = rsgislib.get_gdal_interp_type(interp_method)
 
     backVal = 0.0
     haveNoData = False
@@ -2270,25 +2252,7 @@ def reproject_image(
     import rsgislib.tools.geometrytools
     import rsgislib.tools.utils
 
-    gdal_interp_method = gdal.GRA_NearestNeighbour
-    if interp_method == rsgislib.INTERP_BILINEAR:
-        gdal_interp_method = gdal.GRA_Bilinear
-    elif interp_method == rsgislib.INTERP_LANCZOS:
-        gdal_interp_method = gdal.GRA_Lanczos
-    elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        gdal_interp_method = gdal.GRA_CubicSpline
-    elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        gdal_interp_method = gdal.GRA_NearestNeighbour
-    elif interp_method == rsgislib.INTERP_CUBIC:
-        gdal_interp_method = gdal.GRA_Cubic
-    elif interp_method == rsgislib.INTERP_AVERAGE:
-        gdal_interp_method = gdal.GRA_Average
-    elif interp_method == rsgislib.INTERP_MODE:
-        gdal_interp_method = gdal.GRA_Mode
-    else:
-        raise rsgislib.RSGISPyException(
-            "Interpolation method was not recognised or known."
-        )
+    gdal_interp_method = rsgislib.get_gdal_interp_type(interp_method)
 
     if not os.path.exists(input_img):
         raise rsgislib.RSGISPyException(
@@ -2496,25 +2460,7 @@ def gdal_warp(
     in_epsg = get_epsg_proj_from_img(input_img)
     img_data_type = get_gdal_datatype_from_img(input_img)
 
-    gdal_interp_method = gdal.GRA_NearestNeighbour
-    if interp_method == rsgislib.INTERP_BILINEAR:
-        gdal_interp_method = gdal.GRA_Bilinear
-    elif interp_method == rsgislib.INTERP_LANCZOS:
-        gdal_interp_method = gdal.GRA_Lanczos
-    elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        gdal_interp_method = gdal.GRA_CubicSpline
-    elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        gdal_interp_method = gdal.GRA_NearestNeighbour
-    elif interp_method == rsgislib.INTERP_CUBIC:
-        gdal_interp_method = gdal.GRA_Cubic
-    elif interp_method == rsgislib.INTERP_AVERAGE:
-        gdal_interp_method = gdal.GRA_Average
-    elif interp_method == rsgislib.INTERP_MODE:
-        gdal_interp_method = gdal.GRA_Mode
-    else:
-        raise rsgislib.RSGISPyException(
-            "Interpolation method was not recognised or known."
-        )
+    gdal_interp_method = rsgislib.get_gdal_interp_type(interp_method)
 
     try:
         import tqdm
@@ -3269,25 +3215,7 @@ def create_mosaic_images_vrt(
             "The X and Y resolution cannot be defined independently."
         )
 
-    gdal_interp_method = gdal.GRA_NearestNeighbour
-    if interp_method == rsgislib.INTERP_BILINEAR:
-        gdal_interp_method = gdal.GRA_Bilinear
-    elif interp_method == rsgislib.INTERP_LANCZOS:
-        gdal_interp_method = gdal.GRA_Lanczos
-    elif interp_method == rsgislib.INTERP_CUBICSPLINE:
-        gdal_interp_method = gdal.GRA_CubicSpline
-    elif interp_method == rsgislib.INTERP_NEAREST_NEIGHBOUR:
-        gdal_interp_method = gdal.GRA_NearestNeighbour
-    elif interp_method == rsgislib.INTERP_CUBIC:
-        gdal_interp_method = gdal.GRA_Cubic
-    elif interp_method == rsgislib.INTERP_AVERAGE:
-        gdal_interp_method = gdal.GRA_Average
-    elif interp_method == rsgislib.INTERP_MODE:
-        gdal_interp_method = gdal.GRA_Mode
-    else:
-        raise rsgislib.RSGISPyException(
-            "Interpolation method was not recognised or known."
-        )
+    gdal_interp_method = rsgislib.get_gdal_interp_type(interp_method)
 
     build_vrt_opt = gdal.BuildVRTOptions(
         resolution=res_source,

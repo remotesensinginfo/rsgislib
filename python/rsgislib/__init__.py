@@ -96,6 +96,12 @@ Options for interpolating raster data:
     * INTERP_LANCZOS = 4
     * INTERP_AVERAGE = 5
     * INTERP_MODE = 6
+    * INTERP_MIN = 7
+    * INTERP_MAX = 8
+    * INTERP_MEDIAN = 9
+    * INTERP_Q1 = 10
+    * INTERP_Q3 = 11
+    * INTERP_SUM = 12
 
 Options for image stretching / normalisation:
 
@@ -218,6 +224,12 @@ INTERP_CUBICSPLINE = 3
 INTERP_LANCZOS = 4
 INTERP_AVERAGE = 5
 INTERP_MODE = 6
+INTERP_MIN = 7
+INTERP_MAX = 8
+INTERP_MEDIAN = 9
+INTERP_Q1 = 10
+INTERP_Q3 = 11
+INTERP_SUM = 12
 
 GEOM_PT = 1
 GEOM_LINE = 2
@@ -513,6 +525,39 @@ def get_numpy_char_codes_datatype(rsgislib_datatype: int) -> str:
     else:
         raise RSGISPyException("Datatype was not recognised.")
     return numpy_dt
+
+
+def get_gdal_interp_type(rsgis_interp_method: int):
+    gdal_interp_method = gdal.GRA_NearestNeighbour
+    if rsgis_interp_method == INTERP_BILINEAR:
+        gdal_interp_method = gdal.GRA_Bilinear
+    elif rsgis_interp_method == INTERP_LANCZOS:
+        gdal_interp_method = gdal.GRA_Lanczos
+    elif rsgis_interp_method == INTERP_CUBICSPLINE:
+        gdal_interp_method = gdal.GRA_CubicSpline
+    elif rsgis_interp_method == INTERP_NEAREST_NEIGHBOUR:
+        gdal_interp_method = gdal.GRA_NearestNeighbour
+    elif rsgis_interp_method == INTERP_CUBIC:
+        gdal_interp_method = gdal.GRA_Cubic
+    elif rsgis_interp_method == INTERP_AVERAGE:
+        gdal_interp_method = gdal.GRA_Average
+    elif rsgis_interp_method == INTERP_MODE:
+        gdal_interp_method = gdal.GRA_Mode
+    elif rsgis_interp_method == INTERP_MIN:
+        gdal_interp_method = gdal.GRA_Min
+    elif rsgis_interp_method == INTERP_MAX:
+        gdal_interp_method = gdal.GRA_Max
+    elif rsgis_interp_method == INTERP_MEDIAN:
+        gdal_interp_method = gdal.GRA_Med
+    elif rsgis_interp_method == INTERP_Q1:
+        gdal_interp_method = gdal.GRA_Q1
+    elif rsgis_interp_method == INTERP_Q3:
+        gdal_interp_method = gdal.GRA_Q3
+    elif rsgis_interp_method == INTERP_SUM:
+        gdal_interp_method = gdal.GRA_Sum
+    else:
+        raise RSGISPyException("Interpolation method was not recognised or known.")
+    return gdal_interp_method
 
 
 def is_notebook():
