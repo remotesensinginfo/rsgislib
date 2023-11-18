@@ -81,7 +81,7 @@ class RSGISAbstractFilter:
 
     def getFilterHSize(self):
         """
-        return the hald size of the image filter (i.e., (filter_size-1)/2)
+        return the half size of the image filter (i.e., (filter_size-1)/2)
         """
         hSize = (self.filter_size - 1) / 2
         return hSize
