@@ -602,3 +602,51 @@ def calc_pt_distance(x1: float, y1: float, x2: float, y2: float) -> float:
 
     """
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+
+def pt_in_bbox(pt: List[float], bbox: List[float]) -> bool:
+    """
+    A function which tests whether a point is within a bbox.
+
+    :param pt: the point (x, y)
+    :param bbox: the bounding box (MinX, MaxX, MinY, MaxY)
+    :return: returns a boolean specifying whether the point is within the bbox
+
+    """
+    return (
+        (pt[0] >= bbox[0])
+        and (pt[0] <= bbox[1])
+        and (pt[1] >= bbox[2])
+        and (pt[1] <= bbox[3])
+    )
+
+
+def find_point_on_whole_num_grid(
+    pt: List[float],
+    bbox: List[float],
+    x_grid_res: float,
+    y_grid_res: float,
+) -> List[float]:
+    """
+    A function which returns places a point on to the grid defined by the
+    bbox, base_x_grid and  base_y_grid
+
+    :param pt: the point (x, y)
+    :param bbox: the bounding box for the whole region defining the grid extent
+                 (MinX, MaxX, MinY, MaxY)
+    :param x_grid_res: the resolution of the grid in x axis
+    :param y_grid_res: the resolution of the grid in y axis
+    :return: returns a point (x, y) which now on the defined grid.
+
+    """
+    if not pt_in_bbox(pt, bbox):
+        raise rsgislib.RSGISPyException("Point is not within the bbox!")
+
+    diff_x = pt[0] - bbox[0]
+    diff_y = bbox[3] - pt[1]
+
+    n_pxl_x = math.ceil(diff_x / x_grid_res)
+    n_pxl_y = math.ceil(diff_y / y_grid_res)
+
+    out_pt = [(bbox[0] + (n_pxl_x * x_grid_res)), (bbox[3] - (n_pxl_y * y_grid_res))]
+    return out_pt

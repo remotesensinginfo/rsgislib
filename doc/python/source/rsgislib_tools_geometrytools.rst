@@ -15,6 +15,7 @@ Testing
 .. autofunction:: rsgislib.tools.geometrytools.do_bboxes_intersect
 .. autofunction:: rsgislib.tools.geometrytools.does_bbox_contain
 .. autofunction:: rsgislib.tools.geometrytools.bbox_equal
+.. autofunction:: rsgislib.tools.geometrytools.pt_in_bbox
 
 Calculations
 --------------
@@ -36,6 +37,7 @@ Compute New BBOX
 Compute Points
 ----------------
 .. autofunction:: rsgislib.tools.geometrytools.get_bbox_centre_pt
+.. autofunction:: rsgislib.tools.geometrytools.find_point_on_whole_num_grid
 
 Representation
 ---------------
