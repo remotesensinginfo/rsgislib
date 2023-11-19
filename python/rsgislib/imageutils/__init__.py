@@ -4703,3 +4703,96 @@ def grid_scattered_pts(
     }
     gdal.Grid(output_img, vec_ds_obj, **grid_opts)
     vec_ds_obj = None
+
+
+def create_inmem_gdal_ds_subset(
+    input_img: str, bbox_sub: List[float], no_data_val: float = None
+) -> gdal.Dataset:
+    """
+    A function which creates an in-memory (MEM) GDAL dataset for a
+    subset defined by a BBOX (MinX, MaxX, MinY, MaxY)
+
+    :param input_img: the input image
+    :param bbox_sub: the bbox (MinX, MaxX, MinY, MaxY) defining the subset.
+    :param no_data_val: the image no data value. If None then read from input_img
+    :return: Returns a GDAL Dataset with a subset.
+
+    """
+    import rsgislib.tools.geometrytools
+
+    img_x_res, img_y_res = get_img_res(input_img)
+    img_y_res_abs = math.fabs(img_y_res)
+    img_bbox = get_img_bbox(input_img)
+    img_rsgislib_dtype = get_rsgislib_datatype_from_img(input_img)
+    img_gdal_dtype = get_gdal_datatype_from_img(input_img)
+    img_wkt_str = get_wkt_proj_from_img(input_img)
+    img_n_bands = get_img_band_count(input_img)
+
+    if no_data_val is None:
+        no_data_val = get_img_no_data_value(input_img)
+    if no_data_val is None:
+        raise rsgislib.RSGISPyException(
+            "Either provide a no data value or define in image header."
+        )
+
+    if not rsgislib.tools.geometrytools.does_bbox_contain(img_bbox, bbox_sub):
+        raise rsgislib.RSGISPyException("Subset is not within the image.")
+
+    x_min = bbox_sub[0]
+    x_max = bbox_sub[1]
+    y_min = bbox_sub[2]
+    y_max = bbox_sub[3]
+
+    tl_x = x_min
+    tl_y = y_max
+
+    width_coord = x_max - x_min
+    height_coord = y_max - y_min
+
+    sub_width = int(math.ceil(width_coord / img_x_res))
+    sub_height = int(math.ceil(height_coord / img_y_res_abs))
+
+    if (sub_width < 1) or (sub_height < 1):
+        raise rsgislib.RSGISPyException(
+            f"Something has gone wrong the subset size is "
+            f"less than 1: {sub_width} x {sub_height}."
+        )
+
+    img_coord_x_diff = bbox_sub[0] - img_bbox[0]
+    img_coord_y_diff = img_bbox[3] - bbox_sub[3]
+
+    img_pxl_x_diff = int(math.floor((img_coord_x_diff / img_x_res) + 0.5))
+    img_pxl_y_diff = int(math.floor((img_coord_y_diff / img_y_res_abs) + 0.5))
+
+    gdal_driver = gdal.GetDriverByName("MEM")
+    out_img_ds_obj = gdal_driver.Create(
+        "MEM", sub_width, sub_height, img_n_bands, img_gdal_dtype
+    )
+    out_img_ds_obj.SetGeoTransform((tl_x, img_x_res, 0, tl_y, 0, img_y_res))
+    out_img_ds_obj.SetProjection(img_wkt_str)
+
+    in_img_ds_obj = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if in_img_ds_obj is None:
+        raise rsgislib.RSGISPyException(
+            "Could not open raster image: {}".format(input_img)
+        )
+
+    raster_arr = numpy.zeros(
+        (sub_height, sub_width), dtype=rsgislib.get_numpy_datatype(img_rsgislib_dtype)
+    )
+    raster_arr[...] = no_data_val
+    for band in range(img_n_bands):
+        in_band_obj = in_img_ds_obj.GetRasterBand(band + 1)
+        out_band_obj = out_img_ds_obj.GetRasterBand(band + 1)
+
+        in_band_obj.ReadAsArray(
+            xoff=img_pxl_x_diff,
+            yoff=img_pxl_y_diff,
+            win_xsize=sub_width,
+            win_ysize=sub_height,
+            buf_obj=raster_arr,
+        )
+
+        out_band_obj.WriteArray(raster_arr)
+    in_img_ds_obj = None
+    return out_img_ds_obj

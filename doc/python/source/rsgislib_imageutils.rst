@@ -123,6 +123,7 @@ Subsetting
 .. autofunction:: rsgislib.imageutils.subset_bbox
 .. autofunction:: rsgislib.imageutils.subset_pxl_bbox
 .. autofunction:: rsgislib.imageutils.subset_to_vec
+.. autofunction:: rsgislib.imageutils.create_inmem_gdal_ds_subset
 
 
 Extract / Sample
