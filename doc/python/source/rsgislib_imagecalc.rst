@@ -122,7 +122,14 @@ Equalivance
 
 Least Cost Path
 ----------------
+
 .. autofunction:: rsgislib.imagecalc.leastcostpath.perform_least_cost_path_calc
+
+Calc Image Point Samples
+-------------------------
+
+.. autofunction:: rsgislib.imagecalc.calc_pt_win_smpls.calc_pt_smpl_img_vals
+.. autoclass:: rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumVals
 
 
 * :ref:`genindex`
