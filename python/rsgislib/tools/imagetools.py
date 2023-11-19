@@ -188,11 +188,14 @@ def list_exif_info(input_img):
     for tag_id in pil_exif_data:
         # get the tag name, instead of human unreadable tag id
         tag = TAGS.get(tag_id, tag_id)
-        data = pil_exif_data.get(tag_id)
-        # decode bytes
-        if isinstance(data, bytes):
-            data = data.decode()
-        print(f"{tag:25}: {data}")
+        try:
+            data = pil_exif_data.get(tag_id)
+            #decode bytes
+            if isinstance(data, bytes):
+                data = data.decode()
+            print(f"{tag:25}: {data}")
+        except:
+            continue
     pil_image.close()
 
 
@@ -243,12 +246,15 @@ def split_photos_by_time(
         for tag_id in pil_exif_data:
             # get the tag name, instead of human unreadable tag id
             tag = TAGS.get(tag_id, tag_id)
-            data = pil_exif_data.get(tag_id)
-            # decode bytes
-            if isinstance(data, bytes):
-                data = data.decode()
-            if tag == date_time_tag:
-                img_dt_lut[img_file] = data
+            try:
+                data = pil_exif_data.get(tag_id)
+                # decode bytes
+                if isinstance(data, bytes):
+                    data = data.decode()
+                if tag == date_time_tag:
+                    img_dt_lut[img_file] = data
+            except:
+                continue
 
     img_clusters = list()
     next_cluster_id = 0
