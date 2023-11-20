@@ -118,20 +118,20 @@ def perform_felsenszwalb_segmentation(
         )
 
     pxlValsArr = []
-    multichannel = True
+    channel_axis = None
     if gdalDS.RasterCount > 1:
         for nBand in numpy.arange(gdalDS.RasterCount):
             gdalBand = gdalDS.GetRasterBand(int(nBand + 1))
             pxlValsArr.append(gdalBand.ReadAsArray())
         pxlVals = numpy.stack(pxlValsArr, axis=-1)
-        multichannel = True
+        channel_axis = 0
     else:
         gdalBand = gdalDS.GetRasterBand(1)
         pxlVals = gdalBand.ReadAsArray()
-        multichannel = False
+        channel_axis = None
 
     segResult = skimage.segmentation.felzenszwalb(
-        pxlVals, scale=scale, sigma=sigma, min_size=min_size, multichannel=multichannel
+        pxlVals, scale=scale, sigma=sigma, min_size=min_size, channel_axis=channel_axis
     )
     segResult = segResult + 1
 
@@ -413,26 +413,26 @@ def perform_slic_segmentation(
         )
 
     pxlValsArr = []
-    multichannel = False
+    channel_axis = None
     if gdalDS.RasterCount > 1:
         for nBand in numpy.arange(gdalDS.RasterCount):
             gdalBand = gdalDS.GetRasterBand(int(nBand + 1))
             pxlValsArr.append(gdalBand.ReadAsArray())
         pxlVals = numpy.stack(pxlValsArr, axis=-1)
-        multichannel = True
+        channel_axis = 0
     else:
         gdalBand = gdalDS.GetRasterBand(1)
         pxlVals = gdalBand.ReadAsArray()
-        multichannel = False
+        channel_axis = None
 
     segResult = skimage.segmentation.slic(
         pxlVals,
         n_segments=n_segments,
         compactness=compactness,
-        max_iter=max_iter,
+        max_num_iter=max_iter,
         sigma=sigma,
         spacing=spacing,
-        multichannel=multichannel,
+        channel_axis=channel_axis,
         convert2lab=convert_to_lab,
         enforce_connectivity=enforce_connectivity,
         min_size_factor=min_size_factor,

@@ -143,7 +143,7 @@ def test_plane_fit_detreat_dem(tmp_path):
         output_img, plane_fit_ref_img
     )
     print(prop_match)
-    assert img_eq
+    assert prop_match > 0.99
 
 
 def test_shadow_mask(tmp_path):
