@@ -36,6 +36,7 @@
 from typing import List, Dict
 from abc import ABCMeta, abstractmethod
 import math
+import os
 
 import rsgislib
 import rsgislib.imageutils
@@ -278,3 +279,30 @@ def calc_pt_smpl_img_vals(
         pts_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         pts_gdf.to_file(out_vec_file, driver=out_format)
+
+
+
+class RSGISDebugExportImg(RSGISCalcSumVals):
+
+    """
+    Debug class which exports the data to an out image.
+    """
+    def __init__(self, out_path:str, img_name:str):
+        super().__init__()
+        self.n_out_vals = 1
+        self.out_val_names = ["debug"]
+        self.out_path = out_path
+        self.img_name = img_name
+
+    def calcVals(self, smpl_idx: int, in_img_ds_obj: gdal.Dataset) -> Dict[str, float]:
+        """
+        Abstract function to calculate summary values
+
+        :param smpl_idx: a unique index for the sample being processed.
+        :param in_img_ds_obj: input GDAL dataset.
+        :return: returns dict of value name and value.
+        """
+        out_img = os.path.join(self.out_path, f"{smpl_idx}_{self.img_name}.tif")
+        dset_tiff_out = gdal.GetDriverByName('GTiff')
+        dset_tiff_out.CreateCopy(out_img, in_img_ds_obj)
+        return {"debug": 0.0}
