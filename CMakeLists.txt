@@ -14,6 +14,9 @@
 #
 ###############################################################################
 
+# CMake Min Version
+cmake_minimum_required(VERSION 3.12)
+
 ###############################################################################
 # Set Project name and version
 project (RSGISLIB)
@@ -143,9 +146,6 @@ option(RSGIS_PYTHON "Build Python bindings" ON)
 ###############################################################################
 
 ###############################################################################
-# CMake settings
-cmake_minimum_required(VERSION 3.12)
-
 IF(NOT CMAKE_BUILD_TYPE)
   #SET(CMAKE_BUILD_TYPE "DEBUG")
   SET(CMAKE_BUILD_TYPE "RELEASE")
