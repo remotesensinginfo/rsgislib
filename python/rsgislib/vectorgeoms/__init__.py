@@ -3371,3 +3371,61 @@ def rm_polys_area(
             vec_sel_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
             vec_sel_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def create_angle_lines_from_points(
+        vec_file: str,
+        vec_lyr: str,
+        angle: float,
+        line_len: float,
+        out_vec_file: str,
+        out_vec_lyr: str,
+        out_format: str,
+        ):
+    """
+    A function which calculates a set of points for each point within the input
+    vector layer (which needs to be a points geometry layer) creating a set of
+    lines with the angle specified between them and the length specified.
+
+    :param vec_file: Input points vector file.
+    :param vec_lyr: input points vector layer
+    :param angle: the angle (in degrees) between the points
+    :param line_len: the length of the lines.
+    :param out_vec_file: the output vector file
+    :param out_vec_lyr: the output vector layer
+    :param out_format: the output vector format (e.g., GPKG, GeoJSON).
+
+    """
+    import shapely.geometry
+    import numpy
+    import geopandas
+
+    line_angles = numpy.arange(0, 360, angle)
+    print(f"Creating {len(line_angles)} lines for each point: {line_angles}")
+
+    pts_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    n_pt_smpls = len(pts_gdf)
+
+    lines_dict = dict()
+    lines_dict["pt_id"] = list()
+    lines_dict["geometry"] = list()
+    for i, row in tqdm.tqdm(pts_gdf.iterrows(), total=n_pt_smpls):
+        pt = row["geometry"]
+        pt_lst = [pt.x, pt.y]
+
+        for line_angle in line_angles:
+            line_angle_rad = math.radians(line_angle)
+            end_x = pt.x + (line_len * math.cos(line_angle_rad))
+            end_y = pt.y + (line_len * math.sin(line_angle_rad))
+            shp_line = shapely.geometry.LineString([pt,
+                                                    shapely.geometry.Point(end_x, end_y)])
+            lines_dict["pt_id"].append(i)
+            lines_dict["geometry"].append(shp_line)
+
+    out_gdf = geopandas.GeoDataFrame(lines_dict, geometry="geometry", crs=pts_gdf.crs)
+
+    if out_format == "GPKG":
+        out_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        out_gdf.to_file(out_vec_file, driver=out_format)
+

@@ -906,3 +906,26 @@ def test_bbox_intersects_index():
     out_bool = rsgislib.vectorgeoms.bbox_intersects_index(rt_idx, geom_lst, bbox)
 
     assert out_bool
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_create_angle_lines_from_points(tmp_path):
+    import rsgislib.vectorgeoms
+
+    vec_pts_file = os.path.join(VECTORGEOMS_DATA_DIR, "anglesey_pts.geojson")
+    vec_pts_lyr = "anglesey_pts"
+
+    vec_line_file = os.path.join(tmp_path, "out_vec.geojson")
+    vec_line_lyr = "out_vec"
+
+    rsgislib.vectorgeoms.create_angle_lines_from_points(
+        vec_file = vec_pts_file,
+        vec_lyr = vec_pts_lyr,
+        angle = 10.0,
+        line_len = 1000,
+        out_vec_file = vec_line_file,
+        out_vec_lyr = vec_line_lyr,
+        out_format = "GeoJSON",
+        )
+
+    assert os.path.exists(vec_line_file)
