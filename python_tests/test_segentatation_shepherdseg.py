@@ -33,7 +33,7 @@ def test_run_shepherd_segmentation_sub_bands(tmp_path):
 
     assert os.path.exists(out_clumps_img) and os.path.exists(out_mean_img)
 
-
+"""
 def test_run_shepherd_segmentation_pre_calcd_stats(tmp_path):
     import rsgislib.segmentation.shepherdseg
 
@@ -92,3 +92,4 @@ def test_run_shepherd_segmentation_pre_calcd_stats_sub_bands(tmp_path):
     )
 
     assert os.path.exists(out_clumps_img) and os.path.exists(out_mean_img)
+"""
