@@ -1,4 +1,5 @@
 import os
+import pytest
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SEGMENT_DATA_DIR = os.path.join(DATA_DIR, "segment")
@@ -33,7 +34,10 @@ def test_run_shepherd_segmentation_sub_bands(tmp_path):
 
     assert os.path.exists(out_clumps_img) and os.path.exists(out_mean_img)
 
-"""
+@pytest.mark.skipif(
+    True,
+    reason="Sometimes stretch_img_with_stats freezes on MacOS and haven't figured out why yet...",
+)
 def test_run_shepherd_segmentation_pre_calcd_stats(tmp_path):
     import rsgislib.segmentation.shepherdseg
 
@@ -63,7 +67,10 @@ def test_run_shepherd_segmentation_pre_calcd_stats(tmp_path):
 
     assert os.path.exists(out_clumps_img) and os.path.exists(out_mean_img)
 
-
+@pytest.mark.skipif(
+    True,
+    reason="Sometimes stretch_img_with_stats freezes on MacOS and haven't figured out why yet...",
+)
 def test_run_shepherd_segmentation_pre_calcd_stats_sub_bands(tmp_path):
     import rsgislib.segmentation.shepherdseg
 
@@ -92,4 +99,3 @@ def test_run_shepherd_segmentation_pre_calcd_stats_sub_bands(tmp_path):
     )
 
     assert os.path.exists(out_clumps_img) and os.path.exists(out_mean_img)
-"""
