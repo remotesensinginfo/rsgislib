@@ -190,7 +190,7 @@ def list_exif_info(input_img):
         tag = TAGS.get(tag_id, tag_id)
         try:
             data = pil_exif_data.get(tag_id)
-            #decode bytes
+            # decode bytes
             if isinstance(data, bytes):
                 data = data.decode()
             print(f"{tag:25}: {data}")

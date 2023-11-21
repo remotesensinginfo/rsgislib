@@ -1,10 +1,18 @@
 import os
 import pytest
 
+GEOPANDAS_NOT_AVAIL = False
+try:
+    import geopandas
+except ImportError:
+    GEOPANDAS_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 IMGCALC_DATA_DIR = os.path.join(DATA_DIR, "imagecalc")
 CALCPTWIN_DATA_DIR = os.path.join(IMGCALC_DATA_DIR, "calc_pt_win_smpls")
 
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_count_pxls_of_val_band1(tmp_path):
     import rsgislib.imagecalc.calc_pt_win_smpls
 

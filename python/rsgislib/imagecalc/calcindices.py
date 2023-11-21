@@ -811,7 +811,7 @@ def calc_remi(
         rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
 
 
-#red-edge mangrove index (REMI) (red edge-red)/(SWIR1-green)
+# red-edge mangrove index (REMI) (red edge-red)/(SWIR1-green)
 
 """
 http://bleutner.github.io/RStoolbox/rstbx-docu/spectralIndices.html

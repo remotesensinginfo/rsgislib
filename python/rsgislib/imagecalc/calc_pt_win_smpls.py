@@ -281,13 +281,13 @@ def calc_pt_smpl_img_vals(
         pts_gdf.to_file(out_vec_file, driver=out_format)
 
 
-
 class RSGISDebugExportImg(RSGISCalcSumVals):
 
     """
     Debug class which exports the data to an out image.
     """
-    def __init__(self, out_path:str, img_name:str):
+
+    def __init__(self, out_path: str, img_name: str):
         super().__init__()
         self.n_out_vals = 1
         self.out_val_names = ["debug"]
@@ -303,6 +303,6 @@ class RSGISDebugExportImg(RSGISCalcSumVals):
         :return: returns dict of value name and value.
         """
         out_img = os.path.join(self.out_path, f"{smpl_idx}_{self.img_name}.tif")
-        dset_tiff_out = gdal.GetDriverByName('GTiff')
+        dset_tiff_out = gdal.GetDriverByName("GTiff")
         dset_tiff_out.CreateCopy(out_img, in_img_ds_obj)
         return {"debug": 0.0}

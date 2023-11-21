@@ -1526,7 +1526,9 @@ def calc_fill_regions_knn(
                     for val in vals:
                         int_vals.append(int(val))
                     if summary == rsgislib.SUMTYPE_MODE:
-                        out_arr[i, j] = scipy.stats.mode(int_vals, keepdims=True).mode[0]
+                        out_arr[i, j] = scipy.stats.mode(int_vals, keepdims=True).mode[
+                            0
+                        ]
                     elif summary == rsgislib.SUMTYPE_MEDIAN:
                         out_arr[i, j] = numpy.median(int_vals)
                     elif summary == rsgislib.SUMTYPE_MAX:
