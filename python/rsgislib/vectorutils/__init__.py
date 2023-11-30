@@ -3276,6 +3276,83 @@ def create_train_test_smpls(
         shutil.rmtree(tmp_dir)
 
 
+def create_train_test_valid_smpls(
+    vec_file: str,
+    vec_lyr: str,
+    out_train_vec_file: str,
+    out_train_vec_lyr: str,
+    out_test_vec_file: str,
+    out_test_vec_lyr: str,
+    out_valid_vec_file: str,
+    out_valid_vec_lyr: str,
+    out_format: str = "GPKG",
+    prop_test: float = 0.2,
+    prop_valid: float = 0.2,
+    rnd_seed: int = None,
+):
+    """
+    A function for splitting a vector dataset into training, testing
+    and validation datasets.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer.
+    :param out_train_vec_file: Output vector file with the training data.
+    :param out_train_vec_lyr: Output vector layer with the training data.
+    :param out_test_vec_file: Output vector file with the testing data.
+    :param out_test_vec_lyr: Output vector layer with the testing data.
+    :param out_valid_vec_file: Output vector file with the validation data.
+    :param out_valid_vec_lyr: Output vector layer with the validation data.
+    :param out_format: The output format of the output file. (Default: GPKG)
+    :param prop_test: Proportion of the dataset to be defined as a the test data
+    :param prop_valid: Proportion of the dataset to be defined as a the validation data
+    :param rnd_seed: A seed for the random number generator.
+
+    """
+    import geopandas
+    print("Read Data:")
+    smpl_pts_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    n_smpls = len(smpl_pts_gdf)
+    print(f"Total number of samples: {n_smpls}")
+
+    n_test_smpls = int(n_smpls * prop_test)
+    print(f"Test Samples: {n_test_smpls}")
+    n_valid_smpls = int(n_smpls * prop_valid)
+    print(f"Validation Samples: {n_valid_smpls}")
+    n_train_smpls = n_smpls - (n_test_smpls + n_valid_smpls)
+    print(f"Train Samples: {n_train_smpls}")
+
+    print("Shuffle Samples")
+    # Shuffle the samples so they are random order.
+    smpl_pts_gdf = smpl_pts_gdf.sample(frac=1, random_state=rnd_seed).reset_index(
+        drop=True
+    )
+
+    print("Select Sub-Sample")
+    test_smpl_pts_gdf = smpl_pts_gdf.sample(n=n_test_smpls, random_state=rnd_seed)
+    smpl_pts_remain_gdf = smpl_pts_gdf.drop(test_smpl_pts_gdf.index)
+    valid_smpl_pts_gdf = smpl_pts_remain_gdf.sample(
+        n=n_valid_smpls, random_state=rnd_seed
+    )
+    smpl_pts_remain_gdf = smpl_pts_gdf.drop(valid_smpl_pts_gdf.index)
+
+    print("Export")
+    if out_format == "GPKG":
+        test_smpl_pts_gdf.to_file(
+            out_test_vec_file, layer=out_test_vec_lyr, driver=out_format
+        )
+        valid_smpl_pts_gdf.to_file(
+            out_valid_vec_file, layer=out_valid_vec_lyr, driver=out_format
+        )
+        smpl_pts_remain_gdf.to_file(
+            out_train_vec_file, layer=out_train_vec_lyr, driver=out_format
+        )
+    else:
+        test_smpl_pts_gdf.to_file(out_test_vec_file, driver=out_format)
+        valid_smpl_pts_gdf.to_file(out_valid_vec_file, driver=out_format)
+        smpl_pts_remain_gdf.to_file(out_train_vec_file, driver=out_format)
+
+
 def rm_feat_att_duplicates(
     vec_file: str,
     vec_lyr: str,
