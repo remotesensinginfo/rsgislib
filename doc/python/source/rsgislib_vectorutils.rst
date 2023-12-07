@@ -30,6 +30,7 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.createvectors.write_pts_to_vec
 .. autofunction:: rsgislib.vectorutils.createvectors.create_bboxs_for_pts
 .. autofunction:: rsgislib.vectorutils.create_lines_of_points
+.. autofunction::rsgislib.vectorutils.createvectors.create_random_pts_in_radius
 .. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
 .. autofunction:: rsgislib.vectorutils.createvectors.create_vec_for_image
 .. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_bbox

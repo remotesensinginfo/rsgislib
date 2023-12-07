@@ -1408,10 +1408,13 @@ def create_random_pts_in_radius(
 ):
     """
     A function which generates a set of random points within a radius from the
-    defined centre point and exports to a vector file.
+    defined centre point and exports to a vector file. The output vector is
+    populated with the distance and angle from the centre to the individual points.
+    Note, that the distance and angle calculate is only valid for a projected
+    coordinate system (i.e., is it not valid for lat/lon).
 
     :param centre_x: The x coordinate of the centre point
-    :param centre_y: The y coordindate of the centre point
+    :param centre_y: The y coordinate of the centre point
     :param radius: the radius (in unit of coordinate system) defining the
                    region of interest
     :param n_pts: the number of points to be generated.
@@ -1453,7 +1456,7 @@ def create_random_pts_in_radius(
     n_coords_in_rad = y_coords.shape[0]
     if n_coords_in_rad < n_pts:
         raise Exception(
-            "An insufficent number of points are wihtin the radis; "
+            "An insufficient number of points are within the radius; "
             "increase n_pts_multi_bbox."
         )
 
@@ -1470,6 +1473,29 @@ def create_random_pts_in_radius(
     data_gdf = geopandas.GeoDataFrame(
         geometry=geopandas.points_from_xy(x=x_coords, y=y_coords), crs=epsg_code
     )
+    # Calculate the distance from the centre to each of the points
+    data_gdf["dist"] = numpy.sqrt(
+        (x_coords - centre_x) ** 2 + (y_coords - centre_y) ** 2
+    )
+
+    # Calculate the angle from the centre to each of the points
+    angles = numpy.rad2deg(numpy.arctan2(y_coords - centre_y, x_coords - centre_x))
+
+    # Reorientate the angle so 0 is north.
+    angles_secs = numpy.zeros_like(angles)
+    angles_secs[numpy.logical_and((angles >= 0), (angles <= 90))] = 1
+    angles_secs[angles > 90] = 2
+    angles_secs[angles < 0] = 3
+
+    angles[angles_secs == 1] = angles[angles_secs == 1] - 90.0
+    angles[angles_secs == 1] *= -1
+    angles[angles_secs == 2] = angles[angles_secs == 2] - 180.0
+    angles[angles_secs == 2] *= -1
+    angles[angles_secs == 2] += 270.0
+    angles[angles_secs == 3] *= -1
+    angles[angles_secs == 3] += 90.0
+
+    data_gdf["angle"] = angles
 
     # Export the points
     if out_format == "GPKG":
