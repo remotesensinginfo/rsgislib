@@ -1392,3 +1392,93 @@ def create_hex_grid_polys(
                 hex_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
             else:
                 hex_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def create_random_pts_in_radius(
+    centre_x: float,
+    centre_y: float,
+    radius: float,
+    n_pts: int,
+    epsg_code: int,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GeoJSON",
+    rnd_seed: int = None,
+    n_pts_multi_bbox: float = 3,
+):
+    """
+    A function which generates a set of random points within a radius from the
+    defined centre point and exports to a vector file.
+
+    :param centre_x: The x coordinate of the centre point
+    :param centre_y: The y coordindate of the centre point
+    :param radius: the radius (in unit of coordinate system) defining the
+                   region of interest
+    :param n_pts: the number of points to be generated.
+    :param epsg_code: the EPSG code for the projection of the points.
+    :param out_vec_file: the output file path and name.
+    :param out_vec_lyr: the output layer name.
+    :param out_format: the output file format (Default: GeoJSON)
+    :param rnd_seed: the seed for the random generator.
+    :param n_pts_multi_bbox: the multiplier used to define the number of points
+                             generated within the bbox of the circle which is then
+                             subset. 3 should always be enough but lowing to 2
+                             will reduce the memory footprint and speed up runtime.
+                             In rare cases you might need to increase this if an
+                             insufficient number of points were found within the
+                             radius specified.
+
+    """
+    import numpy
+    import geopandas
+
+    # Set the random seed.
+    numpy.random.seed(seed=rnd_seed)
+
+    # Define Boundary Box
+    bbox = [centre_x - radius, centre_x + radius, centre_y - radius, centre_y + radius]
+
+    # Create more than needed points within the bbox.
+    x_coords = numpy.random.uniform(bbox[0], bbox[1], int(n_pts * n_pts_multi_bbox))
+    y_coords = numpy.random.uniform(bbox[2], bbox[3], int(n_pts * n_pts_multi_bbox))
+
+    # Calculate the distance from the centre to all the points.
+    dist = numpy.sqrt((x_coords - centre_x) ** 2 + (y_coords - centre_y) ** 2)
+
+    # Subset the points to those which are within the radius specified.
+    x_coords = x_coords[dist <= radius]
+    y_coords = y_coords[dist <= radius]
+
+    # Check there are enough points within the radius
+    n_coords_in_rad = y_coords.shape[0]
+    if n_coords_in_rad < n_pts:
+        raise Exception(
+            "An insufficent number of points are wihtin the radis; "
+            "increase n_pts_multi_bbox."
+        )
+
+    # Find the indices to subset the points to the number required.
+    sel_coords = numpy.random.choice(
+        numpy.arange(n_coords_in_rad), size=n_pts, replace=False
+    )
+
+    # Subset the points to the number required.
+    x_coords = x_coords[sel_coords]
+    y_coords = y_coords[sel_coords]
+
+    # create geopandas dataframe with the points.
+    data_gdf = geopandas.GeoDataFrame(
+        geometry=geopandas.points_from_xy(x=x_coords, y=y_coords), crs=epsg_code
+    )
+
+    # Export the points
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            import rsgislib.tools.filetools
+
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                out_vec_file, check_valid=True
+            )
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)

@@ -321,3 +321,27 @@ def test_create_wgs84_vector_grid_overlap(tmp_path):
     )
 
     assert os.path.exists(out_vec_file)
+
+
+def test_create_random_pts_in_radius(tmp_path):
+    import rsgislib.vectorutils.createvectors
+    import rsgislib.vectorutils
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+
+    rsgislib.vectorutils.createvectors.create_random_pts_in_radius(
+        centre_x=277751.195711714506615,
+        centre_y=280747.283988269686233,
+        radius=5000,
+        n_pts=1000,
+        epsg_code=27700,
+        out_vec_file=out_vec_file,
+        out_vec_lyr=out_vec_lyr,
+        out_format="GPKG",
+        rnd_seed=None,
+    )
+
+    n_feats = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
+
+    assert os.path.exists(out_vec_file) and (n_feats == 1000)
