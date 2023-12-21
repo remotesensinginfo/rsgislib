@@ -120,13 +120,13 @@ def calc_pt_smpl_img_vals(
                           data. Default: rsgislib.INTERP_CUBIC
     :param angle_col: name of the column within the vector attribute table defining the
                       rotation (relative to north; 0 = North) for each point. If
-                      None (Default) then no rotation applied.
+                      None (Default) then no rotation applied. (Unit is degrees)
     :param x_box_col: name of the column within the vector attribute table defining
                       the size of the bbox in the x axis. Note, this is half the bbox
-                      width.
+                      width. (Unit is image pixels)
     :param y_box_col: name of the column within the vector attribute table defining
                       the size of the bbox in the y axis. Note, this is half the bbox
-                      height.
+                      height. (Unit is image pixels)
     :param no_data_val: the image no data value. If None then taken from the input
                         image header.
 
