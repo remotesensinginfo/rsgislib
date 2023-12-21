@@ -40,6 +40,13 @@ Fusion
 -------
 .. autofunction:: rsgislib.elevation.fft_dem_fusion
 
+
+Roughness
+-----------
+.. autofunction:: rsgislib.elevation.roughness.calc_simple_roughness_profile_metrics
+
+
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

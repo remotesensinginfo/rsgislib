@@ -111,7 +111,7 @@ def calc_pt_smpl_img_vals(
     :param input_img: input image file.
     :param vec_file: input vector file - needs to be a point type.
     :param vec_lyr: input vector layer name.
-    :param calc_obj: An implementation of the RSGISCalcSumVals class to calculate
+    :param calc_objs: An implementation of the RSGISCalcSumVals class to calculate
                      the summary values for the image data.
     :param out_vec_file: output vector file path.
     :param out_vec_lyr: output vector layer name.
@@ -170,6 +170,9 @@ def calc_pt_smpl_img_vals(
             pt_angle = row[angle_col]
         else:
             pt_angle = 0.0
+
+        if pt_angle < 0.0:
+            raise rsgislib.RSGISPyException("The angle needs to be > 0.0.")
 
         pt_xbox = row[x_box_col]
         pt_ybox = row[y_box_col]
@@ -244,8 +247,8 @@ def calc_pt_smpl_img_vals(
         roi_x_coords = pt_img_bound_bbox[1] - pt_img_bound_bbox[0]
         roi_y_coords = pt_img_bound_bbox[3] - pt_img_bound_bbox[2]
 
-        roi_width = int(math.ceil(roi_x_coords / img_x_res))
-        roi_height = int(math.ceil(roi_y_coords / img_y_res_abs))
+        roi_width = int(math.ceil((roi_x_coords / img_x_res)+0.5))
+        roi_height = int(math.ceil((roi_y_coords / img_y_res_abs)+0.5))
 
         roi_img_ds_obj = gdal_driver.Create(
             "MEM", roi_width, roi_height, img_n_bands, img_gdal_dtype
