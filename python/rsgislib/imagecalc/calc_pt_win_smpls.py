@@ -143,9 +143,9 @@ def calc_pt_smpl_img_vals(
     img_n_bands = rsgislib.imageutils.get_img_band_count(input_img)
 
     out_col_names = list()
+    out_vals_dict = dict()
     for calc_obj in calc_objs:
         out_col_names_tmp = calc_obj.getOutValNames()
-        out_vals_dict = dict()
         for out_col in out_col_names_tmp:
             out_vals_dict[out_col] = []
         out_col_names.extend(out_col_names_tmp)

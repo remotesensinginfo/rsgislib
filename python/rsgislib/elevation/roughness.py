@@ -115,11 +115,11 @@ class CalcProfileRoughMetrics(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumV
         mid_x = math.ceil(x_size / 2)
         mid_y = math.ceil(y_size / 2)
 
-        x_orig_arr = img_arr[..., mid_x]
-        y_orig_arr = img_arr[mid_y, ...]
+        x_orig_arr = img_arr[mid_y, ...]
+        y_orig_arr = img_arr[..., mid_x]
 
-        x_loc_arr = numpy.arange(y_size) * x_res
-        y_loc_arr = numpy.arange(x_size) * y_res
+        x_loc_arr = numpy.arange(x_size) * x_res
+        y_loc_arr = numpy.arange(y_size) * y_res
 
         if self.detrend:
             x_poly_coef = numpy.polyfit(x_loc_arr, x_orig_arr, self.detrend_poly_order)
@@ -314,11 +314,11 @@ class CalcMunroRoughnessMetric(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSum
         mid_x = math.ceil(x_size / 2)
         mid_y = math.ceil(y_size / 2)
 
-        x_orig_arr = img_arr[..., mid_x]
-        y_orig_arr = img_arr[mid_y, ...]
+        x_orig_arr = img_arr[mid_y, ...]
+        y_orig_arr = img_arr[..., mid_x]
 
-        x_loc_arr = numpy.arange(y_size) * x_res
-        y_loc_arr = numpy.arange(x_size) * y_res
+        x_loc_arr = numpy.arange(x_size) * x_res
+        y_loc_arr = numpy.arange(y_size) * y_res
 
         if self.detrend:
             x_poly_coef = numpy.polyfit(x_loc_arr, x_orig_arr, self.detrend_poly_order)
