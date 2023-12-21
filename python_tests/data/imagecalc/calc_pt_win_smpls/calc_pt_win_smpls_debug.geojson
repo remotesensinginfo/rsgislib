@@ -3,7 +3,7 @@
 "name": "calc_pt_win_smpls_debug",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32630" } },
 "features": [
-{ "type": "Feature", "properties": { "angle": -40.0, "xbox": 20, "ybox": 20 }, "geometry": { "type": "Point", "coordinates": [ 426347.089740516094025, 5807254.63778601679951 ] } },
+{ "type": "Feature", "properties": { "angle": 320.0, "xbox": 20, "ybox": 20 }, "geometry": { "type": "Point", "coordinates": [ 426347.089740516094025, 5807254.63778601679951 ] } },
 { "type": "Feature", "properties": { "angle": 0.0, "xbox": 40, "ybox": 40 }, "geometry": { "type": "Point", "coordinates": [ 429835.586467224929947, 5809831.920810084789991 ] } },
 { "type": "Feature", "properties": { "angle": 85.0, "xbox": 30, "ybox": 30 }, "geometry": { "type": "Point", "coordinates": [ 432744.396949192043394, 5806543.159677785821259 ] } }
 ]
