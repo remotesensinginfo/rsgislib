@@ -90,7 +90,7 @@ def calc_pt_smpl_img_vals(
     input_img: str,
     vec_file: str,
     vec_lyr: str,
-    calc_obj: RSGISCalcSumVals,
+    calc_objs: List[RSGISCalcSumVals],
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str,
@@ -142,10 +142,13 @@ def calc_pt_smpl_img_vals(
     img_wkt_str = rsgislib.imageutils.get_wkt_proj_from_img(input_img)
     img_n_bands = rsgislib.imageutils.get_img_band_count(input_img)
 
-    out_col_names = calc_obj.getOutValNames()
-    out_vals_dict = dict()
-    for out_col in out_col_names:
-        out_vals_dict[out_col] = []
+    out_col_names = list()
+    for calc_obj in calc_objs:
+        out_col_names_tmp = calc_obj.getOutValNames()
+        out_vals_dict = dict()
+        for out_col in out_col_names_tmp:
+            out_vals_dict[out_col] = []
+        out_col_names.extend(out_col_names_tmp)
 
     gdal_interp_method = rsgislib.get_gdal_interp_type(interp_method)
 
@@ -265,9 +268,11 @@ def calc_pt_smpl_img_vals(
         gdal.Warp(roi_img_ds_obj, pt_img_ds_obj, options=wrp_opts)
         ##########################################
 
-        rtn_vals = calc_obj.calcVals(i, roi_img_ds_obj)
-        for out_col in out_col_names:
-            out_vals_dict[out_col].append(rtn_vals[out_col])
+        for calc_obj in calc_objs:
+            out_col_names_tmp = calc_obj.getOutValNames()
+            rtn_vals = calc_obj.calcVals(i, roi_img_ds_obj)
+            for out_col in out_col_names_tmp:
+                out_vals_dict[out_col].append(rtn_vals[out_col])
 
         pt_img_ds_obj = None
         roi_img_ds_obj = None

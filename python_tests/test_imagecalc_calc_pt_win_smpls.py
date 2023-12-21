@@ -30,7 +30,7 @@ def test_count_pxls_of_val_band1(tmp_path):
         input_img,
         vec_file,
         vec_lyr,
-        calc_obj=sum_img_obj,
+        calc_obj=[sum_img_obj],
         out_vec_file=out_vec_file,
         out_vec_lyr=out_vec_lyr,
         out_format="GeoJSON",
