@@ -6,6 +6,7 @@ A module to calculate roughness metrics for elevation data.
 from typing import Dict
 import rsgislib.imagecalc.calc_pt_win_smpls
 import numpy
+import scipy.stats
 import math
 from osgeo import gdal
 
@@ -24,18 +25,42 @@ class CalcProfileRoughMetrics(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumV
         self.detrend = detrend
         self.detrend_poly_order = detrend_poly_order
         self.out_val_names = [
+            "x_ra",
+            "y_ra",
+            "sum_ra",
+            "avg_ra",
             "x_rr",
             "y_rr",
             "sum_rr",
             "avg_rr",
-            "x_slp",
-            "y_slp",
-            "sum_slp",
-            "avg_slp",
+            "x_rq",
+            "y_rq",
+            "sum_rq",
+            "avg_rq",
             "x_MIF",
             "y_MIF",
             "sum_MIF",
             "avg_MIF",
+            "x_rv",
+            "y_rv",
+            "sum_rv",
+            "avg_rv",
+            "x_rp",
+            "y_rp",
+            "sum_rp",
+            "avg_rp",
+            "x_rz",
+            "y_rz",
+            "sum_rz",
+            "avg_rz",
+            "x_rsk",
+            "y_rsk",
+            "sum_rsk",
+            "avg_rsk",
+            "x_rku",
+            "y_rku",
+            "sum_rku",
+            "avg_rku",
         ]
         self.n_out_vals = len(self.out_val_names)
 
@@ -44,9 +69,17 @@ class CalcProfileRoughMetrics(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumV
         A function to calculate roughness metrics in x and y axis of the
         window of data provided. The metrics calculated are:
 
+            * Average roughness (RA): Average of profile height deviations from the mean
             * Random roughness (RR)
-            * Sum of absolute slopes of a transect (SLP)
+            * Quadratic mean roughness (RQ) - Sum of absolute slopes.
             * The microrelief index (MIF)
+            * Maximum valley depth below the mean line (RV)
+            * Maximum peak height above the mean line (RP)
+            * Maximum peak to valley height of the profile (RZ)
+            * Skewness, or measure of asymmetry of the profile about the mean line (RSK)
+            * Kurtosis, or measure of peakedness (or tailedness) of the profile about the mean line. (RKU)
+
+        See https://en.wikipedia.org/wiki/Surface_roughness for more information.
 
         :param smpl_idx: a unique index for the sample being processed.
         :param in_img_ds_obj: input GDAL dataset.
@@ -87,12 +120,25 @@ class CalcProfileRoughMetrics(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumV
             x_arr = x_orig_arr
             y_arr = y_orig_arr
 
-        ###############################################################
-        # Calculate random roughness (RR) (standard deviation of
-        # the elevations from the mean surface) of a transect
+        # Calculate the mean of the line.
         x_mean = numpy.mean(x_arr)
         y_mean = numpy.mean(y_arr)
 
+        ###############################################################
+        # Calculate average roughness (RA): Average of profile
+        # height deviations from the mean
+        out_dict["x_ra"] = numpy.sum(numpy.abs(x_arr - x_mean))/x_size
+        out_dict["y_ra"] = numpy.sum(numpy.abs(y_arr - y_mean))/y_size
+        out_dict["sum_ra"] = out_dict["x_ra"] + out_dict["y_ra"]
+        out_dict["avg_ra"] = out_dict["sum_ra"] / 2
+        ###############################################################
+
+        ###############################################################
+        # Calculate random roughness (RR) (standard deviation of
+        # the elevations from the mean surface) of a transect
+        # Also referred to as the quadratic mean roughness (RQ):
+        # or root mean square average of profile height deviations
+        # from the mean line
         out_dict["x_rr"] = numpy.std(x_arr - x_mean)
         out_dict["y_rr"] = numpy.std(y_arr - y_mean)
         out_dict["sum_rr"] = out_dict["x_rr"] + out_dict["y_rr"]
@@ -104,18 +150,18 @@ class CalcProfileRoughMetrics(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumV
         # PB Comment: Really this is the sum of the elevation changes.
         x_arr_dx = numpy.diff(x_arr)
         # x_arr_dy = numpy.diff(x_loc_arr)
-        # x_arr_slps = x_arr_dx / x_arr_dy
-        x_arr_slps_abs = numpy.abs(x_arr_dx)
+        # x_arr_rqs = x_arr_dx / x_arr_dy
+        x_arr_rqs_abs = numpy.abs(x_arr_dx)
 
         y_arr_dx = numpy.diff(y_arr)
         # y_arr_dy = numpy.diff(y_loc_arr)
-        # y_arr_slps = y_arr_dx / y_arr_dy
-        y_arr_slps_abs = numpy.abs(y_arr_dx)
+        # y_arr_rqs = y_arr_dx / y_arr_dy
+        y_arr_rqs_abs = numpy.abs(y_arr_dx)
 
-        out_dict["x_slp"] = numpy.sum(x_arr_slps_abs)
-        out_dict["y_slp"] = numpy.sum(y_arr_slps_abs)
-        out_dict["sum_slp"] = out_dict["x_slp"] + out_dict["y_slp"]
-        out_dict["avg_slp"] = out_dict["sum_slp"] / 2
+        out_dict["x_rq"] = numpy.sum(x_arr_rqs_abs)
+        out_dict["y_rq"] = numpy.sum(y_arr_rqs_abs)
+        out_dict["sum_rq"] = out_dict["x_rq"] + out_dict["y_rq"]
+        out_dict["avg_rq"] = out_dict["sum_rq"] / 2
         ###############################################################
 
         ###############################################################
@@ -136,6 +182,46 @@ class CalcProfileRoughMetrics(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumV
         out_dict["y_MIF"] = numpy.sum(y_mif_pxls)
         out_dict["sum_MIF"] = out_dict["x_MIF"] + out_dict["y_MIF"]
         out_dict["avg_MIF"] = out_dict["sum_MIF"] / 2
+        ###############################################################
+
+        ###############################################################
+        # Maximum valley depth below the mean line (RV)
+        out_dict["x_rv"] = numpy.min(x_arr - x_mean)
+        out_dict["y_rv"] = numpy.min(y_arr - y_mean)
+        out_dict["sum_rv"] = out_dict["x_rv"] + out_dict["y_rv"]
+        out_dict["avg_rv"] = out_dict["sum_rv"] / 2
+        ###############################################################
+
+        ###############################################################
+        # Maximum peak height above the mean line (RP)
+        out_dict["x_rp"] = numpy.max(x_arr - x_mean)
+        out_dict["y_rp"] = numpy.max(y_arr - y_mean)
+        out_dict["sum_rp"] = out_dict["x_rp"] + out_dict["y_rp"]
+        out_dict["avg_rp"] = out_dict["sum_rp"] / 2
+        ###############################################################
+
+        ###############################################################
+        # Maximum peak to valley height of the profile (RZ)
+        out_dict["x_rz"] = out_dict["x_rp"] - out_dict["x_rv"]
+        out_dict["y_rz"] = out_dict["y_rp"] - out_dict["y_rv"]
+        out_dict["sum_rz"] = out_dict["x_rz"] + out_dict["y_rz"]
+        out_dict["avg_rz"] = out_dict["sum_rz"] / 2
+        ###############################################################
+
+        ###############################################################
+        # Skewness, or measure of asymmetry of the profile about the mean line (RSK)
+        out_dict["x_rsk"] = scipy.stats.skew(x_arr - x_mean)
+        out_dict["y_rsk"] = scipy.stats.skew(y_arr - y_mean)
+        out_dict["sum_rsk"] = out_dict["x_rsk"] + out_dict["y_rsk"]
+        out_dict["avg_rsk"] = out_dict["sum_rsk"] / 2
+        ###############################################################
+
+        ###############################################################
+        # Kurtosis, or measure of peakedness (or tailedness) of the profile about the mean line (RKU)
+        out_dict["x_rku"] = scipy.stats.kurtosis(x_arr - x_mean)
+        out_dict["y_rku"] = scipy.stats.kurtosis(y_arr - y_mean)
+        out_dict["sum_rku"] = out_dict["x_rku"] + out_dict["y_rku"]
+        out_dict["avg_rku"] = out_dict["sum_rku"] / 2
         ###############################################################
 
         return out_dict
@@ -161,9 +247,17 @@ def calc_simple_roughness_profile_metrics(
     roughness metrics in x and y axis of the window of data provided.
     The metrics calculated are:
 
-            * Random roughness (RR)
-            * Sum of absolute slopes of a transect (SLP)
-            * The microrelief index (MIF)
+        * Average roughness (RA): Average of profile height deviations from the mean
+        * Random roughness (RR)
+        * Quadratic mean roughness (RQ) - Sum of absolute slopes.
+        * The microrelief index (MIF)
+        * Maximum valley depth below the mean line (RV)
+        * Maximum peak height above the mean line (RP)
+        * Maximum peak to valley height of the profile (RZ)
+        * Skewness, or measure of asymmetry of the profile about the mean line (RSK)
+        * Kurtosis, or measure of peakedness (or tailedness) of the profile about the mean line (RKU)
+
+    See https://en.wikipedia.org/wiki/Surface_roughness for more information.
 
     :param input_img: input image file.
     :param vec_file: input vector file - needs to be a point type.
