@@ -265,7 +265,7 @@ class CalcProfileRoughMetrics(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumV
 class CalcMunroRoughnessMetric(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumVals):
     def __init__(
         self,
-        detrend=False,
+        detrend=True,
         detrend_poly_order=1,
         create_plots: bool = False,
         out_plot_path: str = None,
@@ -437,6 +437,227 @@ class CalcMunroRoughnessMetric(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSum
         return out_dict
 
 
+class CalcSmithRoughnessMetric(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSumVals):
+    def __init__(
+        self, detrend=True, create_plots: bool = False, out_plot_path: str = None
+    ):
+        super().__init__()
+
+        self.detrend = detrend
+        self.create_plots = create_plots
+        self.out_plot_path = out_plot_path
+        self.out_val_names = [
+            "smith_hs",
+            "smith_area",
+            "xe_smith_frt",
+            "xe_smith_z0",
+            "xw_smith_frt",
+            "xw_smith_z0",
+            "x_avg_smith_z0",
+            "yn_smith_frt",
+            "yn_smith_z0",
+            "ys_smith_frt",
+            "ys_smith_z0",
+            "y_avg_smith_z0",
+            "avg_smith_z0",
+        ]
+        self.n_out_vals = len(self.out_val_names)
+
+    def calcVals(self, smpl_idx: int, in_img_ds_obj: gdal.Dataset) -> Dict[str, float]:
+        import matplotlib.pyplot as plt
+        from matplotlib import cm
+        from numpy.lib.stride_tricks import sliding_window_view
+        import scipy.linalg
+
+        out_dict = dict()
+        in_band_obj = in_img_ds_obj.GetRasterBand(1)
+
+        geotransform = in_img_ds_obj.GetGeoTransform()
+        x_res = abs(geotransform[1])
+        y_res = abs(geotransform[5])
+
+        img_orig_arr = in_band_obj.ReadAsArray()
+        img_orig_arr_shp = img_orig_arr.shape
+
+        y_size = img_orig_arr_shp[0]
+        x_size = img_orig_arr_shp[1]
+
+        ###############################################################
+        if self.detrend:
+            # Create location array
+            x_loc_arr = numpy.arange(x_size) * x_res
+            y_loc_arr = numpy.arange(y_size) * y_res
+
+            x_loc_2d_arr = numpy.repeat([x_loc_arr], repeats=y_size, axis=0)
+            y_loc_2d_arr = numpy.repeat(
+                numpy.reshape(y_loc_arr, (-1, 1)), repeats=x_size, axis=1
+            )
+
+            img_orig_arr_flat = img_orig_arr.flatten()
+            x_loc_arr_flat = x_loc_2d_arr.flatten()
+            y_loc_arr_flat = y_loc_2d_arr.flatten()
+
+            # Create location array for fitting.
+            plane_fit_locs_arr = numpy.c_[
+                x_loc_arr_flat, y_loc_arr_flat, numpy.ones(x_loc_arr_flat.shape[0])
+            ]
+            # best-fit linear plane
+            plane_coefs, _, _, _ = scipy.linalg.lstsq(
+                plane_fit_locs_arr, img_orig_arr_flat
+            )
+
+            # Evaluate place on grid - i.e., produce the place surface
+            plane_surf_arr = (
+                plane_coefs[0] * x_loc_2d_arr
+                + plane_coefs[1] * y_loc_2d_arr
+                + plane_coefs[2]
+            )
+
+            # Detrend the original surface
+            img_data_arr = img_orig_arr - plane_surf_arr
+        else:
+            img_data_arr = img_orig_arr
+        ###############################################################
+
+        ###############################################################
+        # h* is an effective height for the roughness elements,
+        # from Munro 1989, h* can be  calculated as the standard deviation
+        # of all the deviations from the detrended mean (i.e. residuals)
+        # multiplied by two
+        h_star = 2 * numpy.std(img_data_arr)
+        ###############################################################
+
+        ###############################################################
+        # S is the Ground area (m2)
+        grd_area = (x_res * x_size) * (y_res * y_size)
+        ###############################################################
+
+        ###############################################################
+        # s is the silhouette area (m2) of roughness elements measured in
+        # a vertical plane
+
+        # Create a set of 3x3 windows for the area to analyse
+        # the frontal area in the four directions.
+        img_data_win_arr = sliding_window_view(img_data_arr, (3, 3))
+        img_data_win_arr = img_data_win_arr.reshape(-1, *img_data_win_arr.shape[-2:])
+
+        # Calculate the difference between the centre pixel and each axis
+        x_east_arr = img_data_win_arr[..., 1, 1] - img_data_win_arr[..., 1, 2]
+        x_east_arr[x_east_arr < 0] = 0.0
+        x_west_arr = img_data_win_arr[..., 1, 1] - img_data_win_arr[..., 1, 0]
+        x_west_arr[x_west_arr < 0] = 0.0
+        y_north_arr = img_data_win_arr[..., 1, 1] - img_data_win_arr[..., 0, 1]
+        y_north_arr[y_north_arr < 0] = 0.0
+        y_south_arr = img_data_win_arr[..., 1, 1] - img_data_win_arr[..., 2, 1]
+        y_south_arr[y_south_arr < 0] = 0.0
+
+        # Calculate the frontal area (m2) for each axis.
+        x_east_frt_area = numpy.sum(x_east_arr) * x_res
+        x_west_frt_area = numpy.sum(x_west_arr) * x_res
+        y_north_frt_area = numpy.sum(y_north_arr) * y_res
+        y_south_frt_area = numpy.sum(y_south_arr) * y_res
+        ###############################################################
+
+        ###############################################################
+        # z0 is the roughness area for wind speed
+        xe_smith_z0 = 0.5 * h_star * (x_east_frt_area / grd_area)
+        xw_smith_z0 = 0.5 * h_star * (x_west_frt_area / grd_area)
+        yn_smith_z0 = 0.5 * h_star * (y_north_frt_area / grd_area)
+        ys_smith_z0 = 0.5 * h_star * (y_south_frt_area / grd_area)
+
+        ###############################################################
+
+        ###############################################################
+        if self.create_plots:
+            if self.detrend:
+                fig = plt.figure(figsize=(15, 5))
+                ax1 = fig.add_subplot(1, 3, 1, projection="3d")
+                ax1.plot_surface(
+                    x_loc_2d_arr,
+                    y_loc_2d_arr,
+                    img_orig_arr,
+                    cmap=cm.coolwarm,
+                    linewidth=0,
+                    antialiased=False,
+                )
+                ax1.set_title("Original Surface")
+
+                ax2 = fig.add_subplot(1, 3, 2, projection="3d")
+                ax2.plot_surface(
+                    x_loc_2d_arr,
+                    y_loc_2d_arr,
+                    plane_surf_arr,
+                    cmap=cm.coolwarm,
+                    linewidth=0,
+                    antialiased=False,
+                )
+                ax2.set_title("Plane Surface")
+
+                ax3 = fig.add_subplot(1, 3, 3, projection="3d")
+                ax3.plot_surface(
+                    x_loc_2d_arr,
+                    y_loc_2d_arr,
+                    img_data_arr,
+                    cmap=cm.coolwarm,
+                    linewidth=0,
+                    antialiased=False,
+                    )
+                ax3.set_title("Detrended Surface")
+
+            else:
+                # Create location arrays
+                x_loc_arr = numpy.arange(x_size) * x_res
+                y_loc_arr = numpy.arange(y_size) * y_res
+                x_loc_2d_arr = numpy.repeat([x_loc_arr], repeats=y_size, axis=0)
+                y_loc_2d_arr = numpy.repeat(
+                    numpy.reshape(y_loc_arr, (-1, 1)), repeats=x_size, axis=1
+                )
+
+                fig = plt.figure(figsize=(5, 5))
+                ax1 = fig.add_subplot(1, 1, 1, projection="3d")
+                ax1.plot_surface(
+                    x_loc_2d_arr,
+                    y_loc_2d_arr,
+                    img_orig_arr,
+                    cmap=cm.coolwarm,
+                    linewidth=0,
+                    antialiased=False,
+                )
+                ax1.set_title("Surface")
+
+            plt.savefig(
+                os.path.join(
+                    self.out_plot_path, f"smith_rough_profile_smp_{smpl_idx}.png"
+                )
+            )
+        ###############################################################
+
+        out_dict["smith_hs"] = h_star
+        out_dict["smith_area"] = grd_area
+        out_dict["xe_smith_frt"] = x_east_frt_area
+        out_dict["xe_smith_z0"] = xe_smith_z0
+        out_dict["xw_smith_frt"] = x_west_frt_area
+        out_dict["xw_smith_z0"] = xw_smith_z0
+        out_dict["x_avg_smith_z0"] = (
+            out_dict["xe_smith_z0"] + out_dict["xw_smith_z0"]
+        ) / 2
+        out_dict["yn_smith_frt"] = y_north_frt_area
+        out_dict["yn_smith_z0"] = yn_smith_z0
+        out_dict["ys_smith_frt"] = y_south_frt_area
+        out_dict["ys_smith_z0"] = ys_smith_z0
+        out_dict["y_avg_smith_z0"] = (
+            out_dict["yn_smith_z0"] + out_dict["ys_smith_z0"]
+        ) / 2
+        out_dict["avg_smith_z0"] = (
+            out_dict["xe_smith_z0"]
+            + out_dict["xw_smith_z0"]
+            + out_dict["yn_smith_z0"]
+            + out_dict["ys_smith_z0"]
+        ) / 4
+
+        return out_dict
+
+
 def calc_simple_roughness_profile_metrics(
     input_img: str,
     vec_file: str,
@@ -603,6 +824,80 @@ def calc_munro_roughness_profile_metrics(
     )
 
 
+def calc_smith_roughness_metrics(
+    input_img: str,
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    interp_method: int = rsgislib.INTERP_CUBIC,
+    angle_col: str = None,
+    x_box_col: str = "xbox",
+    y_box_col: str = "ybox",
+    no_data_val: float = None,
+    detrend: bool = True,
+    export_plot_path: str = None,
+):
+    """
+    A function which uses the CalcSmithRoughnessMetric class to calculate
+    the smith et al 2016 Z0 roughness metrics in x and y axis of the
+    window of data provided.
+
+
+    :param input_img: input image file.
+    :param vec_file: input vector file - needs to be a point type.
+    :param vec_lyr: input vector layer name.
+    :param out_vec_file: output vector file path.
+    :param out_vec_lyr: output vector layer name.
+    :param out_format: output vector file format (e.g., GeoJSON)
+    :param interp_method: the interpolation method used when reorientating the image
+                          data. Default: rsgislib.INTERP_CUBIC
+    :param angle_col: name of the column within the vector attribute table defining the
+                      rotation (relative to north; 0 = North) for each point. If
+                      None (Default) then no rotation applied. (Unit is degrees)
+    :param x_box_col: name of the column within the vector attribute table defining
+                      the size of the bbox in the x axis. Note, this is half the bbox
+                      width. (Unit is image pixels)
+    :param y_box_col: name of the column within the vector attribute table defining
+                      the size of the bbox in the y axis. Note, this is half the bbox
+                      height. (Unit is image pixels)
+    :param no_data_val: the image no data value. If None then taken from the input
+                        image header.
+    :param detrend: Boolean to specify whether to detrend the surface or not.
+                    Default: True
+    :param export_plot_path: If a directory path is provided then plots will be
+                             created for each of the sample windows. This is
+                             expected to be a debugging and data exploration tool
+                             as it significantly slows processing. If None (default)
+                             then no plots will be exported.
+
+    """
+    create_plots = False
+    if export_plot_path is not None:
+        create_plots = True
+
+    rough_profile_obj = CalcSmithRoughnessMetric(
+        detrend=detrend,
+        create_plots=create_plots,
+        out_plot_path=export_plot_path,
+    )
+    rsgislib.imagecalc.calc_pt_win_smpls.calc_pt_smpl_img_vals(
+        input_img,
+        vec_file,
+        vec_lyr,
+        calc_objs=[rough_profile_obj],
+        out_vec_file=out_vec_file,
+        out_vec_lyr=out_vec_lyr,
+        out_format=out_format,
+        interp_method=interp_method,
+        angle_col=angle_col,
+        x_box_col=x_box_col,
+        y_box_col=y_box_col,
+        no_data_val=no_data_val,
+    )
+
+
 def calc_all_roughness_profile_metrics(
     input_img: str,
     vec_file: str,
@@ -655,12 +950,13 @@ def calc_all_roughness_profile_metrics(
     munro_profile_obj = CalcMunroRoughnessMetric(
         detrend=detrend, detrend_poly_order=detrend_poly_order
     )
+    smith_profile_obj = CalcSmithRoughnessMetric(detrend=detrend)
 
     rsgislib.imagecalc.calc_pt_win_smpls.calc_pt_smpl_img_vals(
         input_img,
         vec_file,
         vec_lyr,
-        calc_objs=[rough_profile_obj, munro_profile_obj],
+        calc_objs=[rough_profile_obj, munro_profile_obj, smith_profile_obj],
         out_vec_file=out_vec_file,
         out_vec_lyr=out_vec_lyr,
         out_format=out_format,
