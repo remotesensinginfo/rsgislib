@@ -27,14 +27,13 @@
 # Author: Pete Bunting
 # Email: petebunting@mac.com
 # Date: 16/02/2020
-# Version: 1.0
+# Version: 1.1
 #
 # History:
 # Version 1.0 - Created.
+# Version 1.1 - Changed parameter optimisation libraries.
 #
 ###########################################################################
-
-from __future__ import print_function
 
 import gc
 from typing import Dict
@@ -55,7 +54,6 @@ try:
     import xgboost as xgb
 except ImportError:
     HAVE_XGBOOST = False
-
 
 from sklearn.metrics import accuracy_score, roc_auc_score
 
