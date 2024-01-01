@@ -36,6 +36,9 @@
 
 from __future__ import print_function
 
+import gc
+from typing import Dict
+
 import h5py
 import numpy
 from osgeo import gdal
@@ -45,6 +48,7 @@ import rsgislib
 import rsgislib.imagecalc
 import rsgislib.imageutils
 import rsgislib.rastergis
+import rsgislib.tools.utils
 
 HAVE_XGBOOST = True
 try:
@@ -52,8 +56,6 @@ try:
 except ImportError:
     HAVE_XGBOOST = False
 
-import gc
-import json
 
 from sklearn.metrics import accuracy_score, roc_auc_score
 
@@ -204,15 +206,7 @@ def optimise_xgboost_binary_classifier(
         "num_boost_round": int(best_params[6]),
     }
 
-    with open(out_params_file, "w") as fp:
-        json.dump(
-            params,
-            fp,
-            sort_keys=True,
-            indent=4,
-            separators=(",", ": "),
-            ensure_ascii=False,
-        )
+    rsgislib.tools.utils.write_dict_to_json(params, out_params_file)
 
 
 def train_xgboost_binary_classifier(
@@ -307,8 +301,7 @@ def train_xgboost_binary_classifier(
     test_lbl_np = numpy.concatenate((test_cls2_lbl, test_cls1_lbl))
     d_test = xgb.DMatrix(test_np, label=test_lbl_np)
 
-    with open(cls_params_file) as f:
-        cls_params = json.load(f)
+    cls_params = rsgislib.tools.utils.read_json_to_dict(cls_params_file)
 
     print("Start Training Find Classifier")
 
@@ -527,15 +520,7 @@ def train_opt_xgboost_binary_classifier(
             "num_boost_round": int(best_params[6]),
         }
 
-        with open(out_params_file, "w") as fp:
-            json.dump(
-                out_params,
-                fp,
-                sort_keys=True,
-                indent=4,
-                separators=(",", ": "),
-                ensure_ascii=False,
-            )
+        rsgislib.tools.utils.write_dict_to_json(out_params, out_params_file)
 
     print("Start Training Find Classifier")
 
@@ -703,10 +688,12 @@ def apply_xgboost_binary_classifier(
 def optimise_xgboost_multiclass_classifier(
     out_params_file,
     cls_info_dict,
+    sub_train_smpls=None,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    n_opt_iters: int = 100,
+    rnd_seed: int = None,
     n_threads=1,
     mdl_cls_obj=None,
-    sub_train_smpls=None,
-    rnd_seed=42,
 ):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
@@ -728,9 +715,6 @@ def optimise_xgboost_multiclass_classifier(
     """
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
-
-    from skopt import gp_minimize
-    from skopt.space import Integer, Real
 
     rnd_obj = numpy.random.RandomState(rnd_seed)
 
@@ -802,85 +786,218 @@ def optimise_xgboost_multiclass_classifier(
         numpy.concatenate(train_data_lst), label=numpy.concatenate(train_lbls_lst)
     )
 
-    space = [
-        Real(0.01, 0.9, name="eta"),
-        Integer(0, 100, name="gamma"),
-        Integer(2, 20, name="max_depth"),
-        Integer(1, 10, name="min_child_weight"),
-        Integer(0, 10, name="max_delta_step"),
-        Real(0.5, 1, name="subsample"),
-        Integer(2, 100, name="num_boost_round"),
-    ]
+    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
+        print("Using: OPT_MTHD_BAYSIANOPT")
+        from bayes_opt import BayesianOptimization
 
-    def _objective(values):
+        def _xgb_cls_bo_func(
+            eta,
+            gamma,
+            max_depth,
+            min_child_weight,
+            max_delta_step,
+            subsample,
+            num_boost_round,
+        ):
+            params = {
+                "eta": float(eta),
+                "gamma": int(gamma),
+                "max_depth": int(max_depth),
+                "min_child_weight": int(min_child_weight),
+                "max_delta_step": int(max_delta_step),
+                "subsample": float(subsample),
+                "nthread": n_threads,
+                "eval_metric": "merror",
+                "objective": "multi:softmax",
+                "num_class": n_classes,
+            }
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                int(num_boost_round),
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
+
+            vld_preds_idxs = model_xgb.predict(d_valid)
+
+            acc_score = accuracy_score(vaild_lbl_np, vld_preds_idxs)
+            gc.collect()
+            return acc_score
+
+        hyperparam_space = {
+            "eta": (0.01, 0.9),
+            "gamma": (0, 100),
+            "max_depth": (2, 20),
+            "min_child_weight": (1, 10),
+            "max_delta_step": (0, 10),
+            "subsample": (0.5, 1),
+            "num_boost_round": (2, 100),
+        }
+
+        bo_opt_obj = BayesianOptimization(
+            f=_xgb_cls_bo_func,
+            pbounds=hyperparam_space,
+            random_state=rnd_seed,
+            verbose=10,
+        )
+
+        bo_opt_obj.maximize(init_points=10, n_iter=n_opt_iters)
+
+        op_params = bo_opt_obj.max
         params = {
-            "eta": values[0],
-            "gamma": values[1],
-            "max_depth": values[2],
-            "min_child_weight": values[3],
-            "max_delta_step": values[4],
-            "subsample": values[5],
+            "eta": float(op_params["params"]["eta"]),
+            "gamma": int(op_params["params"]["gamma"]),
+            "max_depth": int(op_params["params"]["max_depth"]),
+            "min_child_weight": int(op_params["params"]["min_child_weight"]),
+            "max_delta_step": int(op_params["params"]["max_delta_step"]),
+            "subsample": float(op_params["params"]["subsample"]),
             "nthread": n_threads,
             "eval_metric": "merror",
             "objective": "multi:softmax",
             "num_class": n_classes,
+            "num_boost_round": int(op_params["params"]["num_boost_round"]),
         }
+    elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
+        print("Using OPT_MTHD_OPTUNA")
+        import optuna
 
-        print("\nNext set of params.....", params)
+        def _xgb_cls_optuna_func(trial):
+            params = {
+                "eta": trial.suggest_float("eta", 0.01, 0.9),
+                "gamma": trial.suggest_int("gamma", 0, 100),
+                "max_depth": trial.suggest_int("max_depth", 2, 20),
+                "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
+                "max_delta_step": trial.suggest_int("max_delta_step", 0, 10),
+                "subsample": trial.suggest_float("subsample", 0.5, 1),
+                "nthread": n_threads,
+                "eval_metric": "merror",
+                "objective": "multi:softmax",
+                "num_class": n_classes,
+            }
+            num_boost_round_trial = trial.suggest_int("num_boost_round", 2, 100)
 
-        num_boost_round = values[6]
-        print("num_boost_round = {}.".format(num_boost_round))
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                num_boost_round_trial,
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
 
-        watchlist = [(d_train, "train"), (d_valid, "validation")]
-        evals_results = {}
-        model_xgb = xgb.train(
-            params,
-            d_train,
-            num_boost_round,
-            evals=watchlist,
-            evals_result=evals_results,
-            verbose_eval=False,
-            xgb_model=mdl_cls_obj,
+            vld_preds_idxs = model_xgb.predict(d_valid)
+
+            acc_score = accuracy_score(vaild_lbl_np, vld_preds_idxs)
+            gc.collect()
+            return acc_score
+
+        optuna_opt_obj = optuna.create_study(direction="maximize")
+        optuna_opt_obj.optimize(_xgb_cls_optuna_func, n_trials=n_opt_iters, timeout=600)
+
+        optuna_opt_trial = optuna_opt_obj.best_trial
+        params = {
+            "eta": float(optuna_opt_trial.params["eta"]),
+            "gamma": int(optuna_opt_trial.params["gamma"]),
+            "max_depth": int(optuna_opt_trial.params["max_depth"]),
+            "min_child_weight": int(optuna_opt_trial.params["min_child_weight"]),
+            "max_delta_step": int(optuna_opt_trial.params["max_delta_step"]),
+            "subsample": float(optuna_opt_trial.params["subsample"]),
+            "nthread": n_threads,
+            "eval_metric": "merror",
+            "objective": "multi:softmax",
+            "num_class": n_classes,
+            "num_boost_round": int(optuna_opt_trial.params["num_boost_round"]),
+        }
+    elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
+        print("Using OPT_MTHD_SKOPT")
+        import skopt
+        import skopt.space
+
+        space = [
+            skopt.space.Real(0.01, 0.9, name="eta"),
+            skopt.space.Integer(0, 100, name="gamma"),
+            skopt.space.Integer(2, 20, name="max_depth"),
+            skopt.space.Integer(1, 10, name="min_child_weight"),
+            skopt.space.Integer(0, 10, name="max_delta_step"),
+            skopt.space.Real(0.5, 1, name="subsample"),
+            skopt.space.Integer(2, 100, name="num_boost_round"),
+        ]
+
+        def _objective(values):
+            params = {
+                "eta": values[0],
+                "gamma": values[1],
+                "max_depth": values[2],
+                "min_child_weight": values[3],
+                "max_delta_step": values[4],
+                "subsample": values[5],
+                "nthread": n_threads,
+                "eval_metric": "merror",
+                "objective": "multi:softmax",
+                "num_class": n_classes,
+            }
+
+            print("\nNext set of params.....", params)
+
+            num_boost_round = values[6]
+            print("num_boost_round = {}.".format(num_boost_round))
+
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                num_boost_round,
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
+
+            vld_preds_idxs = model_xgb.predict(d_valid)
+
+            acc_score = -accuracy_score(vaild_lbl_np, vld_preds_idxs)
+            print("\nAccScore.....", -acc_score, ".....iter.....")
+            gc.collect()
+            return acc_score
+
+        res_gp = skopt.gp_minimize(
+            _objective, space, n_calls=20, random_state=0, n_random_starts=10
         )
 
-        vld_preds_idxs = model_xgb.predict(d_valid)
+        print("Best score={}".format(res_gp.fun))
+        best_params = res_gp.x
+        print("Best Params:\n{}".format(best_params))
 
-        acc_score = -accuracy_score(vaild_lbl_np, vld_preds_idxs)
-        print("\nAccScore.....", -acc_score, ".....iter.....")
-        gc.collect()
-        return acc_score
-
-    res_gp = gp_minimize(
-        _objective, space, n_calls=20, random_state=0, n_random_starts=10
-    )
-
-    print("Best score={}".format(res_gp.fun))
-    best_params = res_gp.x
-    print("Best Params:\n{}".format(best_params))
-
-    params = {
-        "eta": float(best_params[0]),
-        "gamma": int(best_params[1]),
-        "max_depth": int(best_params[2]),
-        "min_child_weight": int(best_params[3]),
-        "max_delta_step": int(best_params[4]),
-        "subsample": float(best_params[5]),
-        "nthread": int(n_threads),
-        "eval_metric": "merror",
-        "objective": "multi:softmax",
-        "num_class": int(n_classes),
-        "num_boost_round": int(best_params[6]),
-    }
-
-    with open(out_params_file, "w") as fp:
-        json.dump(
-            params,
-            fp,
-            sort_keys=True,
-            indent=4,
-            separators=(",", ": "),
-            ensure_ascii=False,
+        print("Start Training Find Classifier")
+        params = {
+            "eta": best_params[0],
+            "gamma": best_params[1],
+            "max_depth": best_params[2],
+            "min_child_weight": best_params[3],
+            "max_delta_step": best_params[4],
+            "subsample": best_params[5],
+            "nthread": n_threads,
+            "eval_metric": "merror",
+            "objective": "multi:softmax",
+            "num_class": n_classes,
+            "num_boost_round": best_params[6],
+        }
+    else:
+        raise rsgislib.RSGISPyException(
+            "Do not recognise or do not have implementation "
+            "for the optimisation method specified."
         )
+
+    rsgislib.tools.utils.write_dict_to_json(params, out_params_file)
 
 
 def train_xgboost_multiclass_classifier(
@@ -975,8 +1092,7 @@ def train_xgboost_multiclass_classifier(
     test_lbl_np = numpy.concatenate(test_lbls_lst)
     d_test = xgb.DMatrix(test_np, label=test_lbl_np)
 
-    with open(cls_params_file) as f:
-        cls_params = json.load(f)
+    cls_params = rsgislib.tools.utils.read_json_to_dict(cls_params_file)
 
     if n_classes != cls_params["num_class"]:
         raise rsgislib.RSGISPyException(
@@ -1024,25 +1140,38 @@ def train_xgboost_multiclass_classifier(
 
 
 def train_opt_xgboost_multiclass_classifier(
-    out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
+    out_mdl_file: str,
+    cls_info_dict: Dict,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    n_opt_iters: int = 100,
+    rnd_seed: int = None,
+    n_threads: int = 1,
+    mdl_cls_obj=None,
 ):
     """
-    A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
-    classifier producing a full trained model at the end. A dict of class information, as ClassInfoObj
-    objects, is defined with the training data.
+    A function which performs an optimisation of the hyper-parameters
+    for a multiclass xgboost classifier producing a full trained model.
+    A dict of class information, as ClassInfoObj objects, is defined
+    with the training data.
 
     This function requires that xgboost and skopt modules to be installed.
 
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
+    :param out_mdl_file: The output file path (for the XGB HDF5 file) where the
+                         classification model will be saved.
+    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj
+                          objects defining the training data.
+    :param op_mthd: The method used for the parameter optimisation
+                    (Default: rsgislib.OPT_MTHD_BAYSIANOPT)
+    :param n_opt_iters: The number of iterations used for the hyper parameter
+                        optimisation
+    :param rnd_seed: A random seed used for the hyper parameter optimisation.
     :param n_threads: The number of threads to use to train the classifier.
+    :param mdl_cls_obj: Optionally, an existing model can be used as the basis
+                        for classification model.
 
     """
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
-
-    from skopt import gp_minimize
-    from skopt.space import Integer, Real
 
     n_classes = len(cls_info_dict)
     for clsname in cls_info_dict:
@@ -1118,77 +1247,218 @@ def train_opt_xgboost_multiclass_classifier(
     test_lbl_np = numpy.concatenate(test_lbls_lst)
     d_test = xgb.DMatrix(test_np, label=test_lbl_np)
 
-    space = [
-        Real(0.01, 0.9, name="eta"),
-        Integer(0, 100, name="gamma"),
-        Integer(2, 20, name="max_depth"),
-        Integer(1, 10, name="min_child_weight"),
-        Integer(0, 10, name="max_delta_step"),
-        Real(0.5, 1, name="subsample"),
-        Integer(2, 100, name="num_boost_round"),
-    ]
+    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
+        print("Using: OPT_MTHD_BAYSIANOPT")
+        from bayes_opt import BayesianOptimization
 
-    def _objective(values):
+        def _xgb_cls_bo_func(
+            eta,
+            gamma,
+            max_depth,
+            min_child_weight,
+            max_delta_step,
+            subsample,
+            num_boost_round,
+        ):
+            params = {
+                "eta": float(eta),
+                "gamma": int(gamma),
+                "max_depth": int(max_depth),
+                "min_child_weight": int(min_child_weight),
+                "max_delta_step": int(max_delta_step),
+                "subsample": float(subsample),
+                "nthread": n_threads,
+                "eval_metric": "merror",
+                "objective": "multi:softmax",
+                "num_class": n_classes,
+            }
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                int(num_boost_round),
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
+
+            vld_preds_idxs = model_xgb.predict(d_valid)
+
+            acc_score = accuracy_score(vaild_lbl_np, vld_preds_idxs)
+            gc.collect()
+            return acc_score
+
+        hyperparam_space = {
+            "eta": (0.01, 0.9),
+            "gamma": (0, 100),
+            "max_depth": (2, 20),
+            "min_child_weight": (1, 10),
+            "max_delta_step": (0, 10),
+            "subsample": (0.5, 1),
+            "num_boost_round": (2, 100),
+        }
+
+        bo_opt_obj = BayesianOptimization(
+            f=_xgb_cls_bo_func,
+            pbounds=hyperparam_space,
+            random_state=rnd_seed,
+            verbose=10,
+        )
+
+        bo_opt_obj.maximize(init_points=10, n_iter=n_opt_iters)
+
+        op_params = bo_opt_obj.max
         params = {
-            "eta": values[0],
-            "gamma": values[1],
-            "max_depth": values[2],
-            "min_child_weight": values[3],
-            "max_delta_step": values[4],
-            "subsample": values[5],
+            "eta": float(op_params["params"]["eta"]),
+            "gamma": int(op_params["params"]["gamma"]),
+            "max_depth": int(op_params["params"]["max_depth"]),
+            "min_child_weight": int(op_params["params"]["min_child_weight"]),
+            "max_delta_step": int(op_params["params"]["max_delta_step"]),
+            "subsample": float(op_params["params"]["subsample"]),
+            "nthread": n_threads,
+            "eval_metric": "merror",
+            "objective": "multi:softmax",
+            "num_class": n_classes,
+        }
+        num_boost_round = int(op_params["params"]["num_boost_round"])
+
+    elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
+        print("Using OPT_MTHD_OPTUNA")
+        import optuna
+
+        def _xgb_cls_optuna_func(trial):
+            params = {
+                "eta": trial.suggest_float("eta", 0.01, 0.9),
+                "gamma": trial.suggest_int("gamma", 0, 100),
+                "max_depth": trial.suggest_int("max_depth", 2, 20),
+                "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
+                "max_delta_step": trial.suggest_int("max_delta_step", 0, 10),
+                "subsample": trial.suggest_float("subsample", 0.5, 1),
+                "nthread": n_threads,
+                "eval_metric": "merror",
+                "objective": "multi:softmax",
+                "num_class": n_classes,
+            }
+            num_boost_round_trial = trial.suggest_int("num_boost_round", 2, 100)
+
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                num_boost_round_trial,
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
+
+            vld_preds_idxs = model_xgb.predict(d_valid)
+
+            acc_score = accuracy_score(vaild_lbl_np, vld_preds_idxs)
+            gc.collect()
+            return acc_score
+
+        optuna_opt_obj = optuna.create_study(direction="maximize")
+        optuna_opt_obj.optimize(_xgb_cls_optuna_func, n_trials=n_opt_iters, timeout=600)
+
+        optuna_opt_trial = optuna_opt_obj.best_trial
+        params = {
+            "eta": float(optuna_opt_trial.params["eta"]),
+            "gamma": int(optuna_opt_trial.params["gamma"]),
+            "max_depth": int(optuna_opt_trial.params["max_depth"]),
+            "min_child_weight": int(optuna_opt_trial.params["min_child_weight"]),
+            "max_delta_step": int(optuna_opt_trial.params["max_delta_step"]),
+            "subsample": float(optuna_opt_trial.params["subsample"]),
+            "nthread": n_threads,
+            "eval_metric": "merror",
+            "objective": "multi:softmax",
+            "num_class": n_classes,
+        }
+        num_boost_round = int(optuna_opt_trial.params["num_boost_round"])
+
+    elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
+        print("Using OPT_MTHD_SKOPT")
+        import skopt
+        import skopt.space
+
+        space = [
+            skopt.space.Real(0.01, 0.9, name="eta"),
+            skopt.space.Integer(0, 100, name="gamma"),
+            skopt.space.Integer(2, 20, name="max_depth"),
+            skopt.space.Integer(1, 10, name="min_child_weight"),
+            skopt.space.Integer(0, 10, name="max_delta_step"),
+            skopt.space.Real(0.5, 1, name="subsample"),
+            skopt.space.Integer(2, 100, name="num_boost_round"),
+        ]
+
+        def _objective(values):
+            params = {
+                "eta": values[0],
+                "gamma": values[1],
+                "max_depth": values[2],
+                "min_child_weight": values[3],
+                "max_delta_step": values[4],
+                "subsample": values[5],
+                "nthread": n_threads,
+                "eval_metric": "merror",
+                "objective": "multi:softmax",
+                "num_class": n_classes,
+            }
+
+            print("\nNext set of params.....", params)
+
+            num_boost_round = values[6]
+            print("num_boost_round = {}.".format(num_boost_round))
+
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                num_boost_round,
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
+
+            vld_preds_idxs = model_xgb.predict(d_valid)
+
+            acc_score = -accuracy_score(vaild_lbl_np, vld_preds_idxs)
+            print("\nAccScore.....", -acc_score, ".....iter.....")
+            gc.collect()
+            return acc_score
+
+        res_gp = skopt.gp_minimize(
+            _objective, space, n_calls=20, random_state=0, n_random_starts=10
+        )
+
+        print("Best score={}".format(res_gp.fun))
+        best_params = res_gp.x
+        print("Best Params:\n{}".format(best_params))
+
+        print("Start Training Find Classifier")
+        params = {
+            "eta": best_params[0],
+            "gamma": best_params[1],
+            "max_depth": best_params[2],
+            "min_child_weight": best_params[3],
+            "max_delta_step": best_params[4],
+            "subsample": best_params[5],
             "nthread": n_threads,
             "eval_metric": "merror",
             "objective": "multi:softmax",
             "num_class": n_classes,
         }
 
-        print("\nNext set of params.....", params)
-
-        num_boost_round = values[6]
-        print("num_boost_round = {}.".format(num_boost_round))
-
-        watchlist = [(d_train, "train"), (d_valid, "validation")]
-        evals_results = {}
-        model_xgb = xgb.train(
-            params,
-            d_train,
-            num_boost_round,
-            evals=watchlist,
-            evals_result=evals_results,
-            verbose_eval=False,
-            xgb_model=mdl_cls_obj,
+        num_boost_round = best_params[6]
+    else:
+        raise rsgislib.RSGISPyException(
+            "Do not recognise or do not have implementation for the optimisation method specified."
         )
-
-        vld_preds_idxs = model_xgb.predict(d_valid)
-
-        acc_score = -accuracy_score(vaild_lbl_np, vld_preds_idxs)
-        print("\nAccScore.....", -acc_score, ".....iter.....")
-        gc.collect()
-        return acc_score
-
-    res_gp = gp_minimize(
-        _objective, space, n_calls=20, random_state=0, n_random_starts=10
-    )
-
-    print("Best score={}".format(res_gp.fun))
-    best_params = res_gp.x
-    print("Best Params:\n{}".format(best_params))
-
-    print("Start Training Find Classifier")
-    params = {
-        "eta": best_params[0],
-        "gamma": best_params[1],
-        "max_depth": best_params[2],
-        "min_child_weight": best_params[3],
-        "max_delta_step": best_params[4],
-        "subsample": best_params[5],
-        "nthread": n_threads,
-        "eval_metric": "merror",
-        "objective": "multi:softmax",
-        "num_class": n_classes,
-    }
-
-    num_boost_round = best_params[6]
 
     watchlist = [(d_train, "train"), (d_valid, "validation")]
     evals_results = {}
