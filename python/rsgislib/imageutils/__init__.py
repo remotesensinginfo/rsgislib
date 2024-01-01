@@ -1357,7 +1357,7 @@ def get_band_names(input_img: str):
         bandNames = imageutils.get_band_names(input_img)
 
     """
-    dataset = gdal.Open(input_img, gdal.GA_Update)
+    dataset = gdal.Open(input_img)
     bandNames = list()
 
     for i in range(dataset.RasterCount):
