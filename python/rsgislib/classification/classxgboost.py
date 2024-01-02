@@ -64,7 +64,7 @@ def optimise_xgboost_binary_classifier(
     cls1_valid_file,
     cls2_train_file,
     cls2_valid_file,
-    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads=1,
@@ -129,8 +129,8 @@ def optimise_xgboost_binary_classifier(
         label=numpy.concatenate((train_cls2_lbl, train_cls1_lbl)),
     )
 
-    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
-        print("Using: OPT_MTHD_BAYSIANOPT")
+    if op_mthd == rsgislib.OPT_MTHD_BAYESOPT:
+        print("Using: OPT_MTHD_BAYESOPT")
         from bayes_opt import BayesianOptimization
 
         def _xgb_cls_bo_func(
@@ -478,7 +478,7 @@ def train_opt_xgboost_binary_classifier(
     cls2_train_file,
     cls2_valid_file,
     cls2_test_file,
-    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads: int = 1,
@@ -567,8 +567,8 @@ def train_opt_xgboost_binary_classifier(
     test_lbl_np = numpy.concatenate((test_cls2_lbl, test_cls1_lbl))
     d_test = xgb.DMatrix(test_np, label=test_lbl_np)
 
-    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
-        print("Using: OPT_MTHD_BAYSIANOPT")
+    if op_mthd == rsgislib.OPT_MTHD_BAYESOPT:
+        print("Using: OPT_MTHD_BAYESOPT")
         from bayes_opt import BayesianOptimization
 
         def _xgb_cls_bo_func(
@@ -925,7 +925,7 @@ def optimise_xgboost_multiclass_classifier(
     out_params_file,
     cls_info_dict,
     sub_train_smpls=None,
-    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads=1,
@@ -1022,8 +1022,8 @@ def optimise_xgboost_multiclass_classifier(
         numpy.concatenate(train_data_lst), label=numpy.concatenate(train_lbls_lst)
     )
 
-    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
-        print("Using: OPT_MTHD_BAYSIANOPT")
+    if op_mthd == rsgislib.OPT_MTHD_BAYESOPT:
+        print("Using: OPT_MTHD_BAYESOPT")
         from bayes_opt import BayesianOptimization
 
         def _xgb_cls_bo_func(
@@ -1378,7 +1378,7 @@ def train_xgboost_multiclass_classifier(
 def train_opt_xgboost_multiclass_classifier(
     out_mdl_file: str,
     cls_info_dict: Dict,
-    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads: int = 1,
@@ -1397,7 +1397,7 @@ def train_opt_xgboost_multiclass_classifier(
     :param cls_info_dict: dict (key is string with class name) of ClassInfoObj
                           objects defining the training data.
     :param op_mthd: The method used for the parameter optimisation
-                    (Default: rsgislib.OPT_MTHD_BAYSIANOPT)
+                    (Default: rsgislib.OPT_MTHD_BAYESOPT)
     :param n_opt_iters: The number of iterations used for the hyper parameter
                         optimisation
     :param rnd_seed: A random seed used for the hyper parameter optimisation.
@@ -1483,8 +1483,8 @@ def train_opt_xgboost_multiclass_classifier(
     test_lbl_np = numpy.concatenate(test_lbls_lst)
     d_test = xgb.DMatrix(test_np, label=test_lbl_np)
 
-    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
-        print("Using: OPT_MTHD_BAYSIANOPT")
+    if op_mthd == rsgislib.OPT_MTHD_BAYESOPT:
+        print("Using: OPT_MTHD_BAYESOPT")
         from bayes_opt import BayesianOptimization
 
         def _xgb_cls_bo_func(

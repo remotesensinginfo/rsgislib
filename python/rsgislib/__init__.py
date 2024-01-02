@@ -140,7 +140,7 @@ Options for classification datasets:
 
 Options for classification hyperparameter optimisation:
     * OPT_MTHD_UNDEFINED = 0
-    * OPT_MTHD_BAYSIANOPT = 1
+    * OPT_MTHD_BAYESOPT = 1
     * OPT_MTHD_OPTUNA = 2
     * OPT_MTHD_SKOPT = 3
     * OPT_MTHD_RANDOM = 4
@@ -265,7 +265,7 @@ CLS_VALID_DATA = 2
 CLS_TEST_DATA = 3
 
 OPT_MTHD_UNDEFINED = 0
-OPT_MTHD_BAYSIANOPT = 1
+OPT_MTHD_BAYESOPT = 1
 OPT_MTHD_OPTUNA = 2
 OPT_MTHD_SKOPT = 3
 OPT_MTHD_RANDOM = 4

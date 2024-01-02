@@ -67,7 +67,7 @@ def optimise_lightgbm_binary_classifier(
     cls2_train_file: str,
     cls2_valid_file: str,
     unbalanced: bool = False,
-    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads: int = 1,
@@ -150,8 +150,8 @@ def optimise_lightgbm_binary_classifier(
             scale_pos_weight = 1
     print("scale_pos_weight = {}".format(scale_pos_weight))
 
-    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
-        print("Using: OPT_MTHD_BAYSIANOPT")
+    if op_mthd == rsgislib.OPT_MTHD_BAYESOPT:
+        print("Using: OPT_MTHD_BAYESOPT")
         from bayes_opt import BayesianOptimization
 
         def _lgbm_cls_bo_func(
@@ -457,7 +457,7 @@ def train_opt_lightgbm_binary_classifier(
     cls2_valid_file: str,
     cls2_test_file: str,
     unbalanced: bool = False,
-    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads: int = 1,
@@ -553,8 +553,8 @@ def train_opt_lightgbm_binary_classifier(
     test_np = numpy.concatenate((test_cls2, test_cls1))
     test_lbl_np = numpy.concatenate((test_cls2_lbl, test_cls1_lbl))
 
-    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
-        print("Using: OPT_MTHD_BAYSIANOPT")
+    if op_mthd == rsgislib.OPT_MTHD_BAYESOPT:
+        print("Using: OPT_MTHD_BAYESOPT")
         from bayes_opt import BayesianOptimization
 
         def _lgbm_cls_bo_func(
@@ -1161,7 +1161,7 @@ def optimise_lightgbm_multiclass_classifier(
     out_params_file: str,
     cls_info_dict: Dict,
     unbalanced: bool = False,
-    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads: int = 1,
@@ -1245,8 +1245,8 @@ def optimise_lightgbm_multiclass_classifier(
     vaild_np = numpy.concatenate(valid_data_lst)
     vaild_lbl_np = numpy.concatenate(valid_lbls_lst)
 
-    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
-        print("Using: OPT_MTHD_BAYSIANOPT")
+    if op_mthd == rsgislib.OPT_MTHD_BAYESOPT:
+        print("Using: OPT_MTHD_BAYESOPT")
         from bayes_opt import BayesianOptimization
 
         def _lgbm_cls_bo_func(
@@ -1545,7 +1545,7 @@ def train_opt_lightgbm_multiclass_classifier(
     cls_info_dict: Dict,
     out_info_file: str = None,
     unbalanced: bool = False,
-    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads: int = 1,
@@ -1646,8 +1646,8 @@ def train_opt_lightgbm_multiclass_classifier(
     test_np = numpy.concatenate(test_data_lst)
     test_lbl_np = numpy.concatenate(test_lbls_lst)
 
-    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
-        print("Using: OPT_MTHD_BAYSIANOPT")
+    if op_mthd == rsgislib.OPT_MTHD_BAYESOPT:
+        print("Using: OPT_MTHD_BAYESOPT")
         from bayes_opt import BayesianOptimization
 
         def _lgbm_cls_bo_func(
