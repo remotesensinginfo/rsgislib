@@ -116,20 +116,29 @@ To apply the multi-class classifier use the following function::
 
 .. note:: Within the rsgislib.classification.ClassInfoObj class you need to provide an id and out_id value. The id must start from zero and be consecutive while the out_id will be used as the pixel value for the output classification image and can be any integer value.
 
-Training Functions
--------------------
+Binary Classification Functions
+--------------------------------
 
+Train Classifier
+^^^^^^^^^^^^^^^^^^
 .. autofunction:: rsgislib.classification.classlightgbm.optimise_lightgbm_binary_classifier
 .. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_binary_classifier
 .. autofunction:: rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifier
+
+Apply Classifier
+^^^^^^^^^^^^^^^^^^^^
+.. autofunction:: rsgislib.classification.classlightgbm.apply_lightgbm_binary_classifier
+
+
+Multi-Class Classification Functions
+-------------------------------------
+
+Train Classifier
+^^^^^^^^^^^^^^^^^^
+.. autofunction:: rsgislib.classification.classlightgbm.optimise_lightgbm_multiclass_classifier
+.. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier
 .. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier
 
-Classify Functions
--------------------
-
-.. autofunction:: rsgislib.classification.classlightgbm.apply_lightgbm_binary_classifier
+Apply Classifier
+^^^^^^^^^^^^^^^^^^^^
 .. autofunction:: rsgislib.classification.classlightgbm.apply_lightgbm_multiclass_classifier
-
-
-
-
