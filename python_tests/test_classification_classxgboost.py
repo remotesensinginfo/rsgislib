@@ -1224,7 +1224,7 @@ def test_apply_xgboost_multiclass_classifier_bayesopt_rat(tmp_path):
         roi_col=None,
         roi_val=1,
         class_colours=True,
-        nthread=1,
+        n_threads=1,
     )
 
     read_out_cls = False
