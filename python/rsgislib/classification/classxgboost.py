@@ -91,31 +91,31 @@ def optimise_xgboost_binary_classifier(
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
     print("Reading Class 1 Training")
-    f = h5py.File(cls1_train_file, "r")
-    num_cls1_train_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls1_train_file, "r")
+    num_cls1_train_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls1_train_rows = {}".format(num_cls1_train_rows))
-    train_cls1 = numpy.array(f["DATA/DATA"])
+    train_cls1 = numpy.array(f_h5["DATA/DATA"])
     train_cls1_lbl = numpy.ones(num_cls1_train_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 1 Validation")
-    f = h5py.File(cls1_valid_file, "r")
-    num_cls1_valid_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls1_valid_file, "r")
+    num_cls1_valid_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls1_valid_rows = {}".format(num_cls1_valid_rows))
-    valid_cls1 = numpy.array(f["DATA/DATA"])
+    valid_cls1 = numpy.array(f_h5["DATA/DATA"])
     valid_cls1_lbl = numpy.ones(num_cls1_valid_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 2 Training")
-    f = h5py.File(cls2_train_file, "r")
-    num_cls2_train_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls2_train_file, "r")
+    num_cls2_train_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls2_train_rows = {}".format(num_cls2_train_rows))
-    train_cls2 = numpy.array(f["DATA/DATA"])
+    train_cls2 = numpy.array(f_h5["DATA/DATA"])
     train_cls2_lbl = numpy.zeros(num_cls2_train_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 2 Validation")
-    f = h5py.File(cls2_valid_file, "r")
-    num_cls2_valid_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls2_valid_file, "r")
+    num_cls2_valid_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls2_valid_rows = {}".format(num_cls2_valid_rows))
-    valid_cls2 = numpy.array(f["DATA/DATA"])
+    valid_cls2 = numpy.array(f_h5["DATA/DATA"])
     valid_cls2_lbl = numpy.zeros(num_cls2_valid_rows, dtype=numpy.dtype(int))
 
     print("Finished Reading Data")
@@ -367,45 +367,45 @@ def train_xgboost_binary_classifier(
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
     print("Reading Class 1 Training")
-    f = h5py.File(cls1_train_file, "r")
-    num_cls1_train_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls1_train_file, "r")
+    num_cls1_train_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls1_train_rows = {}".format(num_cls1_train_rows))
-    train_cls1 = numpy.array(f["DATA/DATA"])
+    train_cls1 = numpy.array(f_h5["DATA/DATA"])
     train_cls1_lbl = numpy.ones(num_cls1_train_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 1 Validation")
-    f = h5py.File(cls1_valid_file, "r")
-    num_cls1_valid_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls1_valid_file, "r")
+    num_cls1_valid_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls1_valid_rows = {}".format(num_cls1_valid_rows))
-    valid_cls1 = numpy.array(f["DATA/DATA"])
+    valid_cls1 = numpy.array(f_h5["DATA/DATA"])
     valid_cls1_lbl = numpy.ones(num_cls1_valid_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 1 Testing")
-    f = h5py.File(cls1_test_file, "r")
-    num_cls1_test_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls1_test_file, "r")
+    num_cls1_test_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls1_test_rows = {}".format(num_cls1_test_rows))
-    test_cls1 = numpy.array(f["DATA/DATA"])
+    test_cls1 = numpy.array(f_h5["DATA/DATA"])
     test_cls1_lbl = numpy.ones(num_cls1_test_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 2 Training")
-    f = h5py.File(cls2_train_file, "r")
-    num_cls2_train_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls2_train_file, "r")
+    num_cls2_train_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls2_train_rows = {}".format(num_cls2_train_rows))
-    train_cls2 = numpy.array(f["DATA/DATA"])
+    train_cls2 = numpy.array(f_h5["DATA/DATA"])
     train_cls2_lbl = numpy.zeros(num_cls2_train_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 2 Validation")
-    f = h5py.File(cls2_valid_file, "r")
-    num_cls2_valid_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls2_valid_file, "r")
+    num_cls2_valid_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls2_valid_rows = {}".format(num_cls2_valid_rows))
-    valid_cls2 = numpy.array(f["DATA/DATA"])
+    valid_cls2 = numpy.array(f_h5["DATA/DATA"])
     valid_cls2_lbl = numpy.zeros(num_cls2_valid_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 2 Testing")
-    f = h5py.File(cls2_test_file, "r")
-    num_cls2_test_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls2_test_file, "r")
+    num_cls2_test_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls2_test_rows = {}".format(num_cls2_test_rows))
-    test_cls2 = numpy.array(f["DATA/DATA"])
+    test_cls2 = numpy.array(f_h5["DATA/DATA"])
     test_cls2_lbl = numpy.zeros(num_cls2_test_rows, dtype=numpy.dtype(int))
 
     print("Finished Reading Data")
@@ -511,45 +511,45 @@ def train_opt_xgboost_binary_classifier(
     from skopt.space import Integer, Real
 
     print("Reading Class 1 Training")
-    f = h5py.File(cls1_train_file, "r")
-    num_cls1_train_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls1_train_file, "r")
+    num_cls1_train_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls1_train_rows = {}".format(num_cls1_train_rows))
-    train_cls1 = numpy.array(f["DATA/DATA"])
+    train_cls1 = numpy.array(f_h5["DATA/DATA"])
     train_cls1_lbl = numpy.ones(num_cls1_train_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 1 Validation")
-    f = h5py.File(cls1_valid_file, "r")
-    num_cls1_valid_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls1_valid_file, "r")
+    num_cls1_valid_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls1_valid_rows = {}".format(num_cls1_valid_rows))
-    valid_cls1 = numpy.array(f["DATA/DATA"])
+    valid_cls1 = numpy.array(f_h5["DATA/DATA"])
     valid_cls1_lbl = numpy.ones(num_cls1_valid_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 1 Testing")
-    f = h5py.File(cls1_test_file, "r")
-    num_cls1_test_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls1_test_file, "r")
+    num_cls1_test_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls1_test_rows = {}".format(num_cls1_test_rows))
-    test_cls1 = numpy.array(f["DATA/DATA"])
+    test_cls1 = numpy.array(f_h5["DATA/DATA"])
     test_cls1_lbl = numpy.ones(num_cls1_test_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 2 Training")
-    f = h5py.File(cls2_train_file, "r")
-    num_cls2_train_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls2_train_file, "r")
+    num_cls2_train_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls2_train_rows = {}".format(num_cls2_train_rows))
-    train_cls2 = numpy.array(f["DATA/DATA"])
+    train_cls2 = numpy.array(f_h5["DATA/DATA"])
     train_cls2_lbl = numpy.zeros(num_cls2_train_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 2 Validation")
-    f = h5py.File(cls2_valid_file, "r")
-    num_cls2_valid_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls2_valid_file, "r")
+    num_cls2_valid_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls2_valid_rows = {}".format(num_cls2_valid_rows))
-    valid_cls2 = numpy.array(f["DATA/DATA"])
+    valid_cls2 = numpy.array(f_h5["DATA/DATA"])
     valid_cls2_lbl = numpy.zeros(num_cls2_valid_rows, dtype=numpy.dtype(int))
 
     print("Reading Class 2 Testing")
-    f = h5py.File(cls2_test_file, "r")
-    num_cls2_test_rows = f["DATA/DATA"].shape[0]
+    f_h5 = h5py.File(cls2_test_file, "r")
+    num_cls2_test_rows = f_h5["DATA/DATA"].shape[0]
     print("num_cls2_test_rows = {}".format(num_cls2_test_rows))
-    test_cls2 = numpy.array(f["DATA/DATA"])
+    test_cls2 = numpy.array(f_h5["DATA/DATA"])
     test_cls2_lbl = numpy.zeros(num_cls2_test_rows, dtype=numpy.dtype(int))
 
     print("Finished Reading Data")
@@ -972,9 +972,9 @@ def optimise_xgboost_multiclass_classifier(
     for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
-        sgl_cls_info["train_n_rows"] = f["DATA/DATA"].shape[0]
-        sgl_cls_info["train_data"] = numpy.array(f["DATA/DATA"])
+        f_h5 = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
 
         if (sub_train_smpls is not None) and (sub_train_smpls > 0):
             if sub_train_smpls < 1:
@@ -991,20 +991,20 @@ def optimise_xgboost_multiclass_classifier(
             sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
         )
         sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
-        f.close()
+        f_h5.close()
 
         train_data_lst.append(sgl_cls_info["train_data"])
         train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
-        sgl_cls_info["valid_n_rows"] = f["DATA/DATA"].shape[0]
-        sgl_cls_info["valid_data"] = numpy.array(f["DATA/DATA"])
+        f_h5 = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        sgl_cls_info["valid_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["valid_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["valid_data_lbls"] = numpy.zeros(
             sgl_cls_info["valid_n_rows"], dtype=numpy.dtype(int)
         )
         sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
-        f.close()
+        f_h5.close()
         valid_data_lst.append(sgl_cls_info["valid_data"])
         valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
@@ -1275,38 +1275,38 @@ def train_xgboost_multiclass_classifier(
     for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
-        sgl_cls_info["train_n_rows"] = f["DATA/DATA"].shape[0]
-        sgl_cls_info["train_data"] = numpy.array(f["DATA/DATA"])
+        f_h5 = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["train_data_lbls"] = numpy.zeros(
             sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
         )
         sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
-        f.close()
+        f_h5.close()
         train_data_lst.append(sgl_cls_info["train_data"])
         train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
-        sgl_cls_info["valid_n_rows"] = f["DATA/DATA"].shape[0]
-        sgl_cls_info["valid_data"] = numpy.array(f["DATA/DATA"])
+        f_h5 = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        sgl_cls_info["valid_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["valid_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["valid_data_lbls"] = numpy.zeros(
             sgl_cls_info["valid_n_rows"], dtype=numpy.dtype(int)
         )
         sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
-        f.close()
+        f_h5.close()
         valid_data_lst.append(sgl_cls_info["valid_data"])
         valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
         print("Reading Class {} Testing".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
-        sgl_cls_info["test_n_rows"] = f["DATA/DATA"].shape[0]
-        sgl_cls_info["test_data"] = numpy.array(f["DATA/DATA"])
+        f_h5 = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
+        sgl_cls_info["test_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["test_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["test_data_lbls"] = numpy.zeros(
             sgl_cls_info["test_n_rows"], dtype=numpy.dtype(int)
         )
         sgl_cls_info["test_data_lbls"][...] = cls_info_dict[clsname].id
-        f.close()
+        f_h5.close()
         test_data_lst.append(sgl_cls_info["test_data"])
         test_lbls_lst.append(sgl_cls_info["test_data_lbls"])
 
@@ -1430,38 +1430,38 @@ def train_opt_xgboost_multiclass_classifier(
     for clsname in cls_info_dict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
-        sgl_cls_info["train_n_rows"] = f["DATA/DATA"].shape[0]
-        sgl_cls_info["train_data"] = numpy.array(f["DATA/DATA"])
+        f_h5 = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["train_data_lbls"] = numpy.zeros(
             sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
         )
         sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
-        f.close()
+        f_h5.close()
         train_data_lst.append(sgl_cls_info["train_data"])
         train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
         print("Reading Class {} Validation".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
-        sgl_cls_info["valid_n_rows"] = f["DATA/DATA"].shape[0]
-        sgl_cls_info["valid_data"] = numpy.array(f["DATA/DATA"])
+        f_h5 = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        sgl_cls_info["valid_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["valid_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["valid_data_lbls"] = numpy.zeros(
             sgl_cls_info["valid_n_rows"], dtype=numpy.dtype(int)
         )
         sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
-        f.close()
+        f_h5.close()
         valid_data_lst.append(sgl_cls_info["valid_data"])
         valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
         print("Reading Class {} Testing".format(clsname))
-        f = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
-        sgl_cls_info["test_n_rows"] = f["DATA/DATA"].shape[0]
-        sgl_cls_info["test_data"] = numpy.array(f["DATA/DATA"])
+        f_h5 = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
+        sgl_cls_info["test_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["test_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["test_data_lbls"] = numpy.zeros(
             sgl_cls_info["test_n_rows"], dtype=numpy.dtype(int)
         )
         sgl_cls_info["test_data_lbls"][...] = cls_info_dict[clsname].id
-        f.close()
+        f_h5.close()
         test_data_lst.append(sgl_cls_info["test_data"])
         test_lbls_lst.append(sgl_cls_info["test_data_lbls"])
 
