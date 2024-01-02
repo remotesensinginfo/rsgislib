@@ -36,7 +36,7 @@
 ###########################################################################
 
 import gc
-from typing import Dict
+from typing import Dict, List
 
 import h5py
 import numpy
@@ -59,15 +59,15 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 
 
 def optimise_xgboost_binary_classifier(
-    out_params_file,
-    cls1_train_file,
-    cls1_valid_file,
-    cls2_train_file,
-    cls2_valid_file,
+    out_params_file: str,
+    cls1_train_file: str,
+    cls1_valid_file: str,
+    cls2_train_file: str,
+    cls2_valid_file: str,
     op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
-    n_threads=1,
+    n_threads: int = 1,
     mdl_cls_obj=None,
 ):
     """
@@ -334,15 +334,15 @@ def optimise_xgboost_binary_classifier(
 
 
 def train_xgboost_binary_classifier(
-    out_mdl_file,
-    cls_params_file,
-    cls1_train_file,
-    cls1_valid_file,
-    cls1_test_file,
-    cls2_train_file,
-    cls2_valid_file,
-    cls2_test_file,
-    n_threads=1,
+    out_mdl_file: str,
+    cls_params_file: str,
+    cls1_train_file: str,
+    cls1_valid_file: str,
+    cls1_test_file: str,
+    cls2_train_file: str,
+    cls2_valid_file: str,
+    cls2_test_file: str,
+    n_threads: int = 1,
     mdl_cls_obj=None,
 ):
     """
@@ -471,13 +471,13 @@ def train_xgboost_binary_classifier(
 
 
 def train_opt_xgboost_binary_classifier(
-    out_mdl_file,
-    cls1_train_file,
-    cls1_valid_file,
-    cls1_test_file,
-    cls2_train_file,
-    cls2_valid_file,
-    cls2_test_file,
+    out_mdl_file: str,
+    cls1_train_file: str,
+    cls1_valid_file: str,
+    cls1_test_file: str,
+    cls2_train_file: str,
+    cls2_valid_file: str,
+    cls2_test_file: str,
     op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
@@ -804,15 +804,15 @@ def train_opt_xgboost_binary_classifier(
 
 
 def apply_xgboost_binary_classifier(
-    model_file,
-    in_msk_img,
-    img_mask_val,
-    img_file_info,
-    out_prob_img,
-    gdalformat,
+    model_file: str,
+    in_msk_img: str,
+    img_mask_val: int,
+    img_file_info: List,
+    out_prob_img: str,
+    gdalformat: str = "KEA",
     out_class_img=None,
-    class_thres=5000,
-    n_threads=1,
+    class_thres: int = 5000,
+    n_threads: int = 1,
 ):
     """
     This function applies a trained binary (i.e., two classes) xgboost model. The function train_xgboost_binary_classifier
@@ -922,13 +922,13 @@ def apply_xgboost_binary_classifier(
 
 
 def optimise_xgboost_multiclass_classifier(
-    out_params_file,
-    cls_info_dict,
+    out_params_file: str,
+    cls_info_dict: Dict,
     sub_train_smpls=None,
     op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
-    n_threads=1,
+    n_threads: int = 1,
     mdl_cls_obj=None,
 ):
     """
@@ -1237,7 +1237,11 @@ def optimise_xgboost_multiclass_classifier(
 
 
 def train_xgboost_multiclass_classifier(
-    out_mdl_file, cls_params_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
+    out_mdl_file: str,
+    cls_params_file: str,
+    cls_info_dict: Dict,
+    n_threads: int = 1,
+    mdl_cls_obj=None,
 ):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
@@ -1720,15 +1724,15 @@ def train_opt_xgboost_multiclass_classifier(
 
 
 def apply_xgboost_multiclass_classifier(
-    class_train_info,
-    model_file,
-    in_mask_img,
-    img_mask_val,
-    img_file_info,
-    out_class_img,
-    gdalformat,
-    class_clr_names=True,
-    n_threads=1,
+    class_train_info: Dict,
+    model_file: str,
+    in_mask_img: str,
+    img_mask_val: int,
+    img_file_info: List,
+    out_class_img: str,
+    gdalformat: str = "KEA",
+    class_clr_names: bool = True,
+    n_threads: int = 1,
 ):
     """
     This function applies a trained multiple classes xgboost model. The function train_xgboost_multiclass_classifier
@@ -1868,16 +1872,16 @@ def apply_xgboost_multiclass_classifier(
 
 
 def apply_xgboost_multiclass_classifier_rat(
-    clumps_img,
-    variables,
-    model_file,
-    class_train_info,
-    out_col_int="OutClass",
-    out_col_str="OutClassName",
-    roi_col=None,
-    roi_val=1,
-    class_colours=True,
-    nthread=1,
+    clumps_img: str,
+    variables: List,
+    model_file: str,
+    class_train_info: Dict,
+    out_col_int: str = "OutClass",
+    out_col_str: str = "OutClassName",
+    roi_col: str = None,
+    roi_val: int = 1,
+    class_colours: bool = True,
+    n_threads: int = 1,
 ):
     """
     A function which will apply an XGBoost model within a Raster Attribute Table (RAT).
@@ -1896,7 +1900,7 @@ def apply_xgboost_multiclass_classifier_rat(
     :param roi_val: is a int value used within the roi_col to select a region to be classified (Default: 1)
     :param class_colours: is a boolean specifying whether the RAT colour table should be
                           updated using the classification colours (default: True)
-    :param nthread: The number of threads to use for the classifier."""
+    :param n_threads: The number of threads to use for the classifier."""
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
@@ -1978,7 +1982,7 @@ def apply_xgboost_multiclass_classifier_rat(
             setattr(outputs.outrat, "Green", green)
             setattr(outputs.outrat, "Blue", blue)
 
-    classifier = xgb.Booster({"nthread": nthread})
+    classifier = xgb.Booster({"nthreads": n_threads})
     classifier.load_model(model_file)
 
     n_classes = len(class_train_info)
