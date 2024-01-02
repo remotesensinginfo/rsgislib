@@ -199,7 +199,7 @@ def optimise_xgboost_binary_classifier(
             "nthread": n_threads,
             "eval_metric": "auc",
             "objective": "binary:logistic",
-            "num_boost_round": int(op_params["params"]["num_boost_round"])
+            "num_boost_round": int(op_params["params"]["num_boost_round"]),
         }
 
     elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
@@ -250,7 +250,7 @@ def optimise_xgboost_binary_classifier(
             "nthread": n_threads,
             "eval_metric": "auc",
             "objective": "binary:logistic",
-            "num_boost_round": int(optuna_opt_trial.params["num_boost_round"])
+            "num_boost_round": int(optuna_opt_trial.params["num_boost_round"]),
         }
 
     elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
@@ -268,7 +268,7 @@ def optimise_xgboost_binary_classifier(
             skopt.space.Integer(2, 100, name="num_boost_round"),
         ]
 
-        def _objective(values):
+        def _xgb_cls_skop_func(values):
             params = {
                 "eta": values[0],
                 "gamma": values[1],
@@ -304,7 +304,7 @@ def optimise_xgboost_binary_classifier(
             return acc_score
 
         res_gp = skopt.gp_minimize(
-            _objective, space, n_calls=20, random_state=0, n_random_starts=10
+            _xgb_cls_skop_func, space, n_calls=20, random_state=0, n_random_starts=10
         )
 
         print("Best score={}".format(res_gp.fun))
@@ -322,7 +322,7 @@ def optimise_xgboost_binary_classifier(
             "nthread": n_threads,
             "eval_metric": "auc",
             "objective": "binary:logistic",
-            "num_boost_round": int(best_params[6])
+            "num_boost_round": int(best_params[6]),
         }
     else:
         raise rsgislib.RSGISPyException(
@@ -481,9 +481,9 @@ def train_opt_xgboost_binary_classifier(
     op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
-    n_threads:int =1,
+    n_threads: int = 1,
     mdl_cls_obj=None,
-    out_params_file:str =None,
+    out_params_file: str = None,
 ):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary xgboost
@@ -706,7 +706,7 @@ def train_opt_xgboost_binary_classifier(
             skopt.space.Integer(2, 100, name="num_boost_round"),
         ]
 
-        def _objective(values):
+        def _xgb_cls_skop_func(values):
             params = {
                 "eta": values[0],
                 "gamma": values[1],
@@ -742,7 +742,7 @@ def train_opt_xgboost_binary_classifier(
             return acc_score
 
         res_gp = skopt.gp_minimize(
-            _objective, space, n_calls=20, random_state=0, n_random_starts=10
+            _xgb_cls_skop_func, space, n_calls=20, random_state=0, n_random_starts=10
         )
 
         print("Best score={}".format(res_gp.fun))
@@ -1167,7 +1167,7 @@ def optimise_xgboost_multiclass_classifier(
             skopt.space.Integer(2, 100, name="num_boost_round"),
         ]
 
-        def _objective(values):
+        def _xgb_cls_skop_func(values):
             params = {
                 "eta": values[0],
                 "gamma": values[1],
@@ -1206,7 +1206,7 @@ def optimise_xgboost_multiclass_classifier(
             return acc_score
 
         res_gp = skopt.gp_minimize(
-            _objective, space, n_calls=20, random_state=0, n_random_starts=10
+            _xgb_cls_skop_func, space, n_calls=20, random_state=0, n_random_starts=10
         )
 
         print("Best score={}".format(res_gp.fun))
@@ -1630,7 +1630,7 @@ def train_opt_xgboost_multiclass_classifier(
             skopt.space.Integer(2, 100, name="num_boost_round"),
         ]
 
-        def _objective(values):
+        def _xgb_cls_skop_func(values):
             params = {
                 "eta": values[0],
                 "gamma": values[1],
@@ -1669,7 +1669,7 @@ def train_opt_xgboost_multiclass_classifier(
             return acc_score
 
         res_gp = skopt.gp_minimize(
-            _objective, space, n_calls=20, random_state=0, n_random_starts=10
+            _xgb_cls_skop_func, space, n_calls=20, random_state=0, n_random_starts=10
         )
 
         print("Best score={}".format(res_gp.fun))
