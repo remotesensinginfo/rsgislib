@@ -36,6 +36,7 @@
 
 import gc
 import warnings
+from typing import List, Dict
 
 import h5py
 import numpy
@@ -60,22 +61,22 @@ warnings.filterwarnings("ignore")
 
 
 def optimise_lightgbm_binary_classifier(
-    out_params_file,
-    cls1_train_file,
-    cls1_valid_file,
-    cls2_train_file,
-    cls2_valid_file,
-    unbalanced=False,
+    out_params_file: str,
+    cls1_train_file: str,
+    cls1_valid_file: str,
+    cls2_train_file: str,
+    cls2_valid_file: str,
+    unbalanced: bool = False,
     op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
-    n_threads=1,
-    scale_pos_weight=None,
-    early_stopping_rounds=100,
-    num_iterations=5000,
-    num_boost_round=100,
-    max_n_leaves=50,
-    learning_rate=0.05,
+    n_threads: int = 1,
+    scale_pos_weight: float = None,
+    early_stopping_rounds: int = 100,
+    num_iterations: int = 5000,
+    num_boost_round: int = 100,
+    max_n_leaves: int = 50,
+    learning_rate: float = 0.05,
     mdl_cls_obj=None,
 ):
     """
@@ -448,26 +449,26 @@ def optimise_lightgbm_binary_classifier(
 
 
 def train_opt_lightgbm_binary_classifier(
-    out_mdl_file,
-    cls1_train_file,
-    cls1_valid_file,
-    cls1_test_file,
-    cls2_train_file,
-    cls2_valid_file,
-    cls2_test_file,
-    unbalanced=False,
+    out_mdl_file: str,
+    cls1_train_file: str,
+    cls1_valid_file: str,
+    cls1_test_file: str,
+    cls2_train_file: str,
+    cls2_valid_file: str,
+    cls2_test_file: str,
+    unbalanced: bool = False,
     op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
-    n_threads=1,
-    scale_pos_weight=None,
-    early_stopping_rounds=100,
-    num_iterations=5000,
-    num_boost_round=100,
-    learning_rate=0.05,
-    max_n_leaves=50,
+    n_threads: int = 1,
+    scale_pos_weight: float = None,
+    early_stopping_rounds: str = 100,
+    num_iterations: str = 5000,
+    num_boost_round: str = 100,
+    learning_rate: float = 0.05,
+    max_n_leaves: str = 50,
     mdl_cls_obj=None,
-    out_params_file=None,
+    out_params_file: str = None,
 ):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
@@ -882,21 +883,21 @@ def train_opt_lightgbm_binary_classifier(
 
 
 def train_lightgbm_binary_classifier(
-    out_mdl_file,
-    cls_params_file,
-    cls1_train_file,
-    cls1_valid_file,
-    cls1_test_file,
-    cls2_train_file,
-    cls2_valid_file,
-    cls2_test_file,
-    unbalanced=False,
-    n_threads=1,
-    scale_pos_weight=None,
-    early_stopping_rounds=100,
-    num_iterations=5000,
-    num_boost_round=100,
-    learning_rate=0.05,
+    out_mdl_file: str,
+    cls_params_file: str,
+    cls1_train_file: str,
+    cls1_valid_file: str,
+    cls1_test_file: str,
+    cls2_train_file: str,
+    cls2_valid_file: str,
+    cls2_test_file: str,
+    unbalanced: bool = False,
+    n_threads: int = 1,
+    scale_pos_weight: float = None,
+    early_stopping_rounds: int = 100,
+    num_iterations: int = 5000,
+    num_boost_round: int = 100,
+    learning_rate: float = 0.05,
     mdl_cls_obj=None,
 ):
     """
@@ -1043,14 +1044,14 @@ def train_lightgbm_binary_classifier(
 
 
 def apply_lightgbm_binary_classifier(
-    model_file,
-    in_img_msk,
-    img_mask_val,
-    img_file_info,
-    out_score_img,
-    gdalformat,
-    out_class_img=None,
-    class_thres=5000,
+    model_file: str,
+    in_img_msk: str,
+    img_mask_val: int,
+    img_file_info: List,
+    out_score_img: str,
+    gdalformat: str = "KEA",
+    out_class_img: str = None,
+    class_thres: int = 5000,
 ):
     """
     This function applies a trained binary (i.e., two classes) lightgbm model. The function train_lightgbm_binary_classifier
@@ -1157,18 +1158,18 @@ def apply_lightgbm_binary_classifier(
 
 
 def optimise_lightgbm_multiclass_classifier(
-    out_params_file,
-    cls_info_dict,
-    unbalanced=False,
+    out_params_file: str,
+    cls_info_dict: Dict,
+    unbalanced: bool = False,
     op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
-    n_threads=1,
-    early_stopping_rounds=100,
-    num_iterations=5000,
-    num_boost_round=100,
-    max_n_leaves=50,
-    learning_rate=0.05,
+    n_threads: int = 1,
+    early_stopping_rounds: int = 100,
+    num_iterations: int = 5000,
+    num_boost_round: int = 100,
+    max_n_leaves: int = 50,
+    learning_rate: float = 0.05,
     mdl_cls_obj=None,
 ):
     """
@@ -1540,19 +1541,19 @@ def optimise_lightgbm_multiclass_classifier(
 
 
 def train_opt_lightgbm_multiclass_classifier(
-    out_mdl_file,
-    cls_info_dict,
-    out_info_file=None,
-    unbalanced=False,
+    out_mdl_file: str,
+    cls_info_dict: Dict,
+    out_info_file: str = None,
+    unbalanced: bool = False,
     op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
-    n_threads=1,
-    early_stopping_rounds=100,
-    num_iterations=5000,
-    num_boost_round=100,
-    max_n_leaves=50,
-    learning_rate=0.05,
+    n_threads: int = 1,
+    early_stopping_rounds: int = 100,
+    num_iterations: int = 5000,
+    num_boost_round: int = 100,
+    max_n_leaves: int = 50,
+    learning_rate: float = 0.05,
     mdl_cls_obj=None,
 ):
     """
@@ -1969,14 +1970,14 @@ def train_opt_lightgbm_multiclass_classifier(
 def train_lightgbm_multiclass_classifier(
     params_file: str,
     out_mdl_file: str,
-    cls_info_dict,
-    out_info_file=None,
-    unbalanced=False,
-    n_threads=1,
-    early_stopping_rounds=100,
-    num_iterations=5000,
-    num_boost_round=100,
-    learning_rate=0.05,
+    cls_info_dict: Dict,
+    out_info_file: str = None,
+    unbalanced: bool = False,
+    n_threads: int = 1,
+    early_stopping_rounds: int = 100,
+    num_iterations: int = 5000,
+    num_boost_round: int = 100,
+    learning_rate: int = 0.05,
     mdl_cls_obj=None,
 ):
     """
@@ -2126,14 +2127,14 @@ def train_lightgbm_multiclass_classifier(
 
 
 def apply_lightgbm_multiclass_classifier(
-    cls_train_info,
-    model_file,
-    in_img_mask,
-    img_mask_val,
-    img_file_info,
-    out_class_img,
-    gdalformat,
-    class_clr_names=True,
+    cls_train_info: Dict,
+    model_file: str,
+    in_img_mask: str,
+    img_mask_val: int,
+    img_file_info: List,
+    out_class_img: str,
+    gdalformat: str = "KEA",
+    class_clr_names: bool = True,
 ):
     """
     This function applies a trained multiple classes lightgbm model. The function train_lightgbm_multiclass_classifier
