@@ -402,7 +402,7 @@ def optimise_lightgbm_binary_classifier(
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
             )
 
-            acc_score = -roc_auc_score(vaild_lbl_np, model_lgb.predict(d_valid))
+            acc_score = -roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
             print("\nAccScore.....", -acc_score, ".....iter.....")
             gc.collect()
             return acc_score
@@ -805,7 +805,7 @@ def train_opt_lightgbm_binary_classifier(
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
             )
 
-            acc_score = -roc_auc_score(vaild_lbl_np, model_lgb.predict(d_valid))
+            acc_score = -roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
             print("\nAccScore.....", -acc_score, ".....iter.....")
             gc.collect()
             return acc_score
