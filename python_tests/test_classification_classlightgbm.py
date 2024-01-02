@@ -13,15 +13,33 @@ try:
 except ImportError:
     LIGHTGBM_NOT_AVAIL = True
 
+SKOPT_NOT_AVAIL = False
+try:
+    import skopt
+except ImportError:
+    SKOPT_NOT_AVAIL = True
+
+BAYESOPT_NOT_AVAIL = False
+try:
+    import bayes_opt
+except ImportError:
+    BAYESOPT_NOT_AVAIL = True
+
+OPTUNA_NOT_AVAIL = False
+try:
+    import optuna
+except ImportError:
+    OPTUNA_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
 
 
 @pytest.mark.skipif(
-    (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
-    reason="h5py or lightgbm dependencies not available",
+    (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL or SKOPT_NOT_AVAIL),
+    reason="h5py, skopt or lightgbm dependencies not available",
 )
-def test_optimise_lightgbm_binary_classifier(tmp_path):
+def test_optimise_lightgbm_binary_classifier_skopt(tmp_path):
     import rsgislib.classification.classlightgbm
 
     cls1_train_file = os.path.join(
@@ -44,6 +62,10 @@ def test_optimise_lightgbm_binary_classifier(tmp_path):
         cls1_valid_file,
         cls2_train_file,
         cls2_valid_file,
+        unbalanced=False,
+        op_mthd = rsgislib.OPT_MTHD_BAYSIANOPT,
+        n_opt_iters = 1,
+        rnd_seed = None,
         n_threads=1,
         scale_pos_weight=None,
         mdl_cls_obj=None,
@@ -97,10 +119,10 @@ def test_train_lightgbm_binary_classifier(tmp_path):
 
 
 @pytest.mark.skipif(
-    (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
-    reason="h5py or lightgbm dependencies not available",
+    (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL or SKOPT_NOT_AVAIL),
+    reason="h5py, skopt or lightgbm dependencies not available",
 )
-def test_train_opt_lightgbm_binary_classifier(tmp_path):
+def test_train_opt_lightgbm_binary_classifier_skopt(tmp_path):
     import rsgislib.classification.classlightgbm
 
     cls1_train_file = os.path.join(
@@ -133,6 +155,10 @@ def test_train_opt_lightgbm_binary_classifier(tmp_path):
         cls2_train_file,
         cls2_valid_file,
         cls2_test_file,
+        unbalanced=False,
+        op_mthd = rsgislib.OPT_MTHD_BAYSIANOPT,
+        n_opt_iters = 1,
+        rnd_seed = None,
         n_threads=1,
         scale_pos_weight=None,
         mdl_cls_obj=None,
@@ -209,10 +235,10 @@ def test_apply_lightgbm_binary_classifier(tmp_path):
 
 
 @pytest.mark.skipif(
-    (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
-    reason="h5py or lightgbm dependencies not available",
+    (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL or SKOPT_NOT_AVAIL),
+    reason="h5py, skopt or lightgbm dependencies not available",
 )
-def test_train_lightgbm_multiclass_classifier(tmp_path):
+def test_train_opt_lightgbm_multiclass_classifier_skopt(tmp_path):
     import rsgislib.classification.classlightgbm
 
     cls_info_dict = dict()
@@ -282,18 +308,25 @@ def test_train_lightgbm_multiclass_classifier(tmp_path):
     )
 
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.txt")
-    rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier(
-        out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
+    rsgislib.classification.classlightgbm.train_opt_lightgbm_multiclass_classifier(
+            out_mdl_file,
+            cls_info_dict,
+            out_info_file=None,
+            unbalanced=False,
+            op_mthd = rsgislib.OPT_MTHD_BAYSIANOPT,
+            n_opt_iters = 100,
+            rnd_seed = None,
+            n_threads = 1,
     )
 
     assert os.path.exists(out_mdl_file)
 
 
 @pytest.mark.skipif(
-    (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL),
-    reason="h5py or lightgbm dependencies not available",
+    (H5PY_NOT_AVAIL or LIGHTGBM_NOT_AVAIL or SKOPT_NOT_AVAIL),
+    reason="h5py, skopt or lightgbm dependencies not available",
 )
-def test_apply_lightgbm_multiclass_classifier(tmp_path):
+def test_apply_lightgbm_multiclass_classifier_skopt(tmp_path):
     import rsgislib.classification.classlightgbm
     import rsgislib.imageutils
 
@@ -364,8 +397,15 @@ def test_apply_lightgbm_multiclass_classifier(tmp_path):
     )
 
     out_mdl_file = os.path.join(tmp_path, "out_mdl_file.txt")
-    rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier(
-        out_mdl_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
+    rsgislib.classification.classlightgbm.train_opt_lightgbm_multiclass_classifier(
+            out_mdl_file,
+            cls_info_dict,
+            out_info_file=None,
+            unbalanced=False,
+            op_mthd=rsgislib.OPT_MTHD_BAYSIANOPT,
+            n_opt_iters=100,
+            rnd_seed=None,
+            n_threads=1,
     )
 
     in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
