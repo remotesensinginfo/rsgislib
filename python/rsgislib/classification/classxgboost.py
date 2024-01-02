@@ -64,8 +64,10 @@ def optimise_xgboost_binary_classifier(
     cls1_valid_file,
     cls2_train_file,
     cls2_valid_file,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    n_opt_iters: int = 100,
+    rnd_seed: int = None,
     n_threads=1,
-    scale_pos_weight=None,
     mdl_cls_obj=None,
 ):
     """
@@ -82,16 +84,11 @@ def optimise_xgboost_binary_classifier(
     :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
     :param cls2_test_file: Testing samples HDF5 file for the 'other' class
     :param n_threads: The number of threads to use for the training.
-    :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
-                             Parameter used to balance imbalanced training data.
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
 
     """
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
-
-    from skopt import gp_minimize
-    from skopt.space import Integer, Real
 
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, "r")
@@ -132,77 +129,206 @@ def optimise_xgboost_binary_classifier(
         label=numpy.concatenate((train_cls2_lbl, train_cls1_lbl)),
     )
 
-    space = [
-        Real(0.01, 0.9, name="eta"),
-        Integer(0, 100, name="gamma"),
-        Integer(2, 20, name="max_depth"),
-        Integer(1, 10, name="min_child_weight"),
-        Integer(0, 10, name="max_delta_step"),
-        Real(0.5, 1, name="subsample"),
-        Integer(2, 100, name="num_boost_round"),
-    ]
+    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
+        print("Using: OPT_MTHD_BAYSIANOPT")
+        from bayes_opt import BayesianOptimization
 
-    if scale_pos_weight is None:
-        scale_pos_weight = num_cls2_train_rows / num_cls1_train_rows
-        if scale_pos_weight < 1:
-            scale_pos_weight = 1
-    print("scale_pos_weight = {}".format(scale_pos_weight))
+        def _xgb_cls_bo_func(
+            eta,
+            gamma,
+            max_depth,
+            min_child_weight,
+            max_delta_step,
+            subsample,
+            num_boost_round,
+        ):
+            params = {
+                "eta": float(eta),
+                "gamma": int(gamma),
+                "max_depth": int(max_depth),
+                "min_child_weight": int(min_child_weight),
+                "max_delta_step": int(max_delta_step),
+                "subsample": float(subsample),
+                "nthread": n_threads,
+                "eval_metric": "auc",
+                "objective": "binary:logistic",
+            }
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                int(num_boost_round),
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
 
-    def _objective(values):
+            acc_score = roc_auc_score(vaild_lbl_np, model_xgb.predict(d_valid))
+            gc.collect()
+            return acc_score
+
+        hyperparam_space = {
+            "eta": (0.01, 0.9),
+            "gamma": (0, 100),
+            "max_depth": (2, 20),
+            "min_child_weight": (1, 10),
+            "max_delta_step": (0, 10),
+            "subsample": (0.5, 1),
+            "num_boost_round": (2, 100),
+        }
+
+        bo_opt_obj = BayesianOptimization(
+            f=_xgb_cls_bo_func,
+            pbounds=hyperparam_space,
+            random_state=rnd_seed,
+            verbose=10,
+        )
+
+        bo_opt_obj.maximize(init_points=10, n_iter=n_opt_iters)
+
+        op_params = bo_opt_obj.max
         params = {
-            "eta": values[0],
-            "gamma": values[1],
-            "max_depth": values[2],
-            "min_child_weight": values[3],
-            "max_delta_step": values[4],
-            "subsample": values[5],
+            "eta": float(op_params["params"]["eta"]),
+            "gamma": int(op_params["params"]["gamma"]),
+            "max_depth": int(op_params["params"]["max_depth"]),
+            "min_child_weight": int(op_params["params"]["min_child_weight"]),
+            "max_delta_step": int(op_params["params"]["max_delta_step"]),
+            "subsample": float(op_params["params"]["subsample"]),
             "nthread": n_threads,
             "eval_metric": "auc",
             "objective": "binary:logistic",
+            "num_boost_round": int(op_params["params"]["num_boost_round"])
         }
 
-        print("\nNext set of params.....", params)
+    elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
+        print("Using OPT_MTHD_OPTUNA")
+        import optuna
 
-        num_boost_round = values[6]
-        print("num_boost_round = {}.".format(num_boost_round))
+        def _xgb_cls_optuna_func(trial):
+            params = {
+                "eta": trial.suggest_float("eta", 0.01, 0.9),
+                "gamma": trial.suggest_int("gamma", 0, 100),
+                "max_depth": trial.suggest_int("max_depth", 2, 20),
+                "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
+                "max_delta_step": trial.suggest_int("max_delta_step", 0, 10),
+                "subsample": trial.suggest_float("subsample", 0.5, 1),
+                "nthread": n_threads,
+                "eval_metric": "auc",
+                "objective": "binary:logistic",
+            }
+            num_boost_round_trial = trial.suggest_int("num_boost_round", 2, 100)
 
-        watchlist = [(d_train, "train"), (d_valid, "validation")]
-        evals_results = {}
-        model_xgb = xgb.train(
-            params,
-            d_train,
-            num_boost_round,
-            evals=watchlist,
-            evals_result=evals_results,
-            verbose_eval=False,
-            xgb_model=mdl_cls_obj,
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                num_boost_round_trial,
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
+
+            acc_score = roc_auc_score(vaild_lbl_np, model_xgb.predict(d_valid))
+            gc.collect()
+            return acc_score
+
+        optuna_opt_obj = optuna.create_study(direction="maximize")
+        optuna_opt_obj.optimize(_xgb_cls_optuna_func, n_trials=n_opt_iters, timeout=600)
+
+        optuna_opt_trial = optuna_opt_obj.best_trial
+        params = {
+            "eta": float(optuna_opt_trial.params["eta"]),
+            "gamma": int(optuna_opt_trial.params["gamma"]),
+            "max_depth": int(optuna_opt_trial.params["max_depth"]),
+            "min_child_weight": int(optuna_opt_trial.params["min_child_weight"]),
+            "max_delta_step": int(optuna_opt_trial.params["max_delta_step"]),
+            "subsample": float(optuna_opt_trial.params["subsample"]),
+            "nthread": n_threads,
+            "eval_metric": "auc",
+            "objective": "binary:logistic",
+            "num_boost_round": int(optuna_opt_trial.params["num_boost_round"])
+        }
+
+    elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
+        print("Using OPT_MTHD_SKOPT")
+        import skopt
+        import skopt.space
+
+        space = [
+            skopt.space.Real(0.01, 0.9, name="eta"),
+            skopt.space.Integer(0, 100, name="gamma"),
+            skopt.space.Integer(2, 20, name="max_depth"),
+            skopt.space.Integer(1, 10, name="min_child_weight"),
+            skopt.space.Integer(0, 10, name="max_delta_step"),
+            skopt.space.Real(0.5, 1, name="subsample"),
+            skopt.space.Integer(2, 100, name="num_boost_round"),
+        ]
+
+        def _objective(values):
+            params = {
+                "eta": values[0],
+                "gamma": values[1],
+                "max_depth": values[2],
+                "min_child_weight": values[3],
+                "max_delta_step": values[4],
+                "subsample": values[5],
+                "nthread": n_threads,
+                "eval_metric": "auc",
+                "objective": "binary:logistic",
+            }
+
+            print("\nNext set of params.....", params)
+
+            num_boost_round = values[6]
+            print("num_boost_round = {}.".format(num_boost_round))
+
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                num_boost_round,
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
+
+            acc_score = -roc_auc_score(vaild_lbl_np, model_xgb.predict(d_valid))
+            print("\nAccScore.....", -acc_score, ".....iter.....")
+            gc.collect()
+            return acc_score
+
+        res_gp = skopt.gp_minimize(
+            _objective, space, n_calls=20, random_state=0, n_random_starts=10
         )
 
-        auc = -roc_auc_score(vaild_lbl_np, model_xgb.predict(d_valid))
-        print("\nAUROC.....", -auc, ".....iter.....")
-        gc.collect()
-        return auc
+        print("Best score={}".format(res_gp.fun))
+        best_params = res_gp.x
+        print("Best Params:\n{}".format(best_params))
 
-    res_gp = gp_minimize(
-        _objective, space, n_calls=20, random_state=0, n_random_starts=10
-    )
-
-    print("Best score={}".format(res_gp.fun))
-
-    best_params = res_gp.x
-
-    params = {
-        "eta": float(best_params[0]),
-        "gamma": int(best_params[1]),
-        "max_depth": int(best_params[2]),
-        "min_child_weight": int(best_params[3]),
-        "max_delta_step": int(best_params[4]),
-        "subsample": float(best_params[5]),
-        "nthread": int(n_threads),
-        "eval_metric": "auc",
-        "objective": "binary:logistic",
-        "num_boost_round": int(best_params[6]),
-    }
+        print("Start Training Find Classifier")
+        params = {
+            "eta": float(best_params[0]),
+            "gamma": int(best_params[1]),
+            "max_depth": int(best_params[2]),
+            "min_child_weight": int(best_params[3]),
+            "max_delta_step": int(best_params[4]),
+            "subsample": float(best_params[5]),
+            "nthread": n_threads,
+            "eval_metric": "auc",
+            "objective": "binary:logistic",
+            "num_boost_round": int(best_params[6])
+        }
+    else:
+        raise rsgislib.RSGISPyException(
+            "Do not recognise or do not have implementation "
+            "for the optimisation method specified."
+        )
 
     rsgislib.tools.utils.write_dict_to_json(params, out_params_file)
 
@@ -234,8 +360,6 @@ def train_xgboost_binary_classifier(
     :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
     :param cls2_test_file: Testing samples HDF5 file for the 'other' class
     :param n_threads: The number of threads to use for the training.
-    :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
-                             Parameter used to balance imbalanced training data.
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
 
     """
@@ -354,10 +478,12 @@ def train_opt_xgboost_binary_classifier(
     cls2_train_file,
     cls2_valid_file,
     cls2_test_file,
-    n_threads=1,
-    scale_pos_weight=None,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    n_opt_iters: int = 100,
+    rnd_seed: int = None,
+    n_threads:int =1,
     mdl_cls_obj=None,
-    out_params_file=None,
+    out_params_file:str =None,
 ):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary xgboost
@@ -373,8 +499,6 @@ def train_opt_xgboost_binary_classifier(
     :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
     :param cls2_test_file: Testing samples HDF5 file for the 'other' class
     :param n_threads: The number of threads to use for the training.
-    :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
-                             Parameter used to balance imbalanced training data.
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
     :param out_params_file: The output model parameters which have been optimised.
                             If None then no file will be outputted.
@@ -443,98 +567,212 @@ def train_opt_xgboost_binary_classifier(
     test_lbl_np = numpy.concatenate((test_cls2_lbl, test_cls1_lbl))
     d_test = xgb.DMatrix(test_np, label=test_lbl_np)
 
-    space = [
-        Real(0.01, 0.9, name="eta"),
-        Integer(0, 100, name="gamma"),
-        Integer(2, 20, name="max_depth"),
-        Integer(1, 10, name="min_child_weight"),
-        Integer(0, 10, name="max_delta_step"),
-        Real(0.5, 1, name="subsample"),
-        Integer(2, 100, name="num_boost_round"),
-    ]
+    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
+        print("Using: OPT_MTHD_BAYSIANOPT")
+        from bayes_opt import BayesianOptimization
 
-    if scale_pos_weight is None:
-        scale_pos_weight = num_cls2_train_rows / num_cls1_train_rows
-        if scale_pos_weight < 1:
-            scale_pos_weight = 1
-    print("scale_pos_weight = {}".format(scale_pos_weight))
+        def _xgb_cls_bo_func(
+            eta,
+            gamma,
+            max_depth,
+            min_child_weight,
+            max_delta_step,
+            subsample,
+            num_boost_round,
+        ):
+            params = {
+                "eta": float(eta),
+                "gamma": int(gamma),
+                "max_depth": int(max_depth),
+                "min_child_weight": int(min_child_weight),
+                "max_delta_step": int(max_delta_step),
+                "subsample": float(subsample),
+                "nthread": n_threads,
+                "eval_metric": "auc",
+                "objective": "binary:logistic",
+            }
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                int(num_boost_round),
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
 
-    def _objective(values):
+            acc_score = roc_auc_score(vaild_lbl_np, model_xgb.predict(d_valid))
+            gc.collect()
+            return acc_score
+
+        hyperparam_space = {
+            "eta": (0.01, 0.9),
+            "gamma": (0, 100),
+            "max_depth": (2, 20),
+            "min_child_weight": (1, 10),
+            "max_delta_step": (0, 10),
+            "subsample": (0.5, 1),
+            "num_boost_round": (2, 100),
+        }
+
+        bo_opt_obj = BayesianOptimization(
+            f=_xgb_cls_bo_func,
+            pbounds=hyperparam_space,
+            random_state=rnd_seed,
+            verbose=10,
+        )
+
+        bo_opt_obj.maximize(init_points=10, n_iter=n_opt_iters)
+
+        op_params = bo_opt_obj.max
         params = {
-            "eta": values[0],
-            "gamma": values[1],
-            "max_depth": values[2],
-            "min_child_weight": values[3],
-            "max_delta_step": values[4],
-            "subsample": values[5],
+            "eta": float(op_params["params"]["eta"]),
+            "gamma": int(op_params["params"]["gamma"]),
+            "max_depth": int(op_params["params"]["max_depth"]),
+            "min_child_weight": int(op_params["params"]["min_child_weight"]),
+            "max_delta_step": int(op_params["params"]["max_delta_step"]),
+            "subsample": float(op_params["params"]["subsample"]),
+            "nthread": n_threads,
+            "eval_metric": "auc",
+            "objective": "binary:logistic",
+        }
+        num_boost_round = int(op_params["params"]["num_boost_round"])
+
+    elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
+        print("Using OPT_MTHD_OPTUNA")
+        import optuna
+
+        def _xgb_cls_optuna_func(trial):
+            params = {
+                "eta": trial.suggest_float("eta", 0.01, 0.9),
+                "gamma": trial.suggest_int("gamma", 0, 100),
+                "max_depth": trial.suggest_int("max_depth", 2, 20),
+                "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
+                "max_delta_step": trial.suggest_int("max_delta_step", 0, 10),
+                "subsample": trial.suggest_float("subsample", 0.5, 1),
+                "nthread": n_threads,
+                "eval_metric": "auc",
+                "objective": "binary:logistic",
+            }
+            num_boost_round_trial = trial.suggest_int("num_boost_round", 2, 100)
+
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                num_boost_round_trial,
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
+
+            acc_score = roc_auc_score(vaild_lbl_np, model_xgb.predict(d_valid))
+            gc.collect()
+            return acc_score
+
+        optuna_opt_obj = optuna.create_study(direction="maximize")
+        optuna_opt_obj.optimize(_xgb_cls_optuna_func, n_trials=n_opt_iters, timeout=600)
+
+        optuna_opt_trial = optuna_opt_obj.best_trial
+        params = {
+            "eta": float(optuna_opt_trial.params["eta"]),
+            "gamma": int(optuna_opt_trial.params["gamma"]),
+            "max_depth": int(optuna_opt_trial.params["max_depth"]),
+            "min_child_weight": int(optuna_opt_trial.params["min_child_weight"]),
+            "max_delta_step": int(optuna_opt_trial.params["max_delta_step"]),
+            "subsample": float(optuna_opt_trial.params["subsample"]),
+            "nthread": n_threads,
+            "eval_metric": "auc",
+            "objective": "binary:logistic",
+        }
+        num_boost_round = int(optuna_opt_trial.params["num_boost_round"])
+
+    elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
+        print("Using OPT_MTHD_SKOPT")
+        import skopt
+        import skopt.space
+
+        space = [
+            skopt.space.Real(0.01, 0.9, name="eta"),
+            skopt.space.Integer(0, 100, name="gamma"),
+            skopt.space.Integer(2, 20, name="max_depth"),
+            skopt.space.Integer(1, 10, name="min_child_weight"),
+            skopt.space.Integer(0, 10, name="max_delta_step"),
+            skopt.space.Real(0.5, 1, name="subsample"),
+            skopt.space.Integer(2, 100, name="num_boost_round"),
+        ]
+
+        def _objective(values):
+            params = {
+                "eta": values[0],
+                "gamma": values[1],
+                "max_depth": values[2],
+                "min_child_weight": values[3],
+                "max_delta_step": values[4],
+                "subsample": values[5],
+                "nthread": n_threads,
+                "eval_metric": "auc",
+                "objective": "binary:logistic",
+            }
+
+            print("\nNext set of params.....", params)
+
+            num_boost_round = values[6]
+            print("num_boost_round = {}.".format(num_boost_round))
+
+            watchlist = [(d_train, "train"), (d_valid, "validation")]
+            evals_results = {}
+            model_xgb = xgb.train(
+                params,
+                d_train,
+                num_boost_round,
+                evals=watchlist,
+                evals_result=evals_results,
+                verbose_eval=False,
+                xgb_model=mdl_cls_obj,
+            )
+
+            acc_score = -roc_auc_score(vaild_lbl_np, model_xgb.predict(d_valid))
+            print("\nAccScore.....", -acc_score, ".....iter.....")
+            gc.collect()
+            return acc_score
+
+        res_gp = skopt.gp_minimize(
+            _objective, space, n_calls=20, random_state=0, n_random_starts=10
+        )
+
+        print("Best score={}".format(res_gp.fun))
+        best_params = res_gp.x
+        print("Best Params:\n{}".format(best_params))
+
+        print("Start Training Find Classifier")
+        params = {
+            "eta": best_params[0],
+            "gamma": best_params[1],
+            "max_depth": best_params[2],
+            "min_child_weight": best_params[3],
+            "max_delta_step": best_params[4],
+            "subsample": best_params[5],
             "nthread": n_threads,
             "eval_metric": "auc",
             "objective": "binary:logistic",
         }
 
-        print("\nNext set of params.....", params)
-
-        num_boost_round = values[6]
-        print("num_boost_round = {}.".format(num_boost_round))
-
-        watchlist = [(d_train, "train"), (d_valid, "validation")]
-        evals_results = {}
-        model_xgb = xgb.train(
-            params,
-            d_train,
-            num_boost_round,
-            evals=watchlist,
-            evals_result=evals_results,
-            verbose_eval=False,
-            xgb_model=mdl_cls_obj,
+        num_boost_round = best_params[6]
+    else:
+        raise rsgislib.RSGISPyException(
+            "Do not recognise or do not have implementation "
+            "for the optimisation method specified."
         )
 
-        auc = -roc_auc_score(vaild_lbl_np, model_xgb.predict(d_valid))
-        print("\nAUROC.....", -auc, ".....iter.....")
-        gc.collect()
-        return auc
-
-    res_gp = gp_minimize(
-        _objective, space, n_calls=20, random_state=0, n_random_starts=10
-    )
-
-    print("Best score={}".format(res_gp.fun))
-
-    best_params = res_gp.x
-
-    print("Best Params:\n{}".format(best_params))
-
     if out_params_file is not None:
-        out_params = {
-            "eta": float(best_params[0]),
-            "gamma": int(best_params[1]),
-            "max_depth": int(best_params[2]),
-            "min_child_weight": int(best_params[3]),
-            "max_delta_step": int(best_params[4]),
-            "subsample": float(best_params[5]),
-            "nthread": int(n_threads),
-            "eval_metric": "auc",
-            "objective": "binary:logistic",
-            "num_boost_round": int(best_params[6]),
-        }
-
-        rsgislib.tools.utils.write_dict_to_json(out_params, out_params_file)
+        rsgislib.tools.utils.write_dict_to_json(params, out_params_file)
 
     print("Start Training Find Classifier")
-
-    params = {
-        "eta": best_params[0],
-        "gamma": best_params[1],
-        "max_depth": best_params[2],
-        "min_child_weight": best_params[3],
-        "max_delta_step": best_params[4],
-        "subsample": best_params[5],
-        "nthread": n_threads,
-        "eval_metric": "auc",
-        "objective": "binary:logistic",
-    }
-
-    num_boost_round = best_params[6]
 
     evals_results = {}
     watchlist = [(d_train, "train"), (d_valid, "validation")]
@@ -1455,7 +1693,8 @@ def train_opt_xgboost_multiclass_classifier(
         num_boost_round = best_params[6]
     else:
         raise rsgislib.RSGISPyException(
-            "Do not recognise or do not have implementation for the optimisation method specified."
+            "Do not recognise or do not have implementation "
+            "for the optimisation method specified."
         )
 
     watchlist = [(d_train, "train"), (d_valid, "validation")]
