@@ -34,7 +34,8 @@
 #
 ###########################################################################
 
-from __future__ import print_function
+import gc
+import warnings
 
 import h5py
 import numpy
@@ -45,6 +46,7 @@ import rsgislib
 import rsgislib.imagecalc
 import rsgislib.imageutils
 import rsgislib.rastergis
+import rsgislib.tools.utils
 
 HAVE_LIGHTGBM = True
 try:
@@ -52,10 +54,9 @@ try:
 except ImportError:
     HAVE_LIGHTGBM = False
 
-import gc
-import json
-
 from sklearn.metrics import accuracy_score, roc_auc_score
+
+warnings.filterwarnings("ignore")
 
 
 def optimise_lightgbm_binary_classifier(
@@ -65,6 +66,9 @@ def optimise_lightgbm_binary_classifier(
     cls2_train_file,
     cls2_valid_file,
     unbalanced=False,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    n_opt_iters: int = 100,
+    rnd_seed: int = None,
     n_threads=1,
     scale_pos_weight=None,
     early_stopping_rounds=100,
@@ -140,6 +144,412 @@ def optimise_lightgbm_binary_classifier(
 
     vaild_np = numpy.concatenate((valid_cls2, valid_cls1))
     vaild_lbl_np = numpy.concatenate((valid_cls2_lbl, valid_cls1_lbl))
+
+    if scale_pos_weight is None:
+        scale_pos_weight = num_cls2_train_rows / num_cls1_train_rows
+        if scale_pos_weight < 1:
+            scale_pos_weight = 1
+    print("scale_pos_weight = {}".format(scale_pos_weight))
+
+    if op_mthd == rsgislib.OPT_MTHD_BAYSIANOPT:
+        print("Using: OPT_MTHD_BAYSIANOPT")
+        from bayes_opt import BayesianOptimization
+
+        def _lgbm_cls_bo_func(
+            max_depth,
+            num_leaves,
+            min_data_in_leaf,
+            lambda_l1,
+            lambda_l2,
+            feature_fraction,
+            bagging_fraction,
+            min_split_gain,
+            min_child_weight,
+            reg_alpha,
+            reg_lambda,
+        ):
+            params = {
+                "max_depth": int(max_depth),
+                "num_leaves": int(num_leaves),
+                "min_data_in_leaf": int(min_data_in_leaf),
+                "feature_pre_filter": False,
+                "lambda_l1": float(lambda_l1),
+                "lambda_l2": float(lambda_l2),
+                "metric": "auc,binary_error",
+                "nthread": n_threads,
+                "boosting_type": "gbdt",
+                "objective": "binary",
+                "learning_rate": learning_rate,
+                "feature_fraction": float(feature_fraction),
+                "bagging_fraction": float(bagging_fraction),
+                "min_split_gain": float(min_split_gain),
+                "min_child_weight": float(min_child_weight),
+                "reg_alpha": float(reg_alpha),
+                "reg_lambda": float(reg_lambda),
+                "num_iterations": num_iterations,
+                "boost_from_average": True,
+                "is_unbalance": unbalanced,
+                "verbose": -1,
+                "verbosity": -1,
+            }
+
+            if not unbalanced:
+                params["scale_pos_weight"] = scale_pos_weight
+
+            model_lgb = lgb.train(
+                params,
+                d_train,
+                valid_sets=[d_train, d_valid],
+                valid_names=["train", "valid"],
+                num_boost_round=num_boost_round,
+                feval=None,
+                init_model=mdl_cls_obj,
+                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
+            )
+
+            acc_score = roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
+            gc.collect()
+            return acc_score
+
+        hyperparam_space = {
+            "max_depth": (3, 10),
+            "num_leaves": (6, max_n_leaves),
+            "min_data_in_leaf": (3, 50),
+            "lambda_l1": (0, 5),
+            "lambda_l2": (0, 3),
+            "feature_fraction": (0.1, 0.9),
+            "bagging_fraction": (0.8, 1.0),
+            "min_split_gain": (0.001, 0.1),
+            "min_child_weight": (1, 50),
+            "reg_alpha": (1, 1.2),
+            "reg_lambda": (1, 1.4),
+        }
+
+        bo_opt_obj = BayesianOptimization(
+            f=_lgbm_cls_bo_func,
+            pbounds=hyperparam_space,
+            random_state=rnd_seed,
+            verbose=10,
+        )
+
+        bo_opt_obj.maximize(init_points=10, n_iter=n_opt_iters)
+
+        op_params = bo_opt_obj.max
+
+        params = {
+            "max_depth": int(op_params["params"]["max_depth"]),
+            "num_leaves": int(op_params["params"]["num_leaves"]),
+            "min_data_in_leaf": int(op_params["params"]["min_data_in_leaf"]),
+            "feature_pre_filter": False,
+            "lambda_l1": float(op_params["params"]["lambda_l1"]),
+            "lambda_l2": float(op_params["params"]["lambda_l2"]),
+            "metric": "auc,binary_error",
+            "nthread": n_threads,
+            "boosting_type": "gbdt",
+            "objective": "binary",
+            "learning_rate": learning_rate,
+            "feature_fraction": float(op_params["params"]["feature_fraction"]),
+            "bagging_fraction": float(op_params["params"]["bagging_fraction"]),
+            "min_split_gain": float(op_params["params"]["min_split_gain"]),
+            "min_child_weight": float(op_params["params"]["min_child_weight"]),
+            "reg_alpha": float(op_params["params"]["reg_alpha"]),
+            "reg_lambda": float(op_params["params"]["reg_lambda"]),
+            "num_iterations": num_iterations,
+            "boost_from_average": True,
+            "verbose": -1,
+        }
+
+    elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
+        print("Using OPT_MTHD_OPTUNA")
+        import optuna
+
+        def _lgbm_cls_optuna_func(trial):
+            params = {
+                "max_depth": trial.suggest_int("max_depth", 3, 10),
+                "num_leaves": trial.suggest_int("num_leaves", 6, max_n_leaves),
+                "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 3, 50),
+                "feature_pre_filter": False,
+                "lambda_l1": trial.suggest_float("lambda_l1", 0, 5),
+                "lambda_l2": trial.suggest_float("lambda_l2", 0, 3),
+                "metric": "auc,binary_error",
+                "nthread": n_threads,
+                "boosting_type": "gbdt",
+                "objective": "binary",
+                "learning_rate": learning_rate,
+                "feature_fraction": trial.suggest_float("feature_fraction", 0.1, 0.9),
+                "bagging_fraction": trial.suggest_float("bagging_fraction", 0.8, 1.0),
+                "min_split_gain": trial.suggest_float("min_split_gain", 0.001, 0.1),
+                "min_child_weight": trial.suggest_float("min_child_weight", 1, 50),
+                "reg_alpha": trial.suggest_float("reg_alpha", 1, 1.2),
+                "reg_lambda": trial.suggest_float("reg_lambda", 1, 1.4),
+                "num_iterations": num_iterations,
+                "boost_from_average": True,
+                "is_unbalance": unbalanced,
+                "verbose": -1,
+                "verbosity": -1,
+            }
+
+            if not unbalanced:
+                params["scale_pos_weight"] = scale_pos_weight
+
+            model_lgb = lgb.train(
+                params,
+                d_train,
+                valid_sets=[d_train, d_valid],
+                valid_names=["train", "valid"],
+                num_boost_round=num_boost_round,
+                feval=None,
+                init_model=mdl_cls_obj,
+                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
+            )
+
+            acc_score = roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
+            gc.collect()
+            return acc_score
+
+        optuna_opt_obj = optuna.create_study(direction="maximize")
+        optuna_opt_obj.optimize(
+            _lgbm_cls_optuna_func, n_trials=n_opt_iters, timeout=600
+        )
+
+        optuna_opt_trial = optuna_opt_obj.best_trial
+
+        params = {
+            "max_depth": int(optuna_opt_trial.params["max_depth"]),
+            "num_leaves": int(optuna_opt_trial.params["num_leaves"]),
+            "min_data_in_leaf": int(optuna_opt_trial.params["min_data_in_leaf"]),
+            "feature_pre_filter": False,
+            "lambda_l1": float(optuna_opt_trial.params["lambda_l1"]),
+            "lambda_l2": float(optuna_opt_trial.params["lambda_l2"]),
+            "metric": "auc,binary_error",
+            "nthread": n_threads,
+            "boosting_type": "gbdt",
+            "objective": "binary",
+            "learning_rate": learning_rate,
+            "feature_fraction": float(optuna_opt_trial.params["feature_fraction"]),
+            "bagging_fraction": float(optuna_opt_trial.params["bagging_fraction"]),
+            "min_split_gain": float(optuna_opt_trial.params["min_split_gain"]),
+            "min_child_weight": float(optuna_opt_trial.params["min_child_weight"]),
+            "reg_alpha": float(optuna_opt_trial.params["reg_alpha"]),
+            "reg_lambda": float(optuna_opt_trial.params["reg_lambda"]),
+            "num_iterations": num_iterations,
+            "boost_from_average": True,
+            "verbose": -1,
+        }
+        if not unbalanced:
+            params["scale_pos_weight"] = scale_pos_weight
+
+    elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
+        print("Using OPT_MTHD_SKOPT")
+        import skopt
+        import skopt.space
+
+        space = [
+            skopt.space.Integer(3, 10, name="max_depth"),
+            skopt.space.Integer(6, max_n_leaves, name="num_leaves"),
+            skopt.space.Integer(3, 50, name="min_data_in_leaf"),
+            skopt.space.Real(0, 5, name="lambda_l1"),
+            skopt.space.Real(0, 3, name="lambda_l2"),
+            skopt.space.Real(0.1, 0.9, name="feature_fraction"),
+            skopt.space.Real(0.8, 1.0, name="bagging_fraction"),
+            skopt.space.Real(0.001, 0.1, name="min_split_gain"),
+            skopt.space.Real(1, 50, name="min_child_weight"),
+            skopt.space.Real(1, 1.2, name="reg_alpha"),
+            skopt.space.Real(1, 1.4, name="reg_lambda"),
+        ]
+
+        def _lgbm_cls_skop_func(values):
+            params = {
+                "max_depth": values[0],
+                "num_leaves": values[1],
+                "min_data_in_leaf": values[2],
+                "feature_pre_filter": False,
+                "lambda_l1": values[3],
+                "lambda_l2": values[4],
+                "metric": "auc,binary_error",
+                "nthread": n_threads,
+                "boosting_type": "gbdt",
+                "objective": "binary",
+                "learning_rate": learning_rate,
+                "feature_fraction": values[5],
+                "bagging_fraction": values[6],
+                "min_split_gain": values[7],
+                "min_child_weight": values[8],
+                "reg_alpha": values[9],
+                "reg_lambda": values[10],
+                "num_iterations": num_iterations,
+                "boost_from_average": True,
+                "is_unbalance": unbalanced,
+                "verbose": -1,
+            }
+
+            if not unbalanced:
+                params["scale_pos_weight"] = scale_pos_weight
+
+            print("\nNext set of params.....", params)
+
+            model_lgb = lgb.train(
+                params,
+                d_train,
+                valid_sets=[d_train, d_valid],
+                valid_names=["train", "valid"],
+                num_boost_round=num_boost_round,
+                feval=None,
+                init_model=mdl_cls_obj,
+                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
+            )
+
+            acc_score = -roc_auc_score(vaild_lbl_np, model_lgb.predict(d_valid))
+            print("\nAccScore.....", -acc_score, ".....iter.....")
+            gc.collect()
+            return acc_score
+
+        res_gp = skopt.gp_minimize(
+            _lgbm_cls_skop_func, space, n_calls=20, random_state=0, n_random_starts=10
+        )
+
+        print("Best score={}".format(res_gp.fun))
+        best_params = res_gp.x
+        print("Best Params:\n{}".format(best_params))
+
+        params = {
+            "max_depth": int(best_params[0]),
+            "num_leaves": int(best_params[1]),
+            "min_data_in_leaf": int(best_params[2]),
+            "feature_pre_filter": False,
+            "lambda_l1": float(best_params[3]),
+            "lambda_l2": float(best_params[4]),
+            "metric": "auc,binary_error",
+            "boosting_type": "gbdt",
+            "objective": "binary",
+            "feature_fraction": float(best_params[5]),
+            "bagging_fraction": float(best_params[6]),
+            "min_split_gain": float(best_params[7]),
+            "min_child_weight": float(best_params[8]),
+            "reg_alpha": float(best_params[9]),
+            "reg_lambda": float(best_params[10]),
+            "scale_pos_weight": float(scale_pos_weight),
+            "boost_from_average": True,
+            "is_unbalance": unbalanced,
+        }
+        if not unbalanced:
+            params["scale_pos_weight"] = scale_pos_weight
+    else:
+        raise rsgislib.RSGISPyException(
+            "Do not recognise or do not have implementation "
+            "for the optimisation method specified."
+        )
+
+    rsgislib.tools.utils.write_dict_to_json(params, out_params_file)
+
+
+def train_opt_lightgbm_binary_classifier(
+    out_mdl_file,
+    out_params_file,
+    cls1_train_file,
+    cls1_valid_file,
+    cls1_test_file,
+    cls2_train_file,
+    cls2_valid_file,
+    cls2_test_file,
+    unbalanced=False,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    n_opt_iters: int = 100,
+    rnd_seed: int = None,
+    n_threads=1,
+    scale_pos_weight=None,
+    early_stopping_rounds=100,
+    num_iterations=5000,
+    num_boost_round=100,
+    learning_rate=0.05,
+    max_n_leaves=50,
+    mdl_cls_obj=None,
+):
+    """
+    A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
+    classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
+
+    This function requires that lightgbm and skopt modules to be installed.
+
+    :param out_mdl_file: The output model which can be loaded to perform a classification.
+    :param out_params_file: The output model parameters which have been optimised.
+    :param cls1_train_file: Training samples HDF5 file for the primary class (i.e., the one being classified)
+    :param cls1_valid_file: Validation samples HDF5 file for the primary class (i.e., the one being classified)
+    :param cls1_test_file: Testing samples HDF5 file for the primary class (i.e., the one being classified)
+    :param cls2_train_file: Training samples HDF5 file for the 'other' class
+    :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
+    :param cls2_test_file: Testing samples HDF5 file for the 'other' class
+    :param unbalanced: Specify that the training data is unbalance (i.e., a different number of samples per class)
+                       and LightGBM will try to take this into account during training.
+    :param n_threads: The number of threads to use for the training.
+    :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
+                             Parameter used to balance imbalanced training data.
+
+    """
+    if not HAVE_LIGHTGBM:
+        raise rsgislib.RSGISPyException("Do not have lightgbm module installed.")
+
+    from skopt import gp_minimize
+    from skopt.space import Integer, Real
+
+    print("Reading Class 1 Training")
+    f = h5py.File(cls1_train_file, "r")
+    num_cls1_train_rows = f["DATA/DATA"].shape[0]
+    print("num_cls1_train_rows = {}".format(num_cls1_train_rows))
+    train_cls1 = numpy.array(f["DATA/DATA"])
+    train_cls1_lbl = numpy.ones(num_cls1_train_rows, dtype=numpy.dtype(int))
+
+    print("Reading Class 1 Validation")
+    f = h5py.File(cls1_valid_file, "r")
+    num_cls1_valid_rows = f["DATA/DATA"].shape[0]
+    print("num_cls1_valid_rows = {}".format(num_cls1_valid_rows))
+    valid_cls1 = numpy.array(f["DATA/DATA"])
+    valid_cls1_lbl = numpy.ones(num_cls1_valid_rows, dtype=numpy.dtype(int))
+
+    print("Reading Class 1 Testing")
+    f = h5py.File(cls1_test_file, "r")
+    num_cls1_test_rows = f["DATA/DATA"].shape[0]
+    print("num_cls1_test_rows = {}".format(num_cls1_test_rows))
+    test_cls1 = numpy.array(f["DATA/DATA"])
+    test_cls1_lbl = numpy.ones(num_cls1_test_rows, dtype=numpy.dtype(int))
+
+    print("Reading Class 2 Training")
+    f = h5py.File(cls2_train_file, "r")
+    num_cls2_train_rows = f["DATA/DATA"].shape[0]
+    print("num_cls2_train_rows = {}".format(num_cls2_train_rows))
+    train_cls2 = numpy.array(f["DATA/DATA"])
+    train_cls2_lbl = numpy.zeros(num_cls2_train_rows, dtype=numpy.dtype(int))
+
+    print("Reading Class 2 Validation")
+    f = h5py.File(cls2_valid_file, "r")
+    num_cls2_valid_rows = f["DATA/DATA"].shape[0]
+    print("num_cls2_valid_rows = {}".format(num_cls2_valid_rows))
+    valid_cls2 = numpy.array(f["DATA/DATA"])
+    valid_cls2_lbl = numpy.zeros(num_cls2_valid_rows, dtype=numpy.dtype(int))
+
+    print("Reading Class 2 Testing")
+    f = h5py.File(cls2_test_file, "r")
+    num_cls2_test_rows = f["DATA/DATA"].shape[0]
+    print("num_cls2_test_rows = {}".format(num_cls2_test_rows))
+    test_cls2 = numpy.array(f["DATA/DATA"])
+    test_cls2_lbl = numpy.zeros(num_cls2_test_rows, dtype=numpy.dtype(int))
+
+    print("Finished Reading Data")
+
+    d_train = lgb.Dataset(
+        [train_cls2, train_cls1],
+        label=numpy.concatenate((train_cls2_lbl, train_cls1_lbl)),
+    )
+    d_valid = lgb.Dataset(
+        [valid_cls2, valid_cls1],
+        label=numpy.concatenate((valid_cls2_lbl, valid_cls1_lbl)),
+    )
+
+    vaild_np = numpy.concatenate((valid_cls2, valid_cls1))
+    vaild_lbl_np = numpy.concatenate((valid_cls2_lbl, valid_cls1_lbl))
+
+    test_np = numpy.concatenate((test_cls2, test_cls1))
+    test_lbl_np = numpy.concatenate((test_cls2_lbl, test_cls1_lbl))
 
     space = [
         Integer(3, 10, name="max_depth"),
@@ -271,6 +681,89 @@ def optimise_lightgbm_binary_classifier(
             separators=(",", ": "),
             ensure_ascii=False,
         )
+
+    print("Start Training Find Classifier")
+
+    if unbalanced:
+        params = {
+            "max_depth": best_params[0],
+            "num_leaves": best_params[1],
+            "min_data_in_leaf": best_params[2],
+            "feature_pre_filter": False,
+            "lambda_l1": best_params[3],
+            "lambda_l2": best_params[4],
+            "metric": "auc,binary_error",
+            "nthread": n_threads,
+            "boosting_type": "gbdt",
+            "objective": "binary",
+            "learning_rate": learning_rate,
+            "feature_fraction": best_params[5],
+            "bagging_fraction": best_params[6],
+            "min_split_gain": best_params[7],
+            "min_child_weight": best_params[8],
+            "reg_alpha": best_params[9],
+            "reg_lambda": best_params[10],
+            "num_iterations": num_iterations,
+            "scale_pos_weight": scale_pos_weight,
+            "boost_from_average": True,
+            "is_unbalance": True,
+            "verbose": -1,
+        }
+    else:
+        params = {
+            "max_depth": best_params[0],
+            "num_leaves": best_params[1],
+            "min_data_in_leaf": best_params[2],
+            "feature_pre_filter": False,
+            "lambda_l1": best_params[3],
+            "lambda_l2": best_params[4],
+            "metric": "auc,binary_error",
+            "nthread": n_threads,
+            "boosting_type": "gbdt",
+            "objective": "binary",
+            "learning_rate": learning_rate,
+            "feature_fraction": best_params[5],
+            "bagging_fraction": best_params[6],
+            "min_split_gain": best_params[7],
+            "min_child_weight": best_params[8],
+            "reg_alpha": best_params[9],
+            "reg_lambda": best_params[10],
+            "num_iterations": num_iterations,
+            "scale_pos_weight": scale_pos_weight,
+            "boost_from_average": True,
+            "is_unbalance": False,
+            "verbose": -1,
+        }
+
+    evals_results = {}
+    model = lgb.train(
+        params,
+        d_train,
+        valid_sets=[d_train, d_valid],
+        valid_names=["train", "valid"],
+        evals_result=evals_results,
+        num_boost_round=num_boost_round,
+        early_stopping_rounds=early_stopping_rounds,
+        verbose_eval=None,
+        feval=None,
+        init_model=mdl_cls_obj,
+    )
+    test_auc = roc_auc_score(test_lbl_np, model.predict(test_np))
+    print("Testing AUC: {}".format(test_auc))
+    print("Finish Training")
+
+    model.save_model(out_mdl_file)
+
+    pred_test = model.predict(test_np)
+    for i in range(test_np.shape[0]):
+        if pred_test[i] >= 0.5:
+            pred_test[i] = 1
+        else:
+            pred_test[i] = 0
+    len(pred_test)
+
+    test_acc = accuracy_score(test_lbl_np, pred_test)
+    print("Testing Accuracy: {}".format(test_acc))
 
 
 def train_lightgbm_binary_classifier(
@@ -464,326 +957,6 @@ def train_lightgbm_binary_classifier(
     print("Testing Accuracy: {}".format(test_acc))
 
 
-def train_opt_lightgbm_binary_classifier(
-    out_mdl_file,
-    out_params_file,
-    cls1_train_file,
-    cls1_valid_file,
-    cls1_test_file,
-    cls2_train_file,
-    cls2_valid_file,
-    cls2_test_file,
-    unbalanced=False,
-    n_threads=1,
-    scale_pos_weight=None,
-    early_stopping_rounds=100,
-    num_iterations=5000,
-    num_boost_round=100,
-    learning_rate=0.05,
-    max_n_leaves=50,
-    mdl_cls_obj=None,
-):
-    """
-    A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
-    classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
-
-    This function requires that lightgbm and skopt modules to be installed.
-
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param out_params_file: The output model parameters which have been optimised.
-    :param cls1_train_file: Training samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_valid_file: Validation samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_test_file: Testing samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls2_train_file: Training samples HDF5 file for the 'other' class
-    :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
-    :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param unbalanced: Specify that the training data is unbalance (i.e., a different number of samples per class)
-                       and LightGBM will try to take this into account during training.
-    :param n_threads: The number of threads to use for the training.
-    :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
-                             Parameter used to balance imbalanced training data.
-
-    """
-    if not HAVE_LIGHTGBM:
-        raise rsgislib.RSGISPyException("Do not have lightgbm module installed.")
-
-    from skopt import gp_minimize
-    from skopt.space import Integer, Real
-
-    print("Reading Class 1 Training")
-    f = h5py.File(cls1_train_file, "r")
-    num_cls1_train_rows = f["DATA/DATA"].shape[0]
-    print("num_cls1_train_rows = {}".format(num_cls1_train_rows))
-    train_cls1 = numpy.array(f["DATA/DATA"])
-    train_cls1_lbl = numpy.ones(num_cls1_train_rows, dtype=numpy.dtype(int))
-
-    print("Reading Class 1 Validation")
-    f = h5py.File(cls1_valid_file, "r")
-    num_cls1_valid_rows = f["DATA/DATA"].shape[0]
-    print("num_cls1_valid_rows = {}".format(num_cls1_valid_rows))
-    valid_cls1 = numpy.array(f["DATA/DATA"])
-    valid_cls1_lbl = numpy.ones(num_cls1_valid_rows, dtype=numpy.dtype(int))
-
-    print("Reading Class 1 Testing")
-    f = h5py.File(cls1_test_file, "r")
-    num_cls1_test_rows = f["DATA/DATA"].shape[0]
-    print("num_cls1_test_rows = {}".format(num_cls1_test_rows))
-    test_cls1 = numpy.array(f["DATA/DATA"])
-    test_cls1_lbl = numpy.ones(num_cls1_test_rows, dtype=numpy.dtype(int))
-
-    print("Reading Class 2 Training")
-    f = h5py.File(cls2_train_file, "r")
-    num_cls2_train_rows = f["DATA/DATA"].shape[0]
-    print("num_cls2_train_rows = {}".format(num_cls2_train_rows))
-    train_cls2 = numpy.array(f["DATA/DATA"])
-    train_cls2_lbl = numpy.zeros(num_cls2_train_rows, dtype=numpy.dtype(int))
-
-    print("Reading Class 2 Validation")
-    f = h5py.File(cls2_valid_file, "r")
-    num_cls2_valid_rows = f["DATA/DATA"].shape[0]
-    print("num_cls2_valid_rows = {}".format(num_cls2_valid_rows))
-    valid_cls2 = numpy.array(f["DATA/DATA"])
-    valid_cls2_lbl = numpy.zeros(num_cls2_valid_rows, dtype=numpy.dtype(int))
-
-    print("Reading Class 2 Testing")
-    f = h5py.File(cls2_test_file, "r")
-    num_cls2_test_rows = f["DATA/DATA"].shape[0]
-    print("num_cls2_test_rows = {}".format(num_cls2_test_rows))
-    test_cls2 = numpy.array(f["DATA/DATA"])
-    test_cls2_lbl = numpy.zeros(num_cls2_test_rows, dtype=numpy.dtype(int))
-
-    print("Finished Reading Data")
-
-    d_train = lgb.Dataset(
-        [train_cls2, train_cls1],
-        label=numpy.concatenate((train_cls2_lbl, train_cls1_lbl)),
-    )
-    d_valid = lgb.Dataset(
-        [valid_cls2, valid_cls1],
-        label=numpy.concatenate((valid_cls2_lbl, valid_cls1_lbl)),
-    )
-
-    vaild_np = numpy.concatenate((valid_cls2, valid_cls1))
-    vaild_lbl_np = numpy.concatenate((valid_cls2_lbl, valid_cls1_lbl))
-
-    test_np = numpy.concatenate((test_cls2, test_cls1))
-    test_lbl_np = numpy.concatenate((test_cls2_lbl, test_cls1_lbl))
-
-    space = [
-        Integer(3, 10, name="max_depth"),
-        Integer(6, max_n_leaves, name="num_leaves"),
-        Integer(3, 50, name="min_data_in_leaf"),
-        Real(0, 5, name="lambda_l1"),
-        Real(0, 3, name="lambda_l2"),
-        Real(0.1, 0.9, name="feature_fraction"),
-        Real(0.8, 1.0, name="bagging_fraction"),
-        Real(0.001, 0.1, name="min_split_gain"),
-        Real(1, 50, name="min_child_weight"),
-        Real(1, 1.2, name="reg_alpha"),
-        Real(1, 1.4, name="reg_lambda"),
-    ]
-
-    if scale_pos_weight is None:
-        scale_pos_weight = num_cls2_train_rows / num_cls1_train_rows
-        if scale_pos_weight < 1:
-            scale_pos_weight = 1
-    print("scale_pos_weight = {}".format(scale_pos_weight))
-
-    def _objective(values):
-        if unbalanced:
-            params = {
-                "max_depth": values[0],
-                "num_leaves": values[1],
-                "min_data_in_leaf": values[2],
-                "feature_pre_filter": False,
-                "lambda_l1": values[3],
-                "lambda_l2": values[4],
-                "metric": "auc,binary_error",
-                "nthread": n_threads,
-                "boosting_type": "gbdt",
-                "objective": "binary",
-                "learning_rate": learning_rate,
-                "feature_fraction": values[5],
-                "bagging_fraction": values[6],
-                "min_split_gain": values[7],
-                "min_child_weight": values[8],
-                "reg_alpha": values[9],
-                "reg_lambda": values[10],
-                "num_iterations": num_iterations,
-                "boost_from_average": True,
-                "is_unbalance": True,
-                "verbose": -1,
-            }
-        else:
-            params = {
-                "max_depth": values[0],
-                "num_leaves": values[1],
-                "min_data_in_leaf": values[2],
-                "feature_pre_filter": False,
-                "lambda_l1": values[3],
-                "lambda_l2": values[4],
-                "metric": "auc,binary_error",
-                "nthread": n_threads,
-                "boosting_type": "gbdt",
-                "objective": "binary",
-                "learning_rate": learning_rate,
-                "feature_fraction": values[5],
-                "bagging_fraction": values[6],
-                "min_split_gain": values[7],
-                "min_child_weight": values[8],
-                "reg_alpha": values[9],
-                "reg_lambda": values[10],
-                "num_iterations": num_iterations,
-                "scale_pos_weight": scale_pos_weight,
-                "boost_from_average": True,
-                "is_unbalance": False,
-                "verbose": -1,
-            }
-
-        print("\nNext set of params.....", params)
-
-        evals_results = {}
-        model_lgb = lgb.train(
-            params,
-            d_train,
-            valid_sets=[d_train, d_valid],
-            valid_names=["train", "valid"],
-            evals_result=evals_results,
-            num_boost_round=num_boost_round,
-            early_stopping_rounds=early_stopping_rounds,
-            verbose_eval=None,
-            feval=None,
-            init_model=mdl_cls_obj,
-        )
-
-        auc = -roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
-        print("\nAUROC.....", -auc, ".....iter.....", model_lgb.current_iteration())
-        gc.collect()
-        return auc
-
-    res_gp = gp_minimize(
-        _objective, space, n_calls=20, random_state=0, n_random_starts=10
-    )
-
-    print("Best score={}".format(res_gp.fun))
-
-    best_params = res_gp.x
-
-    params = {
-        "max_depth": int(best_params[0]),
-        "num_leaves": int(best_params[1]),
-        "min_data_in_leaf": int(best_params[2]),
-        "feature_pre_filter": False,
-        "lambda_l1": float(best_params[3]),
-        "lambda_l2": float(best_params[4]),
-        "metric": "auc,binary_error",
-        "boosting_type": "gbdt",
-        "objective": "binary",
-        "feature_fraction": float(best_params[5]),
-        "bagging_fraction": float(best_params[6]),
-        "min_split_gain": float(best_params[7]),
-        "min_child_weight": float(best_params[8]),
-        "reg_alpha": float(best_params[9]),
-        "reg_lambda": float(best_params[10]),
-        "scale_pos_weight": float(scale_pos_weight),
-        "boost_from_average": True,
-        "is_unbalance": unbalanced,
-    }
-
-    with open(out_params_file, "w") as fp:
-        json.dump(
-            params,
-            fp,
-            sort_keys=True,
-            indent=4,
-            separators=(",", ": "),
-            ensure_ascii=False,
-        )
-
-    print("Start Training Find Classifier")
-
-    if unbalanced:
-        params = {
-            "max_depth": best_params[0],
-            "num_leaves": best_params[1],
-            "min_data_in_leaf": best_params[2],
-            "feature_pre_filter": False,
-            "lambda_l1": best_params[3],
-            "lambda_l2": best_params[4],
-            "metric": "auc,binary_error",
-            "nthread": n_threads,
-            "boosting_type": "gbdt",
-            "objective": "binary",
-            "learning_rate": learning_rate,
-            "feature_fraction": best_params[5],
-            "bagging_fraction": best_params[6],
-            "min_split_gain": best_params[7],
-            "min_child_weight": best_params[8],
-            "reg_alpha": best_params[9],
-            "reg_lambda": best_params[10],
-            "num_iterations": num_iterations,
-            "scale_pos_weight": scale_pos_weight,
-            "boost_from_average": True,
-            "is_unbalance": True,
-            "verbose": -1,
-        }
-    else:
-        params = {
-            "max_depth": best_params[0],
-            "num_leaves": best_params[1],
-            "min_data_in_leaf": best_params[2],
-            "feature_pre_filter": False,
-            "lambda_l1": best_params[3],
-            "lambda_l2": best_params[4],
-            "metric": "auc,binary_error",
-            "nthread": n_threads,
-            "boosting_type": "gbdt",
-            "objective": "binary",
-            "learning_rate": learning_rate,
-            "feature_fraction": best_params[5],
-            "bagging_fraction": best_params[6],
-            "min_split_gain": best_params[7],
-            "min_child_weight": best_params[8],
-            "reg_alpha": best_params[9],
-            "reg_lambda": best_params[10],
-            "num_iterations": num_iterations,
-            "scale_pos_weight": scale_pos_weight,
-            "boost_from_average": True,
-            "is_unbalance": False,
-            "verbose": -1,
-        }
-
-    evals_results = {}
-    model = lgb.train(
-        params,
-        d_train,
-        valid_sets=[d_train, d_valid],
-        valid_names=["train", "valid"],
-        evals_result=evals_results,
-        num_boost_round=num_boost_round,
-        early_stopping_rounds=early_stopping_rounds,
-        verbose_eval=None,
-        feval=None,
-        init_model=mdl_cls_obj,
-    )
-    test_auc = roc_auc_score(test_lbl_np, model.predict(test_np))
-    print("Testing AUC: {}".format(test_auc))
-    print("Finish Training")
-
-    model.save_model(out_mdl_file)
-
-    pred_test = model.predict(test_np)
-    for i in range(test_np.shape[0]):
-        if pred_test[i] >= 0.5:
-            pred_test[i] = 1
-        else:
-            pred_test[i] = 0
-    len(pred_test)
-
-    test_acc = accuracy_score(test_lbl_np, pred_test)
-    print("Testing Accuracy: {}".format(test_acc))
-
-
 def apply_lightgbm_binary_classifier(
     model_file,
     in_img_msk,
@@ -898,11 +1071,14 @@ def apply_lightgbm_binary_classifier(
         )
 
 
-def train_lightgbm_multiclass_classifier(
+def train_opt_lightgbm_multiclass_classifier(
     out_mdl_file,
     cls_info_dict,
     out_info_file=None,
     unbalanced=False,
+    op_mthd: int = rsgislib.OPT_MTHD_BAYSIANOPT,
+    n_opt_iters: int = 100,
+    rnd_seed: int = None,
     n_threads=1,
     early_stopping_rounds=100,
     num_iterations=5000,
