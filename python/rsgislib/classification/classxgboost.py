@@ -507,9 +507,6 @@ def train_opt_xgboost_binary_classifier(
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
-    from skopt import gp_minimize
-    from skopt.space import Integer, Real
-
     print("Reading Class 1 Training")
     f_h5 = h5py.File(cls1_train_file, "r")
     num_cls1_train_rows = f_h5["DATA/DATA"].shape[0]
@@ -775,12 +772,12 @@ def train_opt_xgboost_binary_classifier(
     print("Start Training Find Classifier")
 
     evals_results = {}
-    watchlist = [(d_train, "train"), (d_valid, "validation")]
+    watch_list = [(d_train, "train"), (d_valid, "validation")]
     model = xgb.train(
         params,
         d_train,
         num_boost_round,
-        evals=watchlist,
+        evals=watch_list,
         evals_result=evals_results,
         verbose_eval=False,
         xgb_model=mdl_cls_obj,
@@ -840,52 +837,52 @@ def apply_xgboost_binary_classifier(
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
-    def _applyXGBClassifier(info, inputs, outputs, otherargs):
-        outClassVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
+    def _apply_xgb_classifier(info, inputs, outputs, otherargs):
+        out_class_vals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
         if numpy.any(inputs.imageMask == otherargs.mskVal):
-            outClassVals = outClassVals.flatten()
-            imgMaskVals = inputs.imageMask.flatten()
-            classVars = numpy.zeros(
-                (outClassVals.shape[0], otherargs.numClassVars), dtype=numpy.float32
+            out_class_vals = out_class_vals.flatten()
+            img_mask_vals = inputs.imageMask.flatten()
+            class_vars = numpy.zeros(
+                (out_class_vals.shape[0], otherargs.numClassVars), dtype=numpy.float32
             )
             # Array index which can be used to populate the output array following masking etc.
-            ID = numpy.arange(imgMaskVals.shape[0])
-            classVarsIdx = 0
-            for imgFile in otherargs.imgFileInfo:
-                imgArr = inputs.__dict__[imgFile.name]
-                for band in imgFile.bands:
-                    classVars[..., classVarsIdx] = imgArr[(band - 1)].flatten()
-                    classVarsIdx = classVarsIdx + 1
-            classVars = classVars[imgMaskVals == otherargs.mskVal]
-            ID = ID[imgMaskVals == otherargs.mskVal]
-            predClass = numpy.around(
-                otherargs.classifier.predict(xgb.DMatrix(classVars)) * 10000
+            id_arr = numpy.arange(img_mask_vals.shape[0])
+            class_vars_idx = 0
+            for img_file in otherargs.imgFileInfo:
+                img_arr = inputs.__dict__[img_file.name]
+                for band in img_file.bands:
+                    class_vars[..., class_vars_idx] = img_arr[(band - 1)].flatten()
+                    class_vars_idx = class_vars_idx + 1
+            class_vars = class_vars[img_mask_vals == otherargs.mskVal]
+            id_arr = id_arr[img_mask_vals == otherargs.mskVal]
+            pred_class = numpy.around(
+                otherargs.classifier.predict(xgb.DMatrix(class_vars)) * 10000
             )
-            outClassVals[ID] = predClass
-            outClassVals = numpy.expand_dims(
-                outClassVals.reshape(
+            out_class_vals[id_arr] = pred_class
+            out_class_vals = numpy.expand_dims(
+                out_class_vals.reshape(
                     (inputs.imageMask.shape[1], inputs.imageMask.shape[2])
                 ),
                 axis=0,
             )
-        outputs.outimage = outClassVals
+        outputs.outimage = out_class_vals
 
     classifier = xgb.Booster({"nthread": n_threads})
     classifier.load_model(model_file)
 
     infiles = applier.FilenameAssociations()
     infiles.imageMask = in_msk_img
-    numClassVars = 0
+    num_class_vars = 0
     for imgFile in img_file_info:
         infiles.__dict__[imgFile.name] = imgFile.file_name
-        numClassVars = numClassVars + len(imgFile.bands)
+        num_class_vars = num_class_vars + len(imgFile.bands)
 
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = out_prob_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
     otherargs.mskVal = img_mask_val
-    otherargs.numClassVars = numClassVars
+    otherargs.numClassVars = num_class_vars
     otherargs.imgFileInfo = img_file_info
 
     try:
@@ -901,7 +898,9 @@ def apply_xgboost_binary_classifier(
     aControls.omitPyramids = True
     aControls.calcStats = False
     print("Applying the Classifier")
-    applier.apply(_applyXGBClassifier, infiles, outfiles, otherargs, controls=aControls)
+    applier.apply(
+        _apply_xgb_classifier, infiles, outfiles, otherargs, controls=aControls
+    )
     print("Completed")
     rsgislib.imageutils.pop_img_stats(
         out_prob_img, use_no_data=True, no_data_val=0, calc_pyramids=True
@@ -955,11 +954,11 @@ def optimise_xgboost_multiclass_classifier(
     rnd_obj = numpy.random.RandomState(rnd_seed)
 
     n_classes = len(cls_info_dict)
-    for clsname in cls_info_dict:
-        if cls_info_dict[clsname].id >= n_classes:
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive "
-                "starting from 0.".format(clsname, cls_info_dict[clsname].id)
+                "starting from 0.".format(cls_name, cls_info_dict[cls_name].id)
             )
 
     cls_data_dict = {}
@@ -969,10 +968,10 @@ def optimise_xgboost_multiclass_classifier(
     valid_lbls_lst = []
     cls_ids = []
     n_classes = 0
-    for clsname in cls_info_dict:
+    for cls_name in cls_info_dict:
         sgl_cls_info = {}
-        print("Reading Class {} Training".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        print("Reading Class {} Training".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].train_file_h5, "r")
         sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
 
@@ -990,26 +989,26 @@ def optimise_xgboost_multiclass_classifier(
         sgl_cls_info["train_data_lbls"] = numpy.zeros(
             sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
 
         train_data_lst.append(sgl_cls_info["train_data"])
         train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
-        print("Reading Class {} Validation".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        print("Reading Class {} Validation".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].valid_file_h5, "r")
         sgl_cls_info["valid_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["valid_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["valid_data_lbls"] = numpy.zeros(
             sgl_cls_info["valid_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         valid_data_lst.append(sgl_cls_info["valid_data"])
         valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
-        cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(cls_info_dict[clsname].id)
+        cls_data_dict[cls_name] = sgl_cls_info
+        cls_ids.append(cls_info_dict[cls_name].id)
         n_classes = n_classes + 1
 
     print("Finished Reading Data")
@@ -1260,11 +1259,11 @@ def train_xgboost_multiclass_classifier(
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
     n_classes = len(cls_info_dict)
-    for clsname in cls_info_dict:
-        if cls_info_dict[clsname].id >= n_classes:
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive "
-                "starting from 0.".format(clsname, cls_info_dict[clsname].id)
+                "starting from 0.".format(cls_name, cls_info_dict[cls_name].id)
             )
 
     cls_data_dict = {}
@@ -1276,46 +1275,46 @@ def train_xgboost_multiclass_classifier(
     test_lbls_lst = []
     cls_ids = []
     n_classes = 0
-    for clsname in cls_info_dict:
+    for cls_name in cls_info_dict:
         sgl_cls_info = {}
-        print("Reading Class {} Training".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        print("Reading Class {} Training".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].train_file_h5, "r")
         sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["train_data_lbls"] = numpy.zeros(
             sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         train_data_lst.append(sgl_cls_info["train_data"])
         train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
-        print("Reading Class {} Validation".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        print("Reading Class {} Validation".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].valid_file_h5, "r")
         sgl_cls_info["valid_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["valid_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["valid_data_lbls"] = numpy.zeros(
             sgl_cls_info["valid_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         valid_data_lst.append(sgl_cls_info["valid_data"])
         valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
-        print("Reading Class {} Testing".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
+        print("Reading Class {} Testing".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].test_file_h5, "r")
         sgl_cls_info["test_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["test_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["test_data_lbls"] = numpy.zeros(
             sgl_cls_info["test_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         test_data_lst.append(sgl_cls_info["test_data"])
         test_lbls_lst.append(sgl_cls_info["test_data_lbls"])
 
-        cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(cls_info_dict[clsname].id)
+        cls_data_dict[cls_name] = sgl_cls_info
+        cls_ids.append(cls_info_dict[cls_name].id)
         n_classes = n_classes + 1
 
     print("Finished Reading Data")
@@ -1414,11 +1413,11 @@ def train_opt_xgboost_multiclass_classifier(
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
     n_classes = len(cls_info_dict)
-    for clsname in cls_info_dict:
-        if cls_info_dict[clsname].id >= n_classes:
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    clsname, cls_info_dict[clsname].id
+                    cls_name, cls_info_dict[cls_name].id
                 )
             )
 
@@ -1431,46 +1430,46 @@ def train_opt_xgboost_multiclass_classifier(
     test_lbls_lst = []
     cls_ids = []
     n_classes = 0
-    for clsname in cls_info_dict:
+    for cls_name in cls_info_dict:
         sgl_cls_info = {}
-        print("Reading Class {} Training".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        print("Reading Class {} Training".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].train_file_h5, "r")
         sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["train_data_lbls"] = numpy.zeros(
             sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         train_data_lst.append(sgl_cls_info["train_data"])
         train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
-        print("Reading Class {} Validation".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        print("Reading Class {} Validation".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].valid_file_h5, "r")
         sgl_cls_info["valid_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["valid_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["valid_data_lbls"] = numpy.zeros(
             sgl_cls_info["valid_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         valid_data_lst.append(sgl_cls_info["valid_data"])
         valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
-        print("Reading Class {} Testing".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
+        print("Reading Class {} Testing".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].test_file_h5, "r")
         sgl_cls_info["test_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["test_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["test_data_lbls"] = numpy.zeros(
             sgl_cls_info["test_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         test_data_lst.append(sgl_cls_info["test_data"])
         test_lbls_lst.append(sgl_cls_info["test_data_lbls"])
 
-        cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(cls_info_dict[clsname].id)
+        cls_data_dict[cls_name] = sgl_cls_info
+        cls_ids.append(cls_info_dict[cls_name].id)
         n_classes = n_classes + 1
 
     print("Finished Reading Data")
@@ -1701,13 +1700,13 @@ def train_opt_xgboost_multiclass_classifier(
             "for the optimisation method specified."
         )
 
-    watchlist = [(d_train, "train"), (d_valid, "validation")]
+    watch_list = [(d_train, "train"), (d_valid, "validation")]
     evals_results = {}
     model_xgb = xgb.train(
         params,
         d_train,
         num_boost_round,
-        evals=watchlist,
+        evals=watch_list,
         evals_result=evals_results,
         verbose_eval=False,
         xgb_model=mdl_cls_obj,
@@ -1762,68 +1761,68 @@ def apply_xgboost_multiclass_classifier(
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
     def _applyXGBMClassifier(info, inputs, outputs, otherargs):
-        outClassIdVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
+        out_class_id_vals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
         if numpy.any(inputs.imageMask == otherargs.mskVal):
             n_pxls = inputs.imageMask.shape[1] * inputs.imageMask.shape[2]
-            outClassIdVals = outClassIdVals.flatten()
-            imgMaskVals = inputs.imageMask.flatten()
-            classVars = numpy.zeros(
+            out_class_id_vals = out_class_id_vals.flatten()
+            img_mask_vals = inputs.imageMask.flatten()
+            class_vars = numpy.zeros(
                 (n_pxls, otherargs.numClassVars), dtype=numpy.float32
             )
             # Array index which can be used to populate the output array following masking etc.
-            ID = numpy.arange(imgMaskVals.shape[0])
-            classVarsIdx = 0
-            for imgFile in otherargs.imgFileInfo:
-                imgArr = inputs.__dict__[imgFile.name]
-                for band in imgFile.bands:
-                    classVars[..., classVarsIdx] = imgArr[(band - 1)].flatten()
-                    classVarsIdx = classVarsIdx + 1
-            classVars = classVars[imgMaskVals == otherargs.mskVal]
-            ID = ID[imgMaskVals == otherargs.mskVal]
-            preds_idxs = otherargs.classifier.predict(xgb.DMatrix(classVars))
+            id_arr = numpy.arange(img_mask_vals.shape[0])
+            class_vars_idx = 0
+            for img_file in otherargs.imgFileInfo:
+                img_arr = inputs.__dict__[img_file.name]
+                for band in img_file.bands:
+                    class_vars[..., class_vars_idx] = img_arr[(band - 1)].flatten()
+                    class_vars_idx = class_vars_idx + 1
+            class_vars = class_vars[img_mask_vals == otherargs.mskVal]
+            id_arr = id_arr[img_mask_vals == otherargs.mskVal]
+            preds_idxs = otherargs.classifier.predict(xgb.DMatrix(class_vars))
             preds_cls_ids = numpy.zeros_like(preds_idxs, dtype=numpy.uint16)
             for cld_id, idx in zip(
                 otherargs.cls_id_lut, numpy.arange(0, len(otherargs.cls_id_lut))
             ):
                 preds_cls_ids[preds_idxs == idx] = cld_id
 
-            outClassIdVals[ID] = preds_cls_ids
-            outClassIdVals = numpy.expand_dims(
-                outClassIdVals.reshape(
+            out_class_id_vals[id_arr] = preds_cls_ids
+            out_class_id_vals = numpy.expand_dims(
+                out_class_id_vals.reshape(
                     (inputs.imageMask.shape[1], inputs.imageMask.shape[2])
                 ),
                 axis=0,
             )
 
-        outputs.outclsimage = outClassIdVals
+        outputs.outclsimage = out_class_id_vals
 
     classifier = xgb.Booster({"nthread": n_threads})
     classifier.load_model(model_file)
 
     infiles = applier.FilenameAssociations()
     infiles.imageMask = in_mask_img
-    numClassVars = 0
+    num_class_vars = 0
     for imgFile in img_file_info:
         infiles.__dict__[imgFile.name] = imgFile.file_name
-        numClassVars = numClassVars + len(imgFile.bands)
+        num_class_vars = num_class_vars + len(imgFile.bands)
 
     n_classes = len(class_train_info)
     cls_id_lut = numpy.zeros(n_classes)
-    for clsname in class_train_info:
-        if class_train_info[clsname].id >= n_classes:
+    for cls_name in class_train_info:
+        if class_train_info[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    clsname, class_train_info[clsname].id
+                    cls_name, class_train_info[cls_name].id
                 )
             )
-        cls_id_lut[class_train_info[clsname].id] = class_train_info[clsname].out_id
+        cls_id_lut[class_train_info[cls_name].id] = class_train_info[cls_name].out_id
 
     outfiles = applier.FilenameAssociations()
     outfiles.outclsimage = out_class_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
     otherargs.mskVal = img_mask_val
-    otherargs.numClassVars = numClassVars
+    otherargs.numClassVars = num_class_vars
     otherargs.imgFileInfo = img_file_info
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
@@ -1850,25 +1849,27 @@ def apply_xgboost_multiclass_classifier(
         rsgislib.rastergis.pop_rat_img_stats(
             out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
-        ratDataset = gdal.Open(out_class_img, gdal.GA_Update)
-        red = rat.readColumn(ratDataset, "Red")
-        green = rat.readColumn(ratDataset, "Green")
-        blue = rat.readColumn(ratDataset, "Blue")
+        rat_dataset = gdal.Open(out_class_img, gdal.GA_Update)
+        red = rat.readColumn(rat_dataset, "Red")
+        green = rat.readColumn(rat_dataset, "Green")
+        blue = rat.readColumn(rat_dataset, "Blue")
         class_names = numpy.empty_like(red, dtype=numpy.dtype("a255"))
         class_names[...] = ""
 
-        for classKey in class_train_info:
-            print("Apply Colour to class '" + classKey + "'")
-            red[class_train_info[classKey].out_id] = class_train_info[classKey].red
-            green[class_train_info[classKey].out_id] = class_train_info[classKey].green
-            blue[class_train_info[classKey].out_id] = class_train_info[classKey].blue
-            class_names[class_train_info[classKey].out_id] = classKey
+        for class_key in class_train_info:
+            print("Apply Colour to class '" + class_key + "'")
+            red[class_train_info[class_key].out_id] = class_train_info[class_key].red
+            green[class_train_info[class_key].out_id] = class_train_info[
+                class_key
+            ].green
+            blue[class_train_info[class_key].out_id] = class_train_info[class_key].blue
+            class_names[class_train_info[class_key].out_id] = class_key
 
-        rat.writeColumn(ratDataset, "Red", red)
-        rat.writeColumn(ratDataset, "Green", green)
-        rat.writeColumn(ratDataset, "Blue", blue)
-        rat.writeColumn(ratDataset, "class_names", class_names)
-        ratDataset = None
+        rat.writeColumn(rat_dataset, "Red", red)
+        rat.writeColumn(rat_dataset, "Green", green)
+        rat.writeColumn(rat_dataset, "Blue", blue)
+        rat.writeColumn(rat_dataset, "class_names", class_names)
+        rat_dataset = None
 
 
 def apply_xgboost_multiclass_classifier_rat(
@@ -1910,29 +1911,29 @@ def apply_xgboost_multiclass_classifier_rat(
         """
         This function is used internally within classify_within_rat_tiled using the RIOS ratapplier function
         """
-        numpyVars = []
+        numpy_vars = []
         for var in otherargs.vars:
-            varVals = getattr(inputs.inrat, var)
-            numpyVars.append(varVals)
+            var_vals = getattr(inputs.inrat, var)
+            numpy_vars.append(var_vals)
 
-        xData = numpy.array(numpyVars)
-        xData = xData.transpose()
+        x_data = numpy.array(numpy_vars)
+        x_data = x_data.transpose()
 
-        ID = numpy.arange(xData.shape[0])
-        outClassIntVals = numpy.zeros(xData.shape[0], dtype=numpy.int16)
-        outClassNamesVals = numpy.empty(xData.shape[0], dtype=numpy.dtype("a255"))
-        outClassNamesVals[...] = ""
+        id_arr = numpy.arange(x_data.shape[0])
+        out_class_int_vals = numpy.zeros(x_data.shape[0], dtype=numpy.int16)
+        out_class_names_vals = numpy.empty(x_data.shape[0], dtype=numpy.dtype("a255"))
+        out_class_names_vals[...] = ""
 
-        ID = ID[numpy.isfinite(xData).all(axis=1)]
-        vData = xData[numpy.isfinite(xData).all(axis=1)]
+        id_arr = id_arr[numpy.isfinite(x_data).all(axis=1)]
+        v_data = x_data[numpy.isfinite(x_data).all(axis=1)]
 
         if otherargs.roiCol is not None:
             roi = getattr(inputs.inrat, otherargs.roiCol)
-            roi = roi[numpy.isfinite(xData).all(axis=1)]
-            vData = vData[roi == otherargs.roiVal]
-            ID = ID[roi == otherargs.roiVal]
+            roi = roi[numpy.isfinite(x_data).all(axis=1)]
+            v_data = v_data[roi == otherargs.roiVal]
+            id_arr = id_arr[roi == otherargs.roiVal]
 
-        preds_idxs = otherargs.classifier.predict(xgb.DMatrix(vData))
+        preds_idxs = otherargs.classifier.predict(xgb.DMatrix(v_data))
 
         preds_cls_ids = numpy.zeros_like(preds_idxs, dtype=numpy.uint16)
         for cld_id, idx in zip(
@@ -1940,14 +1941,14 @@ def apply_xgboost_multiclass_classifier_rat(
         ):
             preds_cls_ids[preds_idxs == idx] = cld_id
 
-        outClassIntVals[ID] = preds_cls_ids
-        setattr(outputs.outrat, otherargs.outColInt, outClassIntVals)
+        out_class_int_vals[id_arr] = preds_cls_ids
+        setattr(outputs.outrat, otherargs.outColInt, out_class_int_vals)
 
         for cls_id in otherargs.cls_name_lut:
-            outClassNamesVals[outClassIntVals == cls_id] = otherargs.cls_name_lut[
+            out_class_names_vals[out_class_int_vals == cls_id] = otherargs.cls_name_lut[
                 cls_id
             ]
-        setattr(outputs.outrat, otherargs.outColStr, outClassNamesVals)
+        setattr(outputs.outrat, otherargs.outColStr, out_class_names_vals)
 
         if otherargs.class_colours:
             red = getattr(inputs.inrat, "Red")
@@ -1963,17 +1964,17 @@ def apply_xgboost_multiclass_classifier_rat(
             for class_name in otherargs.class_train_info:
                 cls_id = otherargs.class_train_info[class_name].out_id
                 red = numpy.where(
-                    outClassIntVals == cls_id,
+                    out_class_int_vals == cls_id,
                     otherargs.class_train_info[class_name].red,
                     red,
                 )
                 green = numpy.where(
-                    outClassIntVals == cls_id,
+                    out_class_int_vals == cls_id,
                     otherargs.class_train_info[class_name].green,
                     green,
                 )
                 blue = numpy.where(
-                    outClassIntVals == cls_id,
+                    out_class_int_vals == cls_id,
                     otherargs.class_train_info[class_name].blue,
                     blue,
                 )
@@ -1988,15 +1989,15 @@ def apply_xgboost_multiclass_classifier_rat(
     n_classes = len(class_train_info)
     cls_id_lut = numpy.zeros(n_classes)
     cls_name_lut = dict()
-    for clsname in class_train_info:
-        if class_train_info[clsname].id >= n_classes:
+    for cls_name in class_train_info:
+        if class_train_info[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    clsname, class_train_info[clsname].id
+                    cls_name, class_train_info[cls_name].id
                 )
             )
-        cls_id_lut[class_train_info[clsname].id] = class_train_info[clsname].out_id
-        cls_name_lut[class_train_info[clsname].out_id] = clsname
+        cls_id_lut[class_train_info[cls_name].id] = class_train_info[cls_name].out_id
+        cls_name_lut[class_train_info[cls_name].out_id] = cls_name
 
     in_rats = ratapplier.RatAssociations()
     out_rats = ratapplier.RatAssociations()
@@ -2023,9 +2024,13 @@ def apply_xgboost_multiclass_classifier_rat(
     except:
         progress_bar = cuiprogress.GDALProgressBar()
 
-    aControls = applier.ApplierControls()
+    aControls = ratapplier.RatApplierControls()
     aControls.progress = progress_bar
 
     ratapplier.apply(
-        _apply_rat_classifier, in_rats, out_rats, otherargs=otherargs, controls=None
+        _apply_rat_classifier,
+        in_rats,
+        out_rats,
+        otherargs=otherargs,
+        controls=aControls,
     )

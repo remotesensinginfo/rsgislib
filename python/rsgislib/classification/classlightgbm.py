@@ -462,11 +462,11 @@ def train_opt_lightgbm_binary_classifier(
     rnd_seed: int = None,
     n_threads: int = 1,
     scale_pos_weight: float = None,
-    early_stopping_rounds: str = 100,
-    num_iterations: str = 5000,
-    num_boost_round: str = 100,
+    early_stopping_rounds: int = 100,
+    num_iterations: int = 5000,
+    num_boost_round: int = 100,
     learning_rate: float = 0.05,
-    max_n_leaves: str = 50,
+    max_n_leaves: int = 50,
     mdl_cls_obj=None,
     out_params_file: str = None,
 ):
@@ -1079,48 +1079,48 @@ def apply_lightgbm_binary_classifier(
         raise rsgislib.RSGISPyException("Do not have lightgbm module installed.")
 
     def _applyLGBMClassifier(info, inputs, outputs, otherargs):
-        outClassVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
+        out_class_vals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
         if numpy.any(inputs.imageMask == otherargs.mskVal):
-            outClassVals = outClassVals.flatten()
-            imgMaskVals = inputs.imageMask.flatten()
-            classVars = numpy.zeros(
-                (outClassVals.shape[0], otherargs.numClassVars), dtype=numpy.float32
+            out_class_vals = out_class_vals.flatten()
+            img_mask_vals = inputs.imageMask.flatten()
+            class_vars = numpy.zeros(
+                (out_class_vals.shape[0], otherargs.numClassVars), dtype=numpy.float32
             )
             # Array index which can be used to populate the output array following masking etc.
-            ID = numpy.arange(imgMaskVals.shape[0])
-            classVarsIdx = 0
-            for imgFile in otherargs.imgFileInfo:
-                imgArr = inputs.__dict__[imgFile.name]
-                for band in imgFile.bands:
-                    classVars[..., classVarsIdx] = imgArr[(band - 1)].flatten()
-                    classVarsIdx = classVarsIdx + 1
-            classVars = classVars[imgMaskVals == otherargs.mskVal]
-            ID = ID[imgMaskVals == otherargs.mskVal]
-            predClass = numpy.around(otherargs.classifier.predict(classVars) * 10000)
-            outClassVals[ID] = predClass
-            outClassVals = numpy.expand_dims(
-                outClassVals.reshape(
+            id_arr = numpy.arange(img_mask_vals.shape[0])
+            class_vars_idx = 0
+            for img_file in otherargs.imgFileInfo:
+                img_arr = inputs.__dict__[img_file.name]
+                for band in img_file.bands:
+                    class_vars[..., class_vars_idx] = img_arr[(band - 1)].flatten()
+                    class_vars_idx = class_vars_idx + 1
+            class_vars = class_vars[img_mask_vals == otherargs.mskVal]
+            id_arr = id_arr[img_mask_vals == otherargs.mskVal]
+            pred_class = numpy.around(otherargs.classifier.predict(class_vars) * 10000)
+            out_class_vals[id_arr] = pred_class
+            out_class_vals = numpy.expand_dims(
+                out_class_vals.reshape(
                     (inputs.imageMask.shape[1], inputs.imageMask.shape[2])
                 ),
                 axis=0,
             )
-        outputs.outimage = outClassVals
+        outputs.outimage = out_class_vals
 
     classifier = lgb.Booster(model_file=model_file)
 
     infiles = applier.FilenameAssociations()
     infiles.imageMask = in_img_msk
-    numClassVars = 0
+    num_class_vars = 0
     for imgFile in img_file_info:
         infiles.__dict__[imgFile.name] = imgFile.file_name
-        numClassVars = numClassVars + len(imgFile.bands)
+        num_class_vars = num_class_vars + len(imgFile.bands)
 
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = out_score_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
     otherargs.mskVal = img_mask_val
-    otherargs.numClassVars = numClassVars
+    otherargs.numClassVars = num_class_vars
     otherargs.imgFileInfo = img_file_info
 
     try:
@@ -1190,11 +1190,11 @@ def optimise_lightgbm_multiclass_classifier(
         raise rsgislib.RSGISPyException("Do not have lightgbm module installed.")
 
     n_classes = len(cls_info_dict)
-    for clsname in cls_info_dict:
-        if cls_info_dict[clsname].id >= n_classes:
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    clsname, cls_info_dict[clsname].id
+                    cls_name, cls_info_dict[cls_name].id
                 )
             )
 
@@ -1204,34 +1204,34 @@ def optimise_lightgbm_multiclass_classifier(
     valid_data_lst = []
     valid_lbls_lst = []
     cls_ids = []
-    for clsname in cls_info_dict:
+    for cls_name in cls_info_dict:
         sgl_cls_info = {}
-        print("Reading Class {} Training".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        print("Reading Class {} Training".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].train_file_h5, "r")
         sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["train_data_lbls"] = numpy.zeros(
             sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         train_data_lst.append(sgl_cls_info["train_data"])
         train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
-        print("Reading Class {} Validation".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        print("Reading Class {} Validation".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].valid_file_h5, "r")
         sgl_cls_info["valid_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["valid_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["valid_data_lbls"] = numpy.zeros(
             sgl_cls_info["valid_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         valid_data_lst.append(sgl_cls_info["valid_data"])
         valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
-        cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(cls_info_dict[clsname].id)
+        cls_data_dict[cls_name] = sgl_cls_info
+        cls_ids.append(cls_info_dict[cls_name].id)
 
     print("Finished Reading Data")
 
@@ -1574,11 +1574,11 @@ def train_opt_lightgbm_multiclass_classifier(
         raise rsgislib.RSGISPyException("Do not have lightgbm module installed.")
 
     n_classes = len(cls_info_dict)
-    for clsname in cls_info_dict:
-        if cls_info_dict[clsname].id >= n_classes:
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    clsname, cls_info_dict[clsname].id
+                    cls_name, cls_info_dict[cls_name].id
                 )
             )
 
@@ -1590,46 +1590,46 @@ def train_opt_lightgbm_multiclass_classifier(
     test_data_lst = []
     test_lbls_lst = []
     cls_ids = []
-    for clsname in cls_info_dict:
+    for cls_name in cls_info_dict:
         sgl_cls_info = {}
-        print("Reading Class {} Training".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        print("Reading Class {} Training".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].train_file_h5, "r")
         sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["train_data_lbls"] = numpy.zeros(
             sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         train_data_lst.append(sgl_cls_info["train_data"])
         train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
-        print("Reading Class {} Validation".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        print("Reading Class {} Validation".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].valid_file_h5, "r")
         sgl_cls_info["valid_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["valid_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["valid_data_lbls"] = numpy.zeros(
             sgl_cls_info["valid_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         valid_data_lst.append(sgl_cls_info["valid_data"])
         valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
-        print("Reading Class {} Testing".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
+        print("Reading Class {} Testing".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].test_file_h5, "r")
         sgl_cls_info["test_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["test_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["test_data_lbls"] = numpy.zeros(
             sgl_cls_info["test_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         test_data_lst.append(sgl_cls_info["test_data"])
         test_lbls_lst.append(sgl_cls_info["test_data_lbls"])
 
-        cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(cls_info_dict[clsname].id)
+        cls_data_dict[cls_name] = sgl_cls_info
+        cls_ids.append(cls_info_dict[cls_name].id)
 
     print("Finished Reading Data")
 
@@ -1998,11 +1998,11 @@ def train_lightgbm_multiclass_classifier(
         raise rsgislib.RSGISPyException("Do not have lightgbm module installed.")
 
     n_classes = len(cls_info_dict)
-    for clsname in cls_info_dict:
-        if cls_info_dict[clsname].id >= n_classes:
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    clsname, cls_info_dict[clsname].id
+                    cls_name, cls_info_dict[cls_name].id
                 )
             )
 
@@ -2014,46 +2014,46 @@ def train_lightgbm_multiclass_classifier(
     test_data_lst = []
     test_lbls_lst = []
     cls_ids = []
-    for clsname in cls_info_dict:
+    for cls_name in cls_info_dict:
         sgl_cls_info = {}
-        print("Reading Class {} Training".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].train_file_h5, "r")
+        print("Reading Class {} Training".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].train_file_h5, "r")
         sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["train_data_lbls"] = numpy.zeros(
             sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         train_data_lst.append(sgl_cls_info["train_data"])
         train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
 
-        print("Reading Class {} Validation".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].valid_file_h5, "r")
+        print("Reading Class {} Validation".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].valid_file_h5, "r")
         sgl_cls_info["valid_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["valid_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["valid_data_lbls"] = numpy.zeros(
             sgl_cls_info["valid_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["valid_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         valid_data_lst.append(sgl_cls_info["valid_data"])
         valid_lbls_lst.append(sgl_cls_info["valid_data_lbls"])
 
-        print("Reading Class {} Testing".format(clsname))
-        f_h5 = h5py.File(cls_info_dict[clsname].test_file_h5, "r")
+        print("Reading Class {} Testing".format(cls_name))
+        f_h5 = h5py.File(cls_info_dict[cls_name].test_file_h5, "r")
         sgl_cls_info["test_n_rows"] = f_h5["DATA/DATA"].shape[0]
         sgl_cls_info["test_data"] = numpy.array(f_h5["DATA/DATA"])
         sgl_cls_info["test_data_lbls"] = numpy.zeros(
             sgl_cls_info["test_n_rows"], dtype=numpy.dtype(int)
         )
-        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[clsname].id
+        sgl_cls_info["test_data_lbls"][...] = cls_info_dict[cls_name].id
         f_h5.close()
         test_data_lst.append(sgl_cls_info["test_data"])
         test_lbls_lst.append(sgl_cls_info["test_data_lbls"])
 
-        cls_data_dict[clsname] = sgl_cls_info
-        cls_ids.append(cls_info_dict[clsname].id)
+        cls_data_dict[cls_name] = sgl_cls_info
+        cls_ids.append(cls_info_dict[cls_name].id)
 
     print("Finished Reading Data")
 
@@ -2162,80 +2162,80 @@ def apply_lightgbm_multiclass_classifier(
         raise rsgislib.RSGISPyException("Do not have lightgbm module installed.")
 
     def _applyLGMClassifier(info, inputs, outputs, otherargs):
-        outClassVals = numpy.zeros(
+        out_class_vals = numpy.zeros(
             (otherargs.n_classes, inputs.imageMask.shape[1], inputs.imageMask.shape[2]),
             dtype=numpy.uint16,
         )
-        outClassIdVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
+        out_class_id_vals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
         if numpy.any(inputs.imageMask == otherargs.mskVal):
             n_pxls = inputs.imageMask.shape[1] * inputs.imageMask.shape[2]
-            outClassVals = outClassVals.reshape((n_pxls, otherargs.n_classes))
-            outClassIdVals = outClassIdVals.flatten()
-            imgMaskVals = inputs.imageMask.flatten()
-            classVars = numpy.zeros(
+            out_class_vals = out_class_vals.reshape((n_pxls, otherargs.n_classes))
+            out_class_id_vals = out_class_id_vals.flatten()
+            img_mask_vals = inputs.imageMask.flatten()
+            class_vars = numpy.zeros(
                 (n_pxls, otherargs.numClassVars), dtype=numpy.float32
             )
             # Array index which can be used to populate the output array following masking etc.
-            ID = numpy.arange(imgMaskVals.shape[0])
-            classVarsIdx = 0
-            for imgFile in otherargs.imgFileInfo:
-                imgArr = inputs.__dict__[imgFile.name]
-                for band in imgFile.bands:
-                    classVars[..., classVarsIdx] = imgArr[(band - 1)].flatten()
-                    classVarsIdx = classVarsIdx + 1
-            classVars = classVars[imgMaskVals == otherargs.mskVal]
-            ID = ID[imgMaskVals == otherargs.mskVal]
-            predClassProbs = numpy.around(
-                otherargs.classifier.predict(classVars) * 10000
+            id_arr = numpy.arange(img_mask_vals.shape[0])
+            class_vars_idx = 0
+            for img_file in otherargs.imgFileInfo:
+                img_arr = inputs.__dict__[img_file.name]
+                for band in img_file.bands:
+                    class_vars[..., class_vars_idx] = img_arr[(band - 1)].flatten()
+                    class_vars_idx = class_vars_idx + 1
+            class_vars = class_vars[img_mask_vals == otherargs.mskVal]
+            id_arr = id_arr[img_mask_vals == otherargs.mskVal]
+            pred_class_probs = numpy.around(
+                otherargs.classifier.predict(class_vars) * 10000
             )
-            preds_idxs = numpy.argmax(predClassProbs, axis=1)
-            if otherargs.n_classes != predClassProbs.shape[1]:
+            preds_idxs = numpy.argmax(pred_class_probs, axis=1)
+            if otherargs.n_classes != pred_class_probs.shape[1]:
                 raise rsgislib.RSGISPyException(
                     "The number of classes expected and the number provided by the classifier do not match."
                 )
-            outClassVals[ID] = predClassProbs
+            out_class_vals[id_arr] = pred_class_probs
             preds_cls_ids = numpy.zeros_like(preds_idxs, dtype=numpy.uint16)
             for cld_id, idx in zip(
                 otherargs.cls_id_lut, numpy.arange(0, len(otherargs.cls_id_lut))
             ):
                 preds_cls_ids[preds_idxs == idx] = cld_id
 
-            outClassIdVals[ID] = preds_cls_ids
-            outClassIdVals = numpy.expand_dims(
-                outClassIdVals.reshape(
+            out_class_id_vals[id_arr] = preds_cls_ids
+            out_class_id_vals = numpy.expand_dims(
+                out_class_id_vals.reshape(
                     (inputs.imageMask.shape[1], inputs.imageMask.shape[2])
                 ),
                 axis=0,
             )
 
-        outputs.outclsimage = outClassIdVals
+        outputs.outclsimage = out_class_id_vals
 
     classifier = lgb.Booster(model_file=model_file)
 
     infiles = applier.FilenameAssociations()
     infiles.imageMask = in_img_mask
-    numClassVars = 0
+    num_class_vars = 0
     for imgFile in img_file_info:
         infiles.__dict__[imgFile.name] = imgFile.file_name
-        numClassVars = numClassVars + len(imgFile.bands)
+        num_class_vars = num_class_vars + len(imgFile.bands)
 
     n_classes = len(cls_train_info)
     cls_id_lut = numpy.zeros(n_classes)
-    for clsname in cls_train_info:
-        if cls_train_info[clsname].id >= n_classes:
+    for cls_name in cls_train_info:
+        if cls_train_info[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    clsname, cls_train_info[clsname].id
+                    cls_name, cls_train_info[cls_name].id
                 )
             )
-        cls_id_lut[cls_train_info[clsname].id] = cls_train_info[clsname].out_id
+        cls_id_lut[cls_train_info[cls_name].id] = cls_train_info[cls_name].out_id
 
     outfiles = applier.FilenameAssociations()
     outfiles.outclsimage = out_class_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
     otherargs.mskVal = img_mask_val
-    otherargs.numClassVars = numClassVars
+    otherargs.numClassVars = num_class_vars
     otherargs.imgFileInfo = img_file_info
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
@@ -2260,22 +2260,22 @@ def apply_lightgbm_multiclass_classifier(
         rsgislib.rastergis.pop_rat_img_stats(
             out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
-        ratDataset = gdal.Open(out_class_img, gdal.GA_Update)
-        red = rat.readColumn(ratDataset, "Red")
-        green = rat.readColumn(ratDataset, "Green")
-        blue = rat.readColumn(ratDataset, "Blue")
+        rat_dataset = gdal.Open(out_class_img, gdal.GA_Update)
+        red = rat.readColumn(rat_dataset, "Red")
+        green = rat.readColumn(rat_dataset, "Green")
+        blue = rat.readColumn(rat_dataset, "Blue")
         class_names = numpy.empty_like(red, dtype=numpy.dtype("a255"))
         class_names[...] = ""
 
-        for classKey in cls_train_info:
-            print("Apply Colour to class '" + classKey + "'")
-            red[cls_train_info[classKey].out_id] = cls_train_info[classKey].red
-            green[cls_train_info[classKey].out_id] = cls_train_info[classKey].green
-            blue[cls_train_info[classKey].out_id] = cls_train_info[classKey].blue
-            class_names[cls_train_info[classKey].out_id] = classKey
+        for class_key in cls_train_info:
+            print("Apply Colour to class '" + class_key + "'")
+            red[cls_train_info[class_key].out_id] = cls_train_info[class_key].red
+            green[cls_train_info[class_key].out_id] = cls_train_info[class_key].green
+            blue[cls_train_info[class_key].out_id] = cls_train_info[class_key].blue
+            class_names[cls_train_info[class_key].out_id] = class_key
 
-        rat.writeColumn(ratDataset, "Red", red)
-        rat.writeColumn(ratDataset, "Green", green)
-        rat.writeColumn(ratDataset, "Blue", blue)
-        rat.writeColumn(ratDataset, "class_names", class_names)
-        ratDataset = None
+        rat.writeColumn(rat_dataset, "Red", red)
+        rat.writeColumn(rat_dataset, "Green", green)
+        rat.writeColumn(rat_dataset, "Blue", blue)
+        rat.writeColumn(rat_dataset, "class_names", class_names)
+        rat_dataset = None
