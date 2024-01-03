@@ -14,6 +14,18 @@ try:
 except ImportError:
     SKLEARN_NOT_AVAIL = True
 
+BORUTASHAP_NOT_AVAIL = False
+try:
+    import BorutaShap
+except ImportError:
+    BORUTASHAP_NOT_AVAIL = True
+
+PANDAS_NOT_AVAIL = False
+try:
+    import pandas
+except ImportError:
+    PANDAS_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
 
@@ -410,3 +422,197 @@ def test_apply_sklearn_classifier_rat(tmp_path):
         read_out_cls = False
 
     assert read_out_cls
+
+
+
+@pytest.mark.skipif(
+    (H5PY_NOT_AVAIL or SKLEARN_NOT_AVAIL or BORUTASHAP_NOT_AVAIL or PANDAS_NOT_AVAIL),
+    reason="h5py, BorutaShap, pandas or scikit-learn dependencies not available",
+)
+def test_feat_sel_sklearn_multiclass_borutashap(tmp_path):
+    import rsgislib.classification.classsklearn
+    from sklearn.ensemble import RandomForestClassifier
+
+    cls_info_dict = dict()
+    cls_info_dict["Forest"] = rsgislib.classification.ClassInfoObj(
+        id=0,
+        out_id=1,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Grass"] = rsgislib.classification.ClassInfoObj(
+        id=1,
+        out_id=2,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Urban"] = rsgislib.classification.ClassInfoObj(
+        id=2,
+        out_id=3,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Water"] = rsgislib.classification.ClassInfoObj(
+        id=3,
+        out_id=4,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+
+    sk_classifier = RandomForestClassifier()
+
+    out_csv_file = os.path.join(tmp_path, "out_feats_sel.csv")
+    rsgislib.classification.classsklearn.feat_sel_sklearn_multiclass_borutashap(
+        sk_classifier,
+        cls_info_dict,
+        out_csv_file,
+        n_trials=10,
+        sub_train_smpls=None,
+        rnd_seed=42,
+        feat_names=None,
+    )
+
+    assert os.path.exists(out_csv_file)
+
+
+@pytest.mark.skipif(
+    (H5PY_NOT_AVAIL or SKLEARN_NOT_AVAIL or BORUTASHAP_NOT_AVAIL or PANDAS_NOT_AVAIL),
+    reason="h5py, BorutaShap, pandas or scikit-learn dependencies not available",
+)
+def test_feat_sel_sklearn_multiclass_borutashap_featnames(tmp_path):
+    import rsgislib.classification.classsklearn
+    from sklearn.ensemble import RandomForestClassifier
+
+    cls_info_dict = dict()
+    cls_info_dict["Forest"] = rsgislib.classification.ClassInfoObj(
+        id=0,
+        out_id=1,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_forest_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Grass"] = rsgislib.classification.ClassInfoObj(
+        id=1,
+        out_id=2,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Urban"] = rsgislib.classification.ClassInfoObj(
+        id=2,
+        out_id=3,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_urban_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+    cls_info_dict["Water"] = rsgislib.classification.ClassInfoObj(
+        id=3,
+        out_id=4,
+        train_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_train.h5"
+        ),
+        test_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_test.h5"
+        ),
+        valid_file_h5=os.path.join(
+            CLASSIFICATION_DATA_DIR, "cls_water_smpls_bal_valid.h5"
+        ),
+        red=120,
+        green=120,
+        blue=120,
+    )
+
+    feat_names = [
+        "feat_1",
+        "feat_2",
+        "feat_3",
+        "feat_4",
+        "feat_5",
+        "feat_6",
+        "feat_7",
+        "feat_8",
+        "feat9",
+        "feat10",
+    ]
+
+    sk_classifier = RandomForestClassifier()
+
+    out_csv_file = os.path.join(tmp_path, "out_feats_sel.csv")
+    rsgislib.classification.classsklearn.feat_sel_sklearn_multiclass_borutashap(
+        sk_classifier,
+        cls_info_dict,
+        out_csv_file,
+        n_trials=10,
+        sub_train_smpls=None,
+        rnd_seed=42,
+        feat_names=feat_names,
+    )
+
+    assert os.path.exists(out_csv_file)

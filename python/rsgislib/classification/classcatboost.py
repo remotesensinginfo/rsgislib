@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 import h5py
 import numpy
@@ -7,6 +7,7 @@ from rios import applier, cuiprogress, rat
 from sklearn.metrics import accuracy_score
 
 import rsgislib
+import rsgislib.classification
 import rsgislib.imageutils
 import rsgislib.rastergis
 import rsgislib.tools.utils
@@ -46,7 +47,7 @@ def train_catboost_binary_classifier(
     cls2_train_file: str,
     cls2_valid_file: str,
     cls2_test_file: str,
-    cat_cols: List = None,
+    cat_cols: List[int] = None,
     out_mdl_file: str = None,
     verbose_training: bool = False,
 ):
@@ -154,11 +155,11 @@ def train_catboost_binary_classifier(
 def apply_catboost_binary_classifier(
     mdl_cls_obj,
     in_msk_img: str,
-    img_mask_val: int,
-    img_file_info: List,
+    img_msk_val: int,
+    img_file_info: List[rsgislib.imageutils.ImageBandInfo],
     out_class_img: str,
     gdalformat: str = "KEA",
-    out_prob_img: str = None,
+    out_score_img: str = None,
 ):
     """
     This function applies a trained binary (i.e., two classes) catboost model.
@@ -170,7 +171,7 @@ def apply_catboost_binary_classifier(
     :param in_msk_img: is an image file providing a mask to specify where should
                        be classified. Simplest mask is all the valid data regions
                        (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the in_msk_img to limit the region
+    :param img_msk_val: the pixel value within the in_msk_img to limit the region
                          to which the classification is applied. Can be used to
                          create a hierarchical classification.
     :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects
@@ -180,7 +181,7 @@ def apply_catboost_binary_classifier(
                           classification so it adheres to the training data.
     :param out_class_img: output image file with the hard classification output.
     :param gdalformat: is the output image format (default: KEA)
-    :param out_prob_img: Optional output image which contains the probabilities
+    :param out_score_img: Optional output image which contains the probabilities
                          for the two classes.
 
     """
@@ -246,15 +247,15 @@ def apply_catboost_binary_classifier(
         infiles.__dict__[img_file.name] = img_file.file_name
         num_class_vars = num_class_vars + len(img_file.bands)
 
-    out_probs = out_prob_img is not None
+    out_probs = out_score_img is not None
 
     outfiles = applier.FilenameAssociations()
     outfiles.out_image = out_class_img
     if out_probs:
-        outfiles.out_prob_img = out_prob_img
+        outfiles.out_prob_img = out_score_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = mdl_cls_obj
-    otherargs.msk_val = img_mask_val
+    otherargs.msk_val = img_msk_val
     otherargs.num_class_vars = num_class_vars
     otherargs.out_probs = out_probs
     otherargs.img_file_info = img_file_info
@@ -288,14 +289,14 @@ def apply_catboost_binary_classifier(
 
     if out_probs:
         rsgislib.imageutils.pop_img_stats(
-            out_prob_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+            out_score_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
 
 
 def train_catboost_multiclass_classifier(
     mdl_cls_obj,
-    cls_info_dict,
-    cat_cols: List = None,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
+    cat_cols: List[int] = None,
     out_mdl_file: str = None,
     verbose_training: bool = False,
 ):
@@ -412,20 +413,20 @@ def train_catboost_multiclass_classifier(
 
 
 def apply_catboost_multiclass_classifier(
-    class_train_info,
     mdl_cls_obj,
-    in_msk_img,
-    img_msk_val,
-    img_file_info,
-    out_cls_img,
-    gdalformat,
-    class_clr_names=True,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
+    in_msk_img: str,
+    img_msk_val: int,
+    img_file_info: List[rsgislib.imageutils.ImageBandInfo],
+    out_class_img: str,
+    gdalformat: str = "KEA",
+    class_clr_names: bool = True,
 ):
     """
     This function applies a trained multiple classes catboost model. The function
     train_catboost_multiclass_classifier can be used to train such as model.
 
-    :param class_train_info: dict (where the key is the class name) of
+    :param cls_info_dict: dict (where the key is the class name) of
                              rsgislib.classification.ClassInfoObj objects which will
                              be used to train the classifier (i.e.,
                              train_catboost_multiclass_classifier()), provide pixel
@@ -442,7 +443,7 @@ def apply_catboost_multiclass_classifier(
                           within rsgislib.zonalstats.extract_zone_img_band_values_to_hdf)
                           to identify which images and bands are to be used for the
                           classification so it adheres to the training data.
-    :param out_cls_img: Output image which will contain the hard classification
+    :param out_class_img: Output image which will contain the hard classification
                           defined as the maximum probability.
     :param gdalformat: is the output image format - all GDAL supported formats are
                        supported.
@@ -499,19 +500,19 @@ def apply_catboost_multiclass_classifier(
         infiles.__dict__[imgFile.name] = imgFile.file_name
         numClassVars = numClassVars + len(imgFile.bands)
 
-    n_classes = len(class_train_info)
+    n_classes = len(cls_info_dict)
     cls_id_lut = numpy.zeros(n_classes)
-    for clsname in class_train_info:
-        if class_train_info[clsname].id >= n_classes:
+    for clsname in cls_info_dict:
+        if cls_info_dict[clsname].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    clsname, class_train_info[clsname].id
+                    clsname, cls_info_dict[clsname].id
                 )
             )
-        cls_id_lut[class_train_info[clsname].id] = class_train_info[clsname].out_id
+        cls_id_lut[cls_info_dict[clsname].id] = cls_info_dict[clsname].out_id
 
     outfiles = applier.FilenameAssociations()
-    outfiles.out_cls_img = out_cls_img
+    outfiles.out_cls_img = out_class_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = mdl_cls_obj
     otherargs.mskVal = img_msk_val
@@ -540,21 +541,21 @@ def apply_catboost_multiclass_classifier(
 
     if class_clr_names:
         rsgislib.rastergis.pop_rat_img_stats(
-            out_cls_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
-        ratDataset = gdal.Open(out_cls_img, gdal.GA_Update)
+        ratDataset = gdal.Open(out_class_img, gdal.GA_Update)
         red = rat.readColumn(ratDataset, "Red")
         green = rat.readColumn(ratDataset, "Green")
         blue = rat.readColumn(ratDataset, "Blue")
         class_names = numpy.empty_like(red, dtype=numpy.dtype("a255"))
         class_names[...] = ""
 
-        for classKey in class_train_info:
+        for classKey in cls_info_dict:
             print("Apply Colour to class '" + classKey + "'")
-            red[class_train_info[classKey].out_id] = class_train_info[classKey].red
-            green[class_train_info[classKey].out_id] = class_train_info[classKey].green
-            blue[class_train_info[classKey].out_id] = class_train_info[classKey].blue
-            class_names[class_train_info[classKey].out_id] = classKey
+            red[cls_info_dict[classKey].out_id] = cls_info_dict[classKey].red
+            green[cls_info_dict[classKey].out_id] = cls_info_dict[classKey].green
+            blue[cls_info_dict[classKey].out_id] = cls_info_dict[classKey].blue
+            class_names[cls_info_dict[classKey].out_id] = classKey
 
         rat.writeColumn(ratDataset, "Red", red)
         rat.writeColumn(ratDataset, "Green", green)

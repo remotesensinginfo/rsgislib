@@ -138,6 +138,13 @@ Options for classification datasets:
     * CLS_VALID_DATA = 2
     * CLS_TEST_DATA = 3
 
+Options for classification hyperparameter optimisation:
+    * OPT_MTHD_UNDEFINED = 0
+    * OPT_MTHD_BAYESOPT = 1
+    * OPT_MTHD_OPTUNA = 2
+    * OPT_MTHD_SKOPT = 3
+    * OPT_MTHD_RANDOM = 4
+    * OPT_MTHD_GRID = 5
 
 """
 from __future__ import print_function
@@ -256,6 +263,13 @@ CLS_ALL_DATA = 0
 CLS_TRAIN_DATA = 1
 CLS_VALID_DATA = 2
 CLS_TEST_DATA = 3
+
+OPT_MTHD_UNDEFINED = 0
+OPT_MTHD_BAYESOPT = 1
+OPT_MTHD_OPTUNA = 2
+OPT_MTHD_SKOPT = 3
+OPT_MTHD_RANDOM = 4
+OPT_MTHD_GRID = 5
 
 
 def get_install_base_path() -> pathlib.PurePath:

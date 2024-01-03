@@ -33,7 +33,7 @@
 #
 ###########################################################################
 
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import h5py
 import numpy
@@ -46,12 +46,11 @@ import rsgislib
 import rsgislib.imagecalc
 import rsgislib.imageutils
 import rsgislib.rastergis
-from rsgislib.classification import ClassInfoObj
-from rsgislib.imageutils import ImageBandInfo
+import rsgislib.classification
 
 
 def perform_sklearn_classifier_param_search(
-    cls_train_info: Dict[str, ClassInfoObj],
+    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj],
     search_obj: BaseSearchCV,
 ) -> BaseEstimator:
     """
@@ -91,13 +90,13 @@ def perform_sklearn_classifier_param_search(
     row_init = 0
     for key in cls_train_info:
         # Open the dataset
-        f = h5py.File(cls_train_info[key].valid_file_h5, "r")
-        num_rows = f["DATA/DATA"].shape[0]
+        f_h5 = h5py.File(cls_train_info[key].valid_file_h5, "r")
+        num_rows = f_h5["DATA/DATA"].shape[0]
         # Copy data and populate classid array
-        vld_data_arr[row_init : (row_init + num_rows)] = f["DATA/DATA"]
+        vld_data_arr[row_init : (row_init + num_rows)] = f_h5["DATA/DATA"]
         vld_class_arr[row_init : (row_init + num_rows)] = cls_train_info[key].id
         row_init += num_rows
-        f.close()
+        f_h5.close()
 
     print(
         "Training data size: {} x {}".format(
@@ -119,7 +118,7 @@ def perform_sklearn_classifier_param_search(
 
 
 def train_sklearn_classifier(
-    cls_train_info: Dict[str, ClassInfoObj], sk_classifier: BaseEstimator
+    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj], sk_classifier: BaseEstimator
 ) -> (float, float):
     """
     This function trains the classifier.
@@ -162,26 +161,26 @@ def train_sklearn_classifier(
     row_test_init = 0
     for key in cls_train_info:
         # Open the dataset
-        f = h5py.File(cls_train_info[key].train_file_h5, "r")
-        num_rows = f["DATA/DATA"].shape[0]
+        f_h5 = h5py.File(cls_train_info[key].train_file_h5, "r")
+        num_rows = f_h5["DATA/DATA"].shape[0]
         # Copy data and populate classid array
-        data_train_arr[row_train_init : (row_train_init + num_rows)] = f["DATA/DATA"]
+        data_train_arr[row_train_init : (row_train_init + num_rows)] = f_h5["DATA/DATA"]
         class_train_arr[row_train_init : (row_train_init + num_rows)] = cls_train_info[
             key
         ].id
         row_train_init += num_rows
-        f.close()
+        f_h5.close()
 
         # Open the dataset
-        f = h5py.File(cls_train_info[key].test_file_h5, "r")
-        num_rows = f["DATA/DATA"].shape[0]
+        f_h5 = h5py.File(cls_train_info[key].test_file_h5, "r")
+        num_rows = f_h5["DATA/DATA"].shape[0]
         # Copy data and populate class_test_arr array
-        data_test_arr[row_test_init : (row_test_init + num_rows)] = f["DATA/DATA"]
+        data_test_arr[row_test_init : (row_test_init + num_rows)] = f_h5["DATA/DATA"]
         class_test_arr[row_test_init : (row_test_init + num_rows)] = cls_train_info[
             key
         ].id
         row_test_init += num_rows
-        f.close()
+        f_h5.close()
 
     print(
         "Training data size: {} x {}".format(
@@ -209,12 +208,12 @@ def train_sklearn_classifier(
 
 
 def apply_sklearn_classifier(
-    cls_train_info: Dict[str, ClassInfoObj],
+    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj],
     sk_classifier: BaseEstimator,
-    in_img_mask: str,
-    img_mask_val: int,
-    img_file_info: List[ImageBandInfo],
-    output_img: str,
+    in_msk_img: str,
+    img_msk_val: int,
+    img_file_info: List[rsgislib.imageutils.ImageBandInfo],
+    out_class_img: str,
     gdalformat: str = "KEA",
     class_clr_names: bool = True,
     out_score_img: str = None,
@@ -228,16 +227,16 @@ def apply_sklearn_classifier(
                            used to train the classifier provide pixel value id and
                            RGB class values.
     :param sk_classifier: a trained instance of a scikit-learn classifier
-    :param in_img_mask: is an image file providing a mask to specify where should be
+    :param in_msk_img: is an image file providing a mask to specify where should be
                         classified. Simplest mask is all the valid data regions
                         (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the imgMask to limit the region to
+    :param img_msk_val: the pixel value within the imgMask to limit the region to
                          which the classification is applied. Can be used to create a
                          hierarchical classification.
     :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects to
                           identify which images and bands are to be used for the
                           classification so it adheres to the training data.
-    :param output_img: output image file with the classification. Note. by default
+    :param out_class_img: output image file with the classification. Note. by default
                        a colour table and class names column is added to the image
                        if the gdalformat is KEA.
     :param gdalformat: is the output image format
@@ -267,26 +266,25 @@ def apply_sklearn_classifier(
         if not ignore_consec_cls_ids:
             if cls_train_info[cls_name].id >= n_classes:
                 raise rsgislib.RSGISPyException(
-                    "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                        cls_name, cls_train_info[cls_name].id
-                    )
+                    f"ClassInfoObj '{cls_name}' id ({cls_train_info[cls_name].id}) "
+                    f"is not consecutive starting from 0."
                 )
         cls_id_lut[cls_train_info[cls_name].id] = cls_train_info[cls_name].out_id
 
     in_files = applier.FilenameAssociations()
-    in_files.image_mask = in_img_mask
+    in_files.image_mask = in_msk_img
     num_class_vars = 0
     for img_file in img_file_info:
         in_files.__dict__[img_file.name] = img_file.file_name
         num_class_vars = num_class_vars + len(img_file.bands)
 
     outfiles = applier.FilenameAssociations()
-    outfiles.out_image = output_img
+    outfiles.out_image = out_class_img
     if create_out_score_img:
         outfiles.out_score_img = out_score_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = sk_classifier
-    otherargs.msk_val = img_mask_val
+    otherargs.msk_val = img_msk_val
     otherargs.num_class_vars = num_class_vars
     otherargs.n_classes = n_classes
     otherargs.img_file_info = img_file_info
@@ -385,14 +383,14 @@ def apply_sklearn_classifier(
     print("Completed")
     if gdalformat == "KEA":
         rsgislib.rastergis.pop_rat_img_stats(
-            clumps_img=output_img,
+            clumps_img=out_class_img,
             add_clr_tab=True,
             calc_pyramids=True,
             ignore_zero=True,
         )
     else:
         rsgislib.imageutils.pop_thmt_img_stats(
-            output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
 
     if create_out_score_img:
@@ -401,7 +399,7 @@ def apply_sklearn_classifier(
         )
 
     if class_clr_names and (gdalformat == "KEA"):
-        rat_dataset = gdal.Open(output_img, gdal.GA_Update)
+        rat_dataset = gdal.Open(out_class_img, gdal.GA_Update)
         red = rat.readColumn(rat_dataset, "Red")
         green = rat.readColumn(rat_dataset, "Green")
         blue = rat.readColumn(rat_dataset, "Blue")
@@ -426,7 +424,7 @@ def apply_sklearn_classifier_rat(
     clumps_img: str,
     variables: List[str],
     sk_classifier: BaseEstimator,
-    cls_train_info: Dict[str, ClassInfoObj],
+    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj],
     out_col_int: str = "OutClass",
     out_col_str: str = "OutClassName",
     roi_col: str = None,
@@ -579,3 +577,89 @@ def apply_sklearn_classifier_rat(
     ratapplier.apply(
         _apply_rat_classifier, in_rats, out_rats, otherargs=otherargs, controls=None
     )
+
+
+def feat_sel_sklearn_multiclass_borutashap(
+    sk_classifier: BaseEstimator,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
+    out_csv_file: str,
+    n_trials: int = 100,
+    sub_train_smpls: Union[int, float] = None,
+    rnd_seed: int = None,
+    feat_names: List[str] = None,
+):
+    from BorutaShap import BorutaShap
+    import pandas
+
+    rnd_obj = numpy.random.RandomState(rnd_seed)
+
+    n_classes = len(cls_info_dict)
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
+            raise rsgislib.RSGISPyException(
+                f"ClassInfoObj '{cls_name}' id ({cls_info_dict[cls_name].id}) "
+                f"is not consecutive starting from 0."
+            )
+
+    cls_data_dict = {}
+    train_data_lst = []
+    train_lbls_lst = []
+    cls_ids = []
+    n_classes = 0
+    for cls_name in cls_info_dict:
+        sgl_cls_info = {}
+        print(f"Reading Class {cls_name} Training")
+        f_h5 = h5py.File(cls_info_dict[cls_name].train_file_h5, "r")
+        sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
+
+        if (sub_train_smpls is not None) and (sub_train_smpls > 0):
+            if sub_train_smpls < 1:
+                sub_n_rows = int(sgl_cls_info["train_n_rows"] * sub_train_smpls)
+            else:
+                sub_n_rows = sub_train_smpls
+            print("sub_n_rows = {sub_n_rows}")
+            if sub_n_rows > 0:
+                sub_sel_rows = rnd_obj.choice(sgl_cls_info["train_n_rows"], sub_n_rows)
+                sgl_cls_info["train_data"] = sgl_cls_info["train_data"][sub_sel_rows]
+                sgl_cls_info["train_n_rows"] = sub_n_rows
+
+        sgl_cls_info["train_data_lbls"] = numpy.zeros(
+            sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
+        )
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[cls_name].id
+        f_h5.close()
+
+        train_data_lst.append(sgl_cls_info["train_data"])
+        train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
+
+        cls_data_dict[cls_name] = sgl_cls_info
+        cls_ids.append(cls_info_dict[cls_name].id)
+        n_classes = n_classes + 1
+
+    print("Finished Reading Data")
+
+    train_data_arr = numpy.concatenate(train_data_lst)
+    train_lbls_arr = numpy.concatenate(train_lbls_lst)
+
+    if feat_names is not None:
+        if len(feat_names) != train_data_arr.shape[1]:
+            raise rsgislib.RSGISPyException(
+                f"The number of feature names does not match the number of "
+                f"variables ({len(feat_names)} != {train_data_arr.shape[1]})"
+            )
+    else:
+        feat_names = list()
+        for i in range(train_data_arr.shape[1]):
+            feat_names.append(f"feat_{i+1}")
+
+    train_data_df = pandas.DataFrame(data=train_data_arr, columns=feat_names)
+
+    feat_selector = BorutaShap(
+        model=sk_classifier, importance_measure="shap", classification=True
+    )
+    feat_selector.fit(
+        X=train_data_df, y=train_lbls_arr, n_trials=n_trials, random_state=rnd_seed
+    )
+    feat_selector.TentativeRoughFix()
+    feat_selector.results_to_csv(out_csv_file.replace(".csv", ""))
