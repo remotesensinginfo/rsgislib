@@ -1097,8 +1097,8 @@ def test_apply_xgboost_multiclass_classifier_bayesopt(tmp_path):
 
     out_class_img = os.path.join(tmp_path, "out_cls_img.kea")
     rsgislib.classification.classxgboost.apply_xgboost_multiclass_classifier(
-        cls_info_dict,
         out_mdl_file,
+        cls_info_dict,
         in_msk_img,
         1,
         img_band_info,

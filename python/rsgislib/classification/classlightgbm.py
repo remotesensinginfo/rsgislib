@@ -27,10 +27,11 @@
 # Author: Pete Bunting
 # Email: petebunting@mac.com
 # Date: 05/11/2019
-# Version: 1.0
+# Version: 1.1
 #
 # History:
 # Version 1.0 - Created.
+# Version 1.1 - Changed parameter optimisation libraries.
 #
 ###########################################################################
 
@@ -586,7 +587,8 @@ def train_opt_lightgbm_binary_classifier(
     :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
                         used as the basis model from which training will be
                         continued (i.e., transfer learning).
-    :param out_params_file: The output JSON file with the identified parameters
+    :param out_params_file: The output JSON file with the identified parameters.
+                            If None (default) then no file is outputted.
 
     """
     if not HAVE_LIGHTGBM:
@@ -1803,7 +1805,8 @@ def train_opt_lightgbm_multiclass_classifier(
 ):
     """
     A function which performs a hyper-parameter optimisation for a multi-class
-    lightgbm classifier.
+    lightgbm classifier and then trains a model saving the model for future
+    use.
 
     You have the option of using the bayes_opt (Default), optuna or skopt
     optimisation libraries. Before 5.1.0 skopt was the only option but this
@@ -2500,7 +2503,7 @@ def apply_lightgbm_multiclass_classifier(
     A function for applying a trained multiclass lightgbm model to a image or
     stack of image files.
 
-    :param model_file: a trained lightgbm binary model which can be loaded
+    :param model_file: a trained lightgbm multiclass model which can be loaded
                        with lgb.Booster(model_file=model_file).
     :param cls_info_dict: a dict where the key is string with class name
                           of ClassInfoObj objects defining the training data.

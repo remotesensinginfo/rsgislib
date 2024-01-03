@@ -36,7 +36,7 @@
 ###########################################################################
 
 import gc
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import h5py
 import numpy
@@ -44,6 +44,7 @@ from osgeo import gdal
 from rios import applier, cuiprogress, rat
 
 import rsgislib
+import rsgislib.classification
 import rsgislib.imagecalc
 import rsgislib.imageutils
 import rsgislib.rastergis
@@ -71,22 +72,40 @@ def optimise_xgboost_binary_classifier(
     mdl_cls_obj=None,
 ):
     """
-    A function which performs a bayesian optimisation of the hyper-parameters for a binary xgboost
-    classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
+    A function which performs a hyper-parameter optimisation for a binary
+    xgboost classifier. Class 1 is the class which you are interested in
+    and Class 2 is the 'other class'.
 
-    This function requires that xgboost and skopt modules to be installed.
+    You have the option of using the bayes_opt (Default), optuna or skopt
+    optimisation libraries. Before 5.1.0 skopt was the only option but this
+    no longer appears to be maintained so the other options have been added.
 
-    :param out_params_file: The output model parameters which have been optimised.
-    :param cls1_train_file: Training samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_valid_file: Validation samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_test_file: Testing samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls2_train_file: Training samples HDF5 file for the 'other' class
-    :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
-    :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param n_threads: The number of threads to use for the training.
-    :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
+    :param out_params_file: The output JSON file with the identified parameters
+    :param cls1_train_file: File path to the HDF5 file with the training samples
+                            for class 1
+    :param cls1_valid_file: File path to the HDF5 file with the validation samples
+                            for class 1
+    :param cls2_train_file: File Path to the HDF5 file with the training samples
+                            for class 2
+    :param cls2_valid_file: File path to the HDF5 file with the validation samples
+                            for class 2
+    :param op_mthd: The method used to optimise the parameters.
+                    Default: rsgislib.OPT_MTHD_BAYESOPT
+    :param n_opt_iters: The number of iterations (Default 100) used for the
+                        optimisation. This parameter is ignored for skopt.
+                        For bayes_opt there is a minimum of 10 and these are
+                        added to that minimum so Default is therefore 110.
+                        For optuna this is the number of iterations used.
+    :param rnd_seed: A random seed for the optimisation. Default None. If None
+                     there a different seed will be used each time the function
+                     is run.
+    :param n_threads: The number of threads used by xgboost
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
 
     """
+
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
@@ -346,21 +365,40 @@ def train_xgboost_binary_classifier(
     mdl_cls_obj=None,
 ):
     """
-    A function which performs a bayesian optimisation of the hyper-parameters for a binary xgboost
-    classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
+A function which trains a binary lightgbm model using the parameters provided
+    within a JSON file. The JSON file must provide values for the following
+    parameters:
 
-    This function requires that xgboost and skopt modules to be installed.
+       * eta
+       * gamma
+       * max_depth
+       * min_child_weight
+       * max_delta_step
+       * subsample
+       * bagging_fraction
+       * eval_metric
+       * objective
 
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param cls_params_file: A JSON file with the model parameters
-    :param cls1_train_file: Training samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_valid_file: Validation samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_test_file: Testing samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls2_train_file: Training samples HDF5 file for the 'other' class
-    :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
-    :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param n_threads: The number of threads to use for the training.
-    :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
+    :param out_mdl_file: The file path for the output xgboost (*.h5) model which
+                         can be loaded to perform a classification.
+    :param cls_params_file: The file path to the JSON file with the classifier
+                            parameters.
+    :param cls1_train_file: File path to the HDF5 file with the training samples
+                            for class 1
+    :param cls1_valid_file: File path to the HDF5 file with the validation samples
+                            for class 1
+    :param cls1_test_file: File path to the HDF5 file with the testing samples
+                           for class 1
+    :param cls2_train_file: File path to the HDF5 file with the training samples
+                            for class 2
+    :param cls2_valid_file: File path to the HDF5 file with the validation samples
+                            for class 2
+    :param cls2_test_file: File path to the HDF5 file with the testing samples
+                           for class 2
+    :param n_threads: The number of threads used by lightgbm
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
 
     """
     if not HAVE_XGBOOST:
@@ -486,22 +524,45 @@ def train_opt_xgboost_binary_classifier(
     out_params_file: str = None,
 ):
     """
-    A function which performs a bayesian optimisation of the hyper-parameters for a binary xgboost
-    classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
+    A function which performs a hyper-parameter optimisation for a binary
+    xgboost classifier and then trains a model saving the model for future
+    use. Class 1 is the class which you are interested in and Class 2 is
+    the 'other class'.
 
-    This function requires that xgboost and skopt modules to be installed.
+    You have the option of using the bayes_opt (Default), optuna or skopt
+    optimisation libraries. Before 5.1.0 skopt was the only option but this
+    no longer appears to be maintained so the other options have been added.
 
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param cls1_train_file: Training samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_valid_file: Validation samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_test_file: Testing samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls2_train_file: Training samples HDF5 file for the 'other' class
-    :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
-    :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param n_threads: The number of threads to use for the training.
-    :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
-    :param out_params_file: The output model parameters which have been optimised.
-                            If None then no file will be outputted.
+    :param out_mdl_file: The file path for the output xgboost (*.h5) model which
+                         can be loaded to perform a classification.
+    :param cls1_train_file: File path to the HDF5 file with the training samples
+                            for class 1
+    :param cls1_valid_file: File path to the HDF5 file with the validation samples
+                            for class 1
+    :param cls1_test_file: File path to the HDF5 file with the testing samples
+                           for class 1
+    :param cls2_train_file: File path to the HDF5 file with the training samples
+                            for class 2
+    :param cls2_valid_file: File path to the HDF5 file with the validation samples
+                            for class 2
+    :param cls2_test_file: File path to the HDF5 file with the testing samples
+                           for class 2
+    :param op_mthd: The method used to optimise the parameters.
+                    Default: rsgislib.OPT_MTHD_BAYESOPT
+    :param n_opt_iters: The number of iterations (Default 100) used for the
+                        optimisation. This parameter is ignored for skopt.
+                        For bayes_opt there is a minimum of 10 and these are
+                        added to that minimum so Default is therefore 110.
+                        For optuna this is the number of iterations used.
+    :param rnd_seed: A random seed for the optimisation. Default None. If None
+                     there a different seed will be used each time the function
+                     is run.
+    :param n_threads: The number of threads used by xgboost
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
+    :param out_params_file: The output JSON file with the identified parameters.
+                            If None (default) then no file is outputted.
 
     """
     if not HAVE_XGBOOST:
@@ -805,33 +866,37 @@ def apply_xgboost_binary_classifier(
     in_msk_img: str,
     img_mask_val: int,
     img_file_info: List,
-    out_prob_img: str,
+    out_score_img: str,
     gdalformat: str = "KEA",
     out_class_img=None,
     class_thres: int = 5000,
     n_threads: int = 1,
 ):
     """
-    This function applies a trained binary (i.e., two classes) xgboost model. The function train_xgboost_binary_classifier
-    can be used to train such as model. The output image will contain the probability of membership to the class of
-    interest. You will need to threshold this image to get a final hard classification. Alternative, a hard class output
-    image and threshold can be applied to this image.
+    A function for applying a trained binary xgboost model to a image or stack of
+    image files.
 
-    :param model_file: a trained xgboost binary model which can be loaded with lgb.Booster(model_file=model_file).
-    :param in_msk_img: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                    valid data regions (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
-                       Can be used to create a heirachical classification.
-    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                        rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) to identify which images and bands are to
-                        be used for the classification so it adheres to the training data.
-    :param out_prob_img: output image file with the classification probabilities - this image is scaled by
-                       multiplying by 10000.
-    :param gdalformat: is the output image format - all GDAL supported formats are supported.
-    :param out_class_img: Optional output image which will contain the hard classification, defined with a threshold on the
-                        probability image.
-    :param class_thres: The threshold used to define the hard classification. Default is 5000 (i.e., probability of 0.5).
-    :param n_threads: The number of threads to use for the classifier.
+    :param model_file: a trained lightgbm binary model which can be loaded
+                       with the xgb.Booster function load_model(model_file).
+    :param in_img_msk: is an image file providing a mask to specify where
+                       should be classified. Simplest mask is all the valid
+                       data regions (rsgislib.imageutils.gen_valid_mask)
+    :param img_mask_val: the pixel value within the imgMask to limit the region
+                         to which the classification is applied.
+                         Can be used to create a hierarchical classification.
+    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects
+                          to identify which images and bands are to be used for
+                          the classification so it adheres to the training data.
+    :param out_score_img: output image file with the classification softmax score.
+                          Note. this image is scaled by multiplying by 10000
+                          therefore the range is between 0-10000.
+    :param gdalformat: The output image format (Default: KEA).
+    :param out_class_img: Optional output image which will contain the hard
+                          classification, defined with a threshold on the
+                          softmax score image.
+    :param class_thres: The threshold used to define the hard classification.
+                        Default is 5000 (i.e., softmax score of 0.5).
+    :param n_threads: The number of threads used by xgboost
 
     """
     if not HAVE_XGBOOST:
@@ -878,7 +943,7 @@ def apply_xgboost_binary_classifier(
         num_class_vars = num_class_vars + len(imgFile.bands)
 
     outfiles = applier.FilenameAssociations()
-    outfiles.outimage = out_prob_img
+    outfiles.outimage = out_score_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
     otherargs.mskVal = img_mask_val
@@ -903,12 +968,12 @@ def apply_xgboost_binary_classifier(
     )
     print("Completed")
     rsgislib.imageutils.pop_img_stats(
-        out_prob_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        out_score_img, use_no_data=True, no_data_val=0, calc_pyramids=True
     )
 
     if out_class_img is not None:
         rsgislib.imagecalc.image_math(
-            out_prob_img,
+            out_score_img,
             out_class_img,
             "b1>{}?1:0".format(class_thres),
             gdalformat,
@@ -922,8 +987,8 @@ def apply_xgboost_binary_classifier(
 
 def optimise_xgboost_multiclass_classifier(
     out_params_file: str,
-    cls_info_dict: Dict,
-    sub_train_smpls=None,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
+    sub_train_smpls: Union[int, float] = None,
     op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
@@ -931,21 +996,34 @@ def optimise_xgboost_multiclass_classifier(
     mdl_cls_obj=None,
 ):
     """
-    A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
-    classifier. A dict of class information, as ClassInfoObj objects, is defined with the training and
-    validation data. Note, the training data inputted into this function might well be a smaller subset
-    of the whole training dataset to speed up processing.
+    A function which performs a hyper-parameter optimisation for a multi-class
+    xgboost classifier.
 
-    This function requires that xgboost and skopt modules to be installed.
+    You have the option of using the bayes_opt (Default), optuna or skopt
+    optimisation libraries. Before 5.1.0 skopt was the only option but this
+    no longer appears to be maintained so the other options have been added.
 
-    :param out_params_file: The output model parameters which have been optimised.
-    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the
-                        training and validation data.
-    :param n_threads: The number of threads to use to train the classifier.
-    :param sub_train_smpls: Subset the training, if None or 0 then no sub-setting will occur. If
-                            between 0-1 then a ratio subset (e.g., 0.25 = 25 % subset) will be taken.
-                            If > 1 then that number of points will be taken per class.
-    :param rnd_seed: the seed for the random selection of the training data.
+    :param out_params_file: The output JSON file with the identified parameters
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+    :param sub_train_smpls: Subset the training, if None or 0 then no sub-setting
+                            will occur. If between 0-1 then a ratio subset
+                            (e.g., 0.25 = 25 % subset) will be taken. If > 1 then
+                            that number of points will be taken per class.
+    :param op_mthd: The method used to optimise the parameters.
+                    Default: rsgislib.OPT_MTHD_BAYESOPT
+    :param n_opt_iters: The number of iterations (Default 100) used for the
+                        optimisation. This parameter is ignored for skopt.
+                        For bayes_opt there is a minimum of 10 and these are
+                        added to that minimum so Default is therefore 110.
+                        For optuna this is the number of iterations used.
+    :param rnd_seed: A random seed for the optimisation. Default None. If None
+                     there a different seed will be used each time the function
+                     is run.
+    :param n_threads: The number of threads used by xgboost
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
 
     """
     if not HAVE_XGBOOST:
@@ -1238,21 +1316,35 @@ def optimise_xgboost_multiclass_classifier(
 def train_xgboost_multiclass_classifier(
     out_mdl_file: str,
     cls_params_file: str,
-    cls_info_dict: Dict,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
     n_threads: int = 1,
     mdl_cls_obj=None,
 ):
     """
-    A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
-    classifier producing a full trained model at the end. A dict of class information, as ClassInfoObj
-    objects, is defined with the training data.
+    A function which trains a multiclass xgboost model using the parameters
+    provided within a JSON file. The JSON file must provide values for the
+    following parameters:
 
-    This function requires that xgboost modules to be installed.
+       * eta
+       * gamma
+       * max_depth
+       * min_child_weight
+       * max_delta_step
+       * subsample
+       * bagging_fraction
+       * eval_metric
+       * objective
 
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param cls_params_file: A JSON file with the model parameters
-    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
-    :param n_threads: The number of threads to use to train the classifier.
+    :param params_file: The file path to the JSON file with the classifier
+                        parameters.
+    :param out_mdl_file: The file path for the output xgboost (*.h5) model which
+                         can be loaded to perform a classification.
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+    :param n_threads: The number of threads used by xgboost
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
 
     """
     if not HAVE_XGBOOST:
@@ -1380,7 +1472,7 @@ def train_xgboost_multiclass_classifier(
 
 def train_opt_xgboost_multiclass_classifier(
     out_mdl_file: str,
-    cls_info_dict: Dict,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
     op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
     rnd_seed: int = None,
@@ -1388,25 +1480,32 @@ def train_opt_xgboost_multiclass_classifier(
     mdl_cls_obj=None,
 ):
     """
-    A function which performs an optimisation of the hyper-parameters
-    for a multiclass xgboost classifier producing a full trained model.
-    A dict of class information, as ClassInfoObj objects, is defined
-    with the training data.
+    A function which performs a hyper-parameter optimisation for a multi-class
+    xgboost classifier and then trains a model saving the model for future
+    use.
 
-    This function requires that xgboost and skopt modules to be installed.
+    You have the option of using the bayes_opt (Default), optuna or skopt
+    optimisation libraries. Before 5.1.0 skopt was the only option but this
+    no longer appears to be maintained so the other options have been added.
 
-    :param out_mdl_file: The output file path (for the XGB HDF5 file) where the
-                         classification model will be saved.
-    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj
-                          objects defining the training data.
-    :param op_mthd: The method used for the parameter optimisation
-                    (Default: rsgislib.OPT_MTHD_BAYESOPT)
-    :param n_opt_iters: The number of iterations used for the hyper parameter
-                        optimisation
-    :param rnd_seed: A random seed used for the hyper parameter optimisation.
-    :param n_threads: The number of threads to use to train the classifier.
-    :param mdl_cls_obj: Optionally, an existing model can be used as the basis
-                        for classification model.
+    :param out_mdl_file: The file path for the output xgboost (*.h5) model which
+                         can be loaded to perform a classification.
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+    :param op_mthd: The method used to optimise the parameters.
+                    Default: rsgislib.OPT_MTHD_BAYESOPT
+    :param n_opt_iters: The number of iterations (Default 100) used for the
+                        optimisation. This parameter is ignored for skopt.
+                        For bayes_opt there is a minimum of 10 and these are
+                        added to that minimum so Default is therefore 110.
+                        For optuna this is the number of iterations used.
+    :param rnd_seed: A random seed for the optimisation. Default None. If None
+                     there a different seed will be used each time the function
+                     is run.
+    :param n_threads: The number of threads used by xgboost
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
 
     """
     if not HAVE_XGBOOST:
@@ -1723,8 +1822,8 @@ def train_opt_xgboost_multiclass_classifier(
 
 
 def apply_xgboost_multiclass_classifier(
-    class_train_info: Dict,
     model_file: str,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
     in_mask_img: str,
     img_mask_val: int,
     img_file_info: List,
@@ -1734,27 +1833,32 @@ def apply_xgboost_multiclass_classifier(
     n_threads: int = 1,
 ):
     """
-    This function applies a trained multiple classes xgboost model. The function train_xgboost_multiclass_classifier
-    can be used to train such as model. The output image will contain the probability of membership to the class of
-    interest. You will need to threshold this image to get a final hard classification. Alternative, a hard class
-    output image and threshold can be applied to this image.
+    A function for applying a trained multiclass xgboost model to a image or
+    stack of image files.
 
-    :param class_train_info: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
-                           objects which will be used to train the classifier (i.e., train_xgboost_multiclass_classifier()),
-                           provide pixel value id and RGB class values.
-    :param model_file: a trained xgboost multiclass model which can be loaded with lgb.Booster(model_file=model_file).
-    :param in_mask_img: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                    valid data regions (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
-                       Can be used to create a heirachical classification.
-    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                        rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) to identify which images and bands are to
-                        be used for the classification so it adheres to the training data.
-    :param out_class_img: Output image which will contain the hard classification defined as the maximum probability.
-    :param gdalformat: is the output image format - all GDAL supported formats are supported.
-    :param class_clr_names: default is True and therefore a colour table will the colours specified in ClassInfoObj
-                          and a class_names (from classTrainInfo) column will be added to the output file.
-    :param n_threads: The number of threads to use for the classifier.
+    :param model_file: a trained xgboost multiclass model which can be loaded
+                       with the xgb.Booster function load_model(model_file).
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+                          This is used to define the class names and colours
+                          if class_clr_names is True.
+    :param in_img_msk: is an image file providing a mask to specify where
+                       should be classified. Simplest mask is all the valid
+                       data regions (rsgislib.imageutils.gen_valid_mask)
+    :param img_mask_val: the pixel value within the imgMask to limit the region
+                         to which the classification is applied.
+                         Can be used to create a hierarchical classification.
+    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects
+                          to identify which images and bands are to be used for
+                          the classification so it adheres to the training data.
+    :param out_class_img: The file path for the output classification image
+    :param gdalformat: The output image format (Default: KEA).
+    :param class_clr_names: default is True and therefore a colour table will the
+                            colours specified in ClassInfoObj and a class_names
+                            (from cls_info_dict) column will be added to the
+                            output file. Note the output format needs to support
+                            a raster attribute table (i.e., KEA).
+    :param n_threads: The number of threads used by xgboost
 
     """
     if not HAVE_XGBOOST:
@@ -1806,16 +1910,16 @@ def apply_xgboost_multiclass_classifier(
         infiles.__dict__[imgFile.name] = imgFile.file_name
         num_class_vars = num_class_vars + len(imgFile.bands)
 
-    n_classes = len(class_train_info)
+    n_classes = len(cls_info_dict)
     cls_id_lut = numpy.zeros(n_classes)
-    for cls_name in class_train_info:
-        if class_train_info[cls_name].id >= n_classes:
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    cls_name, class_train_info[cls_name].id
+                    cls_name, cls_info_dict[cls_name].id
                 )
             )
-        cls_id_lut[class_train_info[cls_name].id] = class_train_info[cls_name].out_id
+        cls_id_lut[cls_info_dict[cls_name].id] = cls_info_dict[cls_name].out_id
 
     outfiles = applier.FilenameAssociations()
     outfiles.outclsimage = out_class_img
@@ -1856,14 +1960,14 @@ def apply_xgboost_multiclass_classifier(
         class_names = numpy.empty_like(red, dtype=numpy.dtype("a255"))
         class_names[...] = ""
 
-        for class_key in class_train_info:
+        for class_key in cls_info_dict:
             print("Apply Colour to class '" + class_key + "'")
-            red[class_train_info[class_key].out_id] = class_train_info[class_key].red
-            green[class_train_info[class_key].out_id] = class_train_info[
+            red[cls_info_dict[class_key].out_id] = cls_info_dict[class_key].red
+            green[cls_info_dict[class_key].out_id] = cls_info_dict[
                 class_key
             ].green
-            blue[class_train_info[class_key].out_id] = class_train_info[class_key].blue
-            class_names[class_train_info[class_key].out_id] = class_key
+            blue[cls_info_dict[class_key].out_id] = cls_info_dict[class_key].blue
+            class_names[cls_info_dict[class_key].out_id] = class_key
 
         rat.writeColumn(rat_dataset, "Red", red)
         rat.writeColumn(rat_dataset, "Green", green)
@@ -1874,9 +1978,9 @@ def apply_xgboost_multiclass_classifier(
 
 def apply_xgboost_multiclass_classifier_rat(
     clumps_img: str,
-    variables: List,
+    variables: List[str],
     model_file: str,
-    class_train_info: Dict,
+    cls_info_dict: Dict,
     out_col_int: str = "OutClass",
     out_col_str: str = "OutClassName",
     roi_col: str = None,
@@ -1885,23 +1989,33 @@ def apply_xgboost_multiclass_classifier_rat(
     n_threads: int = 1,
 ):
     """
-    A function which will apply an XGBoost model within a Raster Attribute Table (RAT).
+    A function for applying a trained multiclass xgboost model to a raster
+    attribute table.
 
-    :param clumps_img: is the clumps image on which the classification is to be performed
-    :param variables: is an array of column names which are to be used for the classification
-    :param class_train_info: dict (where the key is the class name) of
-                             rsgislib.classification.ClassInfoObj objects which will be
-                             used to train the classifier (i.e.,
-                             train_xgboost_multiclass_classifier()), provide pixel value
-                             id and RGB class values.
-    :param model_file: a trained xgboost multiclass model which can be loaded with lgb.Booster(model_file=model_file).
-    :param out_col_int: is the output column name for the int class representation (Default: 'OutClass')
-    :param out_col_str: is the output column name for the class names column (Default: 'OutClassName')
-    :param roi_col: is a column name for a column which specifies the region to be classified. If None ignored (Default: None)
-    :param roi_val: is a int value used within the roi_col to select a region to be classified (Default: 1)
-    :param class_colours: is a boolean specifying whether the RAT colour table should be
-                          updated using the classification colours (default: True)
-    :param n_threads: The number of threads to use for the classifier."""
+    :param clumps_img: the file path for the input image with associated
+                       raster attribute table (RAT) to which the classification
+                       will be applied.
+    :param variables: A list of column names within the RAT to be used for the
+                      classification.
+    :param model_file: a trained xgboost multiclass model which can be loaded
+                       with the xgb.Booster function load_model(model_file).
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+                          Note, this is just used for the class names, int ID
+                          and classification colours.
+    :param out_col_int: is the output column name for the int class
+                        representation (Default: 'OutClass')
+    :param out_col_str: is the output column name for the class names
+                        column (Default: 'OutClassName')
+    :param roi_col: is a column name for a column which specifies the region to
+                    be classified. If None ignored (Default: None)
+    :param roi_val: is a int value used within the roi_col to select a region
+                    to be classified (Default: 1)
+    :param class_colours: is a boolean specifying whether the RAT colour table should
+                          be updated using the classification colours (default: True)
+    :param n_threads: The number of threads used by xgboost
+
+    """
     if not HAVE_XGBOOST:
         raise rsgislib.RSGISPyException("Do not have xgboost module installed.")
 
@@ -1961,21 +2075,21 @@ def apply_xgboost_multiclass_classifier_rat(
             blue[...] = 0
 
             # Set colours
-            for class_name in otherargs.class_train_info:
-                cls_id = otherargs.class_train_info[class_name].out_id
+            for class_name in otherargs.cls_info_dict:
+                cls_id = otherargs.cls_info_dict[class_name].out_id
                 red = numpy.where(
                     out_class_int_vals == cls_id,
-                    otherargs.class_train_info[class_name].red,
+                    otherargs.cls_info_dict[class_name].red,
                     red,
                 )
                 green = numpy.where(
                     out_class_int_vals == cls_id,
-                    otherargs.class_train_info[class_name].green,
+                    otherargs.cls_info_dict[class_name].green,
                     green,
                 )
                 blue = numpy.where(
                     out_class_int_vals == cls_id,
-                    otherargs.class_train_info[class_name].blue,
+                    otherargs.cls_info_dict[class_name].blue,
                     blue,
                 )
 
@@ -1986,18 +2100,18 @@ def apply_xgboost_multiclass_classifier_rat(
     classifier = xgb.Booster({"nthreads": n_threads})
     classifier.load_model(model_file)
 
-    n_classes = len(class_train_info)
+    n_classes = len(cls_info_dict)
     cls_id_lut = numpy.zeros(n_classes)
     cls_name_lut = dict()
-    for cls_name in class_train_info:
-        if class_train_info[cls_name].id >= n_classes:
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    cls_name, class_train_info[cls_name].id
+                    cls_name, cls_info_dict[cls_name].id
                 )
             )
-        cls_id_lut[class_train_info[cls_name].id] = class_train_info[cls_name].out_id
-        cls_name_lut[class_train_info[cls_name].out_id] = cls_name
+        cls_id_lut[cls_info_dict[cls_name].id] = cls_info_dict[cls_name].out_id
+        cls_name_lut[cls_info_dict[cls_name].out_id] = cls_name
 
     in_rats = ratapplier.RatAssociations()
     out_rats = ratapplier.RatAssociations()
@@ -2015,7 +2129,7 @@ def apply_xgboost_multiclass_classifier_rat(
     otherargs.cls_id_lut = cls_id_lut
     otherargs.cls_name_lut = cls_name_lut
     otherargs.class_colours = class_colours
-    otherargs.class_train_info = class_train_info
+    otherargs.cls_info_dict = cls_info_dict
 
     try:
         import tqdm
