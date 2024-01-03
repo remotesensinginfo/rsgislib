@@ -137,7 +137,7 @@ Train Classifier
 ^^^^^^^^^^^^^^^^^^
 .. autofunction:: rsgislib.classification.classlightgbm.optimise_lightgbm_multiclass_classifier
 .. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier
-.. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier
+.. autofunction:: rsgislib.classification.classlightgbm.train_opt_lightgbm_multiclass_classifier
 
 Apply Classifier
 ^^^^^^^^^^^^^^^^^^^^
