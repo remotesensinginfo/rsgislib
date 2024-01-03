@@ -91,13 +91,13 @@ def perform_sklearn_classifier_param_search(
     row_init = 0
     for key in cls_train_info:
         # Open the dataset
-        f = h5py.File(cls_train_info[key].valid_file_h5, "r")
-        num_rows = f["DATA/DATA"].shape[0]
+        f_h5 = h5py.File(cls_train_info[key].valid_file_h5, "r")
+        num_rows = f_h5["DATA/DATA"].shape[0]
         # Copy data and populate classid array
-        vld_data_arr[row_init : (row_init + num_rows)] = f["DATA/DATA"]
+        vld_data_arr[row_init : (row_init + num_rows)] = f_h5["DATA/DATA"]
         vld_class_arr[row_init : (row_init + num_rows)] = cls_train_info[key].id
         row_init += num_rows
-        f.close()
+        f_h5.close()
 
     print(
         "Training data size: {} x {}".format(
@@ -162,26 +162,26 @@ def train_sklearn_classifier(
     row_test_init = 0
     for key in cls_train_info:
         # Open the dataset
-        f = h5py.File(cls_train_info[key].train_file_h5, "r")
-        num_rows = f["DATA/DATA"].shape[0]
+        f_h5 = h5py.File(cls_train_info[key].train_file_h5, "r")
+        num_rows = f_h5["DATA/DATA"].shape[0]
         # Copy data and populate classid array
-        data_train_arr[row_train_init : (row_train_init + num_rows)] = f["DATA/DATA"]
+        data_train_arr[row_train_init : (row_train_init + num_rows)] = f_h5["DATA/DATA"]
         class_train_arr[row_train_init : (row_train_init + num_rows)] = cls_train_info[
             key
         ].id
         row_train_init += num_rows
-        f.close()
+        f_h5.close()
 
         # Open the dataset
-        f = h5py.File(cls_train_info[key].test_file_h5, "r")
-        num_rows = f["DATA/DATA"].shape[0]
+        f_h5 = h5py.File(cls_train_info[key].test_file_h5, "r")
+        num_rows = f_h5["DATA/DATA"].shape[0]
         # Copy data and populate class_test_arr array
-        data_test_arr[row_test_init : (row_test_init + num_rows)] = f["DATA/DATA"]
+        data_test_arr[row_test_init : (row_test_init + num_rows)] = f_h5["DATA/DATA"]
         class_test_arr[row_test_init : (row_test_init + num_rows)] = cls_train_info[
             key
         ].id
         row_test_init += num_rows
-        f.close()
+        f_h5.close()
 
     print(
         "Training data size: {} x {}".format(
@@ -211,10 +211,10 @@ def train_sklearn_classifier(
 def apply_sklearn_classifier(
     cls_train_info: Dict[str, ClassInfoObj],
     sk_classifier: BaseEstimator,
-    in_img_mask: str,
-    img_mask_val: int,
+    in_msk_img: str,
+    img_msk_val: int,
     img_file_info: List[ImageBandInfo],
-    output_img: str,
+    out_class_img: str,
     gdalformat: str = "KEA",
     class_clr_names: bool = True,
     out_score_img: str = None,
@@ -228,16 +228,16 @@ def apply_sklearn_classifier(
                            used to train the classifier provide pixel value id and
                            RGB class values.
     :param sk_classifier: a trained instance of a scikit-learn classifier
-    :param in_img_mask: is an image file providing a mask to specify where should be
+    :param in_msk_img: is an image file providing a mask to specify where should be
                         classified. Simplest mask is all the valid data regions
                         (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the imgMask to limit the region to
+    :param img_msk_val: the pixel value within the imgMask to limit the region to
                          which the classification is applied. Can be used to create a
                          hierarchical classification.
     :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects to
                           identify which images and bands are to be used for the
                           classification so it adheres to the training data.
-    :param output_img: output image file with the classification. Note. by default
+    :param out_class_img: output image file with the classification. Note. by default
                        a colour table and class names column is added to the image
                        if the gdalformat is KEA.
     :param gdalformat: is the output image format
@@ -267,26 +267,25 @@ def apply_sklearn_classifier(
         if not ignore_consec_cls_ids:
             if cls_train_info[cls_name].id >= n_classes:
                 raise rsgislib.RSGISPyException(
-                    "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                        cls_name, cls_train_info[cls_name].id
-                    )
+                    f"ClassInfoObj '{cls_name}' id ({cls_train_info[cls_name].id}) "
+                    f"is not consecutive starting from 0."
                 )
         cls_id_lut[cls_train_info[cls_name].id] = cls_train_info[cls_name].out_id
 
     in_files = applier.FilenameAssociations()
-    in_files.image_mask = in_img_mask
+    in_files.image_mask = in_msk_img
     num_class_vars = 0
     for img_file in img_file_info:
         in_files.__dict__[img_file.name] = img_file.file_name
         num_class_vars = num_class_vars + len(img_file.bands)
 
     outfiles = applier.FilenameAssociations()
-    outfiles.out_image = output_img
+    outfiles.out_image = out_class_img
     if create_out_score_img:
         outfiles.out_score_img = out_score_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = sk_classifier
-    otherargs.msk_val = img_mask_val
+    otherargs.msk_val = img_msk_val
     otherargs.num_class_vars = num_class_vars
     otherargs.n_classes = n_classes
     otherargs.img_file_info = img_file_info
@@ -385,14 +384,14 @@ def apply_sklearn_classifier(
     print("Completed")
     if gdalformat == "KEA":
         rsgislib.rastergis.pop_rat_img_stats(
-            clumps_img=output_img,
+            clumps_img=out_class_img,
             add_clr_tab=True,
             calc_pyramids=True,
             ignore_zero=True,
         )
     else:
         rsgislib.imageutils.pop_thmt_img_stats(
-            output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
 
     if create_out_score_img:
@@ -401,7 +400,7 @@ def apply_sklearn_classifier(
         )
 
     if class_clr_names and (gdalformat == "KEA"):
-        rat_dataset = gdal.Open(output_img, gdal.GA_Update)
+        rat_dataset = gdal.Open(out_class_img, gdal.GA_Update)
         red = rat.readColumn(rat_dataset, "Red")
         green = rat.readColumn(rat_dataset, "Green")
         blue = rat.readColumn(rat_dataset, "Blue")

@@ -262,7 +262,6 @@ To apply the binary classifier use the following function::
 To train a multi-class classifier you first need to specify the reference samples as a dict of rsgislib.classification.ClassInfoObj objects::
 
     import rsgislib.classification
-    import rsgislib.classification.classlightgbm
 
     cls_info_dict = dict()
     cls_info_dict["Mangrove"] = rsgislib.classification.ClassInfoObj(

@@ -154,7 +154,7 @@ def train_catboost_binary_classifier(
 def apply_catboost_binary_classifier(
     mdl_cls_obj,
     in_msk_img: str,
-    img_mask_val: int,
+    img_msk_val: int,
     img_file_info: List,
     out_class_img: str,
     gdalformat: str = "KEA",
@@ -170,7 +170,7 @@ def apply_catboost_binary_classifier(
     :param in_msk_img: is an image file providing a mask to specify where should
                        be classified. Simplest mask is all the valid data regions
                        (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the in_msk_img to limit the region
+    :param img_msk_val: the pixel value within the in_msk_img to limit the region
                          to which the classification is applied. Can be used to
                          create a hierarchical classification.
     :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects
@@ -254,7 +254,7 @@ def apply_catboost_binary_classifier(
         outfiles.out_prob_img = out_prob_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = mdl_cls_obj
-    otherargs.msk_val = img_mask_val
+    otherargs.msk_val = img_msk_val
     otherargs.num_class_vars = num_class_vars
     otherargs.out_probs = out_probs
     otherargs.img_file_info = img_file_info
@@ -417,7 +417,7 @@ def apply_catboost_multiclass_classifier(
     in_msk_img,
     img_msk_val,
     img_file_info,
-    out_cls_img,
+    out_class_img,
     gdalformat,
     class_clr_names=True,
 ):
@@ -442,7 +442,7 @@ def apply_catboost_multiclass_classifier(
                           within rsgislib.zonalstats.extract_zone_img_band_values_to_hdf)
                           to identify which images and bands are to be used for the
                           classification so it adheres to the training data.
-    :param out_cls_img: Output image which will contain the hard classification
+    :param out_class_img: Output image which will contain the hard classification
                           defined as the maximum probability.
     :param gdalformat: is the output image format - all GDAL supported formats are
                        supported.
@@ -511,7 +511,7 @@ def apply_catboost_multiclass_classifier(
         cls_id_lut[class_train_info[clsname].id] = class_train_info[clsname].out_id
 
     outfiles = applier.FilenameAssociations()
-    outfiles.out_cls_img = out_cls_img
+    outfiles.out_cls_img = out_class_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = mdl_cls_obj
     otherargs.mskVal = img_msk_val
@@ -540,9 +540,9 @@ def apply_catboost_multiclass_classifier(
 
     if class_clr_names:
         rsgislib.rastergis.pop_rat_img_stats(
-            out_cls_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
-        ratDataset = gdal.Open(out_cls_img, gdal.GA_Update)
+        ratDataset = gdal.Open(out_class_img, gdal.GA_Update)
         red = rat.readColumn(ratDataset, "Red")
         green = rat.readColumn(ratDataset, "Green")
         blue = rat.readColumn(ratDataset, "Blue")
