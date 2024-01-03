@@ -72,31 +72,60 @@ def optimise_lightgbm_binary_classifier(
     rnd_seed: int = None,
     n_threads: int = 1,
     scale_pos_weight: float = None,
-    early_stopping_rounds: int = 100,
-    num_iterations: int = 5000,
-    num_boost_round: int = 100,
+    early_stopping_rounds: int = None,
+    num_iterations: int = 100,
     max_n_leaves: int = 50,
-    learning_rate: float = 0.05,
+    learning_rate: float = 0.1,
     mdl_cls_obj=None,
 ):
     """
-    A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
-    classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
+    A function which performs a hyper-parameter optimisation for a binary
+    lightgbm classifier. Class 1 is the class which you are interested in
+    and Class 2 is the 'other class'.
 
-    This function requires that lightgbm and skopt modules to be installed.
+    You have the option of using the bayes_opt (Default), optuna or skopt
+    optimisation libraries. Before 5.1.0 skopt was the only option but this
+    no longer appears to be maintained so the other options have been added.
 
-    :param out_params_file: The output model parameters which have been optimised.
-    :param cls1_train_file: Training samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_valid_file: Validation samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_test_file: Testing samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls2_train_file: Training samples HDF5 file for the 'other' class
-    :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
-    :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param unbalanced: Specify that the training data is unbalance (i.e., a different number of samples per class)
-                       and LightGBM will try to take this into account during training.
-    :param n_threads: The number of threads to use for the training.
-    :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
-                             Parameter used to balance imbalanced training data.
+    :param out_params_file: The output JSON file with the identified parameters
+    :param cls1_train_file: File path to the HDF5 file with the training samples
+                            for class 1
+    :param cls1_valid_file: File path to the HDF5 file with the validation samples
+                            for class 1
+    :param cls2_train_file: File Path to the HDF5 file with the training samples
+                            for class 2
+    :param cls2_valid_file: File path to the HDF5 file with the validation samples
+                            for class 2
+    :param unbalanced: Boolean (Default: False) specifying whether the training data
+                       is unbalanced (i.e., a different number of samples for each
+                       class).
+    :param op_mthd: The method used to optimise the parameters.
+                    Default: rsgislib.OPT_MTHD_BAYESOPT
+    :param n_opt_iters: The number of iterations (Default 100) used for the
+                        optimisation. This parameter is ignored for skopt.
+                        For bayes_opt there is a minimum of 10 and these are
+                        added to that minimum so Default is therefore 110.
+                        For optuna this is the number of iterations used.
+    :param rnd_seed: A random seed for the optimisation. Default None. If None
+                     there a different seed will be used each time the function
+                     is run.
+    :param n_threads: The number of threads used by lightgbm
+    :param scale_pos_weight: Optional, default is None. If None then a value will
+                             automatically be calculated. Parameter used to balance
+                             imbalanced training data.
+    :param early_stopping_rounds: If not None then activates early stopping.
+                                  The model will train until the validation score
+                                  stops improving. Validation score needs to improve
+                                  at least every early_stopping_rounds round(s)
+                                  to continue training.
+    :param num_iterations: The number of boosting iterations (Default: 100)
+    :param max_n_leaves: The upper limited used within the optimisation search
+                         for the maximum number of leaves used within the model.
+                         Default: 50.
+    :param learning_rate: Default 0.1 (constraint > 0.0) controlling the shrinkage rate
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
 
     """
     if not HAVE_LIGHTGBM:
@@ -199,7 +228,6 @@ def optimise_lightgbm_binary_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -298,7 +326,6 @@ def optimise_lightgbm_binary_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -396,7 +423,6 @@ def optimise_lightgbm_binary_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -462,33 +488,68 @@ def train_opt_lightgbm_binary_classifier(
     rnd_seed: int = None,
     n_threads: int = 1,
     scale_pos_weight: float = None,
-    early_stopping_rounds: int = 100,
-    num_iterations: int = 5000,
-    num_boost_round: int = 100,
-    learning_rate: float = 0.05,
+    early_stopping_rounds: int = None,
+    num_iterations: int = 100,
     max_n_leaves: int = 50,
+    learning_rate: float = 0.1,
     mdl_cls_obj=None,
     out_params_file: str = None,
 ):
     """
-    A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
-    classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
+    A function which performs a hyper-parameter optimisation for a binary
+    lightgbm classifier and then trains a model saving the model for future
+    use. Class 1 is the class which you are interested in and Class 2 is
+    the 'other class'.
 
-    This function requires that lightgbm and skopt modules to be installed.
+    You have the option of using the bayes_opt (Default), optuna or skopt
+    optimisation libraries. Before 5.1.0 skopt was the only option but this
+    no longer appears to be maintained so the other options have been added.
 
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param out_params_file: The output model parameters which have been optimised.
-    :param cls1_train_file: Training samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_valid_file: Validation samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_test_file: Testing samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls2_train_file: Training samples HDF5 file for the 'other' class
-    :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
-    :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param unbalanced: Specify that the training data is unbalance (i.e., a different number of samples per class)
-                       and LightGBM will try to take this into account during training.
-    :param n_threads: The number of threads to use for the training.
-    :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
-                             Parameter used to balance imbalanced training data.
+    :param out_mdl_file: The file path for the output lightgbm (*.txt) model which
+                         can be loaded to perform a classification.
+    :param cls1_train_file: File path to the HDF5 file with the training samples
+                            for class 1
+    :param cls1_valid_file: File path to the HDF5 file with the validation samples
+                            for class 1
+    :param cls1_test_file: File path to the HDF5 file with the testing samples
+                           for class 1
+    :param cls2_train_file: File path to the HDF5 file with the training samples
+                            for class 2
+    :param cls2_valid_file: File path to the HDF5 file with the validation samples
+                            for class 2
+    :param cls2_test_file: File path to the HDF5 file with the testing samples
+                           for class 2
+    :param unbalanced: Boolean (Default: False) specifying whether the training data
+                       is unbalanced (i.e., a different number of samples for each
+                       class).
+    :param op_mthd: The method used to optimise the parameters.
+                    Default: rsgislib.OPT_MTHD_BAYESOPT
+    :param n_opt_iters: The number of iterations (Default 100) used for the
+                        optimisation. This parameter is ignored for skopt.
+                        For bayes_opt there is a minimum of 10 and these are
+                        added to that minimum so Default is therefore 110.
+                        For optuna this is the number of iterations used.
+    :param rnd_seed: A random seed for the optimisation. Default None. If None
+                     there a different seed will be used each time the function
+                     is run.
+    :param n_threads: The number of threads used by lightgbm
+    :param scale_pos_weight: Optional, default is None. If None then a value will
+                             automatically be calculated. Parameter used to balance
+                             imbalanced training data.
+    :param early_stopping_rounds: If not None then activates early stopping.
+                                  The model will train until the validation score
+                                  stops improving. Validation score needs to improve
+                                  at least every early_stopping_rounds round(s)
+                                  to continue training.
+    :param num_iterations: The number of boosting iterations (Default: 100)
+    :param max_n_leaves: The upper limited used within the optimisation search
+                         for the maximum number of leaves used within the model.
+                         Default: 50.
+    :param learning_rate: Default 0.1 (constraint > 0.0) controlling the shrinkage rate
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
+    :param out_params_file: The output JSON file with the identified parameters
 
     """
     if not HAVE_LIGHTGBM:
@@ -553,6 +614,12 @@ def train_opt_lightgbm_binary_classifier(
     test_np = numpy.concatenate((test_cls2, test_cls1))
     test_lbl_np = numpy.concatenate((test_cls2_lbl, test_cls1_lbl))
 
+    if scale_pos_weight is None:
+        scale_pos_weight = num_cls2_train_rows / num_cls1_train_rows
+        if scale_pos_weight < 1:
+            scale_pos_weight = 1
+    print("scale_pos_weight = {}".format(scale_pos_weight))
+
     if op_mthd == rsgislib.OPT_MTHD_BAYESOPT:
         print("Using: OPT_MTHD_BAYESOPT")
         from bayes_opt import BayesianOptimization
@@ -602,7 +669,6 @@ def train_opt_lightgbm_binary_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -701,7 +767,6 @@ def train_opt_lightgbm_binary_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -799,7 +864,6 @@ def train_opt_lightgbm_binary_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -840,7 +904,7 @@ def train_opt_lightgbm_binary_classifier(
             "verbosity": -1,
         }
         if not unbalanced:
-            params["scale_pos_weight"] = float(scale_pos_weight)
+            params["scale_pos_weight"] = scale_pos_weight
     else:
         raise rsgislib.RSGISPyException(
             "Do not recognise or do not have implementation "
@@ -857,7 +921,6 @@ def train_opt_lightgbm_binary_classifier(
         d_train,
         valid_sets=[d_train, d_valid],
         valid_names=["train", "valid"],
-        num_boost_round=num_boost_round,
         feval=None,
         init_model=mdl_cls_obj,
         callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -893,31 +956,61 @@ def train_lightgbm_binary_classifier(
     unbalanced: bool = False,
     n_threads: int = 1,
     scale_pos_weight: float = None,
-    early_stopping_rounds: int = 100,
-    num_iterations: int = 5000,
-    num_boost_round: int = 100,
-    learning_rate: float = 0.05,
+    early_stopping_rounds: int = None,
+    num_iterations: int = 100,
+    learning_rate: float = 0.1,
     mdl_cls_obj=None,
 ):
     """
-    A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
-    classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
+    A function which trains a lightgbm model using the parameters provided
+    within a JSON file. The JSON file must provide values for the following
+    parameters:
 
-    This function requires that lightgbm and skopt modules to be installed.
+       * max_depth
+       * num_leaves
+       * min_data_in_leaf
+       * lambda_l1
+       * lambda_l2
+       * feature_fraction
+       * bagging_fraction
+       * min_split_gain
+       * min_child_weight
+       * reg_alpha
+       * reg_lambda
 
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param cls_params_file: A JSON file with the model parameters
-    :param cls1_train_file: Training samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_valid_file: Validation samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls1_test_file: Testing samples HDF5 file for the primary class (i.e., the one being classified)
-    :param cls2_train_file: Training samples HDF5 file for the 'other' class
-    :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
-    :param cls2_test_file: Testing samples HDF5 file for the 'other' class
-    :param unbalanced: Specify that the training data is unbalance (i.e., a different number of samples per class)
-                       and LightGBM will try to take this into account during training.
-    :param n_threads: The number of threads to use for the training.
-    :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
-                             Parameter used to balance imbalanced training data.
+    :param out_mdl_file: The file path for the output lightgbm (*.txt) model which
+                         can be loaded to perform a classification.
+    :param cls_params_file: The file path to the JSON file with the classifier
+                            parameters.
+    :param cls1_train_file: File path to the HDF5 file with the training samples
+                            for class 1
+    :param cls1_valid_file: File path to the HDF5 file with the validation samples
+                            for class 1
+    :param cls1_test_file: File path to the HDF5 file with the testing samples
+                           for class 1
+    :param cls2_train_file: File path to the HDF5 file with the training samples
+                            for class 2
+    :param cls2_valid_file: File path to the HDF5 file with the validation samples
+                            for class 2
+    :param cls2_test_file: File path to the HDF5 file with the testing samples
+                           for class 2
+    :param unbalanced: Boolean (Default: False) specifying whether the training data
+                       is unbalanced (i.e., a different number of samples for each
+                       class).
+    :param n_threads: The number of threads used by lightgbm
+    :param scale_pos_weight: Optional, default is None. If None then a value will
+                             automatically be calculated. Parameter used to balance
+                             imbalanced training data.
+    :param early_stopping_rounds: If not None then activates early stopping.
+                                  The model will train until the validation score
+                                  stops improving. Validation score needs to improve
+                                  at least every early_stopping_rounds round(s)
+                                  to continue training.
+    :param num_iterations: The number of boosting iterations (Default: 100)
+    :param learning_rate: Default 0.1 (constraint > 0.0) controlling the shrinkage rate
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
 
     """
     if not HAVE_LIGHTGBM:
@@ -1019,7 +1112,6 @@ def train_lightgbm_binary_classifier(
         d_train,
         valid_sets=[d_train, d_valid],
         valid_names=["train", "valid"],
-        num_boost_round=num_boost_round,
         feval=None,
         init_model=mdl_cls_obj,
         callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -1053,25 +1145,27 @@ def apply_lightgbm_binary_classifier(
     class_thres: int = 5000,
 ):
     """
-    This function applies a trained binary (i.e., two classes) lightgbm model. The function train_lightgbm_binary_classifier
-    can be used to train such as model. The output image will contain the softmax score for the class of interest.
-    You will need to threshold this image to get a final hard classification. Alternative, a hard class output
-    image and threshold can be applied to this image. Note. the softmax score is not a probability.
 
-    :param model_file: a trained lightgbm binary model which can be loaded with lgb.Booster(model_file=model_file).
-    :param in_img_msk: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                    valid data regions (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
-                       Can be used to create a heirachical classification.
-    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                        rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) to identify which images and bands are to
-                        be used for the classification so it adheres to the training data.
-    :param out_score_img: output image file with the classification softmax score - this image is scaled by
-                       multiplying by 10000.
-    :param gdalformat: is the output image format - all GDAL supported formats are supported.
-    :param out_class_img: Optional output image which will contain the hard classification, defined with a threshold on the
-                        probability image.
-    :param class_thres: The threshold used to define the hard classification. Default is 5000 (i.e., probability of 0.5).
+    :param model_file: a trained lightgbm binary model which can be loaded
+                       with lgb.Booster(model_file=model_file).
+    :param in_img_msk: is an image file providing a mask to specify where
+                       should be classified. Simplest mask is all the valid
+                       data regions (rsgislib.imageutils.gen_valid_mask)
+    :param img_mask_val: the pixel value within the imgMask to limit the region
+                         to which the classification is applied.
+                         Can be used to create a hierarchical classification.
+    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects
+                          to identify which images and bands are to be used for
+                          the classification so it adheres to the training data.
+    :param out_score_img: output image file with the classification softmax score.
+                          Note. this image is scaled by multiplying by 10000
+                          therefore the range is between 0-10000.
+    :param gdalformat: The output image format (Default: KEA).
+    :param out_class_img: Optional output image which will contain the hard
+                          classification, defined with a threshold on the
+                          softmax score image.
+    :param class_thres: The threshold used to define the hard classification.
+                        Default is 5000 (i.e., softmax score of 0.5).
 
     """
     if not HAVE_LIGHTGBM:
@@ -1164,13 +1258,28 @@ def optimise_lightgbm_multiclass_classifier(
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads: int = 1,
-    early_stopping_rounds: int = 100,
-    num_iterations: int = 5000,
-    num_boost_round: int = 100,
+    early_stopping_rounds: int = None,
+    num_iterations: int = 100,
     max_n_leaves: int = 50,
-    learning_rate: float = 0.05,
+    learning_rate: float = 0.1,
     mdl_cls_obj=None,
 ):
+    """
+
+    :param out_params_file:
+    :param cls_info_dict:
+    :param unbalanced:
+    :param op_mthd:
+    :param n_opt_iters:
+    :param rnd_seed:
+    :param n_threads:
+    :param early_stopping_rounds:
+    :param num_iterations:
+    :param max_n_leaves:
+    :param learning_rate:
+    :param mdl_cls_obj:
+
+    """
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass lightgbm
     classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
@@ -1292,7 +1401,6 @@ def optimise_lightgbm_multiclass_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -1390,7 +1498,6 @@ def optimise_lightgbm_multiclass_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -1487,7 +1594,6 @@ def optimise_lightgbm_multiclass_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -1548,13 +1654,29 @@ def train_opt_lightgbm_multiclass_classifier(
     n_opt_iters: int = 100,
     rnd_seed: int = None,
     n_threads: int = 1,
-    early_stopping_rounds: int = 100,
-    num_iterations: int = 5000,
-    num_boost_round: int = 100,
+    early_stopping_rounds: int = None,
+    num_iterations: int = 100,
     max_n_leaves: int = 50,
-    learning_rate: float = 0.05,
+    learning_rate: float = 0.1,
     mdl_cls_obj=None,
 ):
+    """
+
+    :param out_mdl_file:
+    :param cls_info_dict:
+    :param out_info_file:
+    :param unbalanced:
+    :param op_mthd:
+    :param n_opt_iters:
+    :param rnd_seed:
+    :param n_threads:
+    :param early_stopping_rounds:
+    :param num_iterations:
+    :param max_n_leaves:
+    :param learning_rate:
+    :param mdl_cls_obj:
+
+    """
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass lightgbm
     classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
@@ -1693,7 +1815,6 @@ def train_opt_lightgbm_multiclass_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -1791,7 +1912,6 @@ def train_opt_lightgbm_multiclass_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -1888,7 +2008,6 @@ def train_opt_lightgbm_multiclass_classifier(
                 d_train,
                 valid_sets=[d_train, d_valid],
                 valid_names=["train", "valid"],
-                num_boost_round=num_boost_round,
                 feval=None,
                 init_model=mdl_cls_obj,
                 callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -1942,7 +2061,6 @@ def train_opt_lightgbm_multiclass_classifier(
         d_train,
         valid_sets=[d_train, d_valid],
         valid_names=["train", "valid"],
-        num_boost_round=num_boost_round,
         feval=None,
         init_model=mdl_cls_obj,
         callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -1973,12 +2091,25 @@ def train_lightgbm_multiclass_classifier(
     out_info_file: str = None,
     unbalanced: bool = False,
     n_threads: int = 1,
-    early_stopping_rounds: int = 100,
-    num_iterations: int = 5000,
-    num_boost_round: int = 100,
-    learning_rate: int = 0.05,
+    early_stopping_rounds: int = None,
+    num_iterations: int = 100,
+    learning_rate: float = 0.1,
     mdl_cls_obj=None,
 ):
+    """
+
+    :param params_file:
+    :param out_mdl_file:
+    :param cls_info_dict:
+    :param out_info_file:
+    :param unbalanced:
+    :param n_threads:
+    :param early_stopping_rounds:
+    :param num_iterations:
+    :param learning_rate:
+    :param mdl_cls_obj:
+
+    """
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass lightgbm
     classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
@@ -2101,7 +2232,6 @@ def train_lightgbm_multiclass_classifier(
         d_train,
         valid_sets=[d_train, d_valid],
         valid_names=["train", "valid"],
-        num_boost_round=num_boost_round,
         feval=None,
         init_model=mdl_cls_obj,
         callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
@@ -2135,6 +2265,18 @@ def apply_lightgbm_multiclass_classifier(
     gdalformat: str = "KEA",
     class_clr_names: bool = True,
 ):
+    """
+
+    :param cls_train_info:
+    :param model_file:
+    :param in_img_mask:
+    :param img_mask_val:
+    :param img_file_info:
+    :param out_class_img:
+    :param gdalformat:
+    :param class_clr_names:
+
+    """
     """
     This function applies a trained multiple classes lightgbm model. The function train_lightgbm_multiclass_classifier
     can be used to train such as model. The output image will be a final hard classification using the class with
