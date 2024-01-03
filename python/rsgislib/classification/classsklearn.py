@@ -33,7 +33,7 @@
 #
 ###########################################################################
 
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import h5py
 import numpy
@@ -577,3 +577,89 @@ def apply_sklearn_classifier_rat(
     ratapplier.apply(
         _apply_rat_classifier, in_rats, out_rats, otherargs=otherargs, controls=None
     )
+
+
+def feat_sel_sklearn_multiclass_borutashap(
+    sk_classifier: BaseEstimator,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
+    out_csv_file: str,
+    n_trials: int = 100,
+    sub_train_smpls: Union[int, float] = None,
+    rnd_seed: int = None,
+    feat_names: List[str] = None,
+):
+    from BorutaShap import BorutaShap
+    import pandas
+
+    rnd_obj = numpy.random.RandomState(rnd_seed)
+
+    n_classes = len(cls_info_dict)
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
+            raise rsgislib.RSGISPyException(
+                f"ClassInfoObj '{cls_name}' id ({cls_info_dict[cls_name].id}) "
+                f"is not consecutive starting from 0."
+            )
+
+    cls_data_dict = {}
+    train_data_lst = []
+    train_lbls_lst = []
+    cls_ids = []
+    n_classes = 0
+    for cls_name in cls_info_dict:
+        sgl_cls_info = {}
+        print(f"Reading Class {cls_name} Training")
+        f_h5 = h5py.File(cls_info_dict[cls_name].train_file_h5, "r")
+        sgl_cls_info["train_n_rows"] = f_h5["DATA/DATA"].shape[0]
+        sgl_cls_info["train_data"] = numpy.array(f_h5["DATA/DATA"])
+
+        if (sub_train_smpls is not None) and (sub_train_smpls > 0):
+            if sub_train_smpls < 1:
+                sub_n_rows = int(sgl_cls_info["train_n_rows"] * sub_train_smpls)
+            else:
+                sub_n_rows = sub_train_smpls
+            print("sub_n_rows = {sub_n_rows}")
+            if sub_n_rows > 0:
+                sub_sel_rows = rnd_obj.choice(sgl_cls_info["train_n_rows"], sub_n_rows)
+                sgl_cls_info["train_data"] = sgl_cls_info["train_data"][sub_sel_rows]
+                sgl_cls_info["train_n_rows"] = sub_n_rows
+
+        sgl_cls_info["train_data_lbls"] = numpy.zeros(
+            sgl_cls_info["train_n_rows"], dtype=numpy.dtype(int)
+        )
+        sgl_cls_info["train_data_lbls"][...] = cls_info_dict[cls_name].id
+        f_h5.close()
+
+        train_data_lst.append(sgl_cls_info["train_data"])
+        train_lbls_lst.append(sgl_cls_info["train_data_lbls"])
+
+        cls_data_dict[cls_name] = sgl_cls_info
+        cls_ids.append(cls_info_dict[cls_name].id)
+        n_classes = n_classes + 1
+
+    print("Finished Reading Data")
+
+    train_data_arr = numpy.concatenate(train_data_lst)
+    train_lbls_arr = numpy.concatenate(train_lbls_lst)
+
+    if feat_names is not None:
+        if len(feat_names) != train_data_arr.shape[1]:
+            raise rsgislib.RSGISPyException(
+                f"The number of feature names does not match the number of "
+                f"variables ({len(feat_names)} != {train_data_arr.shape[1]})"
+            )
+    else:
+        feat_names = list()
+        for i in range(train_data_arr.shape[1]):
+            feat_names.append(f"feat_{i+1}")
+
+    train_data_df = pandas.DataFrame(data=train_data_arr, columns=feat_names)
+
+    feat_selector = BorutaShap(
+        model=sk_classifier, importance_measure="shap", classification=True
+    )
+    feat_selector.fit(
+        X=train_data_df, y=train_lbls_arr, n_trials=n_trials, random_state=rnd_seed
+    )
+    feat_selector.TentativeRoughFix()
+    feat_selector.results_to_csv(out_csv_file.replace(".csv", ""))

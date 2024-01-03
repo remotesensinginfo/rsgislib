@@ -279,3 +279,7 @@ Classify Functions
 .. autofunction:: rsgislib.classification.classsklearn.apply_sklearn_classifier_rat
 
 
+Other Utility Functions
+---------------------------
+
+.. autofunction:: rsgislib.classification.classsklearn.feat_sel_sklearn_multiclass_borutashap
