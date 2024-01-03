@@ -20,99 +20,320 @@ LightGBM is a binary classifier (i.e., separates two classes, e.g., mangroves an
   * Train Classifier and Optimise Hyperparameters
   * Apply Classifier
 
+However, fist we'll create a couple of directories for our outputs and intermediary files::
+
+    import os
+
+    out_dir = "baseline_cls_lgbm"
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+
+    tmp_dir = "tmp_lgbm"
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+
+We will also define the input file path and the list ImageBandInfo objects, which specifies which images and bands are used for the analysis::
+
+    import rsgislib.imageutils
+
+    input_img = "./LS5TM_19970716_vmsk_mclds_topshad_rad_srefdem_stdsref_subset.tif"
+
+    imgs_info = []
+    imgs_info.append(
+        rsgislib.imageutils.ImageBandInfo(
+            file_name=input_img, name="ls97", bands=[1, 2, 3, 4, 5, 6]
+        )
+    )
+
+When applying a classifier a mask image needs to be provided where a pixel value within that mask specifying which pixels should be classified. While defining the input image we can also define that valid mask image using the rsgislib.imageutils.gen_valid_mask function, which simply creates a mask of pixels which are not 'no data'::
+
+    vld_msk_img = os.path.join(out_dir, "LS5TM_19970716_vmsk.kea")
+    rsgislib.imageutils.gen_valid_mask(
+        input_img, output_img=vld_msk_img, gdalformat="KEA", no_data_val=0.0
+    )
+
 To define training a raster with a unique value for each class, or multiple binary rasters one for each class. Commonly the training regions might be defined using a vector layer which would require rasterising::
 
-    import rsgislib.vectorutils
+    import rsgislib.vectorutils.createrasters
 
-    sen2_img = 'sen2_srefimg.kea'
-    mangroves_sample_vec_file = 'mangrove_cls_samples.geojson'
-    mangroves_sample_vec_lyr = 'mangrove_cls_samples'
-    mangroves_sample_img = 'mangrove_cls_samples.kea'
-    rsgislib.vectorutils.rasteriseVecLyr(mangroves_sample_vec_file, mangroves_sample_vec_lyr, sen2_img, mangroves_sample_img, gdalformat='KEA')
+    mangrove_vec_file = "./training/mangroves.geojson"
+    mangrove_vec_lyr = "mangroves"
+    mangrove_smpls_img = os.path.join(tmp_dir, "mangrove_smpls.kea")
+    rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
+        vec_file=mangrove_vec_file,
+        vec_lyr=mangrove_vec_lyr,
+        input_img=input_img,
+        output_img=mangrove_smpls_img,
+        gdalformat="KEA",
+        burn_val=1,
+    )
 
-    other_sample_vec_file = 'other_cls_samples.geojson'
-    other_sample_vec_lyr = 'other_cls_samples'
-    other_sample_img = 'other_cls_samples.kea'
-    rsgislib.vectorutils.rasteriseVecLyr(other_sample_vec_file, other_sample_vec_lyr, sen2_img, other_sample_img, gdalformat='KEA')
+    other_terrestrial_vec_file = "./training/other_terrestrial.geojson"
+    other_terrestrial_vec_lyr = "other_terrestrial"
+    other_terrestrial_smpls_img = os.path.join(tmp_dir, "other_terrestrial_smpls.kea")
+    rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
+        vec_file=other_terrestrial_vec_file,
+        vec_lyr=other_terrestrial_vec_lyr,
+        input_img=input_img,
+        output_img=other_terrestrial_smpls_img,
+        gdalformat="KEA",
+        burn_val=1,
+    )
+
+    water_vec_file = "./training/water.geojson"
+    water_vec_lyr = "water"
+    water_smpls_img = os.path.join(tmp_dir, "water_smpls.kea")
+    rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
+        vec_file=water_vec_file,
+        vec_lyr=water_vec_lyr,
+        input_img=input_img,
+        output_img=water_smpls_img,
+        gdalformat="KEA",
+        burn_val=1,
+    )
 
 
 To extract the image pixel values, which are stored within a HDF5 file (see https://portal.hdfgroup.org/display/HDF5/HDF5 for more information) the following functions are used. To define the images and associated bands to be used for the classification and therefore values need to be extracted then a list of rsgislib.imageutils.ImageBandInfo classes needs to be provided::
 
-    import rsgislib.imageutils
+    import rsgislib.zonalstats
 
-    imgs_info = []
-    imgs_info.append(rsgislib.imageutils.ImageBandInfo(fileName='sen2_srefimg.kea', name='sen2', bands=[1,2,3,4,5,6,7,8,9,10]))
-    imgs_info.append(rsgislib.imageutils.ImageBandInfo(fileName='sen1_dBimg.kea', name='sen1', bands=[1,2]))
+    mangrove_all_smpls_h5_file = os.path.join(out_dir, "mangrove_all_smpls.h5")
+    rsgislib.zonalstats.extract_zone_img_band_values_to_hdf(
+        imgs_info,
+        in_msk_img=mangrove_smpls_img,
+        out_h5_file=mangrove_all_smpls_h5_file,
+        mask_val=1,
+        datatype=rsgislib.TYPE_16UINT,
+    )
 
-    mangroves_sample_h5 = 'mangrove_cls_samples.h5'
-    rsgislib.imageutils.extractZoneImageBandValues2HDF(imgs_info, mangroves_sample_img, mangroves_sample_h5, 1)
+    other_terrestrial_all_smpls_h5_file = os.path.join(
+        out_dir, "other_terrestrial_all_smpls.h5"
+    )
+    rsgislib.zonalstats.extract_zone_img_band_values_to_hdf(
+        imgs_info,
+        in_msk_img=other_terrestrial_smpls_img,
+        out_h5_file=other_terrestrial_all_smpls_h5_file,
+        mask_val=1,
+        datatype=rsgislib.TYPE_16UINT,
+    )
 
-    other_sample_h5 = 'other_cls_samples.h5'
-    rsgislib.imageutils.extractZoneImageBandValues2HDF(imgs_info, other_sample_img, other_sample_h5, 1)
+    water_all_smpls_h5_file = os.path.join(out_dir, "water_all_smpls.h5")
+    rsgislib.zonalstats.extract_zone_img_band_values_to_hdf(
+        imgs_info,
+        in_msk_img=water_smpls_img,
+        out_h5_file=water_all_smpls_h5_file,
+        mask_val=1,
+        datatype=rsgislib.TYPE_16UINT,
+    )
 
-If training data is extracted from multiple input images then it will need to be merged using the following function::
+If training data is extracted from multiple input images then it will need to be merged using the following function. In this case we'll merge the water and terrestrial samples and use the merged class to create a mangrove binary classifier::
 
-    rsgislib.imageutils.mergeExtractedHDF5Data(['mang_samples_1.h5', 'mang_samples_2.h5'], 'mangrove_cls_samples.h5')
-    rsgislib.imageutils.mergeExtractedHDF5Data(['other_samples_1.h5', 'other_samples_2.h5'], 'other_cls_samples.h5')
+    other_all_smpls_h5_file = os.path.join(out_dir, "other_all_smpls.h5")
+    rsgislib.zonalstats.merge_extracted_hdf5_data(
+        h5_files=[other_terrestrial_all_smpls_h5_file, water_all_smpls_h5_file],
+        out_h5_file=other_all_smpls_h5_file,
+        datatype=rsgislib.TYPE_16UINT,
+    )
 
-To split the extracted samples into a training, validation and testing sets you can use the rsgislib.classification.split_sample_train_valid_test function::
+To split the extracted samples into a training, validation and testing sets you can use the rsgislib.classification.split_sample_train_valid_test function. Note, this function is also used to standardise the number of samples used to train the classifier so the training data are balanced::
 
     import rsgislib.classification
 
-    mangroves_sample_h5_train = 'mangrove_cls_samples_train.h5'
-    mangroves_sample_h5_valid = 'mangrove_cls_samples_valid.h5'
-    mangroves_sample_h5_test = 'mangrove_cls_samples_test.h5'
-    rsgislib.classification.split_sample_train_valid_test(mangroves_sample_h5, mangroves_sample_h5_train, mangroves_sample_h5_valid, mangroves_sample_h5_test, test_sample=500, valid_sample=500, train_sample=2000)
+    mangrove_train_smpls_h5_file = os.path.join(out_dir, "mangrove_train_smpls.h5")
+    mangrove_valid_smpls_h5_file = os.path.join(out_dir, "mangrove_valid_smpls.h5")
+    mangrove_test_smpls_h5_file = os.path.join(out_dir, "mangrove_test_smpls.h5")
+    rsgislib.classification.split_sample_train_valid_test(
+        in_h5_file=mangrove_all_smpls_h5_file,
+        train_h5_file=mangrove_train_smpls_h5_file,
+        valid_h5_file=mangrove_valid_smpls_h5_file,
+        test_h5_file=mangrove_test_smpls_h5_file,
+        test_sample=10000,
+        valid_sample=10000,
+        train_sample=35000,
+        rnd_seed=42,
+        datatype=rsgislib.TYPE_16UINT,
+    )
 
-    other_sample_h5_train = 'other_cls_samples_train.h5'
-    other_sample_h5_valid = 'other_cls_samples_valid.h5'
-    other_sample_h5_test = 'other_cls_samples_test.h5'
-    rsgislib.classification.split_sample_train_valid_test(other_sample_h5, other_sample_h5_train, other_sample_h5_valid, other_sample_h5_test, test_sample=500, valid_sample=500, train_sample=2000)
+
+    other_terrestrial_train_smpls_h5_file = os.path.join(
+        out_dir, "other_terrestrial_train_smpls.h5"
+    )
+    other_terrestrial_valid_smpls_h5_file = os.path.join(
+        out_dir, "other_terrestrial_valid_smpls.h5"
+    )
+    other_terrestrial_test_smpls_h5_file = os.path.join(
+        out_dir, "other_terrestrial_test_smpls.h5"
+    )
+    rsgislib.classification.split_sample_train_valid_test(
+        in_h5_file=other_terrestrial_all_smpls_h5_file,
+        train_h5_file=other_terrestrial_train_smpls_h5_file,
+        valid_h5_file=other_terrestrial_valid_smpls_h5_file,
+        test_h5_file=other_terrestrial_test_smpls_h5_file,
+        test_sample=10000,
+        valid_sample=10000,
+        train_sample=35000,
+        rnd_seed=42,
+        datatype=rsgislib.TYPE_16UINT,
+    )
+
+
+    water_train_smpls_h5_file = os.path.join(out_dir, "water_train_smpls.h5")
+    water_valid_smpls_h5_file = os.path.join(out_dir, "water_valid_smpls.h5")
+    water_test_smpls_h5_file = os.path.join(out_dir, "water_test_smpls.h5")
+    rsgislib.classification.split_sample_train_valid_test(
+        in_h5_file=water_all_smpls_h5_file,
+        train_h5_file=water_train_smpls_h5_file,
+        valid_h5_file=water_valid_smpls_h5_file,
+        test_h5_file=water_test_smpls_h5_file,
+        test_sample=10000,
+        valid_sample=10000,
+        train_sample=35000,
+        rnd_seed=42,
+        datatype=rsgislib.TYPE_16UINT,
+    )
+
+
+    other_train_smpls_h5_file = os.path.join(out_dir, "other_train_smpls.h5")
+    other_valid_smpls_h5_file = os.path.join(out_dir, "other_valid_smpls.h5")
+    other_test_smpls_h5_file = os.path.join(out_dir, "other_test_smpls.h5")
+    rsgislib.classification.split_sample_train_valid_test(
+        in_h5_file=other_all_smpls_h5_file,
+        train_h5_file=other_train_smpls_h5_file,
+        valid_h5_file=other_valid_smpls_h5_file,
+        test_h5_file=other_test_smpls_h5_file,
+        test_sample=10000,
+        valid_sample=10000,
+        train_sample=35000,
+        rnd_seed=42,
+        datatype=rsgislib.TYPE_16UINT,
+    )
+
 
 .. note::  Training samples are used to train the classifier. Validation samples are used to test the accuracy of the classifier during the parameter optimisation process and are therefore part of the training process and not independent. Testing samples completely independent of the training process and are used as an independent sample to test the overall accuracy of the classifier.
+
+
 
 **Apply a LightGBM Binary Classifier**
 
 To train a single binary classifier you need to use the following function::
 
-    import rsgislib.classification
     import rsgislib.classification.classlightgbm
 
-    out_mdl_file = 'model_file.txt'
-    rsgislib.classification.classlightgbm.train_lightgbm_binary_classifier(out_mdl_file, mangroves_sample_h5_train, mangroves_sample_h5_valid, mangroves_sample_h5_test, other_sample_h5_train, other_sample_h5_valid, other_sample_h5_test)
+    cls_bin_mdl_file = os.path.join(out_dir, "lgbm_mng_bin_mdl.txt")
+    rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifier(
+        out_mdl_file=cls_bin_mdl_file,
+        cls1_train_file=mangrove_train_smpls_h5_file,
+        cls1_valid_file=mangrove_valid_smpls_h5_file,
+        cls1_test_file=mangrove_test_smpls_h5_file,
+        cls2_train_file=other_train_smpls_h5_file,
+        cls2_valid_file=other_valid_smpls_h5_file,
+        cls2_test_file=other_test_smpls_h5_file,
+        unbalanced=False,
+        op_mthd=rsgislib.OPT_MTHD_BAYESOPT,
+        n_opt_iters=100,
+        rnd_seed=42,
+        n_threads=1,
+        scale_pos_weight=None,
+        early_stopping_rounds=None,
+        num_iterations=100,
+        max_n_leaves=50,
+        learning_rate=0.1,
+        mdl_cls_obj=None,
+        out_params_file=None,
+    )
 
 To apply the binary classifier use the following function::
 
-    img_mask = 'mangrove_habitat_img.kea'
-    out_prob_img = 'mangrove_prob_img.kea'
-    out_cls_img = 'mangrove_cls_img.kea'
-    rsgislib.classification.classlightgbm.apply_lightgbm_binary_classifier(out_mdl_file, img_mask, 1, imgs_info, out_prob_img, 'KEA', out_cls_img, class_thres=5000)
+    cls_score_img = os.path.join(out_dir, "LS5TM_19970716_bin_cls_score_img.kea")
+    out_class_img = os.path.join(out_dir, "LS5TM_19970716_bin_cls_img.kea")
+    rsgislib.classification.classlightgbm.apply_lightgbm_binary_classifier(
+        model_file=cls_bin_mdl_file,
+        in_msk_img=vld_msk_img,
+        img_msk_val=1,
+        img_file_info=imgs_info,
+        out_score_img=cls_score_img,
+        gdalformat="KEA",
+        out_class_img=out_class_img,
+        class_thres=5000,
+    )
+
 
 .. note:: Class probability values are multipled by 10,000 so a threshold of 5000 is really 0.5.
 
 **Apply a LightGBM Multi-Class Classifier**
 
-To train a multi-class classifier you need to use the following function::
+To train a multi-class classifier you first need to specify the reference samples as a dict of rsgislib.classification.ClassInfoObj objects::
 
     import rsgislib.classification
     import rsgislib.classification.classlightgbm
 
-    out_mdl_file = 'model_file.txt'
-    clsinfodict = dict()
-    clsinfodict['Mangroves'] = rsgislib.classification.ClassInfoObj(id=0, out_id=1, trainfileH5=mangroves_sample_h5_train, testfileH5=mangroves_sample_h5_test, validfileH5=mangroves_sample_h5_valid, red=0, green=255, blue=0)
-    clsinfodict['Other'] = rsgislib.classification.ClassInfoObj(id=1, out_id=2, trainfileH5=other_sample_h5_train, testfileH5=other_sample_h5_test, validfileH5=other_sample_h5_valid, red=100, green=100, blue=100)
-    # Note. Water samples not shown above but would be extracted and generated using the same functions.
-    clsinfodict['Water'] = rsgislib.classification.ClassInfoObj(id=2, out_id=3, trainfileH5=water_sample_h5_train, testfileH5=water_sample_h5_test, validfileH5=water_sample_h5_valid,, red=0, green=0, blue=255)
+    cls_info_dict = dict()
+    cls_info_dict["Mangrove"] = rsgislib.classification.ClassInfoObj(
+        id=0,
+        out_id=1,
+        train_file_h5=mangrove_train_smpls_h5_file,
+        test_file_h5=mangrove_test_smpls_h5_file,
+        valid_file_h5=mangrove_valid_smpls_h5_file,
+        red=0,
+        green=255,
+        blue=0,
+    )
+    cls_info_dict["Other Terrestrial"] = rsgislib.classification.ClassInfoObj(
+        id=1,
+        out_id=2,
+        train_file_h5=other_terrestrial_train_smpls_h5_file,
+        test_file_h5=other_terrestrial_test_smpls_h5_file,
+        valid_file_h5=other_terrestrial_valid_smpls_h5_file,
+        red=100,
+        green=100,
+        blue=100,
+    )
+    cls_info_dict["Water"] = rsgislib.classification.ClassInfoObj(
+        id=2,
+        out_id=3,
+        train_file_h5=water_train_smpls_h5_file,
+        test_file_h5=water_test_smpls_h5_file,
+        valid_file_h5=water_valid_smpls_h5_file,
+        red=0,
+        green=0,
+        blue=255,
+    )
 
-    rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier(out_mdl_file, clsinfodict)
+You can then train a multi-class lightgbm classifier using the following function::
+
+    import rsgislib.classification.classlightgbm
+
+    cls_mcls_mdl_file = os.path.join(out_dir, "lgbm_mng_mcls_mdl.txt")
+    rsgislib.classification.classlightgbm.train_opt_lightgbm_multiclass_classifier(
+        out_mdl_file=cls_mcls_mdl_file,
+        cls_info_dict=cls_info_dict,
+        unbalanced=False,
+        op_mthd=rsgislib.OPT_MTHD_BAYESOPT,
+        n_opt_iters=100,
+        rnd_seed=42,
+        n_threads=1,
+        early_stopping_rounds=None,
+        num_iterations=100,
+        max_n_leaves=50,
+        learning_rate=0.1,
+        mdl_cls_obj=None,
+        out_params_file=None,
+        out_info_file=None,
+    )
 
 To apply the multi-class classifier use the following function::
 
-    img_mask = 'mangrove_habitat_img.kea'
-    out_prob_img = 'class_prob_img.kea'
-    out_cls_img = 'class_out_img.kea'
-
-    rsgislib.classification.classlightgbm.apply_lightgbm_multiclass_classifier(clsinfodict, out_mdl_file, img_mask, 1, imgs_info, out_prob_img, out_cls_img, 'KEA')
+    out_class_img = os.path.join(out_dir, "LS5TM_19970716_mcls_img.kea")
+    rsgislib.classification.classlightgbm.apply_lightgbm_multiclass_classifier(
+        model_file=cls_mcls_mdl_file,
+        cls_info_dict=cls_info_dict,
+        in_msk_img=vld_msk_img,
+        img_msk_val=1,
+        img_file_info=imgs_info,
+        out_class_img=out_class_img,
+        gdalformat="KEA",
+        class_clr_names=True,
+    )
 
 .. note:: Within the rsgislib.classification.ClassInfoObj class you need to provide an id and out_id value. The id must start from zero and be consecutive while the out_id will be used as the pixel value for the output classification image and can be any integer value.
 

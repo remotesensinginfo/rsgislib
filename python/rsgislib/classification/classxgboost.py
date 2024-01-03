@@ -918,7 +918,7 @@ def train_opt_xgboost_binary_classifier(
 def apply_xgboost_binary_classifier(
     model_file: str,
     in_msk_img: str,
-    img_mask_val: int,
+    img_msk_val: int,
     img_file_info: List,
     out_score_img: str,
     gdalformat: str = "KEA",
@@ -932,10 +932,10 @@ def apply_xgboost_binary_classifier(
 
     :param model_file: a trained xgboost binary model which can be loaded
                        with the xgb.Booster function load_model(model_file).
-    :param in_img_msk: is an image file providing a mask to specify where
+    :param in_msk_img: is an image file providing a mask to specify where
                        should be classified. Simplest mask is all the valid
                        data regions (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the imgMask to limit the region
+    :param img_msk_val: the pixel value within the imgMask to limit the region
                          to which the classification is applied.
                          Can be used to create a hierarchical classification.
     :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects
@@ -1001,7 +1001,7 @@ def apply_xgboost_binary_classifier(
     outfiles.outimage = out_score_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
-    otherargs.mskVal = img_mask_val
+    otherargs.mskVal = img_msk_val
     otherargs.numClassVars = num_class_vars
     otherargs.imgFileInfo = img_file_info
 
@@ -1931,8 +1931,8 @@ def train_opt_xgboost_multiclass_classifier(
 def apply_xgboost_multiclass_classifier(
     model_file: str,
     cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
-    in_mask_img: str,
-    img_mask_val: int,
+    in_msk_img: str,
+    img_msk_val: int,
     img_file_info: List,
     out_class_img: str,
     gdalformat: str = "KEA",
@@ -1949,10 +1949,10 @@ def apply_xgboost_multiclass_classifier(
                           of ClassInfoObj objects defining the training data.
                           This is used to define the class names and colours
                           if class_clr_names is True.
-    :param in_img_msk: is an image file providing a mask to specify where
+    :param in_msk_img: is an image file providing a mask to specify where
                        should be classified. Simplest mask is all the valid
                        data regions (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the imgMask to limit the region
+    :param img_msk_val: the pixel value within the imgMask to limit the region
                          to which the classification is applied.
                          Can be used to create a hierarchical classification.
     :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects
@@ -2012,7 +2012,7 @@ def apply_xgboost_multiclass_classifier(
     classifier.load_model(model_file)
 
     infiles = applier.FilenameAssociations()
-    infiles.imageMask = in_mask_img
+    infiles.imageMask = in_msk_img
     num_class_vars = 0
     for imgFile in img_file_info:
         infiles.__dict__[imgFile.name] = imgFile.file_name
@@ -2032,7 +2032,7 @@ def apply_xgboost_multiclass_classifier(
     outfiles.outclsimage = out_class_img
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
-    otherargs.mskVal = img_mask_val
+    otherargs.mskVal = img_msk_val
     otherargs.numClassVars = num_class_vars
     otherargs.imgFileInfo = img_file_info
     otherargs.n_classes = n_classes
