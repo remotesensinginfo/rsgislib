@@ -755,9 +755,9 @@ def test_train_lightgbm_multiclass_classifier(tmp_path):
         cls_params_file,
         out_mdl_file,
         cls_info_dict,
-        out_info_file=None,
         unbalanced=False,
         n_threads=1,
+        out_info_file=None,
     )
 
     assert os.path.exists(out_mdl_file)
@@ -840,12 +840,12 @@ def test_train_opt_lightgbm_multiclass_classifier_skopt(tmp_path):
     rsgislib.classification.classlightgbm.train_opt_lightgbm_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
-        out_info_file=None,
         unbalanced=False,
         op_mthd=rsgislib.OPT_MTHD_SKOPT,
         n_opt_iters=1,
         rnd_seed=None,
         n_threads=1,
+        out_info_file=None,
     )
 
     assert os.path.exists(out_mdl_file)
@@ -928,12 +928,12 @@ def test_train_opt_lightgbm_multiclass_classifier_bayesopt(tmp_path):
     rsgislib.classification.classlightgbm.train_opt_lightgbm_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
-        out_info_file=None,
         unbalanced=False,
         op_mthd=rsgislib.OPT_MTHD_BAYESOPT,
         n_opt_iters=1,
         rnd_seed=None,
         n_threads=1,
+        out_info_file=None,
     )
 
     assert os.path.exists(out_mdl_file)
@@ -1016,12 +1016,12 @@ def test_train_opt_lightgbm_multiclass_classifier_optuna(tmp_path):
     rsgislib.classification.classlightgbm.train_opt_lightgbm_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
-        out_info_file=None,
         unbalanced=False,
         op_mthd=rsgislib.OPT_MTHD_OPTUNA,
         n_opt_iters=10,
         rnd_seed=None,
         n_threads=1,
+        out_info_file=None,
     )
 
     assert os.path.exists(out_mdl_file)
@@ -1123,8 +1123,8 @@ def test_apply_lightgbm_multiclass_classifier_bayesopt(tmp_path):
 
     out_class_img = os.path.join(tmp_path, "out_cls_img.kea")
     rsgislib.classification.classlightgbm.apply_lightgbm_multiclass_classifier(
-        cls_info_dict,
         out_mdl_file,
+        cls_info_dict,
         in_msk_img,
         1,
         img_band_info,

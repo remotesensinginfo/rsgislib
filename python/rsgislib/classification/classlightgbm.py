@@ -45,6 +45,7 @@ from rios import applier, cuiprogress, rat
 
 import rsgislib
 import rsgislib.imagecalc
+import rsgislib.classification
 import rsgislib.imageutils
 import rsgislib.rastergis
 import rsgislib.tools.utils
@@ -914,7 +915,7 @@ def train_opt_lightgbm_binary_classifier(
     if out_params_file is not None:
         rsgislib.tools.utils.write_dict_to_json(params, out_params_file)
 
-    print("Start Training Find Classifier")
+    print("Start training final classifier")
 
     model_lgb = lgb.train(
         params,
@@ -962,7 +963,7 @@ def train_lightgbm_binary_classifier(
     mdl_cls_obj=None,
 ):
     """
-    A function which trains a lightgbm model using the parameters provided
+    A function which trains a binary lightgbm model using the parameters provided
     within a JSON file. The JSON file must provide values for the following
     parameters:
 
@@ -1138,13 +1139,15 @@ def apply_lightgbm_binary_classifier(
     model_file: str,
     in_img_msk: str,
     img_mask_val: int,
-    img_file_info: List,
+    img_file_info: List[rsgislib.imageutils.ImageBandInfo],
     out_score_img: str,
     gdalformat: str = "KEA",
     out_class_img: str = None,
     class_thres: int = 5000,
 ):
     """
+    A function for applying a trained binary lightgbm model to a image or stack of
+    image files.
 
     :param model_file: a trained lightgbm binary model which can be loaded
                        with lgb.Booster(model_file=model_file).
@@ -1252,7 +1255,7 @@ def apply_lightgbm_binary_classifier(
 
 def optimise_lightgbm_multiclass_classifier(
     out_params_file: str,
-    cls_info_dict: Dict,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
     unbalanced: bool = False,
     op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
@@ -1265,33 +1268,43 @@ def optimise_lightgbm_multiclass_classifier(
     mdl_cls_obj=None,
 ):
     """
+    A function which performs a hyper-parameter optimisation for a multi-class
+    lightgbm classifier.
 
-    :param out_params_file:
-    :param cls_info_dict:
-    :param unbalanced:
-    :param op_mthd:
-    :param n_opt_iters:
-    :param rnd_seed:
-    :param n_threads:
-    :param early_stopping_rounds:
-    :param num_iterations:
-    :param max_n_leaves:
-    :param learning_rate:
-    :param mdl_cls_obj:
+    You have the option of using the bayes_opt (Default), optuna or skopt
+    optimisation libraries. Before 5.1.0 skopt was the only option but this
+    no longer appears to be maintained so the other options have been added.
 
-    """
-    """
-    A function which performs a bayesian optimisation of the hyper-parameters for a multiclass lightgbm
-    classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
-
-    This function requires that lightgbm and skopt modules to be installed.
-
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
-    :param out_info_file: An optional output JSON file with information about the classifier which has been created.
-    :param unbalanced:
-    :param n_threads:
-    :param scale_pos_weight:
+    :param out_params_file: The output JSON file with the identified parameters
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+    :param unbalanced: Boolean (Default: False) specifying whether the training data
+                       is unbalanced (i.e., a different number of samples for each
+                       class).
+    :param op_mthd: The method used to optimise the parameters.
+                    Default: rsgislib.OPT_MTHD_BAYESOPT
+    :param n_opt_iters: The number of iterations (Default 100) used for the
+                        optimisation. This parameter is ignored for skopt.
+                        For bayes_opt there is a minimum of 10 and these are
+                        added to that minimum so Default is therefore 110.
+                        For optuna this is the number of iterations used.
+    :param rnd_seed: A random seed for the optimisation. Default None. If None
+                     there a different seed will be used each time the function
+                     is run.
+    :param n_threads: The number of threads used by lightgbm
+    :param early_stopping_rounds: If not None then activates early stopping.
+                                  The model will train until the validation score
+                                  stops improving. Validation score needs to improve
+                                  at least every early_stopping_rounds round(s)
+                                  to continue training.
+    :param num_iterations: The number of boosting iterations (Default: 100)
+    :param max_n_leaves: The upper limited used within the optimisation search
+                         for the maximum number of leaves used within the model.
+                         Default: 50.
+    :param learning_rate: Default 0.1 (constraint > 0.0) controlling the shrinkage rate
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
 
     """
     if not HAVE_LIGHTGBM:
@@ -1647,8 +1660,7 @@ def optimise_lightgbm_multiclass_classifier(
 
 def train_opt_lightgbm_multiclass_classifier(
     out_mdl_file: str,
-    cls_info_dict: Dict,
-    out_info_file: str = None,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
     unbalanced: bool = False,
     op_mthd: int = rsgislib.OPT_MTHD_BAYESOPT,
     n_opt_iters: int = 100,
@@ -1659,36 +1671,53 @@ def train_opt_lightgbm_multiclass_classifier(
     max_n_leaves: int = 50,
     learning_rate: float = 0.1,
     mdl_cls_obj=None,
+    out_params_file: str = None,
+    out_info_file: str = None,
 ):
     """
+    A function which performs a hyper-parameter optimisation for a multi-class
+    lightgbm classifier.
 
-    :param out_mdl_file:
-    :param cls_info_dict:
-    :param out_info_file:
-    :param unbalanced:
-    :param op_mthd:
-    :param n_opt_iters:
-    :param rnd_seed:
-    :param n_threads:
-    :param early_stopping_rounds:
-    :param num_iterations:
-    :param max_n_leaves:
-    :param learning_rate:
-    :param mdl_cls_obj:
+    You have the option of using the bayes_opt (Default), optuna or skopt
+    optimisation libraries. Before 5.1.0 skopt was the only option but this
+    no longer appears to be maintained so the other options have been added.
 
-    """
-    """
-    A function which performs a bayesian optimisation of the hyper-parameters for a multiclass lightgbm
-    classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
-
-    This function requires that lightgbm and skopt modules to be installed.
-
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
-    :param out_info_file: An optional output JSON file with information about the classifier which has been created.
-    :param unbalanced:
-    :param n_threads:
-    :param scale_pos_weight:
+    :param out_mdl_file: The file path for the output lightgbm (*.txt) model which
+                         can be loaded to perform a classification.
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+    :param unbalanced: Boolean (Default: False) specifying whether the training data
+                       is unbalanced (i.e., a different number of samples for each
+                       class).
+    :param op_mthd: The method used to optimise the parameters.
+                    Default: rsgislib.OPT_MTHD_BAYESOPT
+    :param n_opt_iters: The number of iterations (Default 100) used for the
+                        optimisation. This parameter is ignored for skopt.
+                        For bayes_opt there is a minimum of 10 and these are
+                        added to that minimum so Default is therefore 110.
+                        For optuna this is the number of iterations used.
+    :param rnd_seed: A random seed for the optimisation. Default None. If None
+                     there a different seed will be used each time the function
+                     is run.
+    :param n_threads: The number of threads used by lightgbm
+    :param early_stopping_rounds: If not None then activates early stopping.
+                                  The model will train until the validation score
+                                  stops improving. Validation score needs to improve
+                                  at least every early_stopping_rounds round(s)
+                                  to continue training.
+    :param num_iterations: The number of boosting iterations (Default: 100)
+    :param max_n_leaves: The upper limited used within the optimisation search
+                         for the maximum number of leaves used within the model.
+                         Default: 50.
+    :param learning_rate: Default 0.1 (constraint > 0.0) controlling the shrinkage rate
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
+    :param out_params_file: An output JSON file with the identified parameters.
+                            If None (default) then no file is outputted.
+    :param out_info_file: An output JSON file with the classification outputs
+                          scores (e.g., training, testing). If None (default)
+                          then no file is outputted.
 
     """
     if not HAVE_LIGHTGBM:
@@ -2056,6 +2085,10 @@ def train_opt_lightgbm_multiclass_classifier(
             "for the optimisation method specified."
         )
 
+    if out_params_file is not None:
+        rsgislib.tools.utils.write_dict_to_json(params, out_params_file)
+
+    print("Start training final classifier")
     model_lgb = lgb.train(
         params,
         d_train,
@@ -2087,41 +2120,55 @@ def train_opt_lightgbm_multiclass_classifier(
 def train_lightgbm_multiclass_classifier(
     params_file: str,
     out_mdl_file: str,
-    cls_info_dict: Dict,
-    out_info_file: str = None,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
     unbalanced: bool = False,
     n_threads: int = 1,
     early_stopping_rounds: int = None,
     num_iterations: int = 100,
     learning_rate: float = 0.1,
     mdl_cls_obj=None,
+    out_info_file: str = None,
 ):
     """
+    A function which trains a multiclass lightgbm model using the parameters
+    provided within a JSON file. The JSON file must provide values for the
+    following parameters:
 
-    :param params_file:
-    :param out_mdl_file:
-    :param cls_info_dict:
-    :param out_info_file:
-    :param unbalanced:
-    :param n_threads:
-    :param early_stopping_rounds:
-    :param num_iterations:
-    :param learning_rate:
-    :param mdl_cls_obj:
+       * max_depth
+       * num_leaves
+       * min_data_in_leaf
+       * lambda_l1
+       * lambda_l2
+       * feature_fraction
+       * bagging_fraction
+       * min_split_gain
+       * min_child_weight
+       * reg_alpha
+       * reg_lambda
 
-    """
-    """
-    A function which performs a bayesian optimisation of the hyper-parameters for a multiclass lightgbm
-    classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
-
-    This function requires that lightgbm and skopt modules to be installed.
-
-    :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param cls_info_dict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
-    :param out_info_file: An optional output JSON file with information about the classifier which has been created.
-    :param unbalanced:
-    :param n_threads:
-    :param scale_pos_weight:
+    :param params_file: The file path to the JSON file with the classifier
+                        parameters.
+    :param out_mdl_file: The file path for the output lightgbm (*.txt) model which
+                         can be loaded to perform a classification.
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+    :param unbalanced: Boolean (Default: False) specifying whether the training data
+                       is unbalanced (i.e., a different number of samples for each
+                       class).
+    :param n_threads: The number of threads used by lightgbm
+    :param early_stopping_rounds: If not None then activates early stopping.
+                                  The model will train until the validation score
+                                  stops improving. Validation score needs to improve
+                                  at least every early_stopping_rounds round(s)
+                                  to continue training.
+    :param num_iterations: The number of boosting iterations (Default: 100)
+    :param learning_rate: Default 0.1 (constraint > 0.0) controlling the shrinkage rate
+    :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
+                        used as the basis model from which training will be
+                        continued (i.e., transfer learning).
+    :param out_info_file: An output JSON file with the classification outputs
+                          scores (e.g., training, testing). If None (default)
+                          then no file is outputted.
 
     """
     if not HAVE_LIGHTGBM:
@@ -2256,47 +2303,41 @@ def train_lightgbm_multiclass_classifier(
 
 
 def apply_lightgbm_multiclass_classifier(
-    cls_train_info: Dict,
     model_file: str,
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
     in_img_mask: str,
     img_mask_val: int,
-    img_file_info: List,
+    img_file_info: List[rsgislib.imageutils.ImageBandInfo],
     out_class_img: str,
     gdalformat: str = "KEA",
     class_clr_names: bool = True,
 ):
     """
+    A function for applying a trained multiclass lightgbm model to a image or
+    stack of image files.
 
-    :param cls_train_info:
-    :param model_file:
-    :param in_img_mask:
-    :param img_mask_val:
-    :param img_file_info:
-    :param out_class_img:
-    :param gdalformat:
-    :param class_clr_names:
-
-    """
-    """
-    This function applies a trained multiple classes lightgbm model. The function train_lightgbm_multiclass_classifier
-    can be used to train such as model. The output image will be a final hard classification using the class with
-    the maximum softmax score.
-
-    :param cls_train_info: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
-                           objects which will be used to train the classifier (i.e., train_lightgbm_multiclass_classifier()),
-                           provide pixel value id and RGB class values.
-    :param model_file: a trained lightgbm multiclass model which can be loaded with lgb.Booster(model_file=model_file).
-    :param in_img_mask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                    valid data regions (rsgislib.imageutils.gen_valid_mask)
-    :param img_mask_val: the pixel value within the imgMask to limit the region to which the classification is applied.
-                       Can be used to create a heirachical classification.
-    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                        rsgislib.zonalstats.extract_zone_img_band_values_to_hdf) to identify which images and bands are to
-                        be used for the classification so it adheres to the training data.
-    :param out_class_img: Output image which will contain the hard classification defined as the maximum probability.
-    :param gdalformat: is the output image format - all GDAL supported formats are supported.
-    :param class_clr_names: default is True and therefore a colour table will the colours specified in ClassInfoObj
-                          and a class_names (from classTrainInfo) column will be added to the output file.
+    :param model_file: a trained lightgbm binary model which can be loaded
+                       with lgb.Booster(model_file=model_file).
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+                          This is used to define the class names and colours
+                          if class_clr_names is True.
+    :param in_img_msk: is an image file providing a mask to specify where
+                       should be classified. Simplest mask is all the valid
+                       data regions (rsgislib.imageutils.gen_valid_mask)
+    :param img_mask_val: the pixel value within the imgMask to limit the region
+                         to which the classification is applied.
+                         Can be used to create a hierarchical classification.
+    :param img_file_info: a list of rsgislib.imageutils.ImageBandInfo objects
+                          to identify which images and bands are to be used for
+                          the classification so it adheres to the training data.
+    :param out_class_img: The file path for the output classification image
+    :param gdalformat: The output image format (Default: KEA).
+    :param class_clr_names: default is True and therefore a colour table will the
+                            colours specified in ClassInfoObj and a class_names
+                            (from cls_info_dict) column will be added to the
+                            output file. Note the output format needs to support
+                            a raster attribute table (i.e., KEA).
 
     """
     if not HAVE_LIGHTGBM:
@@ -2360,16 +2401,16 @@ def apply_lightgbm_multiclass_classifier(
         infiles.__dict__[imgFile.name] = imgFile.file_name
         num_class_vars = num_class_vars + len(imgFile.bands)
 
-    n_classes = len(cls_train_info)
+    n_classes = len(cls_info_dict)
     cls_id_lut = numpy.zeros(n_classes)
-    for cls_name in cls_train_info:
-        if cls_train_info[cls_name].id >= n_classes:
+    for cls_name in cls_info_dict:
+        if cls_info_dict[cls_name].id >= n_classes:
             raise rsgislib.RSGISPyException(
                 "ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(
-                    cls_name, cls_train_info[cls_name].id
+                    cls_name, cls_info_dict[cls_name].id
                 )
             )
-        cls_id_lut[cls_train_info[cls_name].id] = cls_train_info[cls_name].out_id
+        cls_id_lut[cls_info_dict[cls_name].id] = cls_info_dict[cls_name].out_id
 
     outfiles = applier.FilenameAssociations()
     outfiles.outclsimage = out_class_img
@@ -2408,12 +2449,12 @@ def apply_lightgbm_multiclass_classifier(
         class_names = numpy.empty_like(red, dtype=numpy.dtype("a255"))
         class_names[...] = ""
 
-        for class_key in cls_train_info:
+        for class_key in cls_info_dict:
             print("Apply Colour to class '" + class_key + "'")
-            red[cls_train_info[class_key].out_id] = cls_train_info[class_key].red
-            green[cls_train_info[class_key].out_id] = cls_train_info[class_key].green
-            blue[cls_train_info[class_key].out_id] = cls_train_info[class_key].blue
-            class_names[cls_train_info[class_key].out_id] = class_key
+            red[cls_info_dict[class_key].out_id] = cls_info_dict[class_key].red
+            green[cls_info_dict[class_key].out_id] = cls_info_dict[class_key].green
+            blue[cls_info_dict[class_key].out_id] = cls_info_dict[class_key].blue
+            class_names[cls_info_dict[class_key].out_id] = class_key
 
         rat.writeColumn(rat_dataset, "Red", red)
         rat.writeColumn(rat_dataset, "Green", green)
