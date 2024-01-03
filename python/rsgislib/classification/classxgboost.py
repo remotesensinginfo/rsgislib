@@ -70,6 +70,7 @@ def optimise_xgboost_binary_classifier(
     rnd_seed: int = None,
     n_threads: int = 1,
     mdl_cls_obj=None,
+    use_gpu:bool = False,
 ):
     """
     A function which performs a hyper-parameter optimisation for a binary
@@ -103,6 +104,10 @@ def optimise_xgboost_binary_classifier(
     :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
                         used as the basis model from which training will be
                         continued (i.e., transfer learning).
+    :param use_gpu: A boolean to specify whether the GPU should be used for training.
+                    If you have a GPU available which supports CUDA and xgboost is
+                    installed with GPU support then this is significantly speed up
+                    the training of your model.
 
     """
 
@@ -172,6 +177,10 @@ def optimise_xgboost_binary_classifier(
                 "eval_metric": "auc",
                 "objective": "binary:logistic",
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
+
             watchlist = [(d_train, "train"), (d_valid, "validation")]
             evals_results = {}
             model_xgb = xgb.train(
@@ -220,6 +229,9 @@ def optimise_xgboost_binary_classifier(
             "objective": "binary:logistic",
             "num_boost_round": int(op_params["params"]["num_boost_round"]),
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
 
     elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
         print("Using OPT_MTHD_OPTUNA")
@@ -237,6 +249,9 @@ def optimise_xgboost_binary_classifier(
                 "eval_metric": "auc",
                 "objective": "binary:logistic",
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
             num_boost_round_trial = trial.suggest_int("num_boost_round", 2, 100)
 
             watchlist = [(d_train, "train"), (d_valid, "validation")]
@@ -271,6 +286,9 @@ def optimise_xgboost_binary_classifier(
             "objective": "binary:logistic",
             "num_boost_round": int(optuna_opt_trial.params["num_boost_round"]),
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
 
     elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
         print("Using OPT_MTHD_SKOPT")
@@ -299,6 +317,9 @@ def optimise_xgboost_binary_classifier(
                 "eval_metric": "auc",
                 "objective": "binary:logistic",
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
 
             print("\nNext set of params.....", params)
 
@@ -343,6 +364,9 @@ def optimise_xgboost_binary_classifier(
             "objective": "binary:logistic",
             "num_boost_round": int(best_params[6]),
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
     else:
         raise rsgislib.RSGISPyException(
             "Do not recognise or do not have implementation "
@@ -363,6 +387,7 @@ def train_xgboost_binary_classifier(
     cls2_test_file: str,
     n_threads: int = 1,
     mdl_cls_obj=None,
+    use_gpu:bool = False,
 ):
     """
 A function which trains a binary lightgbm model using the parameters provided
@@ -399,6 +424,10 @@ A function which trains a binary lightgbm model using the parameters provided
     :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
                         used as the basis model from which training will be
                         continued (i.e., transfer learning).
+    :param use_gpu: A boolean to specify whether the GPU should be used for training.
+                    If you have a GPU available which supports CUDA and xgboost is
+                    installed with GPU support then this is significantly speed up
+                    the training of your model.
 
     """
     if not HAVE_XGBOOST:
@@ -476,6 +505,9 @@ A function which trains a binary lightgbm model using the parameters provided
         "eval_metric": cls_params["eval_metric"],
         "objective": cls_params["objective"],
     }
+    if use_gpu:
+        params["device"] = "cuda"
+        params["tree_method"] = "hist"
 
     num_boost_round = cls_params["num_boost_round"]
 
@@ -522,6 +554,7 @@ def train_opt_xgboost_binary_classifier(
     n_threads: int = 1,
     mdl_cls_obj=None,
     out_params_file: str = None,
+    use_gpu:bool = False,
 ):
     """
     A function which performs a hyper-parameter optimisation for a binary
@@ -563,6 +596,10 @@ def train_opt_xgboost_binary_classifier(
                         continued (i.e., transfer learning).
     :param out_params_file: The output JSON file with the identified parameters.
                             If None (default) then no file is outputted.
+    :param use_gpu: A boolean to specify whether the GPU should be used for training.
+                    If you have a GPU available which supports CUDA and xgboost is
+                    installed with GPU support then this is significantly speed up
+                    the training of your model.
 
     """
     if not HAVE_XGBOOST:
@@ -649,6 +686,10 @@ def train_opt_xgboost_binary_classifier(
                 "eval_metric": "auc",
                 "objective": "binary:logistic",
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
+
             watchlist = [(d_train, "train"), (d_valid, "validation")]
             evals_results = {}
             model_xgb = xgb.train(
@@ -696,6 +737,9 @@ def train_opt_xgboost_binary_classifier(
             "eval_metric": "auc",
             "objective": "binary:logistic",
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
         num_boost_round = int(op_params["params"]["num_boost_round"])
 
     elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
@@ -714,6 +758,9 @@ def train_opt_xgboost_binary_classifier(
                 "eval_metric": "auc",
                 "objective": "binary:logistic",
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
             num_boost_round_trial = trial.suggest_int("num_boost_round", 2, 100)
 
             watchlist = [(d_train, "train"), (d_valid, "validation")]
@@ -747,6 +794,9 @@ def train_opt_xgboost_binary_classifier(
             "eval_metric": "auc",
             "objective": "binary:logistic",
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
         num_boost_round = int(optuna_opt_trial.params["num_boost_round"])
 
     elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
@@ -776,7 +826,9 @@ def train_opt_xgboost_binary_classifier(
                 "eval_metric": "auc",
                 "objective": "binary:logistic",
             }
-
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
             print("\nNext set of params.....", params)
 
             num_boost_round = values[6]
@@ -819,7 +871,9 @@ def train_opt_xgboost_binary_classifier(
             "eval_metric": "auc",
             "objective": "binary:logistic",
         }
-
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
         num_boost_round = best_params[6]
     else:
         raise rsgislib.RSGISPyException(
@@ -994,6 +1048,7 @@ def optimise_xgboost_multiclass_classifier(
     rnd_seed: int = None,
     n_threads: int = 1,
     mdl_cls_obj=None,
+    use_gpu:bool = False,
 ):
     """
     A function which performs a hyper-parameter optimisation for a multi-class
@@ -1024,6 +1079,10 @@ def optimise_xgboost_multiclass_classifier(
     :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
                         used as the basis model from which training will be
                         continued (i.e., transfer learning).
+    :param use_gpu: A boolean to specify whether the GPU should be used for training.
+                    If you have a GPU available which supports CUDA and xgboost is
+                    installed with GPU support then this is significantly speed up
+                    the training of your model.
 
     """
     if not HAVE_XGBOOST:
@@ -1124,6 +1183,10 @@ def optimise_xgboost_multiclass_classifier(
                 "objective": "multi:softmax",
                 "num_class": n_classes,
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
+
             watchlist = [(d_train, "train"), (d_valid, "validation")]
             evals_results = {}
             model_xgb = xgb.train(
@@ -1175,6 +1238,10 @@ def optimise_xgboost_multiclass_classifier(
             "num_class": n_classes,
             "num_boost_round": int(op_params["params"]["num_boost_round"]),
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
+
     elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
         print("Using OPT_MTHD_OPTUNA")
         import optuna
@@ -1192,6 +1259,9 @@ def optimise_xgboost_multiclass_classifier(
                 "objective": "multi:softmax",
                 "num_class": n_classes,
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
             num_boost_round_trial = trial.suggest_int("num_boost_round", 2, 100)
 
             watchlist = [(d_train, "train"), (d_valid, "validation")]
@@ -1229,6 +1299,9 @@ def optimise_xgboost_multiclass_classifier(
             "num_class": n_classes,
             "num_boost_round": int(optuna_opt_trial.params["num_boost_round"]),
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
     elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
         print("Using OPT_MTHD_SKOPT")
         import skopt
@@ -1257,6 +1330,9 @@ def optimise_xgboost_multiclass_classifier(
                 "objective": "multi:softmax",
                 "num_class": n_classes,
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
 
             print("\nNext set of params.....", params)
 
@@ -1304,6 +1380,9 @@ def optimise_xgboost_multiclass_classifier(
             "num_class": n_classes,
             "num_boost_round": best_params[6],
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
     else:
         raise rsgislib.RSGISPyException(
             "Do not recognise or do not have implementation "
@@ -1319,6 +1398,7 @@ def train_xgboost_multiclass_classifier(
     cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
     n_threads: int = 1,
     mdl_cls_obj=None,
+    use_gpu:bool = False,
 ):
     """
     A function which trains a multiclass xgboost model using the parameters
@@ -1345,6 +1425,10 @@ def train_xgboost_multiclass_classifier(
     :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
                         used as the basis model from which training will be
                         continued (i.e., transfer learning).
+    :param use_gpu: A boolean to specify whether the GPU should be used for training.
+                    If you have a GPU available which supports CUDA and xgboost is
+                    installed with GPU support then this is significantly speed up
+                    the training of your model.
 
     """
     if not HAVE_XGBOOST:
@@ -1445,7 +1529,9 @@ def train_xgboost_multiclass_classifier(
         "objective": cls_params["objective"],
         "num_class": n_classes,
     }
-
+    if use_gpu:
+        params["device"] = "cuda"
+        params["tree_method"] = "hist"
     num_boost_round = cls_params["num_boost_round"]
 
     watchlist = [(d_train, "train"), (d_valid, "validation")]
@@ -1478,6 +1564,7 @@ def train_opt_xgboost_multiclass_classifier(
     rnd_seed: int = None,
     n_threads: int = 1,
     mdl_cls_obj=None,
+    use_gpu:bool = False,
 ):
     """
     A function which performs a hyper-parameter optimisation for a multi-class
@@ -1506,6 +1593,10 @@ def train_opt_xgboost_multiclass_classifier(
     :param mdl_cls_obj: An optional (Default None) lightgbm model which will be
                         used as the basis model from which training will be
                         continued (i.e., transfer learning).
+    :param use_gpu: A boolean to specify whether the GPU should be used for training.
+                    If you have a GPU available which supports CUDA and xgboost is
+                    installed with GPU support then this is significantly speed up
+                    the training of your model.
 
     """
     if not HAVE_XGBOOST:
@@ -1610,6 +1701,9 @@ def train_opt_xgboost_multiclass_classifier(
                 "objective": "multi:softmax",
                 "num_class": n_classes,
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
             watchlist = [(d_train, "train"), (d_valid, "validation")]
             evals_results = {}
             model_xgb = xgb.train(
@@ -1660,6 +1754,9 @@ def train_opt_xgboost_multiclass_classifier(
             "objective": "multi:softmax",
             "num_class": n_classes,
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
         num_boost_round = int(op_params["params"]["num_boost_round"])
 
     elif op_mthd == rsgislib.OPT_MTHD_OPTUNA:
@@ -1679,6 +1776,9 @@ def train_opt_xgboost_multiclass_classifier(
                 "objective": "multi:softmax",
                 "num_class": n_classes,
             }
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
             num_boost_round_trial = trial.suggest_int("num_boost_round", 2, 100)
 
             watchlist = [(d_train, "train"), (d_valid, "validation")]
@@ -1715,6 +1815,9 @@ def train_opt_xgboost_multiclass_classifier(
             "objective": "multi:softmax",
             "num_class": n_classes,
         }
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
         num_boost_round = int(optuna_opt_trial.params["num_boost_round"])
 
     elif op_mthd == rsgislib.OPT_MTHD_SKOPT:
@@ -1745,7 +1848,9 @@ def train_opt_xgboost_multiclass_classifier(
                 "objective": "multi:softmax",
                 "num_class": n_classes,
             }
-
+            if use_gpu:
+                params["device"] = "cuda"
+                params["tree_method"] = "hist"
             print("\nNext set of params.....", params)
 
             num_boost_round = values[6]
@@ -1791,7 +1896,9 @@ def train_opt_xgboost_multiclass_classifier(
             "objective": "multi:softmax",
             "num_class": n_classes,
         }
-
+        if use_gpu:
+            params["device"] = "cuda"
+            params["tree_method"] = "hist"
         num_boost_round = best_params[6]
     else:
         raise rsgislib.RSGISPyException(
