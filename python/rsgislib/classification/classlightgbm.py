@@ -224,15 +224,27 @@ def optimise_lightgbm_binary_classifier(
             if not unbalanced:
                 params["scale_pos_weight"] = scale_pos_weight
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             acc_score = roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
             gc.collect()
@@ -322,15 +334,27 @@ def optimise_lightgbm_binary_classifier(
             if not unbalanced:
                 params["scale_pos_weight"] = scale_pos_weight
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             acc_score = roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
             gc.collect()
@@ -419,15 +443,27 @@ def optimise_lightgbm_binary_classifier(
 
             print("\nNext set of params.....", params)
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             acc_score = -roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
             print("\nAccScore.....", -acc_score, ".....iter.....")
@@ -665,16 +701,27 @@ def train_opt_lightgbm_binary_classifier(
             if not unbalanced:
                 params["scale_pos_weight"] = scale_pos_weight
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
-
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
             acc_score = roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
             gc.collect()
             return acc_score
@@ -763,15 +810,27 @@ def train_opt_lightgbm_binary_classifier(
             if not unbalanced:
                 params["scale_pos_weight"] = scale_pos_weight
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             acc_score = roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
             gc.collect()
@@ -860,15 +919,27 @@ def train_opt_lightgbm_binary_classifier(
 
             print("\nNext set of params.....", params)
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             acc_score = -roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
             print("\nAccScore.....", -acc_score, ".....iter.....")
@@ -917,15 +988,25 @@ def train_opt_lightgbm_binary_classifier(
 
     print("Start training final classifier")
 
-    model_lgb = lgb.train(
-        params,
-        d_train,
-        valid_sets=[d_train, d_valid],
-        valid_names=["train", "valid"],
-        feval=None,
-        init_model=mdl_cls_obj,
-        callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-    )
+    if early_stopping_rounds is not None:
+        model_lgb = lgb.train(
+            params,
+            d_train,
+            valid_sets=[d_train, d_valid],
+            valid_names=["train", "valid"],
+            feval=None,
+            init_model=mdl_cls_obj,
+            callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
+        )
+    else:
+        model_lgb = lgb.train(
+            params,
+            d_train,
+            valid_sets=[d_train, d_valid],
+            valid_names=["train", "valid"],
+            feval=None,
+            init_model=mdl_cls_obj,
+        )
 
     test_auc = roc_auc_score(test_lbl_np, model_lgb.predict(test_np))
     print("Testing AUC: {}".format(test_auc))
@@ -1108,15 +1189,25 @@ def train_lightgbm_binary_classifier(
     if not unbalanced:
         params["scale_pos_weight"] = scale_pos_weight
 
-    model_lgb = lgb.train(
-        params,
-        d_train,
-        valid_sets=[d_train, d_valid],
-        valid_names=["train", "valid"],
-        feval=None,
-        init_model=mdl_cls_obj,
-        callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-    )
+    if early_stopping_rounds is not None:
+        model_lgb = lgb.train(
+            params,
+            d_train,
+            valid_sets=[d_train, d_valid],
+            valid_names=["train", "valid"],
+            feval=None,
+            init_model=mdl_cls_obj,
+            callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
+        )
+    else:
+        model_lgb = lgb.train(
+            params,
+            d_train,
+            valid_sets=[d_train, d_valid],
+            valid_names=["train", "valid"],
+            feval=None,
+            init_model=mdl_cls_obj,
+        )
     test_auc = roc_auc_score(test_lbl_np, model_lgb.predict(test_np))
     print("Testing AUC: {}".format(test_auc))
     print("Finish Training")
@@ -1409,15 +1500,27 @@ def optimise_lightgbm_multiclass_classifier(
                 "verbosity": -1,
             }
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             vld_preds_idxs = numpy.argmax(model_lgb.predict(vaild_np), axis=1)
             acc_score = accuracy_score(vaild_lbl_np, vld_preds_idxs)
@@ -1506,15 +1609,27 @@ def optimise_lightgbm_multiclass_classifier(
                 "verbosity": -1,
             }
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             vld_preds_idxs = numpy.argmax(model_lgb.predict(vaild_np), axis=1)
             acc_score = accuracy_score(vaild_lbl_np, vld_preds_idxs)
@@ -1602,15 +1717,27 @@ def optimise_lightgbm_multiclass_classifier(
 
             print("\nNext set of params.....", params)
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             vld_preds_idxs = numpy.argmax(model_lgb.predict(vaild_np), axis=1)
             acc_score = -accuracy_score(vaild_lbl_np, vld_preds_idxs)
@@ -1839,15 +1966,27 @@ def train_opt_lightgbm_multiclass_classifier(
                 "verbosity": -1,
             }
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             vld_preds_idxs = numpy.argmax(model_lgb.predict(vaild_np), axis=1)
             acc_score = accuracy_score(vaild_lbl_np, vld_preds_idxs)
@@ -1936,15 +2075,27 @@ def train_opt_lightgbm_multiclass_classifier(
                 "verbosity": -1,
             }
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             vld_preds_idxs = numpy.argmax(model_lgb.predict(vaild_np), axis=1)
             acc_score = accuracy_score(vaild_lbl_np, vld_preds_idxs)
@@ -2032,15 +2183,27 @@ def train_opt_lightgbm_multiclass_classifier(
 
             print("\nNext set of params.....", params)
 
-            model_lgb = lgb.train(
-                params,
-                d_train,
-                valid_sets=[d_train, d_valid],
-                valid_names=["train", "valid"],
-                feval=None,
-                init_model=mdl_cls_obj,
-                callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-            )
+            if early_stopping_rounds is not None:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                    callbacks=[
+                        lgb.early_stopping(stopping_rounds=early_stopping_rounds)
+                    ],
+                )
+            else:
+                model_lgb = lgb.train(
+                    params,
+                    d_train,
+                    valid_sets=[d_train, d_valid],
+                    valid_names=["train", "valid"],
+                    feval=None,
+                    init_model=mdl_cls_obj,
+                )
 
             vld_preds_idxs = numpy.argmax(model_lgb.predict(vaild_np), axis=1)
             acc_score = -accuracy_score(vaild_lbl_np, vld_preds_idxs)
@@ -2089,15 +2252,26 @@ def train_opt_lightgbm_multiclass_classifier(
         rsgislib.tools.utils.write_dict_to_json(params, out_params_file)
 
     print("Start training final classifier")
-    model_lgb = lgb.train(
-        params,
-        d_train,
-        valid_sets=[d_train, d_valid],
-        valid_names=["train", "valid"],
-        feval=None,
-        init_model=mdl_cls_obj,
-        callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-    )
+
+    if early_stopping_rounds is not None:
+        model_lgb = lgb.train(
+            params,
+            d_train,
+            valid_sets=[d_train, d_valid],
+            valid_names=["train", "valid"],
+            feval=None,
+            init_model=mdl_cls_obj,
+            callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
+        )
+    else:
+        model_lgb = lgb.train(
+            params,
+            d_train,
+            valid_sets=[d_train, d_valid],
+            valid_names=["train", "valid"],
+            feval=None,
+            init_model=mdl_cls_obj,
+        )
 
     vld_preds_idxs = numpy.argmax(model_lgb.predict(vaild_np), axis=1)
     valid_acc_scr = accuracy_score(vaild_lbl_np, vld_preds_idxs)
@@ -2274,15 +2448,25 @@ def train_lightgbm_multiclass_classifier(
         "verbose": -1,
     }
 
-    model_lgb = lgb.train(
-        params,
-        d_train,
-        valid_sets=[d_train, d_valid],
-        valid_names=["train", "valid"],
-        feval=None,
-        init_model=mdl_cls_obj,
-        callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
-    )
+    if early_stopping_rounds is not None:
+        model_lgb = lgb.train(
+            params,
+            d_train,
+            valid_sets=[d_train, d_valid],
+            valid_names=["train", "valid"],
+            feval=None,
+            init_model=mdl_cls_obj,
+            callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds)],
+        )
+    else:
+        model_lgb = lgb.train(
+            params,
+            d_train,
+            valid_sets=[d_train, d_valid],
+            valid_names=["train", "valid"],
+            feval=None,
+            init_model=mdl_cls_obj,
+        )
 
     vld_preds_idxs = numpy.argmax(model_lgb.predict(vaild_np), axis=1)
     valid_acc_scr = accuracy_score(vaild_lbl_np, vld_preds_idxs)
