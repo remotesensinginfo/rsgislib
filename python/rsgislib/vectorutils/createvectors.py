@@ -1162,7 +1162,7 @@ def create_vec_for_image(
     elif geometry_type == rsgislib.GEOM_POLY:
         out_geom_type = ogr.wkbPolygon
     else:
-        rsgislib.RSGISPyException(
+        raise rsgislib.RSGISPyException(
             "Input geometry type was not recognised - only support "
             "rsgislib.GEOM_PT, rsgislib.GEOM_LINE, rsgislib.GEOM_POLY"
         )

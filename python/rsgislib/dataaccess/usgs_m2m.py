@@ -374,7 +374,7 @@ def usgs_search(
         )
 
     if months is not None:
-        scn_filter["seasonalFilter"] = dict()
+        #scn_filter["seasonalFilter"] = dict()
         scn_filter["seasonalFilter"] = months
 
     if len(scn_filter) > 0:
