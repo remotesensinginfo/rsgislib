@@ -46,12 +46,11 @@ import rsgislib
 import rsgislib.imagecalc
 import rsgislib.imageutils
 import rsgislib.rastergis
-from rsgislib.classification import ClassInfoObj
-from rsgislib.imageutils import ImageBandInfo
+import rsgislib.classification
 
 
 def perform_sklearn_classifier_param_search(
-    cls_train_info: Dict[str, ClassInfoObj],
+    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj],
     search_obj: BaseSearchCV,
 ) -> BaseEstimator:
     """
@@ -119,7 +118,7 @@ def perform_sklearn_classifier_param_search(
 
 
 def train_sklearn_classifier(
-    cls_train_info: Dict[str, ClassInfoObj], sk_classifier: BaseEstimator
+    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj], sk_classifier: BaseEstimator
 ) -> (float, float):
     """
     This function trains the classifier.
@@ -209,11 +208,11 @@ def train_sklearn_classifier(
 
 
 def apply_sklearn_classifier(
-    cls_train_info: Dict[str, ClassInfoObj],
+    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj],
     sk_classifier: BaseEstimator,
     in_msk_img: str,
     img_msk_val: int,
-    img_file_info: List[ImageBandInfo],
+    img_file_info: List[rsgislib.imageutils.ImageBandInfo],
     out_class_img: str,
     gdalformat: str = "KEA",
     class_clr_names: bool = True,
@@ -425,7 +424,7 @@ def apply_sklearn_classifier_rat(
     clumps_img: str,
     variables: List[str],
     sk_classifier: BaseEstimator,
-    cls_train_info: Dict[str, ClassInfoObj],
+    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj],
     out_col_int: str = "OutClass",
     out_col_str: str = "OutClassName",
     roi_col: str = None,
