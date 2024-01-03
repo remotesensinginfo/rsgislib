@@ -119,26 +119,16 @@ To apply the multi-class classifier use the following function::
 Binary Classification Functions
 --------------------------------
 
-Train Classifier
-^^^^^^^^^^^^^^^^^^
 .. autofunction:: rsgislib.classification.classlightgbm.optimise_lightgbm_binary_classifier
 .. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_binary_classifier
 .. autofunction:: rsgislib.classification.classlightgbm.train_opt_lightgbm_binary_classifier
-
-Apply Classifier
-^^^^^^^^^^^^^^^^^^^^
 .. autofunction:: rsgislib.classification.classlightgbm.apply_lightgbm_binary_classifier
 
 
 Multi-Class Classification Functions
 -------------------------------------
 
-Train Classifier
-^^^^^^^^^^^^^^^^^^
 .. autofunction:: rsgislib.classification.classlightgbm.optimise_lightgbm_multiclass_classifier
 .. autofunction:: rsgislib.classification.classlightgbm.train_lightgbm_multiclass_classifier
 .. autofunction:: rsgislib.classification.classlightgbm.train_opt_lightgbm_multiclass_classifier
-
-Apply Classifier
-^^^^^^^^^^^^^^^^^^^^
 .. autofunction:: rsgislib.classification.classlightgbm.apply_lightgbm_multiclass_classifier
