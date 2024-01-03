@@ -834,14 +834,13 @@ def train_opt_lightgbm_binary_classifier(
             "min_child_weight": float(best_params[8]),
             "reg_alpha": float(best_params[9]),
             "reg_lambda": float(best_params[10]),
-            "scale_pos_weight": float(scale_pos_weight),
             "boost_from_average": True,
             "is_unbalance": unbalanced,
             "verbose": -1,
             "verbosity": -1,
         }
         if not unbalanced:
-            params["scale_pos_weight"] = scale_pos_weight
+            params["scale_pos_weight"] = float(scale_pos_weight)
     else:
         raise rsgislib.RSGISPyException(
             "Do not recognise or do not have implementation "
