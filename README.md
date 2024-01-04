@@ -3,8 +3,8 @@
 [![<remotesensinginfo>](https://circleci.com/gh/remotesensinginfo/rsgislib/tree/main.svg?style=shield)](https://app.circleci.com/pipelines/github/remotesensinginfo/rsgislib)
 [![codecov](https://codecov.io/gh/remotesensinginfo/rsgislib/branch/main/graph/badge.svg?token=EHTF2G1KCL)](https://codecov.io/gh/remotesensinginfo/rsgislib)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=remotesensinginfo_rsgislib&metric=bugs)](https://sonarcloud.io/summary/new_code?id=remotesensinginfo_rsgislib)
-[![Install](https://anaconda.org/conda-forge/rsgislib/badges/installer/conda.svg)](https://anaconda.org/conda-forge/rsgislib)
-  
+[![Install](https://anaconda.org/conda-forge/rsgislib/badges/version.svg)](https://anaconda.org/conda-forge/rsgislib)
+[![Downloads](https://anaconda.org/conda-forge/rsgislib/badges/downloads.svg)](https://anaconda.org/conda-forge/rsgislib)
   
 The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets.
 For more details see the project website: http://rsgislib.org/
