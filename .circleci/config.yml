@@ -48,7 +48,7 @@ jobs:
       - run:
          name: apt-get install
          command: |
-           sudo apt-get install -y gnupg
+          apt-get install -y gnupg
       - codecov/upload:
           file: pytest_reports/coverage.xml
       - sonarcloud/scan:
