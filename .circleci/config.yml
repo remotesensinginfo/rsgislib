@@ -2,7 +2,8 @@ version: 2.1
 
 orbs:
   codecov: codecov/codecov@3.3.0
-  aws-s3: circleci/aws-s3@3.1.1
+  aws-cli: circleci/aws-cli@4.1.2
+  aws-s3: circleci/aws-s3@4.0.0
 
 executors: #(1)
   exectr:
@@ -56,12 +57,13 @@ jobs:
             pip install matplotlib-scalebar
             cd doc/python
             sh run_doc_gen.sh
+      - aws-cli/setup:
+          aws_access_key_id: ${AWS_ACCESS_KEY_ID_RSGISLIB_WEB}
+          aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY_RSGISLIB_WEB}
+          region: ${AWS_REGION_RSGISLIB_WEB} 
       - aws-s3/sync:
           arguments: |
             --acl public-read
-          aws-access-key-id: AWS_ACCESS_KEY_ID_RSGISLIB_WEB
-          aws-region: AWS_REGION_RSGISLIB_WEB
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_RSGISLIB_WEB
           from: doc/python/html
           to: 's3://rsgislib.org/dev'
 
