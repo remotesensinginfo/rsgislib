@@ -52,8 +52,6 @@ jobs:
           apt-get install -y gnupg
       - codecov/upload:
           file: pytest_reports/coverage.xml
-      - sonarcloud/scan:
-          sonar_token_variable_name: SONAR_TOKEN 
       - run:
           name: build documentation
           command: |
