@@ -13,6 +13,7 @@ Text File I/O
 .. autofunction:: rsgislib.tools.utils.write_list_to_file
 .. autofunction:: rsgislib.tools.utils.write_data_to_file
 .. autofunction:: rsgislib.tools.utils.create_ascii_text_file
+.. autofunction:: rsgislib.tools.utils.prettify_xml_file
 
 
 JSON File I/O

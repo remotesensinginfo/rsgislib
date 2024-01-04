@@ -412,8 +412,8 @@ def read_gz_json_to_dict(input_file: str, encoding: str = "utf-8") -> Dict:
     """
     import gzip
 
-    with gzip.GzipFile(input_file, "r") as fin:
-        json_bytes = fin.read()
+    with gzip.GzipFile(input_file, "r") as f_in:
+        json_bytes = f_in.read()
 
     json_str = json_bytes.decode(encoding)
     data = json.loads(json_str)
@@ -675,7 +675,7 @@ def check_str(
     return str_val_tmp
 
 
-def create_ascii_text_file(input_file, output_file):
+def create_ascii_text_file(input_file:str, output_file:str):
     """
     A function which will ensure that an input text file will
     only have ascii characters. Non-ascii characters will be
@@ -1136,3 +1136,24 @@ def get_username_password(input_file: str) -> (str, str):
     username = decode_base64_text(in_data_lst[0])
     password = decode_base64_text(in_data_lst[1])
     return username, password
+
+
+def prettify_xml_file(input_file:str, output_file:str):
+    """
+     A function which prettifies an XML file - i.e.,
+     inserts new lines and tabs.
+
+    :param input_file: The input file path.
+    :param output_file: The output file path.
+
+    """
+    import xml.etree.ElementTree as ET
+
+    xml_str = read_text_file_no_new_lines(input_file)
+
+    xml_elements = ET.XML(xml_str)
+    ET.indent(xml_elements)
+    xml_str = ET.tostring(xml_elements, encoding='unicode')
+
+    write_data_to_file(xml_str, output_file)
+
