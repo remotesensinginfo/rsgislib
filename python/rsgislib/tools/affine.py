@@ -82,18 +82,20 @@ def cos_sin_deg(deg: float):
     angles.
     """
     deg = deg % 360.0
-    if deg == 90.0:
+
+    if math.isclose(deg, 90.0, rel_tol=1e-09, abs_tol=1e-09):
         return 0.0, 1.0
-    elif deg == 180.0:
+    elif math.isclose(deg, 180.0, rel_tol=1e-09, abs_tol=1e-09):
         return -1.0, 0
-    elif deg == 270.0:
+    elif math.isclose(deg, 270.0, rel_tol=1e-09, abs_tol=1e-09):
         return 0, -1.0
     rad = math.radians(deg)
     return math.cos(rad), math.sin(rad)
 
 
 class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))):
-    """Two dimensional affine transform for 2D linear mapping.
+    """
+    Two-dimensional affine transform for 2D linear mapping.
 
     Parameters
     ----------
@@ -437,7 +439,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         Which means that it will collapse a shape to an effective area
         of zero. Degenerate transforms cannot be inverted.
         """
-        return self.determinant == 0.0
+        return math.isclose(self.determinant, 0.0, rel_tol=1e-09, abs_tol=1e-09)
 
     @cached_property
     def is_proper(self) -> bool:

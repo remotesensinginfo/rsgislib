@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import math
+
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.model_selection import GridSearchCV
 
@@ -436,7 +438,7 @@ def apply_regress_sklearn_mdl(
 
             # Create the output data array
             out_vals = numpy.zeros([n_feats, otherargs.n_out_vars])
-            if otherargs.out_no_date_val != 0.0:
+            if math.isclose(otherargs.out_no_date_val, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                 out_vals[...] = otherargs.out_no_date_val
 
             # Copy the model outputs to the full array
@@ -459,7 +461,7 @@ def apply_regress_sklearn_mdl(
                 ],
                 dtype=numpy.float32,
             )
-            if otherargs.out_no_date_val != 0.0:
+            if math.isclose(otherargs.out_no_date_val, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                 out_img_vals[...] = otherargs.out_no_date_val
             outputs.out_img = out_img_vals
 

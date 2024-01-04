@@ -345,22 +345,22 @@ def calc_zonal_band_stats(
                     y1Sp = float(feat_bbox[3] - imgGeoTrans[3])
                     y2Sp = float(feat_bbox[2] - imgGeoTrans[3])
 
-                    if x1Sp == 0.0:
+                    if math.isclose(x1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         x1 = 0
                     else:
                         x1 = int(x1Sp / pixel_width) - 1
 
-                    if x2Sp == 0.0:
+                    if math.isclose(x2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         x2 = 0
                     else:
                         x2 = int(x2Sp / pixel_width) + 1
 
-                    if y1Sp == 0.0:
+                    if math.isclose(y1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         y1 = 0
                     else:
                         y1 = int(y1Sp / pixel_height) - 1
 
-                    if y2Sp == 0.0:
+                    if math.isclose(y2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         y2 = 0
                     else:
                         y2 = int(y2Sp / pixel_height) + 1
@@ -674,22 +674,22 @@ def calc_zonal_poly_pts_band_stats(
                     y1Sp = float(feat_bbox[3] - imgGeoTrans[3])
                     y2Sp = float(feat_bbox[2] - imgGeoTrans[3])
 
-                    if x1Sp == 0.0:
+                    if math.isclose(x1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         x1 = 0
                     else:
                         x1 = int(x1Sp / pixel_width) - 1
 
-                    if x2Sp == 0.0:
+                    if math.isclose(x2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         x2 = 0
                     else:
                         x2 = int(x2Sp / pixel_width) + 1
 
-                    if y1Sp == 0.0:
+                    if math.isclose(y1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         y1 = 0
                     else:
                         y1 = int(y1Sp / pixel_height) - 1
 
-                    if y2Sp == 0.0:
+                    if math.isclose(y2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         y2 = 0
                     else:
                         y2 = int(y2Sp / pixel_height) + 1
@@ -1076,22 +1076,22 @@ def calc_zonal_band_stats_test_poly_pts(
                     y1Sp = float(feat_bbox[3] - imgGeoTrans[3])
                     y2Sp = float(feat_bbox[2] - imgGeoTrans[3])
 
-                    if x1Sp == 0.0:
+                    if math.isclose(x1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         x1 = 0
                     else:
                         x1 = int(x1Sp / pixel_width) - 1
 
-                    if x2Sp == 0.0:
+                    if math.isclose(x2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         x2 = 0
                     else:
                         x2 = int(x2Sp / pixel_width) + 1
 
-                    if y1Sp == 0.0:
+                    if math.isclose(y1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         y1 = 0
                     else:
                         y1 = int(y1Sp / pixel_height) - 1
 
-                    if y2Sp == 0.0:
+                    if math.isclose(y2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         y2 = 0
                     else:
                         y2 = int(y2Sp / pixel_height) + 1
@@ -1535,12 +1535,12 @@ def ext_point_band_values(
                     x_pt_off = float(x_pt - imgGeoTrans[0])
                     y_pt_off = float(y_pt - imgGeoTrans[3])
 
-                    if x_pt_off == 0.0:
+                    if math.isclose(x_pt_off, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         x_pxl = 0
                     else:
                         x_pxl = int(math.floor(x_pt_off / pixel_width))
 
-                    if y_pt_off == 0.0:
+                    if math.isclose(y_pt_off, 0.0, rel_tol=1e-09, abs_tol=1e-09):
                         y_pxl = 0
                     else:
                         y_pxl = int(math.floor(y_pt_off / pixel_height))
