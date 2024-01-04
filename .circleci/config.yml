@@ -48,6 +48,7 @@ jobs:
       - run:
          name: apt-get install
          command: |
+          apt-get update
           apt-get install -y gnupg
       - codecov/upload:
           file: pytest_reports/coverage.xml
