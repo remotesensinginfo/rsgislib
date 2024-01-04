@@ -58,8 +58,8 @@ jobs:
             cd doc/python
             sh run_doc_gen.sh
       - aws-cli/setup:
-          aws_access_key_id: ${AWS_ACCESS_KEY_ID_RSGISLIB_WEB}
-          aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY_RSGISLIB_WEB}
+          aws_access_key_id: AWS_ACCESS_KEY_ID_RSGISLIB_WEB
+          aws_secret_access_key: AWS_SECRET_ACCESS_KEY_RSGISLIB_WEB
           region: ${AWS_REGION_RSGISLIB_WEB} 
       - aws-s3/sync:
           arguments: |
