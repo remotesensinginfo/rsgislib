@@ -107,6 +107,7 @@ def export_cols_to_gdal_img(
 
     .. code:: python
 
+       from rsgislib import rastergis
        clumps='RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'
        outimage='TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea'
        gdalformat = 'KEA'

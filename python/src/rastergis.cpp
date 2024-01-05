@@ -1832,6 +1832,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 ".. code:: python\n"
 "\n"
+"   from rsgislib import rastergis\n"
 "   clumps='./RATS/injune_p142_casi_sub_utm_clumps_elim_final_clumps_elim_final.kea'\n"
 "   output_img='./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea'\n"
 "   gdalformat = 'KEA'\n"
