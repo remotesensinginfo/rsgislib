@@ -35,7 +35,7 @@ jobs:
           name: Run tests.
           command: |
             mkdir -p pytest_reports/coverage
-            pytest -v python_tests --cov=/opt/miniconda/lib/python3.10/site-packages/rsgislib --cov-report=xml:pytest_reports/coverage.xml --cov-report=html:pytest_reports/coverage/ --junitxml=pytest_reports/junit.xml --html=pytest_reports/rsgisib_tests_report.html --self-contained-html
+            pytest -v python_tests --cov=/opt/miniconda/lib/python3.11/site-packages/rsgislib --cov-report=xml:pytest_reports/coverage.xml --cov-report=html:pytest_reports/coverage/ --junitxml=pytest_reports/junit.xml --html=pytest_reports/rsgisib_tests_report.html --self-contained-html
       - store_test_results:
           path: pytest_reports
       - store_artifacts:
