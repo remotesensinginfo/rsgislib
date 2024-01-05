@@ -3309,6 +3309,7 @@ def create_train_test_valid_smpls(
 
     """
     import geopandas
+
     print("Read Data:")
     smpl_pts_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
 

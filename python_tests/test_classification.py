@@ -459,6 +459,7 @@ def test_generate_stratified_random_accuracy_pts(tmp_path):
 
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
+
 def test_generate_stratified_random_accuracy_pts_pxllst(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -486,6 +487,7 @@ def test_generate_stratified_random_accuracy_pts_pxllst(tmp_path):
 
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
+
 def test_generate_stratified_prop_random_accuracy_pts(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -512,6 +514,7 @@ def test_generate_stratified_prop_random_accuracy_pts(tmp_path):
     n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
 
     assert os.path.exists(out_vec_file) and (n_pts > 0)
+
 
 def test_generate_random_accuracy_pts_clslut(tmp_path):
     import rsgislib.classification
@@ -567,6 +570,7 @@ def test_generate_stratified_random_accuracy_pts_clslut(tmp_path):
 
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
+
 def test_generate_stratified_random_accuracy_pts_pxllst_clslut(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -593,6 +597,7 @@ def test_generate_stratified_random_accuracy_pts_pxllst_clslut(tmp_path):
     n_pts = rsgislib.vectorutils.get_vec_feat_count(out_vec_file, out_vec_lyr)
 
     assert os.path.exists(out_vec_file) and (n_pts > 0)
+
 
 def test_generate_stratified_prop_random_accuracy_pts_clslut(tmp_path):
     import rsgislib.classification

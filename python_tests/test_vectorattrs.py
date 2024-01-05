@@ -700,3 +700,30 @@ def test_perform_spatial_join(tmp_path):
     )
 
     assert os.path.exists(out_vec_file)
+
+
+@pytest.mark.skipif(
+    (GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL),
+    reason="geopandas or rtree dependencies not available",
+)
+def test_create_angle_sets(tmp_path):
+    import rsgislib.vectorattrs
+
+    vec_file = os.path.join(VECTORATTRS_DATA_DIR, "aber_smpl_pts.geojson")
+    vec_lyr = "aber_smpl_pts"
+
+    out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
+    out_vec_lyr = "out_vec"
+    rsgislib.vectorattrs.create_angle_sets(
+        vec_file,
+        vec_lyr,
+        angle_col="angle",
+        start_angle=20,
+        angle_set_width=30,
+        out_vec_file=out_vec_file,
+        out_vec_lyr=out_vec_lyr,
+        out_format="GPKG",
+        out_angle_set_col="angle_set",
+    )
+
+    assert os.path.exists(out_vec_file)

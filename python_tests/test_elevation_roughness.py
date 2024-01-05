@@ -68,6 +68,7 @@ def test_calc_simple_roughness_profile_metrics(tmp_path):
         and (len(avg_rku_arr) == 3)
     )
 
+
 @pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_calc_simple_roughness_profile_metrics_plots(tmp_path):
     import rsgislib.elevation.roughness
@@ -154,6 +155,7 @@ def test_calc_munro_roughness_profile_metrics(tmp_path):
         and (len(avg_munro_z0_arr) == 3)
     )
 
+
 @pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_calc_munro_roughness_profile_metrics_plots(tmp_path):
     import rsgislib.elevation.roughness
@@ -238,6 +240,7 @@ def test_calc_smith_roughness_metrics(tmp_path):
         and (len(ys_smith_z0_arr) == 3)
         and (len(avg_smith_z0_arr) == 3)
     )
+
 
 def test_calc_smith_roughness_metrics_plots(tmp_path):
     import rsgislib.elevation.roughness

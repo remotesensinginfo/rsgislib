@@ -424,7 +424,6 @@ def test_apply_sklearn_classifier_rat(tmp_path):
     assert read_out_cls
 
 
-
 @pytest.mark.skipif(
     (H5PY_NOT_AVAIL or SKLEARN_NOT_AVAIL or BORUTASHAP_NOT_AVAIL or PANDAS_NOT_AVAIL),
     reason="h5py, BorutaShap, pandas or scikit-learn dependencies not available",

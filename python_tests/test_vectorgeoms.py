@@ -919,13 +919,13 @@ def test_create_angle_lines_from_points(tmp_path):
     vec_line_lyr = "out_vec"
 
     rsgislib.vectorgeoms.create_angle_lines_from_points(
-        vec_file = vec_pts_file,
-        vec_lyr = vec_pts_lyr,
-        angle = 10.0,
-        line_len = 1000,
-        out_vec_file = vec_line_file,
-        out_vec_lyr = vec_line_lyr,
-        out_format = "GeoJSON",
-        )
+        vec_file=vec_pts_file,
+        vec_lyr=vec_pts_lyr,
+        angle=10.0,
+        line_len=1000,
+        out_vec_file=vec_line_file,
+        out_vec_lyr=vec_line_lyr,
+        out_format="GeoJSON",
+    )
 
     assert os.path.exists(vec_line_file)

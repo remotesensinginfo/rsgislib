@@ -36,6 +36,7 @@ Calculate Column Values
 .. autofunction:: rsgislib.vectorattrs.add_geom_bbox_cols
 .. autofunction:: rsgislib.vectorattrs.add_unq_numeric_col
 .. autofunction:: rsgislib.vectorattrs.calc_npts_in_radius
+.. autofunction:: rsgislib.vectorattrs.create_angle_sets
 
 Get Column Summaries
 ----------------------

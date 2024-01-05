@@ -1469,10 +1469,15 @@ def create_random_pts_in_radius(
     x_coords = x_coords[sel_coords]
     y_coords = y_coords[sel_coords]
 
-    # create geopandas dataframe with the points.
+    # Create geopandas dataframe with the points.
     data_gdf = geopandas.GeoDataFrame(
         geometry=geopandas.points_from_xy(x=x_coords, y=y_coords), crs=epsg_code
     )
+
+    # Add coordinates as attributes to the points
+    data_gdf["x_coords"] = x_coords
+    data_gdf["y_coords"] = y_coords
+
     # Calculate the distance from the centre to each of the points
     data_gdf["dist"] = numpy.sqrt(
         (x_coords - centre_x) ** 2 + (y_coords - centre_y) ** 2

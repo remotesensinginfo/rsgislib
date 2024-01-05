@@ -722,6 +722,7 @@ def test_stretch_img(tmp_path):
 
     assert os.path.exists(output_img)
 
+
 @pytest.mark.skipif(
     True,
     reason="Sometimes stretch_img_with_stats freezes on MacOS and haven't figured out why yet...",

@@ -1371,3 +1371,115 @@ def rename_vec_cols(
         data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def create_angle_sets(
+    vec_file: str,
+    vec_lyr: str,
+    angle_col: str,
+    start_angle: int,
+    angle_set_width: int,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_angle_set_col: str = "angle_set",
+):
+    """
+    A function which creates sets of features based on an angle column. The
+    assumption is that the angle is from a fixed centre point. The angle sets
+    are mirrored so you can look at patterns along an angle.
+
+    :param vec_file: Input vector file path
+    :param vec_lyr: The input vector layer name.
+    :param angle_col: The name of the column within the vector layer with the angles
+                      the angles must be degrees (0-360)
+    :param start_angle: The angle to start the angle sets from.
+    :param angle_set_width: The width of the angle sets - must divide in 180.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name
+    :param out_format: The output vector file format (Default: GPKG)
+    :param out_angle_set_col: The column in the output file with the column sets.
+                              The column sets are specified by an integer ID (1 - n)
+
+    """
+    import geopandas
+    import numpy
+
+    if (180 % angle_set_width) != 0:
+        raise rsgislib.RSGISPyException(
+            "The angle_set_width should split into units of 180 (e.g., 10, 30, 45, 90)"
+        )
+    if (start_angle < 0) or (start_angle > 360):
+        raise rsgislib.RSGISPyException("The start_angle must be between 0 and 360")
+
+    angle_p1_base_sets = numpy.arange(0, 180, angle_set_width)
+    angle_p1_set_start = start_angle + angle_p1_base_sets
+
+    angle_p1_set_start[angle_p1_set_start > 360] = (
+        angle_p1_set_start[angle_p1_set_start > 360] - 360
+    )
+    angle_p1_set_start[angle_p1_set_start == 360] = 0
+    print(angle_p1_set_start)
+
+    angle_p1_set_end = angle_p1_set_start + angle_set_width
+
+    angle_p1_set_end[angle_p1_set_end > 360] = (
+        angle_p1_set_end[angle_p1_set_end > 360] - 360
+    )
+    angle_p1_set_end[angle_p1_set_end == 0] = 360
+    print(angle_p1_set_end)
+
+    angle_p2_set_start = angle_p1_set_start + 180
+    angle_p2_set_start[angle_p2_set_start > 360] = (
+        angle_p2_set_start[angle_p2_set_start > 360] - 360
+    )
+    angle_p2_set_start[angle_p2_set_start == 360] = 0
+    print(angle_p2_set_start)
+
+    angle_p2_set_end = angle_p1_set_end + 180
+    angle_p2_set_end[angle_p2_set_end > 360] = (
+        angle_p2_set_end[angle_p2_set_end > 360] - 360
+    )
+    angle_p2_set_end[angle_p2_set_end == 0] = 360
+    print(angle_p2_set_end)
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    angles_arr = data_gdf[angle_col].values
+
+    angle_set_arr = numpy.zeros_like(angles_arr, dtype=int)
+    for i, (s1_ang, e1_ang, s2_ang, e2_ang) in enumerate(
+        zip(angle_p1_set_start, angle_p1_set_end, angle_p2_set_start, angle_p2_set_end)
+    ):
+        print(f"{i}: {s1_ang} - {e1_ang} : {s2_ang} - {e2_ang}")
+        if s1_ang > e1_ang:
+            print(f"({s1_ang} < 360) and ({e1_ang} > 0)")
+            angle_set_arr[
+                numpy.logical_and((angles_arr >= s1_ang), (angles_arr <= 360))
+            ] = (i + 1)
+            angle_set_arr[
+                numpy.logical_and((angles_arr >= 0), (angles_arr < e1_ang))
+            ] = (i + 1)
+        else:
+            angle_set_arr[
+                numpy.logical_and((angles_arr >= s1_ang), (angles_arr < e1_ang))
+            ] = (i + 1)
+
+        if s2_ang > e2_ang:
+            print(f"({s2_ang} < 360) and ({e2_ang} > 0)")
+            angle_set_arr[
+                numpy.logical_and((angles_arr >= s2_ang), (angles_arr <= 360))
+            ] = (i + 1)
+            angle_set_arr[
+                numpy.logical_and((angles_arr >= 0), (angles_arr < e2_ang))
+            ] = (i + 1)
+        else:
+            angle_set_arr[
+                numpy.logical_and((angles_arr >= s2_ang), (angles_arr < e2_ang))
+            ] = (i + 1)
+
+    data_gdf[out_angle_set_col] = angle_set_arr
+
+    if out_format == "GPKG":
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
