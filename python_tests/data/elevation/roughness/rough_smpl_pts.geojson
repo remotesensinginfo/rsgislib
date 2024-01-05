@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "rough_smpl_pts",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::27700" } },
+"features": [
+{ "type": "Feature", "properties": { "xbox": 25, "ybox": 25 }, "geometry": { "type": "Point", "coordinates": [ 262494.396161690354347, 280494.671762573299929 ] } },
+{ "type": "Feature", "properties": { "xbox": 25, "ybox": 25 }, "geometry": { "type": "Point", "coordinates": [ 260426.212330238864524, 278160.479624702769797 ] } },
+{ "type": "Feature", "properties": { "xbox": 25, "ybox": 25 }, "geometry": { "type": "Point", "coordinates": [ 261678.972582921735011, 284268.911099065211602 ] } }
+]
+}
