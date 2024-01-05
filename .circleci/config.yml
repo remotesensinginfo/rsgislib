@@ -35,26 +35,17 @@ jobs:
           name: Run tests.
           command: |
             mkdir -p pytest_reports/coverage
-            pip install pytest-html coverage pytest-cov
-            pip install pysondb
-            pip install matplotlib-scalebar
             pytest -v python_tests --cov=/opt/miniconda/lib/python3.10/site-packages/rsgislib --cov-report=xml:pytest_reports/coverage.xml --cov-report=html:pytest_reports/coverage/ --junitxml=pytest_reports/junit.xml --html=pytest_reports/rsgisib_tests_report.html --self-contained-html
       - store_test_results:
           path: pytest_reports
       - store_artifacts:
           path: pytest_reports
           destination: pytest_reports
-      - run:
-          name: apt-get install
-          command: |
-            apt-get update
-            apt-get install -y gnupg
       - codecov/upload:
           file: pytest_reports/coverage.xml
       - run:
           name: build documentation
           command: |
-            pip install matplotlib-scalebar
             cd doc/python
             sh run_doc_gen.sh
       - aws-cli/setup:
@@ -66,7 +57,9 @@ jobs:
             --acl public-read
           from: doc/python/html
           to: 's3://rsgislib.org/dev'
-    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    # The resource_class feature allows configuring CPU and RAM resources for each job.
+    # Different resource classes are available for different executors.
+    # https://circleci.com/docs/2.0/configuration-reference/#resourceclass
     resource_class: large
 
 # Orchestrate our job run sequence
