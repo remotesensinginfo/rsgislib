@@ -4,6 +4,7 @@ orbs:
   codecov: codecov/codecov@3.3.0
   aws-cli: circleci/aws-cli@4.1.2
   aws-s3: circleci/aws-s3@4.0.0
+  sonarcloud: sonarsource/sonarcloud@2.0.0
 
 executors: #(1)
   exectr:
@@ -57,6 +58,8 @@ jobs:
             --acl public-read
           from: doc/python/html
           to: 's3://rsgislib.org/dev'
+      - sonarcloud/scan:
+          sonar_token_variable_name: SONAR_TOKEN
     # The resource_class feature allows configuring CPU and RAM resources for each job.
     # Different resource classes are available for different executors.
     # https://circleci.com/docs/2.0/configuration-reference/#resourceclass
