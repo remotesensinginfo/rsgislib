@@ -1827,7 +1827,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "   band_defns.append(rsgislib.imagecalc.BandDefn('b1', 'img1.kea', 1))\n"
 "   band_defns.append(rsgislib.imagecalc.BandDefn('b2', 'img2.kea', 1))\n"
 "   band_defns.append(rsgislib.imagecalc.BandDefn('b3', 'img3.kea', 2))\n"
-"   rsgislib.imagecalc.band_math('out.kea', ‘(b1==1) || (b2==1) || (b3==1)?1:0', 'KEA', rsgislib.TYPE_8UINT, band_defns)\n"
+"   rsgislib.imagecalc.band_math('out.kea', '(b1==1) || (b2==1) || (b3==1)?1:0', 'KEA', rsgislib.TYPE_8UINT, band_defns)\n"
 "\n\n"},
 
 {"image_math", (PyCFunction)ImageCalc_ImageMath, METH_VARARGS | METH_KEYWORDS,
