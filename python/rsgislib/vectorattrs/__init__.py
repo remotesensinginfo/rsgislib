@@ -1483,3 +1483,64 @@ def create_angle_sets(
         data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def export_vec_attrs_to_csv(vec_file: str, vec_lyr: str, output_file: str):
+    """
+    A function which exports the attribute table from a vector layer to
+    a CSV file.
+
+    :param vec_file: The input vector file path
+    :param vec_lyr: The input vector layer name
+    :param output_file: The output file path.
+
+    """
+    import geopandas
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gdf = data_gdf.drop(["geometry"], axis=1)
+    data_gdf.to_csv(output_file)
+
+
+def export_vec_attrs_to_excel(
+    vec_file: str, vec_lyr: str, output_file: str, out_sheet_name: str = "Sheet1"
+):
+    """
+    A function which exports the attribute table from a vector layer to
+    a Excel file (*.xlsx).
+
+    :param vec_file: The input vector file path
+    :param vec_lyr: The input vector layer name
+    :param output_file: The output file path.
+
+    """
+    import geopandas
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gdf = data_gdf.drop(["geometry"], axis=1)
+    data_gdf.to_excel(output_file, sheet_name=out_sheet_name, engine="xlsxwriter")
+
+
+def export_vec_attrs_to_parquet(
+    vec_file: str,
+    vec_lyr: str,
+    output_file: str,
+    gzip_output: bool = True,
+):
+    """
+    A function which exports the attribute table from a vector layer to
+    a parquet file.
+
+    :param vec_file: The input vector file path
+    :param vec_lyr: The input vector layer name
+    :param output_file: The output file path.
+
+    """
+    import geopandas
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gdf = data_gdf.drop(["geometry"], axis=1)
+    if gzip_output:
+        data_gdf.to_parquet(output_file, compression="gzip")
+    else:
+        data_gdf.to_parquet(output_file)

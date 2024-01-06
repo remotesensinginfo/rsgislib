@@ -19,6 +19,18 @@ try:
 except ImportError:
     RTREE_NOT_AVAIL = True
 
+PYARROW_NOT_AVAIL = False
+try:
+    import pyarrow
+except ImportError:
+    PYARROW_NOT_AVAIL = True
+
+XLSXWRITER_NOT_AVAIL = False
+try:
+    import xlsxwriter
+except ImportError:
+    XLSXWRITER_NOT_AVAIL = True
+
 
 def test_read_vec_column_IntCol():
     import rsgislib.vectorattrs
@@ -643,7 +655,7 @@ def test_find_replace_str_vec_lyr(tmp_path):
 
 
 @pytest.mark.skipif(
-    (GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL),
+    (GEOPANDAS_NOT_AVAIL or RTREE_NOT_AVAIL),
     reason="geopandas or rtree dependencies not available",
 )
 def test_perform_spatial_join_empty(tmp_path):
@@ -673,7 +685,7 @@ def test_perform_spatial_join_empty(tmp_path):
 
 
 @pytest.mark.skipif(
-    (GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL),
+    (GEOPANDAS_NOT_AVAIL or RTREE_NOT_AVAIL),
     reason="geopandas or rtree dependencies not available",
 )
 def test_perform_spatial_join(tmp_path):
@@ -703,8 +715,7 @@ def test_perform_spatial_join(tmp_path):
 
 
 @pytest.mark.skipif(
-    (GEOPANDAS_NOT_AVAIL and RTREE_NOT_AVAIL),
-    reason="geopandas or rtree dependencies not available",
+    (GEOPANDAS_NOT_AVAIL), reason="geopandas dependencies not available"
 )
 def test_create_angle_sets(tmp_path):
     import rsgislib.vectorattrs
@@ -727,3 +738,63 @@ def test_create_angle_sets(tmp_path):
     )
 
     assert os.path.exists(out_vec_file)
+
+
+@pytest.mark.skipif(
+    (GEOPANDAS_NOT_AVAIL), reason="geopandas dependencies not available"
+)
+def test_export_vec_attrs_to_csv(tmp_path):
+    import rsgislib.vectorattrs
+
+    vec_file = os.path.join(VECTORATTRS_DATA_DIR, "aber_smpl_pts.geojson")
+    vec_lyr = "aber_smpl_pts"
+
+    out_file = os.path.join(tmp_path, "out_file.csv")
+    rsgislib.vectorattrs.export_vec_attrs_to_csv(vec_file, vec_lyr, out_file)
+
+    assert os.path.exists(out_file)
+
+
+@pytest.mark.skipif(
+    (GEOPANDAS_NOT_AVAIL or XLSXWRITER_NOT_AVAIL), reason="geopandas or xlsxwriter dependencies not available"
+)
+def test_export_vec_attrs_to_excel(tmp_path):
+    import rsgislib.vectorattrs
+
+    vec_file = os.path.join(VECTORATTRS_DATA_DIR, "aber_smpl_pts.geojson")
+    vec_lyr = "aber_smpl_pts"
+
+    out_file = os.path.join(tmp_path, "out_file.xlsx")
+    rsgislib.vectorattrs.export_vec_attrs_to_excel(vec_file, vec_lyr, out_file)
+
+    assert os.path.exists(out_file)
+
+
+@pytest.mark.skipif(
+    (GEOPANDAS_NOT_AVAIL or PYARROW_NOT_AVAIL), reason="geopandas or pyarrow dependencies not available"
+)
+def test_export_vec_attrs_to_parquet(tmp_path):
+    import rsgislib.vectorattrs
+
+    vec_file = os.path.join(VECTORATTRS_DATA_DIR, "aber_smpl_pts.geojson")
+    vec_lyr = "aber_smpl_pts"
+
+    out_file = os.path.join(tmp_path, "out_file.parquet")
+    rsgislib.vectorattrs.export_vec_attrs_to_parquet(vec_file, vec_lyr, out_file)
+
+    assert os.path.exists(out_file)
+
+
+@pytest.mark.skipif(
+    (GEOPANDAS_NOT_AVAIL or PYARROW_NOT_AVAIL), reason="geopandas or pyarrow dependencies not available"
+)
+def test_export_vec_attrs_to_parquet_gzip(tmp_path):
+    import rsgislib.vectorattrs
+
+    vec_file = os.path.join(VECTORATTRS_DATA_DIR, "aber_smpl_pts.geojson")
+    vec_lyr = "aber_smpl_pts"
+
+    out_file = os.path.join(tmp_path, "out_file.parquet.gzip")
+    rsgislib.vectorattrs.export_vec_attrs_to_parquet(vec_file, vec_lyr, out_file)
+
+    assert os.path.exists(out_file)

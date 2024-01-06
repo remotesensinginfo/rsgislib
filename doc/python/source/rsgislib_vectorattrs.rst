@@ -55,6 +55,11 @@ Geometry Intersections
 .. autofunction:: rsgislib.vectorattrs.count_pt_intersects
 .. autofunction:: rsgislib.vectorattrs.annotate_vec_selection
 
+Export Attribute Table
+------------------------
+.. autofunction:: rsgislib.vectorattrs.export_vec_attrs_to_csv
+.. autofunction:: rsgislib.vectorattrs.export_vec_attrs_to_excel
+.. autofunction:: rsgislib.vectorattrs.export_vec_attrs_to_parquet
 
 * :ref:`genindex`
 * :ref:`modindex`
