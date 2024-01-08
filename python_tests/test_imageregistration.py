@@ -1,4 +1,11 @@
 import os
+import pytest
+
+GEOPANDAS_NOT_AVAIL = False
+try:
+    import geopandas
+except ImportError:
+    GEOPANDAS_NOT_AVAIL = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 IMGREG_DATA_DIR = os.path.join(DATA_DIR, "imageregistration")
@@ -128,6 +135,7 @@ def test_warp_with_gcps_with_gdal(tmp_path):
     )
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_add_vec_pts_as_gcps_to_img(tmp_path):
     import rsgislib.imageregistration
     import rsgislib.imageutils
@@ -151,4 +159,3 @@ def test_add_vec_pts_as_gcps_to_img(tmp_path):
     )
 
     assert os.path.exists(output_img) and rsgislib.imageutils.has_gcps(output_img)
-
