@@ -4,6 +4,7 @@ The tools.test_images module contains some functions to create images which can 
 used for testing other functions or generate example datasets
 
 """
+import os
 from typing import List
 import rsgislib
 
@@ -17,6 +18,7 @@ def create_random_int_img(
     gdalformat: str = "KEA",
     datatype: int = rsgislib.TYPE_8UINT,
     calc_stats: bool = True,
+    tmp_path:str = None,
 ):
     """
     A function which creates an image with pixels values randomly assigned from the
@@ -30,15 +32,25 @@ def create_random_int_img(
     :param gdalformat: the output image file format (Default: KEA)
     :param datatype: the output image data type (Default: rsgislib.TYPE_8UINT)
     :param calc_stats: calculate image statistics and pyramids
+    :param tmp_path: Can optionally provide a temporary path where a reference
+                     image will be created and then removed.
 
     """
     import numpy.random
     from rios import applier
 
     import rsgislib.imageutils
+    import rsgislib.tools.utils
+
+    uid_str = rsgislib.tools.utils.uid_generator()
+
+    if tmp_path is None:
+        tmp_path = ""
+
+    tmp_ref_img = os.path.join(tmp_path, f"tmp_ref_img_{uid_str}.kea")
 
     rsgislib.imageutils.create_blank_img_py(
-        output_img,
+        tmp_ref_img,
         n_bands,
         x_size,
         y_size,
@@ -47,7 +59,7 @@ def create_random_int_img(
         1,
         1,
         "",
-        gdalformat,
+        "KEA",
         datatype,
         options=[],
         no_data_val=0,
@@ -61,7 +73,7 @@ def create_random_int_img(
         progress_bar = cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
-    infiles.image = output_img
+    infiles.image = tmp_ref_img
     outfiles = applier.FilenameAssociations()
     outfiles.out_image = output_img
     otherargs = applier.OtherInputs()
@@ -86,3 +98,5 @@ def create_random_int_img(
         import rsgislib.rastergis
 
         rsgislib.rastergis.pop_rat_img_stats(output_img, True, True, True)
+
+    rsgislib.imageutils.delete_gdal_layer(tmp_ref_img)
