@@ -4,18 +4,19 @@ The tools.test_images module contains some functions to create images which can 
 used for testing other functions or generate example datasets
 
 """
+from typing import List
 import rsgislib
 
 
 def create_random_int_img(
-    output_img,
-    n_bands,
-    x_size,
-    y_size,
-    out_vals,
-    gdalformat="KEA",
-    datatype=rsgislib.TYPE_8UINT,
-    calc_stats=True,
+    output_img: str,
+    n_bands: int,
+    x_size: int,
+    y_size: int,
+    out_vals: List[int],
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_8UINT,
+    calc_stats: bool = True,
 ):
     """
     A function which creates an image with pixels values randomly assigned from the
@@ -36,7 +37,7 @@ def create_random_int_img(
 
     import rsgislib.imageutils
 
-    rsgislib.imageutils.createBlankImagePy(
+    rsgislib.imageutils.create_blank_img_py(
         output_img,
         n_bands,
         x_size,
