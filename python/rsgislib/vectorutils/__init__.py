@@ -2632,21 +2632,22 @@ def split_by_attribute(
                 c_gpdf["geometry"] = c_gpdf.buffer(0)
                 c_gpdf = c_gpdf.dissolve(by=split_col_name)
         # Write output to disk.
+        val_str = f"{val}"
         if multi_layers and (out_format == "GPKG"):
             if chk_lyr_names:
-                val = rsgislib.tools.utils.check_str(
-                    val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True
+                val_str = rsgislib.tools.utils.check_str(
+                    val_str, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True
                 )
-            c_gpdf.to_file(out_vec_file, layer=val, driver="GPKG")
+            c_gpdf.to_file(out_vec_file, layer=val_str, driver="GPKG")
         else:
             if chk_lyr_names:
-                val = rsgislib.tools.utils.check_str(
-                    val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True
+                val_str = rsgislib.tools.utils.check_str(
+                    val_str, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True
                 )
             out_vec_file = os.path.join(
-                out_file_path, "vec_{}.{}".format(val, out_file_ext)
+                out_file_path, "vec_{}.{}".format(val_str, out_file_ext)
             )
-            out_vec_lyr = "vec_{}".format(val)
+            out_vec_lyr = "vec_{}".format(val_str)
             if out_format == "GPKG":
                 c_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
             else:
