@@ -186,7 +186,7 @@ def test_train_xgboost_binary_classifier(tmp_path):
     )
 
     cls_params_file = os.path.join(CLASSIFICATION_DATA_DIR, "gxb_params_file.json")
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_xgboost_binary_classifier(
         out_mdl_file,
         cls_params_file,
@@ -229,7 +229,7 @@ def test_train_opt_xgboost_binary_classifier_skopt(tmp_path):
         CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
     )
 
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_opt_xgboost_binary_classifier(
         out_mdl_file,
         cls1_train_file,
@@ -275,7 +275,7 @@ def test_train_opt_xgboost_binary_classifier_bayesopt(tmp_path):
         CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
     )
 
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_opt_xgboost_binary_classifier(
         out_mdl_file,
         cls1_train_file,
@@ -321,7 +321,7 @@ def test_train_opt_xgboost_binary_classifier_optuna(tmp_path):
         CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
     )
 
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_opt_xgboost_binary_classifier(
         out_mdl_file,
         cls1_train_file,
@@ -368,7 +368,7 @@ def test_apply_xgboost_binary_classifier_bayesopt(tmp_path):
         CLASSIFICATION_DATA_DIR, "cls_grass_smpls_bal_test.h5"
     )
 
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_opt_xgboost_binary_classifier(
         out_mdl_file,
         cls1_train_file,
@@ -750,7 +750,7 @@ def test_train_xgboost_multiclass_classifier(tmp_path):
     cls_params_file = os.path.join(
         CLASSIFICATION_DATA_DIR, "gxb_mulcls_params_file.json"
     )
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_xgboost_multiclass_classifier(
         out_mdl_file, cls_params_file, cls_info_dict, n_threads=1, mdl_cls_obj=None
     )
@@ -831,7 +831,7 @@ def test_train_opt_xgboost_multiclass_classifier_skopt(tmp_path):
         blue=120,
     )
 
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
@@ -918,7 +918,7 @@ def test_train_opt_xgboost_multiclass_classifier_bayesopt(tmp_path):
         blue=120,
     )
 
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
@@ -1005,7 +1005,7 @@ def test_train_opt_xgboost_multiclass_classifier_optuna(tmp_path):
         blue=120,
     )
 
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
@@ -1093,7 +1093,7 @@ def test_apply_xgboost_multiclass_classifier_bayesopt(tmp_path):
         blue=120,
     )
 
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
@@ -1208,7 +1208,7 @@ def test_apply_xgboost_multiclass_classifier_bayesopt_rat(tmp_path):
         blue=120,
     )
 
-    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.h5")
+    out_mdl_file = os.path.join(tmp_path, "out_mdl_file.json")
     rsgislib.classification.classxgboost.train_opt_xgboost_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
