@@ -1,0 +1,14 @@
+{
+"type": "FeatureCollection",
+"name": "sen2_20210527_aber_subset_b123_gcp_pts",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::27700" } },
+"features": [
+{ "type": "Feature", "properties": { "x_match": 425774.0, "y_match": 5807643.0 }, "geometry": { "type": "Point", "coordinates": [ 257859.266956871113507, 281609.450045048899483 ] } },
+{ "type": "Feature", "properties": { "x_match": 427812.0, "y_match": 5806200.0 }, "geometry": { "type": "Point", "coordinates": [ 259880.183766476606252, 280138.027232012827881 ] } },
+{ "type": "Feature", "properties": { "x_match": 426696.0, "y_match": 5807867.0 }, "geometry": { "type": "Point", "coordinates": [ 258784.248517763073323, 281820.089410400483757 ] } },
+{ "type": "Feature", "properties": { "x_match": 425721.0, "y_match": 5806840.0 }, "geometry": { "type": "Point", "coordinates": [ 257795.159323938016314, 280806.578261172398925 ] } },
+{ "type": "Feature", "properties": { "x_match": 427160.0, "y_match": 5806090.0 }, "geometry": { "type": "Point", "coordinates": [ 259223.843715018650983, 280037.286665975116193 ] } },
+{ "type": "Feature", "properties": { "x_match": 247510.0, "y_match": 5806590.0 }, "geometry": { "type": "Point", "coordinates": [ 259581.014812788780546, 280531.831262887630146 ] } },
+{ "type": "Feature", "properties": { "x_match": 427458.0, "y_match": 5808833.0 }, "geometry": { "type": "Point", "coordinates": [ 259559.645601811091183, 282775.598415546293836 ] } }
+]
+}

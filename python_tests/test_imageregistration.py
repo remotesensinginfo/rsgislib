@@ -126,3 +126,29 @@ def test_warp_with_gcps_with_gdal(tmp_path):
         poly_order=2,
         use_multi_thread=False,
     )
+
+
+def test_add_vec_pts_as_gcps_to_img(tmp_path):
+    import rsgislib.imageregistration
+    import rsgislib.imageutils
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    vec_gcp_pts_file = os.path.join(
+        IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_gcp_pts.geojson"
+    )
+    vec_gcp_pts_lyr = "sen2_20210527_aber_subset_b123_gcp_pts"
+    output_img = os.path.join(tmp_path, "out_img.kea")
+
+    rsgislib.imageregistration.add_vec_pts_as_gcps_to_img(
+        input_img,
+        output_img,
+        vec_gcp_pts_file,
+        vec_gcp_pts_lyr,
+        gcp_x_col="x_match",
+        gcp_y_col="y_match",
+        gcp_z_col=None,
+        gcp_epsg=32630,
+    )
+
+    assert os.path.exists(output_img) and rsgislib.imageutils.has_gcps(output_img)
+
