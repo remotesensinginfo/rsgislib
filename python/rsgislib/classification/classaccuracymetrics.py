@@ -1673,7 +1673,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
 
 
 def summarise_multi_acc_ptonly_metrics(
-    acc_json_files: List, out_acc_json_sum_file: str
+    acc_json_files: List[str], out_acc_json_sum_file: str
 ):
     """
     A function which takes a list of JSON files outputted from the
@@ -1886,12 +1886,12 @@ def calc_sampled_acc_metrics(
     out_ref_usr_plot: str = None,
     out_ref_prod_plot: str = None,
     cls_colours: Dict[str, List[float]] = None,
-    y_plt_usr_min=None,
-    y_plt_usr_max=None,
-    y_plt_prod_min=None,
-    y_plt_prod_max=None,
+    y_plt_usr_min:float=None,
+    y_plt_usr_max:float=None,
+    y_plt_prod_min:float=None,
+    y_plt_prod_max:float=None,
     ref_line_clr: List = (0.0, 0.0, 0.0),
-    in_loop=False,
+    in_loop:bool=False,
 ):
     """
     A function which calculates users and producers accuracies for the inputted

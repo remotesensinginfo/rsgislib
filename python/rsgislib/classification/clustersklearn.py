@@ -42,6 +42,7 @@ from osgeo import gdal
 from rios.imagereader import ImageReader
 from rios.imagewriter import ImageWriter
 from sklearn.cluster import MiniBatchKMeans
+from sklearn.base import BaseEstimator
 
 import rsgislib
 import rsgislib.imageutils
@@ -49,16 +50,16 @@ import rsgislib.rastergis
 
 
 def img_pixel_sample_cluster(
-    input_img,
-    output_img,
-    gdalformat="KEA",
-    no_data_val=0,
-    n_img_smpl=100,
-    clusterer=MiniBatchKMeans(
+    input_img:str,
+    output_img:str,
+    gdalformat:str="KEA",
+    no_data_val:float=0,
+    n_img_smpl:int=100,
+    clusterer:BaseEstimator=MiniBatchKMeans(
         n_clusters=60, init="k-means++", max_iter=100, batch_size=100
     ),
-    calc_stats=True,
-    use_mean_shift_est_band_width=False,
+    calc_stats:bool=True,
+    use_mean_shift_est_band_width:bool=False,
 ):
     """
     A function which allows a clustering to be performed using the algorithms available
@@ -145,17 +146,17 @@ def img_pixel_sample_cluster(
 
 
 def img_pixel_tiled_cluster(
-    input_img,
-    output_img,
-    gdalformat="KEA",
-    no_data_val=0,
-    clusterer=MiniBatchKMeans(
+    input_img:str,
+    output_img:str,
+    gdalformat:str="KEA",
+    no_data_val:float=0,
+    clusterer:BaseEstimator=MiniBatchKMeans(
         n_clusters=60, init="k-means++", max_iter=100, batch_size=100
     ),
-    calc_stats=True,
-    use_mean_shift_est_band_width=False,
-    tile_x_size=200,
-    tile_y_size=200,
+    calc_stats:bool=True,
+    use_mean_shift_est_band_width:bool=False,
+    tile_x_size:int=200,
+    tile_y_size:int=200,
 ):
     """
     A function which allows a clustering to be performed using the algorithms available
@@ -235,15 +236,15 @@ def img_pixel_tiled_cluster(
 
 
 def img_pixel_cluster(
-    input_img,
-    output_img,
-    gdalformat="KEA",
-    no_data_val=0,
-    clusterer=MiniBatchKMeans(
+    input_img:str,
+    output_img:str,
+    gdalformat:str="KEA",
+    no_data_val:float=0,
+    clusterer:BaseEstimator=MiniBatchKMeans(
         n_clusters=60, init="k-means++", max_iter=100, batch_size=100
     ),
-    calc_stats=True,
-    use_mean_shift_est_band_width=False,
+    calc_stats:bool=True,
+    use_mean_shift_est_band_width:bool=False,
 ):
     """
     A function which allows a clustering to be performed using the algorithms available
@@ -332,7 +333,7 @@ def img_pixel_cluster(
 def cluster_sklearn_rat(
     clumps_img: str,
     variables: List[str],
-    sk_clusterer=MiniBatchKMeans(
+    sk_clusterer:BaseEstimator=MiniBatchKMeans(
         n_clusters=60, init="k-means++", max_iter=100, batch_size=100
     ),
     out_col: str = "OutClass",

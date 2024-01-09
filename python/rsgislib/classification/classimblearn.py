@@ -1,12 +1,14 @@
 #! /usr/bin/env python
 
+from typing import Dict
+
 import numpy
 
 import rsgislib
-
+import rsgislib.classification
 
 def imblearn_h5_io_smplr(
-    cls_in_info: dict, cls_out_info: dict, imblearn_obj, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], imblearn_obj, datatype: int = None
 ):
     """
     A function which uses imblearn sampling (over or under) instance from the
@@ -101,7 +103,7 @@ def imblearn_h5_io_smplr(
 
 
 def rand_oversample_smpls(
-    cls_in_info: dict, cls_out_info: dict, rnd_seed: int = 42, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], rnd_seed: int = 42, datatype: int = None
 ):
     """
     A function which uses random oversampling from the imbalanced-learn module
@@ -126,7 +128,7 @@ def rand_oversample_smpls(
     imblearn_h5_io_smplr(cls_in_info, cls_out_info, imblearn_obj, datatype=datatype)
 
 
-def smote_oversample_smpls(cls_in_info: dict, cls_out_info: dict, datatype: int = None):
+def smote_oversample_smpls(cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], datatype: int = None):
     """
     A function which uses SMOTE oversampling from the imbalanced-learn module
     to balance samples between all the classes. Note this function only works
@@ -151,7 +153,7 @@ def smote_oversample_smpls(cls_in_info: dict, cls_out_info: dict, datatype: int 
 
 
 def adasyn_oversample_smpls(
-    cls_in_info: dict, cls_out_info: dict, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], datatype: int = None
 ):
     """
     A function which uses ADASYN oversampling from the imbalanced-learn module
@@ -177,7 +179,7 @@ def adasyn_oversample_smpls(
 
 
 def borderline_smote_oversample_smpls(
-    cls_in_info: dict, cls_out_info: dict, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], datatype: int = None
 ):
     """
     A function which uses BorderlineSMOTE oversampling from the imbalanced-learn module
@@ -203,7 +205,7 @@ def borderline_smote_oversample_smpls(
 
 
 def cluster_centroid_undersample_smpls(
-    cls_in_info: dict, cls_out_info: dict, rnd_seed: int = 42, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], rnd_seed: int = 42, datatype: int = None
 ):
     """
     A function which uses ClusterCentroids undersampling from the imbalanced-learn
@@ -229,7 +231,7 @@ def cluster_centroid_undersample_smpls(
 
 
 def random_undersample_smpls(
-    cls_in_info: dict, cls_out_info: dict, rnd_seed: int = 42, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], rnd_seed: int = 42, datatype: int = None
 ):
     """
     A function which uses random undersampling from the imbalanced-learn
@@ -255,7 +257,7 @@ def random_undersample_smpls(
 
 
 def near_miss_undersample_smpls(
-    cls_in_info: dict, cls_out_info: dict, version=1, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], version:int=1, datatype: int = None
 ):
     """
     A function which uses NearMiss undersampling from the imbalanced-learn
@@ -281,7 +283,7 @@ def near_miss_undersample_smpls(
 
 
 def edited_near_neigh_undersample_smpls(
-    cls_in_info: dict, cls_out_info: dict, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], datatype: int = None
 ):
     """
     A function which uses EditedNearestNeighbours undersampling from the
@@ -306,7 +308,7 @@ def edited_near_neigh_undersample_smpls(
 
 
 def repeat_edited_near_neigh_undersample_smpls(
-    cls_in_info: dict, cls_out_info: dict, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], datatype: int = None
 ):
     """
     A function which uses RepeatedEditedNearestNeighbours undersampling from the
@@ -331,7 +333,7 @@ def repeat_edited_near_neigh_undersample_smpls(
 
 
 def all_knn_undersample_smpls(
-    cls_in_info: dict, cls_out_info: dict, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], datatype: int = None
 ):
     """
     A function which uses AllKNN undersampling from the imbalanced-learn
@@ -356,7 +358,7 @@ def all_knn_undersample_smpls(
 
 
 def condensed_near_neigh_undersample_smpls(
-    cls_in_info: dict, cls_out_info: dict, rnd_seed: int = 42, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], rnd_seed: int = 42, datatype: int = None
 ):
     """
     A function which uses CondensedNearestNeighbour undersampling from the
@@ -382,7 +384,7 @@ def condensed_near_neigh_undersample_smpls(
 
 
 def one_sided_sel_undersample_smpls(
-    cls_in_info: dict, cls_out_info: dict, rnd_seed: int = 42, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], rnd_seed: int = 42, datatype: int = None
 ):
     """
     A function which uses OneSidedSelection undersampling from the
@@ -408,7 +410,7 @@ def one_sided_sel_undersample_smpls(
 
 
 def neighbourhood_clean_undersample_smpls(
-    cls_in_info: dict, cls_out_info: dict, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], datatype: int = None
 ):
     """
     A function which uses NeighbourhoodCleaningRule undersampling from the
@@ -433,7 +435,7 @@ def neighbourhood_clean_undersample_smpls(
 
 
 def smoteenn_combined_sample_smpls(
-    cls_in_info: dict, cls_out_info: dict, rnd_seed: int = 42, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], rnd_seed: int = 42, datatype: int = None
 ):
     """
     A function which uses SMOTEENN combined under and over sampling from the
@@ -459,7 +461,7 @@ def smoteenn_combined_sample_smpls(
 
 
 def smotetomek_combined_sample_smpls(
-    cls_in_info: dict, cls_out_info: dict, rnd_seed: int = 42, datatype: int = None
+    cls_in_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], cls_out_info: Dict[str, rsgislib.classification.ClassSimpleInfoObj], rnd_seed: int = 42, datatype: int = None
 ):
     """
     A function which uses SMOTETomek combined under and over sampling from the
