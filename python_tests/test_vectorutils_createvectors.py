@@ -323,6 +323,7 @@ def test_create_wgs84_vector_grid_overlap(tmp_path):
     assert os.path.exists(out_vec_file)
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_create_random_pts_in_radius(tmp_path):
     import rsgislib.vectorutils.createvectors
     import rsgislib.vectorutils

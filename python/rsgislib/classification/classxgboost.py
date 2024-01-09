@@ -404,7 +404,7 @@ def train_xgboost_binary_classifier(
            * eval_metric
            * objective
 
-        :param out_mdl_file: The file path for the output xgboost (*.h5) model which
+        :param out_mdl_file: The file path for the output xgboost (*.json) model which
                              can be loaded to perform a classification.
         :param cls_params_file: The file path to the JSON file with the classifier
                                 parameters.
@@ -566,7 +566,7 @@ def train_opt_xgboost_binary_classifier(
     optimisation libraries. Before 5.1.0 skopt was the only option but this
     no longer appears to be maintained so the other options have been added.
 
-    :param out_mdl_file: The file path for the output xgboost (*.h5) model which
+    :param out_mdl_file: The file path for the output xgboost (*.json) model which
                          can be loaded to perform a classification.
     :param cls1_train_file: File path to the HDF5 file with the training samples
                             for class 1
@@ -1418,7 +1418,7 @@ def train_xgboost_multiclass_classifier(
 
     :param params_file: The file path to the JSON file with the classifier
                         parameters.
-    :param out_mdl_file: The file path for the output xgboost (*.h5) model which
+    :param out_mdl_file: The file path for the output xgboost (*.json) model which
                          can be loaded to perform a classification.
     :param cls_info_dict: a dict where the key is string with class name
                           of ClassInfoObj objects defining the training data.
@@ -1576,7 +1576,7 @@ def train_opt_xgboost_multiclass_classifier(
     optimisation libraries. Before 5.1.0 skopt was the only option but this
     no longer appears to be maintained so the other options have been added.
 
-    :param out_mdl_file: The file path for the output xgboost (*.h5) model which
+    :param out_mdl_file: The file path for the output xgboost (*.json) model which
                          can be loaded to perform a classification.
     :param cls_info_dict: a dict where the key is string with class name
                           of ClassInfoObj objects defining the training data.

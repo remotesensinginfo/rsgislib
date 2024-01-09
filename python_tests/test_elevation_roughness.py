@@ -8,10 +8,17 @@ try:
 except ImportError:
     MATPLOTLIB_NOT_AVAIL = True
 
+GEOPANDAS_NOT_AVAIL = False
+try:
+    import geopandas
+except ImportError:
+    GEOPANDAS_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "elevation")
 ROUGH_DATA_DIR = os.path.join(DATA_DIR, "roughness")
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_calc_simple_roughness_profile_metrics(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
@@ -69,7 +76,10 @@ def test_calc_simple_roughness_profile_metrics(tmp_path):
     )
 
 
-@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
+@pytest.mark.skipif(
+    (MATPLOTLIB_NOT_AVAIL or GEOPANDAS_NOT_AVAIL),
+    reason="matplotlib or geopandas dependency not available",
+)
 def test_calc_simple_roughness_profile_metrics_plots(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
@@ -107,6 +117,7 @@ def test_calc_simple_roughness_profile_metrics_plots(tmp_path):
     assert len(plot_imgs) == 3
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_calc_munro_roughness_profile_metrics(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
@@ -156,7 +167,10 @@ def test_calc_munro_roughness_profile_metrics(tmp_path):
     )
 
 
-@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
+@pytest.mark.skipif(
+    (MATPLOTLIB_NOT_AVAIL or GEOPANDAS_NOT_AVAIL),
+    reason="matplotlib or geopandas dependency not available",
+)
 def test_calc_munro_roughness_profile_metrics_plots(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
@@ -194,6 +208,7 @@ def test_calc_munro_roughness_profile_metrics_plots(tmp_path):
     assert len(plot_imgs) == 3
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_calc_smith_roughness_metrics(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
@@ -242,6 +257,10 @@ def test_calc_smith_roughness_metrics(tmp_path):
     )
 
 
+@pytest.mark.skipif(
+    (MATPLOTLIB_NOT_AVAIL or GEOPANDAS_NOT_AVAIL),
+    reason="matplotlib or geopandas dependency not available",
+)
 def test_calc_smith_roughness_metrics_plots(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
@@ -278,6 +297,7 @@ def test_calc_smith_roughness_metrics_plots(tmp_path):
     assert len(plot_imgs) == 3
 
 
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_calc_all_roughness_profile_metrics(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs

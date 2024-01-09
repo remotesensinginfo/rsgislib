@@ -756,7 +756,8 @@ def test_export_vec_attrs_to_csv(tmp_path):
 
 
 @pytest.mark.skipif(
-    (GEOPANDAS_NOT_AVAIL or XLSXWRITER_NOT_AVAIL), reason="geopandas or xlsxwriter dependencies not available"
+    (GEOPANDAS_NOT_AVAIL or XLSXWRITER_NOT_AVAIL),
+    reason="geopandas or xlsxwriter dependencies not available",
 )
 def test_export_vec_attrs_to_excel(tmp_path):
     import rsgislib.vectorattrs
@@ -771,7 +772,8 @@ def test_export_vec_attrs_to_excel(tmp_path):
 
 
 @pytest.mark.skipif(
-    (GEOPANDAS_NOT_AVAIL or PYARROW_NOT_AVAIL), reason="geopandas or pyarrow dependencies not available"
+    (GEOPANDAS_NOT_AVAIL or PYARROW_NOT_AVAIL),
+    reason="geopandas or pyarrow dependencies not available",
 )
 def test_export_vec_attrs_to_parquet(tmp_path):
     import rsgislib.vectorattrs
@@ -786,7 +788,8 @@ def test_export_vec_attrs_to_parquet(tmp_path):
 
 
 @pytest.mark.skipif(
-    (GEOPANDAS_NOT_AVAIL or PYARROW_NOT_AVAIL), reason="geopandas or pyarrow dependencies not available"
+    (GEOPANDAS_NOT_AVAIL or PYARROW_NOT_AVAIL),
+    reason="geopandas or pyarrow dependencies not available",
 )
 def test_export_vec_attrs_to_parquet_gzip(tmp_path):
     import rsgislib.vectorattrs
