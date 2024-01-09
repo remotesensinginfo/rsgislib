@@ -11,6 +11,7 @@ from rios import applier, cuiprogress, fileinfo
 import rsgislib
 import rsgislib.imageutils
 
+
 class RobustModel(object):
     def __init__(self, datetimes, num_years):
         self.T = 365.25

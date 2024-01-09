@@ -20,7 +20,7 @@ def test_create_random_int_img(tmp_path):
         gdalformat="KEA",
         datatype=rsgislib.TYPE_8UINT,
         calc_stats=True,
-        tmp_path = tmp_path,
+        tmp_path=tmp_path,
     )
 
     assert os.path.exists(output_img)

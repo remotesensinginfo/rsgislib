@@ -601,7 +601,7 @@ class CalcSmithRoughnessMetric(rsgislib.imagecalc.calc_pt_win_smpls.RSGISCalcSum
                     cmap=cm.coolwarm,
                     linewidth=0,
                     antialiased=False,
-                    )
+                )
                 ax3.set_title("Detrended Surface")
 
             else:

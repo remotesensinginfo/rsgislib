@@ -1886,12 +1886,12 @@ def calc_sampled_acc_metrics(
     out_ref_usr_plot: str = None,
     out_ref_prod_plot: str = None,
     cls_colours: Dict[str, List[float]] = None,
-    y_plt_usr_min:float=None,
-    y_plt_usr_max:float=None,
-    y_plt_prod_min:float=None,
-    y_plt_prod_max:float=None,
+    y_plt_usr_min: float = None,
+    y_plt_usr_max: float = None,
+    y_plt_prod_min: float = None,
+    y_plt_prod_max: float = None,
     ref_line_clr: List = (0.0, 0.0, 0.0),
-    in_loop:bool=False,
+    in_loop: bool = False,
 ):
     """
     A function which calculates users and producers accuracies for the inputted

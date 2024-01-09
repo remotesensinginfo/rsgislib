@@ -18,7 +18,7 @@ def create_random_int_img(
     gdalformat: str = "KEA",
     datatype: int = rsgislib.TYPE_8UINT,
     calc_stats: bool = True,
-    tmp_path:str = None,
+    tmp_path: str = None,
 ):
     """
     A function which creates an image with pixels values randomly assigned from the

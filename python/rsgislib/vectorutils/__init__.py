@@ -2636,13 +2636,21 @@ def split_by_attribute(
         if multi_layers and (out_format == "GPKG"):
             if chk_lyr_names:
                 val_str = rsgislib.tools.utils.check_str(
-                    val_str, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True
+                    val_str,
+                    rm_non_ascii=True,
+                    rm_dashs=True,
+                    rm_spaces=False,
+                    rm_punc=True,
                 )
             c_gpdf.to_file(out_vec_file, layer=val_str, driver="GPKG")
         else:
             if chk_lyr_names:
                 val_str = rsgislib.tools.utils.check_str(
-                    val_str, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True
+                    val_str,
+                    rm_non_ascii=True,
+                    rm_dashs=True,
+                    rm_spaces=False,
+                    rm_punc=True,
                 )
             out_vec_file = os.path.join(
                 out_file_path, "vec_{}.{}".format(val_str, out_file_ext)

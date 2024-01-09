@@ -675,7 +675,7 @@ def check_str(
     return str_val_tmp
 
 
-def create_ascii_text_file(input_file:str, output_file:str):
+def create_ascii_text_file(input_file: str, output_file: str):
     """
     A function which will ensure that an input text file will
     only have ascii characters. Non-ascii characters will be
@@ -1138,7 +1138,7 @@ def get_username_password(input_file: str) -> (str, str):
     return username, password
 
 
-def prettify_xml_file(input_file:str, output_file:str):
+def prettify_xml_file(input_file: str, output_file: str):
     """
      A function which prettifies an XML file - i.e.,
      inserts new lines and tabs.
@@ -1153,7 +1153,6 @@ def prettify_xml_file(input_file:str, output_file:str):
 
     xml_elements = ET.XML(xml_str)
     ET.indent(xml_elements)
-    xml_str = ET.tostring(xml_elements, encoding='unicode')
+    xml_str = ET.tostring(xml_elements, encoding="unicode")
 
     write_data_to_file(xml_str, output_file)
-

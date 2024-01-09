@@ -118,7 +118,8 @@ def perform_sklearn_classifier_param_search(
 
 
 def train_sklearn_classifier(
-    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj], sk_classifier: BaseEstimator
+    cls_train_info: Dict[str, rsgislib.classification.ClassInfoObj],
+    sk_classifier: BaseEstimator,
 ) -> (float, float):
     """
     This function trains the classifier.

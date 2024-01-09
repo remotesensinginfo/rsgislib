@@ -3374,14 +3374,14 @@ def rm_polys_area(
 
 
 def create_angle_lines_from_points(
-        vec_file: str,
-        vec_lyr: str,
-        angle: float,
-        line_len: float,
-        out_vec_file: str,
-        out_vec_lyr: str,
-        out_format: str,
-        ):
+    vec_file: str,
+    vec_lyr: str,
+    angle: float,
+    line_len: float,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str,
+):
     """
     A function which calculates a set of points for each point within the input
     vector layer (which needs to be a points geometry layer) creating a set of
@@ -3417,8 +3417,9 @@ def create_angle_lines_from_points(
             line_angle_rad = math.radians(line_angle)
             end_x = pt.x + (line_len * math.cos(line_angle_rad))
             end_y = pt.y + (line_len * math.sin(line_angle_rad))
-            shp_line = shapely.geometry.LineString([pt,
-                                                    shapely.geometry.Point(end_x, end_y)])
+            shp_line = shapely.geometry.LineString(
+                [pt, shapely.geometry.Point(end_x, end_y)]
+            )
             lines_dict["pt_id"].append(i)
             lines_dict["geometry"].append(shp_line)
 
@@ -3428,4 +3429,3 @@ def create_angle_lines_from_points(
         out_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         out_gdf.to_file(out_vec_file, driver=out_format)
-

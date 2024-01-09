@@ -561,15 +561,15 @@ def get_num_samples(in_h5_file: str) -> int:
 
 
 def split_sample_train_valid_test(
-    in_h5_file:str,
-    train_h5_file:str,
-    valid_h5_file:str,
-    test_h5_file:str,
-    test_sample:int,
-    valid_sample:int,
-    train_sample:int=None,
-    rnd_seed:int=42,
-    datatype:int=None,
+    in_h5_file: str,
+    train_h5_file: str,
+    valid_h5_file: str,
+    test_h5_file: str,
+    test_sample: int,
+    valid_sample: int,
+    train_sample: int = None,
+    rnd_seed: int = 42,
+    datatype: int = None,
 ):
     """
     A function to split a HDF5 samples file into three (i.e., Training, Validation
@@ -653,18 +653,16 @@ def split_sample_train_valid_test(
     rsgislib.tools.filetools.delete_file_silent(tmp_train_valid_sample_file)
 
 
-
-
 def split_chip_sample_train_valid_test(
-        in_h5_file: str,
-        train_h5_file: str,
-        valid_h5_file: str,
-        test_h5_file: str,
-        test_sample: int,
-        valid_sample: int,
-        train_sample: int = None,
-        rnd_seed: int = 42,
-        datatype: int = None,
+    in_h5_file: str,
+    train_h5_file: str,
+    valid_h5_file: str,
+    test_h5_file: str,
+    test_sample: int,
+    valid_sample: int,
+    train_sample: int = None,
+    rnd_seed: int = 42,
+    datatype: int = None,
 ):
     """
     A function to split a chip HDF5 samples file (from rsgislib.zonalstats.extract_chip_zone_image_band_values_to_hdf)
@@ -743,15 +741,15 @@ def split_chip_sample_train_valid_test(
 
 
 def split_chip_sample_ref_train_valid_test(
-        in_h5_file: str,
-        train_h5_file: str,
-        valid_h5_file: str,
-        test_h5_file: str,
-        test_sample: int,
-        valid_sample: int,
-        train_sample: int = None,
-        rnd_seed: int = 42,
-        datatype: int = None,
+    in_h5_file: str,
+    train_h5_file: str,
+    valid_h5_file: str,
+    test_h5_file: str,
+    test_sample: int,
+    valid_sample: int,
+    train_sample: int = None,
+    rnd_seed: int = 42,
+    datatype: int = None,
 ):
     """
     A function to split a chip HDF5 samples file (from rsgislib.zonalstats.extract_chip_zone_image_band_values_to_hdf)
@@ -830,7 +828,7 @@ def split_chip_sample_ref_train_valid_test(
     rsgislib.tools.filetools.delete_file_silent(tmp_train_valid_sample_file)
 
 
-def flip_chip_hdf5_file(input_h5_file:str, output_h5_file:str, datatype:int=None):
+def flip_chip_hdf5_file(input_h5_file: str, output_h5_file: str, datatype: int = None):
     """
     A function which flips each sample in both the x and y axis. So the
     output file will have double the number of samples as the input file.
@@ -991,14 +989,14 @@ def flip_ref_chip_hdf5_file(input_h5_file, output_h5_file, datatype=None):
 
 
 def label_pxl_sample_chips(
-    sample_pxls_img:str,
-    cls_msk_img:str,
-    out_image:str,
-    gdalformat:str,
-    chip_size:int,
-    cls_lut:Dict[int, float],
-    sample_pxl_img_band:int=1,
-    cls_msk_img_band:int=1,
+    sample_pxls_img: str,
+    cls_msk_img: str,
+    out_image: str,
+    gdalformat: str,
+    chip_size: int,
+    cls_lut: Dict[int, float],
+    sample_pxl_img_band: int = 1,
+    cls_msk_img_band: int = 1,
 ):
     """
     A function which labels image pixels based on the proportions of a class within a chip around the
@@ -1117,12 +1115,12 @@ def label_pxl_sample_chips(
 
 
 def plot_train_data(
-    cls1_h5_file:str,
-    cls2_h5_file:str,
-    out_plots_dir:str,
-    cls1_name:str="Class 1",
-    cls2_name:str="Class 2",
-    var_names:List[str]=None,
+    cls1_h5_file: str,
+    cls2_h5_file: str,
+    out_plots_dir: str,
+    cls1_name: str = "Class 1",
+    cls2_name: str = "Class 2",
+    var_names: List[str] = None,
 ):
     """
     A function which plots the training data (in HDF5 format) for two classes with histograms for the

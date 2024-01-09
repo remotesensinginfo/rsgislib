@@ -247,8 +247,8 @@ def calc_pt_smpl_img_vals(
         roi_x_coords = pt_img_bound_bbox[1] - pt_img_bound_bbox[0]
         roi_y_coords = pt_img_bound_bbox[3] - pt_img_bound_bbox[2]
 
-        roi_width = int(math.ceil((roi_x_coords / img_x_res)+0.5))
-        roi_height = int(math.ceil((roi_y_coords / img_y_res_abs)+0.5))
+        roi_width = int(math.ceil((roi_x_coords / img_x_res) + 0.5))
+        roi_height = int(math.ceil((roi_y_coords / img_y_res_abs) + 0.5))
 
         roi_img_ds_obj = gdal_driver.Create(
             "MEM", roi_width, roi_height, img_n_bands, img_gdal_dtype
