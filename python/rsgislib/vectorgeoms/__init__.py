@@ -2555,12 +2555,74 @@ def clip_vec_lyr(
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     roi_gpdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
 
-    cliped_gpdf = geopandas.clip(base_gpdf, roi_gpdf, keep_geom_type=True)
+    clipped_gpdf = geopandas.clip(base_gpdf, roi_gpdf, keep_geom_type=True)
 
     if out_format == "GPKG":
-        cliped_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        clipped_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        cliped_gpdf.to_file(out_vec_file, driver=out_format)
+        clipped_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def clip_and_merge_with_roi(
+    vec_file: str,
+    vec_lyr: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    ref_col_name: str = "ref_bkgrd",
+    roi_rgn_val: int = 0,
+    data_rgn_val: int = 1,
+):
+    """
+    This function clips the input vector layer (vec_file) using the region
+    of interest (ROI; vec_roi_file) and merges the clipped vector with the ROI.
+    The input layers should both be polygon layers.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_roi_file: Input vector file defining the ROI polygon(s)
+    :param vec_roi_lyr: Input vector layer within the roi input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: Output file format (Ddefault: GPKG).
+    :param ref_col_name: The name of a column which is added to the output vector
+                         layer to indicate which features are from the background
+                         ROI and those from the input vector layer (Default: ref_bkgrd)
+    :param roi_rgn_val: The value to indicate polygons which relate to the background
+                        region of interest (Default: 0).
+    :param data_rgn_val: The value to indicate polygons which relate to the input data
+                         (Default: 1).
+
+    """
+    import geopandas
+    import pandas
+    import rsgislib.tools.filetools
+
+    print("Reading Data...")
+    roi_gdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
+    roi_gdf[ref_col_name] = roi_rgn_val
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gdf[ref_col_name] = data_rgn_val
+    print("Read Data")
+
+    print("Clip Data")
+    clipped_data_gdf = data_gdf.clip(roi_gdf, keep_geom_type=True)
+
+    print("Merge ROI with Data")
+    roi_diff_gdf = geopandas.overlay(roi_gdf, clipped_data_gdf, how="difference")
+    out_data_gdf = pandas.concat([clipped_data_gdf, roi_diff_gdf])
+
+    print("Export")
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                out_vec_file, check_valid=True
+            )
+        out_data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        out_data_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def get_geom_pts(geom: ogr.Geometry, pts_lst: List = None) -> List:
@@ -3411,7 +3473,6 @@ def create_angle_lines_from_points(
     lines_dict["geometry"] = list()
     for i, row in tqdm.tqdm(pts_gdf.iterrows(), total=n_pt_smpls):
         pt = row["geometry"]
-        pt_lst = [pt.x, pt.y]
 
         for line_angle in line_angles:
             line_angle_rad = math.radians(line_angle)

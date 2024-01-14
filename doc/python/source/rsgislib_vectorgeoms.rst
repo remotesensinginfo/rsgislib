@@ -14,6 +14,8 @@ Convert Geometries
 
 Calculate New Geometries
 ------------------------
+.. autofunction:: rsgislib.vectorgeoms.clip_vec_lyr
+.. autofunction:: rsgislib.vectorgeoms.clip_and_merge_with_roi
 .. autofunction:: rsgislib.vectorgeoms.create_alpha_shape
 .. autofunction:: rsgislib.vectorgeoms.calc_poly_centroids
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_intersection_gp
@@ -23,7 +25,6 @@ Calculate New Geometries
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_union_gp
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_intersection
 .. autofunction:: rsgislib.vectorgeoms.vec_lyr_difference
-.. autofunction:: rsgislib.vectorgeoms.clip_vec_lyr
 .. autofunction:: rsgislib.vectorgeoms.buffer_vec_layer_gp
 .. autofunction:: rsgislib.vectorgeoms.split_vec_by_grid
 .. autofunction:: rsgislib.vectorgeoms.split_lines_to_reg_pts
