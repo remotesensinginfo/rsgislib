@@ -648,35 +648,35 @@ def create_poly_vec_bboxs(
 
         if os.path.exists(vec_file) and (not overwrite):
             # Open the output file.
-            outDataSource = gdal.OpenEx(vec_file, gdal.GA_Update)
+            out_data_source = gdal.OpenEx(vec_file, gdal.GA_Update)
         else:
             # Create the output Driver
-            outDriver = ogr.GetDriverByName(out_format)
+            out_driver = ogr.GetDriverByName(out_format)
             # Create the output vector file
-            outDataSource = outDriver.CreateDataSource(vec_file)
+            out_data_source = out_driver.CreateDataSource(vec_file)
 
         # create the spatial reference
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(int(epsg_code))
-        outLayer = outDataSource.CreateLayer(vec_lyr, srs, geom_type=ogr.wkbPolygon)
+        out_layer = out_data_source.CreateLayer(vec_lyr, srs, geom_type=ogr.wkbPolygon)
 
-        addAtts = False
+        add_atts = False
         if (atts is not None) and (att_types is not None):
-            nAtts = 0
+            n_atts = 0
             if not "names" in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "names"'
                 )
-            nAtts = len(att_types["names"])
+            n_atts = len(att_types["names"])
             if not "types" in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "types"'
                 )
-            if nAtts != len(att_types["types"]):
+            if n_atts != len(att_types["types"]):
                 raise rsgislib.RSGISPyException(
                     'attTypes "names" and "types" lists must be the same length.'
                 )
-            for i in range(nAtts):
+            for i in range(n_atts):
                 if att_types["names"][i] not in atts:
                     raise rsgislib.RSGISPyException(
                         '"{}" is not within atts'.format(att_types["names"][i])
@@ -688,13 +688,13 @@ def create_poly_vec_bboxs(
                         )
                     )
 
-            for i in range(nAtts):
+            for i in range(n_atts):
                 field_defn = ogr.FieldDefn(att_types["names"][i], att_types["types"][i])
-                if outLayer.CreateField(field_defn) != 0:
+                if out_layer.CreateField(field_defn) != 0:
                     raise rsgislib.RSGISPyException(
                         "Creating '" + att_types["names"][i] + "' field failed.\n"
                     )
-            addAtts = True
+            add_atts = True
         elif not ((atts is None) and (att_types is None)):
             raise rsgislib.RSGISPyException(
                 "If atts or attTypes is not None then the other should also not be "
@@ -702,13 +702,13 @@ def create_poly_vec_bboxs(
             )
 
         # Get the output Layer's Feature Definition
-        featureDefn = outLayer.GetLayerDefn()
+        feature_defn = out_layer.GetLayerDefn()
 
-        openTransaction = False
+        open_transaction = False
         for n in range(len(bboxs)):
-            if not openTransaction:
-                outLayer.StartTransaction()
-                openTransaction = True
+            if not open_transaction:
+                out_layer.StartTransaction()
+                open_transaction = True
 
             bbox = bboxs[n]
             # Create Linear Ring
@@ -722,24 +722,24 @@ def create_poly_vec_bboxs(
             poly = ogr.Geometry(ogr.wkbPolygon)
             poly.AddGeometry(ring)
             # Add to output shapefile.
-            outFeature = ogr.Feature(featureDefn)
-            outFeature.SetGeometry(poly)
-            if addAtts:
+            out_feature = ogr.Feature(feature_defn)
+            out_feature.SetGeometry(poly)
+            if add_atts:
                 # Add Attributes
-                for i in range(nAtts):
-                    outFeature.SetField(
+                for i in range(n_atts):
+                    out_feature.SetField(
                         att_types["names"][i], atts[att_types["names"][i]][n]
                     )
-            outLayer.CreateFeature(outFeature)
-            outFeature = None
-            if ((n % 20000) == 0) and openTransaction:
-                outLayer.CommitTransaction()
-                openTransaction = False
+            out_layer.CreateFeature(out_feature)
+            out_feature = None
+            if ((n % 20000) == 0) and open_transaction:
+                out_layer.CommitTransaction()
+                open_transaction = False
 
-        if openTransaction:
-            outLayer.CommitTransaction()
-            openTransaction = False
-        outDataSource = None
+        if open_transaction:
+            out_layer.CommitTransaction()
+            open_transaction = False
+        out_data_source = None
     except Exception as e:
         raise e
 
