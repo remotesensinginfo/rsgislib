@@ -2572,6 +2572,7 @@ def clip_and_merge_with_roi(
     out_vec_lyr: str,
     out_format: str = "GPKG",
     dissolve_lyr: bool = False,
+    explode_rslt_lyr: bool = False,
     ref_col_name: str = "ref_bkgrd",
     roi_rgn_val: int = 0,
     data_rgn_val: int = 1,
@@ -2616,10 +2617,15 @@ def clip_and_merge_with_roi(
     if dissolve_lyr:
         print("Dissolving Layer")
         clipped_data_gdf = clipped_data_gdf.dissolve(ref_col_name)
+        clipped_data_gdf[ref_col_name] = data_rgn_val
 
     print("Merge ROI with Data")
     roi_diff_gdf = geopandas.overlay(roi_gdf, clipped_data_gdf, how="difference")
     out_data_gdf = pandas.concat([clipped_data_gdf, roi_diff_gdf])
+
+    if explode_rslt_lyr:
+        print("Exploding Results Layer")
+        out_data_gdf = out_data_gdf.explode()
 
     print("Export")
     if out_format == "GPKG":
