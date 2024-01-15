@@ -2571,6 +2571,7 @@ def clip_and_merge_with_roi(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
+    dissolve_lyr: bool = False,
     ref_col_name: str = "ref_bkgrd",
     roi_rgn_val: int = 0,
     data_rgn_val: int = 1,
@@ -2587,6 +2588,8 @@ def clip_and_merge_with_roi(
     :param out_vec_file: Output vector file
     :param out_vec_lyr: Output vector layer name.
     :param out_format: Output file format (Default: GPKG).
+    :param dissolve_lyr: After clipping the input vec_lyr the layer can optionally be
+                         dissolved - which would merge all neighbouring polygons.
     :param ref_col_name: The name of a column which is added to the output vector
                          layer to indicate which features are from the background
                          ROI and those from the input vector layer (Default: ref_bkgrd)
@@ -2609,6 +2612,10 @@ def clip_and_merge_with_roi(
 
     print("Clip Data")
     clipped_data_gdf = data_gdf.clip(roi_gdf, keep_geom_type=True)
+
+    if dissolve_lyr:
+        print("Dissolving Layer")
+        clipped_data_gdf = clipped_data_gdf.dissolve(ref_col_name)
 
     print("Merge ROI with Data")
     roi_diff_gdf = geopandas.overlay(roi_gdf, clipped_data_gdf, how="difference")
@@ -3559,3 +3566,39 @@ def create_bbox_vec_lyr(
         bbox_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         bbox_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def vec_lyr_dissolve(
+    vec_file: str,
+    vec_lyr: str,
+    vec_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which dissolves a vector layer using a variable within the
+    attribute table.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_col: The column within the attribute table with the variable
+                    to dissolve on. The variable must be categorical.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: Output file format (Default: GPKG).
+
+    """
+    import geopandas
+
+    print("Reading Data")
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    print("Running Dissolve")
+    dis_data_gdf = data_gdf.dissolve(vec_col)
+
+    print("Export")
+    if out_format == "GPKG":
+        dis_data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        dis_data_gdf.to_file(out_vec_file, driver=out_format)
