@@ -36,6 +36,7 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_bbox
 .. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_polys
 
+
 Vector I/O
 ----------------
 .. autofunction:: rsgislib.vectorutils.open_gdal_vec_lyr

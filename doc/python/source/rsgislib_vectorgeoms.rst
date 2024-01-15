@@ -29,6 +29,7 @@ Calculate New Geometries
 .. autofunction:: rsgislib.vectorgeoms.split_vec_by_grid
 .. autofunction:: rsgislib.vectorgeoms.split_lines_to_reg_pts
 .. autofunction:: rsgislib.vectorgeoms.create_angle_lines_from_points
+.. autofunction:: rsgislib.vectorgeoms.create_bbox_vec_lyr
 
 Edit Geometries
 -----------------

@@ -2586,7 +2586,7 @@ def clip_and_merge_with_roi(
     :param vec_roi_lyr: Input vector layer within the roi input file.
     :param out_vec_file: Output vector file
     :param out_vec_lyr: Output vector layer name.
-    :param out_format: Output file format (Ddefault: GPKG).
+    :param out_format: Output file format (Default: GPKG).
     :param ref_col_name: The name of a column which is added to the output vector
                          layer to indicate which features are from the background
                          ROI and those from the input vector layer (Default: ref_bkgrd)
@@ -3490,3 +3490,47 @@ def create_angle_lines_from_points(
         out_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         out_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def create_bbox_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which creates a new vector layer with a single polygon
+    representing the bounding box (BBOX) / Envelope of the input
+    vector layer.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: Output file format (Default: GPKG).
+
+    """
+    import geopandas
+    from shapely.geometry import Polygon
+
+    in_vec_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    x_min, y_min, x_max, y_max = in_vec_gdf.total_bounds
+
+    polygons = [
+        Polygon(
+            [
+                (x_min, y_min),
+                (x_min, y_max),
+                (x_max, y_max),
+                (x_max, y_min),
+            ]
+        )
+    ]
+    bbox_gdf = geopandas.GeoDataFrame({"geometry": polygons})
+    bbox_gdf = bbox_gdf.set_crs(in_vec_gdf.crs, allow_override=True)
+
+    if out_format == "GPKG":
+        bbox_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        bbox_gdf.to_file(out_vec_file, driver=out_format)

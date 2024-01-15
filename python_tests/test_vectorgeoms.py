@@ -929,3 +929,53 @@ def test_create_angle_lines_from_points(tmp_path):
     )
 
     assert os.path.exists(vec_line_file)
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_create_bbox_vec_lyr(tmp_path):
+    import rsgislib.vectorgeoms
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_lyr = "aber_osgb_multi_polys"
+
+    out_vec_file = os.path.join(tmp_path, "bbox_lyr.gpkg")
+    out_vec_lyr = "bbox_lyr"
+
+    rsgislib.vectorgeoms.create_bbox_vec_lyr(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+    )
+
+    assert os.path.exists(out_vec_file)
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_clip_and_merge_with_roi(tmp_path):
+    import rsgislib.vectorgeoms
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_lyr = "aber_osgb_multi_polys"
+
+    vec_roi_file = os.path.join(DATA_DIR, "aber_osgb_region_of_interest.geojson")
+    vec_roi_lyr = "aber_osgb_region_of_interest"
+
+    out_vec_file = os.path.join(tmp_path, "merged_roi_lyr.gpkg")
+    out_vec_lyr = "merged_roi_lyr"
+
+    rsgislib.vectorgeoms.clip_and_merge_with_roi(
+        vec_file,
+        vec_lyr,
+        vec_roi_file,
+        vec_roi_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+        ref_col_name="ref_bkgrd",
+        roi_rgn_val=0,
+        data_rgn_val=1,
+    )
+
+    assert os.path.exists(out_vec_file)
