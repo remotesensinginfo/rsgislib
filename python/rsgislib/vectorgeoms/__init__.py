@@ -3498,6 +3498,9 @@ def create_bbox_vec_lyr(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
+    whole_num_grid: bool = False,
+    whole_num_base_grid: float = 10.0,
+    whole_num_round: int = None,
 ):
     """
     A function which creates a new vector layer with a single polygon
@@ -3509,6 +3512,13 @@ def create_bbox_vec_lyr(
     :param out_vec_file: Output vector file
     :param out_vec_lyr: Output vector layer name.
     :param out_format: Output file format (Default: GPKG).
+    :param whole_num_grid: Specify whether the bbox coordinates are to be rounded
+                           on to a whole number grid. (Default: False)
+    :param whole_num_base_grid: the size of the (square) grid on which output
+                                will be defined. (Default: 10)
+    :param whole_num_round: specify whether outputted values should be rounded. None
+                            for no rounding (default; None) or integer for number
+                            of significant figures to round to.
 
     """
     import geopandas
@@ -3516,6 +3526,21 @@ def create_bbox_vec_lyr(
 
     in_vec_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     x_min, y_min, x_max, y_max = in_vec_gdf.total_bounds
+
+    if whole_num_grid:
+        import rsgislib.tools.geometrytools
+
+        rounded_grid = rsgislib.tools.geometrytools.find_extent_on_whole_num_grid(
+            base_extent=[x_min, x_max, y_min, y_max],
+            base_grid=whole_num_base_grid,
+            full_contain=True,
+            round_vals=whole_num_round,
+        )
+
+        x_min = rounded_grid[0]
+        x_max = rounded_grid[1]
+        y_min = rounded_grid[2]
+        y_max = rounded_grid[3]
 
     polygons = [
         Polygon(

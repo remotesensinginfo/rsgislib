@@ -953,6 +953,30 @@ def test_create_bbox_vec_lyr(tmp_path):
 
 
 @pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
+def test_create_bbox_vec_lyr_round(tmp_path):
+    import rsgislib.vectorgeoms
+
+    vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
+    vec_lyr = "aber_osgb_multi_polys"
+
+    out_vec_file = os.path.join(tmp_path, "bbox_lyr.gpkg")
+    out_vec_lyr = "bbox_lyr"
+
+    rsgislib.vectorgeoms.create_bbox_vec_lyr(
+        vec_file,
+        vec_lyr,
+        out_vec_file,
+        out_vec_lyr,
+        out_format="GPKG",
+        whole_num_grid=True,
+        whole_num_base_grid=10.0,
+        whole_num_round=None,
+    )
+
+    assert os.path.exists(out_vec_file)
+
+
+@pytest.mark.skipif(GEOPANDAS_NOT_AVAIL, reason="geopandas dependency not available")
 def test_clip_and_merge_with_roi(tmp_path):
     import rsgislib.vectorgeoms
 
