@@ -37,7 +37,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--vecfile", type=str, required=True, help="Input vector file.")
     parser.add_argument(
-        "--veclyr", type=str, required=False, help="Input vector file layer."
+        "--veclyr",
+        type=str,
+        required=False,
+        help="Layer within the specified input vector file.",
+    )
+    parser.add_argument(
+        "--veccol",
+        type=str,
+        required=False,
+        help="Column within the specified vector file layer.",
     )
     parser.add_argument(
         "--lyrs",
@@ -68,7 +77,14 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Print the bounding box of the vector layer.",
-        )
+    )
+
+    parser.add_argument(
+        "--unqvals",
+        action="store_true",
+        default=False,
+        help="Print the unique values within a column of the attribute table.",
+    )
     args = parser.parse_args()
 
     if args.lyrs:
@@ -92,5 +108,14 @@ if __name__ == "__main__":
     if args.bbox:
         bbox = rsgislib.vectorutils.get_vec_layer_extent(args.vecfile, args.veclyr)
         print(f"[xMin, xMax, yMin, yMax]: {bbox}")
-        print(f"Width: {bbox[1]-bbox[0]}")
+        print(f"Width: {bbox[1] - bbox[0]}")
         print(f"Height: {bbox[3] - bbox[2]}")
+
+    if args.unqvals:
+        import rsgislib.vectorattrs
+
+        unq_vals = rsgislib.vectorattrs.get_unq_col_values(
+            args.vecfile, args.veclyr, args.veccol
+        )
+        for i, val in enumerate(unq_vals):
+            print(f"\t{i}: '{val}'")
