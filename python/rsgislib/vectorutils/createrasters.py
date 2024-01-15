@@ -2,6 +2,7 @@
 """
 The vector conversion tools for converting between raster and vector
 """
+from typing import List, Dict, Tuple, Union
 
 from osgeo import gdal, ogr
 
@@ -251,3 +252,130 @@ def copy_vec_to_rat(
         no_data_val=0,
     )
     rsgislib.rastergis.import_vec_atts(output_img, vec_file, vec_lyr, "pxlval", None)
+
+
+def create_vector_range_lut_score_img(
+    vec_file: str,
+    vec_lyr: str,
+    vec_col: str,
+    tmp_vec_file: str,
+    tmp_vec_lyr: str,
+    tmp_vec_col: str,
+    input_img: str,
+    output_img: str,
+    scrs_lut: Dict[int, Tuple[float, float]],
+    out_format: str = "GPKG",
+    gdalformat: str = "KEA",
+):
+    """
+    A function which uses a look up table (LUT) with ranges, defined by
+    lower (>=) and upper (<) values to recode columns within a vector layer
+    and export the column as a raster layer.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_col: The column within which the unique values will be identified.
+    :param tmp_vec_file: Intermediate vector file
+    :param tmp_vec_lyr: Intermediate vector layer name.
+    :param tmp_vec_col: The intermediate vector output numeric column
+    :param input_img: is a string specifying the input image defining the grid, pixel
+                      resolution and area for the rasterisation.
+    :param output_img: is a string specifying the output image for the rasterised
+                       vector file
+    :param scrs_lut: the LUT for defining the output values. Features outside of the
+                     values defined by the LUT will be set as zero. The LUT should
+                     define an int as the key which will be the output value and
+                     a tuple specifying the lower (>=) and upper (<) values within
+                     the vec_col for setting the key value.
+    :param out_format:output file vector format (default GPKG).
+    :param gdalformat: is the output image format (Default: KEA).
+
+    """
+    import rsgislib.vectorattrs
+    import rsgislib.vectorutils.createrasters
+
+    rsgislib.vectorattrs.add_numeric_col_range_lut(
+        vec_file=vec_file,
+        vec_lyr=vec_lyr,
+        vec_col=vec_col,
+        out_vec_file=tmp_vec_file,
+        out_vec_lyr=tmp_vec_lyr,
+        out_vec_col=tmp_vec_col,
+        val_lut=scrs_lut,
+        out_format=out_format,
+    )
+
+    rasterise_vec_lyr(
+        tmp_vec_file,
+        tmp_vec_lyr,
+        input_img=input_img,
+        output_img=output_img,
+        gdalformat=gdalformat,
+        burn_val=1,
+        datatype=rsgislib.TYPE_8UINT,
+        att_column=tmp_vec_col,
+        use_vec_extent=False,
+        thematic=True,
+        no_data_val=0,
+    )
+
+
+def create_vector_lst_lut_score_img(
+    vec_file: str,
+    vec_lyr: str,
+    vec_col: str,
+    tmp_vec_file: str,
+    tmp_vec_lyr: str,
+    tmp_vec_col: str,
+    input_img: str,
+    output_img: str,
+    scrs_lut: List[Tuple[Union[str, int], int]],
+    out_format: str = "GPKG",
+    gdalformat: str = "KEA",
+):
+    """
+    A function which uses a look up table (LUT) as a list of tuples recoding values
+    within the a column within a vector layer and export the column as a raster layer.
+    Example LUT tuples: ("Hello", 1) or ("World", 2)
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_col: The column within which the unique values will be identified.
+    :param tmp_vec_file: Intermediate vector file
+    :param tmp_vec_lyr: Intermediate vector layer name.
+    :param tmp_vec_col: The intermediate vector output numeric column
+    :param input_img: is a string specifying the input image defining the grid, pixel
+                      resolution and area for the rasterisation.
+    :param output_img: is a string specifying the output image for the rasterised
+                       vector file
+    :param scrs_lut: the LUT defined as a list which should be a
+                     list of tuples (LookUp, OutValue).
+    :param out_format:output file vector format (default GPKG).
+    :param gdalformat: is the output image format (Default: KEA).
+    """
+    import rsgislib.vectorattrs
+
+    rsgislib.vectorattrs.add_numeric_col_from_lst_lut(
+        vec_file,
+        vec_lyr,
+        ref_col=vec_col,
+        vals_lut=scrs_lut,
+        out_col=tmp_vec_col,
+        out_vec_file=tmp_vec_file,
+        out_vec_lyr=tmp_vec_lyr,
+        out_format=out_format,
+    )
+
+    rasterise_vec_lyr(
+        tmp_vec_file,
+        tmp_vec_lyr,
+        input_img=input_img,
+        output_img=output_img,
+        gdalformat=gdalformat,
+        burn_val=1,
+        datatype=rsgislib.TYPE_8UINT,
+        att_column=tmp_vec_col,
+        use_vec_extent=False,
+        thematic=True,
+        no_data_val=0,
+    )

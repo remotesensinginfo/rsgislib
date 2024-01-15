@@ -54,6 +54,8 @@ Create Rasters
 .. autofunction:: rsgislib.vectorutils.createrasters.rasterise_vec_lyr
 .. autofunction:: rsgislib.vectorutils.createrasters.rasterise_vec_lyr_obj
 .. autofunction:: rsgislib.vectorutils.createrasters.copy_vec_to_rat
+.. autofunction:: rsgislib.vectorutils.createrasters.create_vector_range_lut_score_img
+.. autofunction:: rsgislib.vectorutils.createrasters.create_vector_lst_lut_score_img
 
 
 Merge Vectors
