@@ -28,6 +28,7 @@ Column Utilities
 .. autofunction:: rsgislib.vectorattrs.drop_vec_cols
 .. autofunction:: rsgislib.vectorattrs.rename_vec_cols
 
+
 Joins
 --------
 .. autofunction:: rsgislib.vectorattrs.perform_spatial_join
@@ -52,6 +53,7 @@ Sort By Attributes
 Change Attribute Values
 ------------------------
 .. autofunction:: rsgislib.vectorattrs.find_replace_str_vec_lyr
+.. autofunction:: rsgislib.vectorattrs.check_str_col
 
 Geometry Intersections
 -----------------------

@@ -1351,10 +1351,10 @@ def rename_vec_cols(
     """
     A function which allows vector column to be renamed.
 
-    param vec_file: Input vector file
+    :param vec_file: Input vector file
     :param vec_lyr: Input vector layer
     :param rname_cols_lut: dict look up for the columns to be renamed.
-                          Format: {"orig_name": "new_name"}
+                           Format: {"orig_name": "new_name"}
     :param out_vec_file: the output vector file
     :param out_vec_lyr: the output vector layer
     :param out_format: the output vector format (Default: GPKG)
@@ -1638,3 +1638,59 @@ def add_numeric_col_from_lst_lut(
         base_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def check_str_col(
+        vec_file: str,
+        vec_lyr: str,
+        vec_col: str,
+        out_vec_file: str,
+        out_vec_lyr: str,
+        out_format: str = "GPKG",
+        rm_non_ascii: bool = True,
+        rm_dashs: bool = False,
+        rm_spaces: bool = False,
+        rm_punc: bool = False
+        ):
+    """
+    A function which checks the values in a string column removing non-ascii
+    characters and optionally removing spaces, dashes and punctuation.
+
+    :param vec_file: the input vector file.
+    :param vec_lyr: the input vector layer name.
+    :param vec_col: the name of the column to be checked.
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the output vector layer name.
+    :param out_format: The output vector file format (Default: GPKG)
+    :param rm_non_ascii: If True (default True) remove any non-ascii characters
+                         from the string
+    :param rm_dashs: If True (default False) remove any dashes from the string
+                     and replace with underscores.
+    :param rm_spaces: If True (default False) remove any spaces from the string.
+    :param rm_punc: If True (default False) remove any punctuation
+                    (other than '_' or '-') from the string.
+
+    """
+    import geopandas
+
+    import rsgislib.vectorutils
+    import rsgislib.tools.utils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
+
+    # Read input vector file.
+    base_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    col_var_arr = base_gdf[vec_col].values
+
+    for i in range(len(col_var_arr)):
+        col_var_arr[i] = rsgislib.tools.utils.check_str(
+            col_var_arr[i], rm_non_ascii, rm_dashs, rm_spaces, rm_punc)
+
+    base_gdf[vec_col] = col_var_arr
+
+    if out_format == "GPKG":
+        base_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        base_gdf.to_file(out_vec_file, driver=out_format)
+
