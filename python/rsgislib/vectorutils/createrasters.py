@@ -3,6 +3,7 @@
 The vector conversion tools for converting between raster and vector
 """
 from typing import List, Dict, Tuple, Union
+import math
 
 from osgeo import gdal, ogr
 
@@ -378,4 +379,82 @@ def create_vector_lst_lut_score_img(
         use_vec_extent=False,
         thematic=True,
         no_data_val=0,
+    )
+
+
+def create_dist_zones_to_vec_layer(
+    vec_file: str,
+    vec_lyr: str,
+    input_img: str,
+    tmp_vec_img: str,
+    tmp_dist_img: str,
+    output_img: str,
+    recode_lut: List[Tuple[int, Tuple[float, float]]],
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_8UINT,
+    max_dist_thres: float = None,
+    backgrd_val: int = 0,
+):
+    """
+    A function which calculates the distance to vector features and then recodes
+    the distance into categories based on a look up table (LUT) provided. The
+    LUT should be a list specifying the output value and lower (>=) and upper (<)
+    thresholds for that category. For example, (1, (10, 20)). If you do not want
+    to specify a lower or upper value then use math.nan.
+    For example, (2, (math.nan, 10)) or (3, (20, math.nan)).
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param input_img: an input image which will used as a reference for the pixel
+                      grid for rasterising the vector layer and calculating distance.
+    :param tmp_vec_img: a temporary image generated during the analysis which is a
+                        rasterised version of the vector layer.
+    :param tmp_dist_img: a temporary image generated during the analysis which is the
+                         distance to the rasterised vector features.
+    :param output_img: the output image where the distance has been recoded to
+                       categories using the recode_lut.
+    :param recode_lut: The recoding LUT specifying the categories to split the
+                       distance layer into.
+    :param gdalformat: the output image file format (default: KEA)
+    :param datatype: the output image file data type (default: rsgislib.TYPE_8UINT)
+    :param max_dist_thres: A threshold limiting the maximum distance to be calculated
+                           from the vector layer. Limiting this distance can speed up
+                           the analysis.
+    :param backgrd_val: The background value used when recoding the distance image.
+                        i.e., if a pixel does not fall into any of the categories
+                        specified then it will be given this value.
+
+    """
+    import rsgislib.imagecalc
+
+    rasterise_vec_lyr(
+        vec_file,
+        vec_lyr,
+        input_img,
+        tmp_vec_img,
+        gdalformat,
+        burn_val=1,
+        datatype=rsgislib.TYPE_8UINT,
+    )
+
+    rsgislib.imagecalc.calc_dist_to_img_vals(
+        input_img=tmp_vec_img,
+        output_img=tmp_dist_img,
+        pxl_vals=[1],
+        img_band=1,
+        gdalformat=gdalformat,
+        max_dist=max_dist_thres,
+        no_data_val=None,
+        out_no_data_val=-9999,
+        unit_geo=True,
+    )
+
+    rsgislib.imagecalc.create_categories_sgl_band(
+        input_img=tmp_dist_img,
+        output_img=output_img,
+        recode_lut=recode_lut,
+        img_band=1,
+        gdalformat=gdalformat,
+        datatype=datatype,
+        backgrd_val=backgrd_val,
     )

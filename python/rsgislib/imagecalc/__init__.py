@@ -6,7 +6,7 @@ calculating on images.
 
 import math
 import os
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import numpy
 from osgeo import gdal
@@ -1852,3 +1852,55 @@ def count_imgs_int_val_occur(
     applier.apply(
         _applyCalcPxlValCount, infiles, outfiles, otherargs, controls=aControls
     )
+
+
+def create_categories_sgl_band(
+    input_img: str,
+    output_img: str,
+    recode_lut: List[Tuple[int, Tuple[float, float]]],
+    img_band: int = 1,
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_8UINT,
+    backgrd_val: int = 0,
+):
+    """
+    A function which categories a continuous image band based on a look up
+    table (LUT) provided. The LUT should be a list specifying the output
+    value and lower (>=) and upper (<) thresholds for that category.
+    For example, (1, (10, 20)). If you do not want to specify a lower or
+    upper value then use math.nan. For example, (2, (math.nan, 10))
+    or (3, (20, math.nan)).
+
+    :param input_img: The input image file path.
+    :param output_img: The output image where the distance has been recoded to
+                       categories using the recode_lut.
+    :param recode_lut: The recoding LUT specifying the categories to split the
+                       continuous band into.
+    :param img_band: The image band within the image (note. band indexes start at 1).
+                     Default = 1.
+    :param gdalformat: the output image file format (default: KEA)
+    :param datatype: the output image file data type (default: rsgislib.TYPE_8UINT)
+    :param backgrd_val: The background value used when recoding the distance image.
+                        i.e., if a pixel does not fall into any of the categories
+                        specified then it will be given this value.
+
+    """
+    recode_exp = ""
+    first = True
+    for lut_ent in recode_lut:
+        if math.isnan(lut_ent[1][0]):
+            ent_exp = f"(b{img_band} < {lut_ent[1][1]})?{lut_ent[0]}"
+        elif math.isnan(lut_ent[1][1]):
+            ent_exp = f"(b{img_band} >= {lut_ent[1][0]})?{lut_ent[0]}"
+        else:
+            ent_exp = f"(b{img_band} >= {lut_ent[1][0]})&&" \
+                      f"(b{img_band} < {lut_ent[1][1]})?{lut_ent[0]}"
+
+        if first:
+            recode_exp = ent_exp
+            first = False
+        else:
+            recode_exp = f"{recode_exp}:{ent_exp}"
+
+    recode_exp = f"{recode_exp}:{backgrd_val}"
+    image_math(input_img, output_img, recode_exp, gdalformat, datatype)
