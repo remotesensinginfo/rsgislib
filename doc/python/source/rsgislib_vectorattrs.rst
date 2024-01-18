@@ -18,12 +18,16 @@ Add Columns
 .. autofunction:: rsgislib.vectorattrs.add_numeric_col
 .. autofunction:: rsgislib.vectorattrs.add_string_col
 .. autofunction:: rsgislib.vectorattrs.add_string_col_lut
+.. autofunction:: rsgislib.vectorattrs.add_numeric_col_range_lut
+.. autofunction:: rsgislib.vectorattrs.add_numeric_col_from_lst_lut
 .. autofunction:: rsgislib.vectorattrs.create_name_col
+
 
 Column Utilities
 ------------------
 .. autofunction:: rsgislib.vectorattrs.drop_vec_cols
 .. autofunction:: rsgislib.vectorattrs.rename_vec_cols
+
 
 Joins
 --------
@@ -49,6 +53,7 @@ Sort By Attributes
 Change Attribute Values
 ------------------------
 .. autofunction:: rsgislib.vectorattrs.find_replace_str_vec_lyr
+.. autofunction:: rsgislib.vectorattrs.check_str_col
 
 Geometry Intersections
 -----------------------

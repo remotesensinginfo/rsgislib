@@ -2,6 +2,8 @@
 """
 The vector conversion tools for converting between raster and vector
 """
+from typing import List, Dict, Tuple, Union
+import math
 
 from osgeo import gdal, ogr
 
@@ -251,3 +253,208 @@ def copy_vec_to_rat(
         no_data_val=0,
     )
     rsgislib.rastergis.import_vec_atts(output_img, vec_file, vec_lyr, "pxlval", None)
+
+
+def create_vector_range_lut_score_img(
+    vec_file: str,
+    vec_lyr: str,
+    vec_col: str,
+    tmp_vec_file: str,
+    tmp_vec_lyr: str,
+    tmp_vec_col: str,
+    input_img: str,
+    output_img: str,
+    scrs_lut: Dict[int, Tuple[float, float]],
+    out_format: str = "GPKG",
+    gdalformat: str = "KEA",
+):
+    """
+    A function which uses a look up table (LUT) with ranges, defined by
+    lower (>=) and upper (<) values to recode columns within a vector layer
+    and export the column as a raster layer.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_col: The column within which the unique values will be identified.
+    :param tmp_vec_file: Intermediate vector file
+    :param tmp_vec_lyr: Intermediate vector layer name.
+    :param tmp_vec_col: The intermediate vector output numeric column
+    :param input_img: is a string specifying the input image defining the grid, pixel
+                      resolution and area for the rasterisation.
+    :param output_img: is a string specifying the output image for the rasterised
+                       vector file
+    :param scrs_lut: the LUT for defining the output values. Features outside of the
+                     values defined by the LUT will be set as zero. The LUT should
+                     define an int as the key which will be the output value and
+                     a tuple specifying the lower (>=) and upper (<) values within
+                     the vec_col for setting the key value.
+    :param out_format:output file vector format (default GPKG).
+    :param gdalformat: is the output image format (Default: KEA).
+
+    """
+    import rsgislib.vectorattrs
+    import rsgislib.vectorutils.createrasters
+
+    rsgislib.vectorattrs.add_numeric_col_range_lut(
+        vec_file=vec_file,
+        vec_lyr=vec_lyr,
+        vec_col=vec_col,
+        out_vec_file=tmp_vec_file,
+        out_vec_lyr=tmp_vec_lyr,
+        out_vec_col=tmp_vec_col,
+        val_lut=scrs_lut,
+        out_format=out_format,
+    )
+
+    rasterise_vec_lyr(
+        tmp_vec_file,
+        tmp_vec_lyr,
+        input_img=input_img,
+        output_img=output_img,
+        gdalformat=gdalformat,
+        burn_val=1,
+        datatype=rsgislib.TYPE_8UINT,
+        att_column=tmp_vec_col,
+        use_vec_extent=False,
+        thematic=True,
+        no_data_val=0,
+    )
+
+
+def create_vector_lst_lut_score_img(
+    vec_file: str,
+    vec_lyr: str,
+    vec_col: str,
+    tmp_vec_file: str,
+    tmp_vec_lyr: str,
+    tmp_vec_col: str,
+    input_img: str,
+    output_img: str,
+    scrs_lut: List[Tuple[Union[str, int], int]],
+    out_format: str = "GPKG",
+    gdalformat: str = "KEA",
+):
+    """
+    A function which uses a look up table (LUT) as a list of tuples recoding values
+    within the a column within a vector layer and export the column as a raster layer.
+    Example LUT tuples: ("Hello", 1) or ("World", 2)
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_col: The column within which the unique values will be identified.
+    :param tmp_vec_file: Intermediate vector file
+    :param tmp_vec_lyr: Intermediate vector layer name.
+    :param tmp_vec_col: The intermediate vector output numeric column
+    :param input_img: is a string specifying the input image defining the grid, pixel
+                      resolution and area for the rasterisation.
+    :param output_img: is a string specifying the output image for the rasterised
+                       vector file
+    :param scrs_lut: the LUT defined as a list which should be a
+                     list of tuples (LookUp, OutValue).
+    :param out_format:output file vector format (default GPKG).
+    :param gdalformat: is the output image format (Default: KEA).
+    """
+    import rsgislib.vectorattrs
+
+    rsgislib.vectorattrs.add_numeric_col_from_lst_lut(
+        vec_file,
+        vec_lyr,
+        ref_col=vec_col,
+        vals_lut=scrs_lut,
+        out_col=tmp_vec_col,
+        out_vec_file=tmp_vec_file,
+        out_vec_lyr=tmp_vec_lyr,
+        out_format=out_format,
+    )
+
+    rasterise_vec_lyr(
+        tmp_vec_file,
+        tmp_vec_lyr,
+        input_img=input_img,
+        output_img=output_img,
+        gdalformat=gdalformat,
+        burn_val=1,
+        datatype=rsgislib.TYPE_8UINT,
+        att_column=tmp_vec_col,
+        use_vec_extent=False,
+        thematic=True,
+        no_data_val=0,
+    )
+
+
+def create_dist_zones_to_vec_layer(
+    vec_file: str,
+    vec_lyr: str,
+    input_img: str,
+    tmp_vec_img: str,
+    tmp_dist_img: str,
+    output_img: str,
+    recode_lut: List[Tuple[int, Tuple[float, float]]],
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_8UINT,
+    max_dist_thres: float = None,
+    backgrd_val: int = 0,
+):
+    """
+    A function which calculates the distance to vector features and then recodes
+    the distance into categories based on a look up table (LUT) provided. The
+    LUT should be a list specifying the output value and lower (>=) and upper (<)
+    thresholds for that category. For example, (1, (10, 20)). If you do not want
+    to specify a lower or upper value then use math.nan.
+    For example, (2, (math.nan, 10)) or (3, (20, math.nan)).
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param input_img: an input image which will used as a reference for the pixel
+                      grid for rasterising the vector layer and calculating distance.
+    :param tmp_vec_img: a temporary image generated during the analysis which is a
+                        rasterised version of the vector layer.
+    :param tmp_dist_img: a temporary image generated during the analysis which is the
+                         distance to the rasterised vector features.
+    :param output_img: the output image where the distance has been recoded to
+                       categories using the recode_lut.
+    :param recode_lut: The recoding LUT specifying the categories to split the
+                       distance layer into.
+    :param gdalformat: the output image file format (default: KEA)
+    :param datatype: the output image file data type (default: rsgislib.TYPE_8UINT)
+    :param max_dist_thres: A threshold limiting the maximum distance to be calculated
+                           from the vector layer. Limiting this distance can speed up
+                           the analysis.
+    :param backgrd_val: The background value used when recoding the distance image.
+                        i.e., if a pixel does not fall into any of the categories
+                        specified then it will be given this value.
+
+    """
+    import rsgislib.imagecalc
+
+    rasterise_vec_lyr(
+        vec_file,
+        vec_lyr,
+        input_img,
+        tmp_vec_img,
+        gdalformat,
+        burn_val=1,
+        datatype=rsgislib.TYPE_8UINT,
+    )
+
+    rsgislib.imagecalc.calc_dist_to_img_vals(
+        input_img=tmp_vec_img,
+        output_img=tmp_dist_img,
+        pxl_vals=[1],
+        img_band=1,
+        gdalformat=gdalformat,
+        max_dist=max_dist_thres,
+        no_data_val=None,
+        out_no_data_val=-9999,
+        unit_geo=True,
+    )
+
+    rsgislib.imagecalc.create_categories_sgl_band(
+        input_img=tmp_dist_img,
+        output_img=output_img,
+        recode_lut=recode_lut,
+        img_band=1,
+        gdalformat=gdalformat,
+        datatype=datatype,
+        backgrd_val=backgrd_val,
+    )

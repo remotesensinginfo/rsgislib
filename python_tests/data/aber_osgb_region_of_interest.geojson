@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "aber_osgb_region_of_interest",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::27700" } },
+"features": [
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 256114.3946590180567, 285372.308097974804696 ], [ 255172.729796615691157, 272130.14597044151742 ], [ 269915.670298602723051, 270835.356784638250247 ], [ 269886.243271652667318, 286402.254041227395646 ], [ 256114.3946590180567, 285372.308097974804696 ] ] ] } }
+]
+}

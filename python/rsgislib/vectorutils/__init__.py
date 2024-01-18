@@ -619,7 +619,6 @@ def get_vec_lyrs_lst(vec_file: str) -> List[str]:
     A function which returns a list of available layers within the inputted vector file.
 
     :param vec_file: file name and path to input vector layer.
-
     :return: list of layer names (can be used with gdal.Dataset.GetLayerByName()).
 
     """

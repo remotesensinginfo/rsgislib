@@ -1486,7 +1486,7 @@ def create_random_pts_in_radius(
     # Calculate the angle from the centre to each of the points
     angles = numpy.rad2deg(numpy.arctan2(y_coords - centre_y, x_coords - centre_x))
 
-    # Reorientate the angle so 0 is north.
+    # Reorientates the angle so 0 is north.
     angles_secs = numpy.zeros_like(angles)
     angles_secs[numpy.logical_and((angles >= 0), (angles <= 90))] = 1
     angles_secs[angles > 90] = 2

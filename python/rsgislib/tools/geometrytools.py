@@ -386,18 +386,22 @@ def find_extent_on_whole_num_grid(
     base_extent: List[float],
     base_grid: float,
     full_contain: bool = True,
-    round_vals: bool = None,
+    round_vals: int = None,
 ) -> List[float]:
     """
-    A function which calculates the extent but defined on a grid with defined resolution.
-    Useful for finding extent on a particular image grid.
+    A function which calculates the extent but defined on a grid with defined
+    resolution. Useful for finding extent on a particular image grid.
 
-    :param base_extent: is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
+    :param base_extent: is a bbox (xMin, xMax, yMin, yMax) providing the
+                        base for the grid on which output will be defined.
     :param base_grid: the size of the (square) grid on which output will be defined.
-    :param full_contain: is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
-                                      False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
-    :param round_vals: specify whether outputted values should be rounded. None for no rounding (default) or integer for number of
-                       significant figures to round to.
+    :param full_contain: is a boolean. True: moving output onto grid will increase
+                         size of bbox (i.e., intersection fully contained)
+                         False: move output onto grid will decrease size of
+                         bbox (i.e., bbox fully contained within intesection)
+    :param round_vals: specify whether outputted values should be rounded. None
+                       for no rounding (default; None) or integer for number
+                       of significant figures to round to.
 
     :return: bbox (xMin, xMax, yMin, yMax)
 

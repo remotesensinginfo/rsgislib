@@ -2571,6 +2571,8 @@ def clip_and_merge_with_roi(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
+    dissolve_lyr: bool = False,
+    explode_rslt_lyr: bool = False,
     ref_col_name: str = "ref_bkgrd",
     roi_rgn_val: int = 0,
     data_rgn_val: int = 1,
@@ -2586,7 +2588,9 @@ def clip_and_merge_with_roi(
     :param vec_roi_lyr: Input vector layer within the roi input file.
     :param out_vec_file: Output vector file
     :param out_vec_lyr: Output vector layer name.
-    :param out_format: Output file format (Ddefault: GPKG).
+    :param out_format: Output file format (Default: GPKG).
+    :param dissolve_lyr: After clipping the input vec_lyr the layer can optionally be
+                         dissolved - which would merge all neighbouring polygons.
     :param ref_col_name: The name of a column which is added to the output vector
                          layer to indicate which features are from the background
                          ROI and those from the input vector layer (Default: ref_bkgrd)
@@ -2610,9 +2614,18 @@ def clip_and_merge_with_roi(
     print("Clip Data")
     clipped_data_gdf = data_gdf.clip(roi_gdf, keep_geom_type=True)
 
+    if dissolve_lyr:
+        print("Dissolving Layer")
+        clipped_data_gdf = clipped_data_gdf.dissolve(ref_col_name)
+        clipped_data_gdf[ref_col_name] = data_rgn_val
+
     print("Merge ROI with Data")
     roi_diff_gdf = geopandas.overlay(roi_gdf, clipped_data_gdf, how="difference")
     out_data_gdf = pandas.concat([clipped_data_gdf, roi_diff_gdf])
+
+    if explode_rslt_lyr:
+        print("Exploding Results Layer")
+        out_data_gdf = out_data_gdf.explode()
 
     print("Export")
     if out_format == "GPKG":
@@ -3490,3 +3503,108 @@ def create_angle_lines_from_points(
         out_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         out_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def create_bbox_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    whole_num_grid: bool = False,
+    whole_num_base_grid: float = 10.0,
+    whole_num_round: int = None,
+):
+    """
+    A function which creates a new vector layer with a single polygon
+    representing the bounding box (BBOX) / Envelope of the input
+    vector layer.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: Output file format (Default: GPKG).
+    :param whole_num_grid: Specify whether the bbox coordinates are to be rounded
+                           on to a whole number grid. (Default: False)
+    :param whole_num_base_grid: the size of the (square) grid on which output
+                                will be defined. (Default: 10)
+    :param whole_num_round: specify whether outputted values should be rounded. None
+                            for no rounding (default; None) or integer for number
+                            of significant figures to round to.
+
+    """
+    import geopandas
+    from shapely.geometry import Polygon
+
+    in_vec_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    x_min, y_min, x_max, y_max = in_vec_gdf.total_bounds
+
+    if whole_num_grid:
+        import rsgislib.tools.geometrytools
+
+        rounded_grid = rsgislib.tools.geometrytools.find_extent_on_whole_num_grid(
+            base_extent=[x_min, x_max, y_min, y_max],
+            base_grid=whole_num_base_grid,
+            full_contain=True,
+            round_vals=whole_num_round,
+        )
+
+        x_min = rounded_grid[0]
+        x_max = rounded_grid[1]
+        y_min = rounded_grid[2]
+        y_max = rounded_grid[3]
+
+    polygons = [
+        Polygon(
+            [
+                (x_min, y_min),
+                (x_min, y_max),
+                (x_max, y_max),
+                (x_max, y_min),
+            ]
+        )
+    ]
+    bbox_gdf = geopandas.GeoDataFrame({"geometry": polygons})
+    bbox_gdf = bbox_gdf.set_crs(in_vec_gdf.crs, allow_override=True)
+
+    if out_format == "GPKG":
+        bbox_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        bbox_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def vec_lyr_dissolve(
+    vec_file: str,
+    vec_lyr: str,
+    vec_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which dissolves a vector layer using a variable within the
+    attribute table.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_col: The column within the attribute table with the variable
+                    to dissolve on. The variable must be categorical.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: Output file format (Default: GPKG).
+
+    """
+    import geopandas
+
+    print("Reading Data")
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    print("Running Dissolve")
+    dis_data_gdf = data_gdf.dissolve(vec_col)
+
+    print("Export")
+    if out_format == "GPKG":
+        dis_data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        dis_data_gdf.to_file(out_vec_file, driver=out_format)

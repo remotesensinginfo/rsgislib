@@ -636,7 +636,7 @@ def check_str(
     :param str_val: the input string to be processed.
     :param rm_non_ascii: If True (default False) remove any non-ascii characters
                          from the string
-    :param rm_dashs: If True (default False) remove any dashs from the string
+    :param rm_dashs: If True (default False) remove any dashes from the string
                      and replace with underscores.
     :param rm_spaces: If True (default False) remove any spaces from the string.
     :param rm_punc: If True (default False) remove any punctuation
@@ -644,6 +644,8 @@ def check_str(
     :return: returns a string outputted from the processing.
 
     """
+    if str_val is None:
+        str_val = ""
     str_val_tmp = str_val.strip()
 
     if rm_non_ascii:

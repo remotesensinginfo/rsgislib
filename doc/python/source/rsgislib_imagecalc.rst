@@ -45,7 +45,7 @@ Update Pixel Values
 
 .. autofunction:: rsgislib.imagecalc.recode_int_raster
 .. autofunction:: rsgislib.imagecalc.calc_fill_regions_knn
-
+.. autofunction:: rsgislib.imagecalc.create_categories_sgl_band
 
 Statistics
 -----------

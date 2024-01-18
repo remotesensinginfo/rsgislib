@@ -4,7 +4,7 @@ The vector attributes module performs attribute table operations on vectors.
 """
 
 import math
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 
 import numpy
 import osgeo.ogr
@@ -1186,7 +1186,6 @@ def annotate_vec_selection(
 
     """
     import geopandas
-    import numpy
 
     print("Read vector layers")
     in_gpdf = geopandas.read_file(vec_in_file, layer=vec_in_lyr)
@@ -1352,10 +1351,10 @@ def rename_vec_cols(
     """
     A function which allows vector column to be renamed.
 
-    param vec_file: Input vector file
+    :param vec_file: Input vector file
     :param vec_lyr: Input vector layer
     :param rname_cols_lut: dict look up for the columns to be renamed.
-                          Format: {"orig_name": "new_name"}
+                           Format: {"orig_name": "new_name"}
     :param out_vec_file: the output vector file
     :param out_vec_lyr: the output vector layer
     :param out_format: the output vector format (Default: GPKG)
@@ -1403,7 +1402,6 @@ def create_angle_sets(
 
     """
     import geopandas
-    import numpy
 
     if (180 % angle_set_width) != 0:
         raise rsgislib.RSGISPyException(
@@ -1544,3 +1542,155 @@ def export_vec_attrs_to_parquet(
         data_gdf.to_parquet(output_file, compression="gzip")
     else:
         data_gdf.to_parquet(output_file)
+
+
+def add_numeric_col_range_lut(
+    vec_file: str,
+    vec_lyr: str,
+    vec_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_vec_col: str,
+    val_lut: Dict[int, Tuple[float, float]],
+    out_format: str = "GPKG",
+):
+    """
+    A function which adds a numerical column to the vector layer using an LUT
+    and low (>=) and upper (<) values with reference to the input column for
+    defining the output value which will be the LUT key.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_col: The column within which the unique values will be identified.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_vec_col: The output numeric column
+    :param val_lut: the LUT for defining the output values. Features outside of the
+                    values defined by the LUT will be set as zero. The LUT should
+                    define an int as the key which will be the output value and
+                    a tuple specifying the lower (>=) and upper (<) values within
+                    the vec_col for setting the key value.
+    :param out_format: output file format (default GPKG).
+
+    """
+    import geopandas
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    out_scrs_arr = numpy.zeros(len(data_gdf), dtype=int)
+    vals_arr = data_gdf[vec_col]
+
+    for src in val_lut:
+        src_range_tup = val_lut[src]
+        out_scrs_arr[
+            numpy.logical_and(vals_arr >= src_range_tup[0], vals_arr < src_range_tup[1])
+        ] = src
+
+    data_gdf[out_vec_col] = out_scrs_arr
+
+    if out_format == "GPKG":
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def add_numeric_col_from_lst_lut(
+    vec_file: str,
+    vec_lyr: str,
+    ref_col: str,
+    vals_lut: List[Tuple[Union[str, int], int]],
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which adds a numeric column based off an existing column in the
+    vector file, using an list based LUT to define the values. The LUT should be
+    defined as a list of tuples with the value to match as the first value and the
+    second the value to be outputted. For example, ("Hello", 1) or ("World", 2)
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param ref_col: The column within which the unique values will be identified.
+    :param vals_lut: A list LUT which should be a list of tuples (LookUp, OutValue).
+    :param out_col: The output numeric column
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: output vector layer name.
+    :param out_format: output file format (default GPKG).
+
+    """
+    import geopandas
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
+
+    # Open vector file
+    base_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    # Add output column
+    out_vals_arr = numpy.zeros((base_gdf.shape[0]), dtype=int)
+    # Loop values in LUT
+    for lut_entry in vals_lut:
+        out_vals_arr[base_gdf[ref_col] == lut_entry[0]] = lut_entry[1]
+
+    base_gdf[out_col] = out_vals_arr
+
+    if out_format == "GPKG":
+        base_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        base_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def check_str_col(
+        vec_file: str,
+        vec_lyr: str,
+        vec_col: str,
+        out_vec_file: str,
+        out_vec_lyr: str,
+        out_format: str = "GPKG",
+        rm_non_ascii: bool = True,
+        rm_dashs: bool = False,
+        rm_spaces: bool = False,
+        rm_punc: bool = False
+        ):
+    """
+    A function which checks the values in a string column removing non-ascii
+    characters and optionally removing spaces, dashes and punctuation.
+
+    :param vec_file: the input vector file.
+    :param vec_lyr: the input vector layer name.
+    :param vec_col: the name of the column to be checked.
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the output vector layer name.
+    :param out_format: The output vector file format (Default: GPKG)
+    :param rm_non_ascii: If True (default True) remove any non-ascii characters
+                         from the string
+    :param rm_dashs: If True (default False) remove any dashes from the string
+                     and replace with underscores.
+    :param rm_spaces: If True (default False) remove any spaces from the string.
+    :param rm_punc: If True (default False) remove any punctuation
+                    (other than '_' or '-') from the string.
+
+    """
+    import geopandas
+
+    import rsgislib.vectorutils
+    import rsgislib.tools.utils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
+
+    # Read input vector file.
+    base_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    col_var_arr = base_gdf[vec_col].values
+
+    for i in range(len(col_var_arr)):
+        col_var_arr[i] = rsgislib.tools.utils.check_str(
+            col_var_arr[i], rm_non_ascii, rm_dashs, rm_spaces, rm_punc)
+
+    base_gdf[vec_col] = col_var_arr
+
+    if out_format == "GPKG":
+        base_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        base_gdf.to_file(out_vec_file, driver=out_format)
+
