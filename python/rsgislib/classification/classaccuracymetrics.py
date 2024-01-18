@@ -35,6 +35,7 @@
 
 import math
 import os
+import random
 from typing import Dict, List, Tuple
 
 import numpy
@@ -1516,8 +1517,8 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
 
 
 def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
-    vec_files: List,
-    vec_lyrs: List,
+    vec_files: List[str],
+    vec_lyrs: List[str],
     ref_col: str,
     cls_col: str,
     tmp_dir: str,
@@ -1528,7 +1529,10 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
     sample_frac: float = 0.2,
     sample_n_smps: int = None,
     bootstrap_n: int = 1000,
-) -> (bool, int, list, list):
+    shuffle_vec_file_order: bool = False,
+    use_rand_choice: bool = False,
+    n_choices: int = None,
+) -> (bool, int, List[float], List[float]):
     """
     A function which calculates the f1-score and the confidence interval for each
     the point sets provided. Where the points a cumulatively combined
@@ -1566,6 +1570,16 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
                           samples can be specified. If None, then sample_frac
                           will be used to calculate sample_n_smps.
     :param bootstrap_n: The number of bootstrap iterations.
+    :param shuffle_vec_file_order: boolean to specify that the order of the vector
+                                   files should be shuffled. (Default: False)
+    :param use_rand_choice: boolean specifying whether the order of the files
+                            should be based on a random choice - allowing the
+                            number of iterations to be different than the number
+                            of files past to the function. (Default: False).
+                            Note. files might be used more than once.
+    :param n_choices: if use_rand_choice=True, then you can specify the number
+                      of iterations which will be used for the analysis. This
+                      might be different from the number of vector files past.
     :return: (bool, int, list, list). 1. Did the confidence interval fall below the
              the confidence threshold. 2. the index of the point it first fell below
              the threshold. 3. list of f1-scores and 4. list of f1-score confidence
@@ -1599,7 +1613,21 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
     tmp_vec_files = list()
     vecs_dict = list()
     stats_info = dict()
-    for vec_file, vec_lyr in zip(vec_files, vec_lyrs):
+
+    if (n_choices is None) or (not use_rand_choice):
+        n_choices = len(vec_files)
+
+    file_idxs = list(range(len(vec_files)))
+    if shuffle_vec_file_order:
+        random.shuffle(file_idxs)
+
+    for i in range(n_choices):
+        if use_rand_choice:
+            idx = random.choice(file_idxs)
+        else:
+            idx = file_idxs[i]
+        vec_file = vec_files[idx]
+        vec_lyr = vec_lyrs[idx]
         vecs_dict.append({"file": vec_file, "layer": vec_lyr})
         if first:
             c_vec_file = vec_file
