@@ -32,6 +32,7 @@
 import argparse
 import glob
 
+import rsgislib
 import rsgislib.tools.checkdatasets
 
 if __name__ == "__main__":
@@ -117,6 +118,8 @@ if __name__ == "__main__":
         )
 
     args = parser.parse_args()
+    t = rsgislib.RSGISTime()
+    t.start(print_start_time = True)
     print(args.input)
 
     chk_projection = args.chkproj
@@ -157,4 +160,4 @@ if __name__ == "__main__":
             print_err=args.printerrs,
             print_file_names=args.printnames,
         )
-    print("Finish Checks")
+    t.end(report_diff = True, precede_str = "Finished Checks")
