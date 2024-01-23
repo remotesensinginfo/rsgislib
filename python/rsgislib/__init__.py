@@ -146,6 +146,13 @@ Options for classification hyperparameter optimisation:
     * OPT_MTHD_RANDOM = 4
     * OPT_MTHD_GRID = 5
 
+Options for calculating correlation:
+    * STATS_CORR_UNDEFINED = 0
+    * STATS_CORR_PEARSONS = 1
+    * STATS_CORR_SPEARMAN = 2
+    * STATS_CORR_KENDALL_TAU = 3
+    * STATS_CORR_POINT_BISERIAL = 4
+
 """
 from __future__ import print_function
 
@@ -270,6 +277,12 @@ OPT_MTHD_OPTUNA = 2
 OPT_MTHD_SKOPT = 3
 OPT_MTHD_RANDOM = 4
 OPT_MTHD_GRID = 5
+
+STATS_CORR_UNDEFINED = 0
+STATS_CORR_PEARSONS = 1  # Pearson
+STATS_CORR_SPEARMAN = 2  # Spearman
+STATS_CORR_KENDALL_TAU = 3  # Kendall's tau
+STATS_CORR_POINT_BISERIAL = 4  # pointbiserialr
 
 
 def get_install_base_path() -> pathlib.PurePath:
