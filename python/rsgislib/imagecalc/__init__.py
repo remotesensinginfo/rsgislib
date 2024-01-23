@@ -1974,7 +1974,13 @@ def calc_img_correlation(
     )
     img_b_arr.flatten()
 
-    vld_pxls = numpy.logical_and(img_a_arr != img_a_no_data, img_b_arr != img_b_no_data)
+    finite_pxls = numpy.logical_and(
+        numpy.isfinite(img_a_arr), numpy.isfinite(img_b_arr)
+    )
+    valid_rng_pxls = numpy.logical_and(
+        img_a_arr != img_a_no_data, img_b_arr != img_b_no_data
+    )
+    vld_pxls = numpy.logical_and(valid_rng_pxls, finite_pxls)
 
     img_a_arr = img_a_arr[vld_pxls]
     img_b_arr = img_b_arr[vld_pxls]
@@ -1987,7 +1993,9 @@ def calc_img_correlation(
         elif corr_stat_method == rsgislib.STATS_CORR_KENDALL_TAU:
             imgs_corr_coeff, imgs_corr_p = scipy.stats.kendalltau(img_a_arr, img_b_arr)
         elif corr_stat_method == rsgislib.STATS_CORR_POINT_BISERIAL:
-            imgs_corr_coeff, imgs_corr_p = scipy.stats.pointbiserialr(img_a_arr, img_b_arr)
+            imgs_corr_coeff, imgs_corr_p = scipy.stats.pointbiserialr(
+                img_a_arr, img_b_arr
+            )
         else:
             raise rsgislib.RSGISPyException(
                 "Do not recognise the correlation method specified"
