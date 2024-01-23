@@ -1979,17 +1979,23 @@ def calc_img_correlation(
     img_a_arr = img_a_arr[vld_pxls]
     img_b_arr = img_b_arr[vld_pxls]
 
-    if corr_stat_method == rsgislib.STATS_CORR_PEARSONS:
-        imgs_corr_coeff, imgs_corr_p = scipy.stats.pearsonr(img_a_arr, img_b_arr)
-    elif corr_stat_method == rsgislib.STATS_CORR_SPEARMAN:
-        imgs_corr_coeff, imgs_corr_p = scipy.stats.spearmanr(img_a_arr, img_b_arr)
-    elif corr_stat_method == rsgislib.STATS_CORR_KENDALL_TAU:
-        imgs_corr_coeff, imgs_corr_p = scipy.stats.kendalltau(img_a_arr, img_b_arr)
-    elif corr_stat_method == rsgislib.STATS_CORR_POINT_BISERIAL:
-        imgs_corr_coeff, imgs_corr_p = scipy.stats.pointbiserialr(img_a_arr, img_b_arr)
+    if (len(img_a_arr) > 5) and (len(img_b_arr) > 5):
+        if corr_stat_method == rsgislib.STATS_CORR_PEARSONS:
+            imgs_corr_coeff, imgs_corr_p = scipy.stats.pearsonr(img_a_arr, img_b_arr)
+        elif corr_stat_method == rsgislib.STATS_CORR_SPEARMAN:
+            imgs_corr_coeff, imgs_corr_p = scipy.stats.spearmanr(img_a_arr, img_b_arr)
+        elif corr_stat_method == rsgislib.STATS_CORR_KENDALL_TAU:
+            imgs_corr_coeff, imgs_corr_p = scipy.stats.kendalltau(img_a_arr, img_b_arr)
+        elif corr_stat_method == rsgislib.STATS_CORR_POINT_BISERIAL:
+            imgs_corr_coeff, imgs_corr_p = scipy.stats.pointbiserialr(img_a_arr, img_b_arr)
+        else:
+            raise rsgislib.RSGISPyException(
+                "Do not recognise the correlation method specified"
+            )
+        imgs_corr_coeff = float(imgs_corr_coeff)
+        imgs_corr_p = float(imgs_corr_p)
     else:
-        raise rsgislib.RSGISPyException(
-            "Do not recognise the correlation method specified"
-        )
+        imgs_corr_coeff = None
+        imgs_corr_p = None
 
-    return float(imgs_corr_coeff), float(imgs_corr_p)
+    return imgs_corr_coeff, imgs_corr_p
