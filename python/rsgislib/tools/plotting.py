@@ -727,13 +727,15 @@ def plot_vec_fields(
             feat_y_vals = y_vals
 
         if plt_line:
-            ax.plot(feat_x_vals, feat_y_vals)
+            ax.plot(feat_x_vals, feat_y_vals, label=f"Feature {feat_id}")
         else:
-            ax.scatter(feat_x_vals, feat_y_vals)
+            ax.scatter(feat_x_vals, feat_y_vals, label=f"Feature {feat_id}")
 
     ax.set_xlabel(x_lbl)
     ax.set_ylabel(y_lbl)
     ax.set_title(title)
+    if feat_id_field is not None:
+        plt.legend()
     fig.tight_layout()
     plt.savefig(out_plot_file)
 
