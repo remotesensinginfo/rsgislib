@@ -35,6 +35,8 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.createvectors.create_vec_for_image
 .. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_bbox
 .. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_polys
+.. autofunction:: rsgislib.vectorutils.createvectors.create_lines_vec
+.. autofunction:: rsgislib.vectorutils.createvectors.create_img_transects
 
 
 Vector I/O

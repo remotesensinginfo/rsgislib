@@ -4,7 +4,7 @@ Tools for creating vector layers.
 """
 
 import os
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import tqdm
 from osgeo import gdal, ogr, osr
@@ -1513,3 +1513,158 @@ def create_random_pts_in_radius(
         data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def create_lines_vec(
+    vec_file: str,
+    vec_lyr: str,
+    out_format: str,
+    epsg_code: int,
+    lines: List[List[Tuple[float, float]]],
+    overwrite: bool = True,
+):
+    """
+    This function creates a set of lines from a list of points.
+
+    :param vec_file: output vector file/path
+    :param vec_lyr: output vector layer
+    :param out_format: the output vector layer type.
+    :param epsg_code: EPSG code specifying the projection of the data (e.g.,
+                      4326 is WSG84 Lat/Long).
+    :param lines: is a list of lines where each line is defined as a list
+                  of tuples (X, Y).
+    :param overwrite: overwrite the vector file specified if it exists. Use False
+                      for GPKG where you want to add multiple layers.
+    """
+    import rsgislib.vectorutils
+
+    gdal.UseExceptions()
+
+    if os.path.exists(vec_file) and (not overwrite):
+        # Open the output file.
+        out_data_source = gdal.OpenEx(vec_file, gdal.GA_Update)
+    else:
+        if os.path.exists(vec_file):
+            rsgislib.vectorutils.delete_vector_file(vec_file, feedback=False)
+
+        # Create the output Driver
+        out_driver = ogr.GetDriverByName(out_format)
+        # Create the output vector file
+        out_data_source = out_driver.CreateDataSource(vec_file)
+
+    # create the spatial reference
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(int(epsg_code))
+    out_layer = out_data_source.CreateLayer(vec_lyr, srs, geom_type=ogr.wkbLineString)
+
+    field_defn = ogr.FieldDefn("line_id", ogr.OFTInteger)
+    if out_layer.CreateField(field_defn) != 0:
+        raise rsgislib.RSGISPyException("Creating 'line_id' field failed.")
+
+    # Get the output Layer's Feature Definition
+    feature_defn = out_layer.GetLayerDefn()
+
+    open_transaction = False
+    for n in range(len(lines)):
+        if not open_transaction:
+            out_layer.StartTransaction()
+            open_transaction = True
+
+        # Create Line
+        line_geom = ogr.Geometry(ogr.wkbLineString)
+        for pt in lines[n]:
+            line_geom.AddPoint(pt[0], pt[1])
+
+        # Add to output vector layer.
+        out_feature = ogr.Feature(feature_defn)
+        out_feature.SetGeometry(line_geom)
+        out_feature.SetField("line_id", n + 1)
+        out_layer.CreateFeature(out_feature)
+        out_feature = None
+        if ((n % 20000) == 0) and open_transaction:
+            out_layer.CommitTransaction()
+            open_transaction = False
+
+    if open_transaction:
+        out_layer.CommitTransaction()
+        open_transaction = False
+    out_data_source = None
+
+
+def create_img_transects(
+    input_img: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    x_intervals: List[float] = None,
+    y_intervals: List[float] = None,
+    out_format: str = "GPKG",
+):
+    """
+    A function which will create transects across an image in both X and Y axis'.
+    To specify the transect using the x_intervals and y_intervals parameters.
+    These are lists of values between 0 and 1 where a value of 0.5 is halfway
+    along the axis.  Therefore, an input of [0.25, 0.5, 0.75] will create
+    transects for the axis specified at a quarter, half and three-quarters of
+    the way along the axis. You must specify at least one or x_intervals or
+    y_intervals.
+
+    :param input_img: The input image path
+    :param out_vec_file: the output vector path
+    :param out_vec_lyr: the output vector layer name
+    :param x_intervals: the list of intervals for the X axis (values between 0-1).
+                        If None then the axis is ignored.
+    :param y_intervals: the list of intervals for the Y axis (values between 0-1).
+                        If None then the axis is ignored.
+    :param out_format: the output vector format (Default: GPKG)
+
+    """
+    import rsgislib.imageutils
+    import numpy
+
+    if (x_intervals is None) and (y_intervals is None):
+        raise rsgislib.RSGISPyException(
+            "You need to provided a list of values for at "
+            "least one of x_intervals or y_intervals"
+        )
+
+    if x_intervals is not None:
+        x_intervals = numpy.array(x_intervals)
+        for val in x_intervals:
+            if (val < 0) or (val > 1):
+                raise rsgislib.RSGISPyException("Interval values must be between 0-1")
+
+    if y_intervals is not None:
+        y_intervals = numpy.array(y_intervals)
+        for val in y_intervals:
+            if (val < 0) or (val > 1):
+                raise rsgislib.RSGISPyException("Interval values must be between 0-1")
+
+    img_bbox = rsgislib.imageutils.get_img_bbox(input_img)
+    img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
+
+    img_width = img_bbox[1] - img_bbox[0]
+    img_height = img_bbox[3] - img_bbox[2]
+
+    out_lines_lst = list()
+    if x_intervals is not None:
+        x_splits = img_width * x_intervals
+        for x_pos in x_splits:
+            out_lines_lst.append(
+                [(img_bbox[0] + x_pos, img_bbox[2]), (img_bbox[0] + x_pos, img_bbox[3])]
+            )
+
+    if y_intervals is not None:
+        y_splits = img_height * y_intervals
+        for y_pos in y_splits:
+            out_lines_lst.append(
+                [(img_bbox[0], img_bbox[2] + y_pos), (img_bbox[1], img_bbox[2] + y_pos)]
+            )
+
+    create_lines_vec(
+        vec_file=out_vec_file,
+        vec_lyr=out_vec_lyr,
+        out_format=out_format,
+        epsg_code=img_epsg,
+        lines=out_lines_lst,
+        overwrite=True,
+    )
