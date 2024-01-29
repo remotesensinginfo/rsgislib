@@ -196,7 +196,7 @@ def corr_feature_selection(df, dep_vars, ind_vars, n_min_clusters=3, n_max_clust
             )
 
         clf = sklearn.cluster.FeatureAgglomeration(
-            n_clusters=n_clusters, linkage="complete", affinity=_pearson_affinity
+            n_clusters=n_clusters, metric=_pearson_affinity, linkage="complete",
         )
         clf.fit(X)
 
