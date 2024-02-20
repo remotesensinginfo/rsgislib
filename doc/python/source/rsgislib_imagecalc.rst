@@ -58,6 +58,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.calculate_img_band_rmse
 .. autofunction:: rsgislib.imagecalc.correlation_window
 .. autofunction:: rsgislib.imagecalc.calc_img_correlation
+.. autofunction:: rsgislib.imagecalc.calc_img_mutual_info
 .. autofunction:: rsgislib.imagecalc.calc_mask_img_pxl_val_prob
 .. autofunction:: rsgislib.imagecalc.calc_img_difference
 
