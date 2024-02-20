@@ -2125,3 +2125,121 @@ def calc_img_mutual_info(
         imgs_mi = None
 
     return imgs_mi
+
+
+def calc_img_earth_move_dist(
+    in_a_img: str,
+    in_b_img: str,
+    img_a_band: int,
+    img_b_band: int,
+    img_a_no_data: float = None,
+    img_b_no_data: float = None,
+    hist_a_bins: int = None,
+    hist_b_bins: int = None,
+    use_glb_range: bool = None,
+) -> float:
+    """
+    A function which calculates the earth movers distance
+    between two input image bands.
+
+    :param in_a_img: The path to input image A.
+    :param in_b_img: The path to input image B.
+    :param img_a_band: The band within input image A
+    :param img_b_band: The band within input image B
+    :param img_a_no_data: The no data value in image A.
+                          If None then read from image header.
+    :param img_b_no_data: The no data value in image B.
+                          If None then read from image header.
+    :param hist_a_bins: Number of bins used for the histogram created for image band A
+    :param hist_b_bins: Number of bins used for the histogram created for image band B
+    :param use_glb_range: Use the global range of the two image bands for both
+                          histograms. Therefore, the range of the histograms
+                          are the same.
+    :return: earth movers distance (float)
+    """
+    import scipy.stats
+    import rsgislib.tools.geometrytools
+    import rsgislib.imageutils
+
+    in_a_img_band_count = rsgislib.imageutils.get_img_band_count(in_a_img)
+    if (img_a_band < 1) or (img_a_band > in_a_img_band_count):
+        raise rsgislib.RSGISPyException(
+            f"The band specified ({img_a_band}) for image A is not within the image."
+        )
+    in_b_img_band_count = rsgislib.imageutils.get_img_band_count(in_b_img)
+    if (img_b_band < 1) or (img_b_band > in_b_img_band_count):
+        raise rsgislib.RSGISPyException(
+            f"The band specified ({img_b_band}) for image B is not within the image."
+        )
+
+    if img_a_no_data is None:
+        img_a_no_data = rsgislib.imageutils.get_img_no_data_value(in_a_img, img_a_band)
+    if img_a_no_data is None:
+        raise rsgislib.RSGISPyException(
+            "A no data value is not available for image A - please specify."
+        )
+
+    if img_b_no_data is None:
+        img_b_no_data = rsgislib.imageutils.get_img_no_data_value(in_b_img, img_b_band)
+    if img_b_no_data is None:
+        raise rsgislib.RSGISPyException(
+            "A no data value is not available for image B - please specify."
+        )
+
+    img_a_bbox = rsgislib.imageutils.get_img_bbox(in_a_img)
+    img_b_bbox = rsgislib.imageutils.get_img_bbox(in_b_img)
+    bbox_sub = rsgislib.tools.geometrytools.bbox_intersection(img_a_bbox, img_b_bbox)
+
+    img_a_arr = rsgislib.imageutils.get_img_band_pxl_data(
+        in_a_img, img_band=img_a_band, bbox_sub=bbox_sub
+    )
+    img_a_arr = img_a_arr.flatten()
+    img_b_arr = rsgislib.imageutils.get_img_band_pxl_data(
+        in_b_img, img_band=img_b_band, bbox_sub=bbox_sub
+    )
+    img_b_arr = img_b_arr.flatten()
+
+    finite_pxls = numpy.logical_and(
+        numpy.isfinite(img_a_arr), numpy.isfinite(img_b_arr)
+    )
+    valid_rng_pxls = numpy.logical_and(
+        img_a_arr != img_a_no_data, img_b_arr != img_b_no_data
+    )
+    vld_pxls = numpy.logical_and(valid_rng_pxls, finite_pxls)
+
+    img_a_arr = img_a_arr[vld_pxls]
+    img_b_arr = img_b_arr[vld_pxls]
+
+    if (len(img_a_arr) > 5) and (len(img_b_arr) > 5):
+
+        img_range = None
+        if use_glb_range:
+            img_min = numpy.min(img_a_arr)
+            img_max = numpy.max(img_a_arr)
+
+            img_b_min = numpy.min(img_b_arr)
+            img_b_max = numpy.max(img_b_arr)
+
+            if img_b_min < img_min:
+                img_min = img_b_min
+            if img_b_max > img_max:
+                img_max = img_b_max
+
+            img_range = [img_min, img_max]
+
+        hist_a, bin_edges_a = numpy.histogram(
+            img_a_arr, bins=hist_a_bins, range=img_range
+        )
+        hist_b, bin_edges_b = numpy.histogram(
+            img_b_arr, bins=hist_b_bins, range=img_range
+        )
+
+        hist_a_prob = hist_a / len(img_a_arr)
+        hist_b_prob = hist_b / len(img_b_arr)
+
+        em_val = scipy.stats.wasserstein_distance(hist_a_prob, hist_b_prob)
+        imgs_em = float(em_val)
+    else:
+        imgs_em = None
+
+    return imgs_em
