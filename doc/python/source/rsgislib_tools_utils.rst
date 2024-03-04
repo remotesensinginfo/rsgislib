@@ -8,6 +8,7 @@ Unique Value
 
 Text File I/O
 ---------------
+.. autofunction:: rsgislib.tools.utils.read_text_file
 .. autofunction:: rsgislib.tools.utils.read_text_file_no_new_lines
 .. autofunction:: rsgislib.tools.utils.read_text_file_to_list
 .. autofunction:: rsgislib.tools.utils.write_list_to_file

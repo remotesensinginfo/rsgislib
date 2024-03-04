@@ -266,6 +266,25 @@ def num_process_cores() -> int:
     return multiprocessing.cpu_count()
 
 
+def read_text_file(input_file: str) -> str:
+    """
+    Read a text file into a single string.
+
+    :param input_file: File path to the input file.
+    :return: string
+
+    """
+    txt_str = ""
+    try:
+        data_file = open(input_file, "r")
+        for line in data_file:
+            txt_str += line
+        data_file.close()
+    except Exception as e:
+        raise e
+    return txt_str
+
+
 def read_text_file_no_new_lines(input_file: str) -> str:
     """
     Read a text file into a single string removing new lines.
