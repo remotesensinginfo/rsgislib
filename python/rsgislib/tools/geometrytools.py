@@ -115,10 +115,10 @@ def does_bbox_contain(bbox1: List[float], bbox2: List[float]) -> bool:
     y_min = 2
     y_max = 3
     contains = (
-        (bbox1[x_min] < bbox2[x_min])
-        and (bbox1[x_max] > bbox2[x_max])
-        and (bbox1[y_min] < bbox2[y_min])
-        and (bbox1[y_max] > bbox2[y_max])
+        (bbox1[x_min] <= bbox2[x_min])
+        and (bbox1[x_max] >= bbox2[x_max])
+        and (bbox1[y_min] <= bbox2[y_min])
+        and (bbox1[y_max] >= bbox2[y_max])
     )
     return contains
 

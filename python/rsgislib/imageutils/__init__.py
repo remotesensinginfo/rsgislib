@@ -3761,6 +3761,89 @@ def get_img_pxl_column(
     return numpy.array(out_pxl_vals)
 
 
+def get_img_band_pxl_data(
+    input_img: str, img_band: int, bbox_sub: List[float]
+) -> numpy.array:
+    """
+    A function which reads the image pixels values from an image to
+    a numpy array for a spatial subset of the input image.
+
+    :param input_img: the path to input image
+    :param img_band: the band within the input image (note band numbering starts at 1)
+    :param bbox_sub: the BBOX (MinX, MaxX, MinY, MaxY) defining the spatial
+                     subset to be read in.
+    :return: a n x m numpy array with the pixel values.
+    """
+    import rsgislib.tools.geometrytools
+
+    img_x_res, img_y_res = get_img_res(input_img)
+    img_y_res_abs = math.fabs(img_y_res)
+    img_bbox = get_img_bbox(input_img)
+    img_rsgislib_dtype = get_rsgislib_datatype_from_img(input_img)
+    img_n_bands = get_img_band_count(input_img)
+    img_x_size, img_y_size = get_img_size(input_img)
+
+    if (img_band < 1) or (img_band > img_n_bands):
+        raise rsgislib.RSGISPyException(
+            f"The band specified ({img_band}) is not within the image."
+        )
+
+    if not rsgislib.tools.geometrytools.does_bbox_contain(img_bbox, bbox_sub):
+        raise rsgislib.RSGISPyException("Subset is not within the image.")
+
+    x_min = bbox_sub[0]
+    x_max = bbox_sub[1]
+    y_min = bbox_sub[2]
+    y_max = bbox_sub[3]
+
+    width_coord = x_max - x_min
+    height_coord = y_max - y_min
+
+    sub_width = int(math.ceil(width_coord / img_x_res))
+    if sub_width > img_x_size:
+        sub_width = img_x_size
+    sub_height = int(math.ceil(height_coord / img_y_res_abs))
+    if sub_height > img_y_size:
+        sub_height = img_y_size
+
+    if (sub_width < 1) or (sub_height < 1):
+        raise rsgislib.RSGISPyException(
+            f"Something has gone wrong the subset size is "
+            f"less than 1: {sub_width} x {sub_height}."
+        )
+
+    img_coord_x_diff = bbox_sub[0] - img_bbox[0]
+    img_coord_y_diff = img_bbox[3] - bbox_sub[3]
+
+    img_pxl_x_diff = int(math.floor((img_coord_x_diff / img_x_res) + 0.5))
+    img_pxl_y_diff = int(math.floor((img_coord_y_diff / img_y_res_abs) + 0.5))
+
+    if sub_width == img_x_size:
+        img_pxl_x_diff = 0
+
+    if sub_height == img_y_size:
+        img_pxl_y_diff = 0
+
+    raster_arr = numpy.zeros(
+        (sub_height, sub_width), dtype=rsgislib.get_numpy_datatype(img_rsgislib_dtype)
+    )
+
+    img_ds_obj = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if img_ds_obj is None:
+        raise rsgislib.RSGISPyException(f"Could not open raster image: {input_img}")
+    band_obj = img_ds_obj.GetRasterBand(img_band)
+    band_obj.ReadAsArray(
+        xoff=img_pxl_x_diff,
+        yoff=img_pxl_y_diff,
+        win_xsize=sub_width,
+        win_ysize=sub_height,
+        buf_obj=raster_arr,
+    )
+    img_ds_obj = None
+
+    return raster_arr
+
+
 def assign_random_pxls(
     input_img: str,
     output_img: str,

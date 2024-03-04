@@ -658,17 +658,20 @@ def plot_histogram_threshold(
 
 
 def plot_vec_fields(
-    vec_file: str,
-    vec_lyr: str,
-    out_plot_file: str,
-    x_plt_field: str,
-    y_plt_field: str,
-    x_lbl: str,
-    y_lbl: str,
-    title: str,
-    plt_width: int = 18,
-    plt_height: int = 6,
-    plt_line: bool = True,
+        vec_file: str,
+        vec_lyr: str,
+        out_plot_file: str,
+        x_plt_field: str,
+        y_plt_field: str,
+        x_lbl: str,
+        y_lbl: str,
+        title: str,
+        feat_id_field: str = None,
+        x_field_no_data: float = None,
+        y_field_no_data: float = None,
+        plt_width: int = 18,
+        plt_height: int = 6,
+        plt_line: bool = True,
 ):
     """
     A function which plots two variables from a vector layer.
@@ -695,14 +698,44 @@ def plot_vec_fields(
     x_vals = data_gdf[x_plt_field].values
     y_vals = data_gdf[y_plt_field].values
 
-    fig, ax = plt.subplots(figsize=(plt_width, plt_height))
-    if plt_line:
-        ax.plot(x_vals, y_vals)
+    if x_field_no_data is not None:
+        x_vld_msk = x_vals != x_field_no_data
     else:
-        ax.scatter(x_vals, y_vals)
+        x_vld_msk = numpy.ones_like(x_vals, dtype=bool)
+    if y_field_no_data is not None:
+        y_vld_msk = y_vals != y_field_no_data
+    else:
+        y_vld_msk = numpy.ones_like(y_vals, dtype=bool)
+
+    vld_vals = numpy.logical_and(x_vld_msk, y_vld_msk)
+    x_vals = x_vals[vld_vals]
+    y_vals = y_vals[vld_vals]
+
+    unq_feat_ids = [None]
+    if feat_id_field is not None:
+        feat_ids = data_gdf[feat_id_field].values
+        feat_ids = feat_ids[vld_vals]
+        unq_feat_ids = numpy.unique(feat_ids)
+
+    fig, ax = plt.subplots(figsize=(plt_width, plt_height))
+    for feat_id in unq_feat_ids:
+        if feat_id is not None:
+            feat_x_vals = x_vals[feat_ids == feat_id]
+            feat_y_vals = y_vals[feat_ids == feat_id]
+        else:
+            feat_x_vals = x_vals
+            feat_y_vals = y_vals
+
+        if plt_line:
+            ax.plot(feat_x_vals, feat_y_vals, label=f"Feature {feat_id}")
+        else:
+            ax.scatter(feat_x_vals, feat_y_vals, label=f"Feature {feat_id}")
+
     ax.set_xlabel(x_lbl)
     ax.set_ylabel(y_lbl)
     ax.set_title(title)
+    if feat_id_field is not None:
+        plt.legend()
     fig.tight_layout()
     plt.savefig(out_plot_file)
 
