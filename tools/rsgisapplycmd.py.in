@@ -49,7 +49,7 @@ def run_cmd(execmd):
     try:
         subprocess.call(execmd, shell=True)
     except OSError as e:
-        raise Exception("Could not excute command: {}".format(execmd))
+        raise Exception("Could not execute command: {}".format(execmd))
 
 
 if __name__ == "__main__":
