@@ -141,6 +141,7 @@ Create
 .. autofunction:: rsgislib.imageutils.create_copy_img
 .. autofunction:: rsgislib.imageutils.create_copy_img_def_extent
 .. autofunction:: rsgislib.imageutils.create_blank_buf_img_from_ref_img
+.. autofunction:: rsgislib.imageutils.create_blank_buf_img_from_4326_ref_img
 .. autofunction:: rsgislib.imageutils.create_blank_img_from_ref_vector
 .. autofunction:: rsgislib.imageutils.create_copy_img_vec_extent_snap_to_grid
 .. autofunction:: rsgislib.imageutils.create_blank_img_from_bbox

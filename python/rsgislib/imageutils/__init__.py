@@ -1753,7 +1753,7 @@ def create_blank_buf_img_from_ref_img(
 ):
     """
     A function to create a new image file based on the input image but buffered by
-    the specified amount (e.g., 100 pixels bigger on all sides. The buffer amount
+    the specified amount (e.g., 100 pixels bigger on all sides). The buffer amount
     can be specified in pixels or spatial units. If non-None value is given for both
     inputs then an error will be produced. By default the no data value will be taken
     from the input image header but if not available or specified within the function
@@ -1810,6 +1810,101 @@ def create_blank_buf_img_from_ref_img(
 
         out_tl_x = in_img_bbox[0] - (buf_pxl_ext * x_res_abs)
         out_tl_y = in_img_bbox[3] + (buf_pxl_ext * y_res_abs)
+
+    create_blank_img(
+        output_img,
+        n_bands,
+        x_out_size,
+        y_out_size,
+        out_tl_x,
+        out_tl_y,
+        x_res,
+        y_res,
+        no_data_val,
+        "",
+        wkt_str,
+        gdalformat,
+        datatype,
+    )
+
+
+def create_blank_buf_img_from_4326_ref_img(
+    input_img: str,
+    output_img: str,
+    gdalformat: str,
+    datatype: int,
+    buf_pxl_ext: int,
+    no_data_val: float = None,
+):
+    """
+    A function to create a new image file based on the input image but buffered by
+    the specified amount (e.g., 100 pixels bigger on all sides). By default the no
+    data value will be taken from the input image header but if not available or
+    specified within the function call then that value will be used. Note, this
+    function only works with images projected in WGS84 (EPSG:4326) and deals with
+    edge cases, reducing the image size so coordinates are within -180-180, -90-90
+    valid range.
+
+    :param input_img: input reference image
+    :param output_img: output image file.
+    :param gdalformat: output image file format.
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the
+                     output image.
+    :param buf_pxl_ext: the amount the input image will be buffered in pixels.
+    :param no_data_val: Optional no data value. If None then the no data value will be
+                        taken from the input image.
+
+    """
+    img_epsg = get_epsg_proj_from_img(input_img)
+    if img_epsg != 4326:
+        raise rsgislib.RSGISPyException(
+            "Expecting an input image with projection EPSG:4326"
+        )
+
+    if no_data_val is None:
+        no_data_val = get_img_no_data_value(input_img)
+
+        if no_data_val is None:
+            raise rsgislib.RSGISPyException("You must specify a no data value ")
+
+    x_res, y_res = get_img_res(input_img, abs_vals=False)
+    x_res_abs = abs(x_res)
+    y_res_abs = abs(y_res)
+    x_in_size, y_in_size = get_img_size(input_img)
+    in_img_bbox = get_img_bbox(input_img)
+    n_bands = get_img_band_count(input_img)
+    wkt_str = get_wkt_proj_from_img(input_img)
+
+    x_out_size = x_in_size + (2 * buf_pxl_ext)
+    y_out_size = y_in_size + (2 * buf_pxl_ext)
+
+    out_tl_x = in_img_bbox[0] - (buf_pxl_ext * x_res_abs)
+    out_tl_y = in_img_bbox[3] + (buf_pxl_ext * y_res_abs)
+
+    br_x = out_tl_x + (x_out_size * x_res_abs)
+    br_y = out_tl_y - (y_out_size * y_res_abs)
+
+    if out_tl_x < -180:
+        x_diff = -180 - out_tl_x
+        n_pxls = int(math.ceil(x_diff / x_res_abs))
+        out_tl_x = -180.0
+        x_out_size -= n_pxls
+
+    if br_x > 180:
+        x_diff = 180 - br_x
+        n_pxls = int(math.ceil(x_diff / x_res_abs))
+        x_out_size -= n_pxls
+
+    if br_y < -90:
+        y_diff = -90 - br_y
+        n_pxls = int(math.ceil(y_diff / y_res_abs))
+        y_out_size -= n_pxls
+
+    if out_tl_y > 90:
+        y_diff = 90 - out_tl_y
+        n_pxls = int(math.ceil(y_diff / y_res_abs))
+        y_out_size -= n_pxls
+        out_tl_y = 90.0
 
     create_blank_img(
         output_img,
