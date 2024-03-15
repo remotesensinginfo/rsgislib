@@ -335,3 +335,29 @@ def extract_images_from_pdf(input_pdf, output_dir):
             image = doc.extract_image(xref)
             pix = fitz.Pixmap(doc, xref)
             pix.save(os.path.join(output_dir, f"p{i}_{xref}.png"))
+
+
+def create_qr_code(output_img, qr_data, qr_code_size=10, qr_code_border=4):
+    """
+    A function which uses the qrcode module to create a QR code image file.
+    Needs the qrcode module installed (pip install qrcode)
+
+    :param output_img: file path to the output image
+    :param qr_data: the data to be encoded in the QR code (e.g., URL)
+    :param qr_code_size: the size of the QR code (default: 10)
+    :param qr_code_border: the border to the QA code (default: 4)
+
+    """
+    import qrcode
+
+    qr = qrcode.QRCode(
+            version=5,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=qr_code_size,
+            border=qr_code_border,
+    )
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    img.save(output_img)
