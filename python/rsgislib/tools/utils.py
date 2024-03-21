@@ -783,7 +783,6 @@ def create_year_month_lst(
     out_year_mnt_lst = list()
     years = numpy.arange(start_year, end_year + 1, 1)
     for year in years:
-        print(year)
         if (year == start_year) and (year == end_year):
             months = numpy.arange(start_month, end_month + 1, 1)
         elif year == start_year:
@@ -793,7 +792,6 @@ def create_year_month_lst(
         else:
             months = numpy.arange(1, 13, 1)
         for month in months:
-            print(month)
             out_year_mnt_lst.append((year, month))
 
     return out_year_mnt_lst
