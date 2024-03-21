@@ -9,7 +9,7 @@ import json
 import math
 import os
 import string
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 
 import numpy
 
@@ -764,6 +764,39 @@ def find_month_end_date(year: int, month: int) -> int:
     month_days = cal.monthdayscalendar(year, month)
     max_day_month = numpy.array(month_days).flatten().max()
     return max_day_month
+
+
+def create_year_month_lst(
+    start_year: int, start_month: int, end_year: int, end_month: int
+) -> List[Tuple[int, int]]:
+    """
+    A function which creates a list of year and month tuples from a start
+    and end month and year.
+
+    :param start_year: int with the start year
+    :param start_month: int with the start month
+    :param end_year: int with the end year
+    :param end_month: int with the end month
+    :return: List of tuples (year, month)
+
+    """
+    out_year_mnt_lst = list()
+    years = numpy.arange(start_year, end_year + 1, 1)
+    for year in years:
+        print(year)
+        if (year == start_year) and (year == end_year):
+            months = numpy.arange(start_month, end_month + 1, 1)
+        elif year == start_year:
+            months = numpy.arange(start_month, 13, 1)
+        elif year == end_year:
+            months = numpy.arange(1, end_month + 1, 1)
+        else:
+            months = numpy.arange(1, 13, 1)
+        for month in months:
+            print(month)
+            out_year_mnt_lst.append((year, month))
+
+    return out_year_mnt_lst
 
 
 def is_summer_winter(lat: float, date: datetime.date) -> int:
