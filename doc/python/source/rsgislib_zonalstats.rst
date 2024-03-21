@@ -46,6 +46,8 @@ Extracting Pixels to HDF5
 .. autofunction:: rsgislib.zonalstats.image_zone_to_hdf
 .. autofunction:: rsgislib.zonalstats.extract_zone_img_values_to_hdf
 .. autofunction:: rsgislib.zonalstats.extract_zone_img_band_values_to_hdf
+.. autofunction:: rsgislib.zonalstats.extract_zone_band_values_to_h5_file
+.. autofunction:: rsgislib.zonalstats.extract_zone_band_values_to_h5
 .. autofunction:: rsgislib.zonalstats.random_sample_hdf5_file
 .. autofunction:: rsgislib.zonalstats.split_sample_hdf5_file
 .. autofunction:: rsgislib.zonalstats.merge_extracted_hdf5_data
@@ -71,4 +73,3 @@ HDF Utilities
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
