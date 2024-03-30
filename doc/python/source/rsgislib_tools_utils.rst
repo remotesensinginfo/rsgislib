@@ -71,6 +71,7 @@ Dates
 .. autofunction:: rsgislib.tools.utils.get_days_since_date
 .. autofunction:: rsgislib.tools.utils.find_month_end_date
 .. autofunction:: rsgislib.tools.utils.is_summer_winter
+.. autofunction:: rsgislib.tools.utils.create_year_month_lst
 
 Powerset
 ----------
@@ -89,4 +90,3 @@ Compute Environment
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

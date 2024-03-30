@@ -17,3 +17,6 @@ PDF Utilities
 -----------------
 .. autofunction:: rsgislib.tools.imagetools.extract_images_from_pdf
 
+QR Codes
+-----------------
+.. autofunction:: rsgislib.tools.imagetools.create_qr_code

@@ -2817,3 +2817,316 @@ def get_hdf5_data(h5_files: List[str]) -> numpy.array:
         f_obj_h5.close()
 
     return data_arr
+
+
+def extract_zone_band_values_to_h5_file(
+    vec_file: str,
+    vec_lyr: str,
+    input_img: str,
+    img_band: int,
+    out_img_base: str,
+    zone_unq_id_field: str,
+    vec_def_epsg: int = None,
+):
+    """
+    A function which exports the pixels for the selected band intersecting with
+    each feature in the raster image to a HDF5 file. The input vector layer requires
+    a column with a unique ID which can be inserted into the output file name.
+
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer within the input file which specifies the
+                    features and where the output stats will be written.
+    :param input_img: the values image
+    :param img_band: the index (starting at 1) of the image band for which the stats
+                     will be calculated. If defined the no data value of the band
+                     will be ignored.
+    :param out_img_base: The base path and file name for the output files.
+                         for example /path/to/file/something would produce an
+                         output file /path/to/file/something_1.h5
+    :param zone_unq_id_field: The column name within the vector layer with the
+                              unique ID which will be added to the output file
+                              name.
+    :param vec_def_epsg: an EPSG code can be specified for the vector layer is the
+                         projection is not well defined within the inputted
+                         vector layer.
+
+    """
+    try:
+        vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+        if vecDS is None:
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
+
+        vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
+        if vec_lyr_obj is None:
+            raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
+
+        extract_zone_band_values_to_h5(
+            vec_lyr_obj,
+            input_img,
+            img_band,
+            out_img_base,
+            zone_unq_id_field,
+            vec_def_epsg,
+        )
+
+        vecDS = None
+    except Exception as e:
+        print(f"Error Vector File: {vec_file}", file=sys.stderr)
+        print(f"Error Vector Layer: {vec_lyr}", file=sys.stderr)
+        print(f"Error Image File: {input_img}", file=sys.stderr)
+        raise e
+
+
+def extract_zone_band_values_to_h5(
+    vec_lyr_obj: ogr.Layer,
+    input_img: str,
+    img_band: int,
+    out_img_base: str,
+    zone_unq_id_field: str,
+    vec_def_epsg: int = None,
+):
+    """
+    A function which exports the pixels for the selected band intersecting with
+    each feature in the raster image to a HDF5 file. The input vector layer requires
+    a column with a unique ID which can be inserted into the output file name.
+
+    :param vec_lyr_obj: OGR vector layer object containing the geometries being
+                        processed and to which the stats will be written.
+    :param input_img: the values image
+    :param img_band: the index (starting at 1) of the image band for which the pixels
+                     to be exported.
+    :param out_img_base: The base path and file name for the output files.
+                         for example /path/to/file/something would produce an
+                         output file /path/to/file/something_1.h5
+    :param zone_unq_id_field: The column name within the vector layer with the
+                              unique ID which will be added to the output file
+                              name.
+    :param vec_def_epsg: an EPSG code can be specified for the vector layer is the
+                         projection is not well defined within the inputted
+                         vector layer.
+
+    """
+    import h5py
+
+    try:
+        if vec_lyr_obj is None:
+            raise rsgislib.RSGISPyException("The inputted vector layer was None")
+
+        imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
+        if imgDS is None:
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
+        img_band_obj = imgDS.GetRasterBand(img_band)
+        if img_band_obj is None:
+            raise rsgislib.RSGISPyException(
+                "Could not find image band '{}'".format(img_band)
+            )
+        imgGeoTrans = imgDS.GetGeoTransform()
+        img_wkt_str = imgDS.GetProjection()
+        img_spatial_ref = osr.SpatialReference()
+        img_spatial_ref.ImportFromWkt(img_wkt_str)
+        img_spatial_ref.AutoIdentifyEPSG()
+        epsg_img_spatial = img_spatial_ref.GetAuthorityCode(None)
+
+        datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
+        h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
+
+        pixel_width = imgGeoTrans[1]
+        pixel_height = imgGeoTrans[5]
+
+        imgSizeX = imgDS.RasterXSize
+        imgSizeY = imgDS.RasterYSize
+
+        imgNoDataVal = img_band_obj.GetNoDataValue()
+
+        if vec_def_epsg is None:
+            veclyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
+            if veclyr_spatial_ref is None:
+                raise rsgislib.RSGISPyException(
+                    "Could not retrieve a projection object from the vector layer - "
+                    "projection might not be be defined."
+                )
+            epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        else:
+            epsg_vec_spatial = vec_def_epsg
+            veclyr_spatial_ref = osr.SpatialReference()
+            veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
+
+        if epsg_vec_spatial != epsg_img_spatial:
+            imgDS = None
+            vecDS = None
+            raise rsgislib.RSGISPyException(
+                "Inputted raster and vector layers have different "
+                "projections: ('{0}' '{1}') ".format("Vector Layer Provided", input_img)
+            )
+
+        veclyrDefn = vec_lyr_obj.GetLayerDefn()
+
+        colExists = False
+        for i in range(veclyrDefn.GetFieldCount()):
+            if veclyrDefn.GetFieldDefn(i).GetName() == zone_unq_id_field:
+                colExists = True
+                break
+
+        if not colExists:
+            raise rsgislib.RSGISPyException(
+                "The specified column does not exist in the input layer; "
+                "check case as some drivers are case sensitive."
+            )
+
+        vec_mem_drv = ogr.GetDriverByName("Memory")
+        img_mem_drv = gdal.GetDriverByName("MEM")
+
+        # Iterate through features.
+        nFeats = vec_lyr_obj.GetFeatureCount(True)
+        pbar = tqdm.tqdm(total=nFeats)
+        counter = 0
+        vec_lyr_obj.ResetReading()
+        feat = vec_lyr_obj.GetNextFeature()
+        while feat is not None:
+
+            if feat is not None:
+                feat_geom = feat.geometry()
+                if feat_geom is not None:
+                    feat_bbox = feat_geom.GetEnvelope()
+                    havepxls = True
+
+                    x1Sp = float(feat_bbox[0] - imgGeoTrans[0])
+                    x2Sp = float(feat_bbox[1] - imgGeoTrans[0])
+                    y1Sp = float(feat_bbox[3] - imgGeoTrans[3])
+                    y2Sp = float(feat_bbox[2] - imgGeoTrans[3])
+
+                    if math.isclose(x1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
+                        x1 = 0
+                    else:
+                        x1 = int(x1Sp / pixel_width) - 1
+
+                    if math.isclose(x2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
+                        x2 = 0
+                    else:
+                        x2 = int(x2Sp / pixel_width) + 1
+
+                    if math.isclose(y1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
+                        y1 = 0
+                    else:
+                        y1 = int(y1Sp / pixel_height) - 1
+
+                    if math.isclose(y2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
+                        y2 = 0
+                    else:
+                        y2 = int(y2Sp / pixel_height) + 1
+
+                    if x1 < 0:
+                        x1 = 0
+                    elif x1 >= imgSizeX:
+                        x1 = imgSizeX - 1
+
+                    if x2 < 0:
+                        x2 = 0
+                    elif x2 >= imgSizeX:
+                        x2 = imgSizeX - 1
+
+                    if y1 < 0:
+                        y1 = 0
+                    elif y1 >= imgSizeY:
+                        y1 = imgSizeY - 1
+
+                    if y2 < 0:
+                        y2 = 0
+                    elif y2 >= imgSizeY:
+                        y2 = imgSizeY - 1
+
+                    xsize = x2 - x1
+                    ysize = y2 - y1
+
+                    if (xsize == 0) or (ysize == 0):
+                        havepxls = False
+
+                    # Define the image ROI for the feature
+                    src_offset = (x1, y1, xsize, ysize)
+
+                    if havepxls:
+                        # Read the band array.
+                        src_array = img_band_obj.ReadAsArray(*src_offset)
+                    else:
+                        src_array = None
+
+                    if (src_array is not None) and havepxls:
+                        # calculate new geotransform of the feature subset
+                        subGeoTrans = (
+                            (imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1])),
+                            imgGeoTrans[1],
+                            0.0,
+                            (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5])),
+                            0.0,
+                            imgGeoTrans[5],
+                        )
+
+                        # Create a temporary vector layer in memory
+                        vec_mem_ds = vec_mem_drv.CreateDataSource("out")
+                        vec_mem_lyr = vec_mem_ds.CreateLayer(
+                            "poly", veclyr_spatial_ref, ogr.wkbPolygon
+                        )
+                        vec_mem_lyr.CreateFeature(feat.Clone())
+
+                        # Rasterize the feature.
+                        img_tmp_ds = img_mem_drv.Create(
+                            "", src_offset[2], src_offset[3], 1, gdal.GDT_Byte
+                        )
+                        img_tmp_ds.SetGeoTransform(subGeoTrans)
+                        img_tmp_ds.SetProjection(img_wkt_str)
+                        gdal.RasterizeLayer(
+                            img_tmp_ds, [1], vec_mem_lyr, burn_values=[1]
+                        )
+                        rv_array = img_tmp_ds.ReadAsArray()
+
+                        # Mask the data vals array to feature.
+                        mask_arr = numpy.ones_like(src_array, dtype=numpy.uint8)
+                        if imgNoDataVal is not None:
+                            mask_arr[src_array == imgNoDataVal] = 0
+                            mask_arr[rv_array == 0] = 0
+                        else:
+                            mask_arr[rv_array == 0] = 0
+
+                        mask_arr = mask_arr.flatten()
+                        src_array_flat = src_array.flatten()
+                        src_array_flat = src_array_flat[mask_arr == 1]
+
+                        if src_array_flat.shape[0] > 0:
+                            # Write H5 file...
+                            feat_id = feat.GetField(zone_unq_id_field)
+                            out_h5_file = f"{out_img_base}_{feat_id}.h5"
+
+                            chunk_len = 1000
+                            num_vals = src_array_flat.shape[0]
+                            if num_vals < chunk_len:
+                                chunk_len = num_vals
+
+                            f_h5_out = h5py.File(out_h5_file, "w")
+                            data_grp = f_h5_out.create_group("DATA")
+                            meta_grp = f_h5_out.create_group("META-DATA")
+                            data_grp.create_dataset(
+                                "DATA",
+                                data=src_array_flat,
+                                chunks=chunk_len,
+                                compression="gzip",
+                                shuffle=True,
+                                dtype=h5_dtype,
+                            )
+                            describ_ds = meta_grp.create_dataset(
+                                "DESCRIPTION", (1,), dtype="S10"
+                            )
+                            describ_ds[0] = f"Pixels from feature {feat_id}".encode()
+                            f_h5_out.close()
+
+                        vec_mem_ds = None
+                        img_tmp_ds = None
+
+            feat = vec_lyr_obj.GetNextFeature()
+            counter = counter + 1
+            pbar.update(counter)
+        pbar.close()
+
+        imgDS = None
+    except Exception as e:
+        print(f"Error Image File: {input_img}", file=sys.stderr)
+        raise e
