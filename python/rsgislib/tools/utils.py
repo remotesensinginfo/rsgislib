@@ -766,7 +766,7 @@ def find_month_end_date(year: int, month: int) -> int:
     return max_day_month
 
 
-def create_year_month_lst(
+def create_year_month_start_end_lst(
     start_year: int, start_month: int, end_year: int, end_month: int
 ) -> List[Tuple[int, int]]:
     """
@@ -793,6 +793,44 @@ def create_year_month_lst(
             months = numpy.arange(1, 13, 1)
         for month in months:
             out_year_mnt_lst.append((year, month))
+
+    return out_year_mnt_lst
+
+
+def create_year_month_n_months_lst(
+    start_year: int, start_month: int, n_months: int
+) -> List[Tuple[int, int]]:
+    """
+    A function which creates a list of year and month tuples from a start
+    and end month and year.
+
+    :param start_year: int with the start year
+    :param start_month: int with the start month
+    :param n_months: int with the number of months ahead
+    :return: List of tuples (year, month)
+
+    """
+    if start_year < 0:
+        raise rsgislib.RSGISPyException("Year must be positive")
+    if (start_month < 1) or (start_month > 12):
+        raise rsgislib.RSGISPyException("Month must be between 1-12")
+
+    out_year_mnt_lst = list()
+    out_year_mnt_lst.append((start_year, start_month))
+    months = numpy.arange(0, n_months, 1)
+    months = months + start_month
+
+    month_vals = months % 12
+    year = start_year
+    first = True
+    for month in month_vals:
+        if first:
+            out_year_mnt_lst.append((year, month + 1))
+            first = False
+        else:
+            if month == 0:
+                year += 1
+            out_year_mnt_lst.append((year, month + 1))
 
     return out_year_mnt_lst
 
