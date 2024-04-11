@@ -691,7 +691,7 @@ static PyMethodDef SegmentationMethods[] = {
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param in_memory: is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
 ":param no_data_val: is None or float\n"
-":param add_to_rat: is a boolean specifying whether the pixel value (from inputimage) should be added as a RAT.\n"
+":param add_to_rat: is a boolean specifying whether the pixel value (from input_img) should be added as a RAT (Column Name: PixelVal).\n"
 "\n"},
 
     {"rm_small_clumps_stepwise", (PyCFunction)Segmentation_RMSmallClumpsStepwise, METH_VARARGS | METH_KEYWORDS,
@@ -906,4 +906,3 @@ init_segmentation(void)
     return pModule;
 #endif
 }
-
