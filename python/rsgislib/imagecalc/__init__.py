@@ -1107,7 +1107,12 @@ def calc_imgs_pxl_mode(
         image_data = numpy.concatenate(inputs.images, axis=0).astype(numpy.float32)
         image_data[image_data == otherargs.no_data_val] = numpy.nan
         mode_arr, count_arr = scipy.stats.mode(image_data, axis=0, nan_policy="omit")
-        outputs.outimage = mode_arr.astype(otherargs.numpyDT)
+        if len(mode_arr.shape) == 2:
+            outputs.outimage = numpy.expand_dims(
+                mode_arr.astype(otherargs.numpyDT), axis=0
+            )
+        else:
+            outputs.outimage = mode_arr.astype(otherargs.numpyDT)
 
     applier.apply(_applyCalcMode, infiles, outfiles, otherargs, controls=aControls)
 
@@ -1173,7 +1178,12 @@ def calc_imgs_pxl_percentiles(
         image_data = numpy.concatenate(inputs.images, axis=0).astype(numpy.float32)
         image_data[image_data == otherargs.no_data_val] = numpy.nan
         percentiles_arr = numpy.nanpercentile(image_data, otherargs.percentiles, axis=0)
-        outputs.outimage = percentiles_arr.astype(otherargs.numpyDT)
+        if len(percentiles_arr.shape) == 2:
+            outputs.outimage = numpy.expand_dims(
+                percentiles_arr.astype(otherargs.numpyDT), axis=0
+            )
+        else:
+            outputs.outimage = percentiles_arr.astype(otherargs.numpyDT)
 
     applier.apply(
         _applyCalcPercentile, infiles, outfiles, otherargs, controls=aControls
@@ -2236,7 +2246,6 @@ def calc_img_earth_move_dist(
     img_b_arr = img_b_arr[vld_pxls]
 
     if (len(img_a_arr) > 5) and (len(img_b_arr) > 5):
-
         img_range = None
         if use_glb_range:
             img_min = numpy.min(img_a_arr)
