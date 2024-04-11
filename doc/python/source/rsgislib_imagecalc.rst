@@ -21,6 +21,9 @@ Statistical Summary
 ---------------------
 
 .. autofunction:: rsgislib.imagecalc.image_pixel_column_summary
+.. autofunction:: rsgislib.imagecalc.calc_img_min_max
+.. autofunction:: rsgislib.imagecalc.calc_img_mean
+.. autofunction:: rsgislib.imagecalc.calc_img_stdev
 .. autofunction:: rsgislib.imagecalc.calc_band_percentile
 .. autofunction:: rsgislib.imagecalc.get_img_band_stats_in_env
 .. autofunction:: rsgislib.imagecalc.get_img_band_mode_in_env
@@ -39,6 +42,7 @@ Statistical Summary
 .. autofunction:: rsgislib.imagecalc.count_imgs_int_val_occur
 .. autofunction:: rsgislib.imagecalc.calc_imgs_pxl_percentiles
 .. autoclass:: rsgislib.imagecalc.StatsSummary
+
 
 Update Pixel Values
 --------------------
@@ -81,6 +85,7 @@ Histogram
 Normalise
 ----------
 
+.. autofunction:: rsgislib.imagecalc.normalise_img_pxl_vals_py
 .. autofunction:: rsgislib.imagecalc.normalise_image_band
 .. autofunction:: rsgislib.imagecalc.calc_img_rescale
 .. autofunction:: rsgislib.imagecalc.rescale_img_pxl_vals

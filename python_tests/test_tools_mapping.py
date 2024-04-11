@@ -38,7 +38,7 @@ def test_create_raster_img_map(tmp_path):
         ax,  # specify the axis to which the image will be drawn
         input_img,  # specify the file path to the image
         img_bands=[8, 9, 3],  # specify the band combination
-        img_stch=rsgislib.IMG_STRECTH_CUMULATIVE,  # specify the stretch to use
+        img_stch=rsgislib.IMG_STRETCH_CUMULATIVE,  # specify the stretch to use
     )
 
     out_plot_img = os.path.join(tmp_path, "out_map_img.png")
@@ -64,7 +64,7 @@ def test_create_raster_img_map_subset(tmp_path):
         ax,  # specify the axis to which the image will be drawn
         input_img,  # specify the file path to the image
         img_bands=[8, 9, 3],  # specify the band combination
-        img_stch=rsgislib.IMG_STRECTH_CUMULATIVE,  # specify the stretch to use
+        img_stch=rsgislib.IMG_STRETCH_CUMULATIVE,  # specify the stretch to use
         bbox=bbox,
     )
 
