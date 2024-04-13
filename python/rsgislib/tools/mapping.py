@@ -632,6 +632,7 @@ def create_raster_img_map(
     img_no_data_val: float = None,
     stch_min_max_vals: Union[Dict, List[Dict]] = None,
     stch_n_stdevs: float = 2.0,
+    img_alpha: float=1.0,
     scale_bar_loc: str = "upper right",
     plot_zorder: float = 1,
 ):
@@ -664,6 +665,8 @@ def create_raster_img_map(
     :param stch_n_stdevs: If using the rsgislib.IMG_STRETCH_STDEV stretch then
                           this is the number of standard deviations parameters.
                           See rsgislib.tools.plotting.stdev_stretch_np_arr
+    :param img_alpha: If less than one then the input_img data will have an alpha
+                      (transparency) applied. Default: 1
     :param scale_bar_loc: the location on the plot of the scale bar. Options defined
                           by the matplotlib-scalebar module. But must be one of:
                           upper right, upper left, lower left, lower right, right,
@@ -713,7 +716,7 @@ def create_raster_img_map(
     if len(img_bands) == 1:
         clr_map = "gist_gray"
 
-    ax.imshow(img_data_strch, cmap=clr_map, extent=img_coords, zorder=plot_zorder)
+    ax.imshow(img_data_strch, cmap=clr_map, extent=img_coords, alpha=img_alpha, zorder=plot_zorder)
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
 
