@@ -6,7 +6,7 @@ calculating on images.
 
 import math
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 import numpy
 from osgeo import gdal
@@ -270,18 +270,18 @@ def _computeProximityArrArgsFunc(arg_vals):
 
 
 def calc_dist_to_img_vals_tiled(
-    input_img,
-    output_img,
-    pxl_vals,
-    img_band=1,
-    max_dist=1000,
-    no_data_val=1000,
-    out_no_data_val=None,
-    gdalformat="KEA",
-    unit_geo=True,
-    tmp_dir="tmp",
-    tile_size=2000,
-    n_cores=-1,
+    input_img: str,
+    output_img: str,
+    pxl_vals: List[int],
+    img_band: int = 1,
+    max_dist: float = 1000,
+    no_data_val: float = 1000,
+    out_no_data_val: float = None,
+    gdalformat: str = "KEA",
+    unit_geo: bool = True,
+    tmp_dir: str = "tmp",
+    tile_size: int = 2000,
+    n_cores: int = -1,
 ):
     """
     A function to calculate the distance to the nearest pixel value with
@@ -560,7 +560,7 @@ def count_pxls_of_val(input_img: str, vals: List[int], img_band: int = None):
     return outVals
 
 
-def get_unique_values(input_img, img_band=1):
+def get_unique_values(input_img: str, img_band: int = 1):
     """
     Find the unique image values within an image band.
     Note, the whole image band gets read into memory.
@@ -587,7 +587,10 @@ def get_unique_values(input_img, img_band=1):
 
 
 def get_pca_eigen_vector(
-    input_img, pxl_n_sample, no_data_val=None, out_matrix_file=None
+    input_img: str,
+    pxl_n_sample: int,
+    no_data_val: float = None,
+    out_matrix_file: str = None,
 ):
     """
     A function which takes a sample from an input image and uses it to
@@ -642,15 +645,15 @@ def get_pca_eigen_vector(
 
 
 def perform_image_pca(
-    input_img,
-    output_img,
-    out_eigen_vec_file,
-    n_comps=None,
-    pxl_n_sample=100,
-    gdalformat="KEA",
-    datatype=rsgislib.TYPE_32FLOAT,
-    no_data_val=None,
-    calc_stats=True,
+    input_img: str,
+    output_img: str,
+    out_eigen_vec_file: str,
+    n_comps: int = None,
+    pxl_n_sample: int = 100,
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_32FLOAT,
+    no_data_val: float = None,
+    calc_stats: bool = True,
 ):
     """
     A function which performs a PCA on the input image.
@@ -702,15 +705,15 @@ def perform_image_pca(
 
 
 def perform_image_mnf(
-    input_img,
-    output_img,
-    n_comps=None,
-    pxl_n_sample=100,
-    in_img_no_data=None,
-    tmp_dir="tmp",
-    gdalformat="KEA",
-    datatype=rsgislib.TYPE_32FLOAT,
-    calc_stats=True,
+    input_img: str,
+    output_img: str,
+    n_comps: int = None,
+    pxl_n_sample: int = 100,
+    in_img_no_data: float = None,
+    tmp_dir: str = "tmp",
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_32FLOAT,
+    calc_stats: bool = True,
 ):
     """
     A function which takes a sample from an input image and uses it to
@@ -815,7 +818,12 @@ def perform_image_mnf(
 
 
 def rescale_img_pxl_vals(
-    input_img, output_img, gdalformat, datatype, band_rescale_objs, trim_to_limits=True
+    input_img: str,
+    output_img: str,
+    gdalformat: str,
+    datatype: int,
+    band_rescale_objs: List[ImageBandRescale],
+    trim_to_limits: bool = True,
 ):
     """
     Function which rescales an input image base on a list of rescaling parameters.
@@ -904,7 +912,14 @@ def rescale_img_pxl_vals(
 
 
 def calc_histograms_for_msk_vals(
-    input_img, img_band, img_msk, msk_band, min_val, max_val, bin_width, msk_vals=None
+    input_img: str,
+    img_band: int,
+    img_msk: str,
+    msk_band: int,
+    min_val: float,
+    max_val: float,
+    bin_width: float,
+    msk_vals: List[float] = None,
 ):
     """
     A function which reads the image bands (values and mask) into memory and creates a
@@ -1042,7 +1057,9 @@ def calc_sum_stats_msk_vals(
     return stats_dict
 
 
-def calc_imgs_pxl_mode(input_imgs, output_img, gdalformat, no_data_val=0):
+def calc_imgs_pxl_mode(
+    input_imgs: List[str], output_img: str, gdalformat: str, no_data_val: float = 0
+):
     """
     Function which calculates the mode of a group of images.
 
@@ -1101,7 +1118,11 @@ def calc_imgs_pxl_mode(input_imgs, output_img, gdalformat, no_data_val=0):
 
 
 def calc_imgs_pxl_percentiles(
-    input_imgs, percentiles, output_img, gdalformat, no_data_val=0
+    input_imgs: List[str],
+    percentiles: List[float],
+    output_img: str,
+    gdalformat: str,
+    no_data_val: float = 0,
 ):
     """
     Function which calculates percentiles on a per-pixel basis for a
@@ -1170,7 +1191,7 @@ def calc_imgs_pxl_percentiles(
 
 
 def calc_img_basic_stats_for_ref_region(
-    in_ref_img, in_stats_imgs, output_img, gdalformat="KEA"
+    in_ref_img: str, in_stats_imgs: List[str], output_img: str, gdalformat: str = "KEA"
 ):
     """
     A function which calculates the mean and standard deviation through a series of
@@ -1292,7 +1313,9 @@ def calc_img_basic_stats_for_ref_region(
     )
 
 
-def normalise_image_band(input_img, band, output_img, gdal_format="KEA"):
+def normalise_image_band(
+    input_img: str, band: int, output_img: str, gdal_format: str = "KEA"
+):
     """
     Perform a simple normalisation a single image band (val - min)/range.
 
@@ -1325,12 +1348,12 @@ def normalise_image_band(input_img, band, output_img, gdal_format="KEA"):
 
 
 def recode_int_raster(
-    input_img,
-    output_img,
-    recode_dict,
-    keep_vals_not_in_dict=True,
-    gdalformat="KEA",
-    datatype=rsgislib.TYPE_32INT,
+    input_img: str,
+    output_img: str,
+    recode_dict: Dict[int, int],
+    keep_vals_not_in_dict: bool = True,
+    gdalformat: str = "KEA",
+    datatype: bool = rsgislib.TYPE_32INT,
 ):
     """
     A function recodes an input image. Assuming image only has a single image band so
@@ -1386,15 +1409,15 @@ def recode_int_raster(
 
 
 def calc_fill_regions_knn(
-    in_ref_img,
-    ref_no_data,
-    in_fill_regions_img,
-    fill_region_val,
-    output_img,
-    k=5,
-    summary=rsgislib.SUMTYPE_MODE,
-    gdalformat="KEA",
-    datatype=rsgislib.TYPE_32INT,
+    in_ref_img: str,
+    ref_no_data: int,
+    in_fill_regions_img: str,
+    fill_region_val: int,
+    output_img: str,
+    k: int = 5,
+    summary: int = rsgislib.SUMTYPE_MODE,
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_32INT,
 ):
     """
     A function will fills regions (defined by having a value == fill_region_val) of
@@ -1562,7 +1585,9 @@ def calc_fill_regions_knn(
     print("Finished fill")
 
 
-def are_imgs_equal(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
+def are_imgs_equal(
+    in_ref_img: str, in_cmp_img: str, prop_eql: float = 1.0, flt_dif: float = 0.0001
+):
     """
     A function to check whether two images have equal pixel values within the spatial
     overlap. Note, if the two input images only have a partial overlap (i.e., one is
@@ -2252,3 +2277,460 @@ def calc_img_earth_move_dist(
         imgs_em = None
 
     return imgs_em
+
+
+def calc_img_min_max(input_img: str, no_data_val: float = None) -> numpy.array:
+    """
+    Function which calculates the minimum and maximum value of each
+    image band in the input image.
+
+    :param input_img: the input image file path.
+    :param no_data_val: the no data value
+    :return: two arrays min_vals, max_vals.
+
+    """
+    from rios import applier
+    import rsgislib.imageutils
+
+    if no_data_val is None:
+        no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
+
+        if no_data_val is None:
+            raise rsgislib.RSGISPyException(
+                "A no data value needs to specified "
+                "either passed to the function or read "
+                "from the input image header."
+            )
+
+    datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
+    numpyDT = rsgislib.get_numpy_datatype(datatype)
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+    min_vals = numpy.zeros(n_bands, dtype=numpyDT)
+    max_vals = numpy.zeros(n_bands, dtype=numpyDT)
+    first_arr = numpy.ones(n_bands, dtype=bool)
+
+    try:
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.input_img = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.n_bands = n_bands
+    otherargs.min_vals = min_vals
+    otherargs.max_vals = max_vals
+    otherargs.no_data_val = no_data_val
+    otherargs.first_arr = first_arr
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    def _applyCalcImgMinMax(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        for n in range(otherargs.n_bands):
+            data = inputs.input_img[n].flatten()
+            data = data[data != otherargs.no_data_val]
+            if data.shape[0] > 0:
+                data_max = data.max()
+                data_min = data.min()
+
+                if otherargs.first_arr[n]:
+                    otherargs.min_vals[n] = data_min
+                    otherargs.max_vals[n] = data_max
+                    otherargs.first_arr[n] = False
+                else:
+                    if data_min < otherargs.min_vals[n]:
+                        otherargs.min_vals[n] = data_min
+                    if data_max > otherargs.max_vals[n]:
+                        otherargs.max_vals[n] = data_max
+
+    applier.apply(_applyCalcImgMinMax, infiles, outfiles, otherargs, controls=aControls)
+
+    return min_vals, max_vals
+
+
+def calc_img_mean(input_img: str, no_data_val: float = None) -> numpy.array:
+    """
+    Function which calculates the mean value of each
+    image band in the input image.
+
+    :param input_img: the input image file path.
+    :param no_data_val: the no data value
+    :return: array mean_vals
+
+    """
+    from rios import applier
+    import rsgislib.imageutils
+
+    if no_data_val is None:
+        no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
+
+        if no_data_val is None:
+            raise rsgislib.RSGISPyException(
+                "A no data value needs to specified "
+                "either passed to the function or read "
+                "from the input image header."
+            )
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+    sum_vals = numpy.zeros(n_bands, dtype=float)
+    n_vals = numpy.zeros(n_bands, dtype=int)
+
+    try:
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.input_img = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.n_bands = n_bands
+    otherargs.sum_vals = sum_vals
+    otherargs.n_vals = n_vals
+    otherargs.no_data_val = no_data_val
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    def _applyCalcImgMean(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        for n in range(otherargs.n_bands):
+            data = inputs.input_img[n].flatten()
+            data = data[data != otherargs.no_data_val]
+            if data.shape[0] > 0:
+                otherargs.sum_vals[n] += data.sum()
+                otherargs.n_vals[n] += data.shape[0]
+
+    applier.apply(_applyCalcImgMean, infiles, outfiles, otherargs, controls=aControls)
+
+    return sum_vals / n_vals
+
+
+def calc_img_stdev(
+    input_img: str, no_data_val: float = None, mean_vals: numpy.array = None
+) -> numpy.array:
+    """
+    Function which calculates the standard deviation value of each
+    image band in the input image.
+
+    :param input_img: the input image file path.
+    :param no_data_val: the no data value
+    :param mean_vals: if available an array with the mean values for each band.
+                      If None then the mean values will be calculated using the
+                      calc_img_mean function.
+    :return: array stdev_vals
+
+    """
+    from rios import applier
+    import rsgislib.imageutils
+
+    if no_data_val is None:
+        no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
+
+        if no_data_val is None:
+            raise rsgislib.RSGISPyException(
+                "A no data value needs to specified "
+                "either passed to the function or read "
+                "from the input image header."
+            )
+
+    if mean_vals is None:
+        mean_vals = calc_img_mean(input_img, no_data_val)
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+
+    if len(mean_vals) != n_bands:
+        raise rsgislib.RSGISPyException(
+            "The length of the mean_vals array must " "equal the number of image bands."
+        )
+
+    sum_vals = numpy.zeros(n_bands, dtype=float)
+    n_vals = numpy.zeros(n_bands, dtype=int)
+
+    try:
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.input_img = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.n_bands = n_bands
+    otherargs.mean_vals = mean_vals
+    otherargs.sum_vals = sum_vals
+    otherargs.n_vals = n_vals
+    otherargs.no_data_val = no_data_val
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    def _applyCalcImgStdev(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        for n in range(otherargs.n_bands):
+            data = inputs.input_img[n].flatten()
+            data = data[data != otherargs.no_data_val]
+            if data.shape[0] > 0:
+                otherargs.sum_vals[n] += numpy.power(
+                    data - otherargs.mean_vals[n], 2
+                ).sum()
+                otherargs.n_vals[n] += data.shape[0]
+
+    applier.apply(_applyCalcImgStdev, infiles, outfiles, otherargs, controls=aControls)
+
+    return numpy.sqrt(sum_vals / n_vals)
+
+
+def normalise_img_pxl_vals_py(
+    input_img: str,
+    output_img: str,
+    norm_type: int = rsgislib.IMG_STRETCH_CUMULATIVE,
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_32FLOAT,
+    in_no_data_val: float = None,
+    out_no_data_val: float = None,
+    out_min: float = 0,
+    out_max: float = 1,
+    stch_min_max_vals: Union[Dict, List[Dict]] = None,
+    stch_n_stdevs: float = 2.0,
+    stch_cuml_low: float = 0.02,
+    stch_cuml_upp: float = 0.98,
+    clip_vals: bool = True,
+) -> List[Dict]:
+    """
+    A function for normalising pixel values similar to rsgislib.imageutils.stretch_img
+    and rsgislib.imageutils.normalise_img_pxl_vals but is a pure python implementation.
+    It is intended that this function will replace the older C++ functions so use
+    this for any new code.
+
+
+    :param input_img: The path to the input image
+    :param output_img: The path to the output image
+    :param norm_type: The normalisation to be applied (e.g.,
+                      rsgislib.IMG_STRETCH_CUMULATIVE). Options are:
+                      IMG_STRETCH_STDEV, IMG_STRETCH_CUMULATIVE, IMG_STRETCH_LINEAR
+                      and IMG_STRETCH_USER.
+    :param gdalformat: The output file format (e.g., KEA)
+    :param datatype: the data type of the output image.
+    :param in_no_data_val: the input no data value.
+    :param out_no_data_val: the output no data value.
+    :param out_min: the minimum output pixel value
+    :param out_max: the maximum output pixel value
+    :param stch_min_max_vals: either a list of dicts each with a 'min' and 'max' key
+                              specifying the min and max value for the normalisation
+                              of each band. Or, if just a single band then provide
+                              a single dict rather than a list. The number items in
+                              the list must equal the number of bands within the
+                              input image.
+    :param stch_n_stdevs: if using IMG_STRETCH_STDEV then this is the number of
+                          standard deviations from the mean
+    :param stch_cuml_low: if using IMG_STRETCH_CUMULATIVE this is the lower percentile
+    :param stch_cuml_upp: if using IMG_STRETCH_CUMULATIVE this is the upper percentile
+    :param clip_vals: boolean specifying whether the output images pixel values should
+                      be clipped to out_min and out_max. Values below out_min will be
+                      given the value out_min and values above out_max will be given
+                      the value out_max.
+    :return: a list of dicts with min and max keys for each band. Can be inputted
+             as stch_min_max_vals to applying to other images.
+    """
+    import rsgislib.imageutils
+    from rios import applier
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+
+    if in_no_data_val is None:
+        in_no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
+
+        if in_no_data_val is None:
+            raise rsgislib.RSGISPyException(
+                "A no data value needs to specified "
+                "either passed to the function or read "
+                "from the input image header."
+            )
+    if out_no_data_val is None:
+        out_no_data_val = in_no_data_val
+
+    if norm_type == rsgislib.IMG_STRETCH_STDEV:
+        if stch_n_stdevs < 0:
+            raise rsgislib.RSGISPyException("stch_n_stdevs must be greater than 0.")
+
+        img_mean_vals = calc_img_mean(input_img, no_data_val=in_no_data_val)
+        img_stdev_vals = calc_img_stdev(
+            input_img, no_data_val=in_no_data_val, mean_vals=img_mean_vals
+        )
+        img_min_vals, img_max_vals = calc_img_min_max(
+            input_img=input_img,
+            no_data_val=in_no_data_val,
+        )
+
+        stch_min_max_vals = list()
+        for b_min, b_max, b_mean, b_stdev in zip(
+            img_min_vals, img_max_vals, img_mean_vals, img_stdev_vals
+        ):
+
+            calcd_min = b_mean - (b_stdev * stch_n_stdevs)
+            calcd_max = b_mean + (b_stdev * stch_n_stdevs)
+
+            if calcd_min < b_min:
+                calcd_min = b_min
+
+            if calcd_max > b_max:
+                calcd_max = b_max
+
+            stch_min_max_vals.append({"min": calcd_min, "max": calcd_max})
+
+    elif norm_type == rsgislib.IMG_STRETCH_CUMULATIVE:
+        if (stch_cuml_low < 0) or (stch_cuml_low > 1.0):
+            raise rsgislib.RSGISPyException(
+                "stch_cuml_low must be greater than 0 and less than 1."
+            )
+        if (stch_cuml_upp < 0) or (stch_cuml_upp > 1.0):
+            raise rsgislib.RSGISPyException(
+                "stch_cuml_upp must be greater than 0 and less than 1."
+            )
+
+        low_band_percent = calc_band_percentile(
+            input_img, stch_cuml_low, no_data_val=in_no_data_val
+        )
+        upp_band_percent = calc_band_percentile(
+            input_img, stch_cuml_upp, no_data_val=in_no_data_val
+        )
+
+        stch_min_max_vals = list()
+        for b_low, b_upp in zip(low_band_percent, upp_band_percent):
+            stch_min_max_vals.append({"min": b_low, "max": b_upp})
+
+    elif norm_type == rsgislib.IMG_STRETCH_LINEAR:
+        img_min_vals, img_max_vals = calc_img_min_max(
+            input_img=input_img,
+            no_data_val=in_no_data_val,
+        )
+        stch_min_max_vals = list()
+        for b_min, b_max in zip(img_min_vals, img_max_vals):
+            stch_min_max_vals.append({"min": b_min, "max": b_max})
+
+    elif norm_type == rsgislib.IMG_STRETCH_USER:
+        if n_bands == 1:
+            if type(stch_min_max_vals) is list:
+                if len(stch_min_max_vals) != 1:
+                    raise rsgislib.RSGISPyException(
+                        "The input image has 1 band and therefore stch_min_max_vals "
+                        "variable must be a dict or list of length 1 with "
+                        "a single dict."
+                    )
+                else:
+                    stch_min_max_vals = stch_min_max_vals[0]
+
+            if type(stch_min_max_vals) is not dict:
+                raise rsgislib.RSGISPyException(
+                    "The input image has 1 band and therefore stch_min_max_vals "
+                    "variable must be a dict or list of length 1 with "
+                    "a single dict."
+                )
+
+            if ("min" not in stch_min_max_vals) or ("max" not in stch_min_max_vals):
+                raise rsgislib.RSGISPyException(
+                    "min and max keys must be provided within the dict"
+                )
+
+            stch_min_max_vals = [stch_min_max_vals]
+        else:
+            if type(stch_min_max_vals) is not list:
+                raise rsgislib.RSGISPyException(
+                    "There are more than 1 band and therefore "
+                    "stch_min_max_vals variable must be a list."
+                )
+
+            if n_bands != len(stch_min_max_vals):
+                raise rsgislib.RSGISPyException(
+                    "length of stch_min_max_vals must be the same as the number "
+                    "of bands in the input image."
+                )
+
+            for n in range(n_bands):
+                if ("min" not in stch_min_max_vals[n]) or (
+                    "max" not in stch_min_max_vals[n]
+                ):
+                    raise rsgislib.RSGISPyException(
+                        "min and max keys must be provided within "
+                        "the stch_min_max_vals dict"
+                    )
+
+    numpyDT = rsgislib.get_numpy_datatype(datatype)
+
+    try:
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.input_img = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.output_img = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.n_bands = n_bands
+    otherargs.in_no_data_val = in_no_data_val
+    otherargs.out_no_data_val = out_no_data_val
+    otherargs.clip_vals = clip_vals
+    otherargs.numpyDT = numpyDT
+    otherargs.stch_min_max_vals = stch_min_max_vals
+    otherargs.out_min = out_min
+    otherargs.out_max = out_max
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyNormalisation(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        out_data_arr = numpy.zeros_like(inputs.input_img, dtype=float)
+
+        for n in range(otherargs.n_bands):
+            stch_range = (
+                otherargs.stch_min_max_vals[n]["max"]
+                - otherargs.stch_min_max_vals[n]["min"]
+            )
+            out_range = otherargs.out_max - otherargs.out_min
+
+            out_data_arr[n] = (
+                (
+                    (inputs.input_img[n] - otherargs.stch_min_max_vals[n]["min"])
+                    / stch_range
+                )
+                * out_range
+            ) + otherargs.out_min
+
+        if otherargs.clip_vals:
+            out_data_arr[out_data_arr < otherargs.out_min] = otherargs.out_min
+            out_data_arr[out_data_arr > otherargs.out_max] = otherargs.out_max
+
+        out_data_arr[otherargs.in_no_data_val == inputs.input_img] = (
+            otherargs.out_no_data_val
+        )
+
+        outputs.output_img = out_data_arr.astype(otherargs.numpyDT)
+
+    applier.apply(_applyNormalisation, infiles, outfiles, otherargs, controls=aControls)
+
+    return stch_min_max_vals

@@ -6,7 +6,7 @@ The imageutils module contains general utilities for applying to images.
 import math
 import os
 import shutil
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import numpy
 from osgeo import gdal, osr
@@ -213,9 +213,9 @@ def set_env_vars_deflate_gtiff_outs(bigtiff: bool = False):
 
     """
     if bigtiff:
-        os.environ[
-            "RSGISLIB_IMG_CRT_OPTS_GTIFF"
-        ] = "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = (
+            "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+        )
     else:
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=DEFLATE"
 
@@ -4768,9 +4768,9 @@ def polyfill_nan_data_values(
                         if otherargs.mean_abs_diff is not None:
                             pxl_mean = numpy.nanmean(img_flat[pxl_idx])
                             pred_vals_diff = numpy.abs(pred_vals - pxl_mean)
-                            pred_vals[
-                                pred_vals_diff > otherargs.mean_abs_diff
-                            ] = pxl_mean
+                            pred_vals[pred_vals_diff > otherargs.mean_abs_diff] = (
+                                pxl_mean
+                            )
                         repl_idxs = numpy.arange(0, pred_vals.shape[0])[
                             numpy.invert(finite_msk)
                         ]

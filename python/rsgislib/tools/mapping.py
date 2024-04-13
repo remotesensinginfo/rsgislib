@@ -704,7 +704,7 @@ def create_raster_img_map(
         img_data_strch = rsgislib.tools.plotting.stdev_stretch_np_arr(
             img_data, n_stdevs=stch_n_stdevs, no_data_val=img_no_data_val
         )
-    elif img_stch == rsgislib.IMG_STRECTH_CUMULATIVE:
+    elif img_stch == rsgislib.IMG_STRETCH_CUMULATIVE:
         img_data_strch = rsgislib.tools.plotting.cumulative_stretch_np_arr(
             img_data, no_data_val=img_no_data_val
         )
