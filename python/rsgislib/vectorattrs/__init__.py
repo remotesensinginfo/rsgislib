@@ -1287,7 +1287,7 @@ def perform_spatial_join(
     if vec_join_epsg is not None:
         join_gpd_df = join_gpd_df.set_crs(epsg=vec_join_epsg, allow_override=True)
 
-    join_gpd_df = geopandas.sjoin(base_gpd_df, join_gpd_df, how=join_how, op=join_op)
+    join_gpd_df = geopandas.sjoin(base_gpd_df, join_gpd_df, how=join_how, predicate=join_op)
 
     if len(join_gpd_df) > 0:
         if out_format == "GPKG":
@@ -1641,17 +1641,17 @@ def add_numeric_col_from_lst_lut(
 
 
 def check_str_col(
-        vec_file: str,
-        vec_lyr: str,
-        vec_col: str,
-        out_vec_file: str,
-        out_vec_lyr: str,
-        out_format: str = "GPKG",
-        rm_non_ascii: bool = True,
-        rm_dashs: bool = False,
-        rm_spaces: bool = False,
-        rm_punc: bool = False
-        ):
+    vec_file: str,
+    vec_lyr: str,
+    vec_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    rm_non_ascii: bool = True,
+    rm_dashs: bool = False,
+    rm_spaces: bool = False,
+    rm_punc: bool = False,
+):
     """
     A function which checks the values in a string column removing non-ascii
     characters and optionally removing spaces, dashes and punctuation.
@@ -1685,7 +1685,8 @@ def check_str_col(
 
     for i in range(len(col_var_arr)):
         col_var_arr[i] = rsgislib.tools.utils.check_str(
-            col_var_arr[i], rm_non_ascii, rm_dashs, rm_spaces, rm_punc)
+            col_var_arr[i], rm_non_ascii, rm_dashs, rm_spaces, rm_punc
+        )
 
     base_gdf[vec_col] = col_var_arr
 
@@ -1693,4 +1694,3 @@ def check_str_col(
         base_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gdf.to_file(out_vec_file, driver=out_format)
-

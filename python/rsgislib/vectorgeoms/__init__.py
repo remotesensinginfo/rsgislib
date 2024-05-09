@@ -3608,3 +3608,73 @@ def vec_lyr_dissolve(
         dis_data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         dis_data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def thin_vector_geoms(
+    vec_file: str,
+    vec_lyr: str,
+    grid_vec_file: str,
+    grid_vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str,
+):
+    """
+    A function which thins the geometries (points are the most likely) using an
+    input set of polygons (most likely a grid). Just a single geometry (point)
+    intersecting with a polygon (grid cell) within the grid input vector will be
+    outputted. This function is expected to be used to thin a set of points, for
+    example, such that only 1 point is within each 1 km grid cell.
+
+    Note. the input vector files must be the same projection.
+
+    :param vec_file: The input vector file which is to be thinned (i.e., points vector)
+    :param vec_lyr: The input vector layer which is to be thinned (i.e., points vector)
+    :param grid_vec_file: The input vector file for the polygons (grid) used to thin
+                          the vec_file geometries (points)
+    :param grid_vec_lyr: The input vector layer for the polygons (grid) used to thin
+                          the vec_file geometries (points)
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the layer name for the output vector.
+    :param out_format: The output vector file format (Default GPKG)
+
+    """
+    import geopandas
+    import numpy
+
+    # Try importing rtree to provide useful error message as
+    # will be used in sjoin but if not present
+    # the error message is not very user friendly:
+    # AttributeError: 'NoneType' object has no attribute 'intersection'
+    try:
+        import rtree
+    except ImportError:
+        raise rsgislib.RSGISPyException(
+            "The rtree module was not available for "
+            "import this is required by geopandas to "
+            "perform a join."
+        )
+
+    print("Read Vector File")
+    pts_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    print("Read Grid")
+    grid_gdf = geopandas.read_file(grid_vec_file, layer=grid_vec_lyr)
+    print("Read Data")
+
+    print("Add unq ID column to grid")
+    grid_gdf["unq_id"] = numpy.arange(1, (grid_gdf.shape[0]) + 1, 1, dtype=int)
+
+    print("Perform Join")
+    pts_join_gdf = geopandas.sjoin(pts_gdf, grid_gdf, how="inner", predicate="intersects")
+
+    pts_join_gdf.drop_duplicates(
+        subset="unq_id", keep="first", inplace=True, ignore_index=False
+    )
+    if len(pts_join_gdf) > 0:
+        if out_format == "GPKG":
+            pts_join_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            pts_join_gdf.to_file(out_vec_file, driver=out_format)
+
+    print("Finished Thinning")

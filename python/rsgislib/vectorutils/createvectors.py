@@ -976,8 +976,8 @@ def create_wgs84_vector_grid(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str,
-    grid_x: int,
-    grid_y: int,
+    grid_x: float,
+    grid_y: float,
     bbox: List[float],
     overlap: float = None,
     tile_names_col: str = "tile_names",
@@ -990,8 +990,8 @@ def create_wgs84_vector_grid(
     :param out_vec_file: output vector file
     :param out_vec_lyr: output vector layer name
     :param out_format: the output vector file format.
-    :param grid_x: the size in the x axis of the grid cells.
-    :param grid_y: the size in the y axis of the grid cells.
+    :param grid_x: the size in the x axis of the grid cells (in degrees).
+    :param grid_y: the size in the y axis of the grid cells (in degrees).
     :param bbox: the area for which cells will be defined (MinX, MaxX, MinY, MaxY).
     :param overlap: the overlap added to each grid cell. If None then no overlap applied.
     :param tile_names_col: The output column name for the tile names.

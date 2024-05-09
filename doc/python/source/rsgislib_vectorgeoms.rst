@@ -43,6 +43,7 @@ Edit Geometries
 Remove Geometries
 -------------------
 .. autofunction:: rsgislib.vectorgeoms.rm_polys_area
+.. autofunction:: rsgislib.vectorgeoms.thin_vector_geoms
 
 
 Geometry Tests
