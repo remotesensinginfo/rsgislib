@@ -3234,7 +3234,7 @@ def gdal_translate(
         callback = gdal.TermProgress
 
     trans_opt = gdal.TranslateOptions(
-        format=gdalformat, creationOptions=options, callback=callback
+        format=gdalformat, options=options, callback=callback
     )
     gdal.Translate(output_img, input_img, options=trans_opt)
 
