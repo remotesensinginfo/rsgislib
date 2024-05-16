@@ -208,9 +208,9 @@ def test_create_mbtile_file(tmp_path):
     output_file = os.path.join(tmp_path, "out_img.mbtiles")
 
     rsgislib.tools.visualisation.create_mbtile_file(
-        input_img,
-        "3,2,1",
-        output_file,
+        input_img=input_img,
+        bands="3,2,1",
+        output_mbtiles=output_file,
         scale_input_img=50,
         tmp_dir=tmp_path,
         tile_format="PNG",

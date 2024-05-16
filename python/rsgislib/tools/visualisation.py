@@ -840,7 +840,7 @@ def create_mbtile_file(
         widthPct=scale_input_img,
         heightPct=scale_input_img,
         noData=0,
-        options=["TILE_FORMAT={}".format(tile_format)],
+        creationOptions=["TILE_FORMAT={}".format(tile_format)],
         callback=callback,
     )
     gdal.Translate(output_mbtiles, stretch_img_re_proj, options=trans_opt)
