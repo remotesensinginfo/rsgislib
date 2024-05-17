@@ -16,6 +16,7 @@ Sort Images
 PDF Utilities
 -----------------
 .. autofunction:: rsgislib.tools.imagetools.extract_images_from_pdf
+.. autofunction:: rsgislib.tools.imagetools.add_pdf_blank_pages
 
 QR Codes
 -----------------

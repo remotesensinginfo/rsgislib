@@ -337,6 +337,28 @@ def extract_images_from_pdf(input_pdf, output_dir):
             pix.save(os.path.join(output_dir, f"p{i}_{xref}.png"))
 
 
+def add_pdf_blank_pages(input_pdf, output_pdf):
+    """
+    A function which adds a blank page after each page within
+    the existing PDF document.
+
+    :param input_pdf: the input PDF file.
+    :param output_pdf: the output PDF file.
+
+    """
+    import fitz
+
+    pdf_doc = fitz.Document(input_pdf)
+    n_pages = pdf_doc.page_count
+
+    n_add_pages = 1
+    for i in range(n_pages):
+        pdf_doc.new_page(pno=i + n_add_pages)
+        n_add_pages += 1
+
+    pdf_doc.save(output_pdf)
+
+
 def create_qr_code(output_img, qr_data, qr_code_size=10, qr_code_border=4):
     """
     A function which uses the qrcode module to create a QR code image file.
@@ -351,10 +373,10 @@ def create_qr_code(output_img, qr_data, qr_code_size=10, qr_code_border=4):
     import qrcode
 
     qr = qrcode.QRCode(
-            version=5,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=qr_code_size,
-            border=qr_code_border,
+        version=5,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=qr_code_size,
+        border=qr_code_border,
     )
     qr.add_data(qr_data)
     qr.make(fit=True)
