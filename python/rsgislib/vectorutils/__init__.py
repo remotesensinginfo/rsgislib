@@ -2728,6 +2728,45 @@ def subset_by_attribute(
         raise rsgislib.RSGISPyException("No output file as no features selected.")
 
 
+def select_feats_str_search(
+    vec_file: str,
+    vec_lyr: str,
+    select_col: str,
+    select_val: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which select features from a vector layer based on a string value
+    within an attribute column. For example, providing a select value 'River'
+    would select all features which had river within the column specified such
+    as 'River Amazon', 'River Seven' etc. Note, it is case-sensitive.
+
+    :param vec_file: The input vector file path
+    :param vec_lyr: the input vector layer name
+    :param select_col: the column which is search within
+    :param select_val: the value used to select features
+    :param out_vec_file: the output file path
+    :param out_vec_lyr: the output layer name
+    :param out_format: the output format (Default: GPKG)
+
+    """
+    import geopandas
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gdf[select_col] = data_gdf[select_col].fillna("")
+    sel_data_gdf = data_gdf[data_gdf[select_col].str.contains(select_val)]
+
+    if sel_data_gdf.shape[0] > 0:
+        if out_format == "GPKG":
+            sel_data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            sel_data_gdf.to_file(out_vec_file, driver=out_format)
+    else:
+        raise rsgislib.RSGISPyException("No output file as no features selected.")
+
+
 def drop_rows_by_attribute(
     vec_file: str,
     vec_lyr: str,
