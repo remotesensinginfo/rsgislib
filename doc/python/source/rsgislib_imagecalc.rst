@@ -119,7 +119,15 @@ Image Indices
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_gndvi
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_evi
 .. autofunction:: rsgislib.imagecalc.calcindices.calc_evi2
-
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_bsi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_si
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_ndgi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_ndmi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_npcri
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_ndbsi
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_cmr
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_fmr
+.. autofunction:: rsgislib.imagecalc.calcindices.calc_ior
 
 Equalivance
 -------------

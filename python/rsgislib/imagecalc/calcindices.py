@@ -39,7 +39,12 @@ import rsgislib.imageutils
 
 
 def calc_ndvi(
-    input_img, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA"
+    input_img: str,
+    img_red_band: int,
+    img_nir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Normalised difference Vegetation Index (NDVI)
@@ -86,12 +91,12 @@ def calc_ndvi(
 
 
 def calc_wbi(
-    input_img,
-    img_blue_band,
-    img_nir_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_blue_band: int,
+    img_nir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Water Band Index (WBI) (Blue/NIR.
@@ -125,12 +130,12 @@ def calc_wbi(
 
 
 def calc_ndwi(
-    input_img,
-    img_nir_band,
-    img_swir1_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_nir_band: int,
+    img_swir1_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Normalised Difference Water Index (NDWI)
@@ -167,12 +172,12 @@ def calc_ndwi(
 
 
 def calc_gndwi(
-    input_img,
-    img_green_band,
-    img_nir_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_green_band: int,
+    img_nir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Green-Normalised Water Different Index (NDWI)
@@ -209,12 +214,12 @@ def calc_gndwi(
 
 
 def calc_gmndwi(
-    input_img,
-    img_green_band,
-    img_swir1_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_green_band: int,
+    img_swir1_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Green/SWIR-Normalised Difference Water Index (NDWI)
@@ -251,13 +256,13 @@ def calc_gmndwi(
 
 
 def calc_whiteness(
-    input_img,
-    img_blue_band,
-    img_green_band,
-    img_red_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_blue_band: int,
+    img_green_band: int,
+    img_red_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate whiteness, note the output no data value is -999.
@@ -292,14 +297,14 @@ def calc_whiteness(
 
 
 def calc_brightness(
-    input_img,
-    img_blue_band,
-    img_green_band,
-    img_red_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
-    scale_factor=1000,
+    input_img: str,
+    img_blue_band: int,
+    img_green_band: int,
+    img_red_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+    scale_factor: int = 1000,
 ):
     """
     Helper function to calculate visible brightness, note the output no data
@@ -339,14 +344,14 @@ def calc_brightness(
 
 
 def calc_brightness_scaled(
-    input_img,
-    img_blue_band,
-    img_green_band,
-    img_red_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
-    scale_factor=1000,
+    input_img: str,
+    img_blue_band: int,
+    img_green_band: int,
+    img_red_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+    scale_factor: int = 1000,
 ):
     """
     Helper function to calculate visible brightness, note the output no data
@@ -407,7 +412,12 @@ def calc_brightness_scaled(
 
 
 def calc_ctvi(
-    input_img, img_red_band, img_nir_band, output_img, calc_stats=True, gdalformat="KEA"
+    input_img: str,
+    img_red_band: int,
+    img_nir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Corrected Transformed Vegetation Index
@@ -443,12 +453,12 @@ def calc_ctvi(
 
 
 def calc_ndsi(
-    input_img,
-    img_green_band,
-    img_swir1_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_green_band: int,
+    img_swir1_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Normalised Difference Snow Index (NDSI)
@@ -481,12 +491,12 @@ def calc_ndsi(
 
 
 def calc_nbr(
-    input_img,
-    img_nir_band,
-    img_swir2_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_nir_band: int,
+    img_swir2_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Normalised Burn Ratio (NBR)
@@ -519,13 +529,13 @@ def calc_nbr(
 
 
 def calc_bai(
-    input_img,
-    img_nir_band,
-    img_red_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
-    scale_factor=1000,
+    input_img: str,
+    img_nir_band: int,
+    img_red_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+    scale_factor: int = 1000,
 ):
     """
     Helper function to calculate Burn Area Index (BAI)
@@ -570,13 +580,13 @@ def calc_bai(
 
 
 def calc_mvi(
-    input_img,
-    img_green_band,
-    img_nir_band,
-    img_swir1_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_green_band: int,
+    img_nir_band: int,
+    img_swir1_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Mangrove Vegetation Index (MFI)
@@ -617,18 +627,18 @@ def calc_mvi(
 
 
 def calc_evi(
-    input_img,
-    img_blue_band,
-    img_red_band,
-    img_nir_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
-    g=2.5,
-    c1=6.0,
-    c2=7.5,
-    l=1,
-    refl_scale_factor=0.001,
+    input_img: str,
+    img_blue_band: int,
+    img_red_band: int,
+    img_nir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+    g: float = 2.5,
+    c1: float = 6.0,
+    c2: float = 7.5,
+    l: float = 1,
+    scale_factor: int = 1000,
 ):
     """
     Helper function to calculate Enhanced Vegetation Index (EVI)
@@ -637,8 +647,6 @@ def calc_evi(
 
     :param input_img: is a string specifying the input image file.
     :param img_blue_band: is an int specifying the blue band in the input image
-                         (band indexing starts at 1)
-    :param img_green_band: is an int specifying the green band in the input image
                          (band indexing starts at 1)
     :param img_red_band: is an int specifying the red band in the input image
                          (band indexing starts at 1)
@@ -649,16 +657,20 @@ def calc_evi(
                        be calculated (Default: True)
     :param gdalformat: is a string specifying the output image file format
                        (Default: KEA)
+    :param g: g coefficient for EVI (Default: 2.5)
+    :param c1: c1 coefficient for EVI (Default: 6.0)
+    :param c2: c2 coefficient for EVI (Default: 7.5)
+    :param l: l coefficient for EVI (Default: 1)
+    :param scale_factor: is a float which can be used retrieved reflectance between
+                         0-1 (Default: 1000 to match rsgislib/arcsi)
 
     """
-    expression = (
-        f"((nir*{refl_scale_factor})+{c1}*(red*{refl_scale_factor})"
-        f"–{c2}*(blue*{refl_scale_factor})+{l}))!=0?"
-        f"{g}*(((nir*{refl_scale_factor})-"
-        f"(red*{refl_scale_factor}))/((nir*{refl_scale_factor})+"
-        f"{c1}*(red*{refl_scale_factor})–{c2}*"
-        f"(blue*{refl_scale_factor})+{l})):-999"
-    )
+    expression = f"( (nir/{scale_factor}) + ({c1} * (red/{scale_factor})) - " \
+                 f"({c2} * (blue/{scale_factor})) + {l} ) !=0? " \
+                 f"{g}*( ( (nir/{scale_factor})-(red/{scale_factor}) ) / " \
+                 f"( (nir/{scale_factor}) + ({c1} * (red/{scale_factor})) - " \
+                 f"({c2} * (blue/{scale_factor})) + {l} ) ):-999"
+
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
@@ -674,16 +686,16 @@ def calc_evi(
 
 
 def calc_evi2(
-    input_img,
-    img_red_band,
-    img_nir_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
-    g=2.5,
-    c=2.4,
-    l=1,
-    refl_scale_factor=0.001,
+    input_img: str,
+    img_red_band: int,
+    img_nir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+    g: float = 2.5,
+    c: float = 2.4,
+    l: float = 1,
+    scale_factor: int = 1000,
 ):
     """
     Helper function to calculate Enhanced Vegetation Index 2 (EVI2)
@@ -700,13 +712,17 @@ def calc_evi2(
                        be calculated (Default: True)
     :param gdalformat: is a string specifying the output image file format
                        (Default: KEA)
+    :param g: g coefficient for EVI2 (Default: 2.5)
+    :param c: c coefficient for EVI2 (Default: 2.4)
+    :param l: l coefficient for EVI2 (Default: 1)
+    :param scale_factor: is a float which can be used retrieved reflectance between
+                         0-1 (Default: 1000 to match rsgislib/arcsi)
 
     """
-    expression = (
-        f"((nir*{refl_scale_factor})+{c}*(red*{refl_scale_factor})+{l})!=0:"
-        f"{g}*((nir*{refl_scale_factor})-(red*{refl_scale_factor}))/"
-        f"((nir*{refl_scale_factor})+{c}*(red*{refl_scale_factor})+{l}):-999"
-    )
+    expression = f"((nir/{scale_factor})+({c}*(red/{scale_factor}))+{l})!=0?" \
+                 f"{g}*( (nir/{scale_factor})-(red/{scale_factor})) / " \
+                 f"((nir/{scale_factor})+ ({c}*(red/{scale_factor}))+{l}):-999"
+
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
@@ -721,12 +737,12 @@ def calc_evi2(
 
 
 def calc_gndvi(
-    input_img,
-    img_green_band,
-    img_nir_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_green_band: int,
+    img_nir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Green Normalised difference Vegetation Index (GNDVI)
@@ -759,14 +775,14 @@ def calc_gndvi(
 
 
 def calc_remi(
-    input_img,
-    img_green_band,
-    img_red_band,
-    img_re_band,
-    img_swir_band,
-    output_img,
-    calc_stats=True,
-    gdalformat="KEA",
+    input_img: str,
+    img_green_band: int,
+    img_red_band: int,
+    img_re_band: int,
+    img_swir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
 ):
     """
     Helper function to calculate Red-Edge Mangrove Index (REMI)
@@ -801,6 +817,467 @@ def calc_remi(
     band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("re", input_img, img_re_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+def calc_bsi(
+    input_img: str,
+    img_blue_band: int,
+    img_red_band: int,
+    img_nir_band: int,
+    img_swir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+):
+    """
+    Helper function to calculate Bare Soil Index (BSI)
+    ((SWIR1+RED) - (NIR + BLUE))  / ((SWIR1+RED) + (NIR + BLUE)).
+    Note the output no data value is -999.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_blue_band: is an int specifying the blue band in the input image
+                         (band indexing starts at 1)
+    :param img_red_band: is an int specifying the red band in the input image
+                         (band indexing starts at 1)
+    :param img_nir_band: is an int specifying the nir band in the input image
+                         (band indexing starts at 1)
+    :param img_swir_band: is an int specifying the swir1 band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = (
+        "(swir+red)+(nir+blue)!=0?(swir+red)-(nir+blue)/(swir+red)+(nir+blue):-999"
+    )
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+def calc_si(
+    input_img: str,
+    img_blue_band: int,
+    img_green_band: int,
+    img_red_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+    scale_factor: int = 1000,
+):
+    """
+    Helper function to calculate Shadow Index (SI)
+    ((1-BLUE) * (1-GREEN) * (1-BLUE))^(1/3).
+    Note the output no data value is -999.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_blue_band: is an int specifying the blue band in the input image
+                         (band indexing starts at 1)
+    :param img_green_band: is an int specifying the green band in the input image
+                         (band indexing starts at 1)
+    :param img_red_band: is an int specifying the red band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+    :param scale_factor: is a float which can be used retrieved reflectance between
+                         0-1 (Default: 1000 to match rsgislib/arcsi)
+
+    """
+    expression = f"(red==0)||(green==0)||(blue==0)?-999:" \
+                 f"( (1-(blue/{scale_factor})) * (1-(green/{scale_factor})) " \
+                 f"* (1-(red/{scale_factor})))^(1/3)"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+def calc_ndgi(
+    input_img: str,
+    img_green_band: int,
+    img_red_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+):
+    """
+    Helper function to calculate Normalized Difference Glacier Index (NDGI)
+    (GREEN - RED)/(GREEN + RED). Note the output no data value is -999.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_green_band: is an int specifying the green band in the input image
+                         (band indexing starts at 1)
+    :param img_red_band: is an int specifying the red band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = "(green+red)!=0?(green-red)/(green+red):-999"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+def calc_ndmi(
+    input_img: str,
+    img_nir_band: int,
+    img_swir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+):
+    """
+    Helper function to calculate Normalized Difference Moisture Index (NDMI)
+    (NIR - SWIR1)/(NIR + SWIR1). Note the output no data value is -999.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_nir_band: is an int specifying the NIR band in the input image
+                         (band indexing starts at 1)
+    :param img_swir_band: is an int specifying the SWIR1 band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = "(nir+swir)!=0?(nir-swir)/(nir+swir):-999"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+def calc_npcri(
+    input_img: str,
+    img_red_band: int,
+    img_blue_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+):
+    """
+    Helper function to calculate Normalized Pigment Chlorophyll Ratio Index (NPCRI)
+    (NIR - SWIR1)/(NIR + SWIR1). Note the output no data value is -999.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_red_band: is an int specifying the NIR band in the input image
+                         (band indexing starts at 1)
+    :param img_blue_band: is an int specifying the SWIR1 band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = "(red+blue)!=0?(red-blue)/(red+blue):-999"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+def calc_ndbsi(
+    input_img: str,
+    img_blue_band: int,
+    img_green_band: int,
+    img_red_band: int,
+    img_nir_band: int,
+    img_swir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+    scale_factor: int = 1000,
+    tmp_dir: str = None,
+):
+    """
+    Helper function to calculate Normalized Difference Bare Soil Index (NDBSI).
+    Note the output no data value is -999.
+
+    Liu, Y., Meng, Q., Zhang, L., Wu, C., 2022. NDBSI: A normalized difference bare
+    soil index for remote sensing to improve bare soil mapping accuracy in urban and
+    rural areas. CATENA 214, 106265. https://doi.org/10.1016/j.catena.2022.106265
+
+    :param input_img: is a string specifying the input image file.
+    :param img_blue_band: is an int specifying the blue band in the input image
+                         (band indexing starts at 1)
+    :param img_green_band: is an int specifying the green band in the input image
+                         (band indexing starts at 1)
+    :param img_red_band: is an int specifying the ref band in the input image
+                         (band indexing starts at 1)
+    :param img_nir_band: is an int specifying the NIR band in the input image
+                         (band indexing starts at 1)
+    :param img_swir_band: is an int specifying the SWIR1 band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+    :param scale_factor: is a float which can be used retrieved reflectance between
+                         0-1 (Default: 1000 to match rsgislib/arcsi)
+    :param tmp_dir: directory where intermediate files will be outputted. If input
+                    is None then a directory will be created in the output image
+                    folder and then deleted at the end of the processing.
+
+    """
+    import os
+    import shutil
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
+
+    uid_str = rsgislib.tools.utils.uid_generator()
+
+    tmp_dir_created = False
+    if tmp_dir is None:
+        tmp_dir = os.path.dirname(os.path.abspath(output_img))
+        tmp_dir = os.path.join(tmp_dir, f"tmp_{uid_str}")
+        if not os.path.exists(tmp_dir):
+            os.mkdir(tmp_dir)
+            tmp_dir_created = True
+
+    basename = rsgislib.tools.filetools.get_file_basename(output_img)
+    file_ext = rsgislib.imageutils.get_file_img_extension(gdalformat)
+    tmp_v_img = os.path.join(tmp_dir, f"{basename}_tmp_{uid_str}_v.{file_ext}")
+    tmp_r_img = os.path.join(tmp_dir, f"{basename}_tmp_{uid_str}_r.{file_ext}")
+    tmp_k_img = os.path.join(tmp_dir, f"{basename}_tmp_{uid_str}_k.{file_ext}")
+
+    # Calc v
+    expression = (
+        f"(red==0)||(green==0)?-999:((red/{scale_factor})-(green/{scale_factor}))"
+    )
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
+    rsgislib.imagecalc.band_math(
+        tmp_v_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    # Calc r
+    expression = f"(red==0)||(nir==0)||(swir==0)?-999:" \
+                 f"1-( ( (swir/{scale_factor}) - (nir/{scale_factor}) ) / " \
+                 f"( 3 * abs( (nir/{scale_factor}) - (red/{scale_factor}) ) ) )"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir_band))
+    rsgislib.imagecalc.band_math(
+        tmp_r_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    # Calc k
+    expression = f"(r==-999)||(v==-999)?-999:v*r"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("r", tmp_r_img, 1))
+    band_defns.append(rsgislib.imagecalc.BandDefn("v", tmp_v_img, 1))
+    rsgislib.imagecalc.band_math(
+        tmp_k_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    expression = f"k==-999?-999:k<0?abs((swir/{scale_factor})-(blue/{scale_factor})) " \
+                 f"/ ((swir/{scale_factor})+(blue/{scale_factor}))*(-1):" \
+                 f"((swir/{scale_factor})-(blue/{scale_factor})) / " \
+                 f"((swir/{scale_factor})+(blue/{scale_factor}))"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("k", tmp_k_img, 1))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+    if tmp_dir_created:
+        shutil.rmtree(tmp_dir)
+    else:
+        rsgislib.imageutils.delete_gdal_layer(tmp_v_img)
+        rsgislib.imageutils.delete_gdal_layer(tmp_r_img)
+        rsgislib.imageutils.delete_gdal_layer(tmp_k_img)
+
+
+def calc_cmr(
+    input_img: str,
+    img_swir1_band: int,
+    img_swir2_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+):
+    """
+    Helper function to calculate Clay Minerals Ratio (CMR)
+    (swir1/swir2)). Note the output no data value is -999.
+
+    Dogan, H., 2009. "Mineral composite assessment of Kelkit River Basin in
+    Turkey by means of remote sensing," Journal of Earth System Science,
+    Vol. 118, 701-710.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_swir1_band: is an int specifying the swir1 band in the input image
+                         (band indexing starts at 1)
+    :param img_swir2_band: is an int specifying the swir2 band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = "(swir1==0)||(swir2==0)?-999:(swir1/swir2)"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir1", input_img, img_swir1_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir2", input_img, img_swir2_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+def calc_fmr(
+    input_img: str,
+    img_nir_band: int,
+    img_swir_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+):
+    """
+    Helper function to calculate Ferrous Minerals Ratio (FMR)
+    (swir/nir)). Note the output no data value is -999.
+
+    Segal, D. "Theoretical Basis for Differentiation of Ferric-Iron Bearing Minerals,
+    Using Landsat MSS Data." Proceedings of Symposium for Remote Sensing of Environment,
+    2nd Thematic Conference on Remote Sensing for Exploratory Geology, Fort Worth, TX
+    (1982): pp. 949-951.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_nir_band: is an int specifying the nir band in the input image
+                         (band indexing starts at 1)
+    :param img_swir_band: is an int specifying the swir band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = "(nir==0)||(swir==0)?-999:(swir/nir)"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir_band))
+    rsgislib.imagecalc.band_math(
+        output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.pop_img_stats(output_img, True, -999.0, True)
+    else:
+        rsgislib.imageutils.set_img_no_data_value(output_img, -999.0)
+
+
+def calc_ior(
+    input_img: str,
+    img_blue_band: int,
+    img_red_band: int,
+    output_img: str,
+    calc_stats: bool = True,
+    gdalformat: str = "KEA",
+):
+    """
+    Helper function to calculate Iron Oxide Ratio (IOR)
+    (red/blue)). Note the output no data value is -999.
+
+    Segal, D. "Theoretical Basis for Differentiation of Ferric-Iron Bearing Minerals,
+    Using Landsat MSS Data." Proceedings of Symposium for Remote Sensing of Environment,
+    2nd Thematic Conference on Remote Sensing for Exploratory Geology, Fort Worth, TX
+    (1982): pp. 949-951.
+
+    :param input_img: is a string specifying the input image file.
+    :param img_blue_band: is an int specifying the blue band in the input image
+                         (band indexing starts at 1)
+    :param img_red_band: is an int specifying the red band in the input image
+                         (band indexing starts at 1)
+    :param output_img: is a string specifying the output image file.
+    :param calc_stats: is a boolean specifying whether pyramids and stats should
+                       be calculated (Default: True)
+    :param gdalformat: is a string specifying the output image file format
+                       (Default: KEA)
+
+    """
+    expression = "(red==0)||(blue==0)?-999:(red/blue)"
+    band_defns = []
+    band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
+    band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
     rsgislib.imagecalc.band_math(
         output_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
@@ -852,5 +1329,8 @@ https://www.sciencedirect.com/science/article/abs/pii/S0034425713002873
 
 Two versions in this article:
 https://www.tandfonline.com/doi/full/10.1080/10095020.2015.1017911
+
+
+More indices: https://www.geo.university/pages/blog?p=spectral-indices-with-multispectral-satellite-data
 
 """
