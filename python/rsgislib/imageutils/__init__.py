@@ -213,9 +213,9 @@ def set_env_vars_deflate_gtiff_outs(bigtiff: bool = False):
 
     """
     if bigtiff:
-        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = (
-            "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
-        )
+        os.environ[
+            "RSGISLIB_IMG_CRT_OPTS_GTIFF"
+        ] = "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
     else:
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=DEFLATE"
 
@@ -3204,7 +3204,11 @@ def combine_binary_masks(
 
 
 def gdal_translate(
-    input_img: str, output_img: str, gdalformat: str = "KEA", options: str = ""
+    input_img: str,
+    output_img: str,
+    gdalformat: str = "KEA",
+    datatype=None,
+    options: str = "",
 ):
     """
     Using GDAL translate to convert input image to a different format, if GTIFF
@@ -3214,6 +3218,8 @@ def gdal_translate(
     :param input_img: Input image which is GDAL readable.
     :param output_img: The output image file.
     :param gdalformat: The output image file format
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the
+                     output image. If None (Default) then input data type will be used.
     :param options: options for the output driver (e.g., "-co TILED=YES
                     -co COMPRESS=LZW -co BIGTIFF=YES")
 
@@ -3233,8 +3239,13 @@ def gdal_translate(
     except:
         callback = gdal.TermProgress
 
+    if datatype is None:
+        datatype = get_rsgislib_datatype_from_img(input_img)
+
+    gdal_data_type = rsgislib.get_gdal_datatype(datatype)
+
     trans_opt = gdal.TranslateOptions(
-        format=gdalformat, options=options, callback=callback
+        format=gdalformat, outputType=gdal_data_type, options=options, callback=callback
     )
     gdal.Translate(output_img, input_img, options=trans_opt)
 
@@ -4768,9 +4779,9 @@ def polyfill_nan_data_values(
                         if otherargs.mean_abs_diff is not None:
                             pxl_mean = numpy.nanmean(img_flat[pxl_idx])
                             pred_vals_diff = numpy.abs(pred_vals - pxl_mean)
-                            pred_vals[pred_vals_diff > otherargs.mean_abs_diff] = (
-                                pxl_mean
-                            )
+                            pred_vals[
+                                pred_vals_diff > otherargs.mean_abs_diff
+                            ] = pxl_mean
                         repl_idxs = numpy.arange(0, pred_vals.shape[0])[
                             numpy.invert(finite_msk)
                         ]
