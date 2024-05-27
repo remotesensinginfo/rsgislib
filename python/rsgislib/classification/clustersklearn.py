@@ -123,6 +123,7 @@ def img_pixel_sample_cluster(
             outClusterVals[ID] = outPred
 
         outClusterValsOutArr = outClusterVals.reshape([1, blkShape[1], blkShape[2]])
+        outClusterValsOutArr = outClusterValsOutArr.astype(numpy.int32)
 
         if writer is None:
             writer = ImageWriter(
