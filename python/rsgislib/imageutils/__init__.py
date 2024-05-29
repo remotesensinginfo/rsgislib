@@ -3207,7 +3207,7 @@ def gdal_translate(
     input_img: str,
     output_img: str,
     gdalformat: str = "KEA",
-    datatype=None,
+    datatype: int = None,
     options: str = "",
 ):
     """
