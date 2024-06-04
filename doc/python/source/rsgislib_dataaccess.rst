@@ -19,6 +19,7 @@ USGS Earth Explorer
 .. autofunction:: rsgislib.dataaccess.usgs_m2m.create_scene_list
 .. autofunction:: rsgislib.dataaccess.usgs_m2m.remove_scene_list
 .. autofunction:: rsgislib.dataaccess.usgs_m2m.check_dwnld_opts
+.. autofunction:: rsgislib.dataaccess.usgs_m2m.request_downloads
 
 
 NASA Common Metadata Repository
@@ -31,5 +32,3 @@ NASA Common Metadata Repository
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.find_all_granules
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.get_total_file_size
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.cmr_download_file_http
-
-

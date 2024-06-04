@@ -2788,9 +2788,6 @@ def drop_rows_by_attribute(
     :param out_vec_file: The output vector file
     :param out_vec_lyr: The output vector layer
     :param out_format: The output vector format.
-    :param match_type: The type of match for the subset. Options: equals (default) -
-                       the same value. contains - string is anywhere within attribute
-                       value. start - string matches the start of the attribute value.
 
     """
     import geopandas

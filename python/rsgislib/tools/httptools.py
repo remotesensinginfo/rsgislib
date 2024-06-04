@@ -265,3 +265,102 @@ def wget_download_file(
         out_message = "File did not successfully download but no exception thrown."
 
     return success, out_message
+
+
+def create_file_listings_db(
+    db_json: str,
+    file_urls: dict[str, str],
+):
+    """
+    A function which builds a JSON database using the pysondb module
+    with a .
+
+    :param db_json: The file path for the databases JSON file.
+    :param file_urls: a dictionary of URLs using the filename as the keys
+
+    """
+    import pysondb
+    import tqdm
+
+    lst_db = pysondb.getDb(db_json)
+    db_data = []
+    for c_file in tqdm.tqdm(file_urls):
+        db_data.append(
+            {
+                "http_url": file_urls[c_file],
+                "file_name": c_file,
+                "lcl_path": "",
+                "downloaded": False,
+            }
+        )
+
+    if len(db_data) > 0:
+        lst_db.addMany(db_data)
+
+
+def download_http_files_use_lst_db(
+    db_json: str,
+    out_dir_path: str,
+    http_user: str = None,
+    http_pass: str = None,
+    use_wget: bool = False,
+    wget_time_out: int = 60,
+    check_file_exists: bool = False,
+):
+    """
+    A function which uses the pysondb JSON database to download all the files
+    recording whether files have been downloaded successful and the output
+    path for the file.
+
+    :param db_json: file path for the JSON db file.
+    :param out_dir_path: the output path where data should be downloaded to.
+    :param http_user: the username, if required, for the ftp server.
+    :param http_pass: the password, if required, for the ftp server.
+    :param use_wget: boolean specifying whether to use wget to download the files.
+                     (Default: False).
+    :param wget_time_out: number of seconds to time out when using wget. (Default: 60)
+    :param check_file_exists: check if the output file already exists and only
+                              download if not present.
+
+    """
+    import pysondb
+
+    lst_db = pysondb.getDb(db_json)
+
+    dwld_files = lst_db.getByQuery({"downloaded": False})
+
+    if not os.path.exists(out_dir_path):
+        os.mkdir(out_dir_path)
+
+    for dwn_file in dwld_files:
+        basename = dwn_file["file_name"]
+        print(basename)
+        lcl_path = os.path.join(out_dir_path, basename)
+        file_exists = False
+        if check_file_exists:
+            file_exists = os.path.exists(lcl_path)
+        if not file_exists:
+            if use_wget:
+                dwnlded, out_message = wget_download_file(
+                    input_url=dwn_file["http_url"],
+                    out_file_path=lcl_path,
+                    username=http_user,
+                    password=http_pass,
+                    try_number=10,
+                    time_out=wget_time_out,
+                    input_url_md5=None,
+                )
+            else:
+                dwnlded = download_file_http(
+                    input_url=dwn_file["http_url"],
+                    out_file_path=lcl_path,
+                    username=http_user,
+                    password=http_pass,
+                    no_except=True,
+                )
+        else:
+            dwnlded = True
+        if dwnlded:
+            lst_db.updateById(
+                dwn_file["id"], {"lcl_path": lcl_path, "downloaded": True}
+            )
