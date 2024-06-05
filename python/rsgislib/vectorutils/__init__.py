@@ -2818,6 +2818,7 @@ def merge_vector_files(
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
     out_epsg: int = None,
+    remove_cols: List[str] = None,
 ):
     """
     A function which merges the input files into a single output file using geopandas.
@@ -2829,6 +2830,7 @@ def merge_vector_files(
     :param out_format: output file format.
     :param out_epsg: if input layers are different projections then option can be
                      used to define the output projection.
+    :param remove_cols: a list of columns to be removed during the merge.
 
     """
     import geopandas
@@ -2848,6 +2850,13 @@ def merge_vector_files(
             data_gdf = geopandas.read_file(vec_file, layer=lyr)
             if out_epsg is not None:
                 data_gdf = data_gdf.to_crs(epsg=out_epsg)
+            if remove_cols is not None:
+                df_col_names = data_gdf.columns.values.tolist()
+                cols_to_rm = list()
+                for col in remove_cols:
+                    if col in df_col_names:
+                        cols_to_rm.append(col)
+                data_gdf = data_gdf.drop(labels=cols_to_rm, axis=1)
             if len(data_gdf) > 0:
                 gp_lyrs.append(data_gdf)
 
@@ -2876,6 +2885,7 @@ def merge_vector_layers(
     out_vec_lyr: str = None,
     out_format: str = "GPKG",
     out_epsg: int = None,
+    remove_cols: List[str] = None,
 ):
     """
     A function which merges the input vector layers into a single output
@@ -2889,6 +2899,7 @@ def merge_vector_layers(
     :param out_format: output file format.
     :param out_epsg: if input layers are different projections then option can be
                      used to define the output projection.
+    :param remove_cols: a list of columns to be removed during the merge.
 
     """
     import geopandas
@@ -2902,6 +2913,13 @@ def merge_vector_layers(
             data_gdf = geopandas.read_file(vec_info["file"], layer=vec_info["layer"])
             if out_epsg is not None:
                 data_gdf = data_gdf.to_crs(epsg=out_epsg)
+            if remove_cols is not None:
+                df_col_names = data_gdf.columns.values.tolist()
+                cols_to_rm = list()
+                for col in remove_cols:
+                    if col in df_col_names:
+                        cols_to_rm.append(col)
+                data_gdf = data_gdf.drop(labels=cols_to_rm, axis=1)
             if len(data_gdf) > 0:
                 gp_lyrs.append(data_gdf)
         else:
