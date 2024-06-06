@@ -803,7 +803,7 @@ def add_string_col_lut(
     # Open vector file
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     # Add output column
-    base_gpdf[out_col] = numpy.zeros((base_gpdf.shape[0]), dtype=numpy.unicode_)
+    base_gpdf[out_col] = numpy.zeros((base_gpdf.shape[0]), dtype=numpy.str_)
     # Loop values in LUT
     for lut_key in val_lut:
         sel_rows = base_gpdf[ref_col] == lut_key
@@ -1287,7 +1287,9 @@ def perform_spatial_join(
     if vec_join_epsg is not None:
         join_gpd_df = join_gpd_df.set_crs(epsg=vec_join_epsg, allow_override=True)
 
-    join_gpd_df = geopandas.sjoin(base_gpd_df, join_gpd_df, how=join_how, predicate=join_op)
+    join_gpd_df = geopandas.sjoin(
+        base_gpd_df, join_gpd_df, how=join_how, predicate=join_op
+    )
 
     if len(join_gpd_df) > 0:
         if out_format == "GPKG":
@@ -1694,3 +1696,37 @@ def check_str_col(
         base_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         base_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def create_date_col(
+    vec_file: str,
+    vec_lyr: str,
+    year_col: str,
+    month_col: str,
+    day_col: str,
+    out_date_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    import geopandas
+    import datetime
+    import rsgislib.vectorutils
+
+    out_format = rsgislib.vectorutils.check_format_name(out_format)
+
+    # Open vector file
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    year_arr = data_gdf[year_col].values
+    month_arr = data_gdf[month_col].values
+    day_arr = data_gdf[day_col].values
+    out_dates_lst = list()
+    for year_val, month_val, day_val in zip(year_arr, month_arr, day_arr):
+        out_dates_lst.append(datetime.datetime(year_val, month_val, day_val))
+    data_gdf[out_date_col] = out_dates_lst
+
+    if out_format == "GPKG":
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
