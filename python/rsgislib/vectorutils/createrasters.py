@@ -3,7 +3,6 @@
 The vector conversion tools for converting between raster and vector
 """
 from typing import List, Dict, Tuple, Union
-import math
 
 from osgeo import gdal, ogr
 
@@ -93,7 +92,7 @@ def rasterise_vec_lyr(
         print("Running Rasterise now...")
         out_img_ds = gdal.Open(output_img, gdal.GA_Update)
         if out_img_ds is None:
-            raise rsgislib.RSGISPyException("Could not open '{}'".format(output_img))
+            raise rsgislib.RSGISPyException(f"Could not open '{output_img}'")
 
         vec_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
         if vec_ds is None:

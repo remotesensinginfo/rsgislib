@@ -26,7 +26,7 @@ class RSGISNumpyArrayEncoder(json.JSONEncoder):
             return obj.tolist()
         elif isinstance(obj, numpy.bool_):
             return bool(obj)
-        elif isinstance(obj, numpy.string_):
+        elif isinstance(obj, numpy.bytes_):
             return str(obj)
         elif isinstance(obj, (numpy.void)):
             return None
