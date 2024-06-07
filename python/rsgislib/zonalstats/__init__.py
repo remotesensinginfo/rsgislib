@@ -2674,23 +2674,27 @@ def merge_extracted_hdf5_chip_ref_data(
 
 
 def msk_h5_smpls_to_finite_values(
-    input_h5: str,
-    output_h5: str,
+    in_h5_file: str,
+    out_h5_file: str,
     datatype: int = None,
     lower_limit: float = None,
     upper_limit: float = None,
+    limits_all_vars: bool = True,
 ):
     """
     A function to remove values from a HDF5 sample file which are not finite.
     Upper and lower values can also be specified.
 
-    :param input_h5: Input HDF5 file.
-    :param output_h5: Output HDF5 file.
+    :param in_h5_file: Input HDF5 file.
+    :param out_h5_file: Output HDF5 file.
     :param datatype: is the data type used for the output HDF5 file
                      (e.g., rsgislib.TYPE_32FLOAT). If None (default)
                      then the output data type will be float32.
     :param lower_limit: Optional lower value threshold (if None then not used).
     :param upper_limit: Optional upper value threshold (if None then not used).
+    :param limits_all_vars: If upper or lower thresholds specified then specify
+                            whether any or all of the variables need to be above
+                            the threshold.
 
     """
     import h5py
@@ -2699,22 +2703,31 @@ def msk_h5_smpls_to_finite_values(
         datatype = rsgislib.TYPE_32FLOAT
     h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
-    fH5 = h5py.File(input_h5, "r")
+    fH5 = h5py.File(in_h5_file, "r")
     data_shp = fH5["DATA/DATA"].shape
     num_vars = data_shp[1]
     data = numpy.array(fH5["DATA/DATA"])
+    # Mask to finite values
     data = data[numpy.isfinite(data).all(axis=1)]
+    # Apply the lower limit
     if lower_limit is not None:
-        data = data[numpy.any(data > lower_limit, axis=1)]
+        if limits_all_vars:
+            data = data[numpy.any(data > lower_limit, axis=1)]
+        else:
+            data = data[numpy.all(data > lower_limit, axis=1)]
+    # Apply the upper limit
     if upper_limit is not None:
-        data = data[numpy.any(data < upper_limit, axis=1)]
+        if limits_all_vars:
+            data = data[numpy.any(data < upper_limit, axis=1)]
+        else:
+            data = data[numpy.all(data < upper_limit, axis=1)]
 
     n_samples = data.shape[0]
     chunk_size = 1000
     if n_samples < 1000:
         chunk_size = n_samples
 
-    fH5Out = h5py.File(output_h5, "w")
+    fH5Out = h5py.File(out_h5_file, "w")
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
     dataGrp.create_dataset(
