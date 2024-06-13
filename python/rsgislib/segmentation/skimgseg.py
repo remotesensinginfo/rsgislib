@@ -114,7 +114,8 @@ def perform_felsenszwalb_segmentation(
     if not ((gdalDS.RasterCount == 1) or (gdalDS.RasterCount == 3)):
         gdalDS = None
         raise rsgislib.RSGISPyException(
-            "Input image should have either a single band or three (RGB). Consider performing PCA to reduce."
+            "Input image should have either a single band or three "
+            "(RGB). Consider performing PCA to reduce."
         )
 
     pxlValsArr = []
@@ -237,7 +238,8 @@ def perform_quickshift_segmentation(
     if not (gdalDS.RasterCount == 3):
         gdalDS = None
         raise rsgislib.RSGISPyException(
-            "Input image should have three bands (RGB). Consider performing PCA to reduce."
+            "Input image should have three bands (RGB). "
+            "Consider performing PCA to reduce."
         )
 
     pxlValsArr = []
@@ -409,7 +411,8 @@ def perform_slic_segmentation(
     if not ((gdalDS.RasterCount == 1) or (gdalDS.RasterCount == 3)):
         gdalDS = None
         raise rsgislib.RSGISPyException(
-            "Input image should have either a single band or three (RGB). Consider performing PCA to reduce."
+            "Input image should have either a single band or three (RGB). "
+            "Consider performing PCA to reduce."
         )
 
     pxlValsArr = []
@@ -568,7 +571,8 @@ def perform_watershed_segmentation(
     if not ((gdalDS.RasterCount == 1) or (gdalDS.RasterCount == 3)):
         gdalDS = None
         raise rsgislib.RSGISPyException(
-            "Input image should have either a single band or three (RGB). Consider performing PCA to reduce."
+            "Input image should have either a single band or three (RGB). "
+            "Consider performing PCA to reduce."
         )
 
     pxlValsArr = []
@@ -730,7 +734,8 @@ def perform_random_walker_segmentation(
     if not ((gdalDS.RasterCount == 1) or (gdalDS.RasterCount == 3)):
         gdalDS = None
         raise rsgislib.RSGISPyException(
-            "Input image should have either a single band or three (RGB). Consider performing PCA to reduce."
+            "Input image should have either a single band or three (RGB). "
+            "Consider performing PCA to reduce."
         )
 
     multichannel = True
