@@ -14,6 +14,7 @@
 #if _MSC_VER
     #include <io.h>
     #define isatty _isatty
+    #include <windows.h>
 #else
     #include <unistd.h>
 #endif
@@ -29,9 +30,7 @@
 #include <cmath>
 #include <algorithm>
 #ifdef __linux__
-#include <sys/ioctl.h>
-#else
-#include <windows.h>
+    #include <sys/ioctl.h>
 #endif
 
 // mark all exported classes/functions with DllExport to have
@@ -92,10 +91,12 @@ namespace rsgis
               struct winsize win {};
               ioctl(0, TIOCGWINSZ, &win);
               unsigned short width = win.ws_col;
-#else
+#elif _MSC_VER
               CONSOLE_SCREEN_BUFFER_INFO csbi;
               GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
               unsigned short width = csbi.srWindow.Right - csbi.srWindow.Left;
+#else
+              unsigned short width = 40;
 #endif
               // return the space left for process bar
               // '60' is an experience value to exclude other output info, such as percent, time elapsed, etc.
