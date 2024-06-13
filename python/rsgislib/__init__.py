@@ -698,6 +698,7 @@ class TQDMProgressBar:
 
     def __init__(self):
         self.lprogress = 0
+        self.pbar = None
 
     def setTotalSteps(self, steps: int):
         import tqdm
@@ -711,13 +712,16 @@ class TQDMProgressBar:
         self.lprogress = 0
 
     def setProgress(self, progress: int):
+        if self.pbar is None:
+            self.setTotalSteps(steps=100)
         step = progress - self.lprogress
         self.pbar.update(step)
         self.lprogress = progress
 
     def reset(self):
-        self.pbar.close()
         import tqdm
+        if self.pbar is not None:
+            self.pbar.close()
 
         if is_notebook():
             import tqdm.notebook
