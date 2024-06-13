@@ -96,7 +96,7 @@ namespace rsgis
               GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
               unsigned short width = csbi.srWindow.Right - csbi.srWindow.Left;
 #else
-              unsigned short width = 40;
+              unsigned short width = 120;
 #endif
               // return the space left for process bar
               // '60' is an experience value to exclude other output info, such as percent, time elapsed, etc.
