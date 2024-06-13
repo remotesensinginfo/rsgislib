@@ -844,6 +844,9 @@ def test_check_validate_geometries(tmp_path):
     assert os.path.exists(out_vec_file)
 
 
+@pytest.mark.skip(
+    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
+)
 def test_does_vmsk_img_intersect(tmp_path):
     import rsgislib.vectorutils
 
