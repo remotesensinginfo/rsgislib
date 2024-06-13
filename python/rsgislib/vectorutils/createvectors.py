@@ -126,7 +126,7 @@ def vectorise_pxls_to_pts(
     """
     Function which creates a new output vector file for the pixels within the input
     image file with the value specified. Pixel locations will be the centroid of
-    the the pixel
+    the pixel
 
     :param input_img: the input image
     :param img_band: the band within the image to use
