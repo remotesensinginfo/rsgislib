@@ -131,7 +131,7 @@ namespace rsgis {
             // and slowing down the loop, shoot for ~25Hz and smooth over 3 seconds
             if (nupdates > 10)
             {
-                period = (int)( std::min(std::max((1.0/25)*curr/dt_tot,1.0), 5e5));
+                period = (int)( (std::min)((std::max)((1.0/25)*curr/dt_tot,1.0), 5e5));
                 smoothing = 25*3;
             }
             double peta = (tot-curr)/avgrate;
@@ -216,4 +216,3 @@ namespace rsgis {
 
     }
 }//rsgis
-

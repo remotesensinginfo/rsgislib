@@ -11,6 +11,8 @@
 #ifndef RSGIS_TQDM_H
 #define RSGIS_TQDM_H
 
+#define NOMINMAX
+
 #if _MSC_VER
     #include <io.h>
     #define isatty _isatty
@@ -100,7 +102,7 @@ namespace rsgis
 #endif
               // return the space left for process bar
               // '60' is an experience value to exclude other output info, such as percent, time elapsed, etc.
-              return std::max((int)width - 60, 1);
+              return (std::max)((int)width - 60, 1);
             }();
     
             std::string right_pad = "▏";
