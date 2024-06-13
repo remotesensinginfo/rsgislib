@@ -250,7 +250,7 @@ def img_pixel_cluster(
     """
     A function which allows a clustering to be performed using the algorithms available
     within the scikit-learn library. The clusterer is applied to the whole image in one
-    operation so therefore requires the whole image to be loaded into memory. However,
+    operation therefore requires the whole image to be loaded into memory. However,
     if there is sufficient memory all the clustering algorithms within scikit-learn can
     be applied without boundary artifacts.
 
