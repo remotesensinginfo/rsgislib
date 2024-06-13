@@ -8,6 +8,12 @@ try:
 except ImportError:
     GEOPANDAS_NOT_AVAIL = True
 
+SCIPY_NOT_AVAIL = False
+try:
+    import scipy
+except ImportError:
+    SCIPY_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 IMGUTILS_DATA_DIR = os.path.join(DATA_DIR, "imageutils")
 IMGREG_DATA_DIR = os.path.join(DATA_DIR, "imageregistration")
@@ -1603,6 +1609,7 @@ def test_whiten_image(tmp_path):
     assert os.path.exists(output_img)
 
 
+@pytest.mark.skipif(SCIPY_NOT_AVAIL, reason="scipy dependency not available")
 def test_spectral_smoothing(tmp_path):
     import rsgislib.imageutils
 
