@@ -5,7 +5,7 @@ image processing.
 """
 import os
 import shutil
-from typing import List
+from typing import List, Dict
 
 import tqdm
 
@@ -82,35 +82,81 @@ def animate_img_set(
         shutil.rmtree(lcl_tmp_dir)
 
 
-def list_exif_info(input_img):
+def list_exif_info_pil(input_img: str):
     """
-    A function which lists the exif information from an input image
+    A function which prints the exif information from an input image to the console
     using the PIL module.
 
     :param input_img: the path to the input image
 
     """
     from PIL import Image
-    from PIL.ExifTags import TAGS
+    from PIL.ExifTags import TAGS, IFD, GPSTAGS
 
     pil_image = Image.open(input_img)
     pil_exif_data = pil_image.getexif()
 
-    for tag_id in pil_exif_data:
-        # get the tag name, instead of human unreadable tag id
-        tag = TAGS.get(tag_id, tag_id)
+    for ifd_id in IFD:
+        print(">>>>>>>>>", ifd_id.name, "<<<<<<<<<<")
         try:
-            data = pil_exif_data.get(tag_id)
-            # decode bytes
-            if isinstance(data, bytes):
-                data = data.decode()
-            print(f"{tag:25}: {data}")
-        except:
-            continue
+            ifd = pil_exif_data.get_ifd(ifd_id)
+
+            if ifd_id == IFD.GPSInfo:
+                resolve = GPSTAGS
+            else:
+                resolve = TAGS
+
+            for k, v in ifd.items():
+                tag = resolve.get(k, k)
+                if tag not in ["UserComment", "PrintImageMatching", "MakerNote"]:
+                    if isinstance(v, bytes):
+                        v = v.decode("utf-8")
+                    print(f"{tag}:\t {v}")
+        except KeyError:
+            pass
     pil_image.close()
 
 
-def extract_images_from_pdf(input_pdf, output_dir):
+def list_exif_info(input_img: str):
+    """
+    A function which prints the exif information from an input image to the console
+    using the exiftool module.
+
+    :param input_img: the path to the input image
+
+    """
+    import exiftool
+
+    with exiftool.ExifToolHelper() as et:
+        exif_data = et.get_metadata(input_img)
+
+        for exif_item in exif_data:
+            for exif_tag in exif_item:
+                print(f"{exif_tag}:\t{exif_item[exif_tag]}")
+
+
+def get_exif_info(input_img: str) -> Dict:
+    """
+    A function which returns a dict of the exif information from an input image
+    using the exiftool module.
+
+    :param input_img: the path to the input image
+    :return: dict of exif data
+
+    """
+    import exiftool
+
+    out_exif_data = dict()
+    with exiftool.ExifToolHelper() as et:
+        exif_data = et.get_metadata(input_img)
+
+        for exif_item in exif_data:
+            for exif_tag in exif_item:
+                out_exif_data[exif_tag] = exif_item[exif_tag]
+    return out_exif_data
+
+
+def extract_images_from_pdf(input_pdf: str, output_dir: str):
     """
     A function which extracts the images from a PDF file and files them
     to a directory as PNG image files.
@@ -139,7 +185,7 @@ def extract_images_from_pdf(input_pdf, output_dir):
             pix.save(os.path.join(output_dir, f"p{i}_{xref}.png"))
 
 
-def add_pdf_blank_pages(input_pdf, output_pdf):
+def add_pdf_blank_pages(input_pdf: str, output_pdf: str):
     """
     A function which adds a blank page after each page within
     the existing PDF document.
@@ -161,7 +207,9 @@ def add_pdf_blank_pages(input_pdf, output_pdf):
     pdf_doc.save(output_pdf)
 
 
-def create_qr_code(output_img, qr_data, qr_code_size=10, qr_code_border=4):
+def create_qr_code(
+    output_img: str, qr_data: str, qr_code_size: int = 10, qr_code_border: int = 4
+):
     """
     A function which uses the qrcode module to create a QR code image file.
     Needs the qrcode module installed (pip install qrcode)

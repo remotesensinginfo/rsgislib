@@ -714,4 +714,6 @@ def define_extern_gps_in_imgs(
                 out_tags["MakerNotes:CameraYaw"] = float(gimbal_yaw)
                 out_tags["XMP:Yaw"] = float(gimbal_yaw)
 
-                et.set_tags(input_img, out_tags)
+                et.set_tags(
+                    input_img, tags=out_tags, params=["-P", "-overwrite_original"]
+                )
