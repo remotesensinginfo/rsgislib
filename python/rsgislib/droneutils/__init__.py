@@ -647,6 +647,7 @@ def define_extern_gps_in_imgs(
     gimbal_roll: float,
     gimbal_pitch: float,
     gimbal_yaw: float,
+    overwrite: bool = False,
 ):
     """
 
@@ -669,10 +670,12 @@ def define_extern_gps_in_imgs(
     :param gimbal_roll: The gimbal roll angle (degrees)
     :param gimbal_pitch: The gimbal pitch angle (degrees)
     :param gimbal_yaw: The gimbal yaw angle (degrees)
+    :param overwrite: If True (Default: False) then the input images are overwritten
 
     """
     import exiftool
 
+    n_imgs = 0
     with exiftool.ExifToolHelper() as et:
         for index, row in tqdm.tqdm(gps_data_df.iterrows()):
             input_img = os.path.join(input_imgs_dir, row["image"])
@@ -682,16 +685,22 @@ def define_extern_gps_in_imgs(
                 out_tags["Composite:GPSLatitude"] = float(row["lat"])
                 out_tags["EXIF:GPSLatitude"] = float(row["lat"])
                 lat_ref = "N"
+                lat_ref_comp = "North"
                 if row["lat"] < 0:
                     lat_ref = "S"
+                    lat_ref_comp = "South"
                 out_tags["EXIF:GPSLatitudeRef"] = lat_ref
+                out_tags["Composite:GPSLatitudeRef"] = lat_ref_comp
 
                 out_tags["Composite:GPSLongitude"] = float(row["lon"])
                 out_tags["EXIF:GPSLongitude"] = float(row["lon"])
                 lon_ref = "E"
+                lon_ref_comp = "East"
                 if row["lon"] < 0:
                     lon_ref = "W"
+                    lon_ref_comp = "West"
                 out_tags["EXIF:GPSLongitudeRef"] = lon_ref
+                out_tags["Composite:GPSLongitudeRef"] = lon_ref_comp
 
                 # Altitude
                 out_tags["XMP:AbsoluteAltitude"] = float(row["alt"])
@@ -723,6 +732,9 @@ def define_extern_gps_in_imgs(
                 out_tags["MakerNotes:CameraYaw"] = float(gimbal_yaw)
                 out_tags["XMP:Yaw"] = float(gimbal_yaw)
 
-                et.set_tags(
-                    input_img, tags=out_tags, params=["-P", "-overwrite_original"]
-                )
+                params = []
+                if overwrite:
+                    params = ["-P", "-overwrite_original"]
+                et.set_tags(input_img, tags=out_tags, params=params)
+                n_imgs += 1
+    print(f"Updated EXIF for {n_imgs} images.")
