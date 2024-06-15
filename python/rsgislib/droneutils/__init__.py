@@ -1,6 +1,7 @@
 from typing import List
 import os
 import shutil
+import tqdm
 
 
 class ImageTimeCluster(object):
@@ -223,6 +224,7 @@ def create_flightline_vec(
     :param out_format: output vector format
 
     """
+    # Based on code from https://github.com/spifftek70/Drone-Footprints
     import rsgislib.tools.filetools
     import datetime
     import pandas
@@ -288,6 +290,7 @@ def create_flightline_vec(
                 or img_exif.get("EXIF:GPSLongitude")
             )
         )
+
         img_info["relative_altitude"].append(
             float(
                 img_exif.get("XMP:RelativeAltitude")
@@ -451,6 +454,7 @@ def create_flightline_extern_gps_vec(
     :param out_format: output vector format
 
     """
+    # Based on code from https://github.com/spifftek70/Drone-Footprints
     import datetime
     import pandas
     import geopandas
@@ -634,3 +638,80 @@ def create_flightline_extern_gps_vec(
             flightline_gdf.to_file(line_vec_file, layer=line_vec_lyr, driver=out_format)
         else:
             flightline_gdf.to_file(line_vec_file, driver=out_format)
+
+
+def define_extern_gps_in_imgs(
+    gps_data_df,
+    input_imgs_dir: str,
+    flying_height: float,
+    gimbal_roll: float,
+    gimbal_pitch: float,
+    gimbal_yaw: float,
+):
+    """
+
+    The input pandas DataFrame needs to have the following columns:
+    image, lat, lon, alt, roll, pitch, yaw
+
+    The columns should be:
+    image - image file name
+    lat - latitude
+    lon - longitude
+    alt - absolute altitude
+    roll - flight roll
+    pitch - flight pitch
+    yaw - flight yaw
+
+    :param gps_data_df: A pandas DataFrame with the external GPS data.
+    :param input_imgs_dir: The directory with input images
+    :param flying_height: The flying height of the drone to be used as the
+                          relative elevation
+    :param gimbal_roll: The gimbal roll angle (degrees)
+    :param gimbal_pitch: The gimbal pitch angle (degrees)
+    :param gimbal_yaw: The gimbal yaw angle (degrees)
+
+    """
+    import exiftool
+
+    with exiftool.ExifToolHelper() as et:
+        for index, row in tqdm.tqdm(gps_data_df.iterrows()):
+            input_img = os.path.join(input_imgs_dir, row["image"])
+            if os.path.exists(input_img):
+                out_tags = dict()
+                # Location
+                out_tags["Composite:GPSLatitude"] = float(row["lat"])
+                out_tags["EXIF:GPSLatitude"] = float(row["lat"])
+                out_tags["Composite:GPSLongitude"] = float(row["lon"])
+                out_tags["EXIF:GPSLongitude"] = float(row["lon"])
+
+                # Altitude
+                out_tags["XMP:AbsoluteAltitude"] = float(row["alt"])
+                out_tags["Composite:GPSAltitude"] = float(row["alt"])
+                out_tags["XMP:RelativeAltitude"] = float(flying_height)
+
+                # Pitch
+                out_tags["XMP:FlightPitchDegree"] = float(row["pitch"])
+                out_tags["MakerNotes:Pitch"] = float(row["pitch"])
+                # Roll
+                out_tags["XMP:FlightRollDegree"] = float(row["roll"])
+                out_tags["MakerNotes:Roll"] = float(row["roll"])
+                # Yaw
+                out_tags["XMP:FlightYawDegree"] = float(row["yaw"])
+                out_tags["MakerNotes:Yaw"] = float(row["yaw"])
+
+                # Gimbal Roll
+                out_tags["XMP:GimbalRollDegree"] = float(gimbal_roll)
+                out_tags["MakerNotes:CameraRoll"] = float(gimbal_roll)
+                out_tags["XMP:Roll"] = float(gimbal_roll)
+
+                # Gimbal Pitch
+                out_tags["XMP:GimbalPitchDegree"] = float(gimbal_pitch)
+                out_tags["MakerNotes:CameraPitch"] = float(gimbal_pitch)
+                out_tags["XMP:Pitch"] = float(gimbal_pitch)
+
+                # Gimbal Yaw
+                out_tags["XMP:GimbalYawDegree"] = float(gimbal_yaw)
+                out_tags["MakerNotes:CameraYaw"] = float(gimbal_yaw)
+                out_tags["XMP:Yaw"] = float(gimbal_yaw)
+
+                et.set_tags(input_img, out_tags)
