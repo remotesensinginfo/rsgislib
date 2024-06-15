@@ -36,6 +36,7 @@ Python documentation
    rsgislib_changedetection
    rsgislib_classification
    rsgislib_dataaccess
+   rsgislib_droneutils
    rsgislib_elevation
    rsgislib_imagecalc
    rsgislib_imagecalibration
@@ -61,5 +62,3 @@ Python documentation
 * :ref:`search`
 
 .. codeauthor:: Dr Peter Bunting <pfb@aber.ac.uk>, Dr Dan Clewely <dac@pml.ac.uk> and Dr Nathan Thomas <nathan.m.thomas@nasa.gov>
-
-
