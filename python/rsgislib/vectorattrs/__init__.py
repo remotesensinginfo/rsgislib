@@ -1730,3 +1730,69 @@ def create_date_col(
         data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def calc_vec_area(
+    vec_file: str,
+    vec_lyr: str,
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which adds a column to the attribute table with the area of
+    each polygon. Geometry is expected to be polygon.
+
+    :param vec_file: the input vector file
+    :param vec_lyr: the input vector layer
+    :param out_col: the output column name
+    :param out_vec_file: output vector file path
+    :param out_vec_lyr: output vector layer name
+    :param out_format: the output vector format (Default: GPKG)
+
+    """
+    import geopandas
+
+    print("Read Vector")
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gdf[out_col] = data_gdf["geometry"].area
+
+    print("Export")
+    if out_format == "GPKG":
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def calc_vec_length(
+    vec_file: str,
+    vec_lyr: str,
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which adds a column to the attribute table with the length of
+    each vector feature. Geometry is expected to be polygon or line.
+
+    :param vec_file: the input vector file
+    :param vec_lyr: the input vector layer
+    :param out_col: the output column name
+    :param out_vec_file: output vector file path
+    :param out_vec_lyr: output vector layer name
+    :param out_format: the output vector format (Default: GPKG)
+
+    """
+    import geopandas
+
+    print("Read Vector")
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gdf[out_col] = data_gdf["geometry"].length
+
+    print("Export")
+    if out_format == "GPKG":
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
