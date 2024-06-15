@@ -681,8 +681,17 @@ def define_extern_gps_in_imgs(
                 # Location
                 out_tags["Composite:GPSLatitude"] = float(row["lat"])
                 out_tags["EXIF:GPSLatitude"] = float(row["lat"])
+                lat_ref = "N"
+                if row["lat"] < 0:
+                    lat_ref = "S"
+                out_tags["EXIF:GPSLatitudeRef"] = lat_ref
+
                 out_tags["Composite:GPSLongitude"] = float(row["lon"])
                 out_tags["EXIF:GPSLongitude"] = float(row["lon"])
+                lon_ref = "E"
+                if row["lon"] < 0:
+                    lon_ref = "W"
+                out_tags["EXIF:GPSLongitudeRef"] = lon_ref
 
                 # Altitude
                 out_tags["XMP:AbsoluteAltitude"] = float(row["alt"])
