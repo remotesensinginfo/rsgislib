@@ -1384,7 +1384,7 @@ def recode_int_raster(
     recode_dict: Dict[int, int],
     keep_vals_not_in_dict: bool = True,
     gdalformat: str = "KEA",
-    datatype: bool = rsgislib.TYPE_32INT,
+    datatype: int = rsgislib.TYPE_32INT,
 ):
     """
     A function recodes an input image. Assuming image only has a single image band so
@@ -1428,7 +1428,7 @@ def recode_int_raster(
     def _recode(info, inputs, outputs, otherargs):
         out_arr = numpy.zeros_like(inputs.inimage[0], dtype=otherargs.np_dtype)
         if otherargs.keep_vals_not_in_dict:
-            out_arr = inputs.inimage[0]
+            numpy.copyto(out_arr, inputs.inimage[0], casting='same_kind')
 
         for rc_val in recode_dict:
             out_arr[inputs.inimage[0] == rc_val] = recode_dict[rc_val]
