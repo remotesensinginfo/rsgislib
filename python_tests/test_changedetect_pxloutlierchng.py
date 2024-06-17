@@ -23,10 +23,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CHANGEDETECT_DATA_DIR = os.path.join(DATA_DIR, "changedetect")
 
 
-#@pytest.mark.skipif(PYOD_NOT_AVAIL, reason="pyod dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(PYOD_NOT_AVAIL, reason="pyod dependency not available")
 def test_find_class_pyod_outliers(tmp_path):
     import rsgislib.changedetect.pxloutlierchng
     import pyod.models.knn
@@ -51,12 +48,9 @@ def test_find_class_pyod_outliers(tmp_path):
     assert os.path.exists(output_img) and os.path.exists(out_scores_img)
 
 
-#@pytest.mark.skipif(
-#    (MATPLOTLIB_NOT_AVAIL or SCIPY_NOT_AVAIL),
-#    reason="matplotlib or scipy dependencies not available",
-#)
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
+@pytest.mark.skipif(
+    (MATPLOTLIB_NOT_AVAIL or SCIPY_NOT_AVAIL),
+    reason="matplotlib or scipy dependencies not available",
 )
 def test_find_class_kurt_skew_outliers(tmp_path):
     from rsgislib.changedetect.pxloutlierchng import find_class_kurt_skew_outliers
@@ -86,10 +80,7 @@ def test_find_class_kurt_skew_outliers(tmp_path):
     assert os.path.exists(output_img)
 
 
-# @pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_find_class_otsu_outliers(tmp_path):
     from rsgislib.changedetect.pxloutlierchng import find_class_otsu_outliers
 
@@ -113,10 +104,7 @@ def test_find_class_otsu_outliers(tmp_path):
     assert os.path.exists(output_img)
 
 
-# @pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(MATPLOTLIB_NOT_AVAIL, reason="matplotlib dependency not available")
 def test_find_class_li_outliers(tmp_path):
     from rsgislib.changedetect.pxloutlierchng import find_class_li_outliers
 

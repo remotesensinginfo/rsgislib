@@ -1071,20 +1071,14 @@ def test_perform_random_pxl_sample_in_mask_low_pxl_count(tmp_path):
     assert os.path.exists(output_img)
 
 
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
 def test_extract_img_pxl_sample():
     import rsgislib.imageutils
 
     input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.kea")
     vals = rsgislib.imageutils.extract_img_pxl_sample(input_img, pxl_n_sample=10)
-    assert vals.shape[0] == 88165
+    assert vals.shape[0] == 88156
 
 
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
 def test_extract_img_pxl_vals_in_msk():
     import rsgislib.imageutils
 

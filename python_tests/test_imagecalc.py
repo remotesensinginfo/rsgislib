@@ -576,10 +576,7 @@ def test_calc_img_rescale_multi_imgs(tmp_path):
     assert img_eq
 
 
-# @pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_perform_image_pca(tmp_path):
     import rsgislib.imagecalc
 
@@ -603,10 +600,7 @@ def test_perform_image_pca(tmp_path):
     assert os.path.exists(output_img) and os.path.exists(out_eigen_vec_file)
 
 
-# @pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_perform_image_mnf(tmp_path):
     import rsgislib.imagecalc
 

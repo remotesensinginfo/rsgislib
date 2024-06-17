@@ -3018,37 +3018,54 @@ def extract_img_pxl_sample(
     :return: outputs a numpy array (n sampled values, n bands)
 
     """
-    # Import the RIOS image reader
-    import tqdm
-    from rios.imagereader import ImageReader
+    from rios import applier
 
-    first = True
-    reader = ImageReader(input_img, windowxsize=200, windowysize=200)
-    for info, block in tqdm.tqdm(reader):
-        blkShape = block.shape
-        blkBands = block.reshape((blkShape[0], (blkShape[1] * blkShape[2])))
+    def _extract_sample(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        img_shp = inputs.image.shape
+        img_bands = inputs.image.reshape((img_shp[0], (img_shp[1] * img_shp[2])))
 
-        blkBandsTrans = numpy.transpose(blkBands)
+        img_bands_trans = numpy.transpose(img_bands)
 
-        if no_data_val is not None:
-            blkBandsTrans = blkBandsTrans[(blkBandsTrans != no_data_val).all(axis=1)]
+        if otherargs.no_data_val is not None:
+            img_bands_trans = img_bands_trans[(img_bands_trans != otherargs.no_data_val).all(axis=1)]
 
-        if blkBandsTrans.shape[0] > 0:
-            nSamp = int((blkBandsTrans.shape[0]) / pxl_n_sample)
-            nSampRange = numpy.arange(0, nSamp, 1) * pxl_n_sample
-            blkBandsTransSamp = blkBandsTrans[nSampRange]
+        if img_bands_trans.shape[0] > 0:
+            n_samp = int((img_bands_trans.shape[0]) / otherargs.pxl_n_sample)
+            n_samp_range = numpy.arange(0, n_samp, 1) * otherargs.pxl_n_sample
+            img_bands_trans_smpl = img_bands_trans[n_samp_range]
 
-            if first:
-                outArr = blkBandsTransSamp
-                first = False
+            if otherargs.out_arr is None:
+                otherargs.out_arr = img_bands_trans_smpl
             else:
-                outArr = numpy.concatenate((outArr, blkBandsTransSamp), axis=0)
-    return outArr
+                otherargs.out_arr = numpy.concatenate((otherargs.out_arr, img_bands_trans_smpl), axis=0)
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.pxl_n_sample = pxl_n_sample
+    otherargs.no_data_val = no_data_val
+    otherargs.out_arr = None
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    applier.apply(_extract_sample, infiles, outfiles, otherargs, controls=aControls)
+
+    return otherargs.out_arr
 
 
 def extract_img_pxl_vals_in_msk(
     input_img: str,
-    img_bands: list,
+    img_bands: List[int],
     in_msk_img: str,
     img_mask_val: int,
     no_data_val: float = None,
@@ -3065,46 +3082,59 @@ def extract_img_pxl_vals_in_msk(
     :return: outputs a numpy array (n values, n bands)
 
     """
-    # Import the RIOS image reader
-    import tqdm
-    from rios.imagereader import ImageReader
+    from rios import applier
 
-    outArr = None
-    first = True
-    reader = ImageReader([input_img, in_msk_img], windowxsize=200, windowysize=200)
-    for info, block in tqdm.tqdm(reader):
-        blk_img = block[0]
-        blk_msk = block[1].flatten()
-        blk_img_shape = blk_img.shape
+    def _extract_sample_msk(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        img_msk = inputs.mask.flatten()
+        img_shp = inputs.image.shape
+        img_bands = inputs.image.reshape((img_shp[0], (img_shp[1] * img_shp[2])))
 
-        blk_bands = blk_img.reshape(
-            (blk_img_shape[0], (blk_img_shape[1] * blk_img_shape[2]))
-        )
-        band_lst = []
-        for band in img_bands:
-            if (band > 0) and (band <= blk_bands.shape[0]):
-                band_lst.append(blk_bands[band - 1])
+        img_band_lst = []
+        for band in otherargs.img_bands:
+            if (band > 0) and (band <= img_bands.shape[0]):
+                img_band_lst.append(img_bands[band - 1])
             else:
-                raise rsgislib.RSGISPyException(
-                    "Band ({}) specified is not within the image".format(band)
-                )
-        blk_bands_sel = numpy.stack(band_lst, axis=0)
-        blk_bands_trans = numpy.transpose(blk_bands_sel)
+                raise rsgislib.RSGISPyException(f"Band ({band}) specified is not within the image")
+        img_bands_sel = numpy.stack(img_band_lst, axis=0)
+        img_bands_trans = numpy.transpose(img_bands_sel)
 
-        if no_data_val is not None:
-            blk_msk = blk_msk[(blk_bands_trans != no_data_val).all(axis=1)]
-            blk_bands_trans = blk_bands_trans[
-                (blk_bands_trans != no_data_val).all(axis=1)
-            ]
+        # Apply mask
+        img_bands_trans = img_bands_trans[img_msk == otherargs.img_mask_val]
 
-        if blk_bands_trans.shape[0] > 0:
-            blk_bands_trans = blk_bands_trans[blk_msk == img_mask_val]
-            if first:
-                out_arr = blk_bands_trans
-                first = False
+        # If no data provided mask to valid values.
+        if otherargs.no_data_val is not None:
+            img_bands_trans = img_bands_trans[(img_bands_trans != otherargs.no_data_val).all(axis=1)]
+
+        if img_bands_trans.shape[0] > 0:
+            if otherargs.out_arr is None:
+                otherargs.out_arr = img_bands_trans
             else:
-                out_arr = numpy.concatenate((out_arr, blk_bands_trans), axis=0)
-    return out_arr
+                otherargs.out_arr = numpy.concatenate((otherargs.out_arr, img_bands_trans), axis=0)
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    infiles.mask = in_msk_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.img_bands = img_bands
+    otherargs.img_mask_val = img_mask_val
+    otherargs.out_arr = None
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    applier.apply(_extract_sample_msk, infiles, outfiles, otherargs, controls=aControls)
+
+    return otherargs.out_arr
 
 
 def combine_binary_masks(
