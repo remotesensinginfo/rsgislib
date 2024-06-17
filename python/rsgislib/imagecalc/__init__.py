@@ -557,7 +557,7 @@ def count_pxls_of_val(input_img: str, vals: List[int], img_band: int = None):
         This is an internal rios function
         """
         for idx in range(otherargs.num_vals):
-            if img_band is None:
+            if otherargs.img_band_idx is None:
                 otherargs.out_vals[idx] = (
                     otherargs.out_vals[idx]
                     + (inputs.image == otherargs.vals[idx]).sum()
@@ -565,7 +565,9 @@ def count_pxls_of_val(input_img: str, vals: List[int], img_band: int = None):
             else:
                 otherargs.out_vals[idx] = (
                     otherargs.out_vals[idx]
-                    + (inputs.image[img_band_idx,] == otherargs.vals[idx]).sum()
+                    + (
+                        inputs.image[otherargs.img_band_idx,] == otherargs.vals[idx]
+                    ).sum()
                 )
 
     if img_band is not None:
