@@ -11,6 +11,13 @@ from osgeo import gdal, ogr, osr
 
 import rsgislib
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+    TQDM_AVAIL = False
+
 gdal.UseExceptions()
 
 
@@ -145,12 +152,10 @@ def vectorise_pxls_to_pts(
     import rsgislib.imageutils
     import rsgislib.vectorutils
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:

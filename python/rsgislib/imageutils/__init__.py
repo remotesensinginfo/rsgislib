@@ -14,6 +14,13 @@ from rios import applier
 
 import rsgislib
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+    TQDM_AVAIL = False
+
 # import the C++ extension into this level
 from ._imageutils import *
 
@@ -2748,14 +2755,10 @@ def calc_pixel_locations(input_img: str, output_img: str, gdalformat: str):
     :param gdalformat: the GDAL image file format of the output image file.
 
     """
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.image1 = input_img
@@ -2795,12 +2798,10 @@ def calc_wgs84_pixel_area(
 
     import rsgislib.tools.projection
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     x_res, y_res = get_img_res(input_img, abs_vals=True)
 
@@ -2972,14 +2973,10 @@ def generate_random_pxl_vals_img(
     :param up_val: upper value
 
     """
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.inImg = input_img
@@ -3130,14 +3127,10 @@ def combine_binary_masks(
     import rsgislib.imagecalc
     import rsgislib.tools.utils
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     in_vals_dict = dict()
     msk_imgs = list()
@@ -4309,14 +4302,10 @@ def spectral_smoothing(
     import scipy.signal
     from rios import applier
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     np_dtype = rsgislib.get_numpy_datatype(datatype)
     in_no_date = get_img_no_data_value(input_img)
@@ -4398,14 +4387,10 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
 
     import rsgislib.tools.projection
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     x_res, y_res = get_img_res(input_img, abs_vals=True)
 
@@ -4463,14 +4448,10 @@ def mask_all_band_zero_vals(
     """
     from rios import applier
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -4611,14 +4592,10 @@ def mask_outliners_data_values(
     """
     from rios import applier
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     np_dtype = rsgislib.get_numpy_datatype(rsgislib.TYPE_32FLOAT)
     in_no_date = get_img_no_data_value(input_img)
@@ -4720,14 +4697,10 @@ def polyfill_nan_data_values(
     """
     from rios import applier
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     np_dtype = rsgislib.get_numpy_datatype(rsgislib.TYPE_32FLOAT)
     in_no_date = get_img_no_data_value(input_img)
