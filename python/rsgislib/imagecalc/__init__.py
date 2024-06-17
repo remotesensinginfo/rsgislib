@@ -11,6 +11,14 @@ from typing import Dict, List, Tuple, Union
 import numpy
 from osgeo import gdal
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
+
 import rsgislib
 
 # import the C++ extension into this level
@@ -528,7 +536,7 @@ def count_pxls_of_val(input_img: str, vals: List[int], img_band: int = None):
     :return: list of pixel counts in same order as the vals input list
 
     """
-    from rios.imagereader import ImageReader
+    from rios import applier
 
     import rsgislib.imageutils
 
@@ -543,21 +551,50 @@ def count_pxls_of_val(input_img: str, vals: List[int], img_band: int = None):
         raise rsgislib.RSGISPyException(
             "The specified input image band is not within the input image."
         )
+
+    def _count_pxl_vals(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        for idx in range(otherargs.num_vals):
+            if img_band is None:
+                otherargs.out_vals[idx] = (
+                    otherargs.out_vals[idx]
+                    + (inputs.image == otherargs.vals[idx]).sum()
+                )
+            else:
+                otherargs.out_vals[idx] = (
+                    otherargs.out_vals[idx]
+                    + (inputs.image[img_band_idx,] == otherargs.vals[idx]).sum()
+                )
+
     if img_band is not None:
         img_band_idx = img_band - 1
+    else:
+        img_band_idx = None
 
-    numVals = len(vals)
-    outVals = numpy.zeros(numVals, dtype=numpy.int64)
+    num_vals = len(vals)
+    out_vals = numpy.zeros(num_vals, dtype=numpy.int64)
 
-    reader = ImageReader(input_img)
-    for info, block in reader:
-        for idx in range(numVals):
-            if img_band is None:
-                outVals[idx] = outVals[idx] + (block == vals[idx]).sum()
-            else:
-                outVals[idx] = outVals[idx] + (block[img_band_idx,] == vals[idx]).sum()
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
-    return outVals
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.out_vals = out_vals
+    otherargs.num_vals = num_vals
+    otherargs.vals = vals
+    otherargs.img_band_idx = img_band_idx
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    applier.apply(_count_pxl_vals, infiles, outfiles, otherargs, controls=aControls)
+
+    return out_vals
 
 
 def get_unique_values(input_img: str, img_band: int = 1):
@@ -844,12 +881,10 @@ def rescale_img_pxl_vals(
 
     numpyDT = rsgislib.get_numpy_datatype(datatype)
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -1080,12 +1115,10 @@ def calc_imgs_pxl_mode(
     datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_imgs[0])
     numpyDT = rsgislib.get_numpy_datatype(datatype)
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.images = input_imgs
@@ -1150,12 +1183,10 @@ def calc_imgs_pxl_percentiles(
     datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_imgs[0])
     numpyDT = rsgislib.get_numpy_datatype(datatype)
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.images = input_imgs
@@ -1275,12 +1306,10 @@ def calc_img_basic_stats_for_ref_region(
                 numpy.isnan(outputs.output_img[band * 2 + 1])
             ] = 0.0
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.imgs = in_stats_imgs
@@ -1374,12 +1403,10 @@ def recode_int_raster(
     """
     from rios import applier
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     # Generated the combined mask.
     infiles = applier.FilenameAssociations()
@@ -1458,12 +1485,10 @@ def calc_fill_regions_knn(
             "do not have the same projection."
         )
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     x_res, y_res = rsgislib.imageutils.get_img_res(in_ref_img)
     if x_res < 0:
@@ -1616,12 +1641,10 @@ def are_imgs_equal(
             "The number of image bands is not the same between the two images."
         )
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     # Generated the combined mask.
     infiles = applier.FilenameAssociations()
@@ -1696,12 +1719,10 @@ def are_img_bands_equal(
             "The specified band is not within the comparison image."
         )
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     # Generated the combined mask.
     infiles = applier.FilenameAssociations()
@@ -1851,12 +1872,10 @@ def count_imgs_int_val_occur(
     """
     from rios import applier
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.images = input_imgs
@@ -2310,12 +2329,10 @@ def calc_img_min_max(input_img: str, no_data_val: float = None) -> numpy.array:
     max_vals = numpy.zeros(n_bands, dtype=numpyDT)
     first_arr = numpy.ones(n_bands, dtype=bool)
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.input_img = input_img
@@ -2383,12 +2400,10 @@ def calc_img_mean(input_img: str, no_data_val: float = None) -> numpy.array:
     sum_vals = numpy.zeros(n_bands, dtype=float)
     n_vals = numpy.zeros(n_bands, dtype=int)
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.input_img = input_img
@@ -2459,12 +2474,10 @@ def calc_img_stdev(
     sum_vals = numpy.zeros(n_bands, dtype=float)
     n_vals = numpy.zeros(n_bands, dtype=int)
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.input_img = input_img
@@ -2674,12 +2687,10 @@ def normalise_img_pxl_vals_py(
 
     numpyDT = rsgislib.get_numpy_datatype(datatype)
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.input_img = input_img

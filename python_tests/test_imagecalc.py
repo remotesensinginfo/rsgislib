@@ -17,9 +17,6 @@ except ImportError:
     SKLEARN_NOT_AVAIL = True
 
 
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
 def test_count_pxls_of_val_band1():
     import rsgislib.imagecalc
 
@@ -35,9 +32,6 @@ def test_count_pxls_of_val_band1():
     )
 
 
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
 def test_count_pxls_of_val_band1_sel_vals():
     import rsgislib.imagecalc
 
@@ -46,9 +40,6 @@ def test_count_pxls_of_val_band1_sel_vals():
     assert (val_counts[0] == 612) and (val_counts[1] == 614)
 
 
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
 def test_count_pxls_of_val_all_bands():
     import rsgislib.imagecalc
 
@@ -585,7 +576,7 @@ def test_calc_img_rescale_multi_imgs(tmp_path):
     assert img_eq
 
 
-#@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
+# @pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 @pytest.mark.skip(
     reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
 )
@@ -612,7 +603,7 @@ def test_perform_image_pca(tmp_path):
     assert os.path.exists(output_img) and os.path.exists(out_eigen_vec_file)
 
 
-#@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
+# @pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 @pytest.mark.skip(
     reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
 )
