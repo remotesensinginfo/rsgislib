@@ -1796,35 +1796,28 @@ def calc_split_win_thresholds(
     :param upper_valid: an upper bounds for pixel values to be used for the analysis.
     :param min_n_vals: the minimum number of values used to calculate the threshold
                        within a window.
-    :param thres_kwrds: some of the thresholding methods have arguments which need
-                        to be provided. Use this key words arguments to provide
+    :param thres_kwrds: some thresholding methods have arguments which need
+                        to be provided. Use the keywords arguments to provide
                         those inputs. See rsgislib.tools.stats for function inputs.
     :return: dict of bands and a list of thresholds for the bands.
 
     """
-    import tqdm
-    from rios.imagereader import ImageReader
+    from rios import applier
 
     import rsgislib.imageutils
     import rsgislib.tools.stats
     import rsgislib.tools.utils
 
-    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
-    band_thresholds = dict()
-    for n in range(n_bands):
-        band_thresholds[n + 1] = list()
-
-    reader = ImageReader(input_img, windowxsize=win_size, windowysize=win_size)
-    for info, block in tqdm.tqdm(reader):
-        for n in range(n_bands):
-            data = block[n].flatten()
+    def _calc_win_thres(info, inputs, outputs, otherargs):
+        for n in range(otherargs.n_bands):
+            data = inputs.image[n].flatten()
             if no_data_val is not None:
-                data = data[data != no_data_val]
+                data = data[data != otherargs.no_data_val]
             if lower_valid is not None:
-                data = data[data > lower_valid]
+                data = data[data > otherargs.lower_valid]
             if upper_valid is not None:
-                data = data[data < upper_valid]
-            if data.shape[0] > min_n_vals:
+                data = data[data < otherargs.upper_valid]
+            if data.shape[0] > otherargs.min_n_vals:
                 if thres_meth == rsgislib.THRES_METH_OTSU:
                     band_thres = rsgislib.tools.stats.calc_otsu_threshold(data)
                 elif thres_meth == rsgislib.THRES_METH_YEN:
@@ -1833,19 +1826,49 @@ def calc_split_win_thresholds(
                     band_thres = rsgislib.tools.stats.calc_isodata_threshold(data)
                 elif thres_meth == rsgislib.THRES_METH_CROSS_ENT:
                     band_thres = rsgislib.tools.stats.calc_hist_cross_entropy(
-                        data, **thres_kwrds
+                        data, **otherargs.thres_kwrds
                     )
                 elif thres_meth == rsgislib.THRES_METH_LI:
                     band_thres = rsgislib.tools.stats.calc_li_threshold(
-                        data, **thres_kwrds
+                        data, **otherargs.thres_kwrds
                     )
                 elif thres_meth == rsgislib.THRES_METH_KURT_SKEW:
                     band_thres = rsgislib.tools.stats.calc_kurt_skew_threshold(
-                        data, **thres_kwrds
+                        data, **otherargs.thres_kwrds
                     )
                 else:
                     raise rsgislib.RSGISPyException("Thresholding method unknown.")
-                band_thresholds[n + 1].append(band_thres)
+                otherargs.band_thresholds[n + 1].append(band_thres)
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+    band_thresholds = dict()
+    for n in range(n_bands):
+        band_thresholds[n + 1] = list()
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.n_bands = n_bands
+    otherargs.thres_meth = thres_meth
+    otherargs.lower_valid = lower_valid
+    otherargs.upper_valid = upper_valid
+    otherargs.min_n_vals = min_n_vals
+    otherargs.thres_kwrds = thres_kwrds
+    otherargs.band_thresholds = band_thresholds
+    otherargs.out_arr = None
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.windowxsize = win_size
+    aControls.windowysize = win_size
+
+    applier.apply(_calc_win_thres, infiles, outfiles, otherargs, controls=aControls)
 
     if output_file is not None:
         rsgislib.tools.utils.write_dict_to_json(band_thresholds, output_file)
