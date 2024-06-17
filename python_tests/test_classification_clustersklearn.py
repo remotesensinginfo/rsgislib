@@ -10,10 +10,7 @@ except ImportError:
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
-# @pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_img_pixel_sample_cluster(tmp_path):
     import rsgislib.classification.clustersklearn
 
@@ -25,10 +22,7 @@ def test_img_pixel_sample_cluster(tmp_path):
     assert os.path.exists(output_img)
 
 
-# @pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_img_pixel_tiled_cluster(tmp_path):
     import rsgislib.classification.clustersklearn
 
