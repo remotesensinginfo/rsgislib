@@ -33,9 +33,17 @@
 ############################################################################
 
 import os
-
+import rsgislib
 import numpy
 from osgeo import gdal
+
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 import rsgislib
 
@@ -290,12 +298,10 @@ def spec_unmix_spts_ucls(
 
     import rsgislib.imageutils
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain, weight)
 
@@ -411,12 +417,10 @@ def spec_unmix_spts_nnls(
 
     import rsgislib.imageutils
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain, weight)
 
@@ -521,12 +525,10 @@ def spec_unmix_spts_fcls(
 
     import rsgislib.imageutils
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain)
 
@@ -638,12 +640,10 @@ def spec_unmix_pymcr_nnls(
 
     import rsgislib.imageutils
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain, weight)
 
@@ -754,12 +754,10 @@ def spec_unmix_pymcr_fcls(
 
     import rsgislib.imageutils
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain)
 
@@ -844,12 +842,10 @@ def rescale_unmixing_results(input_img, output_img, gdalformat="KEA", calc_stats
     """
     from rios import applier
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -904,12 +900,10 @@ def predict_refl_linear_unmixing(
     """
     from rios import applier
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
     endmembers_info = read_endmembers_mtxt(endmembers_file)
 
     infiles = applier.FilenameAssociations()
@@ -992,12 +986,10 @@ def calc_unmixing_rmse_residual_err(
     """
     from rios import applier
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     endmembers_info = read_endmembers_mtxt(endmembers_file)
 

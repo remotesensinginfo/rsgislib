@@ -16,6 +16,7 @@ try:
     import tqdm
 except ImportError:
     import rios.cuiprogress
+
     TQDM_AVAIL = False
 
 gdal.UseExceptions()

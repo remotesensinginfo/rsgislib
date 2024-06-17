@@ -75,9 +75,9 @@ def fft_dem_fusion(
 
     rows, cols = srcbandLowResArr.shape
     crow, ccol = int(rows / 2), int(cols / 2)
-    fshiftLowRes[
-        crow - c_size : crow + c_size, ccol - c_size : ccol + c_size
-    ] = fshiftHighRes[crow - c_size : crow + c_size, ccol - c_size : ccol + c_size]
+    fshiftLowRes[crow - c_size : crow + c_size, ccol - c_size : ccol + c_size] = (
+        fshiftHighRes[crow - c_size : crow + c_size, ccol - c_size : ccol + c_size]
+    )
     f_ishift = numpy.fft.ifftshift(fshiftLowRes)
     img_back = numpy.fft.ifft2(f_ishift)
     img_back = numpy.abs(img_back)

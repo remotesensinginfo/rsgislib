@@ -19,6 +19,7 @@ try:
     import tqdm
 except ImportError:
     import rios.cuiprogress
+
     TQDM_AVAIL = False
 
 # import the C++ extension into this level
@@ -220,9 +221,9 @@ def set_env_vars_deflate_gtiff_outs(bigtiff: bool = False):
 
     """
     if bigtiff:
-        os.environ[
-            "RSGISLIB_IMG_CRT_OPTS_GTIFF"
-        ] = "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = (
+            "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+        )
     else:
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=DEFLATE"
 
@@ -3030,7 +3031,9 @@ def extract_img_pxl_sample(
         img_bands_trans = numpy.transpose(img_bands)
 
         if otherargs.no_data_val is not None:
-            img_bands_trans = img_bands_trans[(img_bands_trans != otherargs.no_data_val).all(axis=1)]
+            img_bands_trans = img_bands_trans[
+                (img_bands_trans != otherargs.no_data_val).all(axis=1)
+            ]
 
         if img_bands_trans.shape[0] > 0:
             n_samp = int((img_bands_trans.shape[0]) / otherargs.pxl_n_sample)
@@ -3040,13 +3043,14 @@ def extract_img_pxl_sample(
             if otherargs.out_arr is None:
                 otherargs.out_arr = img_bands_trans_smpl
             else:
-                otherargs.out_arr = numpy.concatenate((otherargs.out_arr, img_bands_trans_smpl), axis=0)
+                otherargs.out_arr = numpy.concatenate(
+                    (otherargs.out_arr, img_bands_trans_smpl), axis=0
+                )
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
     else:
         progress_bar = rios.cuiprogress.GDALProgressBar()
-
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -3097,7 +3101,9 @@ def extract_img_pxl_vals_in_msk(
             if (band > 0) and (band <= img_bands.shape[0]):
                 img_band_lst.append(img_bands[band - 1])
             else:
-                raise rsgislib.RSGISPyException(f"Band ({band}) specified is not within the image")
+                raise rsgislib.RSGISPyException(
+                    f"Band ({band}) specified is not within the image"
+                )
         img_bands_sel = numpy.stack(img_band_lst, axis=0)
         img_bands_trans = numpy.transpose(img_bands_sel)
 
@@ -3106,19 +3112,22 @@ def extract_img_pxl_vals_in_msk(
 
         # If no data provided mask to valid values.
         if otherargs.no_data_val is not None:
-            img_bands_trans = img_bands_trans[(img_bands_trans != otherargs.no_data_val).all(axis=1)]
+            img_bands_trans = img_bands_trans[
+                (img_bands_trans != otherargs.no_data_val).all(axis=1)
+            ]
 
         if img_bands_trans.shape[0] > 0:
             if otherargs.out_arr is None:
                 otherargs.out_arr = img_bands_trans
             else:
-                otherargs.out_arr = numpy.concatenate((otherargs.out_arr, img_bands_trans), axis=0)
+                otherargs.out_arr = numpy.concatenate(
+                    (otherargs.out_arr, img_bands_trans), axis=0
+                )
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
     else:
         progress_bar = rios.cuiprogress.GDALProgressBar()
-
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -4782,9 +4791,9 @@ def polyfill_nan_data_values(
                         if otherargs.mean_abs_diff is not None:
                             pxl_mean = numpy.nanmean(img_flat[pxl_idx])
                             pred_vals_diff = numpy.abs(pred_vals - pxl_mean)
-                            pred_vals[
-                                pred_vals_diff > otherargs.mean_abs_diff
-                            ] = pxl_mean
+                            pred_vals[pred_vals_diff > otherargs.mean_abs_diff] = (
+                                pxl_mean
+                            )
                         repl_idxs = numpy.arange(0, pred_vals.shape[0])[
                             numpy.invert(finite_msk)
                         ]

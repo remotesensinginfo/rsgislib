@@ -14,6 +14,7 @@ try:
     import tqdm
 except ImportError:
     import rios.cuiprogress
+
     TQDM_AVAIL = False
 
 # import the C++ extension into this level

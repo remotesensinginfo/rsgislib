@@ -120,9 +120,9 @@ def read_sen2_l2a_mtd_to_dict(mtd_header_file: str):
             "Data Take Tag is None - is this a Sentinel-2 L2A header"
         )
     out_header_dict["Product_Info"]["datatake"] = dict()
-    out_header_dict["Product_Info"]["datatake"][
-        "datatakeIdentifier"
-    ] = data_take_tag.attrib["datatakeIdentifier"].strip()
+    out_header_dict["Product_Info"]["datatake"]["datatakeIdentifier"] = (
+        data_take_tag.attrib["datatakeIdentifier"].strip()
+    )
     out_header_dict["Product_Info"]["datatake"]["SPACECRAFT_NAME"] = data_take_tag.find(
         "SPACECRAFT_NAME"
     ).text.strip()
@@ -137,12 +137,12 @@ def read_sen2_l2a_mtd_to_dict(mtd_header_file: str):
     out_header_dict["Product_Info"]["datatake"][
         "DATATAKE_SENSING_START"
     ] = datatake_sense_time
-    out_header_dict["Product_Info"]["datatake"][
-        "SENSING_ORBIT_NUMBER"
-    ] = data_take_tag.find("SENSING_ORBIT_NUMBER").text.strip()
-    out_header_dict["Product_Info"]["datatake"][
-        "SENSING_ORBIT_DIRECTION"
-    ] = data_take_tag.find("SENSING_ORBIT_DIRECTION").text.strip()
+    out_header_dict["Product_Info"]["datatake"]["SENSING_ORBIT_NUMBER"] = (
+        data_take_tag.find("SENSING_ORBIT_NUMBER").text.strip()
+    )
+    out_header_dict["Product_Info"]["datatake"]["SENSING_ORBIT_DIRECTION"] = (
+        data_take_tag.find("SENSING_ORBIT_DIRECTION").text.strip()
+    )
 
     query_options_tag = product_info_tag.find("Query_Options")
     if query_options_tag is None:
@@ -150,9 +150,9 @@ def read_sen2_l2a_mtd_to_dict(mtd_header_file: str):
             "Query Options Tag is None - is this a Sentinel-2 L2A header"
         )
     out_header_dict["Product_Info"]["Query_Options"] = dict()
-    out_header_dict["Product_Info"]["Query_Options"][
-        "PRODUCT_FORMAT"
-    ] = query_options_tag.find("PRODUCT_FORMAT").text.strip()
+    out_header_dict["Product_Info"]["Query_Options"]["PRODUCT_FORMAT"] = (
+        query_options_tag.find("PRODUCT_FORMAT").text.strip()
+    )
 
     product_organisation_tag = product_info_tag.find("Product_Organisation")
     if product_organisation_tag is None:

@@ -11,6 +11,14 @@ from rios import applier, cuiprogress, fileinfo
 import rsgislib
 import rsgislib.imageutils
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
+
 
 class RobustModel(object):
     def __init__(self, datetimes, num_years):
@@ -168,14 +176,10 @@ def get_ST_masks(
     app.setWindowXsize(1)
     app.setWindowYsize(1)
 
-    # Set progress
-    try:
-        import tqdm
-
-        progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
-    app.progress = progress_bar
+    if TQDM_AVAIL:
+        app.progress = rsgislib.TQDMProgressBar()
+    else:
+        app.progress = rios.cuiprogress.GDALProgressBar()
 
     # Set output file type
     app.setOutputDriverName(gdal_format)

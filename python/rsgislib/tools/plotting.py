@@ -658,20 +658,20 @@ def plot_histogram_threshold(
 
 
 def plot_vec_fields(
-        vec_file: str,
-        vec_lyr: str,
-        out_plot_file: str,
-        x_plt_field: str,
-        y_plt_field: str,
-        x_lbl: str,
-        y_lbl: str,
-        title: str,
-        feat_id_field: str = None,
-        x_field_no_data: float = None,
-        y_field_no_data: float = None,
-        plt_width: int = 18,
-        plt_height: int = 6,
-        plt_line: bool = True,
+    vec_file: str,
+    vec_lyr: str,
+    out_plot_file: str,
+    x_plt_field: str,
+    y_plt_field: str,
+    x_lbl: str,
+    y_lbl: str,
+    title: str,
+    feat_id_field: str = None,
+    x_field_no_data: float = None,
+    y_field_no_data: float = None,
+    plt_width: int = 18,
+    plt_height: int = 6,
+    plt_line: bool = True,
 ):
     """
     A function which plots two variables from a vector layer.

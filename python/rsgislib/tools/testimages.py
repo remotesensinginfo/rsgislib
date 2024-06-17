@@ -8,6 +8,14 @@ import os
 from typing import List
 import rsgislib
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
+
 
 def create_random_int_img(
     output_img: str,
@@ -65,12 +73,10 @@ def create_random_int_img(
         no_data_val=0,
     )
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.image = tmp_ref_img

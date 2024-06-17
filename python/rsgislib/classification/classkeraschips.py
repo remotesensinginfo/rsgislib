@@ -42,6 +42,7 @@ import rsgislib
 import rsgislib.imagecalc
 import rsgislib.rastergis
 
+
 def train_keras_chips_pixel_classifier(
     cls_mdl, cls_info_dict, out_mdl_file=None, train_epochs=5, train_batch_size=32
 ):

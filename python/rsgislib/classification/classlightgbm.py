@@ -62,6 +62,7 @@ try:
     import tqdm
 except ImportError:
     import rios.cuiprogress
+
     TQDM_AVAIL = False
 
 from sklearn.metrics import accuracy_score, roc_auc_score
