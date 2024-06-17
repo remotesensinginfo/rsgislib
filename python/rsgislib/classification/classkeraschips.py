@@ -34,19 +34,13 @@
 ###########################################################################
 
 from __future__ import print_function
-
 import h5py
 import numpy
 import tqdm
-from osgeo import gdal
-from rios import rat
-from rios.imagereader import ImageReader
-from rios.imagewriter import ImageWriter
 
 import rsgislib
 import rsgislib.imagecalc
 import rsgislib.rastergis
-
 
 def train_keras_chips_pixel_classifier(
     cls_mdl, cls_info_dict, out_mdl_file=None, train_epochs=5, train_batch_size=32
@@ -201,6 +195,11 @@ def apply_keras_chips_pixel_classifier(
                           and a class_names (from classTrainInfo) column will be added to the output file.
 
     """
+    from osgeo import gdal
+    from rios import rat
+    from rios.imagereader import ImageReader
+    from rios.imagewriter import ImageWriter
+
     n_classes = len(class_train_info)
     cls_id_lut = numpy.zeros(n_classes)
     for clsname in class_train_info:
