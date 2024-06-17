@@ -41,10 +41,10 @@ from typing import List
 
 from osgeo import gdal, ogr
 
-gdal.UseExceptions()
-
 import rsgislib
 import rsgislib.vectorutils
+
+gdal.UseExceptions()
 
 
 def create_img_extent_lut(

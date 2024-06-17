@@ -939,8 +939,8 @@ def sort_vec_lyr(
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
 
-    if type(sort_by) is list:
-        if type(ascending) is not list:
+    if isinstance(sort_by, list):
+        if not isinstance(ascending, list):
             raise rsgislib.RSGISPyException(
                 "If sort_by is a list then ascending must be too."
             )

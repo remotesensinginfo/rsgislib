@@ -3,6 +3,10 @@
 The imagecalc module contains functions for performing a number of
 calculating on images.
 """
+# import the C++ extension into this level
+from ._imagecalc import *
+
+import rsgislib
 
 import math
 import os
@@ -19,10 +23,6 @@ except ImportError:
 
     TQDM_AVAIL = False
 
-import rsgislib
-
-# import the C++ extension into this level
-from ._imagecalc import *
 
 gdal.UseExceptions()
 
@@ -2665,7 +2665,7 @@ def normalise_img_pxl_vals_py(
 
     elif norm_type == rsgislib.IMG_STRETCH_USER:
         if n_bands == 1:
-            if type(stch_min_max_vals) is list:
+            if isinstance(stch_min_max_vals, list):
                 if len(stch_min_max_vals) != 1:
                     raise rsgislib.RSGISPyException(
                         "The input image has 1 band and therefore stch_min_max_vals "
@@ -2675,7 +2675,7 @@ def normalise_img_pxl_vals_py(
                 else:
                     stch_min_max_vals = stch_min_max_vals[0]
 
-            if type(stch_min_max_vals) is not dict:
+            if not isinstance(stch_min_max_vals, dict):
                 raise rsgislib.RSGISPyException(
                     "The input image has 1 band and therefore stch_min_max_vals "
                     "variable must be a dict or list of length 1 with "
@@ -2689,7 +2689,7 @@ def normalise_img_pxl_vals_py(
 
             stch_min_max_vals = [stch_min_max_vals]
         else:
-            if type(stch_min_max_vals) is not list:
+            if not isinstance(stch_min_max_vals, list):
                 raise rsgislib.RSGISPyException(
                     "There are more than 1 band and therefore "
                     "stch_min_max_vals variable must be a list."

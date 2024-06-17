@@ -81,7 +81,6 @@ def populate_clumps_with_class_training(
 
     uid = rsgislib.tools.utils.uid_generator(10)
 
-    classLayerSeq = list()
     tmpClassImgLayers = list()
     classNamesDict = dict()
 
@@ -199,5 +198,5 @@ def extract_rat_col_data(
         dtype=h5_dtype,
     )
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S255")
-    describDS[0] = "Extracted from: ".format(os.path.basename(clumps_img)).encode()
+    describDS[0] = f"Extracted from: {os.path.basename(clumps_img)}".encode()
     fH5Out.close()

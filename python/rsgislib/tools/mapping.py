@@ -525,7 +525,7 @@ def create_vec_lyr_map(
 
     """
     n_vec_lyrs = 1
-    if type(gp_vecs) is list:
+    if isinstance(gp_vecs, list):
         n_vec_lyrs = len(gp_vecs)
     else:
         # Create list of one
@@ -541,7 +541,7 @@ def create_vec_lyr_map(
         else:
             gp_vec_sub = gp_vec
 
-        if type(vec_fill_clrs) is list:
+        if isinstance(vec_fill_clrs, list):
             if len(vec_fill_clrs) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of fill colours not same as number of vector layers"
@@ -550,7 +550,7 @@ def create_vec_lyr_map(
         else:
             vec_fill_clr = vec_fill_clrs
 
-        if type(vec_line_clrs) is list:
+        if isinstance(vec_line_clrs, list):
             if len(vec_line_clrs) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of line colours not same as number of vector layers"
@@ -559,7 +559,7 @@ def create_vec_lyr_map(
         else:
             vec_line_clr = vec_line_clrs
 
-        if type(vec_line_widths) is list:
+        if isinstance(vec_line_widths, list):
             if len(vec_line_widths) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of line widths not same as number of vector layers"
@@ -568,7 +568,7 @@ def create_vec_lyr_map(
         else:
             vec_line_width = vec_line_widths
 
-        if type(vec_fill_alphas) is list:
+        if isinstance(vec_fill_alphas, list):
             if len(vec_fill_alphas) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of fill alphas not same as number of vector layers"
@@ -577,7 +577,7 @@ def create_vec_lyr_map(
         else:
             vec_fill_alpha = vec_fill_alphas
 
-        if type(plot_zorders) is list:
+        if isinstance(plot_zorders, list):
             if len(plot_zorders) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of fill colours not same as number of vector layers"

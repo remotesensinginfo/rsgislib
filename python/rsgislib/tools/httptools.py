@@ -106,7 +106,7 @@ def send_http_json_request(
     else:
         params_data = data
 
-    if api_key == None:
+    if api_key is None:
         response = requests.post(url, params_data, headers=header_data)
     else:
         if header_data is not None:
@@ -117,7 +117,7 @@ def send_http_json_request(
 
     try:
         http_status_code = response.status_code
-        if response == None:
+        if response is None:
             raise rsgislib.RSGISPyException("No output from service")
 
         if http_status_code == 404:

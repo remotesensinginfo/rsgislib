@@ -629,7 +629,7 @@ def get_vec_lyrs_lst(vec_file: str) -> List[str]:
     for lyr_idx in range(gdal_dataset.GetLayerCount()):
         lyr = gdal_dataset.GetLayerByIndex(lyr_idx)
         t_lyr_name = lyr.GetName()
-        if not t_lyr_name in layer_list:
+        if t_lyr_name not in layer_list:
             layer_list.append(t_lyr_name)
     gdal_dataset = None
     return layer_list
@@ -1071,8 +1071,6 @@ def get_att_lst_select_feats(
     :return: list of dictionaries with the output values.
 
     """
-
-    att_vals = []
     try:
         dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if dsVecFile is None:
@@ -1172,8 +1170,6 @@ def get_att_lst_select_feats_lyr_objs(
     :return: list of dictionaries with the output values.
 
     """
-
-    att_vals = []
     try:
         if vec_lyr_obj is None:
             raise rsgislib.RSGISPyException(
@@ -1433,8 +1429,6 @@ def select_intersect_feats(
     if lyrROIVecObj is None:
         raise rsgislib.RSGISPyException("Could not find layer '" + vec_roi_lyr + "'")
 
-    lyrDefn = vec_lyr_obj.GetLayerDefn()
-
     mem_driver = ogr.GetDriverByName("MEMORY")
     mem_roi_ds = mem_driver.CreateDataSource("MemSelData")
     mem_roi_lyr = mem_roi_ds.CopyLayer(lyrROIVecObj, vec_roi_lyr, ["OVERWRITE=YES"])
@@ -1476,8 +1470,6 @@ def export_spatial_select_feats(
     :param out_format: the output vector layer type.
 
     """
-
-    att_vals = []
     try:
         dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
         if dsVecFile is None:
@@ -1529,7 +1521,6 @@ def export_spatial_select_feats(
         for i in range(srcLayerDefn.GetFieldCount()):
             fieldDefn = srcLayerDefn.GetFieldDefn(i)
             result_lyr.CreateField(fieldDefn)
-        rsltLayerDefn = result_lyr.GetLayerDefn()
 
         counter = 0
         openTransaction = False
@@ -1700,7 +1691,6 @@ def subset_envs_vec_lyr_obj(
     counter = 0
     vec_lyr_obj.ResetReading()
     print("Started .0.", end="", flush=True)
-    outenvs = []
     # loop through the input features
     inFeature = vec_lyr_obj.GetNextFeature()
     while inFeature:
@@ -2542,7 +2532,7 @@ def spatial_select(
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     roi_gpdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
     base_gpdf["msk_rsgis_sel"] = numpy.zeros((base_gpdf.shape[0]), dtype=bool)
-    geoms = list()
+
     for i in tqdm.tqdm(range(roi_gpdf.shape[0])):
         inter = base_gpdf["geometry"].intersects(roi_gpdf.iloc[i]["geometry"])
         base_gpdf.loc[inter, "msk_rsgis_sel"] = True

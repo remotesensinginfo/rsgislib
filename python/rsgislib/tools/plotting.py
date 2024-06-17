@@ -1353,7 +1353,7 @@ def manual_stretch_np_arr(
         arr_data_out = arr_data_out.astype(float)
 
     if len(arr_shp) == 2:
-        if type(min_max_vals) is not dict:
+        if not isinstance(min_max_vals, dict):
             raise rsgislib.RSGISPyException(
                 "Just 1 dimension within arr_data and therefore "
                 "min_max_vals variable must be a dict."
@@ -1370,7 +1370,7 @@ def manual_stretch_np_arr(
 
         arr_data_out = (((arr_data_out - min_val) / range_val) * out_gain) + out_off
     else:
-        if type(min_max_vals) is not list:
+        if not isinstance(min_max_vals, list):
             raise rsgislib.RSGISPyException(
                 "arr_data has more than 1 dimension and therefore "
                 "min_max_vals variable must be a list."

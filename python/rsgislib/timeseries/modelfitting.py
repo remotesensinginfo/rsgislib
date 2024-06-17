@@ -39,7 +39,7 @@ import sys
 from datetime import datetime
 
 import numpy
-from rios import applier, cuiprogress, fileinfo
+from rios import applier, fileinfo
 from sklearn import linear_model
 
 import rsgislib

@@ -146,7 +146,7 @@ def split_photos_by_time(
                     data = data.decode()
                 if tag == date_time_tag:
                     img_dt_lut[img_file] = data
-            except:
+            except Exception:
                 continue
 
     img_clusters = list()

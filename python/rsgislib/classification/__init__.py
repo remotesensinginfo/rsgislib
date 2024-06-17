@@ -2,7 +2,10 @@
 """
 The classification module provides classification functionality within RSGISLib.
 """
+# import the C++ extension into this level
+from ._classification import *
 
+import os
 from typing import Dict, List
 
 import rsgislib
@@ -16,9 +19,6 @@ except ImportError:
     import rios.cuiprogress
 
     TQDM_AVAIL = False
-
-# import the C++ extension into this level
-from ._classification import *
 
 
 class ClassSimpleInfoObj(object):
@@ -250,8 +250,6 @@ def get_class_info_dict(
              instance as the value.
 
     """
-    import os
-
     import rsgislib.tools.filetools
 
     cls_smpls_fnl_info = dict()
@@ -308,7 +306,6 @@ def get_class_training_data(
     :return: dictionary of ClassSimpleInfoObj objects.
 
     """
-    import os
     import random
     import shutil
 
@@ -402,7 +399,6 @@ def get_class_training_chips_data(
     :return: dictionary of ClassSimpleInfoObj objects.
 
     """
-    import os
     import random
     import shutil
 
@@ -603,8 +599,6 @@ def split_sample_train_valid_test(
                      then the output data type will be float32.
 
     """
-    import os
-
     import rsgislib.tools.filetools
     import rsgislib.tools.utils
     import rsgislib.zonalstats
@@ -689,8 +683,6 @@ def split_chip_sample_train_valid_test(
                      then the output data type will be float32.
 
     """
-    import os
-
     import rsgislib.tools.filetools
     import rsgislib.tools.utils
     import rsgislib.zonalstats
@@ -776,8 +768,6 @@ def split_chip_sample_ref_train_valid_test(
                      then the output data type will be float32.
 
     """
-    import os
-
     import rsgislib
     import rsgislib.tools.filetools
     import rsgislib.tools.utils
@@ -1147,11 +1137,8 @@ def plot_train_data(
                       otherwise call 'Var #1', 'Var #2' ... 'Var #N' etc.
 
     """
-    import os
-
     import h5py
     import numpy
-    import pandas
     import plotly.express as px
     import tqdm
 
@@ -1207,8 +1194,6 @@ def plot_train_data(
     for var_n in range(cls1_n_vars):
         df_data[var_names[var_n]] = cls_data[..., var_n]
     df_data["ClassName"] = cls_data_name
-
-    df = pandas.DataFrame(df_data)
 
     for var1 in tqdm.tqdm(var_names):
         for var2 in var_names:
@@ -1381,7 +1366,7 @@ def fill_class_timeseries(
                           for both the input and output images.
 
     """
-    from rios import applier, cuiprogress
+    from rios import applier
 
     import rsgislib.imageutils
     import rsgislib.rastergis

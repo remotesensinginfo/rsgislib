@@ -42,7 +42,7 @@ from typing import List, Dict
 import h5py
 import numpy
 from osgeo import gdal
-from rios import applier, cuiprogress, rat
+from rios import applier, rat
 
 import rsgislib
 import rsgislib.imagecalc

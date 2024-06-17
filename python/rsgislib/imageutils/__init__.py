@@ -2,11 +2,13 @@
 """
 The imageutils module contains general utilities for applying to images.
 """
+# import the C++ extension into this level
+from ._imageutils import *
 
 import math
 import os
 import shutil
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import numpy
 from osgeo import gdal, osr
@@ -21,9 +23,6 @@ except ImportError:
     import rios.cuiprogress
 
     TQDM_AVAIL = False
-
-# import the C++ extension into this level
-from ._imageutils import *
 
 gdal.UseExceptions()
 
@@ -1276,7 +1275,6 @@ def get_utm_zone(input_img: str):
     spatRef.ImportFromWkt(projStr)
     utmZone = None
     if spatRef.IsProjected():
-        projName = spatRef.GetAttrValue("projcs")
         zone = spatRef.GetUTMZone()
         if zone != 0:
             if zone < 0:
@@ -1342,7 +1340,7 @@ def set_band_names(input_img: str, band_names: list, feedback: bool = False):
 
         imgBand = dataset.GetRasterBand(band)
         # Check the image band is available
-        if not imgBand is None:
+        if imgBand is not None:
             if feedback:
                 print('Setting Band {0} to "{1}"'.format(band, bandName))
             imgBand.SetDescription(bandName)
@@ -1371,7 +1369,7 @@ def get_band_names(input_img: str):
     for i in range(dataset.RasterCount):
         imgBand = dataset.GetRasterBand(i + 1)
         # Check the image band is available
-        if not imgBand is None:
+        if imgBand is not None:
             bandNames.append(imgBand.GetDescription())
         else:
             raise rsgislib.RSGISPyException(
@@ -2259,7 +2257,7 @@ def resample_img_to_match(
 
     backVal = 0.0
     haveNoData = False
-    if no_data_val != None:
+    if no_data_val is not None:
         backVal = float(no_data_val)
         haveNoData = True
 
@@ -4271,7 +4269,6 @@ def whiten_image(
             raise rsgislib.RSGISPyException(
                 "Could not open image band ({})".format(n + 1)
             )
-        no_data_val = img_band.GetNoDataValue()
         band_arr = img_band.ReadAsArray().flatten()
         band_arr = band_arr.astype(numpy.float32)
         img_data[n] = band_arr

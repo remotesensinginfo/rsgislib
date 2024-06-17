@@ -175,7 +175,7 @@ def run_shepherd_segmentation(
     # Select Image Bands if required
     inputImgBands = input_img
     selectBands = False
-    if not bands is None:
+    if bands is not None:
         print("Subsetting the image bands")
         selectBands = True
         inputImgBands = os.path.join(
@@ -332,7 +332,7 @@ def run_shepherd_segmentation(
         rsgislib.rastergis.pop_rat_img_stats(out_clumps_img, True, True)
 
     # Create mean image if required.
-    if not (out_mean_img is None):
+    if out_mean_img is not None:
         rsgislib.segmentation.mean_image(
             input_img, out_clumps_img, out_mean_img, gdalformat, input_datatype
         )
@@ -342,7 +342,7 @@ def run_shepherd_segmentation(
     if save_process_stats:
         gdalDS = gdal.Open(input_img, gdal.GA_ReadOnly)
         geotransform = gdalDS.GetGeoTransform()
-        if not geotransform is None:
+        if geotransform is not None:
             xTL = geotransform[0]
             yTL = geotransform[3]
 
@@ -495,7 +495,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
     # Select Image Bands if required
     inputImgBands = input_img
     selectBands = False
-    if not bands is None:
+    if bands is not None:
         print("Subsetting the image bands")
         selectBands = True
         inputImgBands = os.path.join(
@@ -634,7 +634,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
         rsgislib.rastergis.pop_rat_img_stats(out_clumps_img, True, True)
 
     # Create mean image if required.
-    if not (out_mean_img is None):
+    if out_mean_img is not None:
         rsgislib.segmentation.mean_image(
             input_img, out_clumps_img, out_mean_img, gdalformat, input_datatype
         )

@@ -65,13 +65,11 @@ def read_sen2_l2a_mtd_to_dict(mtd_header_file: str):
     general_info_tag = root.find(
         "{https://psd-14.sentinel2.eo.esa.int/PSD/User_Product_Level-2A.xsd}General_Info"
     )
-    if general_info_tag == None:
+    if general_info_tag is None:
         raise rsgislib.RSGISPyException(
             "Cannot open top level section 'General_Info' - "
             "is this really a Sentinel-2 image file?"
         )
-    else:
-        hdr_file_version = "psd14"
 
     product_info_tag = general_info_tag.find("Product_Info")
     if product_info_tag is None:

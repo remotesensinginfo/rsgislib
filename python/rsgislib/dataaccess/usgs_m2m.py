@@ -257,7 +257,7 @@ def get_earth_explorer_datasets(api_key: str) -> Dict[str, List[str]]:
         dataset_names[dataset_info[dataset_id]["categoryName"]] = list()
         if "subCategories" in dataset_info[dataset_id]:
             for sub_cat_id in dataset_info[dataset_id]["subCategories"]:
-                if type(sub_cat_id) != dict:
+                if not isinstance(sub_cat_id, dict):
                     for dataset_item in dataset_info[dataset_id]["subCategories"][
                         sub_cat_id
                     ]["datasets"]:

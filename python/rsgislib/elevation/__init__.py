@@ -67,11 +67,11 @@ def fft_dem_fusion(
 
     fftHighRes = numpy.fft.fft2(srcbandHighResArr)
     fshiftHighRes = numpy.fft.fftshift(fftHighRes)
-    magSpectHighRes = 20 * numpy.log(numpy.abs(fshiftHighRes))
+    # magSpectHighRes = 20 * numpy.log(numpy.abs(fshiftHighRes))
 
     fftLowRes = numpy.fft.fft2(srcbandLowResArr)
     fshiftLowRes = numpy.fft.fftshift(fftLowRes)
-    magSpectLowRes = 20 * numpy.log(numpy.abs(fshiftLowRes))
+    # magSpectLowRes = 20 * numpy.log(numpy.abs(fshiftLowRes))
 
     rows, cols = srcbandLowResArr.shape
     crow, ccol = int(rows / 2), int(cols / 2)

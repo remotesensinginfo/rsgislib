@@ -42,6 +42,7 @@ import h5py
 import numpy
 from osgeo import gdal
 from rios import applier, rat
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 import rsgislib
 import rsgislib.classification
@@ -63,8 +64,6 @@ except ImportError:
     import rios.cuiprogress
 
     TQDM_AVAIL = False
-
-from sklearn.metrics import accuracy_score, roc_auc_score
 
 
 def optimise_xgboost_binary_classifier(

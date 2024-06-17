@@ -6,7 +6,7 @@ from datetime import datetime
 
 import numpy
 import statsmodels.api
-from rios import applier, cuiprogress, fileinfo
+from rios import applier, fileinfo
 
 import rsgislib
 import rsgislib.imageutils
