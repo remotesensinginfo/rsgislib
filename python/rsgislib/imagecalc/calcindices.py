@@ -665,11 +665,13 @@ def calc_evi(
                          0-1 (Default: 1000 to match rsgislib/arcsi)
 
     """
-    expression = f"( (nir/{scale_factor}) + ({c1} * (red/{scale_factor})) - " \
-                 f"({c2} * (blue/{scale_factor})) + {l} ) !=0? " \
-                 f"{g}*( ( (nir/{scale_factor})-(red/{scale_factor}) ) / " \
-                 f"( (nir/{scale_factor}) + ({c1} * (red/{scale_factor})) - " \
-                 f"({c2} * (blue/{scale_factor})) + {l} ) ):-999"
+    expression = (
+        f"( (nir/{scale_factor}) + ({c1} * (red/{scale_factor})) - "
+        f"({c2} * (blue/{scale_factor})) + {l} ) !=0? "
+        f"{g}*( ( (nir/{scale_factor})-(red/{scale_factor}) ) / "
+        f"( (nir/{scale_factor}) + ({c1} * (red/{scale_factor})) - "
+        f"({c2} * (blue/{scale_factor})) + {l} ) ):-999"
+    )
 
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
@@ -719,9 +721,11 @@ def calc_evi2(
                          0-1 (Default: 1000 to match rsgislib/arcsi)
 
     """
-    expression = f"((nir/{scale_factor})+({c}*(red/{scale_factor}))+{l})!=0?" \
-                 f"{g}*( (nir/{scale_factor})-(red/{scale_factor})) / " \
-                 f"((nir/{scale_factor})+ ({c}*(red/{scale_factor}))+{l}):-999"
+    expression = (
+        f"((nir/{scale_factor})+({c}*(red/{scale_factor}))+{l})!=0?"
+        f"{g}*( (nir/{scale_factor})-(red/{scale_factor})) / "
+        f"((nir/{scale_factor})+ ({c}*(red/{scale_factor}))+{l}):-999"
+    )
 
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
@@ -907,9 +911,11 @@ def calc_si(
                          0-1 (Default: 1000 to match rsgislib/arcsi)
 
     """
-    expression = f"(red==0)||(green==0)||(blue==0)?-999:" \
-                 f"( (1-(blue/{scale_factor})) * (1-(green/{scale_factor})) " \
-                 f"* (1-(red/{scale_factor})))^(1/3)"
+    expression = (
+        f"(red==0)||(green==0)||(blue==0)?-999:"
+        f"( (1-(blue/{scale_factor})) * (1-(green/{scale_factor})) "
+        f"* (1-(red/{scale_factor})))^(1/3)"
+    )
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("green", input_img, img_green_band))
@@ -1115,9 +1121,11 @@ def calc_ndbsi(
     )
 
     # Calc r
-    expression = f"(red==0)||(nir==0)||(swir==0)?-999:" \
-                 f"1-( ( (swir/{scale_factor}) - (nir/{scale_factor}) ) / " \
-                 f"( 3 * abs( (nir/{scale_factor}) - (red/{scale_factor}) ) ) )"
+    expression = (
+        f"(red==0)||(nir==0)||(swir==0)?-999:"
+        f"1-( ( (swir/{scale_factor}) - (nir/{scale_factor}) ) / "
+        f"( 3 * abs( (nir/{scale_factor}) - (red/{scale_factor}) ) ) )"
+    )
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("red", input_img, img_red_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("nir", input_img, img_nir_band))
@@ -1135,10 +1143,12 @@ def calc_ndbsi(
         tmp_k_img, expression, gdalformat, rsgislib.TYPE_32FLOAT, band_defns
     )
 
-    expression = f"k==-999?-999:k<0?abs((swir/{scale_factor})-(blue/{scale_factor})) " \
-                 f"/ ((swir/{scale_factor})+(blue/{scale_factor}))*(-1):" \
-                 f"((swir/{scale_factor})-(blue/{scale_factor})) / " \
-                 f"((swir/{scale_factor})+(blue/{scale_factor}))"
+    expression = (
+        f"k==-999?-999:k<0?abs((swir/{scale_factor})-(blue/{scale_factor})) "
+        f"/ ((swir/{scale_factor})+(blue/{scale_factor}))*(-1):"
+        f"((swir/{scale_factor})-(blue/{scale_factor})) / "
+        f"((swir/{scale_factor})+(blue/{scale_factor}))"
+    )
     band_defns = []
     band_defns.append(rsgislib.imagecalc.BandDefn("swir", input_img, img_swir_band))
     band_defns.append(rsgislib.imagecalc.BandDefn("blue", input_img, img_blue_band))

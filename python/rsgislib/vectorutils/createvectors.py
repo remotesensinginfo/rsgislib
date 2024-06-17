@@ -11,6 +11,14 @@ from osgeo import gdal, ogr, osr
 
 import rsgislib
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
+
 gdal.UseExceptions()
 
 
@@ -145,12 +153,10 @@ def vectorise_pxls_to_pts(
     import rsgislib.imageutils
     import rsgislib.vectorutils
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -270,7 +276,7 @@ def extract_image_footprint(
     )
 
     out_vec_tmp_file = out_vec_file
-    if not (reproj_to is None):
+    if reproj_to is not None:
         out_vec_tmp_file = os.path.join(
             tmp_dir, in_img_base + "_" + uid_str + "_initVecOut.gpkg"
         )
@@ -297,7 +303,7 @@ def extract_image_footprint(
         out_vec_tmp_file, out_vec_lyr, "FileName", ogr.OFTString, file_name
     )
 
-    if not (reproj_to is None):
+    if reproj_to is not None:
         if os.path.exists(out_vec_file):
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
 
@@ -325,7 +331,7 @@ def extract_image_footprint(
 
         shutil.rmtree(tmp_dir)
     else:
-        if not (reproj_to is None):
+        if reproj_to is not None:
             driver = ogr.GetDriverByName("ESRI Shapefile")
             driver.DeleteDataSource(out_vec_tmp_file)
 
@@ -663,12 +669,12 @@ def create_poly_vec_bboxs(
         add_atts = False
         if (atts is not None) and (att_types is not None):
             n_atts = 0
-            if not "names" in att_types:
+            if "names" not in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "names"'
                 )
             n_atts = len(att_types["names"])
-            if not "types" in att_types:
+            if "types" not in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "types"'
                 )
@@ -811,12 +817,12 @@ def write_pts_to_vec(
         addAtts = False
         if (atts is not None) and (att_types is not None):
             nAtts = 0
-            if not "names" in att_types:
+            if "names" not in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "names"'
                 )
             nAtts = len(att_types["names"])
-            if not "types" in att_types:
+            if "types" not in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "types"'
                 )

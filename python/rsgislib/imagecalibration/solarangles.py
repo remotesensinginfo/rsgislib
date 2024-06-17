@@ -33,8 +33,17 @@
 #
 ############################################################################
 
+import rsgislib
 import numpy
 from osgeo import osr
+
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 
 def get_solar_irr_convention_solar_azimuth_from_usgs(solarAz):
@@ -97,16 +106,12 @@ def calc_solar_azimuth_zenith(inputImg, inImgDateTime, outputImg, gdalformat):
     :param gdalformat: output file format (e.g., KEA)
     """
     import Pysolar
-    from rios import applier, cuiprogress
+    from rios import applier
 
-    import rsgislib
-
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.image1 = inputImg

@@ -17,9 +17,6 @@ except ImportError:
     SKLEARN_NOT_AVAIL = True
 
 
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
 def test_count_pxls_of_val_band1():
     import rsgislib.imagecalc
 
@@ -35,9 +32,6 @@ def test_count_pxls_of_val_band1():
     )
 
 
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
 def test_count_pxls_of_val_band1_sel_vals():
     import rsgislib.imagecalc
 
@@ -46,9 +40,6 @@ def test_count_pxls_of_val_band1_sel_vals():
     assert (val_counts[0] == 612) and (val_counts[1] == 614)
 
 
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
 def test_count_pxls_of_val_all_bands():
     import rsgislib.imagecalc
 
@@ -585,10 +576,7 @@ def test_calc_img_rescale_multi_imgs(tmp_path):
     assert img_eq
 
 
-#@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_perform_image_pca(tmp_path):
     import rsgislib.imagecalc
 
@@ -612,10 +600,7 @@ def test_perform_image_pca(tmp_path):
     assert os.path.exists(output_img) and os.path.exists(out_eigen_vec_file)
 
 
-#@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
 def test_perform_image_mnf(tmp_path):
     import rsgislib.imagecalc
 
@@ -1053,3 +1038,30 @@ def test_mahalanobis_dist_to_img_filter(tmp_path):
         input_img, output_img, 5, "KEA", rsgislib.TYPE_32FLOAT
     )
     assert os.path.exists(output_img)
+
+
+def test_calc_split_win_thresholds_otsu(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+
+    thres_vals = rsgislib.imagecalc.calc_split_win_thresholds(
+        input_img,
+        win_size=500,
+        thres_meth=rsgislib.THRES_METH_OTSU,
+        output_file=None,
+        no_data_val=0.0,
+        lower_valid=None,
+        upper_valid=None,
+        min_n_vals=100,
+        # thres_kwrds = None,
+    )
+
+    n_thres = len(thres_vals[1])
+    assert (
+        (n_thres == 4)
+        and ((thres_vals[1][0] - 0.335) < 0.01)
+        and ((thres_vals[1][1] - 0.692) < 0.01)
+        and ((thres_vals[1][2] - 0.461) < 0.01)
+        and ((thres_vals[1][3] - 0.708) < 0.01)
+    )

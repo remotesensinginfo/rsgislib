@@ -16,6 +16,14 @@ import rsgislib.tools.projection
 import rsgislib.tools.tilecacheutils
 import rsgislib.tools.utils
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
+
 
 def create_kmz_img(
     input_img: str,
@@ -1352,14 +1360,10 @@ def burn_in_binary_msk(
             "the msk_colour array should be equal."
         )
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.base_image = base_image

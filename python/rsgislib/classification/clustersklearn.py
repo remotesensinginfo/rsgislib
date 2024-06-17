@@ -37,16 +37,21 @@
 from typing import List
 
 import numpy
-import tqdm
 from osgeo import gdal
-from rios.imagereader import ImageReader
-from rios.imagewriter import ImageWriter
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.base import BaseEstimator
 
 import rsgislib
 import rsgislib.imageutils
 import rsgislib.rastergis
+
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 
 def img_pixel_sample_cluster(
@@ -65,8 +70,8 @@ def img_pixel_sample_cluster(
     A function which allows a clustering to be performed using the algorithms available
     within the scikit-learn library. The clusterer is trained on a sample of the input
     image and then applied using the predict function (therefore this function is only
-    compatible with clusterers which have the predict function implemented) to the
-    whole image.
+    compatible with clustering algorithms which have the predict function implemented)
+    to the whole image.
 
     :param input_img: input image file.
     :param output_img: output image file.
@@ -82,8 +87,10 @@ def img_pixel_sample_cluster(
                                           (pass None as the clusterer) where the
                                           bandwidth is calculated from the data itself.
     """
-    print("Sample input image:")
-    dataSamp = rsgislib.imageutils.extract_img_pxl_sample(
+    from rios import applier
+
+    print("Sample Input Image:")
+    data_samp = rsgislib.imageutils.extract_img_pxl_sample(
         input_img, n_img_smpl, no_data_val
     )
 
@@ -91,59 +98,80 @@ def img_pixel_sample_cluster(
         print("Using Mean-Shift predict bandwidth")
         from sklearn.cluster import MeanShift, estimate_bandwidth
 
-        bandwidth = estimate_bandwidth(dataSamp, quantile=0.2, n_samples=500)
+        bandwidth = estimate_bandwidth(data_samp, quantile=0.2, n_samples=500)
         clusterer = MeanShift(bandwidth=bandwidth, bin_seeding=True)
 
     print("Fit Clusterer")
-    clusterer.fit(dataSamp)
+    clusterer.fit(data_samp)
     print("Fitted Clusterer")
 
-    print("Apply to whole image:")
-    reader = ImageReader(input_img, windowxsize=200, windowysize=200)
-    writer = None
-    for info, block in tqdm.tqdm(reader):
-        blkShape = block.shape
-        blkBands = block.reshape((blkShape[0], (blkShape[1] * blkShape[2]))).T
-        ID = numpy.arange(blkBands.shape[0])
-        outClusterVals = numpy.zeros((blkBands.shape[0]))
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
-        finiteMskArr = numpy.isfinite(blkBands).all(axis=1)
-        ID = ID[finiteMskArr]
-        blkBands = blkBands[finiteMskArr]
+    infiles = applier.FilenameAssociations()
+    infiles.input_img = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.output_img = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.clusterer = clusterer
+    otherargs.no_data_val = no_data_val
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
 
-        noDataValArr = numpy.logical_not(
-            numpy.where(blkBands == no_data_val, True, False).all(axis=1)
+    # RIOS function to apply clusterer
+    def _apply_sk_clusterer(info, inputs, outputs, otherargs):
+        """
+        Internal function for rios applier. Used within img_pixel_sample_cluster.
+        """
+        img_shp = inputs.input_img.shape
+
+        img_bands_arr = inputs.input_img.reshape(
+            (img_shp[0], (img_shp[1] * img_shp[2]))
+        ).T
+        ID = numpy.arange(img_bands_arr.shape[0])
+        out_cluster_vals = numpy.zeros((img_bands_arr.shape[0]))
+
+        finite_msk_arr = numpy.isfinite(img_bands_arr).all(axis=1)
+        ID = ID[finite_msk_arr]
+        img_bands_arr = img_bands_arr[finite_msk_arr]
+
+        no_data_val_arr = numpy.logical_not(
+            numpy.where(img_bands_arr == otherargs.no_data_val, True, False).all(axis=1)
         )
 
-        blkBandsNoData = blkBands[noDataValArr]
-        ID = ID[noDataValArr]
+        img_bands_vld_data_arr = img_bands_arr[no_data_val_arr]
+        ID = ID[no_data_val_arr]
 
         if ID.shape[0] > 0:
-            outPred = clusterer.predict(blkBandsNoData) + 1
-            outClusterVals[ID] = outPred
+            out_pred = otherargs.clusterer.predict(img_bands_vld_data_arr) + 1
+            out_cluster_vals[ID] = out_pred
 
-        outClusterValsOutArr = outClusterVals.reshape([1, blkShape[1], blkShape[2]])
-        outClusterValsOutArr = outClusterValsOutArr.astype(numpy.int32)
+        out_cluster_vals = out_cluster_vals.astype(numpy.int32)
+        outputs.output_img = out_cluster_vals.reshape([1, img_shp[1], img_shp[2]])
 
-        if writer is None:
-            writer = ImageWriter(
-                output_img,
-                info=info,
-                firstblock=outClusterValsOutArr,
-                drivername=gdalformat,
-                creationoptions=[],
-            )
-        else:
-            writer.write(outClusterValsOutArr)
-    writer.close(calcStats=False)
+    print("Applying to Whole Image")
+    applier.apply(_apply_sk_clusterer, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.rastergis.pop_rat_img_stats(
-            clumps_img=output_img,
-            add_clr_tab=True,
-            calc_pyramids=True,
-            ignore_zero=True,
-        )
+        if gdalformat == "KEA":
+            rsgislib.rastergis.pop_rat_img_stats(
+                clumps_img=output_img,
+                add_clr_tab=True,
+                calc_pyramids=True,
+                ignore_zero=True,
+            )
+        else:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                input_img=output_img,
+                add_clr_tab=True,
+                calc_pyramids=True,
+                ignore_zero=True,
+            )
 
 
 def img_pixel_tiled_cluster(
@@ -180,60 +208,88 @@ def img_pixel_tiled_cluster(
     :param tile_x_size: tile size in the x-axis in pixels.
     :param tile_y_size: tile size in the y-axis in pixels.
     """
+    from rios import applier
+
     if use_mean_shift_est_band_width:
         from sklearn.cluster import MeanShift, estimate_bandwidth
 
-    reader = ImageReader(input_img, windowxsize=tile_x_size, windowysize=tile_y_size)
-    writer = None
-    for info, block in tqdm.tqdm(reader):
-        blkShape = block.shape
-        blkBands = block.reshape((blkShape[0], (blkShape[1] * blkShape[2]))).T
-        ID = numpy.arange(blkBands.shape[0])
-        outClusterVals = numpy.zeros((blkBands.shape[0]))
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
-        finiteMskArr = numpy.isfinite(blkBands).all(axis=1)
-        ID = ID[finiteMskArr]
-        blkBands = blkBands[finiteMskArr]
+    infiles = applier.FilenameAssociations()
+    infiles.input_img = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.output_img = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.clusterer = clusterer
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+    aControls.windowxsize = tile_x_size
+    aControls.windowysize = tile_y_size
 
-        noDataValArr = numpy.logical_not(
-            numpy.where(blkBands == no_data_val, True, False).all(axis=1)
+    # RIOS function to apply clusterer
+    def _apply_sk_tiled_clusterer(info, inputs, outputs, otherargs):
+        """
+        Internal function for rios applier. Used within img_pixel_tiled_cluster.
+        """
+        img_shp = inputs.input_img.shape
+
+        img_bands_arr = inputs.input_img.reshape(
+            (img_shp[0], (img_shp[1] * img_shp[2]))
+        ).T
+        ID = numpy.arange(img_bands_arr.shape[0])
+        out_cluster_vals = numpy.zeros((img_bands_arr.shape[0]))
+
+        finite_msk_arr = numpy.isfinite(img_bands_arr).all(axis=1)
+        ID = ID[finite_msk_arr]
+        img_bands_arr = img_bands_arr[finite_msk_arr]
+
+        no_data_val_arr = numpy.logical_not(
+            numpy.where(img_bands_arr == otherargs.no_data_val, True, False).all(axis=1)
         )
 
-        blkBandsNoData = blkBands[noDataValArr]
-        ID = ID[noDataValArr]
+        img_bands_vld_data_arr = img_bands_arr[no_data_val_arr]
+        ID = ID[no_data_val_arr]
 
         if ID.shape[0] > 0:
             if use_mean_shift_est_band_width:
                 bandwidth = estimate_bandwidth(
-                    blkBandsNoData, quantile=0.2, n_samples=1000
+                    img_bands_vld_data_arr, quantile=0.2, n_samples=1000
                 )
-                clusterer = MeanShift(bandwidth=bandwidth, bin_seeding=True)
+                otherargs.clusterer = MeanShift(bandwidth=bandwidth, bin_seeding=True)
 
-            clusterer.fit(blkBandsNoData)
-            outPred = clusterer.labels_ + 1
-            outClusterVals[ID] = outPred
+            otherargs.clusterer.fit(img_bands_vld_data_arr)
+            out_pred = otherargs.clusterer.predict(img_bands_vld_data_arr) + 1
+            out_cluster_vals[ID] = out_pred
 
-        outClusterValsOutArr = outClusterVals.reshape([1, blkShape[1], blkShape[2]])
+        out_cluster_vals = out_cluster_vals.astype(numpy.int32)
+        outputs.output_img = out_cluster_vals.reshape([1, img_shp[1], img_shp[2]])
 
-        if writer is None:
-            writer = ImageWriter(
-                output_img,
-                info=info,
-                firstblock=outClusterValsOutArr,
-                drivername=gdalformat,
-                creationoptions=[],
-            )
-        else:
-            writer.write(outClusterValsOutArr)
-    writer.close(calcStats=False)
+    applier.apply(
+        _apply_sk_tiled_clusterer, infiles, outfiles, otherargs, controls=aControls
+    )
 
     if calc_stats:
-        rsgislib.rastergis.pop_rat_img_stats(
-            clumps_img=output_img,
-            add_clr_tab=True,
-            calc_pyramids=True,
-            ignore_zero=True,
-        )
+        if gdalformat == "KEA":
+            rsgislib.rastergis.pop_rat_img_stats(
+                clumps_img=output_img,
+                add_clr_tab=True,
+                calc_pyramids=True,
+                ignore_zero=True,
+            )
+        else:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                input_img=output_img,
+                add_clr_tab=True,
+                calc_pyramids=True,
+                ignore_zero=True,
+            )
 
 
 def img_pixel_cluster(
@@ -275,60 +331,68 @@ def img_pixel_cluster(
     if use_mean_shift_est_band_width:
         from sklearn.cluster import MeanShift, estimate_bandwidth
 
-    gdalDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    nPxls = gdalDS.RasterXSize * gdalDS.RasterYSize
+    gdal_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
+    n_pxls = gdal_ds.RasterXSize * gdal_ds.RasterYSize
 
-    pxlVals = numpy.zeros((gdalDS.RasterCount, nPxls))
+    pxl_vals = numpy.zeros((gdal_ds.RasterCount, n_pxls))
 
-    for nBand in numpy.arange(gdalDS.RasterCount):
-        gdalBand = gdalDS.GetRasterBand(int(nBand + 1))
-        imgArr = gdalBand.ReadAsArray().flatten()
-        pxlVals[nBand] = imgArr
+    for n_band in numpy.arange(gdal_ds.RasterCount):
+        gdal_band = gdal_ds.GetRasterBand(int(n_band + 1))
+        img_arr = gdal_band.ReadAsArray().flatten()
+        pxl_vals[n_band] = img_arr
 
-    pxlVals = pxlVals.T
+    pxl_vals = pxl_vals.T
 
-    ID = numpy.arange(pxlVals.shape[0])
-    outClusterVals = numpy.zeros((pxlVals.shape[0]))
+    ID = numpy.arange(pxl_vals.shape[0])
+    out_cluster_vals = numpy.zeros((pxl_vals.shape[0]))
 
-    finiteMskArr = numpy.isfinite(pxlVals).all(axis=1)
-    ID = ID[finiteMskArr]
-    pxlVals = pxlVals[finiteMskArr]
+    finite_msk_arr = numpy.isfinite(pxl_vals).all(axis=1)
+    ID = ID[finite_msk_arr]
+    pxl_vals = pxl_vals[finite_msk_arr]
 
-    noDataValArr = numpy.logical_not(
-        numpy.where(pxlVals == no_data_val, True, False).all(axis=1)
+    no_data_val_arr = numpy.logical_not(
+        numpy.where(pxl_vals == no_data_val, True, False).all(axis=1)
     )
 
-    pxlVals = pxlVals[noDataValArr]
-    ID = ID[noDataValArr]
+    pxl_vals = pxl_vals[no_data_val_arr]
+    ID = ID[no_data_val_arr]
 
     if ID.shape[0] > 0:
         if use_mean_shift_est_band_width:
-            bandwidth = estimate_bandwidth(pxlVals, quantile=0.2, n_samples=1000)
+            bandwidth = estimate_bandwidth(pxl_vals, quantile=0.2, n_samples=1000)
             clusterer = MeanShift(bandwidth=bandwidth, bin_seeding=True)
         print("Perform Clustering")
-        clusterer.fit(pxlVals)
+        clusterer.fit(pxl_vals)
         print("Performed Clustering")
-        outPred = clusterer.labels_ + 1
-        outClusterVals[ID] = outPred
+        out_pred = clusterer.labels_ + 1
+        out_cluster_vals[ID] = out_pred
 
-    outClusterValsOutArr = outClusterVals.reshape(
-        [gdalDS.RasterYSize, gdalDS.RasterXSize]
+    out_cluster_vals_out_arr = out_cluster_vals.reshape(
+        [gdal_ds.RasterYSize, gdal_ds.RasterXSize]
     )
-    print(outClusterValsOutArr.shape)
+    print(out_cluster_vals_out_arr.shape)
 
-    gdalOutDS = gdal.Open(output_img, gdal.GA_Update)
-    gdalOutBand = gdalOutDS.GetRasterBand(1)
-    gdalOutBand.WriteArray(outClusterValsOutArr)
-    gdalOutDS = None
-    gdalDS = None
+    gdal_out_ds = gdal.Open(output_img, gdal.GA_Update)
+    gdal_out_band = gdal_out_ds.GetRasterBand(1)
+    gdal_out_band.WriteArray(out_cluster_vals_out_arr)
+    gdal_out_ds = None
+    gdal_ds = None
 
     if calc_stats:
-        rsgislib.rastergis.pop_rat_img_stats(
-            clumps_img=output_img,
-            add_clr_tab=True,
-            calc_pyramids=True,
-            ignore_zero=True,
-        )
+        if gdalformat == "KEA":
+            rsgislib.rastergis.pop_rat_img_stats(
+                clumps_img=output_img,
+                add_clr_tab=True,
+                calc_pyramids=True,
+                ignore_zero=True,
+            )
+        else:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                input_img=output_img,
+                add_clr_tab=True,
+                calc_pyramids=True,
+                ignore_zero=True,
+            )
 
 
 def cluster_sklearn_rat(
@@ -362,10 +426,7 @@ def cluster_sklearn_rat(
 
     """
     import math
-
-    import numpy
     import numpy.random
-    from osgeo import gdal
     from rios import rat
 
     rat_cols = rsgislib.rastergis.get_rat_columns(clumps_img)

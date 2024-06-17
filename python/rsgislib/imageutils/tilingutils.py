@@ -126,7 +126,7 @@ def create_min_data_tiles(
     )
     rastergis.pop_rat_img_stats(tileClumpsImage, True, True)
 
-    if not maskIntersect is None:
+    if maskIntersect is not None:
         bs = []
         bs.append(rastergis.BandAttStats(band=1, maxField="Mask"))
         rastergis.populate_rat_with_stats(maskIntersect, tileClumpsImage, bs)
@@ -166,7 +166,7 @@ def create_min_data_tiles(
         tileClumpsImage, inputImage, outclumpsFile, "KEA", "Selected", "NoDataClumps"
     )
 
-    if not outshp is None:
+    if outshp is not None:
         tilesDS = gdal.Open(outclumpsFile, gdal.GA_ReadOnly)
         tilesDSBand = tilesDS.GetRasterBand(1)
 

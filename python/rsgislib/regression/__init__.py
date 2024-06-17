@@ -58,10 +58,10 @@ def get_regression_stats(ref_data, pred_data, n_vars=1):
         acc_metrics["r2"] = sklearn.metrics.r2_score(
             ref_data[..., i], pred_data[..., i]
         )
-        acc_metrics[
-            "explained_variance_score"
-        ] = sklearn.metrics.explained_variance_score(
-            ref_data[..., i], pred_data[..., i]
+        acc_metrics["explained_variance_score"] = (
+            sklearn.metrics.explained_variance_score(
+                ref_data[..., i], pred_data[..., i]
+            )
         )
         acc_metrics["median_absolute_error"] = sklearn.metrics.median_absolute_error(
             ref_data[..., i], pred_data[..., i]

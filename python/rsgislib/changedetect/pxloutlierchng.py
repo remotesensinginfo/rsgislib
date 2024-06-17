@@ -37,12 +37,20 @@
 from __future__ import print_function
 
 import numpy
-from rios import applier, cuiprogress
+from rios import applier
 
 import rsgislib
 import rsgislib.imagecalc
 import rsgislib.imageutils
 import rsgislib.rastergis
+
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 
 def find_class_pyod_outliers(
@@ -59,7 +67,7 @@ def find_class_pyod_outliers(
     This function uses the pyod (https://github.com/yzhao062/pyod) library to
     find outliers within a class. It is assumed that the input images are from a
     different date than the mask (classification) and therefore the outliers will
-    related to class changes.
+    be related to class changes.
 
     :param pyod_obj: an instance of a pyod.models (e.g., pyod.models.knn.KNN) pass
                      parameters to the constructor
@@ -78,14 +86,14 @@ def find_class_pyod_outliers(
 
     """
     if img_bands is not None:
-        if not ((type(img_bands) is list) or (type(img_bands) is tuple)):
+        if not (isinstance(img_bands, list) or isinstance(img_bands, tuple)):
             raise rsgislib.RSGISPyException(
                 "If provided then img_bands should be a list (or None)"
             )
     else:
         n_bands = rsgislib.imageutils.get_img_band_count(input_img)
         img_bands = numpy.arange(1, n_bands + 1)
-    num_vars = len(img_bands)
+
     img_val_no_data = rsgislib.imageutils.get_img_no_data_value(input_img)
 
     msk_arr_vals = rsgislib.imageutils.extract_img_pxl_vals_in_msk(
@@ -184,12 +192,10 @@ def find_class_pyod_outliers(
         outfiles.out_scores_img = out_scores_img
         otherargs.out_scores = True
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar

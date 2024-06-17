@@ -215,7 +215,7 @@ def calc_class_accuracy_metrics(
     # normalise the confusion matrix by proportional area:
     norm_cm = cm.astype(float) / cm.sum(axis=1)[:,].reshape(-1, 1)
     norm_cm = norm_cm * prop_area
-    comp_total = norm_cm.sum(axis=1)  # same as proportional area
+
     ref_total = norm_cm.sum(axis=0)
     commission = [(row.sum() - row[idx]) for idx, row in enumerate(norm_cm)]
     omission = ref_total - numpy.diag(norm_cm)
@@ -688,7 +688,7 @@ def calc_acc_metrics_vecsamples_img(
 
     try:
         rat_cols = rsgislib.rastergis.get_rat_columns(cls_img)
-    except:
+    except Exception:
         raise rsgislib.RSGISPyException("The input image does not have a RAT...")
 
     if img_cls_name_col not in rat_cols:

@@ -43,6 +43,14 @@ from rios import applier, cuiprogress, rat
 import rsgislib
 import rsgislib.rastergis
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
+
 
 def train_keras_pixel_classifier(
     cls_mdl, cls_info_dict, out_mdl_file=None, train_epochs=5, train_batch_size=32
@@ -262,12 +270,10 @@ def apply_keras_pixel_classifier(
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
