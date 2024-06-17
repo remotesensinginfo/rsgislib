@@ -38,7 +38,7 @@ from typing import Dict, List, Union
 import h5py
 import numpy
 from osgeo import gdal
-from rios import applier, cuiprogress, rat, ratapplier
+from rios import applier, rat, ratapplier
 from sklearn.base import BaseEstimator
 from sklearn.model_selection._search import BaseSearchCV
 
@@ -47,6 +47,13 @@ import rsgislib.imagecalc
 import rsgislib.imageutils
 import rsgislib.rastergis
 import rsgislib.classification
+
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+    TQDM_AVAIL = False
 
 
 def perform_sklearn_classifier_param_search(
@@ -292,12 +299,10 @@ def apply_sklearn_classifier(
     otherargs.out_score_img = out_score_img
     otherargs.cls_id_lut = cls_id_lut
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
@@ -565,12 +570,10 @@ def apply_sklearn_classifier_rat(
     otherargs.class_colours = class_colours
     otherargs.class_train_info = cls_train_info
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar

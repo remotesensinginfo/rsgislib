@@ -18,6 +18,14 @@ try:
 except ImportError:
     HAVE_CATBOOST = False
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
+
 
 def get_catboost_mdl(mdl_file: str = None, mdl_format: str = "json"):
     """
@@ -260,12 +268,10 @@ def apply_catboost_binary_classifier(
     otherargs.out_probs = out_probs
     otherargs.img_file_info = img_file_info
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
@@ -521,12 +527,10 @@ def apply_catboost_multiclass_classifier(
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar

@@ -9,6 +9,13 @@ import rsgislib
 import rsgislib.imageutils
 from rsgislib.imageutils import ImageBandInfo
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+    TQDM_AVAIL = False
+
 # import the C++ extension into this level
 from ._classification import *
 
@@ -1413,12 +1420,10 @@ def fill_class_timeseries(
     other_args.n_imgs = len(input_imgs)
     other_args.n_iters = n_iters
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     a_controls = applier.ApplierControls()
     a_controls.progress = progress_bar

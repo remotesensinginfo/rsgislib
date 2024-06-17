@@ -44,6 +44,13 @@ import rsgislib.imagecalc
 import rsgislib.imageutils
 import rsgislib.rastergis
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+    TQDM_AVAIL = False
+
 
 def find_class_pyod_outliers(
     pyod_obj,
@@ -184,12 +191,10 @@ def find_class_pyod_outliers(
         outfiles.out_scores_img = out_scores_img
         otherargs.out_scores = True
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
