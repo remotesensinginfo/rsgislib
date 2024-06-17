@@ -33,7 +33,6 @@
 ############################################################################
 
 import os
-import rsgislib
 import numpy
 from osgeo import gdal
 
@@ -841,6 +840,7 @@ def rescale_unmixing_results(input_img, output_img, gdalformat="KEA", calc_stats
 
     """
     from rios import applier
+    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -875,8 +875,6 @@ def rescale_unmixing_results(input_img, output_img, gdalformat="KEA", calc_stats
     applier.apply(_applyUnmixRescale, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        import rsgislib.imageutils
-
         rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
@@ -899,6 +897,7 @@ def predict_refl_linear_unmixing(
 
     """
     from rios import applier
+    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -947,8 +946,6 @@ def predict_refl_linear_unmixing(
     applier.apply(_predict_refl_img, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        import rsgislib.imageutils
-
         rsgislib.imageutils.pop_img_stats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
@@ -985,6 +982,7 @@ def calc_unmixing_rmse_residual_err(
 
     """
     from rios import applier
+    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -1070,8 +1068,6 @@ def calc_unmixing_rmse_residual_err(
     )
 
     if calc_stats:
-        import rsgislib.imageutils
-
         rsgislib.imageutils.set_band_names(
             output_img, ["RMSE", "RMSPE", "Residual"], feedback=False
         )
