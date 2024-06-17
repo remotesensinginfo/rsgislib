@@ -443,7 +443,6 @@ def test_extract_avg_endmembers(tmp_path):
 
 
 def test_exhcon_linear_spec_unmix(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -464,7 +463,6 @@ def test_exhcon_linear_spec_unmix(tmp_path):
 
 @pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
 def test_spec_unmix_spts_ucls_noWeight(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -494,7 +492,6 @@ def test_spec_unmix_spts_ucls_noWeight(tmp_path):
 
 @pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
 def test_spec_unmix_spts_ucls_weight100(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -524,7 +521,6 @@ def test_spec_unmix_spts_ucls_weight100(tmp_path):
 
 @pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
 def test_spec_unmix_spts_nnls_noWeight(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -554,7 +550,6 @@ def test_spec_unmix_spts_nnls_noWeight(tmp_path):
 
 @pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
 def test_spec_unmix_spts_nnls_weight100(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -584,7 +579,6 @@ def test_spec_unmix_spts_nnls_weight100(tmp_path):
 
 @pytest.mark.skipif(PYSPTOOLS_NOT_AVAIL, reason="pysptools dependency not available")
 def test_spec_unmix_spts_fcls(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -613,7 +607,6 @@ def test_spec_unmix_spts_fcls(tmp_path):
 
 @pytest.mark.skipif(PYMCR_NOT_AVAIL, reason="pymcr dependency not available")
 def test_spec_unmix_pymcr_nnls_noWeight(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -643,7 +636,6 @@ def test_spec_unmix_pymcr_nnls_noWeight(tmp_path):
 
 @pytest.mark.skipif(PYMCR_NOT_AVAIL, reason="pymcr dependency not available")
 def test_spec_unmix_pymcr_nnls_weight100(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -673,7 +665,6 @@ def test_spec_unmix_pymcr_nnls_weight100(tmp_path):
 
 @pytest.mark.skipif(PYMCR_NOT_AVAIL, reason="pymcr dependency not available")
 def test_spec_unmix_pymcr_fcls(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -701,7 +692,6 @@ def test_spec_unmix_pymcr_fcls(tmp_path):
 
 
 def test_rescale_unmixing_results(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -722,7 +712,6 @@ def test_rescale_unmixing_results(tmp_path):
 
 
 def test_predict_refl_linear_unmixing(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
@@ -743,7 +732,6 @@ def test_predict_refl_linear_unmixing(tmp_path):
 
 
 def test_calc_unmixing_rmse_residual_err(tmp_path):
-    import rsgislib
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 

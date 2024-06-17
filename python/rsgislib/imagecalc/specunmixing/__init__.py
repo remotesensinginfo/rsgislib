@@ -32,6 +32,9 @@
 #
 ############################################################################
 
+
+import rsgislib
+import rsgislib.imageutils
 import os
 import numpy
 from osgeo import gdal
@@ -43,8 +46,6 @@ except ImportError:
     import rios.cuiprogress
 
     TQDM_AVAIL = False
-
-import rsgislib
 
 # import the C++ extension into this level
 from ._specunmixing import *
@@ -295,8 +296,6 @@ def spec_unmix_spts_ucls(
     import pysptools.abundance_maps.amaps
     from rios import applier
 
-    import rsgislib.imageutils
-
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
     else:
@@ -414,8 +413,6 @@ def spec_unmix_spts_nnls(
     import pysptools.abundance_maps.amaps
     from rios import applier
 
-    import rsgislib.imageutils
-
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
     else:
@@ -521,8 +518,6 @@ def spec_unmix_spts_fcls(
     """
     import pysptools.abundance_maps.amaps
     from rios import applier
-
-    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -637,8 +632,6 @@ def spec_unmix_pymcr_nnls(
     from pymcr.regressors import NNLS
     from rios import applier
 
-    import rsgislib.imageutils
-
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
     else:
@@ -751,8 +744,6 @@ def spec_unmix_pymcr_fcls(
     from pymcr.regressors import NNLS
     from rios import applier
 
-    import rsgislib.imageutils
-
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
     else:
@@ -840,7 +831,6 @@ def rescale_unmixing_results(input_img, output_img, gdalformat="KEA", calc_stats
 
     """
     from rios import applier
-    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -897,7 +887,6 @@ def predict_refl_linear_unmixing(
 
     """
     from rios import applier
-    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -982,7 +971,6 @@ def calc_unmixing_rmse_residual_err(
 
     """
     from rios import applier
-    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -1109,9 +1097,8 @@ def summarise_multi_endmember_linear_unmixing(
     """
 
     import rsgislib.imagecalc
-    import rsgislib.imageutils
     import rsgislib.rastergis
-    from rsgislib.tools import filetools
+    import rsgislib.tools.filetools
 
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
@@ -1157,7 +1144,9 @@ def summarise_multi_endmember_linear_unmixing(
     err_imgs_lst = list()
     endmember_files = list()
     for unmixed_dataset in in_unmixed_datasets:
-        basename = filetools.get_file_basename(unmixed_dataset.in_unmix_img)
+        basename = rsgislib.tools.filetools.get_file_basename(
+            unmixed_dataset.in_unmix_img
+        )
         out_err_img = os.path.join(tmp_dir, "{}_err_img.kea".format(basename))
         calc_unmixing_rmse_residual_err(
             input_img,
@@ -1194,7 +1183,9 @@ def summarise_multi_endmember_linear_unmixing(
 
     band_matched_unmixed_imgs = list()
     for unmixed_dataset in in_unmixed_datasets:
-        basename = filetools.get_file_basename(unmixed_dataset.in_unmix_img)
+        basename = rsgislib.tools.filetools.get_file_basename(
+            unmixed_dataset.in_unmix_img
+        )
 
         band_order_matches = True
         n_bands = rsgislib.imageutils.get_img_band_count(unmixed_dataset.in_unmix_img)
@@ -1309,30 +1300,28 @@ def calc_ppi(
     :param calc_stats: whether to calculate image statistics and pyramids on
                        the output image.
     """
-    # Check gdal is available
-    import tqdm
+    if not TQDM_AVAIL:
+        raise rsgislib.RSGISPyException("tqdm library is not available but needed.")
 
-    import rsgislib.imageutils
-
-    imgDS = gdal.Open(input_img)
-    if imgDS is None:
+    img_ds = gdal.Open(input_img)
+    if img_ds is None:
         raise rsgislib.RSGISPyException("Could not open input image")
-    n_bands = imgDS.RasterCount
-    x_size = imgDS.RasterXSize
-    y_size = imgDS.RasterYSize
+    n_bands = img_ds.RasterCount
+    x_size = img_ds.RasterXSize
+    y_size = img_ds.RasterYSize
     img_data = numpy.zeros((n_bands, (x_size * y_size)), dtype=numpy.float32)
     img_data_msk = numpy.ones((x_size * y_size), dtype=bool)
     img_data_mean = numpy.zeros(n_bands, dtype=numpy.float32)
 
     print("Importing Bands:")
     for n in tqdm.tqdm(range(n_bands)):
-        imgBand = imgDS.GetRasterBand(n + 1)
-        if imgBand is None:
+        img_band = img_ds.GetRasterBand(n + 1)
+        if img_band is None:
             raise rsgislib.RSGISPyException(
                 "Could not open image band ({})".format(n + 1)
             )
-        no_data_val = imgBand.GetNoDataValue()
-        band_arr = imgBand.ReadAsArray().flatten()
+        no_data_val = img_band.GetNoDataValue()
+        band_arr = img_band.ReadAsArray().flatten()
         band_arr = band_arr.astype(numpy.float32)
         img_data[n] = band_arr
         img_data_msk[band_arr == no_data_val] = False
@@ -1342,7 +1331,7 @@ def calc_ppi(
             img_data[n] = img_data[n] / img_gain
         img_data_mean[n] = numpy.nanmean(band_arr)
         img_data[n] = img_data[n] - img_data_mean[n]
-    imgDS = None
+    img_ds = None
     band_arr = None
 
     print("Create empty output image file")
@@ -1351,13 +1340,13 @@ def calc_ppi(
     )
 
     # Open output image
-    outImgDS = gdal.Open(output_img, gdal.GA_Update)
-    if outImgDS is None:
+    out_img_ds = gdal.Open(output_img, gdal.GA_Update)
+    if out_img_ds is None:
         raise rsgislib.RSGISPyException("Could not open output image")
-    outImgBand = outImgDS.GetRasterBand(1)
-    if outImgBand is None:
+    out_img_band = out_img_ds.GetRasterBand(1)
+    if out_img_band is None:
         raise rsgislib.RSGISPyException("Could not open output image band (1)")
-    out_img_data = outImgBand.ReadAsArray()
+    out_img_data = out_img_band.ReadAsArray()
 
     # Mask the datasets to obtain just the valid pixel values
     # (i.e., using the no data value)
@@ -1396,8 +1385,8 @@ def calc_ppi(
     out_img_data[pxl_idxs] = out_img_count
     out_img_data = out_img_data.reshape((y_size, x_size))
 
-    outImgBand.WriteArray(out_img_data)
-    outImgDS = None
+    out_img_band.WriteArray(out_img_data)
+    out_img_ds = None
 
     if calc_stats:
         print("Calculate Image stats and pyramids.")
