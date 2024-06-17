@@ -11,10 +11,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SEGMENT_DATA_DIR = os.path.join(DATA_DIR, "segment")
 
 
-#@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
 def test_perform_felsenszwalb_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
 
@@ -40,10 +37,7 @@ def test_perform_felsenszwalb_segmentation(tmp_path):
     assert os.path.exists(out_clumps_img)
 
 
-#@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
 def test_perform_quickshift_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
 
@@ -71,10 +65,7 @@ def test_perform_quickshift_segmentation(tmp_path):
     assert os.path.exists(out_clumps_img)
 
 
-#@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
 def test_perform_slic_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
 
@@ -107,10 +98,7 @@ def test_perform_slic_segmentation(tmp_path):
     assert os.path.exists(out_clumps_img)
 
 
-#@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
-@pytest.mark.skip(
-    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
-)
+@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
 def test_perform_watershed_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
 

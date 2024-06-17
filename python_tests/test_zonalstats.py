@@ -1250,7 +1250,7 @@ def test_msk_h5_smpls_to_finite_values(tmp_path):
     assert os.path.exists(out_h5_file)
 
 
-#@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+# @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 @pytest.mark.skip(
     reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
 )
@@ -1282,7 +1282,7 @@ def test_extract_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
     assert os.path.exists(out_h5_file)
 
 
-#@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+# @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 @pytest.mark.skip(
     reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
 )
@@ -1314,7 +1314,7 @@ def test_extract_chip_zone_image_band_values_to_hdf_with_rot(tmp_path):
     assert os.path.exists(out_h5_file)
 
 
-#@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+# @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 @pytest.mark.skip(
     reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
 )
@@ -1349,7 +1349,7 @@ def test_extract_ref_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
     assert os.path.exists(out_h5_file)
 
 
-#@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+# @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 @pytest.mark.skip(
     reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
 )

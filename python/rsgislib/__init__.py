@@ -720,6 +720,7 @@ class TQDMProgressBar:
 
     def reset(self):
         import tqdm
+
         if self.pbar is not None:
             self.pbar.close()
 
