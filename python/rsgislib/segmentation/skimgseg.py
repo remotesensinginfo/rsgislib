@@ -260,7 +260,7 @@ def perform_quickshift_segmentation(
         return_tree=False,
         sigma=sigma,
         convert2lab=convert_to_lab,
-        random_seed=random_seed,
+        rng=random_seed,
     )
     segResult = segResult + 1
 
