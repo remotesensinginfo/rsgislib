@@ -1620,6 +1620,9 @@ def merge_extracted_hdf5_data(
     """
     import h5py
 
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
+
     if len(h5_files) == 0:
         raise rsgislib.RSGISPyException("The list of input files is empty.")
 
@@ -1694,6 +1697,9 @@ def merge_extracted_hdf5_vars_data(
 
     """
     import h5py
+
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
 
     if len(h5_files) == 0:
         raise rsgislib.RSGISPyException("The list of input files is empty.")
@@ -2125,6 +2131,9 @@ def merge_extracted_hdf5_chip_data(
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
+
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
 
     first = True
     n_feats = 0
@@ -2605,6 +2614,9 @@ def merge_extracted_hdf5_chip_ref_data(
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
 
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
+
     first = True
     n_feats = 0
     chip_size = 0
@@ -2836,6 +2848,9 @@ def get_var_from_hdf5_data(h5_files: List[str], var_idx: int = 0) -> numpy.array
     """
     import h5py
 
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
+
     if var_idx < 0:
         raise rsgislib.RSGISPyException("The variable index must be greater than 0.")
 
@@ -2877,6 +2892,9 @@ def get_hdf5_data(h5_files: List[str]) -> numpy.array:
 
     """
     import h5py
+
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
 
     num_vals = 0
     n_vars = 0
