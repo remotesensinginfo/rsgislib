@@ -229,6 +229,33 @@ def get_vec_feat_count(
     return nFeats
 
 
+def get_geom_type_name(geom_type: int) -> str:
+    """
+    A function which returns a string with a human-readable name of the
+    geometry type.
+
+    :param geom_type: the numerical type (e.g., rsgislib.GEOM_POLY)
+    :return: the name of the geometry type
+
+    """
+    geom_type_name = ""
+    if geom_type == rsgislib.GEOM_POLY:
+        geom_type_name = "Polygon"
+    elif geom_type == rsgislib.GEOM_PT:
+        geom_type_name = "Point"
+    elif geom_type == rsgislib.GEOM_LINE:
+        geom_type_name = "Line"
+    elif geom_type == rsgislib.GEOM_MPOLY:
+        geom_type_name = "Multi-Polygon"
+    elif geom_type == rsgislib.GEOM_MPT:
+        geom_type_name = "Multi-Point"
+    elif geom_type == rsgislib.GEOM_MLINE:
+        geom_type_name = "Multi-Line"
+    else:
+        raise Exception(f"Do not recognise Geometry Type: '{geom_type}'")
+    return geom_type_name
+
+
 def get_vec_lyr_geom_type(vec_file: str, vec_lyr: str = None) -> int:
     """
     A function which returns an rsgislib.GEOM_XX value related to the vector
@@ -344,7 +371,7 @@ def merge_vectors_to_gpkg(
 
 
     :param in_vec_files: is a list of input files.
-    :param out_vec_file: is the output GPKG database (\*.gpkg)
+    :param out_vec_file: is the output GPKG database (*.gpkg)
     :param out_vec_lyr: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
     :param exists: boolean which specifies whether the database file exists or not.
     """
@@ -428,7 +455,7 @@ def merge_vector_lyrs_to_gpkg(
 
     :param vec_file: is a vector file which contains multiple layers which
                      are to be merged
-    :param out_vec_file: is the output GPKG database (\*.gpkg)
+    :param out_vec_file: is the output GPKG database (*.gpkg)
     :param out_vec_lyr: is the layer name in the output database (i.e., you can
                         merge layers into single layer or write a number of layers
                         to the same database).
@@ -521,7 +548,7 @@ def merge_vectors_to_gpkg_ind_lyrs(
     function wraps the ogr2ogr command.
 
     :param in_vec_files: is a list of input files.
-    :param out_vec_file: is the output GPKG database (\*.gpkg)
+    :param out_vec_file: is the output GPKG database (*.gpkg)
     :param rename_dup_lyrs: If False an exception will be throw if any input layers
                             has the same name. If True a layer will be renamed - with
                             a random set of letters/numbers on the end.

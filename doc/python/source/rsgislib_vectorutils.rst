@@ -123,6 +123,7 @@ Vector Info
 .. autofunction:: rsgislib.vectorutils.get_vec_lyr_cols
 .. autofunction:: rsgislib.vectorutils.get_ogr_vec_col_datatype_from_gdal_rat_col_datatype
 .. autofunction:: rsgislib.vectorutils.get_vec_lyr_geom_type
+.. autofunction:: rsgislib.vectorutils.get_geom_type_name
 
 
 Vectors Utilities
