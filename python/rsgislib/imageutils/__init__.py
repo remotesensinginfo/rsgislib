@@ -497,7 +497,7 @@ def define_colour_table(input_img: str, clr_lut: dict, img_band: int = 1):
     gdal_ds = None
 
 
-def get_rsgislib_datatype_from_img(input_img: str):
+def get_rsgislib_datatype_from_img(input_img: str) -> int:
     """
     Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8UINT)
     for the inputted raster file
@@ -1342,10 +1342,10 @@ def set_band_names(input_img: str, band_names: list, feedback: bool = False):
         # Check the image band is available
         if imgBand is not None:
             if feedback:
-                print('Setting Band {0} to "{1}"'.format(band, bandName))
+                print(f'Setting Band {band} to "{bandName}"')
             imgBand.SetDescription(bandName)
         else:
-            raise rsgislib.RSGISPyException("Could not open the image band: ", band)
+            raise rsgislib.RSGISPyException(f"Could not open the image band: {band}")
 
 
 def get_band_names(input_img: str):
@@ -1360,22 +1360,22 @@ def get_band_names(input_img: str):
         from rsgislib import imageutils
 
         input_img = 'injune_p142_casi_sub_utm.kea'
-        bandNames = imageutils.get_band_names(input_img)
+        band_names = imageutils.get_band_names(input_img)
 
     """
     dataset = gdal.Open(input_img)
-    bandNames = list()
+    band_names = list()
 
     for i in range(dataset.RasterCount):
-        imgBand = dataset.GetRasterBand(i + 1)
+        img_band = dataset.GetRasterBand(i + 1)
         # Check the image band is available
-        if imgBand is not None:
-            bandNames.append(imgBand.GetDescription())
+        if img_band is not None:
+            band_names.append(img_band.GetDescription())
         else:
             raise rsgislib.RSGISPyException(
-                "Could not open the image band: {}".format(imgBand)
+                f"Could not open the image band: {img_band}"
             )
-    return bandNames
+    return band_names
 
 
 def set_img_thematic(input_img: str):
@@ -1388,8 +1388,8 @@ def set_img_thematic(input_img: str):
     ds = gdal.Open(input_img, gdal.GA_Update)
     if ds is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
-    for bandnum in range(ds.RasterCount):
-        band = ds.GetRasterBand(bandnum + 1)
+    for band_num in range(ds.RasterCount):
+        band = ds.GetRasterBand(band_num + 1)
         band.SetMetadataItem("LAYER_TYPE", "thematic")
     ds = None
 
@@ -1405,8 +1405,8 @@ def set_img_not_thematic(input_img: str):
     ds = gdal.Open(input_img, gdal.GA_Update)
     if ds is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
-    for bandnum in range(ds.RasterCount):
-        band = ds.GetRasterBand(bandnum + 1)
+    for band_num in range(ds.RasterCount):
+        band = ds.GetRasterBand(band_num + 1)
         band.SetMetadataItem("LAYER_TYPE", "athematic")
     ds = None
 
@@ -1445,12 +1445,12 @@ def has_gcps(input_img: str):
     raster = gdal.Open(input_img, gdal.GA_ReadOnly)
     if raster is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
-    numGCPs = raster.GetGCPCount()
-    hasGCPs = False
-    if numGCPs > 0:
-        hasGCPs = True
+    num_gcps = raster.GetGCPCount()
+    has_gcps = False
+    if num_gcps > 0:
+        has_gcps = True
     raster = None
-    return hasGCPs
+    return has_gcps
 
 
 def copy_gcps(input_img: str, output_img: str):
@@ -1461,22 +1461,22 @@ def copy_gcps(input_img: str, output_img: str):
     :param output_img: Raster layer to which GCPs will be added
 
     """
-    srcDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if srcDS is None:
+    src_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if src_ds is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
-    destDS = gdal.Open(output_img, gdal.GA_Update)
-    if destDS is None:
-        srcDS = None
+    dest_ds = gdal.Open(output_img, gdal.GA_Update)
+    if dest_ds is None:
+        src_ds = None
         raise rsgislib.RSGISPyException("Could not open the output_img.")
 
-    numGCPs = srcDS.GetGCPCount()
-    if numGCPs > 0:
-        gcpProj = srcDS.GetGCPProjection()
-        gcpList = srcDS.GetGCPs()
-        destDS.SetGCPs(gcpList, gcpProj)
+    num_gcps = src_ds.GetGCPCount()
+    if num_gcps > 0:
+        gcp_proj = src_ds.GetGCPProjection()
+        gcp_list = src_ds.GetGCPs()
+        dest_ds.SetGCPs(gcp_list, gcp_proj)
 
-    srcDS = None
-    destDS = None
+    src_ds = None
+    dest_ds = None
 
 
 def set_img_band_metadata(

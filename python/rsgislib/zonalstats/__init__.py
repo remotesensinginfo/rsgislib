@@ -3242,7 +3242,9 @@ def extract_zone_band_values_to_h5(
         raise e
 
 
-def write_data_to_h5(data_arr:numpy.array, out_h5_file:str, datatype: int = rsgislib.TYPE_32FLOAT):
+def write_data_to_h5(
+    data_arr: numpy.array, out_h5_file: str, datatype: int = rsgislib.TYPE_32FLOAT
+):
     """
     A function which writes the data array to a HDF5 file.
 
@@ -3252,6 +3254,7 @@ def write_data_to_h5(data_arr:numpy.array, out_h5_file:str, datatype: int = rsgi
 
     """
     import h5py
+
     h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
     data_shp = data_arr.shape
@@ -3265,12 +3268,12 @@ def write_data_to_h5(data_arr:numpy.array, out_h5_file:str, datatype: int = rsgi
     data_grp = f_h5_out.create_group("DATA")
     meta_grp = f_h5_out.create_group("META-DATA")
     data_grp.create_dataset(
-            "DATA",
-            data=data_arr,
-            chunks=(chunk_len, num_vars),
-            compression="gzip",
-            shuffle=True,
-            dtype=h5_dtype,
+        "DATA",
+        data=data_arr,
+        chunks=(chunk_len, num_vars),
+        compression="gzip",
+        shuffle=True,
+        dtype=h5_dtype,
     )
     describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describ_ds[0] = "Written Data".encode()
