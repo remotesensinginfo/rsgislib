@@ -1446,7 +1446,7 @@ def ext_point_band_values(
 
         veclyrDefn = vec_lyr_obj.GetLayerDefn()
         lyr_geom_type = ogr.GeometryTypeToName(veclyrDefn.GetGeomType())
-        if lyr_geom_type.lower() != "point":
+        if "point" not in lyr_geom_type.lower():
             raise rsgislib.RSGISPyException("The layer geometry type must be point.")
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
@@ -3240,3 +3240,38 @@ def extract_zone_band_values_to_h5(
     except Exception as e:
         print(f"Error Image File: {input_img}", file=sys.stderr)
         raise e
+
+
+def write_data_to_h5(data_arr:numpy.array, out_h5_file:str, datatype: int = rsgislib.TYPE_32FLOAT):
+    """
+    A function which writes the data array to a HDF5 file.
+
+    :param data_arr: Numpy array - shape: samples x variables
+    :param out_h5_file: the output hdf5 file path
+    :param datatype: the output data type
+
+    """
+    import h5py
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
+
+    data_shp = data_arr.shape
+
+    chunk_len = 1000
+    if data_shp[0] < chunk_len:
+        chunk_len = data_shp[0]
+    num_vars = data_shp[1]
+
+    f_h5_out = h5py.File(out_h5_file, "w")
+    data_grp = f_h5_out.create_group("DATA")
+    meta_grp = f_h5_out.create_group("META-DATA")
+    data_grp.create_dataset(
+            "DATA",
+            data=data_arr,
+            chunks=(chunk_len, num_vars),
+            compression="gzip",
+            shuffle=True,
+            dtype=h5_dtype,
+    )
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describ_ds[0] = "Written Data".encode()
+    f_h5_out.close()
