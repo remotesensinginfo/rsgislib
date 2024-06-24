@@ -8,6 +8,7 @@ Band & Image Maths
 .. autofunction:: rsgislib.imagecalc.image_math
 .. autofunction:: rsgislib.imagecalc.image_band_math
 .. autofunction:: rsgislib.imagecalc.all_bands_equal_to
+.. autofunction:: rsgislib.imagecalc.calc_band_range_thres_msk
 .. autoclass:: rsgislib.imagecalc.BandDefn
 
 
@@ -25,6 +26,8 @@ Statistical Summary
 .. autofunction:: rsgislib.imagecalc.calc_img_mean
 .. autofunction:: rsgislib.imagecalc.calc_img_stdev
 .. autofunction:: rsgislib.imagecalc.calc_band_percentile
+.. autofunction:: rsgislib.imagecalc.calc_band_percentile_msk
+.. autofunction:: rsgislib.imagecalc.calc_imgs_pxl_percentiles
 .. autofunction:: rsgislib.imagecalc.get_img_band_stats_in_env
 .. autofunction:: rsgislib.imagecalc.get_img_band_mode_in_env
 .. autofunction:: rsgislib.imagecalc.calc_prop_true_exp
@@ -35,12 +38,11 @@ Statistical Summary
 .. autofunction:: rsgislib.imagecalc.identify_min_pxl_value_in_win
 .. autofunction:: rsgislib.imagecalc.calc_img_mean_in_mask
 .. autofunction:: rsgislib.imagecalc.count_pxls_of_val
+.. autofunction:: rsgislib.imagecalc.count_imgs_int_val_occur
 .. autofunction:: rsgislib.imagecalc.get_unique_values
 .. autofunction:: rsgislib.imagecalc.calc_imgs_pxl_mode
 .. autofunction:: rsgislib.imagecalc.calc_img_basic_stats_for_ref_region
 .. autofunction:: rsgislib.imagecalc.calc_sum_stats_msk_vals
-.. autofunction:: rsgislib.imagecalc.count_imgs_int_val_occur
-.. autofunction:: rsgislib.imagecalc.calc_imgs_pxl_percentiles
 .. autoclass:: rsgislib.imagecalc.StatsSummary
 
 

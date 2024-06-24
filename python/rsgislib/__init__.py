@@ -153,6 +153,11 @@ Options for calculating correlation:
     * STATS_CORR_KENDALL_TAU = 3
     * STATS_CORR_POINT_BISERIAL = 4
 
+
+Options for logical combination of data:
+LOGIC_AND = 1
+LOGIC_OR = 2
+
 """
 from __future__ import print_function
 
@@ -283,6 +288,9 @@ STATS_CORR_PEARSONS = 1  # Pearson
 STATS_CORR_SPEARMAN = 2  # Spearman
 STATS_CORR_KENDALL_TAU = 3  # Kendall's tau
 STATS_CORR_POINT_BISERIAL = 4  # pointbiserialr
+
+LOGIC_AND = 1
+LOGIC_OR = 2
 
 
 def get_install_base_path() -> pathlib.PurePath:

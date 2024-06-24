@@ -1428,7 +1428,7 @@ def recode_int_raster(
     def _recode(info, inputs, outputs, otherargs):
         out_arr = numpy.zeros_like(inputs.inimage[0], dtype=otherargs.np_dtype)
         if otherargs.keep_vals_not_in_dict:
-            numpy.copyto(out_arr, inputs.inimage[0], casting='same_kind')
+            numpy.copyto(out_arr, inputs.inimage[0], casting="same_kind")
 
         for rc_val in recode_dict:
             out_arr[inputs.inimage[0] == rc_val] = recode_dict[rc_val]
@@ -2770,3 +2770,109 @@ def normalise_img_pxl_vals_py(
     applier.apply(_applyNormalisation, infiles, outfiles, otherargs, controls=aControls)
 
     return stch_min_max_vals
+
+
+def calc_band_percentile_msk(
+    input_img: str,
+    in_msk_img: str,
+    msk_val: int,
+    percentiles: List[float],
+    no_data_val: float = None,
+):
+    """
+    A function to calculate the percentiles for all the bands in the
+    input image for the pixels specified within the input image mask.
+
+    :param input_img: Input image on which the percentiles will be calculated
+    :param in_msk_img: Input mask for which the percentiles will be calculated
+    :param msk_val: The image mask value
+    :param percentiles: list of percentiles to be calculated
+    :param no_data_val: no data value for the input image.
+
+    """
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+    img_bands = list(range(1, n_bands + 1, 1))
+
+    pxl_vals = rsgislib.imageutils.extract_img_pxl_vals_in_msk(
+        input_img=input_img,
+        img_bands=img_bands,
+        in_msk_img=in_msk_img,
+        img_mask_val=msk_val,
+        no_data_val=no_data_val,
+    )
+    percent_vals = numpy.percentile(pxl_vals, percentiles, axis=0)
+
+    return percent_vals
+
+
+def calc_band_range_thres_msk(
+    input_img: str,
+    output_img: str,
+    band_thres_dict: Dict[int, Tuple[float, float]],
+    gdalformat: str = "KEA",
+    combine_mthd: int = rsgislib.LOGIC_AND,
+):
+    """
+    A function which applies a list of min/max thresholds to the image bands witin
+    the input image. The thresholds are specified as a dictionary with the key being
+    the band number (band numbering starts from 1) and the value being a tuple
+    (min, max) where a true pixel value is > min and < max. A band can be used multiple
+    times within the thresholds dictionary. The different thresholds produce a series
+    of binary mask which are combined using either an 'and' (min) or a 'or' (max)
+    operation.
+
+    :param input_img: Input image path
+    :param output_img: Output image path
+    :param band_thres_dict: Dictionary of band thresholds using the key being the
+                            band number and the value being a tuple (min, max).
+    :param gdalformat: The output gdal format
+    :param combine_mthd: the method of combining the band thresholds into a single
+                         output image. Options are either rsgislib.LOGIC_AND (Default)
+                         or rsgislib.LOGIC_OR
+
+    """
+    from rios import applier
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    # Generated the combined mask.
+    infiles = applier.FilenameAssociations()
+    infiles.inimage = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.band_thres_dict = band_thres_dict
+    otherargs.combine_mthd = combine_mthd
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = False
+    aControls.calcStats = False
+
+    def _calc_thres_msk(info, inputs, outputs, otherargs):
+        msk_arrs = []
+        for band_n in band_thres_dict:
+            band_arr = inputs.inimage[band_n - 1]
+            msk_arrs.append(
+                numpy.logical_and(
+                    band_arr > band_thres_dict[band_n][0],
+                    band_arr < band_thres_dict[band_n][1],
+                )
+            )
+
+        msk_arr = numpy.array(msk_arrs, dtype=numpy.uint8)
+        if otherargs.combine_mthd == rsgislib.LOGIC_OR:
+            out_msk_arr = msk_arr.max(axis=0)
+        elif otherargs.combine_mthd == rsgislib.LOGIC_AND:
+            out_msk_arr = msk_arr.min(axis=0)
+        else:
+            raise rsgislib.RSGISPyException(
+                "Do not recognise combine_mthd: should be "
+                "rsgislib.LOGIC_OR or rsgislib.LOGIC_AND"
+            )
+        outputs.outimage = numpy.expand_dims(out_msk_arr, axis=0)
+
+    applier.apply(_calc_thres_msk, infiles, outfiles, otherargs, controls=aControls)
