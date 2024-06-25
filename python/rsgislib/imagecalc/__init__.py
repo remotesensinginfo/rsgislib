@@ -2876,3 +2876,97 @@ def calc_band_range_thres_msk(
         outputs.outimage = numpy.expand_dims(out_msk_arr, axis=0)
 
     applier.apply(_calc_thres_msk, infiles, outfiles, otherargs, controls=aControls)
+
+
+def calc_img_band_pxl_percentiles(
+    input_imgs: List[str],
+    percentiles: List[float],
+    output_img: str,
+    gdalformat: str,
+    no_data_val: float = 0,
+):
+    """
+    Function which calculates percentiles on a per-pixel basis for a
+    group of images on a per-band basis. Therefore, all the input images
+    need to have the same number of bands and the number of output images
+    will be the number of percentiles x the number of input bands. The
+    output band order will be band 1 percentiles, band 2 percentiles, etc.
+    band n percentiles are calculated on a per-band basis.
+
+    :param input_imgs: the list of images - note all bands are used.
+    :param percentiles: a list of percentiles (0-100) to be calculated.
+    :param output_img: the output image file name and path
+    :param gdalformat: the GDAL image file format of the output image file.
+
+    """
+    from rios import applier
+    import rsgislib.imageutils
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_imgs[0])
+    for img in input_imgs:
+        tmp_n_bands = rsgislib.imageutils.get_img_band_count(img)
+        if tmp_n_bands != n_bands:
+            raise rsgislib.RSGISPyException(
+                "Input images have a different number of bands."
+            )
+
+    for percent in percentiles:
+        if percent < 0:
+            raise Exception(f"Percentile is less than 0 ({percent})")
+        elif percent > 100:
+            raise Exception(f"Percentile is greater than 100 ({percent})")
+
+    datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_imgs[0])
+    numpyDT = rsgislib.get_numpy_datatype(datatype)
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.images = input_imgs
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.n_bands = n_bands
+    otherargs.numpyDT = numpyDT
+    otherargs.percentiles = percentiles
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyCalcPercentile(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        out_percent_arrs = list()
+        for band in range(otherargs.n_bands):
+            band_arrs = list()
+            for img in inputs.images:
+                band_arrs.append(numpy.expand_dims(img[band], axis=0))
+            img_band_arr = numpy.concatenate(band_arrs, axis=0).astype(numpy.float32)
+            img_band_arr[img_band_arr == otherargs.no_data_val] = numpy.nan
+            percentiles_arr = numpy.nanpercentile(
+                img_band_arr, otherargs.percentiles, axis=0
+            )
+            percentiles_arr = numpy.nan_to_num(
+                percentiles_arr, copy=False, nan=otherargs.no_data_val
+            )
+            out_percent_arrs.append(percentiles_arr)
+
+        percentiles_arr = numpy.concatenate(out_percent_arrs, axis=0).astype(
+            otherargs.numpyDT
+        )
+
+        if len(percentiles_arr.shape) == 2:
+            outputs.outimage = numpy.expand_dims(percentiles_arr, axis=0)
+        else:
+            outputs.outimage = percentiles_arr
+
+    applier.apply(
+        _applyCalcPercentile, infiles, outfiles, otherargs, controls=aControls
+    )

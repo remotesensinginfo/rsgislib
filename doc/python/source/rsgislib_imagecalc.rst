@@ -28,6 +28,7 @@ Statistical Summary
 .. autofunction:: rsgislib.imagecalc.calc_band_percentile
 .. autofunction:: rsgislib.imagecalc.calc_band_percentile_msk
 .. autofunction:: rsgislib.imagecalc.calc_imgs_pxl_percentiles
+.. autofunction:: rsgislib.imagecalc.calc_img_band_pxl_percentiles
 .. autofunction:: rsgislib.imagecalc.get_img_band_stats_in_env
 .. autofunction:: rsgislib.imagecalc.get_img_band_mode_in_env
 .. autofunction:: rsgislib.imagecalc.calc_prop_true_exp
