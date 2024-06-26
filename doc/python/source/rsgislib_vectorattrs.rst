@@ -44,6 +44,7 @@ Calculate Column Values
 .. autofunction:: rsgislib.vectorattrs.create_angle_sets
 .. autofunction:: rsgislib.vectorattrs.calc_vec_area
 .. autofunction:: rsgislib.vectorattrs.calc_vec_length
+.. autofunction:: rsgislib.vectorattrs.calc_vec_pt_dist_angle
 
 Get Column Summaries
 ----------------------

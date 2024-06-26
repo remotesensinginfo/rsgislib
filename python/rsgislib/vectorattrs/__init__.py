@@ -1796,3 +1796,82 @@ def calc_vec_length(
         data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def calc_vec_pt_dist_angle(
+        vec_file: str,
+        vec_lyr: str,
+        out_vec_file: str,
+        out_vec_lyr: str,
+        out_format: str = "GeoJSON",
+        x_centre: float = None,
+        y_centre: float = None,
+):
+    """
+
+    :param vec_file:
+    :param vec_lyr:
+    :param out_vec_file:
+    :param out_vec_lyr:
+    :param out_format:
+    :param x_centre:
+    :param y_centre:
+
+    """
+    import geopandas
+    import rsgislib.vectorutils
+
+    vec_geom_type = rsgislib.vectorutils.get_vec_lyr_geom_type(vec_file, vec_lyr)
+    if vec_geom_type != rsgislib.GEOM_PT:
+        raise Exception("Vector geometry type must be points.")
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    geom_pts = data_gdf["geometry"].get_coordinates()
+
+    if not {'x', 'y'}.issubset(geom_pts.columns):
+        raise Exception(
+            "The geometry is not as expected - need x and y fields. Might be in degrees (e.g., EPSG:4326)")
+
+    x_coords = geom_pts["x"].values
+    y_coords = geom_pts["y"].values
+
+    if x_centre is None:
+        x_centre = x_coords.mean()
+    if y_centre is None:
+        y_centre = y_coords.mean()
+
+    # Calculate the distance from the centre to each of the points
+    data_gdf["dist"] = numpy.sqrt(
+            (x_coords - x_centre) ** 2 + (y_coords - y_centre) ** 2
+    )
+
+    # Calculate the angle from the centre to each of the points
+    angles = numpy.rad2deg(numpy.arctan2(y_coords - y_centre, x_coords - x_centre))
+
+    # Reorientates the angle so 0 is north.
+    angles_secs = numpy.zeros_like(angles)
+    angles_secs[numpy.logical_and((angles >= 0), (angles <= 90))] = 1
+    angles_secs[angles > 90] = 2
+    angles_secs[angles < 0] = 3
+
+    angles[angles_secs == 1] = angles[angles_secs == 1] - 90.0
+    angles[angles_secs == 1] *= -1
+    angles[angles_secs == 2] = angles[angles_secs == 2] - 180.0
+    angles[angles_secs == 2] *= -1
+    angles[angles_secs == 2] += 270.0
+    angles[angles_secs == 3] *= -1
+    angles[angles_secs == 3] += 90.0
+
+    data_gdf["angle"] = angles
+
+    # Export the points
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            import rsgislib.tools.filetools
+
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                    out_vec_file, check_valid=True
+            )
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
