@@ -1392,7 +1392,7 @@ def create_angle_sets(
 
     :param vec_file: Input vector file path
     :param vec_lyr: The input vector layer name.
-    :param angle_col: The name of the column within the vector layer with the angles
+    :param angle_col: The name of the column within the vector layer with
                       the angles must be degrees (0-360)
     :param start_angle: The angle to start the angle sets from.
     :param angle_set_width: The width of the angle sets - must divide in 180.
