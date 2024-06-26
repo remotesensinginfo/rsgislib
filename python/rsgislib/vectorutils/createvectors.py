@@ -1408,7 +1408,7 @@ def create_random_pts_in_radius(
     epsg_code: int,
     out_vec_file: str,
     out_vec_lyr: str,
-    out_format: str = "GeoJSON",
+    out_format: str = "GPKG",
     rnd_seed: int = None,
     n_pts_multi_bbox: float = 3,
 ):
@@ -1674,3 +1674,53 @@ def create_img_transects(
         lines=out_lines_lst,
         overwrite=True,
     )
+
+
+def create_random_pts_in_bbox(
+        bbox: List[float],
+        n_pts: int,
+        epsg_code: int,
+        out_vec_file: str,
+        out_vec_lyr: str,
+        out_format: str = "GPKG",
+        rnd_seed: int = None,
+):
+    """
+    A function which generates a set of random points within a boundary
+    box.
+
+    :param bbox: The bounding box the points ([xMin, xMax, yMin, yMax])
+    :param n_pts: the number of points to be generated.
+    :param epsg_code: the EPSG code for the projection of the points.
+    :param out_vec_file: the output file path and name.
+    :param out_vec_lyr: the output layer name.
+    :param out_format: the output file format (Default: GeoJSON)
+    :param rnd_seed: the seed for the random generator.
+
+    """
+    import numpy
+    import geopandas
+
+    # Set the random seed.
+    numpy.random.seed(seed=rnd_seed)
+
+    # Create more than needed points within the bbox.
+    x_coords = numpy.random.uniform(bbox[0], bbox[1], n_pts)
+    y_coords = numpy.random.uniform(bbox[2], bbox[3], n_pts)
+
+    # Create geopandas dataframe with the points.
+    data_gdf = geopandas.GeoDataFrame(
+            geometry=geopandas.points_from_xy(x=x_coords, y=y_coords), crs=epsg_code
+    )
+
+    # Export the points
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            import rsgislib.tools.filetools
+
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                    out_vec_file, check_valid=True
+            )
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
