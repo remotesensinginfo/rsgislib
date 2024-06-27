@@ -7,7 +7,7 @@ import numpy
 import rsgislib.vectorutils
 
 
-def calc_empirical_variogram(
+def calc_empirical_semivariogram(
     vec_file: str,
     vec_lyr: str,
     vals_col: str,
@@ -20,23 +20,23 @@ def calc_empirical_variogram(
     normalize_vals: bool = False,
 ):
     """
-    A function which calculates variogram for the vector layer provided using the
+    A function which calculates semi-variance for the vector layer provided using the
     skgstat module (https://scikit-gstat.readthedocs.io/). The layer needs to be
     use point geometries and projected so they have X and Y coordinates.
 
     :param vec_file: Input vector layer file
     :param vec_lyr: Input vector layer name
-    :param vals_col: Column name with values to calculate variogram
+    :param vals_col: Column name with values to calculate semi-variance
     :param pts_sel_col: Optionally (Default: None) column name used to subset the
-                        points within the vector layer for which the variogram is
+                        points within the vector layer for which the semi-variance is
                         calculated (e.g., just points within a particular angular
                         range)
     :param pts_sel_val: Optionally (Default: None) value to subset the points within
                         the vector layer using the pts_sel_col.
-    :param out_data_file: Optionally output a CSV file with the lag_bins, variance
+    :param out_data_file: Optionally output a CSV file with the distance, semi-variance
                           and count. Default is None but if file path provided the
                           output will be produced.
-    :param out_plot_file: Optionally output a plot file of the lag_bins, variance
+    :param out_plot_file: Optionally output a plot file of the distance, semi-variance
                           and count. Default is None but if file path provided the
                           output will be produced.
     :param max_lag: Can specify the maximum lag distance directly by giving a value
@@ -80,7 +80,7 @@ def calc_empirical_variogram(
 
     pts_coords = numpy.stack([x, y]).T
 
-    vario_out_df = rsgislib.tools.stats.calc_variogram(
+    vario_out_df = rsgislib.tools.stats.calc_semivariogram(
         pts_coords=pts_coords,
         data_vals=vals,
         out_data_file=out_data_file,

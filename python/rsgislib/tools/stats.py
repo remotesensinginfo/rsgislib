@@ -1076,7 +1076,7 @@ def decompose_bias_variance(y_true, y_pred):
     return mse, bias_squared, variance, noise
 
 
-def calc_variogram(
+def calc_semivariogram(
     pts_coords: numpy.array,
     data_vals: numpy.array,
     out_data_file: str = None,
@@ -1086,17 +1086,17 @@ def calc_variogram(
     normalize_vals: bool = False,
 ):
     """
-    A function which calculates variogram for the data provided using the
+    A function which calculates semi-variance for the data provided using the
     skgstat module (https://scikit-gstat.readthedocs.io/)
 
-    :param pts_coords: the x/y coordinates of the points for which the variogram is
+    :param pts_coords: the x/y coordinates of the points for which the semi-variance is
                        calculated. Shape must be [n, 2] where n is the number of points
-    :param data_vals: the data values of the points for which the variogram is
+    :param data_vals: the data values of the points for which the semi-variance is
                       calculated.
-    :param out_data_file: Optionally output a CSV file with the lag_bins, variance
+    :param out_data_file: Optionally output a CSV file with the distance, semi-variance
                           and count. Default is None but if file path provided the
                           output will be produced.
-    :param out_plot_file: Optionally output a plot file of the lag_bins, variance
+    :param out_plot_file: Optionally output a plot file of the distance, semi-variance
                           and count. Default is None but if file path provided the
                           output will be produced.
     :param max_lag: Can specify the maximum lag distance directly by giving a value
@@ -1134,8 +1134,8 @@ def calc_variogram(
     n_count = numpy.fromiter((g.size for g in vario_obj.lag_classes()), dtype=int)
 
     vario_data = {
-        "lag_bins": variogram_data[0],
-        "variance": variogram_data[1],
+        "distance": variogram_data[0],
+        "semivariance": variogram_data[1],
         "count": n_count,
     }
 
@@ -1150,9 +1150,9 @@ def calc_variogram(
         ax2 = plt.subplot2grid((5, 1), (0, 0), sharex=ax1)
         fig.subplots_adjust(hspace=0)
 
-        ax1.scatter(x=vario_out_df["lag_bins"], y=vario_out_df["variance"])
-        ax1.set_xlabel("Lag bins")
-        ax1.set_ylabel("Variance")
+        ax1.scatter(x=vario_out_df["distance"], y=vario_out_df["semivariance"])
+        ax1.set_xlabel("Distance")
+        ax1.set_ylabel("Semi-Variance")
 
         if normalize_vals:
             ax1.set_xlim([0, 1.05])
@@ -1160,18 +1160,18 @@ def calc_variogram(
 
         ax1.grid(False)
         ax1.vlines(
-            vario_out_df["lag_bins"],
+            vario_out_df["distance"],
             *ax1.axes.get_ybound(),
             colors=(0.85, 0.85, 0.85),
             linestyles="dashed"
         )
 
         # set the sum of hist bar widths to 70% of the x-axis space
-        w = (numpy.max(vario_out_df["lag_bins"]) * 0.7) / len(vario_out_df["count"])
+        w = (numpy.max(vario_out_df["distance"]) * 0.7) / len(vario_out_df["count"])
 
         # plot bar chart with count of number of pairs
         ax2.bar(
-            vario_out_df["lag_bins"],
+            vario_out_df["distance"],
             vario_out_df["count"],
             width=w,
             align="center",
@@ -1183,7 +1183,7 @@ def calc_variogram(
 
         ax2.grid(False)
         ax2.vlines(
-            vario_out_df["lag_bins"],
+            vario_out_df["distance"],
             *ax2.axes.get_ybound(),
             colors=(0.85, 0.85, 0.85),
             linestyles="dashed"
