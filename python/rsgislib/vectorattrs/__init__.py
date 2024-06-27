@@ -1932,19 +1932,28 @@ def calc_vec_pt_dist_angle(
     vec_lyr: str,
     out_vec_file: str,
     out_vec_lyr: str,
-    out_format: str = "GeoJSON",
+    out_format: str = "GPKG",
     x_centre: float = None,
     y_centre: float = None,
+    angle_col: str = "angle",
+    dist_col: str = "dist",
 ):
     """
+    A function which adds a column to the attribute table with the distance and
+    angle for each point from a centre point (x_centre, y_centre). If x_centre,
+    y_centre are provided then they are calculated as the mean of all the points.
 
-    :param vec_file:
-    :param vec_lyr:
-    :param out_vec_file:
-    :param out_vec_lyr:
-    :param out_format:
-    :param x_centre:
-    :param y_centre:
+    :param vec_file: Input vector file path
+    :param vec_lyr: Input vector layer name
+    :param out_vec_file: Output vector file path
+    :param out_vec_lyr: Output vector layer name
+    :param out_format: the output vector format (Default: GPKG)
+    :param x_centre: Optionally the X centre point (Default: None). If None then
+                     calculated as the mean of all the points.
+    :param y_centre: Optionally the Y centre point (Default: None). If None then
+                     calculated as the mean of all the points.
+    :param angle_col: The output angle column name
+    :param dist_col: The output distance column name
 
     """
     import geopandas
@@ -1971,7 +1980,7 @@ def calc_vec_pt_dist_angle(
         y_centre = y_coords.mean()
 
     # Calculate the distance from the centre to each of the points
-    data_gdf["dist"] = numpy.sqrt(
+    data_gdf[dist_col] = numpy.sqrt(
         (x_coords - x_centre) ** 2 + (y_coords - y_centre) ** 2
     )
 
@@ -1992,7 +2001,7 @@ def calc_vec_pt_dist_angle(
     angles[angles_secs == 3] *= -1
     angles[angles_secs == 3] += 90.0
 
-    data_gdf["angle"] = angles
+    data_gdf[angle_col] = angles
 
     # Export the points
     if out_format == "GPKG":
