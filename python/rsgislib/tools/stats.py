@@ -1074,3 +1074,123 @@ def decompose_bias_variance(y_true, y_pred):
         if noise < 0:
             noise = 0
     return mse, bias_squared, variance, noise
+
+
+def calc_variogram(
+    pts_coords: numpy.array,
+    data_vals: numpy.array,
+    out_data_file: str = None,
+    out_plot_file: str = None,
+    max_lag: float | str = "median",
+    n_lags: int = 25,
+    normalize_vals: bool = False,
+):
+    """
+    A function which calculates variogram for the data provided using the
+    skgstat module (https://scikit-gstat.readthedocs.io/)
+
+    :param pts_coords: the x/y coordinates of the points for which the variogram is
+                       calculated. Shape must be [n, 2] where n is the number of points
+    :param data_vals: the data values of the points for which the variogram is
+                      calculated.
+    :param out_data_file: Optionally output a CSV file with the lag_bins, variance
+                          and count. Default is None but if file path provided the
+                          output will be produced.
+    :param out_plot_file: Optionally output a plot file of the lag_bins, variance
+                          and count. Default is None but if file path provided the
+                          output will be produced.
+    :param max_lag: Can specify the maximum lag distance directly by giving a value
+                    larger than 1. Can also be a string with value ‘median’, ‘mean’.
+                    See skgstat.Variogram documentation.
+    :param n_lags: Specify the number of lag classes to be defined by the binning
+                   function. See skgstat.Variogram documentation.
+    :param normalize_vals: Defaults to False. If True, the independent and dependent
+                           variable will be normalized to the range [0,1].
+                           See skgstat.Variogram documentation.
+    :return: returns a pandas dataframe with the lag_bins, variance and count
+
+    """
+    import matplotlib.pyplot as plt
+    import skgstat
+    import pandas
+
+    if pts_coords.shape[1] != 2:
+        raise rsgislib.RSGISPyException(
+            "Error: pts_coords has wrong shape. Must be [n, 2] "
+            "where n is the number of points."
+        )
+
+    if pts_coords.shape[0] != data_vals.shape[0]:
+        raise rsgislib.RSGISPyException(
+            "Error: the length of pts_coords must be the same as data_vals."
+        )
+
+    vario_obj = skgstat.Variogram(
+        pts_coords, data_vals, normalize=normalize_vals, maxlag=max_lag, n_lags=n_lags
+    )
+
+    variogram_data = vario_obj.get_empirical()
+
+    n_count = numpy.fromiter((g.size for g in vario_obj.lag_classes()), dtype=int)
+
+    vario_data = {
+        "lag_bins": variogram_data[0],
+        "variance": variogram_data[1],
+        "count": n_count,
+    }
+
+    vario_out_df = pandas.DataFrame(vario_data)
+
+    if out_data_file is not None:
+        vario_out_df.to_csv(out_data_file)
+
+    if out_plot_file is not None:
+        fig = plt.figure(figsize=(8, 5))
+        ax1 = plt.subplot2grid((5, 1), (1, 0), rowspan=4)
+        ax2 = plt.subplot2grid((5, 1), (0, 0), sharex=ax1)
+        fig.subplots_adjust(hspace=0)
+
+        ax1.scatter(x=vario_out_df["lag_bins"], y=vario_out_df["variance"])
+        ax1.set_xlabel("Lag bins")
+        ax1.set_ylabel("Variance")
+
+        if normalize_vals:
+            ax1.set_xlim([0, 1.05])
+            ax1.set_ylim([0, 1.05])
+
+        ax1.grid(False)
+        ax1.vlines(
+            vario_out_df["lag_bins"],
+            *ax1.axes.get_ybound(),
+            colors=(0.85, 0.85, 0.85),
+            linestyles="dashed"
+        )
+
+        # set the sum of hist bar widths to 70% of the x-axis space
+        w = (numpy.max(vario_out_df["lag_bins"]) * 0.7) / len(vario_out_df["count"])
+
+        # plot bar chart with count of number of pairs
+        ax2.bar(
+            vario_out_df["lag_bins"],
+            vario_out_df["count"],
+            width=w,
+            align="center",
+            color="red",
+        )
+
+        plt.setp(ax2.axes.get_xticklabels(), visible=False)
+        ax2.axes.set_yticks(ax2.axes.get_yticks()[1:])
+
+        ax2.grid(False)
+        ax2.vlines(
+            vario_out_df["lag_bins"],
+            *ax2.axes.get_ybound(),
+            colors=(0.85, 0.85, 0.85),
+            linestyles="dashed"
+        )
+        ax2.axes.set_ylabel("N")
+
+        # Save figure
+        plt.savefig(out_plot_file)
+
+    return vario_out_df

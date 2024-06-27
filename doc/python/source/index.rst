@@ -52,6 +52,7 @@ Python documentation
    rsgislib_tools
    rsgislib_vectorattrs
    rsgislib_vectorgeoms
+   rsgislib_vectorstats
    rsgislib_vectorutils
    rsgislib_zonalstats
 
