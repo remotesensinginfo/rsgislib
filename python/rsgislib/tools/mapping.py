@@ -57,6 +57,7 @@ def define_axis_extent(ax: plt.axis, bbox: List[float]):
     ax.set_aspect("equal", "box")
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
 
 def define_map_tick_spacing(ax: plt.axis, tick_spacing: float):
@@ -75,6 +76,7 @@ def define_map_tick_spacing(ax: plt.axis, tick_spacing: float):
 
     ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax.ticklabel_format(useOffset=False, style='plain')
 
 
 def get_overview_info(
@@ -597,6 +599,7 @@ def create_vec_lyr_map(
         )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()
@@ -725,6 +728,7 @@ def create_raster_img_map(
     )
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()
@@ -830,6 +834,7 @@ def create_thematic_raster_map(
 
     ax.set_xlim([img_coords_scns[0][0], img_coords_scns[0][1]])
     ax.set_ylim([img_coords_scns[0][2], img_coords_scns[0][3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     for img_data_arr, img_coords, plot_zorder in zip(
         img_data_arr_scns, img_coords_scns, lcl_plot_zorders
@@ -947,6 +952,7 @@ def create_choropleth_vec_lyr_map(
     )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()
@@ -1072,6 +1078,7 @@ def create_raster_cmap_img_map(
     ax.imshow(img_data, extent=img_coords, cmap=c_cmap, norm=c_norm, zorder=plot_zorder)
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()
@@ -1206,6 +1213,7 @@ def create_vec_pt_density_map(
 
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()
