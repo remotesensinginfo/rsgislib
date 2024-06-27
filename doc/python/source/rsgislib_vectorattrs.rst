@@ -42,6 +42,7 @@ Calculate Column Values
 .. autofunction:: rsgislib.vectorattrs.add_unq_numeric_col
 .. autofunction:: rsgislib.vectorattrs.calc_npts_in_radius
 .. autofunction:: rsgislib.vectorattrs.create_angle_sets
+.. autofunction:: rsgislib.vectorattrs.create_orthogonal_angle_sets
 .. autofunction:: rsgislib.vectorattrs.calc_vec_area
 .. autofunction:: rsgislib.vectorattrs.calc_vec_length
 .. autofunction:: rsgislib.vectorattrs.calc_vec_pt_dist_angle
