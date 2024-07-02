@@ -316,6 +316,9 @@ def spec_unmix_spts_ucls(
     otherargs.weight = weight
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -433,6 +436,9 @@ def spec_unmix_spts_nnls(
     otherargs.weight = weight
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -538,6 +544,9 @@ def spec_unmix_spts_fcls(
     otherargs.gain = gain
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -652,6 +661,9 @@ def spec_unmix_pymcr_nnls(
     otherargs.weight = weight
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -763,6 +775,9 @@ def spec_unmix_pymcr_fcls(
     otherargs.gain = gain
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -844,6 +859,9 @@ def rescale_unmixing_results(input_img, output_img, gdalformat="KEA", calc_stats
     otherargs = applier.OtherInputs()
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -904,6 +922,9 @@ def predict_refl_linear_unmixing(
     otherargs.endmembers_arr = endmembers_info[2]
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -990,6 +1011,9 @@ def calc_unmixing_rmse_residual_err(
     otherargs.endmembers_arr = endmembers_info[2]
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False

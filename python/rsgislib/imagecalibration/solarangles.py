@@ -121,7 +121,12 @@ def calc_solar_azimuth_zenith(inputImg, inImgDateTime, outputImg, gdalformat):
     otherargs.dateTime = inImgDateTime
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
 
     wgs84latlonProj = osr.SpatialReference()
     wgs84latlonProj.ImportFromEPSG(4326)

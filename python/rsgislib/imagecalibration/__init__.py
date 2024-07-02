@@ -529,6 +529,7 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
     otherargs.numpyDT = numpy.float32
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(gdalformat)
     aControls.drivername = 'KEA'
     aControls.omitPyramids = True
     aControls.calcStats = False

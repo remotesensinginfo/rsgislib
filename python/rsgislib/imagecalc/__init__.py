@@ -898,6 +898,9 @@ def rescale_img_pxl_vals(
     otherargs.numpyDT = numpyDT
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -1131,6 +1134,9 @@ def calc_imgs_pxl_mode(
     otherargs.numpyDT = numpyDT
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -1200,6 +1206,9 @@ def calc_imgs_pxl_percentiles(
     otherargs.percentiles = percentiles
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -1327,6 +1336,9 @@ def calc_img_basic_stats_for_ref_region(
     aControls.referenceImage = in_ref_img
     aControls.footprint = applier.BOUNDS_FROM_REFERENCE
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -1421,6 +1433,9 @@ def recode_int_raster(
     otherargs.recode_dict = recode_dict
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = False
     aControls.calcStats = False
@@ -1561,6 +1576,9 @@ def calc_fill_regions_knn(
     otherargs.h_box = y_res / 2
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = False
     aControls.calcStats = False
@@ -1910,6 +1928,9 @@ def count_imgs_int_val_occur(
     otherargs.bin_vals = bin_vals
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -2732,6 +2753,9 @@ def normalise_img_pxl_vals_py(
     otherargs.out_max = out_max
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -2848,6 +2872,9 @@ def calc_band_range_thres_msk(
     otherargs.combine_mthd = combine_mthd
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = False
     aControls.calcStats = False
@@ -2935,6 +2962,9 @@ def calc_img_band_pxl_percentiles(
     otherargs.percentiles = percentiles
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False

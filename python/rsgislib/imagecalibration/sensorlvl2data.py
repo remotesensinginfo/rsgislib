@@ -661,6 +661,9 @@ def parse_landsat_c2_qa_pixel_img(
     otherargs.qa_lut = qa_lut
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False

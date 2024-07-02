@@ -86,6 +86,9 @@ def create_random_int_img(
     otherargs.out_vals = out_vals
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False

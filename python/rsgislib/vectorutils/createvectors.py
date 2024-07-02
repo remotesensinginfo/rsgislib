@@ -1677,13 +1677,13 @@ def create_img_transects(
 
 
 def create_random_pts_in_bbox(
-        bbox: List[float],
-        n_pts: int,
-        epsg_code: int,
-        out_vec_file: str,
-        out_vec_lyr: str,
-        out_format: str = "GPKG",
-        rnd_seed: int = None,
+    bbox: List[float],
+    n_pts: int,
+    epsg_code: int,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    rnd_seed: int = None,
 ):
     """
     A function which generates a set of random points within a boundary
@@ -1710,7 +1710,7 @@ def create_random_pts_in_bbox(
 
     # Create geopandas dataframe with the points.
     data_gdf = geopandas.GeoDataFrame(
-            geometry=geopandas.points_from_xy(x=x_coords, y=y_coords), crs=epsg_code
+        geometry=geopandas.points_from_xy(x=x_coords, y=y_coords), crs=epsg_code
     )
 
     # Export the points
@@ -1719,7 +1719,7 @@ def create_random_pts_in_bbox(
             import rsgislib.tools.filetools
 
             out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
-                    out_vec_file, check_valid=True
+                out_vec_file, check_valid=True
             )
         data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:

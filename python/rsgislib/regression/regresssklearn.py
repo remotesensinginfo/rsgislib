@@ -409,6 +409,9 @@ def apply_regress_sklearn_mdl(
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False

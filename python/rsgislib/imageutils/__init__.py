@@ -197,9 +197,13 @@ def set_env_vars_lzw_gtiff_outs(bigtiff: bool = False):
 
     """
     if bigtiff:
-        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=LZW:BIGTIFF=YES"
+        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = (
+            "TILED=YES:COMPRESS=LZW:INTERLEAVE=BAND:BIGTIFF=YES"
+        )
     else:
-        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=LZW"
+        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = (
+            "TILED=YES:COMPRESS=LZW:INTERLEAVE=BAND:BIGTIFF=IF_SAFER"
+        )
 
 
 def set_env_vars_deflate_gtiff_outs(bigtiff: bool = False):
@@ -221,10 +225,31 @@ def set_env_vars_deflate_gtiff_outs(bigtiff: bool = False):
     """
     if bigtiff:
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = (
-            "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+            "TILED=YES:COMPRESS=DEFLATE:INTERLEAVE=BAND:BIGTIFF=YES"
         )
     else:
-        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=DEFLATE"
+        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = (
+            "TILED=YES:COMPRESS=DEFLATE:INTERLEAVE=BAND:BIGTIFF=IF_SAFER"
+        )
+
+
+def get_rios_img_creation_opts(gdalformat: str) -> List[str]:
+    """
+    An internal function used to get the RSGISLib specified GDAL image
+    creation options for input into RIOS applier.
+
+    :param gdalformat: the GDAL format (e.g., GTIFF)
+    :return: list of creation options
+
+    """
+    gdalformat = gdalformat.upper()
+    var_name = f"RSGISLIB_IMG_CRT_OPTS_{gdalformat}"
+    ctr_out_opts = list()
+    if var_name in os.environ:
+        ctr_opts = os.environ[var_name]
+        for ind_ctr_opt in ctr_opts.split(":"):
+            ctr_out_opts.append(ind_ctr_opt)
+    return ctr_out_opts
 
 
 def pop_thmt_img_stats(
@@ -2766,6 +2791,7 @@ def calc_pixel_locations(input_img: str, output_img: str, gdalformat: str):
     otherargs = applier.OtherInputs()
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = get_rios_img_creation_opts(gdalformat)
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -2814,6 +2840,7 @@ def calc_wgs84_pixel_area(
     otherargs.scale = float(scale)
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = get_rios_img_creation_opts(gdalformat)
     aControls.drivername = gdalformat
     aControls.omitPyramids = False
     aControls.calcStats = False
@@ -2986,6 +3013,7 @@ def generate_random_pxl_vals_img(
     otherargs.upVal = up_val
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = get_rios_img_creation_opts(gdalformat)
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -3183,6 +3211,7 @@ def combine_binary_masks(
     otherargs = applier.OtherInputs()
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = get_rios_img_creation_opts(gdalformat)
     aControls.drivername = gdalformat
     aControls.omitPyramids = False
     aControls.calcStats = False
@@ -4359,6 +4388,7 @@ def spectral_smoothing(
     otherargs.np_dtype = np_dtype
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = get_rios_img_creation_opts(gdalformat)
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -4439,6 +4469,7 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
     otherargs.y_res = y_res
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = get_rios_img_creation_opts(gdalformat)
     aControls.drivername = gdalformat
     aControls.omitPyramids = False
     aControls.calcStats = False
@@ -4497,6 +4528,7 @@ def mask_all_band_zero_vals(
     otherargs.out_val = out_val
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = get_rios_img_creation_opts(gdalformat)
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -4649,6 +4681,7 @@ def mask_outliners_data_values(
     otherargs.np_dtype = np_dtype
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = get_rios_img_creation_opts(gdalformat)
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -4755,6 +4788,7 @@ def polyfill_nan_data_values(
     otherargs.np_dtype = np_dtype
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
+    aControls.creationoptions = get_rios_img_creation_opts(gdalformat)
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
