@@ -23,7 +23,7 @@ def test_set_env_vars_lzw_gtiff_outs():
     import rsgislib.imageutils
 
     rsgislib.imageutils.set_env_vars_lzw_gtiff_outs(bigtiff=False)
-    assert os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] == "TILED=YES:COMPRESS=LZW"
+    assert os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] == "TILED=YES:COMPRESS=LZW:INTERLEAVE=BAND:BIGTIFF=IF_SAFER"
 
 
 def test_set_env_vars_lzw_gtiff_outs_bigtiff():
@@ -32,7 +32,7 @@ def test_set_env_vars_lzw_gtiff_outs_bigtiff():
     rsgislib.imageutils.set_env_vars_lzw_gtiff_outs(bigtiff=True)
     assert (
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"]
-        == "TILED=YES:COMPRESS=LZW:BIGTIFF=YES"
+        == "TILED=YES:COMPRESS=LZW:INTERLEAVE=BAND:BIGTIFF=YES"
     )
 
 
@@ -40,7 +40,7 @@ def test_set_env_vars_deflate_gtiff_outs():
     import rsgislib.imageutils
 
     rsgislib.imageutils.set_env_vars_deflate_gtiff_outs(bigtiff=False)
-    assert os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] == "TILED=YES:COMPRESS=DEFLATE"
+    assert os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] == "TILED=YES:COMPRESS=DEFLATE:INTERLEAVE=BAND:BIGTIFF=IF_SAFER"
 
 
 def test_set_env_vars_deflate_gtiff_outs_bigtiff():
@@ -49,7 +49,7 @@ def test_set_env_vars_deflate_gtiff_outs_bigtiff():
     rsgislib.imageutils.set_env_vars_deflate_gtiff_outs(bigtiff=True)
     assert (
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"]
-        == "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+        == "TILED=YES:COMPRESS=DEFLATE:INTERLEAVE=BAND:BIGTIFF=YES"
     )
 
 
