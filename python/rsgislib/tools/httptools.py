@@ -145,11 +145,11 @@ def download_file_http(
 ):
     """
 
-    :param input_url:
-    :param out_file_path:
-    :param username:
-    :param password:
-    :return:
+    :param input_url: The URL to be downlaoded
+    :param out_file_path: output file path (including the file name)
+    :param username: optionally provided a username (Default: None)
+    :param password: optionally provided a password (Default: None)
+    :param no_except: If True (Default) then expections are not outputted.
 
     """
     session_http = requests.Session()
