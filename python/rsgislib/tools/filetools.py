@@ -906,6 +906,21 @@ def natural_sort_file_names(in_file_lst: List[str]) -> List[str]:
     return in_file_lst
 
 
+def sort_file_by_datetime(in_file_lst: List[str]) -> List[str]:
+    """
+    A function which sorts a list of file based on the list the file was
+    last modified. The list will be outputted in ascending order (i.e., oldest
+    to earliest). The python function os.path.getmtime is used to access the
+    modified file for the file.
+
+    :param in_file_lst: the input list of file paths, which need to be accessible.
+    :return: the sorted list of names.
+
+    """
+    in_file_lst.sort(key=os.path.getmtime)
+    return in_file_lst
+
+
 def create_directory_archive(in_dir: str, out_arch: str, arch_format: str) -> str:
     """
     A function which creates an archive from an input directory. This function uses

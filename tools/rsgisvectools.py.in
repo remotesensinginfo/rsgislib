@@ -85,6 +85,13 @@ if __name__ == "__main__":
         default=False,
         help="Print the unique values within a column of the attribute table.",
     )
+
+    parser.add_argument(
+            "--geom",
+            action="store_true",
+            default=False,
+            help="Print the geometry type of the vector layer.",
+    )
     args = parser.parse_args()
 
     if args.lyrs:
@@ -119,3 +126,8 @@ if __name__ == "__main__":
         )
         for i, val in enumerate(unq_vals):
             print(f"\t{i}: '{val}'")
+
+    if args.geom:
+        geom_type = rsgislib.vectorutils.get_vec_lyr_geom_type(args.vecfile, args.veclyr)
+        geom_type_name = rsgislib.vectorutils.get_geom_type_name(geom_type)
+        print(geom_type_name)

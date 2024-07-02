@@ -40,9 +40,12 @@ Numpy Array Manipulation
 .. autofunction:: rsgislib.tools.stats.mask_data_to_valid
 
 
+Variograms
+--------------
+.. autofunction:: rsgislib.tools.stats.calc_variogram
+
 
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

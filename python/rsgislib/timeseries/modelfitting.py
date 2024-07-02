@@ -39,10 +39,18 @@ import sys
 from datetime import datetime
 
 import numpy
-from rios import applier, cuiprogress, fileinfo
+from rios import applier, fileinfo
 from sklearn import linear_model
 
 import rsgislib
+
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 
 # could have two functions- one for Lasso, one for OLS
@@ -327,13 +335,10 @@ def get_ST_model_coeffs(
     app.setOutputDriverName(gdalformat)
 
     # Set progress
-    try:
-        import tqdm
-
-        progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
-    app.progress = progress_bar
+    if TQDM_AVAIL:
+        app.progress = rsgislib.TQDMProgressBar()
+    else:
+        app.progress = rios.cuiprogress.GDALProgressBar()
 
     # Set that pyramids and statistics are not calculated.
     app.omitPyramids = True
@@ -474,13 +479,10 @@ def predict_for_date(date, input_path, output_path, gdalformat="KEA", num_proces
     app.setOutputDriverName(gdalformat)
 
     # Set progress
-    try:
-        import tqdm
-
-        progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
-    app.progress = progress_bar
+    if TQDM_AVAIL:
+        app.progress = rsgislib.TQDMProgressBar()
+    else:
+        app.progress = rios.cuiprogress.GDALProgressBar()
 
     # Set that pyramids and statistics are not calculated.
     app.omitPyramids = True

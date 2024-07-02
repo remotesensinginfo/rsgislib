@@ -125,7 +125,7 @@ def str_to_float(str_val: str, err_val: float = None) -> float:
     try:
         out_float = float(str_val)
     except ValueError:
-        if not err_val is None:
+        if err_val is not None:
             out_float = float(err_val)
         else:
             raise rsgislib.RSGISPyException(
@@ -155,7 +155,7 @@ def str_to_int(str_val: str, err_val: int = None) -> int:
             tmp_float = float(str_val)
             out_int = int(math.floor(tmp_float + 0.5))
         except ValueError:
-            if not err_val is None:
+            if err_val is not None:
                 out_int = int(err_val)
             else:
                 raise rsgislib.RSGISPyException(
@@ -966,14 +966,14 @@ def dict_struct_get_date_value(
         else:
             raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
 
-    if type(date_format) is str:
+    if isinstance(date_format, str):
         try:
             out_date_obj = datetime.datetime.strptime(
                 curr_dict_struct_obj, date_format
             ).date()
         except Exception as e:
             raise rsgislib.RSGISPyException(e)
-    elif type(date_format) is list:
+    elif isinstance(date_format, list):
         found = False
         except_obj = None
         for date_format_str in date_format:
@@ -1019,14 +1019,14 @@ def dict_struct_get_datetime_value(
             raise rsgislib.RSGISPyException("Could not find '{}'".format(steps_str))
 
     curr_dict_struct_obj = curr_dict_struct_obj.replace("Z", "")
-    if type(date_time_format) is str:
+    if isinstance(date_time_format, str):
         try:
             out_datetime_obj = datetime.datetime.strptime(
                 curr_dict_struct_obj, date_time_format
             )
         except Exception as e:
             raise rsgislib.RSGISPyException(e)
-    elif type(date_time_format) is list:
+    elif isinstance(date_time_format, list):
         found = False
         except_obj = None
         for date_time_format_str in date_time_format:

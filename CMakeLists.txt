@@ -31,7 +31,7 @@ set (PROJECT_DATA_DIR share)
 # The version number.
 set (RSGISLIB_VERSION_MAJOR 5)
 set (RSGISLIB_VERSION_MINOR 1)
-set (RSGISLIB_VERSION_PATCH 4)
+set (RSGISLIB_VERSION_PATCH 7)
 set (RSGISLIB_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_VERSION_PATCH}")
 set (RSGISLIB_PACKAGE_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_VERSION_PATCH}")
 set (RSGISLIB_PACKAGE_STRING "RSGISLib ${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_VERSION_PATCH}")
@@ -341,8 +341,8 @@ endif(RSGIS_PYTHON)
 ###############################################################################
 # Build executables
 if (RSGISLIB_WITH_UTILTIES)
-	add_executable(flip ${PROJECT_TOOLS_DIR}/flip.cpp)
-	target_link_libraries (flip )
+	add_executable(rsgisflip ${PROJECT_TOOLS_DIR}/rsgisflip.cpp)
+	target_link_libraries (rsgisflip)
     if (MSVC)
         configure_file ( "${PROJECT_TOOLS_DIR}/rsgis-config.bat.in" "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgis-config.bat" )
 
@@ -392,7 +392,7 @@ endif(RSGISLIB_WITH_UTILTIES)
 ###############################################################################
 # Installation
 if (RSGISLIB_WITH_UTILTIES)
-	install (TARGETS flip DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+	install (TARGETS rsgisflip DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
     if (MSVC)
         install (PROGRAMS "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgis-config.bat" DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 

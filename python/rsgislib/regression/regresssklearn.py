@@ -2,10 +2,15 @@
 
 import math
 
-from sklearn.ensemble import ExtraTreesRegressor
-from sklearn.model_selection import GridSearchCV
-
 import rsgislib
+
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 
 def get_ann_obj_params(n_predictors):
@@ -371,16 +376,14 @@ def apply_regress_sklearn_mdl(
     """
 
     import numpy
-    from rios import applier, cuiprogress
+    from rios import applier
 
     import rsgislib.imageutils
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     # Convert from GDAL band index (start 1) to Numpy Array index (start 0)
     predictor_img_bands_arr = numpy.array(predictor_img_bands)

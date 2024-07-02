@@ -8,10 +8,8 @@ Animate Images
 EXIF Metadata
 -----------------
 .. autofunction:: rsgislib.tools.imagetools.list_exif_info
-
-Sort Images
------------------
-.. autofunction:: rsgislib.tools.imagetools.split_photos_by_time
+.. autofunction:: rsgislib.tools.imagetools.get_exif_info
+.. autofunction:: rsgislib.tools.imagetools.list_exif_info_pil
 
 PDF Utilities
 -----------------

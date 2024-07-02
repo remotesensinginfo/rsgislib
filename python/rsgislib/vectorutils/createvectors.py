@@ -11,6 +11,14 @@ from osgeo import gdal, ogr, osr
 
 import rsgislib
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
+
 gdal.UseExceptions()
 
 
@@ -126,7 +134,7 @@ def vectorise_pxls_to_pts(
     """
     Function which creates a new output vector file for the pixels within the input
     image file with the value specified. Pixel locations will be the centroid of
-    the the pixel
+    the pixel
 
     :param input_img: the input image
     :param img_band: the band within the image to use
@@ -145,12 +153,10 @@ def vectorise_pxls_to_pts(
     import rsgislib.imageutils
     import rsgislib.vectorutils
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
@@ -270,7 +276,7 @@ def extract_image_footprint(
     )
 
     out_vec_tmp_file = out_vec_file
-    if not (reproj_to is None):
+    if reproj_to is not None:
         out_vec_tmp_file = os.path.join(
             tmp_dir, in_img_base + "_" + uid_str + "_initVecOut.gpkg"
         )
@@ -297,7 +303,7 @@ def extract_image_footprint(
         out_vec_tmp_file, out_vec_lyr, "FileName", ogr.OFTString, file_name
     )
 
-    if not (reproj_to is None):
+    if reproj_to is not None:
         if os.path.exists(out_vec_file):
             rsgislib.vectorutils.delete_vector_file(out_vec_file)
 
@@ -325,7 +331,7 @@ def extract_image_footprint(
 
         shutil.rmtree(tmp_dir)
     else:
-        if not (reproj_to is None):
+        if reproj_to is not None:
             driver = ogr.GetDriverByName("ESRI Shapefile")
             driver.DeleteDataSource(out_vec_tmp_file)
 
@@ -663,12 +669,12 @@ def create_poly_vec_bboxs(
         add_atts = False
         if (atts is not None) and (att_types is not None):
             n_atts = 0
-            if not "names" in att_types:
+            if "names" not in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "names"'
                 )
             n_atts = len(att_types["names"])
-            if not "types" in att_types:
+            if "types" not in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "types"'
                 )
@@ -811,12 +817,12 @@ def write_pts_to_vec(
         addAtts = False
         if (atts is not None) and (att_types is not None):
             nAtts = 0
-            if not "names" in att_types:
+            if "names" not in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "names"'
                 )
             nAtts = len(att_types["names"])
-            if not "types" in att_types:
+            if "types" not in att_types:
                 raise rsgislib.RSGISPyException(
                     'attTypes must include a list for "types"'
                 )
@@ -1402,7 +1408,7 @@ def create_random_pts_in_radius(
     epsg_code: int,
     out_vec_file: str,
     out_vec_lyr: str,
-    out_format: str = "GeoJSON",
+    out_format: str = "GPKG",
     rnd_seed: int = None,
     n_pts_multi_bbox: float = 3,
 ):
@@ -1668,3 +1674,53 @@ def create_img_transects(
         lines=out_lines_lst,
         overwrite=True,
     )
+
+
+def create_random_pts_in_bbox(
+        bbox: List[float],
+        n_pts: int,
+        epsg_code: int,
+        out_vec_file: str,
+        out_vec_lyr: str,
+        out_format: str = "GPKG",
+        rnd_seed: int = None,
+):
+    """
+    A function which generates a set of random points within a boundary
+    box.
+
+    :param bbox: The bounding box the points ([xMin, xMax, yMin, yMax])
+    :param n_pts: the number of points to be generated.
+    :param epsg_code: the EPSG code for the projection of the points.
+    :param out_vec_file: the output file path and name.
+    :param out_vec_lyr: the output layer name.
+    :param out_format: the output file format (Default: GeoJSON)
+    :param rnd_seed: the seed for the random generator.
+
+    """
+    import numpy
+    import geopandas
+
+    # Set the random seed.
+    numpy.random.seed(seed=rnd_seed)
+
+    # Create more than needed points within the bbox.
+    x_coords = numpy.random.uniform(bbox[0], bbox[1], n_pts)
+    y_coords = numpy.random.uniform(bbox[2], bbox[3], n_pts)
+
+    # Create geopandas dataframe with the points.
+    data_gdf = geopandas.GeoDataFrame(
+            geometry=geopandas.points_from_xy(x=x_coords, y=y_coords), crs=epsg_code
+    )
+
+    # Export the points
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            import rsgislib.tools.filetools
+
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                    out_vec_file, check_valid=True
+            )
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)

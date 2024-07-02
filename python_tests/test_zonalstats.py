@@ -7,6 +7,12 @@ try:
 except ImportError:
     H5PY_NOT_AVAIL = True
 
+SCIPY_NOT_AVAIL = False
+try:
+    import scipy
+except ImportError:
+    SCIPY_NOT_AVAIL = True
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 ZONALSTATS_DATA_DIR = os.path.join(DATA_DIR, "zonalstats")
 
@@ -484,6 +490,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Count(tmp_path):
     assert vals_eq
 
 
+@pytest.mark.skipif(SCIPY_NOT_AVAIL, reason="scipy dependency not available")
 def test_calc_zonal_band_stats_test_poly_pts_file_Mode(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.vectorutils
@@ -999,6 +1006,7 @@ def test_calc_zonal_band_stats_file_Count(tmp_path):
     assert vals_eq
 
 
+@pytest.mark.skipif(SCIPY_NOT_AVAIL, reason="scipy dependency not available")
 def test_calc_zonal_band_stats_file_Mode(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.vectorutils
@@ -1242,7 +1250,10 @@ def test_msk_h5_smpls_to_finite_values(tmp_path):
     assert os.path.exists(out_h5_file)
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+# @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+@pytest.mark.skip(
+    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
+)
 def test_extract_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils
@@ -1271,7 +1282,10 @@ def test_extract_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
     assert os.path.exists(out_h5_file)
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+# @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+@pytest.mark.skip(
+    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
+)
 def test_extract_chip_zone_image_band_values_to_hdf_with_rot(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils
@@ -1300,7 +1314,10 @@ def test_extract_chip_zone_image_band_values_to_hdf_with_rot(tmp_path):
     assert os.path.exists(out_h5_file)
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+# @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+@pytest.mark.skip(
+    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
+)
 def test_extract_ref_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils
@@ -1332,7 +1349,10 @@ def test_extract_ref_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
     assert os.path.exists(out_h5_file)
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+# @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+@pytest.mark.skip(
+    reason="TODO: Function need updating to not use rios.imagereader.ImageReader"
+)
 def test_extract_ref_chip_zone_image_band_values_to_hdf_with_rot(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils

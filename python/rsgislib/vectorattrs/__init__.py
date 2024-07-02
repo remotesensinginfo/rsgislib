@@ -939,8 +939,8 @@ def sort_vec_lyr(
 
     out_format = rsgislib.vectorutils.check_format_name(out_format)
 
-    if type(sort_by) is list:
-        if type(ascending) is not list:
+    if isinstance(sort_by, list):
+        if not isinstance(ascending, list):
             raise rsgislib.RSGISPyException(
                 "If sort_by is a list then ascending must be too."
             )
@@ -1392,7 +1392,7 @@ def create_angle_sets(
 
     :param vec_file: Input vector file path
     :param vec_lyr: The input vector layer name.
-    :param angle_col: The name of the column within the vector layer with the angles
+    :param angle_col: The name of the column within the vector layer with
                       the angles must be degrees (0-360)
     :param start_angle: The angle to start the angle sets from.
     :param angle_set_width: The width of the angle sets - must divide in 180.
@@ -1404,6 +1404,7 @@ def create_angle_sets(
 
     """
     import geopandas
+    import rsgislib.tools.filetools
 
     if (180 % angle_set_width) != 0:
         raise rsgislib.RSGISPyException(
@@ -1479,7 +1480,135 @@ def create_angle_sets(
 
     data_gdf[out_angle_set_col] = angle_set_arr
 
+    # Export the points
     if out_format == "GPKG":
+        if out_vec_lyr is None:
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                out_vec_file, check_valid=True
+            )
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def create_orthogonal_angle_sets(
+    vec_file: str,
+    vec_lyr: str,
+    angle_col: str,
+    start_angle: int,
+    angle_half_width: int,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_angle_set_col: str = "angle_set",
+):
+    """
+    A function which creates a pair of angle sets which are orthogonal to one
+    another. For example, if the start angle is 0 and the angle half width
+    is 20 then the width of each set will be 40 degrees and the first set will
+    be from 340 to 20 degrees. If the start angle is 60 then the first set would
+    be 40-80.
+
+    :param vec_file: Input vector file path
+    :param vec_lyr: The input vector layer name.
+    :param angle_col: The name of the column within the vector layer with
+                      the angles must be degrees (0-360)
+    :param start_angle: The angle to start the angle sets from.
+    :param angle_half_width: The half width of each of the angle sets.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name
+    :param out_format: The output vector file format (Default: GPKG)
+    :param out_angle_set_col: The column in the output file with the column set
+
+    """
+    import geopandas
+    import rsgislib.tools.filetools
+
+    if (start_angle < 0) or (start_angle > 180):
+        raise rsgislib.RSGISPyException("The start_angle must be between 0 and 180")
+
+    if (angle_half_width < 0) or (angle_half_width > 45):
+        raise rsgislib.RSGISPyException("The angle_set_width must be between 0 and 45")
+
+    def _sgl_create_angle_sets(set_start_angle, set_end_angle):
+        if set_end_angle == 0:
+            set_end_angle = 360
+        angle_sets = list()
+        if (set_start_angle > 360) and (set_end_angle > 360):
+            tmp_set_start_angle = set_start_angle - 360
+            tmp_set_end_angle = set_end_angle - 360
+            if (tmp_set_start_angle > 360) and (tmp_set_end_angle > 360):
+                raise rsgislib.RSGISPyException(
+                    f"The set_start_angle ({set_start_angle}) and "
+                    f"set_end_angle ({set_end_angle}) are out of range."
+                )
+            set_start_angle = tmp_set_start_angle
+            set_end_angle = tmp_set_end_angle
+
+        if (set_start_angle >= 0) and (set_end_angle <= 360):
+            angle_sets.append([set_start_angle, set_end_angle])
+        elif (set_start_angle < 0) and (set_end_angle <= 360):
+            angle_sets.append([360 + set_start_angle, 360])
+            angle_sets.append([0, set_end_angle])
+        elif (set_start_angle >= 0) and (set_end_angle > 360):
+            angle_sets.append([set_start_angle, 360])
+            angle_sets.append([0, set_end_angle - 360])
+        else:
+            raise rsgislib.RSGISPyException(
+                f"Start ({set_start_angle}) and end ({set_end_angle}) "
+                f"angles a not valid - don't know how to process."
+            )
+
+        return angle_sets
+
+    set1_p1_start_angle = start_angle - angle_half_width
+    set1_p1_end_angle = start_angle + angle_half_width
+    set1_p1_angle_sets = _sgl_create_angle_sets(set1_p1_start_angle, set1_p1_end_angle)
+
+    start_angle_mir = start_angle + 180
+    set1_p2_start_angle = start_angle_mir - angle_half_width
+    set1_p2_end_angle = start_angle_mir + angle_half_width
+    set1_p2_angle_sets = _sgl_create_angle_sets(set1_p2_start_angle, set1_p2_end_angle)
+
+    set1_angle_sets = set1_p1_angle_sets + set1_p2_angle_sets
+
+    orthog_start_angle = start_angle + 90
+    set2_p1_start_angle = orthog_start_angle - angle_half_width
+    set2_p1_end_angle = orthog_start_angle + angle_half_width
+    set2_p1_angle_sets = _sgl_create_angle_sets(set2_p1_start_angle, set2_p1_end_angle)
+
+    orthog_start_angle_mir = orthog_start_angle + 180
+    set2_p2_start_angle = orthog_start_angle_mir - angle_half_width
+    set2_p2_end_angle = orthog_start_angle_mir + angle_half_width
+    set2_p2_angle_sets = _sgl_create_angle_sets(set2_p2_start_angle, set2_p2_end_angle)
+
+    set2_angle_sets = set2_p1_angle_sets + set2_p2_angle_sets
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    angles_arr = data_gdf[angle_col].values
+    angle_set_arr = numpy.zeros_like(angles_arr, dtype=int)
+
+    for angle_thres in set1_angle_sets:
+        angle_set_arr[
+            numpy.logical_and(
+                (angles_arr >= angle_thres[0]), (angles_arr <= angle_thres[1])
+            )
+        ] = 1
+    for angle_thres in set2_angle_sets:
+        angle_set_arr[
+            numpy.logical_and(
+                (angles_arr >= angle_thres[0]), (angles_arr <= angle_thres[1])
+            )
+        ] = 2
+
+    data_gdf[out_angle_set_col] = angle_set_arr
+
+    # Export the points
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                out_vec_file, check_valid=True
+            )
         data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gdf.to_file(out_vec_file, driver=out_format)
@@ -1727,6 +1856,161 @@ def create_date_col(
     data_gdf[out_date_col] = out_dates_lst
 
     if out_format == "GPKG":
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def calc_vec_area(
+    vec_file: str,
+    vec_lyr: str,
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which adds a column to the attribute table with the area of
+    each polygon. Geometry is expected to be polygon.
+
+    :param vec_file: the input vector file
+    :param vec_lyr: the input vector layer
+    :param out_col: the output column name
+    :param out_vec_file: output vector file path
+    :param out_vec_lyr: output vector layer name
+    :param out_format: the output vector format (Default: GPKG)
+
+    """
+    import geopandas
+
+    print("Read Vector")
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gdf[out_col] = data_gdf["geometry"].area
+
+    print("Export")
+    if out_format == "GPKG":
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def calc_vec_length(
+    vec_file: str,
+    vec_lyr: str,
+    out_col: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which adds a column to the attribute table with the length of
+    each vector feature. Geometry is expected to be polygon or line.
+
+    :param vec_file: the input vector file
+    :param vec_lyr: the input vector layer
+    :param out_col: the output column name
+    :param out_vec_file: output vector file path
+    :param out_vec_lyr: output vector layer name
+    :param out_format: the output vector format (Default: GPKG)
+
+    """
+    import geopandas
+
+    print("Read Vector")
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_gdf[out_col] = data_gdf["geometry"].length
+
+    print("Export")
+    if out_format == "GPKG":
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def calc_vec_pt_dist_angle(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    x_centre: float = None,
+    y_centre: float = None,
+    angle_col: str = "angle",
+    dist_col: str = "dist",
+):
+    """
+    A function which adds a column to the attribute table with the distance and
+    angle for each point from a centre point (x_centre, y_centre). If x_centre,
+    y_centre are provided then they are calculated as the mean of all the points.
+
+    :param vec_file: Input vector file path
+    :param vec_lyr: Input vector layer name
+    :param out_vec_file: Output vector file path
+    :param out_vec_lyr: Output vector layer name
+    :param out_format: the output vector format (Default: GPKG)
+    :param x_centre: Optionally the X centre point (Default: None). If None then
+                     calculated as the mean of all the points.
+    :param y_centre: Optionally the Y centre point (Default: None). If None then
+                     calculated as the mean of all the points.
+    :param angle_col: The output angle column name
+    :param dist_col: The output distance column name
+
+    """
+    import geopandas
+    import rsgislib.vectorutils
+
+    vec_geom_type = rsgislib.vectorutils.get_vec_lyr_geom_type(vec_file, vec_lyr)
+    if vec_geom_type != rsgislib.GEOM_PT:
+        raise Exception("Vector geometry type must be points.")
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    geom_pts = data_gdf["geometry"].get_coordinates()
+
+    if not {"x", "y"}.issubset(geom_pts.columns):
+        raise Exception(
+            "The geometry is not as expected - need x and y fields. Might be in degrees (e.g., EPSG:4326)"
+        )
+
+    x_coords = geom_pts["x"].values
+    y_coords = geom_pts["y"].values
+
+    if x_centre is None:
+        x_centre = x_coords.mean()
+    if y_centre is None:
+        y_centre = y_coords.mean()
+
+    # Calculate the distance from the centre to each of the points
+    data_gdf[dist_col] = numpy.sqrt(
+        (x_coords - x_centre) ** 2 + (y_coords - y_centre) ** 2
+    )
+
+    # Calculate the angle from the centre to each of the points
+    angles = numpy.rad2deg(numpy.arctan2(y_coords - y_centre, x_coords - x_centre))
+
+    # Reorientates the angle so 0 is north.
+    angles_secs = numpy.zeros_like(angles)
+    angles_secs[numpy.logical_and((angles >= 0), (angles <= 90))] = 1
+    angles_secs[angles > 90] = 2
+    angles_secs[angles < 0] = 3
+
+    angles[angles_secs == 1] = angles[angles_secs == 1] - 90.0
+    angles[angles_secs == 1] *= -1
+    angles[angles_secs == 2] = angles[angles_secs == 2] - 180.0
+    angles[angles_secs == 2] *= -1
+    angles[angles_secs == 2] += 270.0
+    angles[angles_secs == 3] *= -1
+    angles[angles_secs == 3] += 90.0
+
+    data_gdf[angle_col] = angles
+
+    # Export the points
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            import rsgislib.tools.filetools
+
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                out_vec_file, check_valid=True
+            )
         data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gdf.to_file(out_vec_file, driver=out_format)

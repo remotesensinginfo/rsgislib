@@ -42,7 +42,7 @@ from typing import List, Dict
 import h5py
 import numpy
 from osgeo import gdal
-from rios import applier, cuiprogress, rat
+from rios import applier, rat
 
 import rsgislib
 import rsgislib.imagecalc
@@ -56,6 +56,14 @@ try:
     import lightgbm as lgb
 except ImportError:
     HAVE_LIGHTGBM = False
+
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 from sklearn.metrics import accuracy_score, roc_auc_score
 
@@ -1312,12 +1320,10 @@ def apply_lightgbm_binary_classifier(
     otherargs.numClassVars = num_class_vars
     otherargs.imgFileInfo = img_file_info
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
@@ -2609,12 +2615,10 @@ def apply_lightgbm_multiclass_classifier(
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar

@@ -658,20 +658,20 @@ def plot_histogram_threshold(
 
 
 def plot_vec_fields(
-        vec_file: str,
-        vec_lyr: str,
-        out_plot_file: str,
-        x_plt_field: str,
-        y_plt_field: str,
-        x_lbl: str,
-        y_lbl: str,
-        title: str,
-        feat_id_field: str = None,
-        x_field_no_data: float = None,
-        y_field_no_data: float = None,
-        plt_width: int = 18,
-        plt_height: int = 6,
-        plt_line: bool = True,
+    vec_file: str,
+    vec_lyr: str,
+    out_plot_file: str,
+    x_plt_field: str,
+    y_plt_field: str,
+    x_lbl: str,
+    y_lbl: str,
+    title: str,
+    feat_id_field: str = None,
+    x_field_no_data: float = None,
+    y_field_no_data: float = None,
+    plt_width: int = 18,
+    plt_height: int = 6,
+    plt_line: bool = True,
 ):
     """
     A function which plots two variables from a vector layer.
@@ -1353,7 +1353,7 @@ def manual_stretch_np_arr(
         arr_data_out = arr_data_out.astype(float)
 
     if len(arr_shp) == 2:
-        if type(min_max_vals) is not dict:
+        if not isinstance(min_max_vals, dict):
             raise rsgislib.RSGISPyException(
                 "Just 1 dimension within arr_data and therefore "
                 "min_max_vals variable must be a dict."
@@ -1370,7 +1370,7 @@ def manual_stretch_np_arr(
 
         arr_data_out = (((arr_data_out - min_val) / range_val) * out_gain) + out_off
     else:
-        if type(min_max_vals) is not list:
+        if not isinstance(min_max_vals, list):
             raise rsgislib.RSGISPyException(
                 "arr_data has more than 1 dimension and therefore "
                 "min_max_vals variable must be a list."

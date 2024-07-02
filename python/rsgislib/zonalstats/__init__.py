@@ -1446,7 +1446,7 @@ def ext_point_band_values(
 
         veclyrDefn = vec_lyr_obj.GetLayerDefn()
         lyr_geom_type = ogr.GeometryTypeToName(veclyrDefn.GetGeomType())
-        if lyr_geom_type.lower() != "point":
+        if "point" not in lyr_geom_type.lower():
             raise rsgislib.RSGISPyException("The layer geometry type must be point.")
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
@@ -1620,6 +1620,9 @@ def merge_extracted_hdf5_data(
     """
     import h5py
 
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
+
     if len(h5_files) == 0:
         raise rsgislib.RSGISPyException("The list of input files is empty.")
 
@@ -1694,6 +1697,9 @@ def merge_extracted_hdf5_vars_data(
 
     """
     import h5py
+
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
 
     if len(h5_files) == 0:
         raise rsgislib.RSGISPyException("The list of input files is empty.")
@@ -2125,6 +2131,9 @@ def merge_extracted_hdf5_chip_data(
 
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
+
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
 
     first = True
     n_feats = 0
@@ -2605,6 +2614,9 @@ def merge_extracted_hdf5_chip_ref_data(
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
 
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
+
     first = True
     n_feats = 0
     chip_size = 0
@@ -2674,23 +2686,27 @@ def merge_extracted_hdf5_chip_ref_data(
 
 
 def msk_h5_smpls_to_finite_values(
-    input_h5: str,
-    output_h5: str,
+    in_h5_file: str,
+    out_h5_file: str,
     datatype: int = None,
     lower_limit: float = None,
     upper_limit: float = None,
+    limits_all_vars: bool = True,
 ):
     """
     A function to remove values from a HDF5 sample file which are not finite.
     Upper and lower values can also be specified.
 
-    :param input_h5: Input HDF5 file.
-    :param output_h5: Output HDF5 file.
+    :param in_h5_file: Input HDF5 file.
+    :param out_h5_file: Output HDF5 file.
     :param datatype: is the data type used for the output HDF5 file
                      (e.g., rsgislib.TYPE_32FLOAT). If None (default)
                      then the output data type will be float32.
     :param lower_limit: Optional lower value threshold (if None then not used).
     :param upper_limit: Optional upper value threshold (if None then not used).
+    :param limits_all_vars: If upper or lower thresholds specified then specify
+                            whether any or all of the variables need to be above
+                            the threshold.
 
     """
     import h5py
@@ -2699,22 +2715,31 @@ def msk_h5_smpls_to_finite_values(
         datatype = rsgislib.TYPE_32FLOAT
     h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
 
-    fH5 = h5py.File(input_h5, "r")
+    fH5 = h5py.File(in_h5_file, "r")
     data_shp = fH5["DATA/DATA"].shape
     num_vars = data_shp[1]
     data = numpy.array(fH5["DATA/DATA"])
+    # Mask to finite values
     data = data[numpy.isfinite(data).all(axis=1)]
+    # Apply the lower limit
     if lower_limit is not None:
-        data = data[numpy.any(data > lower_limit, axis=1)]
+        if limits_all_vars:
+            data = data[numpy.any(data > lower_limit, axis=1)]
+        else:
+            data = data[numpy.all(data > lower_limit, axis=1)]
+    # Apply the upper limit
     if upper_limit is not None:
-        data = data[numpy.any(data < upper_limit, axis=1)]
+        if limits_all_vars:
+            data = data[numpy.any(data < upper_limit, axis=1)]
+        else:
+            data = data[numpy.all(data < upper_limit, axis=1)]
 
     n_samples = data.shape[0]
     chunk_size = 1000
     if n_samples < 1000:
         chunk_size = n_samples
 
-    fH5Out = h5py.File(output_h5, "w")
+    fH5Out = h5py.File(out_h5_file, "w")
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
     dataGrp.create_dataset(
@@ -2730,6 +2755,85 @@ def msk_h5_smpls_to_finite_values(
     fH5Out.close()
 
 
+def filter_h5_smpls_var_range(
+    in_h5_file: str,
+    out_h5_file: str,
+    var_idx: int,
+    lower_limit: float = None,
+    upper_limit: float = None,
+    datatype: int = None,
+):
+    """
+    A function which filters the data in the H5 file using the data values
+    of one variable. The function will remove rows where the value of the
+    specified variable is not within the range specified. Note, you must specify
+    at least the lower_limit or upper_limit but both can also be specified.
+
+    :param in_h5_file: Input HDF5 file.
+    :param out_h5_file: Output HDF5 file.
+    :param var_idx: The index of the variable to be used for filtering. Note,
+                    indexing numbering starts at 0.
+    :param lower_limit: Optional lower value threshold (if None then not used).
+    :param upper_limit: Optional upper value threshold (if None then not used).
+    :param datatype: is the data type used for the output HDF5 file
+                     (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
+
+    """
+    import h5py
+    import numpy
+
+    if (lower_limit is None) and (upper_limit is None):
+        raise rsgislib.RSGISPyException(
+            "Both lower_limit and upper_limit cannot be None "
+            "or function will not do any work."
+        )
+
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
+
+    fH5 = h5py.File(in_h5_file, "r")
+    data_shp = fH5["DATA/DATA"].shape
+    num_vars = data_shp[1]
+    data = numpy.array(fH5["DATA/DATA"])
+
+    # Apply the lower limit
+    if lower_limit is not None:
+        data_sel = data[..., var_idx] > lower_limit
+        data = data[data_sel]
+    # Apply the upper limit
+    if upper_limit is not None:
+        data_sel = data[..., var_idx] < upper_limit
+        data = data[data_sel]
+
+    n_samples = data.shape[0]
+    if n_samples > 0:
+        chunk_size = 1000
+        if n_samples < 1000:
+            chunk_size = n_samples
+
+        fH5Out = h5py.File(out_h5_file, "w")
+        dataGrp = fH5Out.create_group("DATA")
+        metaGrp = fH5Out.create_group("META-DATA")
+        dataGrp.create_dataset(
+            "DATA",
+            data=data,
+            chunks=(chunk_size, num_vars),
+            compression="gzip",
+            shuffle=True,
+            dtype=h5_dtype,
+        )
+        describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+        describDS[0] = "Filtered values".encode()
+        fH5Out.close()
+    else:
+        raise rsgislib.RSGISPyException(
+            "Filtering has resulted in no data remaining "
+            "to be written to the output file."
+        )
+
+
 def get_var_from_hdf5_data(h5_files: List[str], var_idx: int = 0) -> numpy.array:
     """
     A function to get the data for a specific variable from a list of HDF files
@@ -2743,6 +2847,9 @@ def get_var_from_hdf5_data(h5_files: List[str], var_idx: int = 0) -> numpy.array
 
     """
     import h5py
+
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
 
     if var_idx < 0:
         raise rsgislib.RSGISPyException("The variable index must be greater than 0.")
@@ -2785,6 +2892,9 @@ def get_hdf5_data(h5_files: List[str]) -> numpy.array:
 
     """
     import h5py
+
+    if not isinstance(h5_files, list):
+        raise rsgislib.RSGISPyException("h5_files must be a list.")
 
     num_vals = 0
     n_vars = 0
@@ -3130,3 +3240,41 @@ def extract_zone_band_values_to_h5(
     except Exception as e:
         print(f"Error Image File: {input_img}", file=sys.stderr)
         raise e
+
+
+def write_data_to_h5(
+    data_arr: numpy.array, out_h5_file: str, datatype: int = rsgislib.TYPE_32FLOAT
+):
+    """
+    A function which writes the data array to a HDF5 file.
+
+    :param data_arr: Numpy array - shape: samples x variables
+    :param out_h5_file: the output hdf5 file path
+    :param datatype: the output data type
+
+    """
+    import h5py
+
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
+
+    data_shp = data_arr.shape
+
+    chunk_len = 1000
+    if data_shp[0] < chunk_len:
+        chunk_len = data_shp[0]
+    num_vars = data_shp[1]
+
+    f_h5_out = h5py.File(out_h5_file, "w")
+    data_grp = f_h5_out.create_group("DATA")
+    meta_grp = f_h5_out.create_group("META-DATA")
+    data_grp.create_dataset(
+        "DATA",
+        data=data_arr,
+        chunks=(chunk_len, num_vars),
+        compression="gzip",
+        shuffle=True,
+        dtype=h5_dtype,
+    )
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describ_ds[0] = "Written Data".encode()
+    f_h5_out.close()

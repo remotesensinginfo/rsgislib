@@ -3666,7 +3666,9 @@ def thin_vector_geoms(
     grid_gdf["unq_id"] = numpy.arange(1, (grid_gdf.shape[0]) + 1, 1, dtype=int)
 
     print("Perform Join")
-    pts_join_gdf = geopandas.sjoin(pts_gdf, grid_gdf, how="inner", predicate="intersects")
+    pts_join_gdf = geopandas.sjoin(
+        pts_gdf, grid_gdf, how="inner", predicate="intersects"
+    )
 
     pts_join_gdf.drop_duplicates(
         subset="unq_id", keep="first", inplace=True, ignore_index=False

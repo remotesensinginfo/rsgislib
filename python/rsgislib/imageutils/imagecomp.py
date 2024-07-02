@@ -373,7 +373,6 @@ def create_max_ndvi_ndwi_composite(
             img_lyrs = numpy.empty(num_in_lyrs + 1, dtype=numpy.dtype("a255"))
 
             # Generate Comp Ref layers:
-            land_water_msk_band_defns = []
             msk_imgs = []
             idx = 1
             for img in in_images_sub_to_ref:

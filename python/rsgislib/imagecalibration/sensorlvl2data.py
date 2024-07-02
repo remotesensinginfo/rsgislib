@@ -40,6 +40,14 @@ import numpy
 import rsgislib
 import rsgislib.tools.sensors
 
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
+
 
 def create_stacked_sref_ls_oli_cl2_lv2_img(
     input_file: str,
@@ -640,12 +648,10 @@ def parse_landsat_c2_qa_pixel_img(
         else:
             qa_lut[val]["CirrusConfidence"] = 1
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img

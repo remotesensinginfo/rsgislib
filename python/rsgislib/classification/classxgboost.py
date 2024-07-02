@@ -41,7 +41,8 @@ from typing import Dict, List, Union
 import h5py
 import numpy
 from osgeo import gdal
-from rios import applier, cuiprogress, rat
+from rios import applier, rat
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 import rsgislib
 import rsgislib.classification
@@ -56,7 +57,13 @@ try:
 except ImportError:
     HAVE_XGBOOST = False
 
-from sklearn.metrics import accuracy_score, roc_auc_score
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 
 def optimise_xgboost_binary_classifier(
@@ -1005,12 +1012,10 @@ def apply_xgboost_binary_classifier(
     otherargs.numClassVars = num_class_vars
     otherargs.imgFileInfo = img_file_info
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
@@ -2038,12 +2043,10 @@ def apply_xgboost_multiclass_classifier(
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
@@ -2236,12 +2239,10 @@ def apply_xgboost_multiclass_classifier_rat(
     otherargs.class_colours = class_colours
     otherargs.cls_info_dict = cls_info_dict
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     aControls = ratapplier.RatApplierControls()
     aControls.progress = progress_bar

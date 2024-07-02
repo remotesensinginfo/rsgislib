@@ -57,6 +57,7 @@ def define_axis_extent(ax: plt.axis, bbox: List[float]):
     ax.set_aspect("equal", "box")
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
 
 def define_map_tick_spacing(ax: plt.axis, tick_spacing: float):
@@ -75,6 +76,7 @@ def define_map_tick_spacing(ax: plt.axis, tick_spacing: float):
 
     ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax.ticklabel_format(useOffset=False, style='plain')
 
 
 def get_overview_info(
@@ -525,7 +527,7 @@ def create_vec_lyr_map(
 
     """
     n_vec_lyrs = 1
-    if type(gp_vecs) is list:
+    if isinstance(gp_vecs, list):
         n_vec_lyrs = len(gp_vecs)
     else:
         # Create list of one
@@ -541,7 +543,7 @@ def create_vec_lyr_map(
         else:
             gp_vec_sub = gp_vec
 
-        if type(vec_fill_clrs) is list:
+        if isinstance(vec_fill_clrs, list):
             if len(vec_fill_clrs) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of fill colours not same as number of vector layers"
@@ -550,7 +552,7 @@ def create_vec_lyr_map(
         else:
             vec_fill_clr = vec_fill_clrs
 
-        if type(vec_line_clrs) is list:
+        if isinstance(vec_line_clrs, list):
             if len(vec_line_clrs) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of line colours not same as number of vector layers"
@@ -559,7 +561,7 @@ def create_vec_lyr_map(
         else:
             vec_line_clr = vec_line_clrs
 
-        if type(vec_line_widths) is list:
+        if isinstance(vec_line_widths, list):
             if len(vec_line_widths) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of line widths not same as number of vector layers"
@@ -568,7 +570,7 @@ def create_vec_lyr_map(
         else:
             vec_line_width = vec_line_widths
 
-        if type(vec_fill_alphas) is list:
+        if isinstance(vec_fill_alphas, list):
             if len(vec_fill_alphas) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of fill alphas not same as number of vector layers"
@@ -577,7 +579,7 @@ def create_vec_lyr_map(
         else:
             vec_fill_alpha = vec_fill_alphas
 
-        if type(plot_zorders) is list:
+        if isinstance(plot_zorders, list):
             if len(plot_zorders) != n_vec_lyrs:
                 raise rsgislib.RSGISPyException(
                     "Number of fill colours not same as number of vector layers"
@@ -597,6 +599,7 @@ def create_vec_lyr_map(
         )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()
@@ -632,7 +635,7 @@ def create_raster_img_map(
     img_no_data_val: float = None,
     stch_min_max_vals: Union[Dict, List[Dict]] = None,
     stch_n_stdevs: float = 2.0,
-    img_alpha: float=1.0,
+    img_alpha: float = 1.0,
     scale_bar_loc: str = "upper right",
     plot_zorder: float = 1,
 ):
@@ -716,9 +719,16 @@ def create_raster_img_map(
     if len(img_bands) == 1:
         clr_map = "gist_gray"
 
-    ax.imshow(img_data_strch, cmap=clr_map, extent=img_coords, alpha=img_alpha, zorder=plot_zorder)
+    ax.imshow(
+        img_data_strch,
+        cmap=clr_map,
+        extent=img_coords,
+        alpha=img_alpha,
+        zorder=plot_zorder,
+    )
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()
@@ -824,6 +834,7 @@ def create_thematic_raster_map(
 
     ax.set_xlim([img_coords_scns[0][0], img_coords_scns[0][1]])
     ax.set_ylim([img_coords_scns[0][2], img_coords_scns[0][3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     for img_data_arr, img_coords, plot_zorder in zip(
         img_data_arr_scns, img_coords_scns, lcl_plot_zorders
@@ -941,6 +952,7 @@ def create_choropleth_vec_lyr_map(
     )
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()
@@ -1066,6 +1078,7 @@ def create_raster_cmap_img_map(
     ax.imshow(img_data, extent=img_coords, cmap=c_cmap, norm=c_norm, zorder=plot_zorder)
     ax.set_xlim([img_coords[0], img_coords[1]])
     ax.set_ylim([img_coords[2], img_coords[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()
@@ -1200,6 +1213,7 @@ def create_vec_pt_density_map(
 
     ax.set_xlim([bbox[0], bbox[1]])
     ax.set_ylim([bbox[2], bbox[3]])
+    ax.ticklabel_format(useOffset=False, style='plain')
 
     if use_grid:
         ax.grid()

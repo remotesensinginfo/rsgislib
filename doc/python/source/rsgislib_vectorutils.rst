@@ -31,6 +31,7 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.createvectors.create_bboxs_for_pts
 .. autofunction:: rsgislib.vectorutils.create_lines_of_points
 .. autofunction:: rsgislib.vectorutils.createvectors.create_random_pts_in_radius
+.. autofunction:: rsgislib.vectorutils.createvectors.create_random_pts_in_bbox
 .. autofunction:: rsgislib.vectorutils.create_copy_vector_lyr
 .. autofunction:: rsgislib.vectorutils.createvectors.create_vec_for_image
 .. autofunction:: rsgislib.vectorutils.createvectors.create_hex_grid_bbox
@@ -123,6 +124,7 @@ Vector Info
 .. autofunction:: rsgislib.vectorutils.get_vec_lyr_cols
 .. autofunction:: rsgislib.vectorutils.get_ogr_vec_col_datatype_from_gdal_rat_col_datatype
 .. autofunction:: rsgislib.vectorutils.get_vec_lyr_geom_type
+.. autofunction:: rsgislib.vectorutils.get_geom_type_name
 
 
 Vectors Utilities

@@ -12,7 +12,6 @@ import rsgislib.tools.projection
 
 
 class StdImgBlockIter:
-
     """
     A class to read and write images in blocks where all blocks are all identical in
     size. To deal with image boundaries, where block do not divide into the the image
@@ -137,9 +136,9 @@ class StdImgBlockIter:
             self.img_info[img.name]["pxl_size"] = rsgislib.imageutils.get_img_size(
                 img.file_name
             )
-            self.img_info[img.name][
-                "epsg"
-            ] = rsgislib.imageutils.get_epsg_proj_from_img(img.file_name)
+            self.img_info[img.name]["epsg"] = (
+                rsgislib.imageutils.get_epsg_proj_from_img(img.file_name)
+            )
             if self.img_info[img.name]["epsg"] is None:
                 raise rsgislib.RSGISPyException(
                     "The input image ({}) does not have a "

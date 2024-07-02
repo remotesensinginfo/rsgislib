@@ -32,3 +32,5 @@ NASA Common Metadata Repository
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.find_all_granules
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.get_total_file_size
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.cmr_download_file_http
+.. autofunction:: rsgislib.dataaccess.nasa_cmr.create_cmr_dwnld_db
+.. autofunction:: rsgislib.dataaccess.nasa_cmr.download_granules_use_dwnld_db

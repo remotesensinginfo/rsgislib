@@ -290,7 +290,6 @@ def calc_pt_smpl_img_vals(
 
 
 class RSGISDebugExportImg(RSGISCalcSumVals):
-
     """
     Debug class which exports the data to an out image.
     """

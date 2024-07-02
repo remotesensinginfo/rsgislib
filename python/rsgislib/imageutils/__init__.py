@@ -2,11 +2,13 @@
 """
 The imageutils module contains general utilities for applying to images.
 """
+# import the C++ extension into this level
+from ._imageutils import *
 
 import math
 import os
 import shutil
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import numpy
 from osgeo import gdal, osr
@@ -14,8 +16,13 @@ from rios import applier
 
 import rsgislib
 
-# import the C++ extension into this level
-from ._imageutils import *
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 gdal.UseExceptions()
 
@@ -213,9 +220,9 @@ def set_env_vars_deflate_gtiff_outs(bigtiff: bool = False):
 
     """
     if bigtiff:
-        os.environ[
-            "RSGISLIB_IMG_CRT_OPTS_GTIFF"
-        ] = "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+        os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = (
+            "TILED=YES:COMPRESS=DEFLATE:BIGTIFF=YES"
+        )
     else:
         os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=DEFLATE"
 
@@ -490,7 +497,7 @@ def define_colour_table(input_img: str, clr_lut: dict, img_band: int = 1):
     gdal_ds = None
 
 
-def get_rsgislib_datatype_from_img(input_img: str):
+def get_rsgislib_datatype_from_img(input_img: str) -> int:
     """
     Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8UINT)
     for the inputted raster file
@@ -1268,7 +1275,6 @@ def get_utm_zone(input_img: str):
     spatRef.ImportFromWkt(projStr)
     utmZone = None
     if spatRef.IsProjected():
-        projName = spatRef.GetAttrValue("projcs")
         zone = spatRef.GetUTMZone()
         if zone != 0:
             if zone < 0:
@@ -1334,12 +1340,12 @@ def set_band_names(input_img: str, band_names: list, feedback: bool = False):
 
         imgBand = dataset.GetRasterBand(band)
         # Check the image band is available
-        if not imgBand is None:
+        if imgBand is not None:
             if feedback:
-                print('Setting Band {0} to "{1}"'.format(band, bandName))
+                print(f'Setting Band {band} to "{bandName}"')
             imgBand.SetDescription(bandName)
         else:
-            raise rsgislib.RSGISPyException("Could not open the image band: ", band)
+            raise rsgislib.RSGISPyException(f"Could not open the image band: {band}")
 
 
 def get_band_names(input_img: str):
@@ -1354,22 +1360,22 @@ def get_band_names(input_img: str):
         from rsgislib import imageutils
 
         input_img = 'injune_p142_casi_sub_utm.kea'
-        bandNames = imageutils.get_band_names(input_img)
+        band_names = imageutils.get_band_names(input_img)
 
     """
     dataset = gdal.Open(input_img)
-    bandNames = list()
+    band_names = list()
 
     for i in range(dataset.RasterCount):
-        imgBand = dataset.GetRasterBand(i + 1)
+        img_band = dataset.GetRasterBand(i + 1)
         # Check the image band is available
-        if not imgBand is None:
-            bandNames.append(imgBand.GetDescription())
+        if img_band is not None:
+            band_names.append(img_band.GetDescription())
         else:
             raise rsgislib.RSGISPyException(
-                "Could not open the image band: {}".format(imgBand)
+                f"Could not open the image band: {img_band}"
             )
-    return bandNames
+    return band_names
 
 
 def set_img_thematic(input_img: str):
@@ -1382,8 +1388,8 @@ def set_img_thematic(input_img: str):
     ds = gdal.Open(input_img, gdal.GA_Update)
     if ds is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
-    for bandnum in range(ds.RasterCount):
-        band = ds.GetRasterBand(bandnum + 1)
+    for band_num in range(ds.RasterCount):
+        band = ds.GetRasterBand(band_num + 1)
         band.SetMetadataItem("LAYER_TYPE", "thematic")
     ds = None
 
@@ -1399,8 +1405,8 @@ def set_img_not_thematic(input_img: str):
     ds = gdal.Open(input_img, gdal.GA_Update)
     if ds is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
-    for bandnum in range(ds.RasterCount):
-        band = ds.GetRasterBand(bandnum + 1)
+    for band_num in range(ds.RasterCount):
+        band = ds.GetRasterBand(band_num + 1)
         band.SetMetadataItem("LAYER_TYPE", "athematic")
     ds = None
 
@@ -1439,12 +1445,12 @@ def has_gcps(input_img: str):
     raster = gdal.Open(input_img, gdal.GA_ReadOnly)
     if raster is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
-    numGCPs = raster.GetGCPCount()
-    hasGCPs = False
-    if numGCPs > 0:
-        hasGCPs = True
+    num_gcps = raster.GetGCPCount()
+    has_gcps = False
+    if num_gcps > 0:
+        has_gcps = True
     raster = None
-    return hasGCPs
+    return has_gcps
 
 
 def copy_gcps(input_img: str, output_img: str):
@@ -1455,22 +1461,22 @@ def copy_gcps(input_img: str, output_img: str):
     :param output_img: Raster layer to which GCPs will be added
 
     """
-    srcDS = gdal.Open(input_img, gdal.GA_ReadOnly)
-    if srcDS is None:
+    src_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if src_ds is None:
         raise rsgislib.RSGISPyException("Could not open the input_img.")
-    destDS = gdal.Open(output_img, gdal.GA_Update)
-    if destDS is None:
-        srcDS = None
+    dest_ds = gdal.Open(output_img, gdal.GA_Update)
+    if dest_ds is None:
+        src_ds = None
         raise rsgislib.RSGISPyException("Could not open the output_img.")
 
-    numGCPs = srcDS.GetGCPCount()
-    if numGCPs > 0:
-        gcpProj = srcDS.GetGCPProjection()
-        gcpList = srcDS.GetGCPs()
-        destDS.SetGCPs(gcpList, gcpProj)
+    num_gcps = src_ds.GetGCPCount()
+    if num_gcps > 0:
+        gcp_proj = src_ds.GetGCPProjection()
+        gcp_list = src_ds.GetGCPs()
+        dest_ds.SetGCPs(gcp_list, gcp_proj)
 
-    srcDS = None
-    destDS = None
+    src_ds = None
+    dest_ds = None
 
 
 def set_img_band_metadata(
@@ -2251,7 +2257,7 @@ def resample_img_to_match(
 
     backVal = 0.0
     haveNoData = False
-    if no_data_val != None:
+    if no_data_val is not None:
         backVal = float(no_data_val)
         haveNoData = True
 
@@ -2748,14 +2754,10 @@ def calc_pixel_locations(input_img: str, output_img: str, gdalformat: str):
     :param gdalformat: the GDAL image file format of the output image file.
 
     """
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.image1 = input_img
@@ -2795,12 +2797,10 @@ def calc_wgs84_pixel_area(
 
     import rsgislib.tools.projection
 
-    try:
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     x_res, y_res = get_img_res(input_img, abs_vals=True)
 
@@ -2972,14 +2972,10 @@ def generate_random_pxl_vals_img(
     :param up_val: upper value
 
     """
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.inImg = input_img
@@ -3021,37 +3017,57 @@ def extract_img_pxl_sample(
     :return: outputs a numpy array (n sampled values, n bands)
 
     """
-    # Import the RIOS image reader
-    import tqdm
-    from rios.imagereader import ImageReader
+    from rios import applier
 
-    first = True
-    reader = ImageReader(input_img, windowxsize=200, windowysize=200)
-    for info, block in tqdm.tqdm(reader):
-        blkShape = block.shape
-        blkBands = block.reshape((blkShape[0], (blkShape[1] * blkShape[2])))
+    def _extract_sample(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        img_shp = inputs.image.shape
+        img_bands = inputs.image.reshape((img_shp[0], (img_shp[1] * img_shp[2])))
 
-        blkBandsTrans = numpy.transpose(blkBands)
+        img_bands_trans = numpy.transpose(img_bands)
 
-        if no_data_val is not None:
-            blkBandsTrans = blkBandsTrans[(blkBandsTrans != no_data_val).all(axis=1)]
+        if otherargs.no_data_val is not None:
+            img_bands_trans = img_bands_trans[
+                (img_bands_trans != otherargs.no_data_val).all(axis=1)
+            ]
 
-        if blkBandsTrans.shape[0] > 0:
-            nSamp = int((blkBandsTrans.shape[0]) / pxl_n_sample)
-            nSampRange = numpy.arange(0, nSamp, 1) * pxl_n_sample
-            blkBandsTransSamp = blkBandsTrans[nSampRange]
+        if img_bands_trans.shape[0] > 0:
+            n_samp = int((img_bands_trans.shape[0]) / otherargs.pxl_n_sample)
+            n_samp_range = numpy.arange(0, n_samp, 1) * otherargs.pxl_n_sample
+            img_bands_trans_smpl = img_bands_trans[n_samp_range]
 
-            if first:
-                outArr = blkBandsTransSamp
-                first = False
+            if otherargs.out_arr is None:
+                otherargs.out_arr = img_bands_trans_smpl
             else:
-                outArr = numpy.concatenate((outArr, blkBandsTransSamp), axis=0)
-    return outArr
+                otherargs.out_arr = numpy.concatenate(
+                    (otherargs.out_arr, img_bands_trans_smpl), axis=0
+                )
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.pxl_n_sample = pxl_n_sample
+    otherargs.no_data_val = no_data_val
+    otherargs.out_arr = None
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    applier.apply(_extract_sample, infiles, outfiles, otherargs, controls=aControls)
+
+    return otherargs.out_arr
 
 
 def extract_img_pxl_vals_in_msk(
     input_img: str,
-    img_bands: list,
+    img_bands: List[int],
     in_msk_img: str,
     img_mask_val: int,
     no_data_val: float = None,
@@ -3068,46 +3084,64 @@ def extract_img_pxl_vals_in_msk(
     :return: outputs a numpy array (n values, n bands)
 
     """
-    # Import the RIOS image reader
-    import tqdm
-    from rios.imagereader import ImageReader
+    from rios import applier
 
-    outArr = None
-    first = True
-    reader = ImageReader([input_img, in_msk_img], windowxsize=200, windowysize=200)
-    for info, block in tqdm.tqdm(reader):
-        blk_img = block[0]
-        blk_msk = block[1].flatten()
-        blk_img_shape = blk_img.shape
+    def _extract_sample_msk(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        img_msk = inputs.mask.flatten()
+        img_shp = inputs.image.shape
+        img_bands = inputs.image.reshape((img_shp[0], (img_shp[1] * img_shp[2])))
 
-        blk_bands = blk_img.reshape(
-            (blk_img_shape[0], (blk_img_shape[1] * blk_img_shape[2]))
-        )
-        band_lst = []
-        for band in img_bands:
-            if (band > 0) and (band <= blk_bands.shape[0]):
-                band_lst.append(blk_bands[band - 1])
+        img_band_lst = []
+        for band in otherargs.img_bands:
+            if (band > 0) and (band <= img_bands.shape[0]):
+                img_band_lst.append(img_bands[band - 1])
             else:
                 raise rsgislib.RSGISPyException(
-                    "Band ({}) specified is not within the image".format(band)
+                    f"Band ({band}) specified is not within the image"
                 )
-        blk_bands_sel = numpy.stack(band_lst, axis=0)
-        blk_bands_trans = numpy.transpose(blk_bands_sel)
+        img_bands_sel = numpy.stack(img_band_lst, axis=0)
+        img_bands_trans = numpy.transpose(img_bands_sel)
 
-        if no_data_val is not None:
-            blk_msk = blk_msk[(blk_bands_trans != no_data_val).all(axis=1)]
-            blk_bands_trans = blk_bands_trans[
-                (blk_bands_trans != no_data_val).all(axis=1)
+        # Apply mask
+        img_bands_trans = img_bands_trans[img_msk == otherargs.img_mask_val]
+
+        # If no data provided mask to valid values.
+        if otherargs.no_data_val is not None:
+            img_bands_trans = img_bands_trans[
+                (img_bands_trans != otherargs.no_data_val).all(axis=1)
             ]
 
-        if blk_bands_trans.shape[0] > 0:
-            blk_bands_trans = blk_bands_trans[blk_msk == img_mask_val]
-            if first:
-                out_arr = blk_bands_trans
-                first = False
+        if img_bands_trans.shape[0] > 0:
+            if otherargs.out_arr is None:
+                otherargs.out_arr = img_bands_trans
             else:
-                out_arr = numpy.concatenate((out_arr, blk_bands_trans), axis=0)
-    return out_arr
+                otherargs.out_arr = numpy.concatenate(
+                    (otherargs.out_arr, img_bands_trans), axis=0
+                )
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    infiles.mask = in_msk_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.img_bands = img_bands
+    otherargs.img_mask_val = img_mask_val
+    otherargs.out_arr = None
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    applier.apply(_extract_sample_msk, infiles, outfiles, otherargs, controls=aControls)
+
+    return otherargs.out_arr
 
 
 def combine_binary_masks(
@@ -3130,14 +3164,10 @@ def combine_binary_masks(
     import rsgislib.imagecalc
     import rsgislib.tools.utils
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     in_vals_dict = dict()
     msk_imgs = list()
@@ -4239,7 +4269,6 @@ def whiten_image(
             raise rsgislib.RSGISPyException(
                 "Could not open image band ({})".format(n + 1)
             )
-        no_data_val = img_band.GetNoDataValue()
         band_arr = img_band.ReadAsArray().flatten()
         band_arr = band_arr.astype(numpy.float32)
         img_data[n] = band_arr
@@ -4309,14 +4338,10 @@ def spectral_smoothing(
     import scipy.signal
     from rios import applier
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     np_dtype = rsgislib.get_numpy_datatype(datatype)
     in_no_date = get_img_no_data_value(input_img)
@@ -4398,14 +4423,10 @@ def calc_wsg84_pixel_size(input_img: str, output_img: str, gdalformat: str = "KE
 
     import rsgislib.tools.projection
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     x_res, y_res = get_img_res(input_img, abs_vals=True)
 
@@ -4463,14 +4484,10 @@ def mask_all_band_zero_vals(
     """
     from rios import applier
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -4611,14 +4628,10 @@ def mask_outliners_data_values(
     """
     from rios import applier
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     np_dtype = rsgislib.get_numpy_datatype(rsgislib.TYPE_32FLOAT)
     in_no_date = get_img_no_data_value(input_img)
@@ -4720,14 +4733,10 @@ def polyfill_nan_data_values(
     """
     from rios import applier
 
-    try:
-        import tqdm
-
+    if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-
-        progress_bar = cuiprogress.GDALProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
 
     np_dtype = rsgislib.get_numpy_datatype(rsgislib.TYPE_32FLOAT)
     in_no_date = get_img_no_data_value(input_img)
@@ -4779,9 +4788,9 @@ def polyfill_nan_data_values(
                         if otherargs.mean_abs_diff is not None:
                             pxl_mean = numpy.nanmean(img_flat[pxl_idx])
                             pred_vals_diff = numpy.abs(pred_vals - pxl_mean)
-                            pred_vals[
-                                pred_vals_diff > otherargs.mean_abs_diff
-                            ] = pxl_mean
+                            pred_vals[pred_vals_diff > otherargs.mean_abs_diff] = (
+                                pxl_mean
+                            )
                         repl_idxs = numpy.arange(0, pred_vals.shape[0])[
                             numpy.invert(finite_msk)
                         ]
