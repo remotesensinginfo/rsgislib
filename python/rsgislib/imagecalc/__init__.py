@@ -518,7 +518,7 @@ def buffer_img_pxl_vals(
         output_img,
         "(b1>=0)&&(b1<{})?1:0".format(buf_thres),
         gdalformat,
-        rsgislib.TYPE_32FLOAT,
+        rsgislib.TYPE_8UINT,
     )
 
     rsgislib.tools.filetools.delete_file_silent(dist_img)
