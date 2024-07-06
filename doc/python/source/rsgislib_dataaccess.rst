@@ -34,3 +34,13 @@ NASA Common Metadata Repository
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.cmr_download_file_http
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.create_cmr_dwnld_db
 .. autofunction:: rsgislib.dataaccess.nasa_cmr.download_granules_use_dwnld_db
+
+Copernicus Data Space Ecosystem
+---------------------------------
+
+.. autofunction:: rsgislib.dataaccess.copernicus_odata.get_access_token
+.. autofunction:: rsgislib.dataaccess.copernicus_odata.query_scn
+.. autofunction:: rsgislib.dataaccess.copernicus_odata.query_scn_lst
+.. autofunction:: rsgislib.dataaccess.copernicus_odata.download_scn
+.. autofunction:: rsgislib.dataaccess.copernicus_odata.download_scns
+.. autofunction:: rsgislib.dataaccess.copernicus_odata.get_sensor_collection_name
