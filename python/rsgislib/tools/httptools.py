@@ -144,6 +144,9 @@ def download_file_http(
     no_except: bool = True,
 ):
     """
+    A function which downloads a file from an URL and saves it to a local file.
+    Note, the file is downloaded with '.incomplete' extension before being
+    renamed to the output file path.
 
     :param input_url: The URL to be downlaoded
     :param out_file_path: output file path (including the file name)
@@ -179,13 +182,13 @@ def download_file_http(
                             f.write(chunk)
         if os.path.exists(tmp_dwnld_path):
             os.rename(tmp_dwnld_path, out_file_path)
-            print("Download Complete: {}".format(out_file_path))
+            print(f"Download Complete: {out_file_path}")
 
     except Exception as e:
         if no_except:
             print(e)
         else:
-            raise rsgislib.RSGISPyException("{}".format(e))
+            raise rsgislib.RSGISPyException(f"{e}")
         return False
     return True
 
