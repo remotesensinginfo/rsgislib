@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 """
-The tools.geometrytool module contains functions for manipulating and moving files around.
+The tools.geometrytool module contains functions for
+manipulating and moving files around.
 """
 
 import math
-from typing import Dict, List
+from typing import Dict, List, Union, Tuple
 
 from osgeo import ogr, osr
 
@@ -12,10 +13,10 @@ import rsgislib
 
 
 def reproj_bbox(
-    bbox: List[float],
+    bbox: Union[Tuple[float, float, float, float], List[float]],
     in_osr_proj_obj: osr.SpatialReference(),
     out_osr_proj_obj: osr.SpatialReference(),
-) -> List[float]:
+) -> Tuple[float, float, float, float]:
     """
     A function to reproject a bounding box.
 
@@ -56,10 +57,14 @@ def reproj_bbox(
     if out_trY > maxY:
         maxY = out_trY
 
-    return [minX, maxX, minY, maxY]
+    return (minX, maxX, minY, maxY)
 
 
-def reproj_bbox_epsg(bbox: List[float], in_epsg: int, out_epsg: int):
+def reproj_bbox_epsg(
+    bbox: Union[Tuple[float, float, float, float], List[float]],
+    in_epsg: int,
+    out_epsg: int,
+) -> Tuple[float, float, float, float]:
     """
     A function to reproject a bounding box.
 
@@ -79,7 +84,10 @@ def reproj_bbox_epsg(bbox: List[float], in_epsg: int, out_epsg: int):
     return out_bbox
 
 
-def do_bboxes_intersect(bbox1: List[float], bbox2: List[float]) -> bool:
+def do_bboxes_intersect(
+    bbox1: Union[Tuple[float, float, float, float], List[float]],
+    bbox2: Union[Tuple[float, float, float, float], List[float]],
+) -> bool:
     """
     A function which tests whether two bboxes (MinX, MaxX, MinY, MaxY) intersect.
 
@@ -101,7 +109,10 @@ def do_bboxes_intersect(bbox1: List[float], bbox2: List[float]) -> bool:
     return intersect
 
 
-def does_bbox_contain(bbox1: List[float], bbox2: List[float]) -> bool:
+def does_bbox_contain(
+    bbox1: Union[Tuple[float, float, float, float], List[float]],
+    bbox2: Union[Tuple[float, float, float, float], List[float]],
+) -> bool:
     """
     A function which tests whether bbox1 contains bbox2.
 
@@ -123,7 +134,9 @@ def does_bbox_contain(bbox1: List[float], bbox2: List[float]) -> bool:
     return contains
 
 
-def calc_bbox_area(bbox: List[float]) -> float:
+def calc_bbox_area(
+    bbox: Union[Tuple[float, float, float, float], List[float]]
+) -> float:
     """
     Calculate the area of the bbox.
 
@@ -135,7 +148,10 @@ def calc_bbox_area(bbox: List[float]) -> float:
     return (bbox[1] - bbox[0]) * (bbox[3] - bbox[2])
 
 
-def bbox_equal(bbox1: List[float], bbox2: List[float]) -> bool:
+def bbox_equal(
+    bbox1: Union[Tuple[float, float, float, float], List[float]],
+    bbox2: Union[Tuple[float, float, float, float], List[float]],
+) -> bool:
     """
     A function which tests whether two bboxes (xMin, xMax, yMin, yMax) are equal.
 
@@ -155,7 +171,10 @@ def bbox_equal(bbox1: List[float], bbox2: List[float]) -> bool:
     return bbox_eql
 
 
-def bbox_intersection(bbox1: List[float], bbox2: List[float]) -> List[float]:
+def bbox_intersection(
+    bbox1: Union[Tuple[float, float, float, float], List[float]],
+    bbox2: Union[Tuple[float, float, float, float], List[float]],
+) -> Tuple[float, float, float, float]:
     """
     A function which calculates the intersection of the two bboxes (xMin, xMax, yMin, yMax).
 
@@ -184,10 +203,12 @@ def bbox_intersection(bbox1: List[float], bbox2: List[float]) -> List[float]:
     if bbox2[3] < yMaxOverlap:
         yMaxOverlap = bbox2[3]
 
-    return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
+    return (xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap)
 
 
-def bboxes_intersection(bboxes: List[List[float]]) -> List[float]:
+def bboxes_intersection(
+    bboxes: List[Union[Tuple[float, float, float, float], List[float]]]
+) -> Tuple[float, float, float, float]:
     """
     A function to find the intersection between a list of
     bboxes.
@@ -207,7 +228,9 @@ def bboxes_intersection(bboxes: List[List[float]]) -> List[float]:
     return inter_bbox
 
 
-def buffer_bbox(bbox: List[float], buf: float) -> List[float]:
+def buffer_bbox(
+    bbox: Union[Tuple[float, float, float, float], List[float]], buf: float
+) -> Tuple[float, float, float, float]:
     """
     Buffer the input BBOX by a set amount.
 
@@ -221,10 +244,12 @@ def buffer_bbox(bbox: List[float], buf: float) -> List[float]:
     out_bbox[1] = bbox[1] + buf
     out_bbox[2] = bbox[2] - buf
     out_bbox[3] = bbox[3] + buf
-    return out_bbox
+    return (out_bbox[0], out_bbox[1], out_bbox[2], out_bbox[3])
 
 
-def find_bbox_union(bboxes: List[List[float]]) -> List[float]:
+def find_bbox_union(
+    bboxes: List[Union[Tuple[float, float, float, float], List[float]]]
+) -> Tuple[float, float, float, float]:
     """
     A function which finds the union of all the bboxes inputted.
 
@@ -233,24 +258,28 @@ def find_bbox_union(bboxes: List[List[float]]) -> List[float]:
 
     """
     if len(bboxes) == 1:
-        out_bbox = list(bboxes[0])
+        tmp_bbox = list(bboxes[0])
+        out_bbox = (tmp_bbox[0], tmp_bbox[1], tmp_bbox[2], tmp_bbox[3])
     elif len(bboxes) > 1:
-        out_bbox = list(bboxes[0])
+        tmp_bbox = list(bboxes[0])
         for bbox in bboxes:
-            if bbox[0] < out_bbox[0]:
-                out_bbox[0] = bbox[0]
-            if bbox[1] > out_bbox[1]:
-                out_bbox[1] = bbox[1]
-            if bbox[2] < out_bbox[2]:
-                out_bbox[2] = bbox[2]
-            if bbox[3] > out_bbox[3]:
-                out_bbox[3] = bbox[3]
+            if bbox[0] < tmp_bbox[0]:
+                tmp_bbox[0] = bbox[0]
+            if bbox[1] > tmp_bbox[1]:
+                tmp_bbox[1] = bbox[1]
+            if bbox[2] < tmp_bbox[2]:
+                tmp_bbox[2] = bbox[2]
+            if bbox[3] > tmp_bbox[3]:
+                tmp_bbox[3] = bbox[3]
+        out_bbox = (tmp_bbox[0], tmp_bbox[1], tmp_bbox[2], tmp_bbox[3])
     else:
         out_bbox = None
     return out_bbox
 
 
-def unwrap_wgs84_bbox(bbox: List[float]) -> List[List[float]]:
+def unwrap_wgs84_bbox(
+    bbox: Union[Tuple[float, float, float, float], List[float]]
+) -> List[Tuple[float, float, float, float]]:
     """
     A function which unwraps a bbox if it projected in WGS84 and over the 180/-180 boundary.
 
@@ -260,9 +289,9 @@ def unwrap_wgs84_bbox(bbox: List[float]) -> List[List[float]]:
     """
     bboxes = []
     if bbox[1] < bbox[0]:
-        bbox1 = [-180.0, bbox[1], bbox[2], bbox[3]]
+        bbox1 = (-180.0, bbox[1], bbox[2], bbox[3])
         bboxes.append(bbox1)
-        bbox2 = [bbox[0], 180.0, bbox[2], bbox[3]]
+        bbox2 = (bbox[0], 180.0, bbox[2], bbox[3])
         bboxes.append(bbox2)
     else:
         bboxes.append(bbox)
@@ -270,11 +299,11 @@ def unwrap_wgs84_bbox(bbox: List[float]) -> List[List[float]]:
 
 
 def find_common_extent_on_grid(
-    base_extent: List[float],
+    base_extent: Union[Tuple[float, float, float, float], List[float]],
     base_grid: float,
-    other_extent: List[float],
+    other_extent: Union[Tuple[float, float, float, float], List[float]],
     full_contain: bool = True,
-) -> List[float]:
+) -> Tuple[float, float, float, float]:
     """
     A function which calculates the common extent between two extents but defines output on
     grid with defined resolutions. Useful for finding common extent on a particular image grid.
@@ -325,12 +354,14 @@ def find_common_extent_on_grid(
             diff = math.ceil(abs(yMaxOverlap - other_extent[3]) / base_grid) * base_grid
         yMaxOverlap = yMaxOverlap - diff
 
-    return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
+    return (xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap)
 
 
 def find_extent_on_grid(
-    base_extent: List[float], base_grid: float, full_contain: bool = True
-) -> List[float]:
+    base_extent: Union[Tuple[float, float, float, float], List[float]],
+    base_grid: float,
+    full_contain: bool = True,
+) -> Tuple[float, float, float, float]:
     """
     A function which calculates the extent but defined on a grid with defined
     resolution. Useful for finding extent on a particular image grid.
@@ -379,15 +410,15 @@ def find_extent_on_grid(
     xMaxOut = xMinOut + (nPxlX * base_grid)
     yMinOut = yMaxOut - (nPxlY * base_grid)
 
-    return [xMinOut, xMaxOut, yMinOut, yMaxOut]
+    return (xMinOut, xMaxOut, yMinOut, yMaxOut)
 
 
 def find_extent_on_whole_num_grid(
-    base_extent: List[float],
+    base_extent: Union[Tuple[float, float, float, float], List[float]],
     base_grid: float,
     full_contain: bool = True,
     round_vals: int = None,
-) -> List[float]:
+) -> Tuple[float, float, float, float]:
     """
     A function which calculates the extent but defined on a grid with defined
     resolution. Useful for finding extent on a particular image grid.
@@ -433,18 +464,22 @@ def find_extent_on_whole_num_grid(
     yMaxOut = yMinOut + (nPxlY * base_grid)
 
     if round_vals is None:
-        out_bbox = [xMinOut, xMaxOut, yMinOut, yMaxOut]
+        out_bbox = (xMinOut, xMaxOut, yMinOut, yMaxOut)
     else:
-        out_bbox = [
+        out_bbox = (
             round(xMinOut, round_vals),
             round(xMaxOut, round_vals),
             round(yMinOut, round_vals),
             round(yMaxOut, round_vals),
-        ]
+        )
     return out_bbox
 
 
-def get_bbox_grid(bbox: List[float], x_size: int, y_size: int) -> List[List[float]]:
+def get_bbox_grid(
+    bbox: Union[Tuple[float, float, float, float], List[float]],
+    x_size: int,
+    y_size: int,
+) -> List[Tuple[float, float, float, float]]:
     """
     Create a grid with size x_size, y_size for the area represented by bbox.
 
@@ -463,8 +498,8 @@ def get_bbox_grid(bbox: List[float], x_size: int, y_size: int) -> List[List[floa
 
     if (n_tiles_x > 10000) or (n_tiles_y > 10000):
         print(
-            "WARNING: did you mean to product so many tiles (X: {}, Y: {}) "
-            "might want to check your units".format(n_tiles_x, n_tiles_y)
+            f"WARNING: did you mean to product so many tiles "
+            f" (X: {n_tiles_x}, Y: {n_tiles_y}) might want to check your units"
         )
 
     full_tile_width = n_tiles_x * x_size
@@ -485,12 +520,12 @@ def get_bbox_grid(bbox: List[float], x_size: int, y_size: int) -> List[List[floa
         c_min_x = bbox[0]
         c_max_x = c_min_x + x_size
         for nx in range(n_tiles_x):
-            bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+            bboxs.append((c_min_x, c_max_x, c_min_y, c_max_y))
             c_min_x = c_max_x
             c_max_x = c_max_x + x_size
         if x_remain > 0:
             c_max_x = c_min_x + x_remain
-            bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+            bboxs.append((c_min_x, c_max_x, c_min_y, c_max_y))
         c_min_y = c_max_y
         c_max_y = c_max_y + y_size
     if y_remain > 0:
@@ -498,17 +533,19 @@ def get_bbox_grid(bbox: List[float], x_size: int, y_size: int) -> List[List[floa
         c_min_x = bbox[0]
         c_max_x = c_min_x + x_size
         for nx in range(n_tiles_x):
-            bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+            bboxs.append((c_min_x, c_max_x, c_min_y, c_max_y))
             c_min_x = c_max_x
             c_max_x = c_max_x + x_size
         if x_remain > 0:
             c_max_x = c_min_x + x_remain
-            bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+            bboxs.append((c_min_x, c_max_x, c_min_y, c_max_y))
 
     return bboxs
 
 
-def get_bbox_geojson_poly(bbox: List) -> Dict:
+def get_bbox_geojson_poly(
+    bbox: Union[Tuple[float, float, float, float], List[float]]
+) -> Dict:
     """
     Get the bbox (xMin, xMax, yMin, yMax) represented as a GeoJSON polygon
     using dict and list.
@@ -530,7 +567,9 @@ def get_bbox_geojson_poly(bbox: List) -> Dict:
     return bbox_poly
 
 
-def get_bbox_centre_pt(bbox: List) -> List:
+def get_bbox_centre_pt(
+    bbox: Union[Tuple[float, float, float, float], List[float]]
+) -> Tuple[float, float]:
     """
     Function which returns the centre point of a bbox (xMin, xMax, yMin, yMax)
 
@@ -539,7 +578,7 @@ def get_bbox_centre_pt(bbox: List) -> List:
     """
     x_pt = bbox[0] + (bbox[1] - bbox[0]) / 2
     y_pt = bbox[2] + (bbox[3] - bbox[2]) / 2
-    return [x_pt, y_pt]
+    return (x_pt, y_pt)
 
 
 def reproj_point(
@@ -547,7 +586,7 @@ def reproj_point(
     out_osr_proj_obj: osr.SpatialReference(),
     x: float,
     y: float,
-) -> (float, float):
+) -> Tuple[float, float]:
     """
     Reproject a point from 'in_osr_proj_obj' to 'out_osr_proj_obj' where they are gdal
     osgeo.osr.SpatialReference objects.
@@ -578,7 +617,7 @@ def reproj_point(
 
 def reproj_point_to_wgs84(
     osr_proj_obj: osr.SpatialReference(), x: float, y: float
-) -> (float, float):
+) -> Tuple[float, float]:
     """
     A function which reprojects a point to the WGS84 projection
 
@@ -596,19 +635,22 @@ def reproj_point_to_wgs84(
 
 def calc_pt_distance(x1: float, y1: float, x2: float, y2: float) -> float:
     """
-    Calculate the euclidean distance between two points
+    Calculate the Euclidean distance between two points
 
     :param x1: x1 coordinate
     :param y1: y1 coordinate
     :param x2: x2 coordinate
     :param y2: y2 coordinate
-    :return: euclidean distance
+    :return: Euclidean distance
 
     """
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 
-def pt_in_bbox(pt: List[float], bbox: List[float]) -> bool:
+def pt_in_bbox(
+    pt: Union[Tuple[float, float, float, float], List[float]],
+    bbox: Union[Tuple[float, float, float, float], List[float]],
+) -> bool:
     """
     A function which tests whether a point is within a bbox.
 
@@ -626,11 +668,11 @@ def pt_in_bbox(pt: List[float], bbox: List[float]) -> bool:
 
 
 def find_point_on_whole_num_grid(
-    pt: List[float],
-    bbox: List[float],
+    pt: Union[Tuple[float, float, float, float], List[float]],
+    bbox: Union[Tuple[float, float, float, float], List[float]],
     x_grid_res: float,
     y_grid_res: float,
-) -> List[float]:
+) -> Tuple[float, float]:
     """
     A function which returns places a point on to the grid defined by the
     bbox, base_x_grid and  base_y_grid
@@ -652,5 +694,24 @@ def find_point_on_whole_num_grid(
     n_pxl_x = math.ceil(diff_x / x_grid_res)
     n_pxl_y = math.ceil(diff_y / y_grid_res)
 
-    out_pt = [(bbox[0] + (n_pxl_x * x_grid_res)), (bbox[3] - (n_pxl_y * y_grid_res))]
+    out_pt = ((bbox[0] + (n_pxl_x * x_grid_res)), (bbox[3] - (n_pxl_y * y_grid_res)))
     return out_pt
+
+
+def get_bbox_wkt_poly(
+    bbox: Union[Tuple[float, float, float, float], List[float]]
+) -> str:
+    """
+    A function which creates a WKT polygon from a bounding box.
+
+    :param bbox: the bounding box (MinX, MaxX, MinY, MaxY)
+    :return: WKT polygon representation of the bounding box
+
+    """
+    return (
+        f"POLYGON (({bbox[0]} {bbox[2]}, "
+        f"{bbox[1]} {bbox[2]}, "
+        f"{bbox[1]} {bbox[3]}, "
+        f"{bbox[0]} {bbox[3]}, "
+        f"{bbox[0]} {bbox[2]}))"
+    )
