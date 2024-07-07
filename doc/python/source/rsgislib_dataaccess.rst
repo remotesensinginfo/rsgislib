@@ -38,6 +38,8 @@ NASA Common Metadata Repository
 Copernicus Data Space Ecosystem
 ---------------------------------
 
+.. note::  See `rsgislib_dataaccess_copernicus_odata`_ for more detail and constants.
+
 .. autofunction:: rsgislib.dataaccess.copernicus_odata.get_access_token
 .. autofunction:: rsgislib.dataaccess.copernicus_odata.query_scn
 .. autofunction:: rsgislib.dataaccess.copernicus_odata.query_scn_lst
