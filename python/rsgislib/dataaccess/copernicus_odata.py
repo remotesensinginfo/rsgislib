@@ -245,7 +245,7 @@ def query_scn_lst(
     order_by: int = RSGIS_ODATA_ORDERBY_ASC,
     max_n_rslts: int = 25,
     start_n: int = None,
-)->List[Dict]:
+) -> List[Dict]:
     """
     A function which uses the Copernicus Data Space Ecosystem OData API
     to find lists of scenes using criteria to filter the return list of
