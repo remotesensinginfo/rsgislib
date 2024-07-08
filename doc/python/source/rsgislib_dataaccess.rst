@@ -2,7 +2,7 @@ RSGISLib Data Sources
 ========================
 
 This module has functions to help with searching for and downloading data.
-Tutorials showing how to use these functions available `here<https://github.com/remotesensinginfo/rsgislib-tutorials/tree/main/11_download_datasets>`_
+Tutorials showing how to use these functions available `here <https://github.com/remotesensinginfo/rsgislib-tutorials/tree/main/11_download_datasets>`_
 
 
 USGS Earth Explorer
