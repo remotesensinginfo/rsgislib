@@ -1,7 +1,8 @@
 RSGISLib Data Sources
 ========================
 
-This module has function to help with accessing and downloading data.
+This module has functions to help with searching for and downloading data.
+Tutorials showing how to use these functions available `here<https://github.com/remotesensinginfo/rsgislib-tutorials/tree/main/11_download_datasets>`_
 
 
 USGS Earth Explorer
@@ -38,7 +39,7 @@ NASA Common Metadata Repository
 Copernicus Data Space Ecosystem
 ---------------------------------
 
-.. note::  See `rsgislib_dataaccess_copernicus_odata`_ for more detail and constants.
+.. note::  See `Copernicus OData API <rsgislib_dataaccess_copernicus_odata.html>`_ for constants.
 
 .. autofunction:: rsgislib.dataaccess.copernicus_odata.get_access_token
 .. autofunction:: rsgislib.dataaccess.copernicus_odata.query_scn
