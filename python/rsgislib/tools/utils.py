@@ -383,6 +383,26 @@ def write_dict_to_json(data_dict: Dict, out_file: str):
         )
 
 
+def dict_to_json_str(data_dict: Dict) -> str:
+    """
+    Write some data to a JSON file. The data would commonly be structured as a dict
+    but could also be a list.
+
+    :param data_dict: The dict (or list) to be written to the output JSON file.
+    :param out_file: The file path to the output file.
+
+    """
+    data_str = json.dumps(
+        data_dict,
+        cls=RSGISNumpyArrayEncoder,
+        sort_keys=True,
+        indent=None,
+        separators=(",", ": "),
+        ensure_ascii=False,
+    )
+    return data_str
+
+
 def write_dict_to_json_gz(data_dict: Dict, out_file: str, encoding: str = "utf-8"):
     """
     Write some data to a JSON file compressed with gzip. The data would commonly be

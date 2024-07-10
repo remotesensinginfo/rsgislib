@@ -27,6 +27,7 @@ JSON File I/O
 
 Parse Dict/JSON
 -------------------
+.. autofunction:: rsgislib.tools.utils.dict_to_json_str
 .. autofunction:: rsgislib.tools.utils.dict_struct_does_path_exist
 .. autofunction:: rsgislib.tools.utils.dict_struct_get_str_value
 .. autofunction:: rsgislib.tools.utils.dict_struct_get_boolean_value
