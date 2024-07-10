@@ -47,3 +47,20 @@ Copernicus Data Space Ecosystem
 .. autofunction:: rsgislib.dataaccess.copernicus_odata.download_scn
 .. autofunction:: rsgislib.dataaccess.copernicus_odata.download_scns
 .. autofunction:: rsgislib.dataaccess.copernicus_odata.get_sensor_collection_name
+
+
+Planet Data
+-------------
+
+.. note::  See `Planet Data API <rsgislib_dataaccess_planet_data_api.html>`_ for constants.
+
+.. autofunction:: rsgislib.dataaccess.planet_data_api.planet_auth
+.. autofunction:: rsgislib.dataaccess.planet_data_api.run_search_planet_items
+.. autofunction:: rsgislib.dataaccess.planet_data_api.run_create_planet_order
+.. autofunction:: rsgislib.dataaccess.planet_data_api.run_download_planet_order
+.. autofunction:: rsgislib.dataaccess.planet_data_api.run_get_planet_orders
+.. autofunction:: rsgislib.dataaccess.planet_data_api.run_cancel_planet_orders
+.. autofunction:: rsgislib.dataaccess.planet_data_api.run_download_and_validate_item
+.. autofunction:: rsgislib.dataaccess.planet_data_api.get_item_type_str
+.. autofunction:: rsgislib.dataaccess.planet_data_api.get_asset_type_str
+.. autofunction:: rsgislib.dataaccess.planet_data_api.get_bundle_type_str
