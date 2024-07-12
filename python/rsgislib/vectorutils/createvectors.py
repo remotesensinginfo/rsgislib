@@ -626,7 +626,7 @@ def create_poly_vec_bboxs(
     epsg_code: int,
     bboxs: List[Union[Tuple[float, float, float, float], List[float]]],
     atts: Dict[str, List] = None,
-    att_types: Dict[str:List] = None,
+    att_types: Dict[str, List] = None,
     overwrite: bool = True,
 ):
     """
