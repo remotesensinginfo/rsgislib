@@ -1835,7 +1835,8 @@ def create_img_from_array(
         )
 
     print(
-        f"Output Image with {n_bands} and Size (width x height): ({width} x {height})."
+        f"Output image with {n_bands} bands and size "
+        f"(width x height): ({width} x {height})."
     )
 
     gdal_data_type = rsgislib.get_gdal_datatype(datatype)
@@ -1850,7 +1851,6 @@ def create_img_from_array(
         band_obj = out_img_ds_obj.GetRasterBand(band + 1)
         band_obj.SetNoDataValue(no_data_val)
         if multi_band:
-            print(data_arr[band].shape)
             band_obj.WriteArray(data_arr[band])
         else:
             band_obj.WriteArray(data_arr)
