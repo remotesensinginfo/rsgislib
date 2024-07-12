@@ -252,10 +252,6 @@ def get_rios_img_creation_opts(gdalformat: str) -> List[str]:
     return ctr_out_opts
 
 
-def get_gdal_img_creation_opts(gdalformat: str) -> List[str]:
-    return get_rios_img_creation_opts(gdalformat)
-
-
 def pop_thmt_img_stats(
     input_img: str,
     add_clr_tab: bool = True,
