@@ -146,9 +146,11 @@ Create
 .. autofunction:: rsgislib.imageutils.create_copy_img_vec_extent_snap_to_grid
 .. autofunction:: rsgislib.imageutils.create_blank_img_from_bbox
 .. autofunction:: rsgislib.imageutils.create_img_for_each_vec_feat
+.. autofunction:: rsgislib.imageutils.create_img_from_array
 .. autofunction:: rsgislib.imageutils.gdal_translate
 .. autofunction:: rsgislib.imageutils.create_copy_img_vec_extent
 .. autofunction:: rsgislib.imageutils.grid_scattered_pts
+
 
 Create VRT
 ------------
@@ -211,6 +213,7 @@ Pixel Size / Area
 .. autofunction:: rsgislib.imageutils.calc_wgs84_pixel_area
 .. autofunction:: rsgislib.imageutils.calc_wsg84_pixel_size
 .. autofunction:: rsgislib.imageutils.calc_pixel_locations
+.. autofunction:: rsgislib.imageutils.calc_wgs84_pixel_locations
 
 
 Image File Operations:

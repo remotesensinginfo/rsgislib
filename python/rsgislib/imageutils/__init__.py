@@ -252,6 +252,10 @@ def get_rios_img_creation_opts(gdalformat: str) -> List[str]:
     return ctr_out_opts
 
 
+def get_gdal_img_creation_opts(gdalformat: str) -> List[str]:
+    return get_rios_img_creation_opts(gdalformat)
+
+
 def pop_thmt_img_stats(
     input_img: str,
     add_clr_tab: bool = True,
@@ -1243,7 +1247,7 @@ def get_wkt_proj_from_img(input_img: str):
     return projStr
 
 
-def get_epsg_proj_from_img(input_img: str):
+def get_epsg_proj_from_img(input_img: str) -> int:
     """
     Using GDAL to return the EPSG code for the input layer.
 
@@ -1272,7 +1276,7 @@ def get_epsg_proj_from_img(input_img: str):
     return epsgCode
 
 
-def get_img_files(input_img: str):
+def get_img_files(input_img: str) -> List[str]:
     """
     A function which returns a list of the files associated (e.g., header etc.)
     with the input image file.
@@ -1281,10 +1285,10 @@ def get_img_files(input_img: str):
     :return: lists
 
     """
-    imgDS = gdal.Open(input_img)
-    fileList = imgDS.GetFileList()
-    imgDS = None
-    return fileList
+    img_ds = gdal.Open(input_img)
+    file_list = img_ds.GetFileList()
+    img_ds = None
+    return file_list
 
 
 def get_utm_zone(input_img: str):
@@ -1345,7 +1349,7 @@ def do_gdal_layers_have_same_proj(in_a_img: str, in_b_img: str):
     return sameEPSG
 
 
-def set_band_names(input_img: str, band_names: list, feedback: bool = False):
+def set_band_names(input_img: str, band_names: List[str], feedback: bool = False):
     """
     A utility function to set band names.
 
@@ -1381,7 +1385,7 @@ def set_band_names(input_img: str, band_names: list, feedback: bool = False):
             raise rsgislib.RSGISPyException(f"Could not open the image band: {band}")
 
 
-def get_band_names(input_img: str):
+def get_band_names(input_img: str) -> List[str]:
     """
     A utility function to get band names.
 
@@ -1740,7 +1744,7 @@ def create_blank_img_py(
     wkt_string: str,
     gdalformat: str,
     datatype: int,
-    options: list = [],
+    options: List[str] = [],
     no_data_val: float = 0,
 ):
     """
@@ -1778,6 +1782,78 @@ def create_blank_img_py(
         band_obj = out_img_ds_obj.GetRasterBand(band + 1)
         band_obj.SetNoDataValue(no_data_val)
         band_obj.WriteArray(raster)
+    out_img_ds_obj = None
+
+
+def create_img_from_array(
+    data_arr: numpy.array,
+    output_img: str,
+    tl_x: float,
+    tl_y: float,
+    out_img_res_x: float,
+    out_img_res_y: float,
+    wkt_string: str,
+    gdalformat: str,
+    datatype: int,
+    options: List[str] = [],
+    no_data_val: float = 0,
+):
+    """
+    A function which creates a new image from a numpy array with
+    the spatial header information provided.
+
+    :param data_arr: a numpy array with dimensions (bands, height, width) or if
+                     just a single band then can be (height, width).
+    :param output_img: the output file and path.
+    :param tl_x: the top-left corner x coordinate
+    :param tl_y: the top-left corner y coordinate
+    :param out_img_res_x: the output image resolution in the x axis
+    :param out_img_res_y: the output image resolution in the y axis
+    :param wkt_string: a WKT string with the output image projection
+    :param gdalformat: the output image file format.
+    :param datatype: the output image data type - needs to be a
+                     rsgislib datatype (e.g., rsgislib.TYPE_32FLOAT)
+    :param options: image creation options e.g., ["TILED=YES", "INTERLEAVE=PIXEL",
+                    "COMPRESS=LZW", "BIGTIFF=YES"]
+    :param no_data_val: the output image no data value.
+
+    """
+    data_arr_shp = data_arr.shape
+    if len(data_arr_shp) == 3:
+        n_bands = data_arr_shp[0]
+        width = data_arr_shp[2]
+        height = data_arr_shp[1]
+        multi_band = True
+    elif len(data_arr_shp) == 2:
+        n_bands = 1
+        width = data_arr_shp[1]
+        height = data_arr_shp[0]
+        multi_band = False
+    else:
+        raise rsgislib.RSGISPyException(
+            "The dimensions of the input array must be either 2 or 3."
+        )
+
+    print(
+        f"Output Image with {n_bands} and Size (width x height): ({width} x {height})."
+    )
+
+    gdal_data_type = rsgislib.get_gdal_datatype(datatype)
+    gdal_driver = gdal.GetDriverByName(gdalformat)
+    out_img_ds_obj = gdal_driver.Create(
+        output_img, width, height, n_bands, gdal_data_type, options=options
+    )
+    out_img_ds_obj.SetGeoTransform((tl_x, out_img_res_x, 0, tl_y, 0, out_img_res_y))
+    out_img_ds_obj.SetProjection(wkt_string)
+
+    for band in range(n_bands):
+        band_obj = out_img_ds_obj.GetRasterBand(band + 1)
+        band_obj.SetNoDataValue(no_data_val)
+        if multi_band:
+            print(data_arr[band].shape)
+            band_obj.WriteArray(data_arr[band])
+        else:
+            band_obj.WriteArray(data_arr)
     out_img_ds_obj = None
 
 
@@ -2094,7 +2170,7 @@ def create_copy_img_vec_extent_snap_to_grid(
 
 
 def create_blank_img_from_bbox(
-    bbox: list,
+    bbox: Union[Tuple[float, float, float, float], List[float]],
     wkt_str: str,
     output_img: str,
     out_img_res: float,
@@ -2352,7 +2428,7 @@ def reproject_image(
     out_pxl_res: float = "image",
     snap_to_grid: bool = True,
     multicore: bool = False,
-    gdal_options: list = [],
+    gdal_options: List[str] = [],
 ):
     """
     This function provides a tool which uses the gdalwarp function to reproject an
@@ -2570,7 +2646,7 @@ def gdal_warp(
     interp_method: int = rsgislib.INTERP_NEAREST_NEIGHBOUR,
     gdalformat: str = "KEA",
     use_multi_threaded: bool = True,
-    options: list = [],
+    options: List[str] = [],
 ):
     """
     A function which runs GDAL Warp function to tranform an image from one projection
@@ -2812,6 +2888,70 @@ def calc_pixel_locations(input_img: str, output_img: str, gdalformat: str):
         outputs.outimage = numpy.stack((xBlock, yBlock))
 
     applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
+
+
+def calc_wgs84_pixel_locations(input_img: str, output_img: str, gdalformat: str):
+    """
+    Function which produces a 2 band output image with the latitude and longitude
+    locations of the image pixels in WGS84 (EPSG:4326). This function works with
+    data in any projection and is assumed to be used with images which are not
+    projected in EPSG:4326 as you would then use calc_pixel_locations. Note, the
+    outputted pixel locations are an approximation.
+
+    :param input_img: the input reference image
+    :param output_img: the output image file name and path (will be same
+                       dimensions as the input)
+    :param gdalformat: the GDAL image file format of the output image file.
+
+    """
+    # Get the image size (pixel count)
+    x_size, y_size = get_img_size(input_img)
+
+    # The bounding box of the input image in EPSG:4326
+    img_wsg84_bbox = get_img_bbox_in_proj(input_img, out_epsg=4326)
+
+    # The height and width in EPSG:4326
+    width = img_wsg84_bbox[1] - img_wsg84_bbox[0]
+    height = img_wsg84_bbox[3] - img_wsg84_bbox[2]
+
+    # cell resolution in EPSG:4326
+    cell_res_x = width / x_size
+    cell_res_y = height / y_size
+
+    # Create an array of locations in x axis.
+    x_row_cells = numpy.arange(img_wsg84_bbox[0], img_wsg84_bbox[1], cell_res_x)
+    x_row_cells = numpy.expand_dims(x_row_cells, axis=0)
+
+    # Create an array of locations in y axis - reverse order.
+    y_row_cells = numpy.arange(img_wsg84_bbox[2], img_wsg84_bbox[3], cell_res_y)[::-1]
+    y_row_cells = numpy.expand_dims(y_row_cells, axis=0)
+
+    # Replicate the single rows for the whole image area.
+    lat_grid = numpy.repeat(x_row_cells, y_size, axis=0)
+    lon_grid = numpy.repeat(y_row_cells, x_size, axis=0).T  # rotate axis.
+
+    # stack lat and lon
+    data_arr = numpy.stack([lat_grid, lon_grid])
+
+    # Export the array to the output image file.
+    # Get image format options.
+    gdal_options = get_gdal_img_creation_opts(gdalformat)
+    img_bbox = get_img_bbox(input_img)
+    img_x_res, img_y_res = get_img_res(input_img, abs_vals=False)
+    img_wkt_str = get_wkt_proj_from_img(input_img)
+    create_img_from_array(
+        data_arr,
+        output_img=output_img,
+        tl_x=img_bbox[0],
+        tl_y=img_bbox[3],
+        out_img_res_x=img_x_res,
+        out_img_res_y=img_y_res,
+        wkt_string=img_wkt_str,
+        gdalformat=gdalformat,
+        datatype=rsgislib.TYPE_32FLOAT,
+        options=gdal_options,
+        no_data_val=0,
+    )
 
 
 def calc_wgs84_pixel_area(
@@ -3317,7 +3457,7 @@ def gdal_translate(
     gdal.Translate(output_img, input_img, options=trans_opt)
 
 
-def create_stack_images_vrt(input_imgs: list, out_vrt_file: str):
+def create_stack_images_vrt(input_imgs: List[str], out_vrt_file: str):
     """
     A function which creates a GDAL VRT file from a set of input images by stacking
     the input images in a multi-band output file.
@@ -3339,9 +3479,9 @@ def create_stack_images_vrt(input_imgs: list, out_vrt_file: str):
 
 
 def create_mosaic_images_vrt(
-    input_imgs: list,
+    input_imgs: List[str],
     out_vrt_file: str,
-    vrt_extent: List = None,
+    vrt_extent: Union[Tuple[float, float, float, float], List[float]] = None,
     vrt_out_res_x: float = None,
     vrt_out_res_y: float = None,
     interp_method: int = rsgislib.INTERP_NEAREST_NEIGHBOUR,
@@ -3677,7 +3817,7 @@ def mask_img_with_vec(
 
 
 def create_valid_mask(
-    img_band_info: list, out_msk_file: str, gdalformat: str, tmp_dir: str
+    img_band_info: List, out_msk_file: str, gdalformat: str, tmp_dir: str
 ):
     """
     A function to create a single valid mask from the intersection of the valid masks
@@ -4013,10 +4153,10 @@ def assign_random_pxls(
 
 
 def check_img_lst(
-    input_imgs: list,
+    input_imgs: List[str],
     exp_x_res: float,
     exp_y_res: float,
-    bbox: list = None,
+    bbox: Union[Tuple[float, float, float, float], List[float]] = None,
     print_errors: bool = True,
     abs_res: bool = True,
 ):
@@ -4122,7 +4262,7 @@ def check_img_file_comparison(
     return imgs_match
 
 
-def test_img_lst_intersects(input_imgs: list, stop_err: bool = False):
+def test_img_lst_intersects(input_imgs: List[str], stop_err: bool = False):
     """
     A function which will test a list of image to check if they intersect,
     have matching image resolution and projection. The first image in the list is
