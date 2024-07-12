@@ -2931,7 +2931,7 @@ def calc_wgs84_pixel_locations(input_img: str, output_img: str, gdalformat: str)
 
     # Export the array to the output image file.
     # Get image format options.
-    gdal_options = get_gdal_img_creation_opts(gdalformat)
+    gdal_options = get_rios_img_creation_opts(gdalformat)
     img_bbox = get_img_bbox(input_img)
     img_x_res, img_y_res = get_img_res(input_img, abs_vals=False)
     img_wkt_str = get_wkt_proj_from_img(input_img)
