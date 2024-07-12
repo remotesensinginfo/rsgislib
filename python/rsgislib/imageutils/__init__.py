@@ -2916,10 +2916,26 @@ def calc_wgs84_pixel_locations(input_img: str, output_img: str, gdalformat: str)
 
     # Create an array of locations in x axis.
     x_row_cells = numpy.arange(img_wsg84_bbox[0], img_wsg84_bbox[1], cell_res_x)
+    if len(x_row_cells) < x_size:
+        x_row_cells = numpy.arange(
+            img_wsg84_bbox[0], img_wsg84_bbox[1] + cell_res_x / 2, cell_res_x
+        )
+    elif len(x_row_cells) > x_size:
+        x_row_cells = numpy.arange(
+            img_wsg84_bbox[0], img_wsg84_bbox[1] - cell_res_x / 2, cell_res_x
+        )
     x_row_cells = numpy.expand_dims(x_row_cells, axis=0)
 
     # Create an array of locations in y axis - reverse order.
     y_row_cells = numpy.arange(img_wsg84_bbox[2], img_wsg84_bbox[3], cell_res_y)[::-1]
+    if len(y_row_cells) < y_size:
+        y_row_cells = numpy.arange(
+            img_wsg84_bbox[2], img_wsg84_bbox[3] + cell_res_y / 2, cell_res_y
+        )[::-1]
+    elif len(y_row_cells) > y_size:
+        y_row_cells = numpy.arange(
+            img_wsg84_bbox[2], img_wsg84_bbox[3] - cell_res_y / 2, cell_res_y
+        )[::-1]
     y_row_cells = numpy.expand_dims(y_row_cells, axis=0)
 
     # Replicate the single rows for the whole image area.
