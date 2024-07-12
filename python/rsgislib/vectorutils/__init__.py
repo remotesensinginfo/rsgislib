@@ -8,7 +8,7 @@ import os
 import shutil
 import subprocess
 import sys
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 
 from osgeo import gdal, ogr, osr
 
@@ -364,7 +364,7 @@ def count_feats_per_att_val(
 
 
 def merge_vectors_to_gpkg(
-    in_vec_files: List, out_vec_file: str, out_vec_lyr: str, exists: bool = False
+    in_vec_files: List[str], out_vec_file: str, out_vec_lyr: str, exists: bool = False
 ):
     """
     Function which will merge a list of vector files into an single output GeoPackage (GPKG) file using ogr2ogr.
@@ -664,7 +664,7 @@ def get_vec_lyrs_lst(vec_file: str) -> List[str]:
 
 def get_vec_layer_extent(
     vec_file: str, vec_lyr: str = None, compute_if_exp: bool = True
-) -> list:
+) -> Tuple[float, float, float, float]:
     """
     Get the extent of the vector layer.
 
@@ -1084,7 +1084,7 @@ def reproj_vec_lyr_obj(
 
 def get_att_lst_select_feats(
     vec_file: str, vec_lyr: str, att_names: List, vec_sel_file: str, vec_sel_lyr: str
-) -> List:
+) -> List[Dict]:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1185,7 +1185,7 @@ def get_att_lst_select_feats(
 
 def get_att_lst_select_feats_lyr_objs(
     vec_lyr_obj: ogr.Layer, att_names: List, vec_sel_lyr_obj: ogr.Layer
-) -> List:
+) -> List[Dict]:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1267,8 +1267,12 @@ def get_att_lst_select_feats_lyr_objs(
 
 
 def get_att_lst_select_bbox_feats(
-    vec_file: str, vec_lyr: str, att_names: List, bbox: List, bbox_epsg: int = None
-) -> List:
+    vec_file: str,
+    vec_lyr: str,
+    att_names: List,
+    bbox: Union[Tuple[float, float, float, float], List[float]],
+    bbox_epsg: int = None,
+) -> List[Dict]:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.
@@ -1299,8 +1303,11 @@ def get_att_lst_select_bbox_feats(
 
 
 def get_att_lst_select_bbox_feats_lyr_objs(
-    vec_lyr_obj: ogr.Layer, att_names: List, bbox: List, bbox_epsg: int = None
-) -> List:
+    vec_lyr_obj: ogr.Layer,
+    att_names: List,
+    bbox: Union[Tuple[float, float, float, float], List[float]],
+    bbox_epsg: int = None,
+) -> List[Dict]:
     """
     Function to get a list of attribute values from features which intersect
     with the select layer.

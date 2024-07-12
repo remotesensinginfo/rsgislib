@@ -18,11 +18,11 @@ def rasterise_vec_lyr(
     output_img: str,
     gdalformat: str = "KEA",
     burn_val: int = 1,
-    datatype=rsgislib.TYPE_8UINT,
-    att_column=None,
-    use_vec_extent=False,
-    thematic=True,
-    no_data_val=0,
+    datatype: int = rsgislib.TYPE_8UINT,
+    att_column: str = None,
+    use_vec_extent: bool = False,
+    thematic: bool = True,
+    no_data_val: float = 0,
 ):
     """
     A utility to rasterise a vector layer to an image covering the same region and at

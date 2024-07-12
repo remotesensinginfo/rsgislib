@@ -8,7 +8,7 @@ from ._imageutils import *
 import math
 import os
 import shutil
-from typing import Dict, List
+from typing import Dict, List, Tuple, Union
 
 import numpy
 from osgeo import gdal, osr
@@ -875,7 +875,7 @@ def get_img_pxl_coords(
     return x_pxl_coords, y_pxl_coords
 
 
-def get_img_bbox(input_img: str):
+def get_img_bbox(input_img: str) -> Tuple[float, float, float, float]:
     """
     A function to retrieve the bounding box in the spatial
     coordinates of the image.
@@ -912,10 +912,12 @@ def get_img_bbox(input_img: str):
     brX = tlX + (xRes * xSize)
     brY = tlY - (yRes * ySize)
 
-    return [tlX, brX, brY, tlY]
+    return (tlX, brX, brY, tlY)
 
 
-def get_img_bbox_in_proj(input_img: str, out_epsg: int):
+def get_img_bbox_in_proj(
+    input_img: str, out_epsg: int
+) -> Tuple[float, float, float, float]:
     """
     A function to retrieve the bounding box in the spatial
     coordinates of the image.
@@ -948,7 +950,9 @@ def get_img_bbox_in_proj(input_img: str, out_epsg: int):
     return reproj_img_bbox
 
 
-def get_img_subset_pxl_bbox(input_img: str, sub_bbox: List[float]) -> List[int]:
+def get_img_subset_pxl_bbox(
+    input_img: str, sub_bbox: Union[Tuple[float, float, float, float], List[float]]
+) -> Tuple[float, float, float, float]:
     """
     A function which returns a BBOX (xmin, xmax, ymin, ymax) with the pixel coordinates
     for an intersecting BBOX in the spatial coordinates of the image. Note, the
@@ -984,10 +988,12 @@ def get_img_subset_pxl_bbox(input_img: str, sub_bbox: List[float]) -> List[int]:
     min_y_pxl = math.floor(((img_bbox[3] - sub_inter_bbox[3]) / y_res) + 0.5)
     max_y_pxl = math.floor(((img_bbox[3] - sub_inter_bbox[2]) / y_res) + 0.5)
 
-    return [min_x_pxl, max_x_pxl, min_y_pxl, max_y_pxl]
+    return (min_x_pxl, max_x_pxl, min_y_pxl, max_y_pxl)
 
 
-def get_img_pxl_spatial_coords(input_img: str, sub_pxl_bbox: List[int]) -> List[float]:
+def get_img_pxl_spatial_coords(
+    input_img: str, sub_pxl_bbox: Union[Tuple[float, float, float, float], List[float]]
+) -> Tuple[float, float, float, float]:
     """
     A function which gets the spatial coordinates for a image pixel space
     BBOX (xmin, xmax, ymin, ymax). The returned BBOX will be within the
@@ -1009,10 +1015,12 @@ def get_img_pxl_spatial_coords(input_img: str, sub_pxl_bbox: List[int]) -> List[
     min_y = img_bbox[3] - (sub_pxl_bbox[3] * y_res)
     max_y = img_bbox[3] - (sub_pxl_bbox[2] * y_res)
 
-    return [min_x, max_x, min_y, max_y]
+    return (min_x, max_x, min_y, max_y)
 
 
-def get_img_band_stats(input_img: str, img_band: int, compute: bool = True):
+def get_img_band_stats(
+    input_img: str, img_band: int, compute: bool = True
+) -> Tuple[float, float, float, float]:
     """
     A function which calls the GDAL function on the band selected to calculate
     the pixel stats (min, max, mean, standard deviation).

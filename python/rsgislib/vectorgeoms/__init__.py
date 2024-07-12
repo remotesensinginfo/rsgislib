@@ -5,7 +5,7 @@ The vector geometries module performs geometric operations on vectors.
 
 import math
 import os
-from typing import List
+from typing import List, Tuple, Union
 
 import tqdm
 from osgeo import gdal, ogr
@@ -1591,7 +1591,7 @@ def create_alpha_shape(
     out_vec_lyr: str,
     out_format: str = "GPKG",
     alpha_val: float = None,
-    alpha_vals: list = None,
+    alpha_vals: List = None,
     max_iter: int = 10000,
     del_exist_vec: bool = False,
 ):
@@ -1796,7 +1796,7 @@ def explode_vec_lyr(
 
 
 def explode_vec_files(
-    in_vec_files: List,
+    in_vec_files: List[str],
     output_dir: str,
     out_format: str = "GPKG",
     out_vec_ext: str = "gpkg",
@@ -3079,7 +3079,9 @@ def vec_crosses_vec(
     return does_cross
 
 
-def get_geoms_as_bboxs(vec_file: str, vec_lyr: str) -> List:
+def get_geoms_as_bboxs(
+    vec_file: str, vec_lyr: str
+) -> List[Tuple[float, float, float, float]]:
     """
     A function which returns a list of bounding boxes for each feature
     within the vector layer.
@@ -3107,7 +3109,11 @@ def get_geoms_as_bboxs(vec_file: str, vec_lyr: str) -> List:
     return bboxs
 
 
-def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: List) -> bool:
+def bbox_intersects_vec_lyr(
+    vec_file: str,
+    vec_lyr: str,
+    bbox: Union[Tuple[float, float, float, float], List[float]],
+) -> bool:
     """
     A function which tests whether a feature within an inputted vector layer intersects
     with a bounding box.
@@ -3121,11 +3127,11 @@ def bbox_intersects_vec_lyr(vec_file: str, vec_lyr: str, bbox: List) -> bool:
     """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
-        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
+        raise rsgislib.RSGISPyException(f"Could not open '{vec_file}'")
 
     vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise rsgislib.RSGISPyException("Could not find layer '" + vec_lyr + "'")
+        raise rsgislib.RSGISPyException(f"Could not find layer '{vec_lyr}'")
 
     # Get a geometry collection object for shapefile.
     geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
@@ -3230,7 +3236,9 @@ def create_rtree_index(vec_file: str, vec_lyr: str):
     return idx_obj, geom_lst
 
 
-def bbox_intersects_index(rt_idx, geom_lst: List, bbox: List) -> bool:
+def bbox_intersects_index(
+    rt_idx, geom_lst: List, bbox: Union[Tuple[float, float, float, float], List[float]]
+) -> bool:
     """
     A function which tests for intersection between the geometries and the bounding box
     using a spatial index.

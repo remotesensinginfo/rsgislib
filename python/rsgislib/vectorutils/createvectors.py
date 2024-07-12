@@ -4,7 +4,7 @@ Tools for creating vector layers.
 """
 
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 import tqdm
 from osgeo import gdal, ogr, osr
@@ -230,7 +230,7 @@ def extract_image_footprint(
     out_format: str = "GPKG",
     tmp_dir: str = "tmp",
     reproj_to: str = None,
-    no_data_val=None,
+    no_data_val: float = None,
 ):
     """
     A function to extract an image footprint as a vector.
@@ -425,16 +425,16 @@ def create_poly_vec_for_lst_bboxs(
 
 
 def define_grid(
-    bbox,
-    x_size,
-    y_size,
-    in_epsg_code,
-    out_vec,
-    out_vec_lyr,
-    out_format="GPKG",
-    out_epsg_code=None,
-    utm_grid=False,
-    utm_hemi=False,
+    bbox: Union[Tuple[float, float, float, float], List[float]],
+    x_size: int,
+    y_size: int,
+    in_epsg_code: int,
+    out_vec: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_epsg_code: int = None,
+    utm_grid: bool = False,
+    utm_hemi: bool = False,
 ):
     """
     Define a grid of bounding boxes for a specified bounding box. The output grid can
@@ -620,14 +620,14 @@ def define_grid(
 
 
 def create_poly_vec_bboxs(
-    vec_file,
-    vec_lyr,
-    out_format,
-    epsg_code,
-    bboxs,
-    atts=None,
-    att_types=None,
-    overwrite=True,
+    vec_file: str,
+    vec_lyr: str,
+    out_format: str,
+    epsg_code: int,
+    bboxs: List[Union[Tuple[float, float, float, float], List[float]]],
+    atts: Dict[str, List] = None,
+    att_types: Dict[str:List] = None,
+    overwrite: bool = True,
 ):
     """
     This function creates a set of polygons for a set of bounding boxes.
@@ -751,17 +751,17 @@ def create_poly_vec_bboxs(
 
 
 def write_pts_to_vec(
-    out_vec_file,
-    out_vec_lyr,
-    out_format,
-    epsg_code,
-    pts_x,
-    pts_y,
-    atts=None,
-    att_types=None,
-    replace=True,
-    file_opts=[],
-    lyr_opts=[],
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str,
+    epsg_code: int,
+    pts_x: List[float],
+    pts_y: List[float],
+    atts: Dict[str, List] = None,
+    att_types: Dict[str, List] = None,
+    replace: bool = True,
+    file_opts: List[str] = [],
+    lyr_opts: List[str] = [],
 ):
     """
     This function creates a set of polygons for a set of bounding boxes.
@@ -957,7 +957,7 @@ def create_bboxs_for_pts(
             y_min = pt_y - h_height
             y_max = pt_y + h_height
 
-            out_bboxs.append([x_min, x_max, y_min, y_max])
+            out_bboxs.append((x_min, x_max, y_min, y_max))
 
         in_feature = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
@@ -1038,15 +1038,15 @@ def create_wgs84_vector_grid(
             )
             tile_names.append(f"{tile_name_prefix}{lat_lon_str_name}")
             if overlap is None:
-                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+                bboxs.append((c_min_x, c_max_x, c_min_y, c_max_y))
             else:
                 bboxs.append(
-                    [
+                    (
                         c_min_x - overlap,
                         c_max_x + overlap,
                         c_min_y - overlap,
                         c_max_y + overlap,
-                    ]
+                    )
                 )
         if x_remain > 0:
             c_min_x = min_x + (n_x_cells * grid_x)
@@ -1056,15 +1056,15 @@ def create_wgs84_vector_grid(
             )
             tile_names.append(f"{tile_name_prefix}{lat_lon_str_name}")
             if overlap is None:
-                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+                bboxs.append((c_min_x, c_max_x, c_min_y, c_max_y))
             else:
                 bboxs.append(
-                    [
+                    (
                         c_min_x - overlap,
                         c_max_x + overlap,
                         c_min_y - overlap,
                         c_max_y + overlap,
-                    ]
+                    )
                 )
     if y_remain > 0:
         c_max_y = max_y - (n_y_cells * grid_y)
@@ -1077,15 +1077,15 @@ def create_wgs84_vector_grid(
             )
             tile_names.append(f"{tile_name_prefix}{lat_lon_str_name}")
             if overlap is None:
-                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+                bboxs.append((c_min_x, c_max_x, c_min_y, c_max_y))
             else:
                 bboxs.append(
-                    [
+                    (
                         c_min_x - overlap,
                         c_max_x + overlap,
                         c_min_y - overlap,
                         c_max_y + overlap,
-                    ]
+                    )
                 )
         if x_remain > 0:
             c_min_x = min_x + (n_x_cells * grid_x)
@@ -1095,15 +1095,15 @@ def create_wgs84_vector_grid(
             )
             tile_names.append(f"{tile_name_prefix}{lat_lon_str_name}")
             if overlap is None:
-                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+                bboxs.append((c_min_x, c_max_x, c_min_y, c_max_y))
             else:
                 bboxs.append(
-                    [
+                    (
                         c_min_x - overlap,
                         c_max_x + overlap,
                         c_min_y - overlap,
                         c_max_y + overlap,
-                    ]
+                    )
                 )
 
     for bbox in bboxs:
@@ -1235,7 +1235,7 @@ def create_vec_for_image(
 
 
 def create_hex_grid_bbox(
-    bbox: List,
+    bbox: Union[Tuple[float, float, float, float], List[float]],
     bbox_epsg: int,
     hex_scale: int,
     out_vec_file: str,
@@ -1677,7 +1677,7 @@ def create_img_transects(
 
 
 def create_random_pts_in_bbox(
-    bbox: List[float],
+    bbox: Union[Tuple[float, float, float, float], List[float]],
     n_pts: int,
     epsg_code: int,
     out_vec_file: str,

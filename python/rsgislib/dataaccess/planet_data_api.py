@@ -247,7 +247,7 @@ async def _search_planet_items(
     view_angle_min: float = None,
     view_angle_max: float = None,
     max_n_rslts: int = 25,
-)->List[Dict]:
+) -> List[Dict]:
     if not PLANET_AVAIL:
         raise rsgislib.RSGISPyException(
             "The Planet API (pip install planet) needs to be available."
@@ -317,7 +317,7 @@ def run_search_planet_items(
     view_angle_min: float = None,
     view_angle_max: float = None,
     max_n_rslts: int = 25,
-)->List[Dict]:
+) -> List[Dict]:
     """
     A function which searches the planet API to find scenes/items
 
