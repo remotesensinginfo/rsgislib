@@ -42,10 +42,10 @@ Compute Points
 Representation
 ---------------
 .. autofunction:: rsgislib.tools.geometrytools.get_bbox_geojson_poly
+.. autofunction:: rsgislib.tools.geometrytools.get_bbox_wkt_poly
 
 
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
