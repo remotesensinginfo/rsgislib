@@ -37,7 +37,7 @@ RSGISLib.
 ############################################################################
 
 import os
-from typing import List
+from typing import List, Tuple, Union
 
 from osgeo import gdal, ogr
 
@@ -149,7 +149,7 @@ def create_img_extent_lut(
     )
 
 
-def query_img_lut(scn_bbox: List[float], lut_db_file: str, lyr_name: str) -> List[str]:
+def query_img_lut(scn_bbox: Union[Tuple[float, float, float, float], List[float]], lut_db_file: str, lyr_name: str) -> List[str]:
     """
     A function for querying the LUT DB spatially filtering using a BBOX
 
@@ -190,8 +190,8 @@ def get_all_lut_imgs(lut_db_file: str, lyr_name: str) -> List[str]:
 
 
 def get_raster_lyr(
-    scn_bbox: List[float], lut_db_file: str, lyr_name: str, tmp_dir: str
-) -> str:
+    scn_bbox: Union[Tuple[float, float, float, float], List[float]], lut_db_file: str, lyr_name: str, tmp_dir: str
+) -> Union[str, None]:
     """
     This function provides a single raster layer using the LUT file provided. If
     a single image file intersecting with the BBOX is not within the LUT then a
