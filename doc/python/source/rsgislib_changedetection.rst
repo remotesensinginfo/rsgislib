@@ -2,8 +2,8 @@ RSGISLib Image Change Detection
 ==================================
 
 
-Image Pixel Change Detection
------------------------------
+Classification Outlier Change Detection
+-----------------------------------------
 
 .. autofunction:: rsgislib.changedetect.pxloutlierchng.find_class_pyod_outliers
 .. autofunction:: rsgislib.changedetect.pxloutlierchng.find_class_kurt_skew_outliers
@@ -11,8 +11,13 @@ Image Pixel Change Detection
 .. autofunction:: rsgislib.changedetect.pxloutlierchng.find_class_li_outliers
 
 
+Image to Image Change Detection
+----------------------------------
+
+.. autofunction:: rsgislib.changedetect.imgchngmthds.change_vector_analysis
+.. autofunction:: rsgislib.changedetect.imgchngmthds.slow_feature_analysis
+
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
