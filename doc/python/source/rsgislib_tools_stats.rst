@@ -1,6 +1,11 @@
 RSGISLib Stats Tools
 =============================
 
+Normalisation
+----------------
+.. autofunction:: rsgislib.tools.stats.standarise_img_data
+
+
 Histogram Thresholds
 ---------------------
 .. autofunction:: rsgislib.tools.stats.calc_otsu_threshold

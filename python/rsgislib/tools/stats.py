@@ -1194,3 +1194,26 @@ def calc_semivariogram(
         plt.savefig(out_plot_file)
 
     return vario_out_df
+
+
+def standarise_img_data(img_data: numpy.array) -> numpy.array:
+    """
+    Standardise the input image (minus the mean and
+    divide by the standard deviation).
+
+    :param img_data: a numpy array with the shape [bands, height, width]
+    :return: a numpy array with the standarised pixel values.
+
+    """
+    img_bands, img_height, img_width = img_data.shape
+    img_data_reshp = numpy.reshape(img_data, (img_bands, img_height * img_width))
+    img_band_mean = numpy.mean(img_data_reshp, axis=1, keepdims=True)
+    img_band_cen = img_data_reshp - img_band_mean
+    img_band_var = numpy.sum(numpy.power(img_band_cen, 2), axis=1, keepdims=True) / (
+        img_height * img_width
+    )
+    img_band_std = numpy.sqrt(img_band_var)
+    std_img_data = img_band_cen / img_band_std
+    std_img_data = numpy.reshape(std_img_data, (img_bands, img_height, img_width))
+
+    return std_img_data
