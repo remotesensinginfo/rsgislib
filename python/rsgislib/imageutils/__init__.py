@@ -1792,7 +1792,7 @@ def create_img_from_array(
     gdalformat: str,
     datatype: int,
     options: List[str] = [],
-    no_data_val: float = 0,
+    no_data_val: float = None,
 ):
     """
     A function which creates a new image from a numpy array with
@@ -1811,7 +1811,7 @@ def create_img_from_array(
                      rsgislib datatype (e.g., rsgislib.TYPE_32FLOAT)
     :param options: image creation options e.g., ["TILED=YES", "INTERLEAVE=PIXEL",
                     "COMPRESS=LZW", "BIGTIFF=YES"]
-    :param no_data_val: the output image no data value.
+    :param no_data_val: the output image no data value. If None then ignored.
 
     """
     data_arr_shp = data_arr.shape
@@ -1845,7 +1845,8 @@ def create_img_from_array(
 
     for band in range(n_bands):
         band_obj = out_img_ds_obj.GetRasterBand(band + 1)
-        band_obj.SetNoDataValue(no_data_val)
+        if no_data_val is not None:
+            band_obj.SetNoDataValue(no_data_val)
         if multi_band:
             band_obj.WriteArray(data_arr[band])
         else:
@@ -1860,7 +1861,7 @@ def create_img_from_array_ref_img(
     gdalformat: str,
     datatype: int,
     options: List[str] = [],
-    no_data_val: float = 0,
+    no_data_val: float = None,
 ):
     """
     A function which creates a new image from a numpy array with
@@ -1877,7 +1878,7 @@ def create_img_from_array_ref_img(
                      rsgislib datatype (e.g., rsgislib.TYPE_32FLOAT)
     :param options: image creation options e.g., ["TILED=YES", "INTERLEAVE=PIXEL",
                     "COMPRESS=LZW", "BIGTIFF=YES"]
-    :param no_data_val: the output image no data value.
+    :param no_data_val: the output image no data value. If None then ignored.
 
     """
     data_arr_shp = data_arr.shape
