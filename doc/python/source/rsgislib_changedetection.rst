@@ -16,6 +16,7 @@ Image to Image Change Detection
 
 .. autofunction:: rsgislib.changedetect.imgchngmthds.change_vector_analysis
 .. autofunction:: rsgislib.changedetect.imgchngmthds.slow_feature_analysis
+.. autofunction:: rsgislib.changedetect.imgchngmthds.multivariate_alteration_detection
 
 
 * :ref:`genindex`
