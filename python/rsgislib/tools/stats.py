@@ -1217,3 +1217,22 @@ def standarise_img_data(img_data: numpy.array) -> numpy.array:
     std_img_data = numpy.reshape(std_img_data, (img_bands, img_height, img_width))
 
     return std_img_data
+
+
+def normalise_img_data(img_data: numpy.array) -> numpy.array:
+    """
+    Normalise the input image (data - min)/range.
+
+    :param img_data: a numpy array with the shape [bands, height, width]
+    :return: a numpy array with the normalised pixel values.
+
+    """
+    img_bands, img_height, img_width = img_data.shape
+    img_data_reshp = numpy.reshape(img_data, (img_bands, img_height * img_width))
+    max_value = numpy.max(img_data_reshp, axis=1, keepdims=True)
+    min_value = numpy.min(img_data_reshp, axis=1, keepdims=True)
+    diff_value = max_value - min_value
+    nm_img = (img_data_reshp - min_value) / diff_value
+    nm_img = numpy.reshape(nm_img, (img_bands, img_height, img_width))
+
+    return nm_img

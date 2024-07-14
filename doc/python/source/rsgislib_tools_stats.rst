@@ -4,6 +4,7 @@ RSGISLib Stats Tools
 Normalisation
 ----------------
 .. autofunction:: rsgislib.tools.stats.standarise_img_data
+.. autofunction:: rsgislib.tools.stats.normalise_img_data
 
 
 Histogram Thresholds
