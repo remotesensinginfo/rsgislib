@@ -1853,6 +1853,69 @@ def create_img_from_array(
     out_img_ds_obj = None
 
 
+def create_img_from_array_ref_img(
+    data_arr: numpy.array,
+    output_img: str,
+    ref_img: str,
+    gdalformat: str,
+    datatype: int,
+    options: List[str] = [],
+    no_data_val: float = 0,
+):
+    """
+    A function which creates a new image from a numpy array with
+    the spatial header information provided from a reference image.
+    Note, the reference image must match the image size (height and width)
+    of the data_arr.
+
+    :param data_arr: a numpy array with dimensions (bands, height, width) or if
+                     just a single band then can be (height, width).
+    :param output_img: the output file path.
+    :param ref_img: the reference image file path
+    :param gdalformat: the output image file format.
+    :param datatype: the output image data type - needs to be a
+                     rsgislib datatype (e.g., rsgislib.TYPE_32FLOAT)
+    :param options: image creation options e.g., ["TILED=YES", "INTERLEAVE=PIXEL",
+                    "COMPRESS=LZW", "BIGTIFF=YES"]
+    :param no_data_val: the output image no data value.
+
+    """
+    data_arr_shp = data_arr.shape
+    if len(data_arr_shp) == 3:
+        width = data_arr_shp[2]
+        height = data_arr_shp[1]
+    elif len(data_arr_shp) == 2:
+        width = data_arr_shp[1]
+        height = data_arr_shp[0]
+    else:
+        raise rsgislib.RSGISPyException(
+            "The dimensions of the input array must be either 2 or 3."
+        )
+
+    img_size_x, img_size_y = get_img_size(ref_img)
+    if (width != img_size_x) and (height != img_size_y):
+        raise rsgislib.RSGISPyException(
+            "The input reference image size must be the same as the array - otherwise BBOX and resolution will not match."
+        )
+    img_bbox = get_img_bbox(ref_img)
+    x_res, y_res = get_img_res(ref_img)
+    wkt_str = get_wkt_proj_from_img(ref_img)
+
+    create_img_from_array(
+        data_arr=data_arr,
+        output_img=output_img,
+        tl_x=img_bbox[0],
+        tl_y=img_bbox[3],
+        out_img_res_x=x_res,
+        out_img_res_y=y_res,
+        wkt_string=wkt_str,
+        gdalformat=gdalformat,
+        datatype=datatype,
+        options=options,
+        no_data_val=no_data_val,
+    )
+
+
 def create_blank_buf_img_from_ref_img(
     input_img: str,
     output_img: str,
@@ -4072,6 +4135,61 @@ def get_img_band_pxl_data(
     img_ds_obj = None
 
     return raster_arr
+
+
+def get_img_data_as_arr(input_img: str, img_bands: List[int] = None) -> numpy.ndarray:
+    """
+    A function which gets the image data as a numpy array for the whole
+    image extent. If a list of bands is not provided then all the bands
+    will be read and returned in order. If a list is provided the bands
+    will be returned in the order listed in img_bands. Note. GDAL band
+    indexing starts from 1.
+
+    :param input_img: the image file path
+    :param img_bands: optional list of bands to be read.
+    :return: numpy array of the image data (band, height, width)
+
+    """
+
+    if not os.path.exists(input_img):
+        raise FileNotFoundError(f"Input image does not exist: {input_img}")
+    img_ds_obj = gdal.Open(input_img, gdal.GA_ReadOnly)
+
+    if img_ds_obj is None:
+        raise rsgislib.RSGISPyException("Could not open raster image: '{input_img}'")
+
+    img_x_size = int(img_ds_obj.RasterXSize)
+    img_y_size = int(img_ds_obj.RasterYSize)
+    n_bands = img_ds_obj.RasterCount
+
+    if img_bands is None:
+        img_data = img_ds_obj.ReadAsArray(0, 0, img_x_size, img_y_size)
+    else:
+        for b in img_bands:
+            if (b <= 0) or (b > n_bands):
+                raise rsgislib.RSGISPyException(
+                    f"Band ({b}) must be between 1-{n_bands}."
+                )
+        n_out_bands = len(img_bands)
+        img_rsgislib_dtype = get_rsgislib_datatype_from_img(input_img)
+        img_np_dtype = rsgislib.get_numpy_datatype(img_rsgislib_dtype)
+        img_data = numpy.zeros(
+            (n_out_bands, img_y_size, img_x_size), dtype=img_np_dtype
+        )
+
+        for i, b in enumerate(img_bands):
+            band_obj = img_ds_obj.GetRasterBand(b)
+
+            band_obj.ReadAsArray(
+                xoff=0,
+                yoff=0,
+                win_xsize=img_x_size,
+                win_ysize=img_y_size,
+                buf_obj=img_data[i],
+            )
+    img_ds_obj = None
+
+    return img_data
 
 
 def assign_random_pxls(

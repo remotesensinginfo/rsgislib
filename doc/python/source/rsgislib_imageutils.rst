@@ -148,6 +148,7 @@ Create
 .. autofunction:: rsgislib.imageutils.create_blank_img_from_bbox
 .. autofunction:: rsgislib.imageutils.create_img_for_each_vec_feat
 .. autofunction:: rsgislib.imageutils.create_img_from_array
+.. autofunction:: rsgislib.imageutils.create_img_from_array_ref_img
 .. autofunction:: rsgislib.imageutils.gdal_translate
 .. autofunction:: rsgislib.imageutils.create_copy_img_vec_extent
 .. autofunction:: rsgislib.imageutils.grid_scattered_pts
@@ -235,6 +236,7 @@ Image I/O
 .. autofunction:: rsgislib.imageutils.assign_random_pxls
 .. autofunction:: rsgislib.imageutils.generate_random_pxl_vals_img
 .. autofunction:: rsgislib.imageutils.get_img_band_pxl_data
+.. autofunction:: rsgislib.imageutils.get_img_data_as_arr
 
 
 Pixel Smoothing / Filling
