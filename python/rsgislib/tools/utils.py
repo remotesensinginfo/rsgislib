@@ -884,6 +884,30 @@ def is_summer_winter(lat: float, date: datetime.date) -> int:
     return summer_winter
 
 
+def get_datetime_increment_lst(
+    start_date: datetime.datetime,
+    end_date: datetime.datetime,
+    interval: datetime.timedelta,
+) -> List[datetime.datetime]:
+    """
+    A function which returns a list of datetime objects from the start
+    date in steps of the interval until the date is greater than the
+    end date.
+
+    :param start_date: the start datetime of the sequence
+    :param end_date: the end datetime of the sequence
+    :param interval: the interval as a timedelta object.
+    :return: List of datetime objects
+
+    """
+    date_lst = list()
+    c_date = start_date
+    while c_date < end_date:
+        c_date = c_date + interval
+        date_lst.append(c_date)
+    return date_lst
+
+
 def dict_struct_does_path_exist(dict_struct_obj: Dict, tree_sequence: List) -> bool:
     """
     A function which tests whether a path exists within JSON file.
