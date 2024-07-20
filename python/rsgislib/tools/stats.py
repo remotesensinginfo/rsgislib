@@ -1201,20 +1201,32 @@ def standarise_img_data(img_data: numpy.array) -> numpy.array:
     Standardise the input image (minus the mean and
     divide by the standard deviation).
 
-    :param img_data: a numpy array with the shape [bands, height, width]
+    :param img_data: a numpy array with the shape [bands, height, width] or
+                     [bands, n_pxls].
     :return: a numpy array with the standarised pixel values.
 
     """
-    img_bands, img_height, img_width = img_data.shape
-    img_data_reshp = numpy.reshape(img_data, (img_bands, img_height * img_width))
+    if len(img_data.shape) == 3:
+        img_bands, img_height, img_width = img_data.shape
+        n_img_pxls = img_height * img_width
+        img_data_reshp = numpy.reshape(img_data, (img_bands, img_height * img_width))
+    elif len(img_data.shape) == 2:
+        img_bands, n_img_pxls = img_data.shape
+        img_data_reshp = img_data
+    else:
+        raise rsgislib.RSGISPyException(
+            "Input array must have either 2 or 3 dimensions."
+        )
+
     img_band_mean = numpy.mean(img_data_reshp, axis=1, keepdims=True)
     img_band_cen = img_data_reshp - img_band_mean
     img_band_var = numpy.sum(numpy.power(img_band_cen, 2), axis=1, keepdims=True) / (
-        img_height * img_width
+        n_img_pxls
     )
     img_band_std = numpy.sqrt(img_band_var)
     std_img_data = img_band_cen / img_band_std
-    std_img_data = numpy.reshape(std_img_data, (img_bands, img_height, img_width))
+    if len(img_data.shape) == 3:
+        std_img_data = numpy.reshape(std_img_data, (img_bands, img_height, img_width))
 
     return std_img_data
 
@@ -1227,12 +1239,22 @@ def normalise_img_data(img_data: numpy.array) -> numpy.array:
     :return: a numpy array with the normalised pixel values.
 
     """
-    img_bands, img_height, img_width = img_data.shape
-    img_data_reshp = numpy.reshape(img_data, (img_bands, img_height * img_width))
+    if len(img_data.shape) == 3:
+        img_bands, img_height, img_width = img_data.shape
+        img_data_reshp = numpy.reshape(img_data, (img_bands, img_height * img_width))
+    elif len(img_data.shape) == 2:
+        img_bands, n_img_pxls = img_data.shape
+        img_data_reshp = img_data
+    else:
+        raise rsgislib.RSGISPyException(
+            "Input array must have either 2 or 3 dimensions."
+        )
+
     max_value = numpy.max(img_data_reshp, axis=1, keepdims=True)
     min_value = numpy.min(img_data_reshp, axis=1, keepdims=True)
     diff_value = max_value - min_value
     nm_img = (img_data_reshp - min_value) / diff_value
-    nm_img = numpy.reshape(nm_img, (img_bands, img_height, img_width))
+    if len(img_data.shape) == 3:
+        nm_img = numpy.reshape(nm_img, (img_bands, img_height, img_width))
 
     return nm_img
