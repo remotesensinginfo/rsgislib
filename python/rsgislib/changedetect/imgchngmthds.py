@@ -53,6 +53,8 @@ def change_vector_analysis(
     img_base_bands: List[int] = None,
     img_chng_bands: List[int] = None,
     use_kmeans: bool = False,
+    base_img_no_data: float = 0,
+    chng_img_no_data: float = 0,
 ):
     """
     A function which performs Change vector analysis (CVA) between two images.
@@ -67,6 +69,8 @@ def change_vector_analysis(
     :param apply_std: Optionally apply standardisation to the input images.
     :param img_base_bands: Optionally specified a list of bands for the base image
     :param img_chng_bands: Optionally specified a list of bands for the change image
+    :param base_img_no_data: Optionally specified nodata value for the base image
+    :param chng_img_no_data: Optionally specified nodata value for the change image
 
     """
     imgs_match = rsgislib.imageutils.check_img_file_comparison(
@@ -109,6 +113,21 @@ def change_vector_analysis(
     )
     chng_img_data = rsgislib.imageutils.get_img_data_as_arr(
         in_chng_img, img_bands=img_chng_bands
+    )
+
+    base_img_data = numpy.nan_to_num(
+        base_img_data,
+        copy=False,
+        nan=base_img_no_data,
+        posinf=base_img_no_data,
+        neginf=base_img_no_data,
+    )
+    chng_img_data = numpy.nan_to_num(
+        chng_img_data,
+        copy=False,
+        nan=chng_img_no_data,
+        posinf=chng_img_no_data,
+        neginf=chng_img_no_data,
     )
 
     if apply_std:
@@ -165,6 +184,8 @@ def slow_feature_analysis(
     sfa_norm_trans: bool = False,
     sfa_regular: bool = False,
     use_kmeans: bool = False,
+    base_img_no_data: float = 0,
+    chng_img_no_data: float = 0,
 ):
     """
     A function which performs Slow Feature Analysis (SFA) between two images.
@@ -187,6 +208,8 @@ def slow_feature_analysis(
     :param sfa_epsilon: Threshold for convergence.
     :param sfa_norm_trans: Specifies whether to normalise the transformation matrix
     :param sfa_regular: Specifies whether to regularise the transformation matrix
+    :param base_img_no_data: Optionally specified nodata value for the base image
+    :param chng_img_no_data: Optionally specified nodata value for the change image
 
     """
     import scipy.linalg
@@ -235,6 +258,21 @@ def slow_feature_analysis(
     )
     chng_img_data = rsgislib.imageutils.get_img_data_as_arr(
         in_chng_img, img_bands=img_chng_bands
+    )
+
+    base_img_data = numpy.nan_to_num(
+        base_img_data,
+        copy=False,
+        nan=base_img_no_data,
+        posinf=base_img_no_data,
+        neginf=base_img_no_data,
+    )
+    chng_img_data = numpy.nan_to_num(
+        chng_img_data,
+        copy=False,
+        nan=chng_img_no_data,
+        posinf=chng_img_no_data,
+        neginf=chng_img_no_data,
     )
 
     if apply_std:
@@ -396,6 +434,8 @@ def multivariate_alteration_detection(
     mad_max_iter: int = 50,
     mad_epsilon: float = 1e-6,
     use_kmeans: bool = True,
+    base_img_no_data: float = 0,
+    chng_img_no_data: float = 0,
 ):
     """
     A function which performs Multivariate Alteration Detection (MAD) between
@@ -414,7 +454,10 @@ def multivariate_alteration_detection(
     :param img_chng_bands: Optionally specified a list of bands for the change image
     :param mad_max_iter: Maximum number of iterations for the algorithm to converge.
     :param mad_epsilon: Threshold for convergence.
-
+    :param base_img_no_data: The base image no data value.
+    :param chng_img_no_data: The change image no data value.
+    :param base_img_no_data: Optionally specified nodata value for the base image
+    :param chng_img_no_data: Optionally specified nodata value for the change image
 
     """
     import numpy.linalg
@@ -470,6 +513,21 @@ def multivariate_alteration_detection(
     )
     chng_img_data = rsgislib.imageutils.get_img_data_as_arr(
         in_chng_img, img_bands=img_chng_bands
+    )
+
+    base_img_data = numpy.nan_to_num(
+        base_img_data,
+        copy=False,
+        nan=base_img_no_data,
+        posinf=base_img_no_data,
+        neginf=base_img_no_data,
+    )
+    chng_img_data = numpy.nan_to_num(
+        chng_img_data,
+        copy=False,
+        nan=chng_img_no_data,
+        posinf=chng_img_no_data,
+        neginf=chng_img_no_data,
     )
 
     if apply_std:
@@ -557,11 +615,23 @@ def multivariate_alteration_detection(
     # sigma_22, sigma_12, chi_square_dis, weight
     # mad, can_coo, mad_var, ev_1, ev_2, sigma_11, sigma_22, sigma_12, chi2, noc_weight
 
+    print(mad_variates.shape)
+    print(chi_square_dis.shape)
+
     sqrt_chi2 = numpy.sqrt(chi_square_dis)
+    sqrt_chi2 = numpy.nan_to_num(
+        sqrt_chi2,
+        copy=False,
+        nan=0,
+        posinf=0,
+        neginf=0,
+    )
     sqrt_chi2_img = sqrt_chi2.reshape((1, img_size_y, img_size_x))
 
+    mad_variates_img = mad_variates.reshape((n_bands, img_size_y, img_size_x))
+
     rsgislib.imageutils.create_img_from_array_ref_img(
-        data_arr=sqrt_chi2_img,
+        data_arr=mad_variates_img,
         output_img=out_chng_dist_img,
         ref_img=in_base_img,
         gdalformat=gdalformat,
