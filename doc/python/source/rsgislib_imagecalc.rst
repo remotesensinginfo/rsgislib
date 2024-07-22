@@ -69,6 +69,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.calc_img_earth_move_dist
 .. autofunction:: rsgislib.imagecalc.calc_mask_img_pxl_val_prob
 .. autofunction:: rsgislib.imagecalc.calc_img_difference
+.. autofunction:: rsgislib.imagecalc.calc_area_under_curve
 
 Thresholding
 --------------

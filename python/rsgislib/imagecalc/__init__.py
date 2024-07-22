@@ -3000,3 +3000,83 @@ def calc_img_band_pxl_percentiles(
     applier.apply(
         _applyCalcPercentile, infiles, outfiles, otherargs, controls=aControls
     )
+
+
+def calc_area_under_curve(
+    input_img: str,
+    band_widths: List[float],
+    output_img: str,
+    gdalformat: str = "KEA",
+    datatype: int = rsgislib.TYPE_32FLOAT,
+):
+    """
+    A function which calculates the area under the curve defined by the bands.
+    Could be a spectral curve for reflectance data but also a temporal curve.
+
+    :param input_img: the input image file name
+    :param band_widths: the widths of the bands provided as a list of floats.
+                        must be the same length as the number of bands within the
+                        input image.
+    :param output_img: Output image file name and path
+    :param gdalformat: Output image file format.
+    :param datatype: Output image data type - Default: rsgislib.TYPE_32FLOAT
+
+    """
+    from rios import applier
+    import rsgislib.imageutils
+
+    if band_widths is None:
+        raise rsgislib.RSGISPyException("Input band_widths list must not be None.")
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+    if n_bands != len(band_widths):
+        raise rsgislib.RSGISPyException(
+            f"Length of band_widths ({len(band_widths)}) must be equal to "
+            f"the number of bands in the input image (N Bands: {n_bands}) ."
+        )
+
+    def _calc_pxl_area_under_curve(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        # Reshape to list of pixels x bands
+        img_shp = inputs.image.shape
+        img_arr = inputs.image.reshape(img_shp[0], img_shp[1] * img_shp[2])
+        img_arr = numpy.moveaxis(img_arr, 0, -1)
+
+        # Calc Image Band Area
+        img_arr_area = img_arr * otherargs.band_widths
+
+        # Sum Areas
+        img_area_total = numpy.sum(img_arr_area, axis=1)
+
+        # Reshape to image
+        outputs.output_img = img_area_total.reshape(1, img_shp[1], img_shp[2]).astype(
+            otherargs.numpyDT
+        )
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.output_img = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.n_bands = n_bands
+    otherargs.band_widths = numpy.array(band_widths)
+    otherargs.numpyDT = rsgislib.get_numpy_datatype(datatype)
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    applier.apply(
+        _calc_pxl_area_under_curve, infiles, outfiles, otherargs, controls=aControls
+    )
