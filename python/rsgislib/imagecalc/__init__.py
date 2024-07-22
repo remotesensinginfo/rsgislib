@@ -1357,7 +1357,7 @@ def calc_img_basic_stats_for_ref_region(
 
 
 def normalise_image_band(
-    input_img: str, band: int, output_img: str, gdal_format: str = "KEA"
+    input_img: str, band: int, output_img: str, gdalformat: str = "KEA"
 ):
     """
     Perform a simple normalisation a single image band (val - min)/range.
@@ -1365,7 +1365,7 @@ def normalise_image_band(
     :param input_img: The input image file.
     :param band: the image band (starts at 1) to be normalised
     :param output_img: the output image file (will just be a single band).
-    :param gdal_format: The output image format.
+    :param gdalformat: The output image format.
 
     """
     import rsgislib
@@ -1384,7 +1384,7 @@ def normalise_image_band(
     band_defns = [BandDefn("b1", input_img, band)]
     band_range = band_max - band_min
     exp = "(b1=={0})?0.0:(b1-{1})/{2}".format(no_data_val, band_min, band_range)
-    band_math(output_img, exp, gdal_format, rsgislib.TYPE_32FLOAT, band_defns)
+    band_math(output_img, exp, gdalformat, rsgislib.TYPE_32FLOAT, band_defns)
     rsgislib.imageutils.pop_img_stats(
         output_img, use_no_data=True, no_data_val=0.0, calc_pyramids=True
     )

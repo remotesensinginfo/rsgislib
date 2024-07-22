@@ -963,7 +963,7 @@ def test_normalise_image_band(tmp_path):
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
     output_img = os.path.join(tmp_path, "out_img.kea")
-    rsgislib.imagecalc.normalise_image_band(input_img, 1, output_img, gdal_format="KEA")
+    rsgislib.imagecalc.normalise_image_band(input_img, 1, output_img, gdalformat="KEA")
     assert os.path.exists(output_img)
 
 

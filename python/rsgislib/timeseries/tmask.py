@@ -189,7 +189,7 @@ def _gen_tmask(info, inputs, outputs, other_args):
 
 def run_tmask(
     json_fp,
-    gdal_format="KEA",
+    gdalformat="KEA",
     num_processes=1,
     green_band=2,
     nir_band=4,
@@ -206,7 +206,7 @@ def run_tmask(
 
     :param json_fp: Path to JSON file which provides a dictionary where for each
                     date, an input file name and an output file name are provided.
-    :param gdal_format: The file format of the output image (e.g., KEA, GTIFF). (Default: KEA)
+    :param gdalformat: The file format of the output image (e.g., KEA, GTIFF). (Default: KEA)
     :param num_processes: Number of concurrent processes to use. (Default: 1)
     :param green_band: GDAL band number for green spectral band. Defaults to 2.
     :param nir_band: GDAL band number for NIR spectral band. Defaults to 4.
@@ -251,7 +251,7 @@ def run_tmask(
     app.setWindowYsize(1)
 
     # Set output file type
-    app.setOutputDriverName(gdal_format)
+    app.setOutputDriverName(gdalformat)
 
     # Use Python's multiprocessing module
     app.setJobManagerType("multiprocessing")

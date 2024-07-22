@@ -122,7 +122,7 @@ def _gen_band_masks(info, inputs, outputs, other_args):
 
 
 def get_ST_masks(
-    json_fp, bands=None, roi_img=None, gdal_format="KEA", num_processes=1, threshold=3
+    json_fp, bands=None, roi_img=None, gdalformat="KEA", num_processes=1, threshold=3
 ):
     """Main function to run to generate the output masks. Given an input JSON file,
     generates a mask for each date, for each band where 0=Inlier, 1=High outlier,
@@ -134,7 +134,7 @@ def get_ST_masks(
 
     json_fp:       Path to JSON file which provides a dictionary where for each
                    date, an input file name and an output file name are provided.
-    gdal_format: Short driver name for GDAL, e.g. KEA, GTiff.
+    gdalformat: Short driver name for GDAL, e.g. KEA, GTiff.
     num_processes: Number of concurrent processes to use.
     bands:         List of GDAL band numbers to use, e.g. [1, 3, 5]. Defaults to all.
     threshold:     Threshold for screening. Defaults to 3, meaning that observations
@@ -182,7 +182,7 @@ def get_ST_masks(
         app.progress = rios.cuiprogress.GDALProgressBar()
 
     # Set output file type
-    app.setOutputDriverName(gdal_format)
+    app.setOutputDriverName(gdalformat)
 
     if roi_img is not None:
         app.setReferenceImage(roi_img)
@@ -229,7 +229,7 @@ def get_ST_masks(
         print("Do all images in the JSON file exist?")
 
 
-def create_datejson_file(image_list, out_msk_dir, out_json_file, gdal_format="KEA"):
+def create_datejson_file(image_list, out_msk_dir, out_json_file, gdalformat="KEA"):
     """
     Assume the date is the second component of the file name (XXX_YYYYMMDD_XXXX.xxx)
 
@@ -239,7 +239,7 @@ def create_datejson_file(image_list, out_msk_dir, out_json_file, gdal_format="KE
 
     import rsgislib.tools.filetools
 
-    out_img_ext = rsgislib.imageutils.get_file_img_extension(gdal_format)
+    out_img_ext = rsgislib.imageutils.get_file_img_extension(gdalformat)
     date_imgs = dict()
     for img in image_list:
         basename = rsgislib.tools.filetools.get_file_basename(img)
