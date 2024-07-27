@@ -101,7 +101,7 @@ namespace rsgis{namespace calib{
         this->distance = distance;
         this->solarZenith = solarZenith;
         this->scaleFactor = scaleFactor;
-        this->distSq = distance * distance;
+        this->distSq =  1 / distance;
     }
     
     void RSGISCalculateRadianceFromTOAReflectance::calcImageValue(float *bandValues, int numBands, double *output) 
