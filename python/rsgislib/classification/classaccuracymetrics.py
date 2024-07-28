@@ -39,7 +39,6 @@ import random
 from typing import Dict, List, Tuple
 
 import numpy
-import numpy.dtypes
 
 import rsgislib
 import rsgislib.tools.utils
@@ -1868,9 +1867,9 @@ def create_modelled_acc_pts(
     if abs(err_mtx_unit_area_arr.sum() - 1) > 0.0001:
         raise rsgislib.RSGISPyException("The error matrix does not sum to 1")
 
-    out_ref_arr = numpy.empty(n_pts, dtype=numpy.dtypes.StringDType())
+    out_ref_arr = numpy.empty(n_pts, dtype=numpy.dtype("a255"))
     out_ref_arr[...] = ""
-    out_cls_arr = numpy.empty(n_pts, dtype=numpy.dtypes.StringDType())
+    out_cls_arr = numpy.empty(n_pts, dtype=numpy.dtype("a255"))
     out_cls_arr[...] = ""
 
     s_ref_idx = 0
