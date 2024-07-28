@@ -770,7 +770,8 @@ namespace rsgis{namespace calib{
                 
                 LVal = (bandValues[srefBandIdx] / this->reflScaleFactor) * bandValues[irrTotalBandIdx];
                 // I am not multipling by Pi (Eq 8) as I have not divided by Pui (Eq 4).
-                output[i] = (LVal) / ((bandValues[irrDirBandIdx] / gamma) + (bandValues[irrDifandIdx] * this->brdfBeta));
+                // Checked *gamma rather than /gamma (Eq 8). *gamma corrects slope /gamma increases topo refl
+                output[i] = (LVal) / ((bandValues[irrDirBandIdx] * gamma) + (bandValues[irrDifandIdx] * this->brdfBeta));
                 
                 output[i] = output[i] * reflScaleFactor;
                 if(reflScaleFactor > 99) // i.e., At least 100 so outputting as a percentage.
