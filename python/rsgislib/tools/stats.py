@@ -3,6 +3,8 @@
 The tools.stats module contains some useful tools for calculating useful statistics which aren't
 easily available else where.
 """
+from typing import Union
+
 import numpy
 
 import rsgislib
@@ -1081,7 +1083,7 @@ def calc_semivariogram(
     data_vals: numpy.array,
     out_data_file: str = None,
     out_plot_file: str = None,
-    max_lag: float | str = "median",
+    max_lag: Union[float, str] = "median",
     n_lags: int = 25,
     normalize_vals: bool = False,
 ):
