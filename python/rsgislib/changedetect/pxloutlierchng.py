@@ -36,6 +36,7 @@
 
 from __future__ import print_function
 
+from typing import List
 import numpy
 from rios import applier
 
@@ -55,13 +56,13 @@ except ImportError:
 
 def find_class_pyod_outliers(
     pyod_obj,
-    input_img,
-    in_msk_img,
-    output_img,
-    out_scores_img=None,
-    img_mask_val=1,
-    img_bands=None,
-    gdalformat="KEA",
+    input_img: str,
+    in_msk_img: str,
+    output_img: str,
+    out_scores_img: str = None,
+    img_mask_val: int = 1,
+    img_bands: List[int] = None,
+    gdalformat: str = "KEA",
 ):
     """
     This function uses the pyod (https://github.com/yzhao062/pyod) library to
