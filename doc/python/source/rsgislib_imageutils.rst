@@ -34,6 +34,8 @@ Get Image Info
 .. autofunction:: rsgislib.imageutils.get_gdal_format_name
 .. autofunction:: rsgislib.imageutils.is_img_thematic
 .. autofunction:: rsgislib.imageutils.get_img_pxl_coords
+.. autofunction:: rsgislib.imageutils.get_img_no_data_value
+.. autofunction:: rsgislib.imageutils.set_img_no_data_value
 
 Spatial Header info
 --------------------

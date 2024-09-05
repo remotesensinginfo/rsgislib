@@ -57,6 +57,7 @@ def image_difference(
     chng_img_no_data: float = 0,
 ):
     """
+    A function to calculate the difference between two images.
 
     :param in_base_img: The input base image file path
     :param in_chng_img: The input change image file path
@@ -188,6 +189,152 @@ def image_difference(
         no_data_val=None,
     )
 
+def image_ratio(
+    in_base_img: str,
+    in_chng_img: str,
+    out_ratio_img: str,
+    vld_msk_img: str = None,
+    vld_msk_val: int = 1,
+    gdalformat: str = "KEA",
+    apply_std: bool = False,
+    img_base_bands: List[int] = None,
+    img_chng_bands: List[int] = None,
+    base_img_no_data: float = 0,
+    chng_img_no_data: float = 0,
+):
+    """
+    A function to calculate a ratio difference between two images.
+
+    :param in_base_img: The input base image file path
+    :param in_chng_img: The input change image file path
+    :param out_ratio_img: Output ratio image file path
+    :param vld_msk_img: An optional valid pixel image mask - if not specified
+                        the no data values of the input images will be used.
+    :param vld_msk_val: the pixel value within in the mask defining which pixels
+                        are valid. Default is 1.
+    :param gdalformat: Output GDAL image file format
+    :param apply_std: Optionally apply standardisation to the input images.
+    :param img_base_bands: Optionally specified a list of bands for the base image
+    :param img_chng_bands: Optionally specified a list of bands for the change image
+    :param base_img_no_data: Optionally specified nodata value for the base image
+    :param chng_img_no_data: Optionally specified nodata value for the change image
+
+    """
+    imgs_match = rsgislib.imageutils.check_img_file_comparison(
+        in_base_img,
+        in_chng_img,
+        test_n_bands=False,
+        test_eql_bbox=True,
+        print_errors=True,
+    )
+    if not imgs_match:
+        raise rsgislib.RSGISPyException("Image does not match")
+
+    if img_base_bands is not None:
+        n_base_bands = len(img_base_bands)
+        if img_chng_bands is None:
+            raise rsgislib.RSGISPyException(
+                "img_base_bands is not None but img_chng_bands is None"
+            )
+    else:
+        n_base_bands = rsgislib.imageutils.get_img_band_count(in_base_img)
+
+    if img_chng_bands is not None:
+        n_chng_bands = len(img_chng_bands)
+        if img_chng_bands is None:
+            raise rsgislib.RSGISPyException(
+                "img_chng_bands is not None but img_base_bands is None"
+            )
+    else:
+        n_chng_bands = rsgislib.imageutils.get_img_band_count(in_chng_img)
+
+    if n_base_bands != n_chng_bands:
+        raise rsgislib.RSGISPyException(
+            "The number of bands specified for the two images do not match"
+        )
+    n_bands = n_base_bands
+    img_size_x, img_size_y = rsgislib.imageutils.get_img_size(in_base_img)
+    n_pxls = img_size_x * img_size_y
+
+    base_img_data = rsgislib.imageutils.get_img_data_as_arr(
+        in_base_img, img_bands=img_base_bands
+    )
+    base_img_data = base_img_data.astype(numpy.dtype("float32"))
+    chng_img_data = rsgislib.imageutils.get_img_data_as_arr(
+        in_chng_img, img_bands=img_chng_bands
+    )
+    chng_img_data = chng_img_data.astype(numpy.dtype("float32"))
+
+    base_img_data = numpy.nan_to_num(
+        base_img_data,
+        copy=False,
+        nan=base_img_no_data,
+        posinf=base_img_no_data,
+        neginf=base_img_no_data,
+    )
+    chng_img_data = numpy.nan_to_num(
+        chng_img_data,
+        copy=False,
+        nan=chng_img_no_data,
+        posinf=chng_img_no_data,
+        neginf=chng_img_no_data,
+    )
+
+    # Get the valid mask - either read mask file or use no data value.
+    if vld_msk_img is not None:
+        vld_msk_arr = rsgislib.imageutils.get_img_data_as_arr(
+            vld_msk_img, img_bands=[1]
+        )
+    else:
+        vld_msk_arr = numpy.zeros([1, img_size_y, img_size_x], dtype=int)
+        vld_msk_arr[base_img_data != base_img_no_data] = vld_msk_val
+        vld_msk_arr[chng_img_data != chng_img_no_data] = vld_msk_val
+
+    # Flatten / Reshape  data.
+    base_flat_data = base_img_data.reshape([n_bands, n_pxls])
+    base_flat_data = numpy.moveaxis(base_flat_data, 0, -1)
+    chng_flat_data = chng_img_data.reshape([n_bands, n_pxls])
+    chng_flat_data = numpy.moveaxis(chng_flat_data, 0, -1)
+    vld_flat_data = vld_msk_arr.reshape([n_pxls])
+
+    # Create Pixel IDs
+    pxl_ids = numpy.arange(0, n_pxls, 1)
+    pxl_ids = pxl_ids[vld_flat_data == vld_msk_val]
+
+    # Mask the image data to the valid pixels
+    base_flat_data = base_flat_data[vld_flat_data == vld_msk_val]
+    chng_flat_data = chng_flat_data[vld_flat_data == vld_msk_val]
+
+    # Reshape the arrays so bands are first dim
+    base_flat_data = numpy.moveaxis(base_flat_data, 0, -1)
+    chng_flat_data = numpy.moveaxis(chng_flat_data, 0, -1)
+
+    # If specified standardise the image bands.
+    if apply_std:
+        base_flat_data = rsgislib.tools.stats.standarise_img_data(base_flat_data)
+        chng_flat_data = rsgislib.tools.stats.standarise_img_data(chng_flat_data)
+
+    # Calculate the image difference
+    img_ratio = base_flat_data / chng_flat_data
+    numpy.nan_to_num(img_ratio, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
+
+    # Reshape and used pxl_ids to un-mask the output.
+    img_ratio = numpy.moveaxis(img_ratio, 0, -1)
+    ratio_img_arr = numpy.zeros([n_pxls, n_bands], dtype=float)
+    ratio_img_arr[pxl_ids] = img_ratio
+    ratio_img_arr = numpy.moveaxis(ratio_img_arr, 0, -1)
+    ratio_img_arr = ratio_img_arr.reshape([n_bands, img_size_y, img_size_x])
+
+    # Write the output image file.
+    rsgislib.imageutils.create_img_from_array_ref_img(
+        data_arr=ratio_img_arr,
+        output_img=out_ratio_img,
+        ref_img=in_base_img,
+        gdalformat=gdalformat,
+        datatype=rsgislib.TYPE_32FLOAT,
+        options=rsgislib.imageutils.get_rios_img_creation_opts(gdalformat),
+        no_data_val=None,
+    )
 
 def change_vector_analysis(
     in_base_img: str,
@@ -330,6 +477,7 @@ def change_vector_analysis(
 
     # Calculate the l2 normalised difference
     l2_norm = numpy.sqrt(numpy.sum(numpy.square(img_diff), axis=0))
+    numpy.nan_to_num(l2_norm, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
 
     # Calculate the otsu threshold
     otsu_thres = rsgislib.tools.stats.calc_otsu_threshold(l2_norm)
@@ -630,6 +778,7 @@ def slow_feature_analysis(
     # return isfa_variable, lamb, all_lambda, trans_mat, T, weight
 
     sqrt_chi2 = numpy.sqrt(T)
+    numpy.nan_to_num(sqrt_chi2, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
     otsu_thres = rsgislib.tools.stats.calc_otsu_threshold(sqrt_chi2)
 
     sqrt_chi2_flat_arr = numpy.zeros([n_pxls], dtype=float)
@@ -851,6 +1000,7 @@ def multivariate_alteration_detection(
             ),
             sigma_21,
         )
+        numpy.nan_to_num(target_mat, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
         eigenvalue, eigenvector_X = numpy.linalg.eig(
             target_mat
         )  # the eigenvalue and eigenvector of image X
@@ -891,7 +1041,7 @@ def multivariate_alteration_detection(
         # calculate chi-square distance and probility of unchanged
         mad_var = numpy.reshape(2 * (1 - can_corr), (n_bands, 1))
         chi_square_dis = numpy.sum(
-            mad_variates * mad_variates / mad_var, axis=0, keepdims=True
+            mad_variates * mad_variates / mad_var, axis=0, dtype=float, keepdims=True
         )
         weight = 1 - scipy.stats.chi2.cdf(chi_square_dis, n_bands)
 
@@ -905,6 +1055,7 @@ def multivariate_alteration_detection(
     # mad, can_coo, mad_var, ev_1, ev_2, sigma_11, sigma_22, sigma_12, chi2, noc_weight
 
     sqrt_chi2 = numpy.sqrt(chi_square_dis)
+    numpy.nan_to_num(sqrt_chi2, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
     sqrt_chi2_flat_arr = numpy.zeros([n_pxls], dtype=float)
     sqrt_chi2_flat_arr[pxl_ids] = sqrt_chi2
     sqrt_chi2_img = sqrt_chi2_flat_arr.reshape([1, img_size_y, img_size_x])
