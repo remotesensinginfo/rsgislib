@@ -3080,3 +3080,117 @@ def calc_area_under_curve(
     applier.apply(
         _calc_pxl_area_under_curve, infiles, outfiles, otherargs, controls=aControls
     )
+
+
+def calc_apply_img_band_threshold(
+    input_img: str,
+    output_img: str,
+    img_band: int,
+    gdalformat: str = "KEA",
+    thres_mthd: int = rsgislib.THRES_METH_OTSU,
+    apply_thres_op: str = ">",
+    no_data_val: float = None,
+    use_no_data: bool = True,
+    cross_entropy_thres: float = None,
+    li_tolerance: float = None,
+    li_initial_guess: float = None,
+    kurt_skew_max_val: float = None,
+    kurt_skew_min_val: float = None,
+    kurt_skew_init_thres: float = None,
+    kurt_skew_low_thres: bool = True,
+    kurt_skew_contamination: float = 10.0,
+    kurt_skew_only_kurtosis: bool = False,
+) -> float:
+    """
+    A function which calculates a threshold for a band and applies it to the image.
+
+    :param input_img: The input image file path
+    :param output_img: The output image file path
+    :param img_band: the image band used calculating the threshold
+    :param gdalformat: output image format (e.g., KEA)
+    :param thres_mthd: the thresholding method (Default: rsgislib.THRES_METH_OTSU)
+    :param apply_thres_op: the operator used to threshold the image to produce the output
+                           must be one of '>', '<', '<=', '>='.
+    :param no_data_val: no data value for the input image band - If None then read from image header.
+    :param use_no_data: boolean (Default True) to specify whether the image no data value should be used.
+    :param cross_entropy_thres: THRES_METH_CROSS_ENT parameter - See tools.stats docs.
+    :param li_tolerance: THRES_METH_LI parameter - See tools.stats docs.
+    :param li_initial_guess: THRES_METH_LI parameter - See tools.stats docs.
+    :param kurt_skew_max_val: THRES_METH_KURT_SKEW parameter - See tools.stats docs.
+    :param kurt_skew_min_val: THRES_METH_KURT_SKEW parameter - See tools.stats docs.
+    :param kurt_skew_init_thres: THRES_METH_KURT_SKEW parameter - See tools.stats docs.
+    :param kurt_skew_low_thres: THRES_METH_KURT_SKEW parameter - See tools.stats docs.
+    :param kurt_skew_contamination: THRES_METH_KURT_SKEW parameter - See tools.stats docs.
+    :param kurt_skew_only_kurtosis: THRES_METH_KURT_SKEW parameter - See tools.stats docs.
+    :return: returns the calculated threshold.
+
+    """
+    import rsgislib.tools.stats
+    import rsgislib.imageutils
+
+    if apply_thres_op not in [">", "<", "<=", ">="]:
+        raise rsgislib.RSGISPyException(
+            "apply_thres_op must be one of: '>', '<', '<=', '>='"
+        )
+
+    if use_no_data and (no_data_val is None):
+        no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img, img_band)
+
+        if no_data_val is None:
+            raise rsgislib.RSGISPyException(
+                "A no data value was not defined - either specify "
+                "not to use, provide to function or specify in image header."
+            )
+
+    img_bnd_arr = rsgislib.imageutils.get_img_data_as_arr(
+        input_img, img_bands=[img_band]
+    )
+    img_bnd_arr = img_bnd_arr.flatten()
+    if use_no_data:
+        img_bnd_arr = img_bnd_arr[img_bnd_arr != no_data_val]
+
+    if thres_mthd == rsgislib.THRES_METH_OTSU:
+        thres = rsgislib.tools.stats.calc_otsu_threshold(img_bnd_arr)
+    elif thres_mthd == rsgislib.THRES_METH_YEN:
+        thres = rsgislib.tools.stats.calc_yen_threshold(img_bnd_arr)
+    elif thres_mthd == rsgislib.THRES_METH_ISODATA:
+        thres = rsgislib.tools.stats.calc_isodata_threshold(img_bnd_arr)
+    elif thres_mthd == rsgislib.THRES_METH_CROSS_ENT:
+        if cross_entropy_thres is None:
+            raise rsgislib.RSGISPyException("cross_entropy_thres must not be None")
+        thres = rsgislib.tools.stats.calc_hist_cross_entropy(
+            img_bnd_arr, cross_entropy_thres
+        )
+    elif thres_mthd == rsgislib.THRES_METH_LI:
+        thres = rsgislib.tools.stats.calc_li_threshold(
+            img_bnd_arr, tolerance=li_tolerance, initial_guess=li_initial_guess
+        )
+    elif thres_mthd == rsgislib.THRES_METH_KURT_SKEW:
+        if kurt_skew_max_val is None:
+            raise rsgislib.RSGISPyException("kurt_skew_max_val must not be None")
+        if kurt_skew_min_val is None:
+            raise rsgislib.RSGISPyException("kurt_skew_min_val must not be None")
+        if kurt_skew_init_thres is None:
+            raise rsgislib.RSGISPyException("kurt_skew_init_thres must not be None")
+        if kurt_skew_contamination is None:
+            raise rsgislib.RSGISPyException("kurt_skew_contamination must not be None")
+
+        thres = rsgislib.tools.stats.calc_kurt_skew_threshold(
+            img_bnd_arr,
+            max_val=kurt_skew_max_val,
+            min_val=kurt_skew_min_val,
+            init_thres=kurt_skew_init_thres,
+            low_thres=kurt_skew_low_thres,
+            contamination=kurt_skew_contamination,
+            only_kurtosis=kurt_skew_only_kurtosis,
+        )
+    else:
+        raise rsgislib.RSGISPyException(
+            "Do not recognise thresholding method - must be rsgislib.THRES_METH_*"
+        )
+
+    band_defns = list()
+    band_defns.append(BandDefn("img", input_img, img_band))
+    exp = f"img {apply_thres_op} {thres}"
+    band_math(output_img, exp, gdalformat, rsgislib.TYPE_8UINT, band_defns)
+    return thres

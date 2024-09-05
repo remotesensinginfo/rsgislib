@@ -75,6 +75,7 @@ Thresholding
 --------------
 
 .. autofunction:: rsgislib.imagecalc.calc_split_win_thresholds
+.. autofunction:: rsgislib.imagecalc.calc_apply_img_band_threshold
 
 Histogram
 ------------

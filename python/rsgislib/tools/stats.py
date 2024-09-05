@@ -643,7 +643,7 @@ def get_bin_centres(bin_edges, geometric=False):
     return bin_centres
 
 
-def calc_otsu_threshold(data) -> float:
+def calc_otsu_threshold(data: numpy.array) -> float:
     """
     A function to calculate otsu's threshold for a dataset. Input is expected
     to be a 1d numpy array.
@@ -681,7 +681,7 @@ def calc_otsu_threshold(data) -> float:
     return bin_centres[numpy.argmax(variance12)]
 
 
-def calc_yen_threshold(data) -> float:
+def calc_yen_threshold(data: numpy.array) -> float:
     """
     A function to calculate yen threshold for a dataset. Input is expected
     to be a 1d numpy array.
@@ -719,7 +719,7 @@ def calc_yen_threshold(data) -> float:
     return bin_centres[crit.argmax()]
 
 
-def calc_isodata_threshold(data) -> float:
+def calc_isodata_threshold(data: numpy.array) -> float:
     """
     A function to calculate inter-means threshold for a dataset. Input is expected
     to be a 1d numpy array. Histogram-based threshold, known as Ridler-Calvard method
@@ -789,7 +789,7 @@ def calc_isodata_threshold(data) -> float:
     return thresholds[0]
 
 
-def calc_hist_cross_entropy(data, threshold) -> float:
+def calc_hist_cross_entropy(data: numpy.array, threshold: float) -> float:
     """
     A function which computes the cross-entropy between distributions
     above and below a threshold. Cross-entropy is a measure of the difference
@@ -836,7 +836,9 @@ def calc_hist_cross_entropy(data, threshold) -> float:
     return nu
 
 
-def calc_li_threshold(data, tolerance=None, initial_guess=None) -> float:
+def calc_li_threshold(
+    data: numpy.array, tolerance: float = None, initial_guess: float = None
+) -> float:
     """
     A function which calculates a threshold value by Li's iterative
     Minimum Cross Entropy method.
@@ -903,13 +905,13 @@ def calc_li_threshold(data, tolerance=None, initial_guess=None) -> float:
 
 
 def calc_kurt_skew_threshold(
-    data,
-    max_val,
-    min_val,
-    init_thres,
-    low_thres=True,
-    contamination=10.0,
-    only_kurtosis=False,
+    data: numpy.array,
+    max_val: float,
+    min_val: float,
+    init_thres: float,
+    low_thres: bool = True,
+    contamination: float = 10.0,
+    only_kurtosis: bool = False,
 ) -> float:
     """
     A function to calculate a threshold either side of the histogram based on
