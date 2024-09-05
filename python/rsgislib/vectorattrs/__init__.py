@@ -649,6 +649,7 @@ def add_numeric_col_lut(
     out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
+    col_dtype: str = "int",
 ):
     """
     A function which adds a numeric column based off an existing column in the
@@ -663,18 +664,26 @@ def add_numeric_col_lut(
     :param out_vec_file: Output vector file
     :param out_vec_lyr: output vector layer name.
     :param out_format: output file format (default GPKG).
+    :param col_dtype: output data type (default int). Must be either "int" or "float".
 
     """
     import geopandas
 
     import rsgislib.vectorutils
 
+    if col_dtype.lower() not in ["int", "float"]:
+        raise ValueError("col_type must be int or float")
+
     out_format = rsgislib.vectorutils.check_format_name(out_format)
 
     # Open vector file
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     # Add output column
-    base_gpdf[out_col] = numpy.zeros((base_gpdf.shape[0]), dtype=int)
+    if col_dtype.lower() == "int":
+        base_gpdf[out_col] = numpy.zeros((base_gpdf.shape[0]), dtype=int)
+    elif col_dtype.lower() == "float":
+        base_gpdf[out_col] = numpy.zeros((base_gpdf.shape[0]), dtype=float)
+
     # Loop values in LUT
     for lut_key in val_lut:
         sel_rows = base_gpdf[ref_col] == lut_key
