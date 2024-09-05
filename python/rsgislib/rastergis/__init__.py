@@ -313,7 +313,7 @@ def set_class_names_colours(
     if class_names_col_avail:
         class_names_arr = rat.readColumn(rat_dataset, class_names_col)
     else:
-        class_names_arr = numpy.zeros(n_rows, dtype=str)
+        class_names_arr = numpy.zeros(n_rows, dtype=numpy.dtype("U255"))
 
     for class_key in class_info_dict:
         if (class_key >= 0) and (class_key < n_rows):
@@ -534,7 +534,7 @@ def define_class_names(
     def _ratapplier_def_class_names(info, inputs, outputs, otherargs):
         classNum = getattr(inputs.inrat, otherargs.classNumCol)
 
-        class_names = numpy.empty_like(classNum, dtype=str)
+        class_names = numpy.empty_like(classNum, dtype=numpy.dtype("U255"))
         class_names[...] = ""
 
         for key in otherargs.classNamesDict:
