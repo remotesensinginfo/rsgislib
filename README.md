@@ -23,10 +23,13 @@ Instructions on installing RSGISLib:
 conda install -c conda-forge rsgislib
 ```
   
-If you want to install a system of packages for undertaking remote sensing and GIS data analysis in python then the following packages would be a recommended list:
+If you want to install a system of packages for undertaking remote sensing and GIS data analysis in python then the following packages are what I install as a base environment:
   
 ```shell
-conda install -c conda-forge rsgislib gdal h5py parallel scikit-learn scikit-image scikit-optimize imbalanced-learn matplotlib pandas geopandas statsmodels scipy rasterio shapely networkx sqlalchemy pycurl xgboost lightgbm tpot seaborn numba pip sphinx elevation rtree tqdm jinja2 keras keras-preprocessing pytables bokeh pygal jupyterlab psutil pysal libpysal esda pyyaml netcdf4 xarray rasterstats fiona plotly python-kaleido psycopg2 ipywidgets tuiview
+conda install -c conda-forge rsgislib gdal libgdal-arrow-parquet libgdal-fits libgdal-grib libgdal-hdf4 libgdal-hdf5 libgdal-jp2openjpeg libgdal-pg libgdal-kea libgdal-netcdf proj-data geos gsl kealib xerces-c muparser boost-cpp rios scikit-learn scikit-image imbalanced-learn scikit-plot scikit-fuzzy bayesian-optimization optuna matplotlib pandas geopandas statsmodels h5py scipy rasterio shapely networkx sqlalchemy pycurl xgboost catboost lightgbm numba pip sphinx elevation rtree tqdm jinja2 keras parallel bokeh pygal jupyterlab psutil pysal libpysal esda pyyaml netcdf4 xarray rasterstats fiona plotly python-kaleido pyod psycopg2 contextily cvxopt feather-format openpyxl SALib xlsxwriter black jupyterlab_code_formatter ruff flake8 pylint isort autopep8 pytest pytest-html coverage pytest-cov requests imageio Pillow pyyaml exiftool scikit-gstat tuiview
+
+pip install gsutil alphashape pysptools matplotlib-scalebar pysondb BorutaShap PyMuPDF mpl-scatter-density OWSLib mpl_scatter_density tabulate pyMCR pyexiftool azure-storage-blob azure-identity 
+
 ```
 
 ## Documentation and Support ##
@@ -39,7 +42,7 @@ You need to be a member of the group to post.
 Please check through existing posts to see if there is already an answer to your question before emailing.
 To help us answer your question provide as much information as possible (RSGISLib version and how you installed it, OS, things you have already tried to solve the problem etc.,).
 
-We occasionally post tutorials on RSGISLib and other useful bits and pieces to our [website remotesensing.info](https://remotesensing.info).
+We occasionally post tutorials on RSGISLib and other useful bits and pieces to our [website remotesensing.info](http://remotesensing.info).
 
 ## Citing ##
 
