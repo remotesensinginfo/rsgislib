@@ -28,9 +28,9 @@ If you want to install a system of packages for undertaking remote sensing and G
 ```shell
 conda install -c conda-forge rsgislib gdal libgdal-arrow-parquet libgdal-fits libgdal-grib libgdal-hdf4 libgdal-hdf5 libgdal-jp2openjpeg libgdal-pg libgdal-kea libgdal-netcdf proj-data geos gsl kealib xerces-c muparser boost-cpp rios scikit-learn scikit-image imbalanced-learn scikit-plot scikit-fuzzy bayesian-optimization optuna matplotlib pandas geopandas statsmodels h5py scipy rasterio shapely networkx sqlalchemy pycurl xgboost catboost lightgbm numba pip sphinx elevation rtree tqdm jinja2 keras parallel bokeh pygal jupyterlab psutil pysal libpysal esda pyyaml netcdf4 xarray rasterstats fiona plotly python-kaleido pyod psycopg2 contextily cvxopt feather-format openpyxl SALib xlsxwriter black jupyterlab_code_formatter ruff flake8 pylint isort autopep8 pytest pytest-html coverage pytest-cov requests imageio Pillow pyyaml exiftool scikit-gstat tuiview
 ```
-I have sometimes found that packages can clash between the default conda channel and conda-forge so I would recommend removing `default` from your configuration and just use conda-forge.
+I have sometimes found that packages can clash between the `default` conda channel and `conda-forge` so I would recommend removing `default` from your configuration and just using `conda-forge`.
 
-I also instatll the following packages which are not available via conda:
+I also install the following packages using pip, which are not available via conda:
 ```shell
 pip install gsutil alphashape pysptools matplotlib-scalebar pysondb BorutaShap PyMuPDF mpl-scatter-density OWSLib mpl_scatter_density tabulate pyMCR pyexiftool azure-storage-blob azure-identity 
 
