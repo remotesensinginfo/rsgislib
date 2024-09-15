@@ -3298,6 +3298,47 @@ def split_vec_lyr_random_subset(
         smpl_gpdf.to_file(out_smpl_vec_file, driver=out_format)
 
 
+def vec_lyr_random_subset(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    n_smpl: int,
+    out_format: str = "GPKG",
+    rnd_seed: int = None,
+):
+    """
+    A function to create a random subset of features from a vector layer.
+    This function uses geopandas so that library must therefore be installed.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer.
+    :param out_vec_file: Output vector file with the random outputs
+    :param out_vec_lyr: Output vector layer with the random outputs
+    :param n_smpl: the number of samples to be randomly selected
+    :param out_format: The output format of the output file. (Default: GPKG)
+    :param rnd_seed: A seed for the random number generator.
+
+    """
+    import geopandas
+
+    n_feats = get_vec_feat_count(vec_file, vec_lyr)
+    if n_smpl >= n_feats:
+        raise rsgislib.RSGISPyException(
+            "The number of samples must be less than the number of features in the file."
+        )
+
+    # Read input vector file.
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    smpl_gpdf = base_gpdf.sample(n=n_smpl, random_state=rnd_seed)
+
+    if out_format == "GPKG":
+        smpl_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        smpl_gpdf.to_file(out_vec_file, driver=out_format)
+
+
 def create_train_test_smpls(
     vec_file: str,
     vec_lyr: str,
@@ -3818,3 +3859,45 @@ def create_n_random_subsets(
             sub_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
             sub_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def drop_rows_by_multi_attributes(
+    vec_file: str,
+    vec_lyr: str,
+    drop_atts: Dict[str, Union[float, int, str]],
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+):
+    """
+    A function which subsets an input vector layer based on a list of attributes
+    and values.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer
+    :param drop_atts: dictionary of column names and values to be dropped.
+    :param out_vec_file: The output vector file
+    :param out_vec_lyr: The output vector layer
+    :param out_format: The output vector format.
+
+    """
+    import geopandas
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    first = True
+    for col in drop_atts:
+        print(col)
+        if first:
+            out_gpdf = base_gpdf.drop(base_gpdf[base_gpdf[col] == drop_atts[col]].index)
+            first = False
+        else:
+            out_gpdf = out_gpdf.drop(out_gpdf[out_gpdf[col] == drop_atts[col]].index)
+
+    if out_gpdf.shape[0] > 0:
+        if out_format == "GPKG":
+            out_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            out_gpdf.to_file(out_vec_file, driver=out_format)
+    else:
+        raise rsgislib.RSGISPyException("No output file as no features selected.")

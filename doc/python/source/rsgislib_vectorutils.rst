@@ -90,9 +90,10 @@ Vector Select / Subset
 .. autofunction:: rsgislib.vectorutils.subset_by_attribute
 .. autofunction:: rsgislib.vectorutils.select_feats_str_search
 .. autofunction:: rsgislib.vectorutils.drop_rows_by_attribute
+.. autofunction:: rsgislib.vectorutils.drop_rows_by_multi_attributes
 .. autofunction:: rsgislib.vectorutils.rm_feat_att_duplicates
 .. autofunction:: rsgislib.vectorutils.spatial_select_bbox
-
+.. autofunction:: rsgislib.vectorutils.vec_lyr_random_subset
 
 
 Vector Split
