@@ -1786,7 +1786,7 @@ def explode_vec_lyr(
     import geopandas
 
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
-    data_explode_gdf = data_gdf.explode()
+    data_explode_gdf = data_gdf.explode(index_parts=False)
 
     if len(data_explode_gdf) > 0:
         if out_format == "GPKG":
