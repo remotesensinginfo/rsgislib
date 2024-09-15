@@ -625,6 +625,102 @@ def get_unique_values(input_img: str, img_band: int = 1):
     return uniq_vals
 
 
+def one_hot_category_encoding(
+    input_img: str,
+    output_img: str,
+    recode_dict: Dict[int, int] = None,
+    gdalformat: str = "KEA",
+    no_data_val: int = None,
+):
+    """
+    A function to which encodes categorical images as a one-hot image.
+    The output image will have the same number of output image bands
+    as there are unique image values. If a recode_dict is provided then
+    the keys should be the image values and the value will be the band
+    number in the output image related to this value. If no recode_dict
+    is provided then the unique values from the input image will be used.
+    The output bands will be ordered by the unique values (low to high).
+
+    :param input_img: Input image file
+    :param output_img: Output image file
+    :param recode_dict: dict for recode (key: int to be encoded, value: int
+                        output image band - starting 1)
+    :param gdalformat: output file format (default: KEA)
+    :param no_data_val: a no data value that will be ignored when
+                        calculating the unique values.
+
+    """
+    import rsgislib.imageutils
+    from rios import applier
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    if recode_dict is None:
+        unq_vals = get_unique_values(input_img)
+        unq_vals = sorted(unq_vals)
+        if no_data_val is not None:
+            unq_vals.remove(no_data_val)
+        lcl_recode_dict = dict()
+        for i, unq_val in enumerate(unq_vals):
+            lcl_recode_dict[unq_val] = i
+        n_out_bands = len(lcl_recode_dict)
+    else:
+        n_out_bands = 0
+        lcl_recode_dict = dict()
+        for img_val in recode_dict:
+            band = recode_dict[img_val]
+            if band < 0:
+                raise rsgislib.RSGISPyException(
+                    "The band number must be greater than 1."
+                )
+            if band > n_out_bands:
+                n_out_bands = band
+            lcl_recode_dict[img_val] = band - 1
+
+    print(f"Number of Output Bands: {n_out_bands}")
+
+    if n_out_bands > 50:
+        print(
+            "WARNING: You are creating a lot of image "
+            "bands this might not be what you want."
+        )
+
+    # Generated the combined mask.
+    infiles = applier.FilenameAssociations()
+    infiles.inimage = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.recode_dict = lcl_recode_dict
+    otherargs.n_out_bands = n_out_bands
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = False
+    aControls.calcStats = False
+    aControls.statsIgnore = -9999
+
+    def _hot_one_recode(info, inputs, outputs, otherargs):
+        arr_shp = inputs.inimage[0].shape
+        out_arr = numpy.zeros(
+            (otherargs.n_out_bands, arr_shp[0], arr_shp[1]), dtype=numpy.uint8
+        )
+
+        for img_val in otherargs.recode_dict:
+            band_idx = otherargs.recode_dict[img_val]
+            out_arr[band_idx][inputs.inimage[0] == img_val] = 1
+
+        outputs.outimage = out_arr
+
+    applier.apply(_hot_one_recode, infiles, outfiles, otherargs, controls=aControls)
+
+
 def get_pca_eigen_vector(
     input_img: str,
     pxl_n_sample: int,
