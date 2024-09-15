@@ -155,8 +155,13 @@ Options for calculating correlation:
 
 
 Options for logical combination of data:
-LOGIC_AND = 1
-LOGIC_OR = 2
+    * LOGIC_AND = 1
+    * LOGIC_OR = 2
+
+Options for variable type
+    * VAR_TYPE_UNDEFINED = 0
+    * VAR_TYPE_CONTINUOUS = 1
+    * VAR_TYPE_CATEGORICAL = 2
 
 """
 from __future__ import print_function
@@ -292,6 +297,10 @@ STATS_CORR_POINT_BISERIAL = 4  # pointbiserialr
 LOGIC_AND = 1
 LOGIC_OR = 2
 
+VAR_TYPE_UNDEFINED = 0
+VAR_TYPE_CONTINUOUS = 1
+VAR_TYPE_CATEGORICAL = 2
+
 
 def get_install_base_path() -> pathlib.PurePath:
     """
@@ -412,7 +421,7 @@ class RSGISGDALErrorHandler:
         self.err_msg = err_msg
 
 
-def get_rsgislib_datatype(gdal_type: int) -> int:
+def get_rsgislib_datatype(gdal_type: str) -> int:
     """
     Convert from GDAL data type string to RSGISLib data type int.
 
@@ -492,6 +501,41 @@ def get_gdal_datatype(rsgislib_datatype: int) -> int:
     return out_dt
 
 
+def get_rsgislib_datatype_str(rsgislib_datatype: int) -> str:
+    """
+    Get a string representation of the datatype.
+    Easier for a user to interpret.
+
+    :return: str
+
+    """
+    if rsgislib_datatype == TYPE_16INT:
+        out_dt = "16 bit INTEGER"
+    elif rsgislib_datatype == TYPE_32INT:
+        out_dt = "32 bit INTEGER"
+    elif rsgislib_datatype == TYPE_8UINT:
+        out_dt = "8 bit UNSIGNED INTEGER (BYTE)"
+    elif rsgislib_datatype == TYPE_16UINT:
+        out_dt = "16 bit UNSIGNED INTEGER"
+    elif rsgislib_datatype == TYPE_32UINT:
+        out_dt = "32 bit UNSIGNED INTEGER"
+    elif rsgislib_datatype == TYPE_32FLOAT:
+        out_dt = "32 bit FLOAT"
+    elif rsgislib_datatype == TYPE_64FLOAT:
+        out_dt = "64 bit FLOAT"
+    elif rsgislib_datatype == TYPE_64INT:
+        out_dt = "64 bit INTEGER"
+    elif rsgislib_datatype == TYPE_64UINT:
+        out_dt = "32 bit UNSIGNED INTEGER"
+    elif rsgislib_datatype == TYPE_8INT:
+        out_dt = "8 bit INTEGER"
+    else:
+        raise RSGISPyException(
+            f"The data type '{rsgislib_datatype}' is unknown / not supported."
+        )
+    return out_dt
+
+
 def get_numpy_datatype(rsgislib_datatype: int) -> int:
     """
     Convert from RSGISLib data type to numpy datatype
@@ -523,7 +567,7 @@ def get_numpy_datatype(rsgislib_datatype: int) -> int:
     elif rsgislib_datatype == TYPE_64FLOAT:
         numpy_dt = numpy.float64
     else:
-        raise RSGISPyException("Datatype was not recognised.")
+        raise RSGISPyException("Data type was not recognised.")
     return numpy_dt
 
 
@@ -558,7 +602,7 @@ def get_numpy_char_codes_datatype(rsgislib_datatype: int) -> str:
     elif rsgislib_datatype == TYPE_64FLOAT:
         numpy_dt = numpy.dtype(numpy.float64).char
     else:
-        raise RSGISPyException("Datatype was not recognised.")
+        raise RSGISPyException("Data type was not recognised.")
     return numpy_dt
 
 
