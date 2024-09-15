@@ -2023,3 +2023,42 @@ def calc_vec_pt_dist_angle(
         data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def calc_near_dist_to_feats(
+    vec_file: str,
+    vec_lyr: str,
+    vec_dist_file: str,
+    vec_dist_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_col: str = "dist",
+    out_format: str = "GPKG",
+):
+    import geopandas
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    dist_gdf = geopandas.read_file(vec_dist_file, layer=vec_dist_lyr)
+
+    data_cols = list(data_gdf.columns.values)
+    dist_cols = list(dist_gdf.columns.values)
+
+    data_dist_gdf = geopandas.sjoin_nearest(
+        data_gdf,
+        dist_gdf,
+        distance_col=out_col,
+        lsuffix="left",
+        rsuffix="right",
+        exclusive=True,
+    )
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            import rsgislib.tools.filetools
+
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                out_vec_file, check_valid=True
+            )
+        data_dist_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_dist_gdf.to_file(out_vec_file, driver=out_format)
