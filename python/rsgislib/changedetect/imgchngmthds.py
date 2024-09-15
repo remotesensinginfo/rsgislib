@@ -189,6 +189,7 @@ def image_difference(
         no_data_val=None,
     )
 
+
 def image_ratio(
     in_base_img: str,
     in_chng_img: str,
@@ -335,6 +336,7 @@ def image_ratio(
         options=rsgislib.imageutils.get_rios_img_creation_opts(gdalformat),
         no_data_val=None,
     )
+
 
 def change_vector_analysis(
     in_base_img: str,
