@@ -2,7 +2,7 @@
 """
 Functions implementing species distribution modelling.
 """
-from typing import Dict
+from typing import Dict, List
 import os
 
 import rsgislib
@@ -75,9 +75,9 @@ def gen_pseudo_absences_smpls(
     out_vec_lyr: str,
     n_smpls: int = 10000,
     xtra_n_smpls: int = 30000,
-    present_smpls_vec_file: str = None,
-    present_smpls_vec_lyr: str = None,
-    present_smpls_dist_thres: float = 1000,
+    presence_smpls_vec_file: str = None,
+    presence_smpls_vec_lyr: str = None,
+    presence_smpls_dist_thres: float = 1000,
     out_format: str = "GeoJSON",
     rnd_seed: int = None,
 ):
@@ -95,12 +95,12 @@ def gen_pseudo_absences_smpls(
     :param xtra_n_smpls: the number of extra samples to be produced internally so
                          after the various masking steps the final number is likely
                          to be near or higher than n_smpls
-    :param present_smpls_vec_file: Optionally a set of presence samples can be
+    :param presence_smpls_vec_file: Optionally a set of presence samples can be
                                    provided and this is the file path to that file.
                                    If None then ignored (Default: None).
-    :param present_smpls_vec_lyr: Optionally a set of presence samples can be
+    :param presence_smpls_vec_lyr: Optionally a set of presence samples can be
                                   provided and this the layer name of the vector.
-    :param present_smpls_dist_thres: If provided this is a distance threshold
+    :param presence_smpls_dist_thres: If provided this is a distance threshold
                                      to presence samples below which absences
                                      points are removed. Unit is the same as the
                                      projection of the input files.
@@ -154,13 +154,13 @@ def gen_pseudo_absences_smpls(
         match_type="equals",
     )
 
-    if present_smpls_vec_file is not None:
-        # calc distance to present_smpls_vec_lyr
+    if presence_smpls_vec_file is not None:
+        # calc distance to presence_smpls_vec_lyr
         rsgislib.vectorattrs.calc_near_dist_to_feats(
             vec_file=out_vec_file,
             vec_lyr=out_vec_lyr,
-            vec_dist_file=present_smpls_vec_file,
-            vec_dist_lyr=present_smpls_vec_lyr,
+            vec_dist_file=presence_smpls_vec_file,
+            vec_dist_lyr=presence_smpls_vec_lyr,
             out_vec_file=out_vec_file,
             out_vec_lyr=out_vec_lyr,
             out_col="presents_dist",
@@ -171,7 +171,7 @@ def gen_pseudo_absences_smpls(
                 vec_file=out_vec_file, vec_lyr=out_vec_lyr, att_column="presents_dist"
             )
         )
-        dist_sel_arr = numpy.where(dist_col_arr > present_smpls_dist_thres, 1, 0)
+        dist_sel_arr = numpy.where(dist_col_arr > presence_smpls_dist_thres, 1, 0)
 
         rsgislib.vectorattrs.write_vec_column(
             out_vec_file=out_vec_file,
@@ -274,3 +274,110 @@ def extract_env_var_data(
         replace=True,
     )
     vec_ds = None
+
+def combine_presence_absence_data(presence_smpls_vec_file: str,
+                                  presence_smpls_vec_lyr: str,
+                                  absence_smpls_vec_file: str,
+                                  absence_smpls_vec_lyr: str,
+                                  env_vars: Dict[str, EnvVarInfo],
+                                  out_vec_file: str,
+                                  out_vec_lyr: str,
+                                  out_format: str = "GPKG",
+                                  equalise_smpls: bool = False,
+                                  cls_col:str = "clsid",
+                                  rnd_seed: int = None,
+                                  )->List[str]:
+    """
+    A function which combines the presence and absence data into a single set
+    with the option to equalise the number of samples within the two classes.
+    The output file will only have the columns listed within env_vars and the
+    classification column.
+
+    :param presence_smpls_vec_file: path to the vector file with the presence data.
+    :param presence_smpls_vec_lyr: layer name of the vector file with the presence data.
+    :param absence_smpls_vec_file: path to the vector file with the absence data.
+    :param absence_smpls_vec_lyr: layer name of the vector file with the absence data.
+    :param env_vars: A dictionary of environment variables populated onto both the
+                     presence and absence data.
+    :param out_vec_file: the output vector file populated with presence and
+                         absence data.
+    :param out_vec_lyr: the output vector layer name.
+    :param out_format: the output vector file format (Default: GPKG)
+    :param equalise_smpls: optionally decide whether to equalise the number of samples.
+                           This would normally be done if you are using a tree based
+                           modelling (e.g., random forests)
+    :param cls_col: the name of the classification column.
+    :param rnd_seed: A seed for the random selection. Default: None.
+    :return: a list of the variables the order in which they are present.
+
+    """
+    import geopandas
+    import pandas
+    import rsgislib.tools.filetools
+
+    presence_gdf = geopandas.read_file(presence_smpls_vec_file, layer=presence_smpls_vec_lyr)
+    absence_gdf = geopandas.read_file(absence_smpls_vec_file, layer=absence_smpls_vec_lyr)
+
+    # Get the list of environmental variable columns
+    analysis_vars = list()
+    for var in env_vars:
+        analysis_vars.append(env_vars[var].name)
+
+    # Drop any columns not needed from presences data
+    presence_cols_drop = list()
+    for col in presence_gdf.columns:
+        if (col not in analysis_vars) and (col != "geometry"):
+            presence_cols_drop.append(col)
+
+    if len(presence_cols_drop) > 0:
+        print(f"Dropping from presence: {presence_cols_drop}")
+        presence_gdf.drop(columns=presence_cols_drop, inplace=True)
+
+    # Drop any columns not needed from absence data
+    absence_cols_drop = list()
+    for col in absence_gdf.columns:
+        if (col not in analysis_vars) and (col != "geometry"):
+            absence_cols_drop.append(col)
+
+    if len(absence_cols_drop) > 0:
+        print(f"Dropping from absence: {absence_cols_drop}")
+        absence_gdf.drop(columns=absence_cols_drop, inplace=True)
+
+    # Check all environmental variable columns are present: presence data.
+    presence_data_cols = list(presence_gdf.columns)
+    for col in analysis_vars:
+        if col not in presence_data_cols:
+            raise rsgislib.RSGISPyException(f"'{col}' is not within the presence data")
+
+    # Check all environmental variable columns are present: absence data.
+    absence_data_cols = list(absence_gdf.columns)
+    for col in analysis_vars:
+        if col not in absence_data_cols:
+            raise rsgislib.RSGISPyException(f"'{col}' is not within the absence data")
+
+    presence_gdf[cls_col] = numpy.ones((presence_gdf.shape[0]), dtype=int)
+    absence_gdf[cls_col] = numpy.zeros((absence_gdf.shape[0]), dtype=int)
+
+    if equalise_smpls:
+        n_presence_smpls = presence_gdf.shape[0]
+        n_absence_smpls = absence_gdf.shape[0]
+
+        if n_presence_smpls > n_absence_smpls:
+            print(f"Equalising number of samples: sampling presense to {n_absence_smpls}")
+            presence_gdf = presence_gdf.sample(n=n_absence_smpls, random_state=rnd_seed, axis=0)
+        elif n_absence_smpls > n_presence_smpls:
+            print(f"Equalising number of samples: sampling absence to {n_presence_smpls}")
+            absence_gdf = absence_gdf.sample(n=n_presence_smpls, random_state=rnd_seed, axis=0)
+
+    data_gdf = pandas.concat([presence_gdf, absence_gdf])
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            out_vec_lyr = rsgislib.tools.filetools.get_file_basename(
+                out_vec_file, check_valid=True
+            )
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)
+
+    return analysis_vars
