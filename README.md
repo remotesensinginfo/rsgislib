@@ -6,6 +6,8 @@
 [![Install](https://anaconda.org/conda-forge/rsgislib/badges/version.svg)](https://anaconda.org/conda-forge/rsgislib)
 [![Downloads](https://anaconda.org/conda-forge/rsgislib/badges/downloads.svg)](https://anaconda.org/conda-forge/rsgislib)
 [![Platforms](https://anaconda.org/conda-forge/rsgislib/badges/platforms.svg)](https://anaconda.org/conda-forge/rsgislib)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12755969.svg)](https://doi.org/10.5281/zenodo.12755969)
+
   
 The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets.
 For more details see the project website: http://rsgislib.org/
