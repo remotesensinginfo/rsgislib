@@ -2,12 +2,26 @@
 """
 Functions implementing species distribution modelling.
 """
-from typing import Dict, List
+from typing import Dict, List, Tuple, Any
 import os
 
 import rsgislib
 import numpy
 from osgeo import gdal, ogr
+from sklearn.base import BaseEstimator
+from sklearn.model_selection._search import BaseSearchCV
+
+GEOPANDAS_AVAIL = True
+try:
+    import geopandas
+except ImportError:
+    GEOPANDAS_AVAIL = False
+
+PANDAS_AVAIL = True
+try:
+    import pandas
+except ImportError:
+    PANDAS_AVAIL = False
 
 
 class EnvVarInfo(object):
@@ -339,8 +353,10 @@ def combine_presence_absence_data(
     :return: a list of the variables the order in which they are present.
 
     """
-    import geopandas
-    import pandas
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+    if not PANDAS_AVAIL:
+        raise ImportError("Pandas is not available")
     import rsgislib.tools.filetools
 
     presence_gdf = geopandas.read_file(
@@ -455,8 +471,10 @@ def create_train_test_sets(
                      Default: None.
 
     """
-    import geopandas
-    import pandas
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+    if not PANDAS_AVAIL:
+        raise ImportError("Pandas is not available")
     import rsgislib.tools.filetools
 
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
@@ -514,7 +532,8 @@ def pop_normalise_coeffs(env_vars: Dict[str, EnvVarInfo], vec_file: str, vec_lyr
     :param vec_lyr: the input vector layer name
 
     """
-    import geopandas
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
 
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     data_gdf.drop(columns=["geometry"], inplace=True)
@@ -539,6 +558,8 @@ def apply_normalise_coeffs(
     out_format: str = "GPKG",
 ):
     """
+    A function which normalises the continuous variables using the mean and
+    standard deviation provided within the env_vars dictionary.
 
     :param env_vars:
     :param vec_file:
@@ -548,7 +569,8 @@ def apply_normalise_coeffs(
     :param out_format:
 
     """
-    import geopandas
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
     import rsgislib.tools.filetools
 
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
@@ -593,9 +615,9 @@ def comparison_box_plots(
                       or violin plots (False; Default)
 
     """
-    import geopandas
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
     import seaborn
-    import tqdm
     import matplotlib.pyplot as plt
 
     seaborn.set_theme()
@@ -636,7 +658,8 @@ def correlation_matrix(
     :param fig_height: The height of the plot figure
 
     """
-    import geopandas
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
     import seaborn
     import numpy
     import matplotlib.pyplot as plt
@@ -680,3 +703,110 @@ def correlation_matrix(
         )
         sns_plot.figure.savefig(out_plt_file)
         plt.clf()
+
+
+def search_mdl_params(
+    search_obj: BaseSearchCV,
+    train_vec_file: str,
+    train_vec_lyr: str,
+    analysis_vars: List[str],
+    cls_col: str = "clsid",
+) -> Tuple[BaseEstimator, Dict[str, Any]]:
+    """
+    A function which will run a scikit-learn search (e.g., GridSearchCV)
+    to find optimal parameters for the model estimator.
+
+    :param search_obj: A scikit-learn SearchCV object
+    :param train_vec_file: file path to a vector file with the training data.
+    :param train_vec_lyr: vector layer name for the training data.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis. The names must be the column names
+                          within the vector layer.
+    :param cls_col: the name of the column specifying the class within the input
+                    vector layer.
+    :return: returns the estimator initialised with the best parameters and a
+             dictionary of the best parameters.
+
+    """
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+    train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
+
+    train_y = train_data_gdf[cls_col].values
+    train_x = train_data_gdf[analysis_vars].values
+
+    search_obj.fit(train_x, train_y)
+    if not search_obj.refit:
+        raise rsgislib.RSGISPyException("Search did no find a fit therefore failed...")
+
+    print(
+        "Best score was {} and has parameters {}.".format(
+            search_obj.best_score_, search_obj.best_params_
+        )
+    )
+
+    return search_obj.best_estimator_, search_obj.best_params_
+
+
+def fit_sgl_mdl(
+    est_cls_obj: BaseEstimator,
+    train_vec_file: str,
+    train_vec_lyr: str,
+    test_vec_file: str,
+    test_vec_lyr: str,
+    analysis_vars: List[str],
+    cls_col: str = "clsid",
+    roc_curve_plot: str = None,
+) -> Tuple[float, float, float]:
+    """
+    A function which fits a single scikit-learn estimator model returning
+    the accuracy statistics and optionally plotting a ROC curve.
+
+    :param est_cls_obj: a scikit-learn estimator model
+    :param train_vec_file: file path to a vector file with the training data.
+    :param train_vec_lyr: vector layer name for the training data.
+    :param test_vec_file: file path to a vector file with the testing data.
+    :param test_vec_lyr: vector layer name for the testing data.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis. The names must be the column names
+                          within the vector layer.
+    :param cls_col: the name of the column specifying the class within the input
+                    vector layers.
+    :param roc_curve_plot: A file path for the ROC curve plot to be outputted.
+    :return: returns the training accuracy, testing accuracy and ROC AUC score.
+
+    """
+    import sklearn.metrics
+    import matplotlib.pyplot as plt
+
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+    train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
+    test_data_gdf = geopandas.read_file(test_vec_file, layer=test_vec_lyr)
+
+    train_y = train_data_gdf[cls_col].values
+    train_x = train_data_gdf[analysis_vars].values
+
+    test_y = test_data_gdf[cls_col].values
+    test_x = test_data_gdf[analysis_vars].values
+
+    est_cls_obj.fit(train_x, train_y)
+
+    train_acc_val = est_cls_obj.score(train_x, train_y)
+    print(f"Classifier Train Score = {round(train_acc_val * 100, 2)}%")
+
+    test_acc_val = est_cls_obj.score(test_x, test_y)
+    print(f"Classifier Test Score = {round(test_acc_val * 100, 2)}%")
+
+    test_probs = est_cls_obj.predict_proba(test_x)
+    fpr, tpr, thresholds = sklearn.metrics.roc_curve(test_y, test_probs[:, -1])
+    roc_auc = sklearn.metrics.auc(fpr, tpr)
+    if roc_curve_plot is not None:
+        display = sklearn.metrics.RocCurveDisplay(
+            fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name="ROC Curve"
+        )
+        display.plot()
+        plt.savefig(roc_curve_plot)
+        plt.clf()
+
+    return train_acc_val, test_acc_val, roc_auc
