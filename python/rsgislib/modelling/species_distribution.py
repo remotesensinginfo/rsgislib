@@ -733,7 +733,7 @@ def search_mdl_params(
     train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
 
     train_y = train_data_gdf[cls_col].values
-    train_x = train_data_gdf[analysis_vars].values
+    train_x = train_data_gdf[analysis_vars]
 
     search_obj.fit(train_x, train_y)
     if not search_obj.refit:
@@ -785,10 +785,10 @@ def fit_sgl_mdl(
     test_data_gdf = geopandas.read_file(test_vec_file, layer=test_vec_lyr)
 
     train_y = train_data_gdf[cls_col].values
-    train_x = train_data_gdf[analysis_vars].values
+    train_x = train_data_gdf[analysis_vars]
 
     test_y = test_data_gdf[cls_col].values
-    test_x = test_data_gdf[analysis_vars].values
+    test_x = test_data_gdf[analysis_vars]
 
     est_cls_obj.fit(train_x, train_y)
 
@@ -810,3 +810,92 @@ def fit_sgl_mdl(
         plt.clf()
 
     return train_acc_val, test_acc_val, roc_auc
+
+
+def shap_mdl_explainer(
+    est_cls_obj: BaseEstimator,
+    train_vec_file: str,
+    train_vec_lyr: str,
+    analysis_vars: List[str],
+    shap_summary_plot: str = None,
+    shap_heatmap_plot: str = None,
+    shap_scatter_plots_dir: str = None,
+    shap_depend_plots_dir: str = None,
+    subsample_n_smpls: int = None,
+):
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+    import shap
+    import matplotlib.pyplot as plt
+
+    show_plots = False
+    if rsgislib.is_notebook():
+        shap.initjs()
+        show_plots = True
+
+    train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
+    train_x = train_data_gdf[analysis_vars]
+
+    if (subsample_n_smpls is not None) and (subsample_n_smpls > 10):
+        train_x_smpl = shap.sample(train_x, subsample_n_smpls)
+    else:
+        train_x_smpl = train_x
+    # explainer = shap.KernelExplainer(est_cls_obj.predict_proba, train_x_smpl)
+    explainer = shap.TreeExplainer(est_cls_obj, feature_names=analysis_vars)
+    shap_values = explainer(train_x_smpl)
+    # print(shap_values.shape)
+    shap_values = shap_values[:, :, 1]
+    # print(shap_values.shape)
+
+    if shap_summary_plot is not None:
+        fig = shap.summary_plot(shap_values, train_x_smpl, show=show_plots)
+        plt.savefig(shap_summary_plot)
+        plt.clf()
+
+    if shap_heatmap_plot is not None:
+        shap.plots.heatmap(shap_values, show=show_plots)
+        plt.savefig(shap_heatmap_plot)
+        plt.clf()
+
+    if shap_scatter_plots_dir is not None:
+        if not os.path.exists(shap_scatter_plots_dir):
+            os.mkdir(shap_scatter_plots_dir)
+
+        for name in analysis_vars:
+            out_plot_file = os.path.join(
+                shap_scatter_plots_dir, f"shap_scatter_{name}.png"
+            )
+            fig = shap.plots.scatter(shap_values[:, name], show=show_plots)
+            plt.savefig(out_plot_file)
+            plt.clf()
+
+    if shap_depend_plots_dir is not None:
+        if not os.path.exists(shap_depend_plots_dir):
+            os.mkdir(shap_depend_plots_dir)
+
+        sample_ind = 20
+        for name in analysis_vars:
+            out_plot_file = os.path.join(
+                shap_depend_plots_dir, f"shap_depends_{name}.png"
+            )
+            fig, ax = shap.partial_dependence_plot(
+                name,
+                est_cls_obj.predict_proba,
+                train_x_smpl,
+                model_expected_value=True,
+                feature_expected_value=True,
+                show=False,
+                ice=False,
+                shap_values=shap_values[sample_ind : sample_ind + 1, :],
+            )
+            """
+            fig = shap.dependence_plot(
+                name,
+                shap_values,
+                train_x_smpl,
+                #display_features=analysis_vars,
+                show=show_plots,
+            )
+            """
+            plt.savefig(out_plot_file)
+            plt.clf()
