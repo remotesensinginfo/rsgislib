@@ -81,7 +81,34 @@ def gen_pseudo_absences_smpls(
     out_format: str = "GeoJSON",
     rnd_seed: int = None,
 ):
-    import geopandas
+    """
+    A function which generates pseudo absences samples for species distribution
+    modelling. Note, it is expected that all input files have the same projection.
+
+    :param in_msk_img: File path to a valid mask image which defines the region
+                       of interest.
+    :param img_msk_val: The value within the mask image which defines the region
+                        of interest
+    :param out_vec_file: Output vector file path
+    :param out_vec_lyr: Output vector layer name
+    :param n_smpls: the maximum number of samples to be outputted
+    :param xtra_n_smpls: the number of extra samples to be produced internally so
+                         after the various masking steps the final number is likely
+                         to be near or higher than n_smpls
+    :param present_smpls_vec_file: Optionally a set of presence samples can be
+                                   provided and this is the file path to that file.
+                                   If None then ignored (Default: None).
+    :param present_smpls_vec_lyr: Optionally a set of presence samples can be
+                                  provided and this the layer name of the vector.
+    :param present_smpls_dist_thres: If provided this is a distance threshold
+                                     to presence samples below which absences
+                                     points are removed. Unit is the same as the
+                                     projection of the input files.
+    :param out_format: The output vector format (Default: GeoJSON)
+    :param rnd_seed: Optionally provide a random seed for the random number generator.
+                     Default: None.
+
+    """
     import rsgislib.imageutils
     import rsgislib.vectorattrs
     import rsgislib.vectorutils.createvectors
