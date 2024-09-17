@@ -821,6 +821,96 @@ def fit_sgl_mdl(
     return train_acc_val, test_acc_val, roc_auc
 
 
+def fit_kfold_mdls(
+    est_cls_obj: BaseEstimator,
+    train_vec_file: str,
+    train_vec_lyr: str,
+    test_vec_file: str,
+    test_vec_lyr: str,
+    analysis_vars: List[str],
+    n_kfolds: int = 10,
+    fold_prop: float = 0.6,
+    cls_col: str = "clsid",
+    rnd_seed: int = None,
+) -> List[BaseEstimator]:
+    """
+    Fit an ensemble of classifiers using K-fold selection of training data subsets.
+
+    :param est_cls_obj:
+    :param train_vec_file:
+    :param train_vec_lyr:
+    :param test_vec_file:
+    :param test_vec_lyr:
+    :param analysis_vars:
+    :param n_kfolds:
+    :param fold_prop:
+    :param cls_col:
+    :param rnd_seed:
+    :return:
+    """
+    import sklearn.metrics
+    import sklearn.base
+
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+
+    if rnd_seed is not None:
+        numpy.random.seed(rnd_seed)
+
+    train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
+    test_data_gdf = geopandas.read_file(test_vec_file, layer=test_vec_lyr)
+
+    test_y = test_data_gdf[cls_col].values
+    test_x = test_data_gdf[analysis_vars]
+
+    train_y = train_data_gdf[cls_col].values
+    train_x = train_data_gdf[analysis_vars]
+
+    n_fold_size = int(train_y.shape[0] * fold_prop)
+    train_idxs = range(train_y.shape[0])
+
+    train_fkolds = list()
+    test_fkolds = list()
+    roc_fkolds = list()
+    fpr_fkolds = list()
+    tpr_fkolds = list()
+    est_cls_objs = list()
+    for i in tqdm.tqdm(range(n_kfolds)):
+        train_idx = numpy.random.choice(train_idxs, size=n_fold_size, replace=True)
+        train_y_set = train_y[train_idx]
+        train_x_set = train_x.iloc[train_idx]
+
+        est_cls_fold = sklearn.base.clone(est_cls_obj, safe=True)
+
+        est_cls_fold.fit(train_x_set, train_y_set)
+        est_cls_objs.append(est_cls_fold)
+
+        train_acc_val = est_cls_fold.score(train_x_set, train_y_set)
+        train_fkolds.append(train_acc_val)
+
+        test_acc_val = est_cls_fold.score(test_x, test_y)
+        test_fkolds.append(test_acc_val)
+
+        test_probs = est_cls_fold.predict_proba(test_x)
+        fpr, tpr, thresholds = sklearn.metrics.roc_curve(test_y, test_probs[:, -1])
+        fpr_fkolds.append(fpr)
+        tpr_fkolds.append(tpr)
+        roc_auc = sklearn.metrics.auc(fpr, tpr)
+        roc_fkolds.append(roc_auc)
+
+    print(
+        f"ROC: {numpy.min(roc_fkolds)} - {numpy.median(roc_fkolds)} - {numpy.max(roc_fkolds)}"
+    )
+    print(
+        f"Train: {numpy.min(train_fkolds)} - {numpy.median(train_fkolds)} - {numpy.max(train_fkolds)}"
+    )
+    print(
+        f"Test: {numpy.min(test_fkolds)} - {numpy.median(test_fkolds)} - {numpy.max(test_fkolds)}"
+    )
+
+    return est_cls_objs
+
+
 def shap_mdl_explainer(
     est_cls_obj: BaseEstimator,
     train_vec_file: str,
@@ -940,6 +1030,7 @@ def pred_slg_mdl_prob(
     output_img: str,
     gdalformat: str = "KEA",
     normalise_data: bool = False,
+    calc_img_stats: bool = True,
 ):
     """
     A function which calculates the probability of the presence of the species of
@@ -965,6 +1056,9 @@ def pred_slg_mdl_prob(
                            normalised data. The mean and standard deviation of
                            variables used for normalisation should be provided
                            through the env_vars dict of EnvVarInfo objects.
+    :param calc_img_stats: boolean specifying whether to calculate the image
+                           statistic and pyramids are built for the output image.
+                           Default: True
 
     """
     import rsgislib.imageutils
@@ -1060,14 +1154,15 @@ def pred_slg_mdl_prob(
         )
         outputs.out_image = out_img_vals
 
-    print("Applying the Classifier")
+    # Applying the Classifier
     applier.apply(
         _calc_sk_class_prob, in_files, outfiles, otherargs, controls=aControls
     )
 
-    rsgislib.imageutils.pop_img_stats(
-        output_img, use_no_data=True, no_data_val=-1, calc_pyramids=True
-    )
+    if calc_img_stats:
+        rsgislib.imageutils.pop_img_stats(
+            output_img, use_no_data=True, no_data_val=-1, calc_pyramids=True
+        )
 
 
 def pred_slg_mdl_cls(
@@ -1079,6 +1174,7 @@ def pred_slg_mdl_cls(
     output_img: str,
     gdalformat: str = "KEA",
     normalise_data: bool = False,
+    calc_img_stats: bool = True,
 ):
     """
     A function which calculates the binary classification for the presence
@@ -1104,6 +1200,9 @@ def pred_slg_mdl_cls(
                            normalised data. The mean and standard deviation of
                            variables used for normalisation should be provided
                            through the env_vars dict of EnvVarInfo objects.
+    :param calc_img_stats: boolean specifying whether to calculate the image
+                           statistic and pyramids are built for the output image.
+                           Default: True
 
     """
     import rsgislib.imageutils
@@ -1198,19 +1297,202 @@ def pred_slg_mdl_cls(
         )
         outputs.out_image = out_img_vals
 
-    print("Applying the Classifier")
+    # Applying the Classifier
     applier.apply(_calc_sk_class, in_files, outfiles, otherargs, controls=aControls)
 
-    if gdalformat == "KEA":
-        import rsgislib.rastergis
+    if calc_img_stats:
+        if gdalformat == "KEA":
+            import rsgislib.rastergis
 
-        rsgislib.rastergis.pop_rat_img_stats(
-            clumps_img=output_img,
-            add_clr_tab=True,
-            calc_pyramids=True,
-            ignore_zero=True,
+            rsgislib.rastergis.pop_rat_img_stats(
+                clumps_img=output_img,
+                add_clr_tab=True,
+                calc_pyramids=True,
+                ignore_zero=True,
+            )
+        else:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            )
+
+
+def pred_ensemble_mdl_prob(
+    est_cls_objs: List[BaseEstimator],
+    in_msk_img: str,
+    img_msk_val: int,
+    env_vars: Dict[str, EnvVarInfo],
+    analysis_vars: List[str],
+    output_img: str,
+    gdalformat: str = "KEA",
+    tmp_dir: str = "tmp_dir",
+    normalise_data: bool = False,
+    calc_img_stats: bool = True,
+):
+    """
+    A function which runs an ensemble of trained classifier models estimating the
+    probability of the species presence. The ensemble results are combined by
+    calculating the median of the probability from each model.
+
+
+    :param est_cls_objs: A list of scikit-learn estimator models which have been
+                         trained.
+    :param in_msk_img: File path to a valid mask image which defines the region
+                       of interest.
+    :param img_msk_val: The value within the mask image which defines the region
+                        of interest
+    :param env_vars: A dictionary of environment variables populated onto both the
+                     presence and absence data. The EnvVarInfo will provide the image
+                     file path, image band and normalisation (mean and
+                     standard deviation) values.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis - specifies the order of the variables
+                          presented to the classifier.
+    :param output_img: the output image path
+    :param gdalformat: the output image format
+    :param tmp_dir: the temporary directory where the intermediate image files
+                    will be outputted.
+    :param normalise_data: boolean specifying whether to normalise the input data.
+                           This should be used if the model was trained with
+                           normalised data. The mean and standard deviation of
+                           variables used for normalisation should be provided
+                           through the env_vars dict of EnvVarInfo objects.
+    :param calc_img_stats: boolean specifying whether to calculate the image
+                           statistic and pyramids are built for the output image.
+                           Default: True
+
+    """
+    import rsgislib.imagecalc
+    import rsgislib.imageutils
+    import rsgislib.tools.filetools
+
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+    out_basename = rsgislib.tools.filetools.get_file_basename(output_img)
+
+    tmp_out_imgs = list()
+    for i, est_cls_obj in enumerate(est_cls_objs):
+        out_tmp_img = os.path.join(tmp_dir, f"{out_basename}_{i}.tif")
+        pred_slg_mdl_prob(
+            est_cls_obj=est_cls_obj,
+            in_msk_img=in_msk_img,
+            img_msk_val=img_msk_val,
+            env_vars=env_vars,
+            analysis_vars=analysis_vars,
+            output_img=out_tmp_img,
+            gdalformat=gdalformat,
+            normalise_data=normalise_data,
+            calc_img_stats=False,
         )
-    else:
-        rsgislib.imageutils.pop_thmt_img_stats(
-            output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+        tmp_out_imgs.append(out_tmp_img)
+
+    rsgislib.imagecalc.calc_multi_img_band_stats(
+        input_imgs=tmp_out_imgs,
+        output_img=output_img,
+        summary_stat=rsgislib.SUMTYPE_MEDIAN,
+        gdalformat=gdalformat,
+        datatype=rsgislib.TYPE_32FLOAT,
+        no_data_val=-1,
+        use_no_data=True,
+    )
+
+    if calc_img_stats:
+        rsgislib.imageutils.pop_img_stats(
+            output_img, use_no_data=True, no_data_val=-1, calc_pyramids=True
+        )
+
+
+def pred_ensemble_mdl_cls(
+    est_cls_objs: List[BaseEstimator],
+    in_msk_img: str,
+    img_msk_val: int,
+    env_vars: Dict[str, EnvVarInfo],
+    analysis_vars: List[str],
+    output_img: str,
+    gdalformat: str = "KEA",
+    tmp_dir: str = "tmp_dir",
+    normalise_data: bool = False,
+    calc_img_stats: bool = True,
+):
+    """
+    A function which runs an ensemble of trained classifier models estimating the
+    binary classification of the species presence. The ensemble results are combined by
+    calculating the number of times a pixel is included in the presences class
+    from each model.
+
+    :param est_cls_objs: A list of scikit-learn estimator models which have been
+                         trained.
+    :param in_msk_img: File path to a valid mask image which defines the region
+                       of interest.
+    :param img_msk_val: The value within the mask image which defines the region
+                        of interest
+    :param env_vars: A dictionary of environment variables populated onto both the
+                     presence and absence data. The EnvVarInfo will provide the image
+                     file path, image band and normalisation (mean and
+                     standard deviation) values.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis - specifies the order of the variables
+                          presented to the classifier.
+    :param output_img: the output image path
+    :param gdalformat: the output image format
+    :param tmp_dir: the temporary directory where the intermediate image files
+                    will be outputted.
+    :param normalise_data: boolean specifying whether to normalise the input data.
+                           This should be used if the model was trained with
+                           normalised data. The mean and standard deviation of
+                           variables used for normalisation should be provided
+                           through the env_vars dict of EnvVarInfo objects.
+    :param calc_img_stats: boolean specifying whether to calculate the image
+                           statistic and pyramids are built for the output image.
+                           Default: True
+
+    """
+    import rsgislib.imagecalc
+    import rsgislib.imageutils
+    import rsgislib.tools.filetools
+
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+    out_basename = rsgislib.tools.filetools.get_file_basename(output_img)
+
+    tmp_out_imgs = list()
+    for i, est_cls_obj in enumerate(est_cls_objs):
+        out_tmp_img = os.path.join(tmp_dir, f"{out_basename}_{i}.tif")
+        pred_slg_mdl_cls(
+            est_cls_obj=est_cls_obj,
+            in_msk_img=in_msk_img,
+            img_msk_val=img_msk_val,
+            env_vars=env_vars,
+            analysis_vars=analysis_vars,
+            output_img=out_tmp_img,
+            gdalformat=gdalformat,
+            normalise_data=normalise_data,
+            calc_img_stats=False,
+        )
+        tmp_out_imgs.append(out_tmp_img)
+
+    tmp_sum_img = os.path.join(tmp_dir, f"{out_basename}_sum.tif")
+    rsgislib.imagecalc.calc_multi_img_band_stats(
+        input_imgs=tmp_out_imgs,
+        output_img=tmp_sum_img,
+        summary_stat=rsgislib.SUMTYPE_SUM,
+        gdalformat=gdalformat,
+        datatype=rsgislib.TYPE_8UINT,
+        no_data_val=0,
+        use_no_data=False,
+    )
+
+    band_defns = list()
+    band_defns.append(rsgislib.imagecalc.BandDefn("sum_img", tmp_sum_img, 1))
+    band_defns.append(rsgislib.imagecalc.BandDefn("msk", in_msk_img, 1))
+    rsgislib.imagecalc.band_math(
+        output_img = output_img,
+        exp = f"(msk=={img_msk_val})?sum_img/{len(tmp_out_imgs)}:0",
+        gdalformat=gdalformat,
+        datatype=rsgislib.TYPE_32FLOAT,
+        band_defs=band_defns,
+    )
+
+    if calc_img_stats:
+        rsgislib.imageutils.pop_img_stats(
+            output_img, use_no_data=True, no_data_val=-1, calc_pyramids=True
         )

@@ -27,6 +27,7 @@ Model Fitting
 ~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsgislib.modelling.species_distribution.search_mdl_params
 .. autofunction:: rsgislib.modelling.species_distribution.fit_sgl_mdl
+.. autofunction:: rsgislib.modelling.species_distribution.fit_kfold_mdls
 
 Model Explanation
 ~~~~~~~~~~~~~~~~~~~~
@@ -36,3 +37,5 @@ Apply Models
 ~~~~~~~~~~~~~~~
 .. autofunction:: rsgislib.modelling.species_distribution.pred_slg_mdl_prob
 .. autofunction:: rsgislib.modelling.species_distribution.pred_slg_mdl_cls
+.. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_mdl_prob
+.. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_mdl_cls

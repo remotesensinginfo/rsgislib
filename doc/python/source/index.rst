@@ -45,7 +45,6 @@ Python documentation
    rsgislib_imageregistration
    rsgislib_imagecalc_spectralunmixing
    rsgislib_imageutils
-   rsgislib_imageutils
    rsgislib_modelling
    rsgislib_rastergis
    rsgislib_regression
