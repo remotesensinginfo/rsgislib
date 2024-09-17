@@ -8,6 +8,7 @@ import os
 import rsgislib
 import numpy
 from osgeo import gdal, ogr
+from rios import applier
 from sklearn.base import BaseEstimator
 from sklearn.model_selection._search import BaseSearchCV
 
@@ -22,6 +23,14 @@ try:
     import pandas
 except ImportError:
     PANDAS_AVAIL = False
+
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 
 class EnvVarInfo(object):
@@ -823,6 +832,21 @@ def shap_mdl_explainer(
     shap_depend_plots_dir: str = None,
     subsample_n_smpls: int = None,
 ):
+    """
+    This functions uses the SHAP model to output feature importance and
+    dependence plots for the est_cls_obj model.
+
+    :param est_cls_obj:
+    :param train_vec_file:
+    :param train_vec_lyr:
+    :param analysis_vars:
+    :param shap_summary_plot:
+    :param shap_heatmap_plot:
+    :param shap_scatter_plots_dir:
+    :param shap_depend_plots_dir:
+    :param subsample_n_smpls:
+
+    """
     if not GEOPANDAS_AVAIL:
         raise ImportError("Geopandas is not available")
     import shap
@@ -865,7 +889,9 @@ def shap_mdl_explainer(
             out_plot_file = os.path.join(
                 shap_scatter_plots_dir, f"shap_scatter_{name}.png"
             )
-            fig = shap.plots.scatter(shap_values[:, name], show=show_plots)
+            fig = shap.plots.scatter(
+                shap_values[:, name], color=shap_values, show=show_plots
+            )
             plt.savefig(out_plot_file)
             plt.clf()
 
@@ -874,10 +900,11 @@ def shap_mdl_explainer(
             os.mkdir(shap_depend_plots_dir)
 
         sample_ind = 20
-        for name in analysis_vars:
+        for i, name in enumerate(analysis_vars):
             out_plot_file = os.path.join(
                 shap_depend_plots_dir, f"shap_depends_{name}.png"
             )
+
             fig, ax = shap.partial_dependence_plot(
                 name,
                 est_cls_obj.predict_proba,
@@ -888,14 +915,302 @@ def shap_mdl_explainer(
                 ice=False,
                 shap_values=shap_values[sample_ind : sample_ind + 1, :],
             )
+
             """
             fig = shap.dependence_plot(
-                name,
+                i,
                 shap_values,
                 train_x_smpl,
                 #display_features=analysis_vars,
                 show=show_plots,
             )
             """
+            """
             plt.savefig(out_plot_file)
             plt.clf()
+            """
+
+
+def pred_slg_mdl_prob(
+    est_cls_obj: BaseEstimator,
+    in_msk_img: str,
+    img_msk_val: int,
+    env_vars: Dict[str, EnvVarInfo],
+    analysis_vars: List[str],
+    output_img: str,
+    gdalformat: str = "KEA",
+    normalise_data: bool = False,
+):
+    """
+    A function which calculates the probability of the presence of the species of
+    interest using the trained model. Note, the est_cls_obj must have the
+    predict_proba function available to use by this function.
+
+    :param est_cls_obj: a scikit-learn estimator model
+    :param in_msk_img: File path to a valid mask image which defines the region
+                       of interest.
+    :param img_msk_val: The value within the mask image which defines the region
+                        of interest
+    :param env_vars: A dictionary of environment variables populated onto both the
+                     presence and absence data. The EnvVarInfo will provide the image
+                     file path, image band and normalisation (mean and
+                     standard deviation) values.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis - specifies the order of the variables
+                          presented to the classifier.
+    :param output_img: the output image path
+    :param gdalformat: the output image format
+    :param normalise_data: boolean specifying whether to normalise the input data.
+                           This should be used if the model was trained with
+                           normalised data. The mean and standard deviation of
+                           variables used for normalisation should be provided
+                           through the env_vars dict of EnvVarInfo objects.
+
+    """
+    import rsgislib.imageutils
+
+    in_files = applier.FilenameAssociations()
+    in_files.image_mask = in_msk_img
+
+    var_imgs = list()
+    var_lut = dict()
+    file_lut = dict()
+    for i, var_name in enumerate(analysis_vars):
+        if env_vars[var_name].file not in var_imgs:
+            in_files.__dict__[f"img_{i}"] = env_vars[var_name].file
+            var_lut[var_name] = f"img_{i}"
+            file_lut[env_vars[var_name].file] = f"img_{i}"
+            var_imgs.append(env_vars[var_name].file)
+        else:
+            var_lut[var_name] = file_lut[env_vars[var_name].file]
+
+    outfiles = applier.FilenameAssociations()
+    outfiles.out_image = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.classifier = est_cls_obj
+    otherargs.msk_val = img_msk_val
+    otherargs.env_vars = env_vars
+    otherargs.analysis_vars = analysis_vars
+    otherargs.var_lut = var_lut
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    # RIOS function to apply classifier
+    def _calc_sk_class_prob(info, inputs, outputs, otherargs):
+        """
+        Internal function for rios applier. Used within apply_sklearn_classifier.
+        """
+        out_img_vals = numpy.zeros_like(inputs.image_mask, dtype=numpy.float32)
+        out_img_vals[...] = -1
+
+        if numpy.any(inputs.image_mask == otherargs.msk_val):
+            out_img_vals = out_img_vals.flatten()
+            img_mask_vals = inputs.image_mask.flatten()
+            n_vars = len(otherargs.analysis_vars)
+            env_pxl_vars = numpy.zeros(
+                (out_img_vals.shape[0], n_vars), dtype=numpy.float32
+            )
+            # Array index which can be used to populate the output
+            # array following masking etc.
+            pxl_id = numpy.arange(img_mask_vals.shape[0])
+            class_vars_idx = 0
+            for env_var in otherargs.analysis_vars:
+                img_lut_id = otherargs.var_lut[env_var]
+                img_arr = inputs.__dict__[img_lut_id]
+                env_var_band = otherargs.env_vars[env_var].band
+                env_var_idx = env_var_band - 1
+                data_arr = img_arr[(env_var_idx)].flatten()
+                if (
+                    normalise_data
+                    and otherargs.env_vars[env_var].data_type
+                    == rsgislib.VAR_TYPE_CONTINUOUS
+                ):
+                    data_arr = (
+                        data_arr - otherargs.env_vars[env_var].norm_mean
+                    ) / otherargs.env_vars[env_var].norm_std
+                env_pxl_vars[..., class_vars_idx] = data_arr
+                class_vars_idx = class_vars_idx + 1
+
+            env_pxl_vars = env_pxl_vars[img_mask_vals == otherargs.msk_val]
+            pxl_id = pxl_id[img_mask_vals == otherargs.msk_val]
+
+            env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+
+            # Perform classification
+            pred_class_score = otherargs.classifier.predict_proba(env_pxl_df)
+            out_img_vals[pxl_id] = pred_class_score[..., 1]
+
+        out_img_vals = numpy.expand_dims(
+            out_img_vals.reshape(
+                (inputs.image_mask.shape[1], inputs.image_mask.shape[2])
+            ),
+            axis=0,
+        )
+        outputs.out_image = out_img_vals
+
+    print("Applying the Classifier")
+    applier.apply(
+        _calc_sk_class_prob, in_files, outfiles, otherargs, controls=aControls
+    )
+
+    rsgislib.imageutils.pop_img_stats(
+        output_img, use_no_data=True, no_data_val=-1, calc_pyramids=True
+    )
+
+
+def pred_slg_mdl_cls(
+    est_cls_obj: BaseEstimator,
+    in_msk_img: str,
+    img_msk_val: int,
+    env_vars: Dict[str, EnvVarInfo],
+    analysis_vars: List[str],
+    output_img: str,
+    gdalformat: str = "KEA",
+    normalise_data: bool = False,
+):
+    """
+    A function which calculates the binary classification for the presence
+    of the species of interest using the trained model. Note, the est_cls_obj
+    must have the predict function available to use by this function.
+
+    :param est_cls_obj: a scikit-learn estimator model
+    :param in_msk_img: File path to a valid mask image which defines the region
+                       of interest.
+    :param img_msk_val: The value within the mask image which defines the region
+                        of interest
+    :param env_vars: A dictionary of environment variables populated onto both the
+                     presence and absence data. The EnvVarInfo will provide the image
+                     file path, image band and normalisation (mean and
+                     standard deviation) values.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis - specifies the order of the variables
+                          presented to the classifier.
+    :param output_img: the output image path
+    :param gdalformat: the output image format
+    :param normalise_data: boolean specifying whether to normalise the input data.
+                           This should be used if the model was trained with
+                           normalised data. The mean and standard deviation of
+                           variables used for normalisation should be provided
+                           through the env_vars dict of EnvVarInfo objects.
+
+    """
+    import rsgislib.imageutils
+
+    in_files = applier.FilenameAssociations()
+    in_files.image_mask = in_msk_img
+
+    var_imgs = list()
+    var_lut = dict()
+    file_lut = dict()
+    for i, var_name in enumerate(analysis_vars):
+        if env_vars[var_name].file not in var_imgs:
+            in_files.__dict__[f"img_{i}"] = env_vars[var_name].file
+            var_lut[var_name] = f"img_{i}"
+            file_lut[env_vars[var_name].file] = f"img_{i}"
+            var_imgs.append(env_vars[var_name].file)
+        else:
+            var_lut[var_name] = file_lut[env_vars[var_name].file]
+
+    outfiles = applier.FilenameAssociations()
+    outfiles.out_image = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.classifier = est_cls_obj
+    otherargs.msk_val = img_msk_val
+    otherargs.env_vars = env_vars
+    otherargs.analysis_vars = analysis_vars
+    otherargs.var_lut = var_lut
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.creationoptions = rsgislib.imageutils.get_rios_img_creation_opts(
+        gdalformat
+    )
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    # RIOS function to apply classifier
+    def _calc_sk_class(info, inputs, outputs, otherargs):
+        """
+        Internal function for rios applier. Used within apply_sklearn_classifier.
+        """
+        out_img_vals = numpy.zeros_like(inputs.image_mask, dtype=numpy.uint8)
+
+        if numpy.any(inputs.image_mask == otherargs.msk_val):
+            out_img_vals = out_img_vals.flatten()
+            img_mask_vals = inputs.image_mask.flatten()
+            n_vars = len(otherargs.analysis_vars)
+            env_pxl_vars = numpy.zeros(
+                (out_img_vals.shape[0], n_vars), dtype=numpy.float32
+            )
+            # Array index which can be used to populate the output
+            # array following masking etc.
+            pxl_id = numpy.arange(img_mask_vals.shape[0])
+            class_vars_idx = 0
+            for env_var in otherargs.analysis_vars:
+                img_lut_id = otherargs.var_lut[env_var]
+                img_arr = inputs.__dict__[img_lut_id]
+                env_var_band = otherargs.env_vars[env_var].band
+                env_var_idx = env_var_band - 1
+                data_arr = img_arr[(env_var_idx)].flatten()
+                if (
+                    normalise_data
+                    and otherargs.env_vars[env_var].data_type
+                    == rsgislib.VAR_TYPE_CONTINUOUS
+                ):
+                    data_arr = (
+                        data_arr - otherargs.env_vars[env_var].norm_mean
+                    ) / otherargs.env_vars[env_var].norm_std
+                env_pxl_vars[..., class_vars_idx] = data_arr
+                class_vars_idx = class_vars_idx + 1
+
+            env_pxl_vars = env_pxl_vars[img_mask_vals == otherargs.msk_val]
+            pxl_id = pxl_id[img_mask_vals == otherargs.msk_val]
+
+            env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+
+            # Perform classification
+            pred_class_val = otherargs.classifier.predict(env_pxl_df)
+            out_img_vals[pxl_id] = pred_class_val
+
+        out_img_vals = numpy.expand_dims(
+            out_img_vals.reshape(
+                (inputs.image_mask.shape[1], inputs.image_mask.shape[2])
+            ),
+            axis=0,
+        )
+        outputs.out_image = out_img_vals
+
+    print("Applying the Classifier")
+    applier.apply(_calc_sk_class, in_files, outfiles, otherargs, controls=aControls)
+
+    if gdalformat == "KEA":
+        import rsgislib.rastergis
+
+        rsgislib.rastergis.pop_rat_img_stats(
+            clumps_img=output_img,
+            add_clr_tab=True,
+            calc_pyramids=True,
+            ignore_zero=True,
+        )
+    else:
+        rsgislib.imageutils.pop_thmt_img_stats(
+            output_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+        )

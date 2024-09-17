@@ -31,3 +31,8 @@ Model Fitting
 Model Explanation
 ~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsgislib.modelling.species_distribution.shap_mdl_explainer
+
+Apply Models
+~~~~~~~~~~~~~~~
+.. autofunction:: rsgislib.modelling.species_distribution.pred_slg_mdl_prob
+.. autofunction:: rsgislib.modelling.species_distribution.pred_slg_mdl_cls
