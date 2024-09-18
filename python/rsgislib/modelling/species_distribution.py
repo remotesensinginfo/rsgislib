@@ -1106,7 +1106,9 @@ def shap_sklearn_mdl_explainer(
 ):
     """
     This functions uses the SHAP model to output feature importance and
-    dependence plots for the est_cls_obj model.
+    dependence plots for the est_cls_obj model. If neither use_tree_explainer
+    or use_linear_explainer are set, then the KernelExplainer will be used
+    and this works with all models.
 
     :param est_cls_obj: a scikit-learn estimator model
     :param train_vec_file: file path to a vector file with the training data.
@@ -1114,13 +1116,18 @@ def shap_sklearn_mdl_explainer(
     :param analysis_vars: a list of environmental variables to be used
                           for the analysis. The names must be the column names
                           within the vector layer.
-    :param shap_summary_plot:
-    :param shap_heatmap_plot:
-    :param shap_scatter_plots_dir:
-    :param shap_depend_plots_dir:
-    :param subsample_n_smpls:
-    :param use_tree_explainer:
-    :param use_linear_explainer:
+    :param shap_summary_plot: Output summary plot of SHAP scores.
+    :param shap_heatmap_plot: Output heatmap of SHAP scores.
+    :param shap_scatter_plots_dir: Output directory for SHAP scatter plots
+    :param shap_depend_plots_dir: Output directory for SHAP dependence plots
+    :param subsample_n_smpls: Optionally use a subset of the training samples
+                              for the SHAP analysis.
+    :param use_tree_explainer: The est_cls_obj is a tree classifier (e.g., Random
+                               Forests) and therefore the SHAP TreeExplainer can
+                               be used.
+    :param use_linear_explainer: The est_cls_obj is a linear classifier (e.g., Logistic
+                                 Regression) and therefore the SHAP LinearExplainer can
+                                 be used.
 
     """
     if not GEOPANDAS_AVAIL:
@@ -1205,6 +1212,85 @@ def shap_sklearn_mdl_explainer(
 
             plt.savefig(out_plot_file)
             plt.clf()
+
+
+def salib_sklearn_mdl_sensitity(
+    est_cls_obj: BaseEstimator,
+    train_vec_file: str,
+    train_vec_lyr: str,
+    analysis_vars: List[str],
+    n_samples: int = 10000,
+    sobol_plot_file: str = None,
+    sobol_overall_file: str = None,
+    sobol_first_file: str = None,
+    sobol_second_file: str = None,
+):
+    """
+    This functions uses the SALib sobol sensitivity analysis to assess the feature
+    importance and first and second order responses within the est_cls_obj model.
+
+    :param est_cls_obj: a scikit-learn estimator model
+    :param train_vec_file: file path to a vector file with the training data.
+    :param train_vec_lyr: vector layer name for the training data.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis. The names must be the column names
+                          within the vector layer.
+    :param n_samples: the number of samples to be generated and used for the sobol
+                      modelling.
+    :param sobol_plot_file: Output sobol plot file path.
+    :param sobol_overall_file: Output overall sobol variance values CSV file.
+    :param sobol_first_file: Output first order sobol variance values CSV file.
+    :param sobol_second_file: Output second order sobol variance values CSV file.
+
+    """
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+    import matplotlib.pyplot as plt
+    import SALib.analyze.sobol
+    import SALib.sample.sobol
+
+    train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
+
+    var_bounds = list()
+    for var in analysis_vars:
+        min_val = train_data_gdf[var].min()
+        max_val = train_data_gdf[var].max()
+        var_bounds.append([min_val, max_val])
+        print(f"{var} Range:\t({min_val} - {max_val})")
+
+    problem = {
+        "num_vars": len(analysis_vars),
+        "names": analysis_vars,
+        "bounds": var_bounds,
+    }
+
+    # Generate samples
+    param_values = SALib.sample.sobol.sample(problem, N=n_samples)
+    env_param_val_df = pandas.DataFrame(data=param_values, columns=analysis_vars)
+
+    pred_y = est_cls_obj.predict_proba(env_param_val_df)[..., 1]
+
+    si = SALib.analyze.sobol.analyze(
+        problem, pred_y, calc_second_order=True, print_to_console=False
+    )
+    total_Si, first_Si, second_Si = si.to_df()
+
+    if sobol_overall_file is not None:
+        total_Si.to_csv(sobol_overall_file)
+
+    if sobol_first_file is not None:
+        first_Si.to_csv(sobol_first_file)
+
+    if sobol_second_file is not None:
+        second_Si.to_csv(sobol_second_file)
+
+    if sobol_plot_file is not None:
+        ax = si.plot()
+        fig = plt.gcf()
+        fig.set_size_inches(15, 10)
+        plt.tight_layout()
+        plt.savefig(sobol_plot_file)
+        plt.clf()
 
 
 def pred_sklearn_mdl_prob(
@@ -1624,7 +1710,7 @@ def pred_sklearn_slg_cls_mdl_prob(
             env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
 
             # Perform classification
-            pred_class_score = otherargs.classifier.decision_function(env_pxl_df)
+            pred_class_score = otherargs.classifier.score_samples(env_pxl_df)
             out_img_vals[pxl_id] = pred_class_score
 
         out_img_vals = numpy.expand_dims(

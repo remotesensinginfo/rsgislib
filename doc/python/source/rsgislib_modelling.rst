@@ -34,6 +34,7 @@ Model Fitting
 Model Explanation
 ~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsgislib.modelling.species_distribution.shap_sklearn_mdl_explainer
+.. autofunction:: rsgislib.modelling.species_distribution.salib_sklearn_mdl_sensitity
 
 Apply Models
 ~~~~~~~~~~~~~~~
