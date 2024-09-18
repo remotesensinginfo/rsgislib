@@ -832,21 +832,31 @@ def fit_kfold_mdls(
     fold_prop: float = 0.6,
     cls_col: str = "clsid",
     rnd_seed: int = None,
+    sel_replacement: bool = True,
 ) -> List[BaseEstimator]:
     """
     Fit an ensemble of classifiers using K-fold selection of training data subsets.
 
-    :param est_cls_obj:
-    :param train_vec_file:
-    :param train_vec_lyr:
-    :param test_vec_file:
-    :param test_vec_lyr:
-    :param analysis_vars:
-    :param n_kfolds:
-    :param fold_prop:
-    :param cls_col:
-    :param rnd_seed:
-    :return:
+    :param est_cls_obj: a scikit-learn estimator model
+    :param train_vec_file: file path to a vector file with the training data.
+    :param train_vec_lyr: vector layer name for the training data.
+    :param test_vec_file: file path to a vector file with the testing data.
+    :param test_vec_lyr: vector layer name for the testing data.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis. The names must be the column names
+                          within the vector layer.
+    :param n_kfolds: The number of models to fit from training data subsets
+    :param fold_prop: The proportion of the training data set to use for each
+                      model. The proportion should be between 0 and 1. The subset
+                      will be randomly selected.
+    :param cls_col: the name of the column specifying the class within the input
+                    vector layers.
+    :param rnd_seed: Optionally provide a random seed for the random number generator.
+                     Default: None.
+    :param sel_replacement: Optionally replace the training data when creating the
+                            subsets. Default: True.
+    :return: returns a list of scikit-learn estimator models
+
     """
     import sklearn.metrics
     import sklearn.base
@@ -876,7 +886,9 @@ def fit_kfold_mdls(
     tpr_fkolds = list()
     est_cls_objs = list()
     for i in tqdm.tqdm(range(n_kfolds)):
-        train_idx = numpy.random.choice(train_idxs, size=n_fold_size, replace=True)
+        train_idx = numpy.random.choice(
+            train_idxs, size=n_fold_size, replace=sel_replacement
+        )
         train_y_set = train_y[train_idx]
         train_x_set = train_x.iloc[train_idx]
 
@@ -899,13 +911,19 @@ def fit_kfold_mdls(
         roc_fkolds.append(roc_auc)
 
     print(
-        f"ROC: {numpy.min(roc_fkolds)} - {numpy.median(roc_fkolds)} - {numpy.max(roc_fkolds)}"
+        f"ROC: {numpy.min(roc_fkolds)} - "
+        f"{numpy.median(roc_fkolds)} - "
+        f"{numpy.max(roc_fkolds)}"
     )
     print(
-        f"Train: {numpy.min(train_fkolds)} - {numpy.median(train_fkolds)} - {numpy.max(train_fkolds)}"
+        f"Train: {numpy.min(train_fkolds)} - "
+        f"{numpy.median(train_fkolds)} - "
+        f"{numpy.max(train_fkolds)}"
     )
     print(
-        f"Test: {numpy.min(test_fkolds)} - {numpy.median(test_fkolds)} - {numpy.max(test_fkolds)}"
+        f"Test: {numpy.min(test_fkolds)} - "
+        f"{numpy.median(test_fkolds)} - "
+        f"{numpy.max(test_fkolds)}"
     )
 
     return est_cls_objs
@@ -921,26 +939,38 @@ def shap_mdl_explainer(
     shap_scatter_plots_dir: str = None,
     shap_depend_plots_dir: str = None,
     subsample_n_smpls: int = None,
+    use_tree_explainer: bool = False,
+    use_linear_explainer: bool = False,
 ):
     """
     This functions uses the SHAP model to output feature importance and
     dependence plots for the est_cls_obj model.
 
-    :param est_cls_obj:
-    :param train_vec_file:
-    :param train_vec_lyr:
-    :param analysis_vars:
+    :param est_cls_obj: a scikit-learn estimator model
+    :param train_vec_file: file path to a vector file with the training data.
+    :param train_vec_lyr: vector layer name for the training data.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis. The names must be the column names
+                          within the vector layer.
     :param shap_summary_plot:
     :param shap_heatmap_plot:
     :param shap_scatter_plots_dir:
     :param shap_depend_plots_dir:
     :param subsample_n_smpls:
+    :param use_tree_explainer:
+    :param use_linear_explainer:
 
     """
     if not GEOPANDAS_AVAIL:
         raise ImportError("Geopandas is not available")
     import shap
     import matplotlib.pyplot as plt
+
+    if use_tree_explainer and use_linear_explainer:
+        raise rsgislib.RSGISPyException(
+            "You can only use one explainer. "
+            "use_tree_explainer and use_linear_explainer cannot both be True"
+        )
 
     show_plots = False
     if rsgislib.is_notebook():
@@ -954,12 +984,19 @@ def shap_mdl_explainer(
         train_x_smpl = shap.sample(train_x, subsample_n_smpls)
     else:
         train_x_smpl = train_x
-    # explainer = shap.KernelExplainer(est_cls_obj.predict_proba, train_x_smpl)
-    explainer = shap.TreeExplainer(est_cls_obj, feature_names=analysis_vars)
+
+    if use_tree_explainer:
+        explainer = shap.TreeExplainer(est_cls_obj, feature_names=analysis_vars)
+    elif use_linear_explainer:
+        explainer = shap.LinearExplainer(
+            est_cls_obj, train_x_smpl, feature_perturbation="correlation_dependent"
+        )
+    else:
+        explainer = shap.KernelExplainer(est_cls_obj.predict_proba, train_x_smpl)
+
     shap_values = explainer(train_x_smpl)
-    # print(shap_values.shape)
-    shap_values = shap_values[:, :, 1]
-    # print(shap_values.shape)
+    if use_tree_explainer:
+        shap_values = shap_values[:, :, 1]
 
     if shap_summary_plot is not None:
         fig = shap.summary_plot(shap_values, train_x_smpl, show=show_plots)
@@ -979,9 +1016,7 @@ def shap_mdl_explainer(
             out_plot_file = os.path.join(
                 shap_scatter_plots_dir, f"shap_scatter_{name}.png"
             )
-            fig = shap.plots.scatter(
-                shap_values[:, name], color=shap_values, show=show_plots
-            )
+            fig = (shap.plots.scatter(shap_values[:, name], show=show_plots),)
             plt.savefig(out_plot_file)
             plt.clf()
 
@@ -989,7 +1024,7 @@ def shap_mdl_explainer(
         if not os.path.exists(shap_depend_plots_dir):
             os.mkdir(shap_depend_plots_dir)
 
-        sample_ind = 20
+        sample_ind = 100
         for i, name in enumerate(analysis_vars):
             out_plot_file = os.path.join(
                 shap_depend_plots_dir, f"shap_depends_{name}.png"
@@ -1001,24 +1036,13 @@ def shap_mdl_explainer(
                 train_x_smpl,
                 model_expected_value=True,
                 feature_expected_value=True,
-                show=False,
+                show=show_plots,
                 ice=False,
                 shap_values=shap_values[sample_ind : sample_ind + 1, :],
             )
 
-            """
-            fig = shap.dependence_plot(
-                i,
-                shap_values,
-                train_x_smpl,
-                #display_features=analysis_vars,
-                show=show_plots,
-            )
-            """
-            """
             plt.savefig(out_plot_file)
             plt.clf()
-            """
 
 
 def pred_slg_mdl_prob(
@@ -1485,8 +1509,8 @@ def pred_ensemble_mdl_cls(
     band_defns.append(rsgislib.imagecalc.BandDefn("sum_img", tmp_sum_img, 1))
     band_defns.append(rsgislib.imagecalc.BandDefn("msk", in_msk_img, 1))
     rsgislib.imagecalc.band_math(
-        output_img = output_img,
-        exp = f"(msk=={img_msk_val})?sum_img/{len(tmp_out_imgs)}:0",
+        output_img=output_img,
+        exp=f"(msk=={img_msk_val})?sum_img/{len(tmp_out_imgs)}:0",
         gdalformat=gdalformat,
         datatype=rsgislib.TYPE_32FLOAT,
         band_defs=band_defns,
