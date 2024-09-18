@@ -1276,13 +1276,13 @@ def salib_sklearn_mdl_sensitity(
     total_Si, first_Si, second_Si = si.to_df()
 
     if sobol_overall_file is not None:
-        total_Si.to_csv(sobol_overall_file)
+        total_Si.to_csv(sobol_overall_file, index=False)
 
     if sobol_first_file is not None:
-        first_Si.to_csv(sobol_first_file)
+        first_Si.to_csv(sobol_first_file, index=False)
 
     if sobol_second_file is not None:
-        second_Si.to_csv(sobol_second_file)
+        second_Si.to_csv(sobol_second_file, index=False)
 
     if sobol_plot_file is not None:
         ax = si.plot()
@@ -1291,6 +1291,119 @@ def salib_sklearn_mdl_sensitity(
         plt.tight_layout()
         plt.savefig(sobol_plot_file)
         plt.clf()
+
+
+def sklearn_mdl_variable_response_curves(
+    est_cls_obj: BaseEstimator,
+    train_vec_file: str,
+    train_vec_lyr: str,
+    analysis_vars: List[str],
+    output_file: str,
+    response_plots_dir: str,
+    n_samples: int = 1000,
+    cls_col: str = "clsid",
+    normalised_data: bool = False,
+    env_vars: Dict[str, EnvVarInfo] = None,
+):
+    """
+    A function to generate response curves for a scikit learn classifier. To
+    generate the response curves the mean presence values are used for the
+    environment variables and then each variable is varied in turn across the
+    full range of values within the presence and absence data training data.
+
+    :param est_cls_obj: a scikit-learn estimator model
+    :param train_vec_file: file path to a vector file with the training data.
+    :param train_vec_lyr: vector layer name for the training data.
+    :param analysis_vars: a list of environmental variables to be used
+                          for the analysis. The names must be the column names
+                          within the vector layer.
+    :param output_file: output CSV file with the response curve data.
+    :param response_plots_dir: output directory where the response curve plots
+                               will be outputted.
+    :param n_samples: the number of samples to be generated to generate the
+                      response curves
+    :param cls_col: the name of the column specifying the class within the input
+                    vector layers.
+    :param normalised_data: boolean specifying whether the input data is normalised.
+                            If the data is normalised then to aid interpretation of
+                            the resulting response curves the orignal values will be
+                            used. Default: False
+    :param env_vars: If the data is normalised then a dictionary of environment
+                     variables populated onto the train_vec_lyr data if required.
+                     The EnvVarInfo will provide the normalisation (mean and
+                     standard deviation) values.
+
+    """
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+    import matplotlib.pyplot as plt
+
+    if not os.path.exists(response_plots_dir):
+        os.mkdir(response_plots_dir)
+
+    if normalised_data and (env_vars is None):
+        raise rsgislib.RSGISPyException(
+            "env_vars must be provided is the data is normalised"
+        )
+
+    train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
+    train_data_presence_gdf = train_data_gdf[train_data_gdf[cls_col] == 1]
+
+    var_bounds = dict()
+    var_avg = dict()
+    for var in analysis_vars:
+        min_val = train_data_gdf[var].min()
+        max_val = train_data_gdf[var].max()
+        var_bounds[var] = [min_val, max_val]
+        var_avg[var] = train_data_presence_gdf[var].mean()
+        print(f"{var} Range:\t({min_val} - {max_val}): Mean = {var_avg[var]}")
+
+    response_vals = dict()
+    for var in analysis_vars:
+        print(f"Calculating Response Curve for '{var}'")
+        range = var_bounds[var][1] - var_bounds[var][0]
+        step = range / n_samples
+        var_vals = numpy.arange(
+            start=var_bounds[var][0],
+            stop=var_bounds[var][1] + step,
+            step=step,
+            dtype=float,
+        )
+        var_vals = var_vals[:n_samples]
+        n_vals = len(var_vals)
+
+        data_dict = dict()
+        for tmp_var in analysis_vars:
+            if tmp_var == var:
+                data_dict[tmp_var] = var_vals
+            else:
+                data_dict[tmp_var] = numpy.zeros(n_vals, dtype=float)
+                data_dict[tmp_var][...] = var_avg[tmp_var]
+
+        env_param_val_df = pandas.DataFrame(data=data_dict)
+        env_resp_probs = est_cls_obj.predict_proba(env_param_val_df)[..., 1]
+
+        if normalised_data:
+            norm_mean = env_vars[var].norm_mean
+            norm_std = env_vars[var].norm_std
+            var_vals = (var_vals * norm_std) + norm_mean
+
+        response_vals[f"{var}_vals"] = var_vals
+        response_vals[f"{var}_resp"] = env_resp_probs
+
+        out_plot_file = os.path.join(response_plots_dir, f"{var}_response_curve.png")
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8, 5)
+        ax.plot(var_vals, env_resp_probs)
+        ax.set_ylim([0, 1])
+        ax.set_title(f"{var} Response Curve")
+        ax.set_xlabel(f"{var}")
+        ax.set_ylabel(f"Class Probability")
+        plt.savefig(out_plot_file)
+        plt.clf()
+
+    response_vals_df = pandas.DataFrame(data=response_vals)
+    response_vals_df.to_csv(output_file, index=False)
 
 
 def pred_sklearn_mdl_prob(
