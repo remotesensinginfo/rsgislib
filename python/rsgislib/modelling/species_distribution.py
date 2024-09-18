@@ -1406,6 +1406,165 @@ def sklearn_mdl_variable_response_curves(
     response_vals_df.to_csv(output_file, index=False)
 
 
+def sklearn_jackknife_var_importance(
+    est_cls_obj: BaseEstimator,
+    train_vec_file: str,
+    train_vec_lyr: str,
+    test_vec_file: str,
+    test_vec_lyr: str,
+    analysis_vars: List[str],
+    out_var_importance_file: str,
+    out_importance_auc_plot: str = None,
+    out_importance_test_plot: str = None,
+    cls_col: str = "clsid",
+):
+    import sklearn.metrics
+    import matplotlib.pyplot as plt
+
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+    train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
+    test_data_gdf = geopandas.read_file(test_vec_file, layer=test_vec_lyr)
+
+    train_y = train_data_gdf[cls_col].values
+    train_x = train_data_gdf[analysis_vars]
+
+    test_y = test_data_gdf[cls_col].values
+    test_x = test_data_gdf[analysis_vars]
+
+    est_cls_tmp = sklearn.base.clone(est_cls_obj, safe=True)
+    est_cls_tmp.fit(train_x, train_y)
+
+    all_train_acc_val = est_cls_tmp.score(train_x, train_y)
+    all_test_acc_val = est_cls_tmp.score(test_x, test_y)
+
+    test_probs = est_cls_tmp.predict_proba(test_x)
+    fpr, tpr, thresholds = sklearn.metrics.roc_curve(test_y, test_probs[:, -1])
+    all_roc_auc = sklearn.metrics.auc(fpr, tpr)
+
+    out_data = dict()
+    out_data["train_acc_leave_var_out"] = list()
+    out_data["test_acc_leave_var_out"] = list()
+    out_data["roc_test_acc_leave_var_out"] = list()
+    out_data["train_acc_only_var"] = list()
+    out_data["test_acc_only_var"] = list()
+    out_data["roc_test_acc_only_var"] = list()
+    var_leave_out_auc = list()
+    var_leave_out_test = list()
+    for var in tqdm.tqdm(analysis_vars):
+        tmp_analysis_vars = analysis_vars.copy()
+        tmp_analysis_vars.remove(var)
+
+        train_x = train_data_gdf[tmp_analysis_vars]
+        test_x = test_data_gdf[tmp_analysis_vars]
+
+        est_cls_tmp = sklearn.base.clone(est_cls_obj, safe=True)
+        est_cls_tmp.fit(train_x, train_y)
+
+        var_train_acc_val = est_cls_tmp.score(train_x, train_y)
+        var_test_acc_val = est_cls_tmp.score(test_x, test_y)
+
+        test_probs = est_cls_tmp.predict_proba(test_x)
+        fpr, tpr, thresholds = sklearn.metrics.roc_curve(test_y, test_probs[:, -1])
+        var_roc_auc = sklearn.metrics.auc(fpr, tpr)
+
+        out_data["train_acc_leave_var_out"].append(var_train_acc_val)
+        out_data["test_acc_leave_var_out"].append(var_test_acc_val)
+        out_data["roc_test_acc_leave_var_out"].append(var_roc_auc)
+        var_leave_out_auc.append(var_roc_auc)
+        var_leave_out_test.append(var_test_acc_val)
+
+    var_only_auc = list()
+    var_only_test = list()
+    for var in tqdm.tqdm(analysis_vars):
+        train_x = train_data_gdf[[var]]
+        test_x = test_data_gdf[[var]]
+
+        est_cls_tmp = sklearn.base.clone(est_cls_obj, safe=True)
+        est_cls_tmp.fit(train_x, train_y)
+
+        var_train_acc_val = est_cls_tmp.score(train_x, train_y)
+        var_test_acc_val = est_cls_tmp.score(test_x, test_y)
+
+        test_probs = est_cls_tmp.predict_proba(test_x)
+        fpr, tpr, thresholds = sklearn.metrics.roc_curve(test_y, test_probs[:, -1])
+        var_roc_auc = sklearn.metrics.auc(fpr, tpr)
+
+        out_data["train_acc_only_var"].append(var_train_acc_val)
+        out_data["test_acc_only_var"].append(var_test_acc_val)
+        out_data["roc_test_acc_only_var"].append(var_roc_auc)
+        var_only_auc.append(var_roc_auc)
+        var_only_test.append(var_test_acc_val)
+
+    var_import_vals_df = pandas.DataFrame(data=out_data, index=analysis_vars)
+    var_import_vals_df.to_csv(out_var_importance_file, index=True)
+
+    var_idx = list(range(len(analysis_vars)))
+    if out_importance_auc_plot is not None:
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8, 5)
+        ax.barh(
+            var_idx, var_leave_out_auc, height=0.8, color="#1E88E5", label="Without Var"
+        )
+        ax.barh(var_idx, var_only_auc, height=0.8, color="#FFC107", label="Only Var")
+        ax.barh(
+            [len(analysis_vars)],
+            [all_roc_auc],
+            height=0.8,
+            color="#D81B60",
+            label="All Vars",
+        )
+        var_idx_all = var_idx + [len(analysis_vars)]
+        all_var_names = analysis_vars + ["All"]
+        ax.set_yticks(var_idx_all, labels=all_var_names)
+        ax.set_title(f"Jackknife AUC Gain")
+        ax.set_xlabel(f"Testing AUC")
+        ax.legend(
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.11),
+            fancybox=True,
+            shadow=False,
+            ncol=3,
+        )
+        plt.tight_layout()
+        plt.savefig(out_importance_auc_plot)
+        plt.clf()
+
+    if out_importance_test_plot is not None:
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8, 5)
+        ax.barh(
+            var_idx,
+            var_leave_out_test,
+            height=0.8,
+            color="#1E88E5",
+            label="Without Var",
+        )
+        ax.barh(var_idx, var_only_test, height=0.8, color="#FFC107", label="Only Var")
+        ax.barh(
+            [len(analysis_vars)],
+            [all_test_acc_val],
+            height=0.8,
+            color="#D81B60",
+            label="All Vars",
+        )
+        var_idx_all = var_idx + [len(analysis_vars)]
+        all_var_names = analysis_vars + ["All"]
+        ax.set_yticks(var_idx_all, labels=all_var_names)
+        ax.set_title(f"Jackknife Test Gain")
+        ax.set_xlabel(f"Testing Accuracy")
+        ax.legend(
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.11),
+            fancybox=True,
+            shadow=False,
+            ncol=3,
+        )
+        plt.tight_layout()
+        plt.savefig(out_importance_test_plot)
+        plt.clf()
+
+
 def pred_sklearn_mdl_prob(
     est_cls_obj: BaseEstimator,
     in_msk_img: str,

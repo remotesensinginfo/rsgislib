@@ -36,6 +36,7 @@ Model Explanation
 .. autofunction:: rsgislib.modelling.species_distribution.shap_sklearn_mdl_explainer
 .. autofunction:: rsgislib.modelling.species_distribution.salib_sklearn_mdl_sensitity
 .. autofunction:: rsgislib.modelling.species_distribution.sklearn_mdl_variable_response_curves
+.. autofunction:: rsgislib.modelling.species_distribution.sklearn_jacknife_var_importance
 
 Apply Models
 ~~~~~~~~~~~~~~~
