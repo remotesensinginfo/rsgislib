@@ -26,16 +26,20 @@ Summary Statistics
 Model Fitting
 ~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsgislib.modelling.species_distribution.search_mdl_params
-.. autofunction:: rsgislib.modelling.species_distribution.fit_sgl_mdl
-.. autofunction:: rsgislib.modelling.species_distribution.fit_kfold_mdls
+.. autofunction:: rsgislib.modelling.species_distribution.fit_sklearn_mdl
+.. autofunction:: rsgislib.modelling.species_distribution.fit_sklearn_slg_cls_mdl
+.. autofunction:: rsgislib.modelling.species_distribution.fit_kfold_sklearn_mdls
+.. autofunction:: rsgislib.modelling.species_distribution.fit_kfold_sklearn_sgl_cls_mdls
 
 Model Explanation
 ~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsgislib.modelling.species_distribution.shap_mdl_explainer
+.. autofunction:: rsgislib.modelling.species_distribution.shap_sklearn_mdl_explainer
 
 Apply Models
 ~~~~~~~~~~~~~~~
-.. autofunction:: rsgislib.modelling.species_distribution.pred_slg_mdl_prob
-.. autofunction:: rsgislib.modelling.species_distribution.pred_slg_mdl_cls
-.. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_mdl_prob
-.. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_mdl_cls
+.. autofunction:: rsgislib.modelling.species_distribution.pred_sklearn_mdl_prob
+.. autofunction:: rsgislib.modelling.species_distribution.pred_sklearn_mdl_cls
+.. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_sklearn_mdls_prob
+.. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_sklearn_mdls_cls
+.. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_sklearn_slg_cls_mdls_prob
+.. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_sklearn_sgl_cls_mdls_cls
