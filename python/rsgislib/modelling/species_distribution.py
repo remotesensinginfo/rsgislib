@@ -641,7 +641,10 @@ def comparison_box_plots(
             sns_plot = seaborn.boxplot(data=data_gdf, x=cls_col, y=col_name)
         else:
             sns_plot = seaborn.violinplot(data=data_gdf, x=cls_col, y=col_name)
-        sns_plot.figure.savefig(os.path.join(out_dir, f"{col_name}_comp_plot.png"))
+        if rsgislib.is_notebook():
+            plt.show(sns_plot.figure)
+        else:
+            sns_plot.figure.savefig(os.path.join(out_dir, f"{col_name}_comp_plot.png"))
         plt.clf()
 
 
@@ -710,7 +713,10 @@ def correlation_matrix(
             linewidths=0.5,
             cbar_kws={"shrink": 0.5},
         )
-        sns_plot.figure.savefig(out_plt_file)
+        if rsgislib.is_notebook():
+            plt.show(sns_plot.figure)
+        else:
+            sns_plot.figure.savefig(out_plt_file)
         plt.clf()
 
 
@@ -815,7 +821,10 @@ def fit_sklearn_mdl(
             fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name="ROC Curve"
         )
         display.plot()
-        plt.savefig(roc_curve_plot)
+        if rsgislib.is_notebook():
+            plt.show()
+        else:
+            plt.savefig(roc_curve_plot)
         plt.clf()
 
     return train_acc_val, test_acc_val, roc_auc
@@ -878,7 +887,10 @@ def fit_sklearn_slg_cls_mdl(
             fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name="ROC Curve"
         )
         display.plot()
-        plt.savefig(roc_curve_plot)
+        if rsgislib.is_notebook():
+            plt.show()
+        else:
+            plt.savefig(roc_curve_plot)
         plt.clf()
 
     return test_acc_val, roc_auc
@@ -1169,12 +1181,18 @@ def shap_sklearn_mdl_explainer(
 
     if shap_summary_plot is not None:
         fig = shap.summary_plot(shap_values, train_x_smpl, show=show_plots)
-        plt.savefig(shap_summary_plot)
+        if rsgislib.is_notebook():
+            plt.show(fig)
+        else:
+            plt.savefig(shap_summary_plot)
         plt.clf()
 
     if shap_heatmap_plot is not None:
-        shap.plots.heatmap(shap_values, show=show_plots)
-        plt.savefig(shap_heatmap_plot)
+        fig = shap.plots.heatmap(shap_values, show=show_plots)
+        if rsgislib.is_notebook():
+            plt.show(fig)
+        else:
+            plt.savefig(shap_heatmap_plot)
         plt.clf()
 
     if shap_scatter_plots_dir is not None:
@@ -1186,7 +1204,10 @@ def shap_sklearn_mdl_explainer(
                 shap_scatter_plots_dir, f"shap_scatter_{name}.png"
             )
             fig = (shap.plots.scatter(shap_values[:, name], show=show_plots),)
-            plt.savefig(out_plot_file)
+            if rsgislib.is_notebook():
+                plt.show(fig)
+            else:
+                plt.savefig(out_plot_file)
             plt.clf()
 
     if shap_depend_plots_dir is not None:
@@ -1209,8 +1230,10 @@ def shap_sklearn_mdl_explainer(
                 ice=False,
                 shap_values=shap_values[sample_ind : sample_ind + 1, :],
             )
-
-            plt.savefig(out_plot_file)
+            if rsgislib.is_notebook():
+                plt.show(fig)
+            else:
+                plt.savefig(out_plot_file)
             plt.clf()
 
 
@@ -1250,6 +1273,7 @@ def salib_sklearn_mdl_sensitity(
     import SALib.sample.sobol
 
     train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
+    n_vars = len(analysis_vars)
 
     var_bounds = list()
     for var in analysis_vars:
@@ -1259,7 +1283,7 @@ def salib_sklearn_mdl_sensitity(
         print(f"{var} Range:\t({min_val} - {max_val})")
 
     problem = {
-        "num_vars": len(analysis_vars),
+        "num_vars": n_vars,
         "names": analysis_vars,
         "bounds": var_bounds,
     }
@@ -1285,11 +1309,15 @@ def salib_sklearn_mdl_sensitity(
         second_Si.to_csv(sobol_second_file, index=False)
 
     if sobol_plot_file is not None:
+        plt_width = ((n_vars * 0.4)*3)+2
         ax = si.plot()
         fig = plt.gcf()
-        fig.set_size_inches(15, 10)
+        fig.set_size_inches(plt_width, 10)
         plt.tight_layout()
-        plt.savefig(sobol_plot_file)
+        if rsgislib.is_notebook():
+            plt.show(fig)
+        else:
+            plt.savefig(sobol_plot_file)
         plt.clf()
 
 
@@ -1399,7 +1427,10 @@ def sklearn_mdl_variable_response_curves(
         ax.set_title(f"{var} Response Curve")
         ax.set_xlabel(f"{var}")
         ax.set_ylabel(f"Class Probability")
-        plt.savefig(out_plot_file)
+        if rsgislib.is_notebook():
+            plt.show(fig)
+        else:
+            plt.savefig(out_plot_file)
         plt.clf()
 
     response_vals_df = pandas.DataFrame(data=response_vals)
@@ -1425,6 +1456,8 @@ def sklearn_jackknife_var_importance(
         raise ImportError("Geopandas is not available")
     train_data_gdf = geopandas.read_file(train_vec_file, layer=train_vec_lyr)
     test_data_gdf = geopandas.read_file(test_vec_file, layer=test_vec_lyr)
+
+    n_vars = len(analysis_vars)
 
     train_y = train_data_gdf[cls_col].values
     train_x = train_data_gdf[analysis_vars]
@@ -1502,7 +1535,8 @@ def sklearn_jackknife_var_importance(
     var_idx = list(range(len(analysis_vars)))
     if out_importance_auc_plot is not None:
         fig, ax = plt.subplots()
-        fig.set_size_inches(8, 5)
+        plt_height = (0.5 * n_vars) + 1.5
+        fig.set_size_inches(8, plt_height)
         ax.barh(
             var_idx, var_leave_out_auc, height=0.8, color="#1E88E5", label="Without Var"
         )
@@ -1527,12 +1561,16 @@ def sklearn_jackknife_var_importance(
             ncol=3,
         )
         plt.tight_layout()
-        plt.savefig(out_importance_auc_plot)
+        if rsgislib.is_notebook():
+            plt.show(fig)
+        else:
+            plt.savefig(out_importance_auc_plot)
         plt.clf()
 
     if out_importance_test_plot is not None:
         fig, ax = plt.subplots()
-        fig.set_size_inches(8, 5)
+        plt_height = (0.5 * n_vars) + 1.5
+        fig.set_size_inches(8, plt_height)
         ax.barh(
             var_idx,
             var_leave_out_test,
@@ -1561,7 +1599,10 @@ def sklearn_jackknife_var_importance(
             ncol=3,
         )
         plt.tight_layout()
-        plt.savefig(out_importance_test_plot)
+        if rsgislib.is_notebook():
+            plt.show(fig)
+        else:
+            plt.savefig(out_importance_test_plot)
         plt.clf()
 
 
