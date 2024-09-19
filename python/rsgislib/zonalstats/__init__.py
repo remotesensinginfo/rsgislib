@@ -1446,8 +1446,9 @@ def ext_point_band_values(
 
         veclyrDefn = vec_lyr_obj.GetLayerDefn()
         lyr_geom_type = ogr.GeometryTypeToName(veclyrDefn.GetGeomType())
-        if "point" not in lyr_geom_type.lower():
-            raise rsgislib.RSGISPyException("The layer geometry type must be point.")
+        if (lyr_geom_type.lower() != "point") and (lyr_geom_type.lower() != "3d point"):
+            raise rsgislib.RSGISPyException(
+                f"The layer geometry type must be point: Got '{lyr_geom_type}'.")
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
         if imgDS is None:
