@@ -1793,17 +1793,23 @@ def pred_sklearn_mdl_prob(
                     data_arr = (
                         data_arr - otherargs.env_vars[env_var].norm_mean
                     ) / otherargs.env_vars[env_var].norm_std
-                env_pxl_vars[..., class_vars_idx] = data_arr
+                env_pxl_vars[..., class_vars_idx] = numpy.float32(data_arr)
                 class_vars_idx = class_vars_idx + 1
 
             env_pxl_vars = env_pxl_vars[img_mask_vals == otherargs.msk_val]
             pxl_id = pxl_id[img_mask_vals == otherargs.msk_val]
 
-            env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+            finite_msk = numpy.logical_not(numpy.isfinite(env_pxl_vars))
+            finite_row_msk = numpy.logical_not(numpy.any(finite_msk, axis=1))
+            env_pxl_vars = env_pxl_vars[finite_row_msk]
+            pxl_id = pxl_id[finite_row_msk]
 
-            # Perform classification
-            pred_class_score = otherargs.classifier.predict_proba(env_pxl_df)
-            out_img_vals[pxl_id] = pred_class_score[..., 1]
+            if pxl_id.shape[0] > 0:
+                env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+
+                # Perform classification
+                pred_class_score = otherargs.classifier.predict_proba(env_pxl_df)
+                out_img_vals[pxl_id] = pred_class_score[..., 1]
 
         out_img_vals = numpy.expand_dims(
             out_img_vals.reshape(
@@ -1936,34 +1942,19 @@ def pred_sklearn_mdl_cls(
                     data_arr = (
                         data_arr - otherargs.env_vars[env_var].norm_mean
                     ) / otherargs.env_vars[env_var].norm_std
-                env_pxl_vars[..., class_vars_idx] = data_arr
+                env_pxl_vars[..., class_vars_idx] = numpy.float32(data_arr)
                 class_vars_idx = class_vars_idx + 1
 
             env_pxl_vars = env_pxl_vars[img_mask_vals == otherargs.msk_val]
             pxl_id = pxl_id[img_mask_vals == otherargs.msk_val]
 
-            print(env_pxl_vars.shape)
-            finite_msk = numpy.isfinite(env_pxl_vars)
-            finite_msk = numpy.logical_not(numpy.isinf(env_pxl_vars))
-            print(finite_msk.shape)
-            finite_row_msk = numpy.any(finite_msk, axis=1)
-            print(finite_row_msk.shape)
-            print(numpy.unique(finite_row_msk))
-            print(finite_row_msk[finite_row_msk == True].shape)
-            print(finite_row_msk[finite_row_msk == False].shape)
-
+            finite_msk = numpy.logical_not(numpy.isfinite(env_pxl_vars))
+            finite_row_msk = numpy.logical_not(numpy.any(finite_msk, axis=1))
             env_pxl_vars = env_pxl_vars[finite_row_msk]
             pxl_id = pxl_id[finite_row_msk]
 
             if pxl_id.shape[0] > 0:
                 env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
-                env_pxl_df.to_csv("df_test.csv", index=True)
-                init_shape = env_pxl_df.shape
-                env_pxl_df = env_pxl_df.dropna(how="all")
-                masked_shape = env_pxl_df.shape
-                print(f"{init_shape} ? {masked_shape}")
-                if init_shape[0] > masked_shape[0]:
-                    sys.exit()
 
                 # Perform classification
                 pred_class_val = otherargs.classifier.predict(env_pxl_df)
@@ -2109,17 +2100,23 @@ def pred_sklearn_slg_cls_mdl_prob(
                     data_arr = (
                         data_arr - otherargs.env_vars[env_var].norm_mean
                     ) / otherargs.env_vars[env_var].norm_std
-                env_pxl_vars[..., class_vars_idx] = data_arr
+                env_pxl_vars[..., class_vars_idx] = numpy.float32(data_arr)
                 class_vars_idx = class_vars_idx + 1
 
             env_pxl_vars = env_pxl_vars[img_mask_vals == otherargs.msk_val]
             pxl_id = pxl_id[img_mask_vals == otherargs.msk_val]
 
-            env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+            finite_msk = numpy.logical_not(numpy.isfinite(env_pxl_vars))
+            finite_row_msk = numpy.logical_not(numpy.any(finite_msk, axis=1))
+            env_pxl_vars = env_pxl_vars[finite_row_msk]
+            pxl_id = pxl_id[finite_row_msk]
 
-            # Perform classification
-            pred_class_score = otherargs.classifier.score_samples(env_pxl_df)
-            out_img_vals[pxl_id] = pred_class_score
+            if pxl_id.shape[0] > 0:
+                env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+
+                # Perform classification
+                pred_class_score = otherargs.classifier.score_samples(env_pxl_df)
+                out_img_vals[pxl_id] = pred_class_score
 
         out_img_vals = numpy.expand_dims(
             out_img_vals.reshape(
@@ -2252,18 +2249,24 @@ def pred_sklearn_slg_cls_mdl_cls(
                     data_arr = (
                         data_arr - otherargs.env_vars[env_var].norm_mean
                     ) / otherargs.env_vars[env_var].norm_std
-                env_pxl_vars[..., class_vars_idx] = data_arr
+                env_pxl_vars[..., class_vars_idx] = numpy.float32(data_arr)
                 class_vars_idx = class_vars_idx + 1
 
             env_pxl_vars = env_pxl_vars[img_mask_vals == otherargs.msk_val]
             pxl_id = pxl_id[img_mask_vals == otherargs.msk_val]
 
-            env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+            finite_msk = numpy.logical_not(numpy.isfinite(env_pxl_vars))
+            finite_row_msk = numpy.logical_not(numpy.any(finite_msk, axis=1))
+            env_pxl_vars = env_pxl_vars[finite_row_msk]
+            pxl_id = pxl_id[finite_row_msk]
 
-            # Perform classification
-            pred_class_val = otherargs.classifier.predict(env_pxl_df)
-            pred_class_val[pred_class_val < 0] = 0
-            out_img_vals[pxl_id] = pred_class_val
+            if pxl_id.shape[0] > 0:
+                env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+
+                # Perform classification
+                pred_class_val = otherargs.classifier.predict(env_pxl_df)
+                pred_class_val[pred_class_val < 0] = 0
+                out_img_vals[pxl_id] = pred_class_val
 
         out_img_vals = numpy.expand_dims(
             out_img_vals.reshape(
