@@ -794,6 +794,48 @@ def correlation_matrix(
         plt.clf()
 
 
+def calc_vif_multicollinearity(
+    analysis_vars: List[str],
+    vec_file: str,
+    vec_lyr: str,
+    out_vif_file: str = "vif_multicollinearity.csv",
+):
+    """
+    A function to calculate variance inflation factors to
+    investigate multicollinearity between predictor variables.
+
+    Interpretation of VIF scores (somewhat subjective):
+    1 = No multicollinearity.
+    1-5 = Moderate multicollinearity.
+    > 5 = High multicollinearity.
+    > 10 = This predictor should be removed from the model.
+
+    :param env_vars: A dictionary of environment variables populated onto both the
+                     presence and absence data.
+    :param vec_file: the input vector file path
+    :param vec_lyr: the input vector layer name
+    :param out_vif_file: output VIF CSV file
+
+    """
+    if not GEOPANDAS_AVAIL:
+        raise ImportError("Geopandas is not available")
+    import rsgislib.tools.stats
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    # Drop any columns not needed from data
+    data_cols_drop = list()
+    for col in data_gdf.columns:
+        if col not in analysis_vars:
+            data_cols_drop.append(col)
+
+    if len(data_cols_drop) > 0:
+        data_gdf.drop(columns=data_cols_drop, inplace=True)
+
+    vif_scores = rsgislib.tools.stats.calc_pandas_vif(data_gdf)
+    vif_scores.to_csv(out_vif_file, index=True)
+
+
 def search_mdl_params(
     search_obj: BaseSearchCV,
     train_vec_file: str,

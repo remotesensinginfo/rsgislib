@@ -21,6 +21,7 @@ Summary Statistics
 ~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsgislib.modelling.species_distribution.comparison_box_plots
 .. autofunction:: rsgislib.modelling.species_distribution.correlation_matrix
+.. autofunction:: rsgislib.modelling.species_distribution.calc_vif_multicollinearity
 
 
 Model Fitting
