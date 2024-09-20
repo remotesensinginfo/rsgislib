@@ -2,6 +2,8 @@
 """
 Functions implementing species distribution modelling.
 """
+import shutil
+import sys
 from typing import Dict, List, Tuple, Any
 import os
 
@@ -115,6 +117,77 @@ class EnvVarInfo(object):
             f"(Range: {self.min_vld_val}, {self.max_vld_val}) "
             f"(Normalisation: (x - {self.norm_mean}) / {self.norm_std})"
         )
+
+
+def create_finite_mask(
+    in_msk_img: str,
+    img_msk_val: int,
+    env_vars: Dict[str, EnvVarInfo],
+    analysis_vars: List[str],
+    output_img: str,
+    gdalformat: str = "KEA",
+    tmp_dir: str = "tmp_msk_dir",
+):
+    import shutil
+    import rsgislib.imageutils
+    import rsgislib.tools.filetools
+    import rsgislib.imagecalc
+
+    create_tmp_dir = False
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+        create_tmp_dir = True
+
+    msks = list()
+    for var in analysis_vars:
+        basename = rsgislib.tools.filetools.get_file_basename(env_vars[var].file)
+        finite_msk_img = os.path.join(tmp_dir, f"{basename}_finite_mask.kea")
+        if not os.path.exists(finite_msk_img):
+            rsgislib.imageutils.gen_finite_mask(
+                input_img=env_vars[var].file,
+                output_img=finite_msk_img,
+                gdalformat="KEA",
+            )
+            msks.append(finite_msk_img)
+
+        no_data_val = rsgislib.imageutils.get_img_no_data_value(
+            input_img=env_vars[var].file, img_band=env_vars[var].band
+        )
+
+        vld_msk_img = os.path.join(tmp_dir, f"{basename}_vld_mask.kea")
+        if not os.path.exists(vld_msk_img):
+            rsgislib.imageutils.gen_valid_mask(
+                input_imgs=env_vars[var].file,
+                output_img=vld_msk_img,
+                gdalformat="KEA",
+                no_data_val=no_data_val,
+            )
+            msks.append(vld_msk_img)
+
+    cmb_vld_msk_img = os.path.join(tmp_dir, "combined_vld_mask.kea")
+    rsgislib.imagecalc.calc_multi_img_band_stats(
+        msks,
+        output_img=cmb_vld_msk_img,
+        summary_stat=rsgislib.SUMTYPE_MAX,
+        gdalformat="KEA",
+        datatype=rsgislib.TYPE_8UINT,
+        no_data_val=0,
+        use_no_data=False,
+    )
+
+    band_defns = list()
+    band_defns.append(rsgislib.imagecalc.BandDefn("roi", in_msk_img, 1))
+    band_defns.append(rsgislib.imagecalc.BandDefn("vld", cmb_vld_msk_img, 1))
+    rsgislib.imagecalc.band_math(
+        output_img,
+        exp=f"(roi=={img_msk_val}) && (vld==1)?1:0",
+        gdalformat=gdalformat,
+        datatype=rsgislib.TYPE_8UINT,
+        band_defs=band_defns,
+    )
+
+    if create_tmp_dir:
+        shutil.rmtree(tmp_dir)
 
 
 def gen_pseudo_absences_smpls(
@@ -658,7 +731,8 @@ def correlation_matrix(
     fig_height: int = 14,
 ):
     """
-    Create plots for each of the variables comparing the
+    Calculate the correlation matrix between all the variables and optionally
+    output a plot of the correlation matrix.
 
     :param env_vars: A dictionary of environment variables populated onto both the
                      presence and absence data.
@@ -1309,7 +1383,7 @@ def salib_sklearn_mdl_sensitity(
         second_Si.to_csv(sobol_second_file, index=False)
 
     if sobol_plot_file is not None:
-        plt_width = ((n_vars * 0.4)*3)+2
+        plt_width = ((n_vars * 0.4) * 3) + 2
         ax = si.plot()
         fig = plt.gcf()
         fig.set_size_inches(plt_width, 10)
@@ -1868,11 +1942,32 @@ def pred_sklearn_mdl_cls(
             env_pxl_vars = env_pxl_vars[img_mask_vals == otherargs.msk_val]
             pxl_id = pxl_id[img_mask_vals == otherargs.msk_val]
 
-            env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+            print(env_pxl_vars.shape)
+            finite_msk = numpy.isfinite(env_pxl_vars)
+            finite_msk = numpy.logical_not(numpy.isinf(env_pxl_vars))
+            print(finite_msk.shape)
+            finite_row_msk = numpy.any(finite_msk, axis=1)
+            print(finite_row_msk.shape)
+            print(numpy.unique(finite_row_msk))
+            print(finite_row_msk[finite_row_msk == True].shape)
+            print(finite_row_msk[finite_row_msk == False].shape)
 
-            # Perform classification
-            pred_class_val = otherargs.classifier.predict(env_pxl_df)
-            out_img_vals[pxl_id] = pred_class_val
+            env_pxl_vars = env_pxl_vars[finite_row_msk]
+            pxl_id = pxl_id[finite_row_msk]
+
+            if pxl_id.shape[0] > 0:
+                env_pxl_df = pandas.DataFrame(data=env_pxl_vars, columns=analysis_vars)
+                env_pxl_df.to_csv("df_test.csv", index=True)
+                init_shape = env_pxl_df.shape
+                env_pxl_df = env_pxl_df.dropna(how="all")
+                masked_shape = env_pxl_df.shape
+                print(f"{init_shape} ? {masked_shape}")
+                if init_shape[0] > masked_shape[0]:
+                    sys.exit()
+
+                # Perform classification
+                pred_class_val = otherargs.classifier.predict(env_pxl_df)
+                out_img_vals[pxl_id] = pred_class_val
 
         out_img_vals = numpy.expand_dims(
             out_img_vals.reshape(

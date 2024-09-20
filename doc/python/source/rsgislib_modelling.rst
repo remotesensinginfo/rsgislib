@@ -46,3 +46,8 @@ Apply Models
 .. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_sklearn_mdls_cls
 .. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_sklearn_slg_cls_mdls_prob
 .. autofunction:: rsgislib.modelling.species_distribution.pred_ensemble_sklearn_sgl_cls_mdls_cls
+
+
+Other Tools
+~~~~~~~~~~~~~~~
+.. autofunction:: rsgislib.modelling.species_distribution.create_finite_mask
