@@ -3673,30 +3673,48 @@ def redefine_vec_lyr_proj(
 def reproj_vec_lyr_gp(
     vec_file: str,
     vec_lyr: str,
-    epsg_code: int,
     out_vec_file: str,
     out_vec_lyr: str,
+    epsg_code: int = None,
+    wkt_str: str = None,
     out_format: str = "GPKG",
 ):
     """
     A function which re-projects of a vector layer to a new projection
-    using GeoPandas.
+    using GeoPandas. You must provide either project a ESPG code or WKT
+    string represention of the projection.
 
     Note. this function loads the layer into memory you can use also use
     vector_translate for reprojection if you do not want that behaviour.
 
     :param vec_file: Input vector file
     :param vec_lyr: Input vector layer
-    :param epsg_code: the epsg code for the projection you are defining the layer to.
     :param out_vec_file: the output vector file
     :param out_vec_lyr: the output vector layer
+    :param epsg_code: epsg code for the projection you are transforming the layer to.
+    :param wkt_str: WKT string for the projection you are transforming the layer to.
     :param out_format: the output vector format (Default: GPKG)
 
     """
     import geopandas
 
+    if (epsg_code is None) and (wkt_str is None):
+        raise rsgislib.RSGISPyException(
+            "You must provide either an EPSG code or WKT string for the projection."
+        )
+    elif (epsg_code is not None) and (wkt_str is not None):
+        raise rsgislib.RSGISPyException(
+            "You must provide only one of an EPSG code or "
+            "WKT string for the projection and not both."
+        )
+
+    if epsg_code is not None:
+        wkt_str = None
+    elif wkt_str is not None:
+        epsg_code = None
+
     data_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
-    data_gpdf = data_gpdf.to_crs(epsg=epsg_code)
+    data_gpdf = data_gpdf.to_crs(crs=wkt_str, epsg=epsg_code)
 
     if out_format == "GPKG":
         data_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
