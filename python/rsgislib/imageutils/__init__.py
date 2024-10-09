@@ -5191,6 +5191,14 @@ def grid_scattered_pts(
     import rsgislib.vectorutils
     from osgeo import gdal
 
+    try:
+        import tqdm
+
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
     x_img_size, y_img_size = get_img_size(input_img)
     base_img_bbox = get_img_bbox(input_img)
 
@@ -5201,6 +5209,7 @@ def grid_scattered_pts(
         "outputType": rsgislib.get_gdal_datatype(datatype),
         "width": x_img_size,
         "height": y_img_size,
+        "creationOptions": get_gdal_img_creation_opts(gdalformat=gdalformat),
         "outputBounds": [
             base_img_bbox[0],
             base_img_bbox[3],
@@ -5211,6 +5220,7 @@ def grid_scattered_pts(
         "algorithm": gdal_grid_alg,
         "layers": vec_lyr,
         "zfield": vec_col,
+        "callback": callback,
     }
     gdal.Grid(output_img, vec_ds_obj, **grid_opts)
     vec_ds_obj = None
