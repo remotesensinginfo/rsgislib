@@ -99,21 +99,29 @@ if __name__ == "__main__":
         for i, lyr in enumerate(vec_lyrs):
             print(f"{i + 1}: {lyr}")
 
+    if args.veclyr is None:
+        vec_lyr_names = rsgislib.vectorutils.get_vec_lyrs_lst(args.vecfile)
+        if len(vec_lyr_names) > 1:
+            raise rsgislib.RSGISPyException("You need to specify a vector layer")
+        vec_lyr_name = vec_lyr_names[0]
+    else:
+        vec_lyr_name = args.veclyr
+
     if args.cols:
-        vec_cols = rsgislib.vectorutils.get_vec_lyr_cols(args.vecfile, args.veclyr)
+        vec_cols = rsgislib.vectorutils.get_vec_lyr_cols(args.vecfile, vec_lyr_name)
         for i, col in enumerate(vec_cols):
             print(f"{i+1}: {col}")
 
     if args.nfeats:
-        n_lyr_feats = rsgislib.vectorutils.get_vec_feat_count(args.vecfile, args.veclyr)
-        print(f"N Features in {args.veclyr}: {n_lyr_feats}")
+        n_lyr_feats = rsgislib.vectorutils.get_vec_feat_count(args.vecfile, vec_lyr_name)
+        print(f"N Features in {vec_lyr_name}: {n_lyr_feats}")
 
     if args.proj:
-        proj_wkt = rsgislib.vectorutils.get_proj_wkt_from_vec(args.vecfile, args.veclyr)
+        proj_wkt = rsgislib.vectorutils.get_proj_wkt_from_vec(args.vecfile, vec_lyr_name)
         print(proj_wkt)
 
     if args.bbox:
-        bbox = rsgislib.vectorutils.get_vec_layer_extent(args.vecfile, args.veclyr)
+        bbox = rsgislib.vectorutils.get_vec_layer_extent(args.vecfile, vec_lyr_name)
         print(f"[xMin, xMax, yMin, yMax]: {bbox}")
         print(f"Width: {bbox[1] - bbox[0]}")
         print(f"Height: {bbox[3] - bbox[2]}")
@@ -122,12 +130,12 @@ if __name__ == "__main__":
         import rsgislib.vectorattrs
 
         unq_vals = rsgislib.vectorattrs.get_unq_col_values(
-            args.vecfile, args.veclyr, args.veccol
+            args.vecfile, vec_lyr_name, args.veccol
         )
         for i, val in enumerate(unq_vals):
             print(f"\t{i}: '{val}'")
 
     if args.geom:
-        geom_type = rsgislib.vectorutils.get_vec_lyr_geom_type(args.vecfile, args.veclyr)
+        geom_type = rsgislib.vectorutils.get_vec_lyr_geom_type(args.vecfile, vec_lyr_name)
         geom_type_name = rsgislib.vectorutils.get_geom_type_name(geom_type)
         print(geom_type_name)
