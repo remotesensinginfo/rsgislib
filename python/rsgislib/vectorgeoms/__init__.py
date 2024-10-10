@@ -2528,6 +2528,77 @@ def vec_lyr_difference(
     ds_over_vec = None
 
 
+def clip_vec_lyr_ogr(
+    vec_file: str,
+    vec_lyr: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+):
+    """
+    A function which clips a vector layer using an input region of interest
+    (ROI) polygon layer. This function uses GDAL/OGR.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_roi_file: Input vector file defining the ROI polygon(s)
+    :param vec_roi_lyr: Input vector layer within the roi input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: Output file format (default GPKG).
+
+    """
+    import rsgislib.tools.filetools
+
+    try:
+        import tqdm
+
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
+    vec_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    if vec_ds is None:
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
+
+    vec_lyr_obj = vec_ds.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
+
+    lyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
+
+    vec_roi_ds = gdal.OpenEx(vec_roi_file, gdal.OF_VECTOR)
+    if vec_roi_ds is None:
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_roi_file))
+
+    vec_roi_lyr_obj = vec_roi_ds.GetLayerByName(vec_roi_lyr)
+    if vec_roi_lyr_obj is None:
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_roi_lyr))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = rsgislib.tools.filetools.get_file_basename(out_vec_file)
+
+    out_driver = ogr.GetDriverByName(out_format)
+    result_ds = out_driver.CreateDataSource(out_vec_file)
+    if result_ds is None:
+        raise rsgislib.RSGISPyException("Could not create '{}'".format(out_vec_file))
+
+    result_lyr_obj = result_ds.CreateLayer(
+        out_vec_lyr, lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType()
+    )
+    if result_lyr_obj is None:
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
+
+    vec_lyr_obj.Clip(vec_roi_lyr_obj, result_lyr_obj, callback=callback)
+
+    vec_ds = None
+    vec_roi_ds = None
+    result_ds = None
+
+
 def clip_vec_lyr(
     vec_file: str,
     vec_lyr: str,
@@ -2539,7 +2610,7 @@ def clip_vec_lyr(
 ):
     """
     A function which clips a vector layer using an input region of interest
-    (ROI) polygon layer.
+    (ROI) polygon layer. This function uses geopandas.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer within the input file.
