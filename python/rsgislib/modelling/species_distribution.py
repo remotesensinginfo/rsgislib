@@ -795,7 +795,7 @@ def correlation_matrix(
 
 
 def calc_vif_multicollinearity(
-    analysis_vars: List[str],
+    env_vars: List[str],
     vec_file: str,
     vec_lyr: str,
     out_vif_file: str = "vif_multicollinearity.csv",
@@ -826,7 +826,7 @@ def calc_vif_multicollinearity(
     # Drop any columns not needed from data
     data_cols_drop = list()
     for col in data_gdf.columns:
-        if col not in analysis_vars:
+        if col not in env_vars:
             data_cols_drop.append(col)
 
     if len(data_cols_drop) > 0:
