@@ -454,6 +454,49 @@ def get_colour_tab_info(input_img: str, img_band: int = 1) -> Dict[str, Dict]:
     return cls_info
 
 
+def get_colour_tab_info_for_def(input_img: str, img_band: int = 1) -> Dict[int, List]:
+    """
+    A function which returns the colour table info from an input image.
+    The output of this function can be directly inputted into the
+    rsgislib.imageutils.define_colour_table function.
+    The output dict has the following structure:
+
+    clr_info[1] = [0, 255, 0, 255]
+    clr_info[2] = [0, 0, 255, 255}
+
+    :param input_img: the file path to the input image.
+    :param img_band: optional image band to be read - default is 1.
+    :return: dict of lists [R, G, B, A] colour table info.
+
+    """
+    gdal_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if gdal_ds is None:
+        raise Exception(f"Cannot open input image: {input_img}")
+
+    gdal_band = gdal_ds.GetRasterBand(img_band)
+    if gdal_band is None:
+        raise Exception(f"Cannot open input image band {gdal_band} in {input_img}")
+
+    gdal_clr_tab = gdal_band.GetColorTable()
+    if gdal_clr_tab is None:
+        raise Exception(f"Input does not have a colour table: {input_img}")
+
+    cls_info = dict()
+    for i in range(gdal_clr_tab.GetCount()):
+        clr_entry = gdal_clr_tab.GetColorEntry(i)
+
+        cls_info[i] = list()
+        cls_info[i].append(int(clr_entry[0]))
+        cls_info[i].append(int(clr_entry[1]))
+        cls_info[i].append(int(clr_entry[2]))
+        if len(clr_entry) > 3:
+            cls_info[i].append(int(clr_entry[3]))
+        else:
+            cls_info[i].append(255)
+
+    return cls_info
+
+
 def define_colour_table(input_img: str, clr_lut: dict, img_band: int = 1):
     """
     A function which defines specific colours for image values for a colour
