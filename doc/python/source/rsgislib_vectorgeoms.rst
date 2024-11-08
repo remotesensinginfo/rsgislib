@@ -11,6 +11,7 @@ Convert Geometries
 .. autofunction:: rsgislib.vectorgeoms.get_vec_lyr_as_pts
 .. autofunction:: rsgislib.vectorgeoms.get_geom_pts
 .. autofunction:: rsgislib.vectorgeoms.get_geoms_as_bboxs
+.. autofunction:: rsgislib.vectorgeoms.pts_to_line_geoms
 
 Calculate New Geometries
 ------------------------

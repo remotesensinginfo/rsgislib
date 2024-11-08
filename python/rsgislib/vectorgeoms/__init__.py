@@ -3759,3 +3759,68 @@ def thin_vector_geoms(
             pts_join_gdf.to_file(out_vec_file, driver=out_format)
 
     print("Finished Thinning")
+
+
+def pts_to_line_geoms(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    sort_col: str = None,
+):
+    """
+    A function which converts a vector file of points to a single
+    line geometry. Note, if the input geometry is a multi-point then
+    the geometry is exploded before the line is created.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: output file format (default GPKG).
+    :param sort_col: Optionally the input points can be sorted by
+                     an attribute before the line is generated.
+
+    """
+    import geopandas
+    import pandas
+    from shapely.geometry import LineString
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    geom_type = pandas.unique(data_gdf.geom_type)
+
+    if len(geom_type) == 1:
+        if "MultiPoint" == geom_type[0]:
+            data_gdf = data_gdf.explode(index_parts=False)
+    else:
+        explode_vec = False
+        for geom_t in geom_type:
+            if geom_t not in ["MultiPoint", "Point"]:
+                raise rsgislib.RSGISPyException("Input vector must be Point geometry.")
+            if geom_t == "MultiPoint":
+                explode_vec = True
+        if explode_vec:
+            data_gdf = data_gdf.explode(index_parts=False)
+
+    if sort_col is not None:
+        data_gdf = data_gdf.sort_values(by=sort_col, ascending=True)
+
+    pts = data_gdf["geometry"].values
+    line_geom = LineString(pts)
+
+    line_gdf = geopandas.GeoDataFrame(
+        {"id": [1], "geometry": [line_geom]}, crs=data_gdf.crs
+    )
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            raise rsgislib.RSGISPyException(
+                "If output format is GPKG then an output layer is required."
+            )
+        line_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        line_gdf.to_file(out_vec_file, driver=out_format)
