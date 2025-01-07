@@ -175,3 +175,4 @@ if __name__ == "__main__":
             geom_type = rsgislib.vectorutils.get_vec_lyr_geom_type(args.vecfile, args.veclyr)
             geom_type_name = rsgislib.vectorutils.get_geom_type_name(geom_type)
             print(geom_type_name)
+

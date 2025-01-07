@@ -454,6 +454,49 @@ def get_colour_tab_info(input_img: str, img_band: int = 1) -> Dict[str, Dict]:
     return cls_info
 
 
+def get_colour_tab_info_for_def(input_img: str, img_band: int = 1) -> Dict[int, List]:
+    """
+    A function which returns the colour table info from an input image.
+    The output of this function can be directly inputted into the
+    rsgislib.imageutils.define_colour_table function.
+    The output dict has the following structure:
+
+    clr_info[1] = [0, 255, 0, 255]
+    clr_info[2] = [0, 0, 255, 255}
+
+    :param input_img: the file path to the input image.
+    :param img_band: optional image band to be read - default is 1.
+    :return: dict of lists [R, G, B, A] colour table info.
+
+    """
+    gdal_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if gdal_ds is None:
+        raise Exception(f"Cannot open input image: {input_img}")
+
+    gdal_band = gdal_ds.GetRasterBand(img_band)
+    if gdal_band is None:
+        raise Exception(f"Cannot open input image band {gdal_band} in {input_img}")
+
+    gdal_clr_tab = gdal_band.GetColorTable()
+    if gdal_clr_tab is None:
+        raise Exception(f"Input does not have a colour table: {input_img}")
+
+    cls_info = dict()
+    for i in range(gdal_clr_tab.GetCount()):
+        clr_entry = gdal_clr_tab.GetColorEntry(i)
+
+        cls_info[i] = list()
+        cls_info[i].append(int(clr_entry[0]))
+        cls_info[i].append(int(clr_entry[1]))
+        cls_info[i].append(int(clr_entry[2]))
+        if len(clr_entry) > 3:
+            cls_info[i].append(int(clr_entry[3]))
+        else:
+            cls_info[i].append(255)
+
+    return cls_info
+
+
 def define_colour_table(input_img: str, clr_lut: dict, img_band: int = 1):
     """
     A function which defines specific colours for image values for a colour
@@ -5191,6 +5234,14 @@ def grid_scattered_pts(
     import rsgislib.vectorutils
     from osgeo import gdal
 
+    try:
+        import tqdm
+
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
     x_img_size, y_img_size = get_img_size(input_img)
     base_img_bbox = get_img_bbox(input_img)
 
@@ -5201,6 +5252,7 @@ def grid_scattered_pts(
         "outputType": rsgislib.get_gdal_datatype(datatype),
         "width": x_img_size,
         "height": y_img_size,
+        "creationOptions": get_gdal_img_creation_opts(gdalformat=gdalformat),
         "outputBounds": [
             base_img_bbox[0],
             base_img_bbox[3],
@@ -5211,6 +5263,7 @@ def grid_scattered_pts(
         "algorithm": gdal_grid_alg,
         "layers": vec_lyr,
         "zfield": vec_col,
+        "callback": callback,
     }
     gdal.Grid(output_img, vec_ds_obj, **grid_opts)
     vec_ds_obj = None

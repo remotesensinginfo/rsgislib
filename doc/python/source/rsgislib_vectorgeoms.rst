@@ -11,10 +11,12 @@ Convert Geometries
 .. autofunction:: rsgislib.vectorgeoms.get_vec_lyr_as_pts
 .. autofunction:: rsgislib.vectorgeoms.get_geom_pts
 .. autofunction:: rsgislib.vectorgeoms.get_geoms_as_bboxs
+.. autofunction:: rsgislib.vectorgeoms.pts_to_line_geoms
 
 Calculate New Geometries
 ------------------------
 .. autofunction:: rsgislib.vectorgeoms.clip_vec_lyr
+.. autofunction:: rsgislib.vectorgeoms.clip_vec_lyr_ogr
 .. autofunction:: rsgislib.vectorgeoms.clip_and_merge_with_roi
 .. autofunction:: rsgislib.vectorgeoms.create_alpha_shape
 .. autofunction:: rsgislib.vectorgeoms.calc_poly_centroids

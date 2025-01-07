@@ -2528,6 +2528,77 @@ def vec_lyr_difference(
     ds_over_vec = None
 
 
+def clip_vec_lyr_ogr(
+    vec_file: str,
+    vec_lyr: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str = None,
+    out_format: str = "GPKG",
+):
+    """
+    A function which clips a vector layer using an input region of interest
+    (ROI) polygon layer. This function uses GDAL/OGR.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param vec_roi_file: Input vector file defining the ROI polygon(s)
+    :param vec_roi_lyr: Input vector layer within the roi input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: Output file format (default GPKG).
+
+    """
+    import rsgislib.tools.filetools
+
+    try:
+        import tqdm
+
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
+    vec_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    if vec_ds is None:
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
+
+    vec_lyr_obj = vec_ds.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
+
+    lyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
+
+    vec_roi_ds = gdal.OpenEx(vec_roi_file, gdal.OF_VECTOR)
+    if vec_roi_ds is None:
+        raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_roi_file))
+
+    vec_roi_lyr_obj = vec_roi_ds.GetLayerByName(vec_roi_lyr)
+    if vec_roi_lyr_obj is None:
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_roi_lyr))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = rsgislib.tools.filetools.get_file_basename(out_vec_file)
+
+    out_driver = ogr.GetDriverByName(out_format)
+    result_ds = out_driver.CreateDataSource(out_vec_file)
+    if result_ds is None:
+        raise rsgislib.RSGISPyException("Could not create '{}'".format(out_vec_file))
+
+    result_lyr_obj = result_ds.CreateLayer(
+        out_vec_lyr, lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType()
+    )
+    if result_lyr_obj is None:
+        raise rsgislib.RSGISPyException("Could not open layer '{}'".format(out_vec_lyr))
+
+    vec_lyr_obj.Clip(vec_roi_lyr_obj, result_lyr_obj, callback=callback)
+
+    vec_ds = None
+    vec_roi_ds = None
+    result_ds = None
+
+
 def clip_vec_lyr(
     vec_file: str,
     vec_lyr: str,
@@ -2539,7 +2610,7 @@ def clip_vec_lyr(
 ):
     """
     A function which clips a vector layer using an input region of interest
-    (ROI) polygon layer.
+    (ROI) polygon layer. This function uses geopandas.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer within the input file.
@@ -3783,3 +3854,70 @@ def clip_vec_into_sets(
             roi_data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
             roi_data_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def pts_to_line_geoms(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    sort_col: str = None,
+):
+    """
+    A function which converts a vector file of points to a single
+    line geometry. Note, if the input geometry is a multi-point then
+    the geometry is exploded before the line is created.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: output file format (default GPKG).
+    :param sort_col: Optionally the input points can be sorted by
+                     an attribute before the line is generated.
+
+    """
+    import geopandas
+    import pandas
+    from shapely.geometry import LineString
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    geom_type = pandas.unique(data_gdf.geom_type)
+
+    if len(geom_type) == 1:
+        if "MultiPoint" == geom_type[0]:
+            data_gdf = data_gdf.explode(index_parts=False)
+    else:
+        explode_vec = False
+        for geom_t in geom_type:
+            if geom_t not in ["MultiPoint", "Point"]:
+                raise rsgislib.RSGISPyException("Input vector must be Point geometry.")
+            if geom_t == "MultiPoint":
+                explode_vec = True
+        if explode_vec:
+            data_gdf = data_gdf.explode(index_parts=False)
+
+    if sort_col is not None:
+        data_gdf = data_gdf.sort_values(by=sort_col, ascending=True)
+
+    pts = data_gdf["geometry"].values
+    line_geom = LineString(pts)
+
+    line_gdf = geopandas.GeoDataFrame(
+        {"id": [1], "geometry": [line_geom]}, crs=data_gdf.crs
+    )
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            raise rsgislib.RSGISPyException(
+                "If output format is GPKG then an output layer is required."
+            )
+        line_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        line_gdf.to_file(out_vec_file, driver=out_format)
+
+

@@ -22,7 +22,7 @@ Add Columns
 .. autofunction:: rsgislib.vectorattrs.add_numeric_col_from_lst_lut
 .. autofunction:: rsgislib.vectorattrs.create_name_col
 .. autofunction:: rsgislib.vectorattrs.create_date_col
-
+.. autofunction:: rsgislib.vectorattrs.add_ran_vals_cols
 
 Column Utilities
 ------------------

@@ -2062,3 +2062,50 @@ def calc_near_dist_to_feats(
         data_dist_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         data_dist_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def add_ran_vals_cols(
+    vec_file: str,
+    vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    out_col: str = "ran_vals",
+    rnd_seed: int = None,
+):
+    """
+    A function which adds a new column with a random (integer) value assigned
+    to each row. Note, this does not guarantee that the random values will be
+    unique for each row.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param out_vec_file: Output vector file
+    :param out_vec_lyr: Output vector layer name.
+    :param out_format: output file format (default GPKG).
+    :param out_col: The output numeric column with the random value
+    :param rnd_seed: the random seed for the random number generator.
+                     Default is None.
+
+    """
+    import geopandas
+    import os
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    rng = numpy.random.default_rng(seed=rnd_seed)
+
+    n_rows = len(data_gdf)
+    data_gdf[out_col] = rng.integers(low=1, high=n_rows * 10, size=n_rows)
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            raise rsgislib.RSGISPyException(
+                "If output format is GPKG then an output layer is required."
+            )
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_gdf.to_file(out_vec_file, driver=out_format)

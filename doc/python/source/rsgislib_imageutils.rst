@@ -101,6 +101,7 @@ Visualisation / Normalisation
 .. autofunction:: rsgislib.imageutils.set_img_thematic
 .. autofunction:: rsgislib.imageutils.set_img_not_thematic
 .. autofunction:: rsgislib.imageutils.get_colour_tab_info
+.. autofunction:: rsgislib.imageutils.get_colour_tab_info_for_def
 .. autofunction:: rsgislib.imageutils.define_colour_table
 
 
