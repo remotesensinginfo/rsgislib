@@ -2631,7 +2631,7 @@ def split_by_attribute(
         if (out_file_path is None) or (out_file_ext is None):
             raise rsgislib.RSGISPyException(
                 "If a single layer output is specified then an output file path "
-                "and file extention needs to be specified."
+                "and file extension needs to be specified."
             )
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
