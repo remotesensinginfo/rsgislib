@@ -29,9 +29,12 @@
 #
 #############################################
 
+import os
 import argparse
 
 import rsgislib.vectorutils
+import rsgislib.tools.filetools
+import rsgislib.tools.projection
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -94,40 +97,81 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if args.lyrs:
-        vec_lyrs = rsgislib.vectorutils.get_vec_lyrs_lst(args.vecfile)
-        for i, lyr in enumerate(vec_lyrs):
-            print(f"{i + 1}: {lyr}")
+    if "parquet" in os.path.basename(args.vecfile):
+        import geopandas
 
-    if args.cols:
-        vec_cols = rsgislib.vectorutils.get_vec_lyr_cols(args.vecfile, args.veclyr)
-        for i, col in enumerate(vec_cols):
-            print(f"{i+1}: {col}")
+        base_gpdf = geopandas.read_parquet(args.vecfile)
+        basename = rsgislib.tools.filetools.get_file_basename(args.vecfile)
+        if args.lyrs:
+            print("Parquet files do not have multiple layers")
+            print(f"1: {basename}")
 
-    if args.nfeats:
-        n_lyr_feats = rsgislib.vectorutils.get_vec_feat_count(args.vecfile, args.veclyr)
-        print(f"N Features in {args.veclyr}: {n_lyr_feats}")
+        if args.cols:
+            vec_cols = list(base_gpdf.columns.values)
+            for i, col in enumerate(vec_cols):
+                print(f"{i+1}: {col}")
 
-    if args.proj:
-        proj_wkt = rsgislib.vectorutils.get_proj_wkt_from_vec(args.vecfile, args.veclyr)
-        print(proj_wkt)
+        if args.nfeats:
+            n_lyr_feats = len(base_gpdf)
+            print(f"N Features in {basename}: {n_lyr_feats}")
 
-    if args.bbox:
-        bbox = rsgislib.vectorutils.get_vec_layer_extent(args.vecfile, args.veclyr)
-        print(f"[xMin, xMax, yMin, yMax]: {bbox}")
-        print(f"Width: {bbox[1] - bbox[0]}")
-        print(f"Height: {bbox[3] - bbox[2]}")
+        if args.proj:
+            crs = base_gpdf.crs
+            print(crs.to_wkt(pretty=True))
 
-    if args.unqvals:
-        import rsgislib.vectorattrs
+        if args.bbox:
+            # Get layer bbox: minx, miny, maxx, maxy
+            gp_bbox = base_gpdf.total_bounds
+            bbox = [gp_bbox[0], gp_bbox[2], gp_bbox[1], gp_bbox[3]]
+            print(f"[xMin, xMax, yMin, yMax]: {bbox}")
+            print(f"Width: {bbox[1] - bbox[0]}")
+            print(f"Height: {bbox[3] - bbox[2]}")
 
-        unq_vals = rsgislib.vectorattrs.get_unq_col_values(
-            args.vecfile, args.veclyr, args.veccol
-        )
-        for i, val in enumerate(unq_vals):
-            print(f"\t{i}: '{val}'")
+        if args.unqvals:
+            unq_vals = base_gpdf[args.veccol].unique()
+            for i, val in enumerate(unq_vals):
+                print(f"\t{i}: '{val}'")
 
-    if args.geom:
-        geom_type = rsgislib.vectorutils.get_vec_lyr_geom_type(args.vecfile, args.veclyr)
-        geom_type_name = rsgislib.vectorutils.get_geom_type_name(geom_type)
-        print(geom_type_name)
+        if args.geom:
+            geom_types = base_gpdf.geom_type.unique()
+            for geom_type in geom_types:
+                print(geom_type)
+
+    else:
+        if args.lyrs:
+            vec_lyrs = rsgislib.vectorutils.get_vec_lyrs_lst(args.vecfile)
+            for i, lyr in enumerate(vec_lyrs):
+                print(f"{i + 1}: {lyr}")
+
+        if args.cols:
+            vec_cols = rsgislib.vectorutils.get_vec_lyr_cols(args.vecfile, args.veclyr)
+            for i, col in enumerate(vec_cols):
+                print(f"{i+1}: {col}")
+
+        if args.nfeats:
+            n_lyr_feats = rsgislib.vectorutils.get_vec_feat_count(args.vecfile, args.veclyr)
+            print(f"N Features in {args.veclyr}: {n_lyr_feats}")
+
+        if args.proj:
+            proj_wkt = rsgislib.vectorutils.get_proj_wkt_from_vec(args.vecfile, args.veclyr)
+            print(proj_wkt)
+
+        if args.bbox:
+            bbox = rsgislib.vectorutils.get_vec_layer_extent(args.vecfile, args.veclyr)
+            print(f"[xMin, xMax, yMin, yMax]: {bbox}")
+            print(f"Width: {bbox[1] - bbox[0]}")
+            print(f"Height: {bbox[3] - bbox[2]}")
+
+        if args.unqvals:
+            import rsgislib.vectorattrs
+
+            unq_vals = rsgislib.vectorattrs.get_unq_col_values(
+                args.vecfile, args.veclyr, args.veccol
+            )
+            for i, val in enumerate(unq_vals):
+                print(f"\t{i}: '{val}'")
+
+        if args.geom:
+            geom_type = rsgislib.vectorutils.get_vec_lyr_geom_type(args.vecfile, args.veclyr)
+            geom_type_name = rsgislib.vectorutils.get_geom_type_name(geom_type)
+            print(geom_type_name)
