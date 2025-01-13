@@ -50,7 +50,8 @@ class VecColVar(object):
 
 class VecLayersInfoObj(object):
     """
-    This is a class to store the information associated within the rsgislib.vectorutils.merge_to_multi_layer_vec function.
+    This is a class to store the information associated within the
+    rsgislib.vectorutils.merge_to_multi_layer_vec function.
 
     :param vec_file: input vector file.
     :param vec_lyr: input vector layer name
@@ -167,8 +168,8 @@ def get_proj_wkt_from_vec(vec_file: str, vec_lyr: str = None) -> str:
         raise rsgislib.RSGISPyException(
             "Could not open layer within file: {}".format(vec_file)
         )
-    spatialRef = layer.GetSpatialRef()
-    return spatialRef.ExportToWkt()
+    spatial_ref = layer.GetSpatialRef()
+    return spatial_ref.ExportToWkt()
 
 
 def get_proj_epsg_from_vec(vec_file: str, vec_lyr: str = None) -> int:
@@ -192,9 +193,9 @@ def get_proj_epsg_from_vec(vec_file: str, vec_lyr: str = None) -> int:
         raise rsgislib.RSGISPyException(
             "Could not open layer within file: {}".format(vec_file)
         )
-    spatialRef = layer.GetSpatialRef()
-    spatialRef.AutoIdentifyEPSG()
-    epsg_str = spatialRef.GetAuthorityCode(None)
+    spatial_ref = layer.GetSpatialRef()
+    spatial_ref.AutoIdentifyEPSG()
+    epsg_str = spatial_ref.GetAuthorityCode(None)
     espg_rtn = None
     if epsg_str is not None:
         espg_rtn = int(epsg_str)
@@ -218,15 +219,15 @@ def get_vec_feat_count(
 
     """
 
-    inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    in_data_source = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vec_lyr is not None:
-        inLayer = inDataSource.GetLayer(vec_lyr)
+        in_layer = in_data_source.GetLayer(vec_lyr)
     else:
-        inLayer = inDataSource.GetLayer()
-    if inLayer is None:
+        in_layer = in_data_source.GetLayer()
+    if in_layer is None:
         raise rsgislib.RSGISPyException("Check layer name as did not open layer.")
-    nFeats = inLayer.GetFeatureCount(compute_count)
-    return nFeats
+    n_feats = in_layer.GetFeatureCount(compute_count)
+    return n_feats
 
 
 def get_geom_type_name(geom_type: int) -> str:
@@ -372,7 +373,8 @@ def merge_vectors_to_gpkg(
 
     :param in_vec_files: is a list of input files.
     :param out_vec_file: is the output GPKG database (*.gpkg)
-    :param out_vec_lyr: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+    :param out_vec_lyr: is the layer name in the output database (i.e., you can merge layers into single
+                        layer or write a number of layers to the same database).
     :param exists: boolean which specifies whether the database file exists or not.
     """
     import rsgislib.tools.filetools
@@ -383,9 +385,9 @@ def merge_vectors_to_gpkg(
         )
     first = True
     for inFile in in_vec_files:
-        nFeat = get_vec_feat_count(inFile)
-        print("Processing: " + inFile + " has " + str(nFeat) + " features.")
-        if nFeat > 0:
+        n_feat = get_vec_feat_count(inFile)
+        print("Processing: " + inFile + " has " + str(n_feat) + " features.")
+        if n_feat > 0:
             if first:
                 if not exists:
                     cmd = [
@@ -471,9 +473,9 @@ def merge_vector_lyrs_to_gpkg(
     lyrs = get_vec_lyrs_lst(vec_file)
     first = True
     for lyr in lyrs:
-        nFeat = get_vec_feat_count(vec_file, lyr)
-        print("Processing: " + lyr + " has " + str(nFeat) + " features.")
-        if nFeat > 0:
+        n_feat = get_vec_feat_count(vec_file, lyr)
+        print("Processing: " + lyr + " has " + str(n_feat) + " features.")
+        if n_feat > 0:
             if first:
                 if not exists:
                     cmd = [
@@ -586,7 +588,7 @@ def merge_vectors_to_gpkg_ind_lyrs(
             "Processing File: {0} has {1} layers to copy.".format(inFile, len(inlyrs))
         )
         for lyr in inlyrs:
-            nFeat = get_vec_feat_count(inFile, lyr)
+            n_feat = get_vec_feat_count(inFile, lyr)
             out_lyr = lyr
             if lyr in out_lyr_names:
                 if rename_dup_lyrs:
@@ -598,9 +600,9 @@ def merge_vectors_to_gpkg_ind_lyrs(
                     )
             print(
                 "Processing Layer: {0} has {1} features to "
-                "copy - output layer name: {2}".format(lyr, nFeat, out_lyr)
+                "copy - output layer name: {2}".format(lyr, n_feat, out_lyr)
             )
-            if nFeat > 0:
+            if n_feat > 0:
                 if geom_type is None:
                     cmd = [
                         "ogr2ogr",
@@ -721,81 +723,81 @@ def split_vec_lyr(
     """
 
     datasrc = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
-    srcLyr = datasrc.GetLayer(vec_lyr)
-    nInFeats = srcLyr.GetFeatureCount(True)
-    print(nInFeats)
+    src_lyr = datasrc.GetLayer(vec_lyr)
+    n_in_feats = src_lyr.GetFeatureCount(True)
+    print(n_in_feats)
 
-    nOutFiles = math.floor(nInFeats / n_feats)
-    remainFeats = nInFeats - (nOutFiles * n_feats)
-    print(nOutFiles)
-    print(remainFeats)
+    n_out_files = math.floor(n_in_feats / n_feats)
+    remain_feats = n_in_feats - (n_out_files * n_feats)
+    print(n_out_files)
+    print(remain_feats)
 
     out_driver = ogr.GetDriverByName(out_format)
-    src_lyr_spat_ref = srcLyr.GetSpatialRef()
+    src_lyr_spat_ref = src_lyr.GetSpatialRef()
 
-    cFeatN = 0
-    sFeatN = 0
-    eFeatN = n_feats
-    for i in range(nOutFiles):
+    c_feat_n = 0
+    s_feat_n = 0
+    e_feat_n = n_feats
+    for i in range(n_out_files):
         outveclyr = "{0}{1}".format(out_vec_base, i + 1)
         outvecfile = os.path.join(out_dir, "{0}.{1}".format(outveclyr, out_vec_ext))
         print("Creating: {}".format(outvecfile))
         result_ds = out_driver.CreateDataSource(outvecfile)
         result_lyr = result_ds.CreateLayer(
-            outveclyr, src_lyr_spat_ref, geom_type=srcLyr.GetGeomType()
+            outveclyr, src_lyr_spat_ref, geom_type=src_lyr.GetGeomType()
         )
 
-        srcLayerDefn = srcLyr.GetLayerDefn()
-        for i in range(srcLayerDefn.GetFieldCount()):
-            fieldDefn = srcLayerDefn.GetFieldDefn(i)
-            result_lyr.CreateField(fieldDefn)
-        rsltLayerDefn = result_lyr.GetLayerDefn()
+        src_layer_defn = src_lyr.GetLayerDefn()
+        for i in range(src_layer_defn.GetFieldCount()):
+            field_defn = src_layer_defn.GetFieldDefn(i)
+            result_lyr.CreateField(field_defn)
+        rslt_layer_defn = result_lyr.GetLayerDefn()
 
-        cFeatN = 0
-        srcLyr.ResetReading()
-        inFeat = srcLyr.GetNextFeature()
+        c_feat_n = 0
+        src_lyr.ResetReading()
+        in_feat = src_lyr.GetNextFeature()
         result_lyr.StartTransaction()
-        while inFeat:
-            if (cFeatN >= sFeatN) and (cFeatN < eFeatN):
-                geom = inFeat.GetGeometryRef()
+        while in_feat:
+            if (c_feat_n >= s_feat_n) and (c_feat_n < e_feat_n):
+                geom = in_feat.GetGeometryRef()
                 if geom is not None:
-                    result_lyr.CreateFeature(inFeat)
-            elif cFeatN > eFeatN:
+                    result_lyr.CreateFeature(in_feat)
+            elif c_feat_n > e_feat_n:
                 break
-            inFeat = srcLyr.GetNextFeature()
-            cFeatN = cFeatN + 1
+            in_feat = src_lyr.GetNextFeature()
+            c_feat_n = c_feat_n + 1
         result_lyr.CommitTransaction()
         result_ds = None
 
-        sFeatN = sFeatN + n_feats
-        eFeatN = eFeatN + n_feats
+        s_feat_n = s_feat_n + n_feats
+        e_feat_n = e_feat_n + n_feats
 
-    if remainFeats > 0:
-        outveclyr = "{0}{1}".format(out_vec_base, nOutFiles + 1)
+    if remain_feats > 0:
+        outveclyr = "{0}{1}".format(out_vec_base, n_out_files + 1)
         outvecfile = os.path.join(out_dir, "{0}.{1}".format(outveclyr, out_vec_ext))
         print("Creating: {}".format(outvecfile))
         result_ds = out_driver.CreateDataSource(outvecfile)
         result_lyr = result_ds.CreateLayer(
-            outveclyr, src_lyr_spat_ref, geom_type=srcLyr.GetGeomType()
+            outveclyr, src_lyr_spat_ref, geom_type=src_lyr.GetGeomType()
         )
 
-        srcLayerDefn = srcLyr.GetLayerDefn()
-        for i in range(srcLayerDefn.GetFieldCount()):
-            fieldDefn = srcLayerDefn.GetFieldDefn(i)
-            result_lyr.CreateField(fieldDefn)
-        rsltLayerDefn = result_lyr.GetLayerDefn()
+        src_layer_defn = src_lyr.GetLayerDefn()
+        for i in range(src_layer_defn.GetFieldCount()):
+            field_defn = src_layer_defn.GetFieldDefn(i)
+            result_lyr.CreateField(field_defn)
+        rslt_layer_defn = result_lyr.GetLayerDefn()
 
-        cFeatN = 0
-        srcLyr.ResetReading()
-        inFeat = srcLyr.GetNextFeature()
+        c_feat_n = 0
+        src_lyr.ResetReading()
+        in_feat = src_lyr.GetNextFeature()
         result_lyr.StartTransaction()
-        while inFeat:
-            if cFeatN >= sFeatN:
-                geom = inFeat.GetGeometryRef()
+        while in_feat:
+            if c_feat_n >= s_feat_n:
+                geom = in_feat.GetGeometryRef()
                 if geom is not None:
-                    result_lyr.CreateFeature(inFeat)
-            inFeat = srcLyr.GetNextFeature()
-            cFeatN = cFeatN + 1
+                    result_lyr.CreateFeature(in_feat)
+            in_feat = src_lyr.GetNextFeature()
+            c_feat_n = c_feat_n + 1
         result_lyr.CommitTransaction()
         result_ds = None
     datasrc = None
@@ -832,29 +834,29 @@ def reproj_vector_layer(
     ## https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
 
     # get the input layer
-    inDataSet = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
-    if inDataSet is None:
+    in_data_set = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    if in_data_set is None:
         raise rsgislib.RSGISPyException(
             "Failed to open input vector file: {}".format(vec_file)
         )
     if vec_lyr is None:
-        inLayer = inDataSet.GetLayer()
+        in_layer = in_data_set.GetLayer()
     else:
-        inLayer = inDataSet.GetLayer(vec_lyr)
+        in_layer = in_data_set.GetLayer(vec_lyr)
 
     # input SpatialReference
-    inSpatialRef = osr.SpatialReference()
+    in_spatial_ref = osr.SpatialReference()
     if in_proj_wkt is not None:
-        inSpatialRef.ImportFromWkt(in_proj_wkt)
+        in_spatial_ref.ImportFromWkt(in_proj_wkt)
     else:
-        inSpatialRef = inLayer.GetSpatialRef()
+        in_spatial_ref = in_layer.GetSpatialRef()
 
     # output SpatialReference
-    outSpatialRef = osr.SpatialReference()
-    outSpatialRef.ImportFromWkt(out_proj_wkt)
+    out_spatial_ref = osr.SpatialReference()
+    out_spatial_ref.ImportFromWkt(out_proj_wkt)
 
     # create the CoordinateTransformation
-    coordTrans = osr.CoordinateTransformation(inSpatialRef, outSpatialRef)
+    coord_trans = osr.CoordinateTransformation(in_spatial_ref, out_spatial_ref)
 
     # Create shapefile driver
     driver = gdal.GetDriverByName(out_format)
@@ -868,79 +870,79 @@ def reproj_vector_layer(
                 raise rsgislib.RSGISPyException(
                     "Output shapefile already exists - stopping."
                 )
-            outDataSet = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
+            out_data_set = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
         else:
-            outDataSet = gdal.OpenEx(out_vec_file, gdal.OF_UPDATE)
+            out_data_set = gdal.OpenEx(out_vec_file, gdal.OF_UPDATE)
     else:
-        outDataSet = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
+        out_data_set = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
-    outLayer = outDataSet.CreateLayer(out_vec_lyr, outSpatialRef, inLayer.GetGeomType())
+    out_layer = out_data_set.CreateLayer(out_vec_lyr, out_spatial_ref, in_layer.GetGeomType())
 
     # add fields
-    inLayerDefn = inLayer.GetLayerDefn()
-    for i in range(0, inLayerDefn.GetFieldCount()):
-        fieldDefn = inLayerDefn.GetFieldDefn(i)
-        outLayer.CreateField(fieldDefn)
+    in_layer_defn = in_layer.GetLayerDefn()
+    for i in range(0, in_layer_defn.GetFieldCount()):
+        field_defn = in_layer_defn.GetFieldDefn(i)
+        out_layer.CreateField(field_defn)
 
     # get the output layer's feature definition
-    outLayerDefn = outLayer.GetLayerDefn()
+    out_layer_defn = out_layer.GetLayerDefn()
 
-    openTransaction = False
-    nFeats = inLayer.GetFeatureCount(True)
-    step = math.floor(nFeats / 10)
+    open_transaction = False
+    n_feats = in_layer.GetFeatureCount(True)
+    step = math.floor(n_feats / 10)
     feedback = 10
     feedback_next = step
     counter = 0
     print("Started .0.", end="", flush=True)
 
     # loop through the input features
-    inFeature = inLayer.GetNextFeature()
-    while inFeature:
-        if (nFeats > 10) and (counter == feedback_next):
+    in_feature = in_layer.GetNextFeature()
+    while in_feature:
+        if (n_feats > 10) and (counter == feedback_next):
             print(".{}.".format(feedback), end="", flush=True)
             feedback_next = feedback_next + step
             feedback = feedback + 10
 
-        if not openTransaction:
-            outLayer.StartTransaction()
-            openTransaction = True
+        if not open_transaction:
+            out_layer.StartTransaction()
+            open_transaction = True
 
         # get the input geometry
-        geom = inFeature.GetGeometryRef()
+        geom = in_feature.GetGeometryRef()
         if geom is not None:
             # reproject the geometry
-            geom.Transform(coordTrans)
+            geom.Transform(coord_trans)
             # create a new feature
-            outFeature = ogr.Feature(outLayerDefn)
+            out_feature = ogr.Feature(out_layer_defn)
             # set the geometry and attribute
-            outFeature.SetGeometry(geom)
-            for i in range(0, outLayerDefn.GetFieldCount()):
-                outFeature.SetField(
-                    outLayerDefn.GetFieldDefn(i).GetNameRef(), inFeature.GetField(i)
+            out_feature.SetGeometry(geom)
+            for i in range(0, out_layer_defn.GetFieldCount()):
+                out_feature.SetField(
+                    out_layer_defn.GetFieldDefn(i).GetNameRef(), in_feature.GetField(i)
                 )
             # add the feature to the shapefile
-            outLayer.CreateFeature(outFeature)
+            out_layer.CreateFeature(out_feature)
         # dereference the features and get the next input feature
-        outFeature = None
+        out_feature = None
 
-        if ((counter % 20000) == 0) and openTransaction:
-            outLayer.CommitTransaction()
-            openTransaction = False
+        if ((counter % 20000) == 0) and open_transaction:
+            out_layer.CommitTransaction()
+            open_transaction = False
 
-        inFeature = inLayer.GetNextFeature()
+        in_feature = in_layer.GetNextFeature()
         counter = counter + 1
 
-    if openTransaction:
-        outLayer.CommitTransaction()
-        openTransaction = False
-    outLayer.SyncToDisk()
+    if open_transaction:
+        out_layer.CommitTransaction()
+        open_transaction = False
+    out_layer.SyncToDisk()
     print(" Completed")
 
     # Save and close the shapefiles
-    inDataSet = None
-    outDataSet = None
+    in_data_set = None
+    out_data_set = None
 
 
 def reproj_vec_lyr_obj(
@@ -964,8 +966,6 @@ def reproj_vec_lyr_obj(
     :param out_vec_lyr: is a string for the output layer name. If None then ignored and
                        assume there is just a single layer in the vector and layer name
                        is the same as the file name.
-    :param inLyrName: is a string for the input layer name. If None then ignored and
-                      assume there is just a single layer in the vector.
     :param in_epsg: is an int with the EPSG code for the input vector file
                       (Optional; taken from input file if not specified).
     :param print_feedback: is a boolean (Default True) specifying whether feedback should be printed to the console.
@@ -2631,7 +2631,7 @@ def split_by_attribute(
         if (out_file_path is None) or (out_file_ext is None):
             raise rsgislib.RSGISPyException(
                 "If a single layer output is specified then an output file path "
-                "and file extention needs to be specified."
+                "and file extension needs to be specified."
             )
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
@@ -3107,10 +3107,10 @@ def merge_utm_vecs_wgs84(
     :param out_vec_file: output vector file.
     :param out_vec_lyr: output vector layer - only used if output format is GPKG
     :param out_format: output file format.
-    :param n_utm_zones_vec: GPKG file with layer per zone (layer names: 01, 02, ...
+    :param n_hemi_utm_file: GPKG file with layer per zone (layer names: 01, 02, ...
                             59, 60) each projected in the northern hemisphere UTM
                             projections.
-    :param s_utm_zone_vec: GPKG file with layer per zone (layer names: 01, 02, ...
+    :param s_hemi_utm_file: GPKG file with layer per zone (layer names: 01, 02, ...
                            59, 60) each projected in the southern hemisphere
                            UTM projections.
     :param width_thres: The threshold (default 350 degrees) for the width of a polygon
@@ -3682,10 +3682,10 @@ def reproj_vec_lyr_gp(
     """
     A function which re-projects of a vector layer to a new projection
     using GeoPandas. You must provide either project a ESPG code or WKT
-    string represention of the projection.
+    string representation of the projection.
 
     Note. this function loads the layer into memory you can use also use
-    vector_translate for reprojection if you do not want that behaviour.
+    vector_translate for projection if you do not want that behaviour.
 
     :param vec_file: Input vector file
     :param vec_lyr: Input vector layer

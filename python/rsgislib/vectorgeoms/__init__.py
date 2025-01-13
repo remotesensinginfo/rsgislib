@@ -3761,6 +3761,101 @@ def thin_vector_geoms(
     print("Finished Thinning")
 
 
+def clip_vec_into_sets(
+    vec_file:str,
+    vec_lyr:str,
+    vec_roi_file:str,
+    vec_roi_lyr:str,
+    roi_att_col:str,
+    out_vec_dir:str,
+    out_vec_base_pre:str = "",
+    out_vec_base_post:str = "",
+    out_vec_ext:str = "gpkg",
+    out_format:str="GPKG",
+    out_name_lower:bool=False,
+):
+    """
+    A function which clips (subsets) a vector file (vec_file) by a region of interest (roi) specified
+    by the features (polygons) within the region of interest file where the roi file has an attribute
+    (e.g., country, class, project) separating the roi vector layer into a number of regions.
+    The output will be a series of vector files each clipped to the region of interest of the
+    features associated with each unique roi.
+
+    Note, this function supports parquet files as both the input and output vector files.
+
+    :param vec_file: Input vector file which will be clipped (subsetted)
+    :param vec_lyr: Input vector file layer name
+    :param vec_roi_file: The region of interest (roi) vector file path
+    :param vec_roi_lyr: The region of interest (roi) vector layer
+    :param roi_att_col: The region of interest attribute column - this specifies the number of output vector files
+                        one for each of the unique values within this column.
+    :param out_vec_dir: The directory for the output vector files. If it does not exist then it will be created.
+    :param out_vec_base_pre: a string which is prepended to the output vector file names
+    :param out_vec_base_post: a string which is appended to the output vector file names
+    :param out_vec_ext: the output vector file format extension (without the dot; e.g., gpkg, shp, parquet.sz)
+    :param out_format: the output format (Default GPKG)
+    :param out_name_lower: boolean specifying whether the output file name should be
+                           changed to lowercase. (default: False)
+
+    """
+    import geopandas
+    import rsgislib.tools.utils
+
+    if not os.path.exists(out_vec_dir):
+        os.mkdir(out_vec_dir)
+
+    print("Reading Data")
+    if "parquet" in os.path.basename(vec_file):
+        data_gdf = geopandas.read_parquet(vec_file)
+    else:
+        data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    print("Reading ROI Data")
+    if "parquet" in os.path.basename(vec_roi_file):
+        roi_gdf = geopandas.read_parquet(vec_roi_file)
+    else:
+        roi_gdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
+
+    unq_roi_vals = roi_gdf[roi_att_col].unique()
+
+    print(f"Running Subset for {len(unq_roi_vals)} unique roi vals:")
+    for roi_val in tqdm.tqdm(unq_roi_vals):
+        roi_sub_gdf = roi_gdf[roi_gdf[roi_att_col] == roi_val]
+        roi_data_gdf = data_gdf.clip(roi_sub_gdf, keep_geom_type=True)
+
+        out_vec_base_pre_tmp = out_vec_base_pre
+        if out_vec_base_pre != "":
+            out_vec_base_pre_tmp = f"{out_vec_base_pre}_"
+        out_vec_base_post_tmp = out_vec_base_post
+        if out_vec_base_post != "":
+            out_vec_base_post_tmp = f"_{out_vec_base_post}"
+        out_vec_lyr = f"{out_vec_base_pre_tmp}{roi_val}{out_vec_base_post_tmp}"
+        out_vec_lyr = rsgislib.tools.utils.check_str(
+            out_vec_lyr,
+            rm_non_ascii=True,
+            rm_dashs=False,
+            rm_spaces=True,
+            rm_punc=True,
+        )
+        if out_name_lower:
+            out_vec_lyr = out_vec_lyr.lower()
+
+        out_vec_file = os.path.join(out_vec_dir, f"{out_vec_lyr}.{out_vec_ext}")
+
+        if out_format == "PARQUET":
+            out_compress = None
+            if "gzip" in out_vec_ext:
+                out_compress = "gzip"
+            elif "sz" in out_vec_ext:
+                out_compress = "snappy"
+
+            roi_data_gdf.to_parquet(out_vec_file, compression=out_compress)
+        elif out_format == "GPKG":
+            roi_data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            roi_data_gdf.to_file(out_vec_file, driver=out_format)
+
+
 def pts_to_line_geoms(
     vec_file: str,
     vec_lyr: str,
@@ -3824,3 +3919,5 @@ def pts_to_line_geoms(
         line_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         line_gdf.to_file(out_vec_file, driver=out_format)
+
+
