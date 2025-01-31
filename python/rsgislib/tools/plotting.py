@@ -1452,7 +1452,7 @@ def create_legend_img(
     box_size: Tuple[int] = (10, 20),
     title_str: str = None,
     font_size: int = 12,
-    font: str = "Arial",
+    font: str = None,
     font_clr: Tuple[int] = (0, 0, 0, 255),
     col_width: int = None,
     img_height: int = None,
@@ -1489,6 +1489,7 @@ def create_legend_img(
     :param title_height: Extra height in pixels for the title (Default: 16)
     :param margin: The margin in pixels around the image each and between features
                    (Default: 2)
+    :return: A PIL image object.
 
     """
     import math
@@ -1571,7 +1572,7 @@ def create_legend_img_file(
     box_size: Tuple[int] = (10, 20),
     title_str: str = None,
     font_size: int = 12,
-    font: str = "Arial",
+    font: str = None,
     font_clr: Tuple[int] = (0, 0, 0, 255),
     col_width: int = None,
     img_height: int = None,
@@ -1638,7 +1639,7 @@ def create_legend_img_mpl_ax(
     box_size: Tuple[int] = (10, 20),
     title_str: str = None,
     font_size: int = 12,
-    font: str = "Arial",
+    font: str = None,
     font_clr: Tuple[int] = (0, 0, 0, 255),
     col_width: int = None,
     img_height: int = None,
@@ -1740,7 +1741,9 @@ def create_legend_info_dict(
                       (Default: Alpha)
     :param histogram_col: The name of the histogram column within the RAT
                           (Default: Histogram)
-    :return:
+    :return: dictionary with the classification name as the key and the value a tuple of [Red, Green, Blue, Alpha]
+             values.
+
     """
     import rsgislib.rastergis
 
