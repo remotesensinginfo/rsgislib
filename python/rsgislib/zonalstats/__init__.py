@@ -51,6 +51,7 @@ from osgeo import gdal, ogr, osr
 
 import rsgislib
 import rsgislib.imageutils
+import rsgislib.tools.geometrytools
 
 # import the C++ extension into this level
 from ._zonalstats import *
@@ -237,6 +238,15 @@ def calc_zonal_band_stats(
         ):
             raise rsgislib.RSGISPyException(
                 "At least one field needs to be specified for there is to an output."
+            )
+
+        img_bbox = rsgislib.imageutils.get_img_bbox(input_img)
+        vec_bbox = vec_lyr_obj.GetExtent(True)
+        if not rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox):
+            print(f"Image BBOX: {img_bbox}")
+            print(f"Vector BBOX: {vec_bbox}")
+            raise rsgislib.RSGISPyException(
+                "The vector layer and image do not overlap."
             )
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
@@ -594,6 +604,15 @@ def calc_zonal_poly_pts_band_stats(
     try:
         if vec_lyr_obj is None:
             raise rsgislib.RSGISPyException("The inputted vector layer was None")
+
+        img_bbox = rsgislib.imageutils.get_img_bbox(input_img)
+        vec_bbox = vec_lyr_obj.GetExtent(True)
+        if not rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox):
+            print(f"Image BBOX: {img_bbox}")
+            print(f"Vector BBOX: {vec_bbox}")
+            raise rsgislib.RSGISPyException(
+                "The vector layer and image do not overlap."
+            )
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
         if imgDS is None:
@@ -967,6 +986,15 @@ def calc_zonal_band_stats_test_poly_pts(
         ):
             raise rsgislib.RSGISPyException(
                 "At least one field needs to be specified for there is to an output."
+            )
+
+        img_bbox = rsgislib.imageutils.get_img_bbox(input_img)
+        vec_bbox = vec_lyr_obj.GetExtent(True)
+        if not rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox):
+            print(f"Image BBOX: {img_bbox}")
+            print(f"Vector BBOX: {vec_bbox}")
+            raise rsgislib.RSGISPyException(
+                "The vector layer and image do not overlap."
             )
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
@@ -1448,7 +1476,33 @@ def ext_point_band_values(
         lyr_geom_type = ogr.GeometryTypeToName(veclyrDefn.GetGeomType())
         if (lyr_geom_type.lower() != "point") and (lyr_geom_type.lower() != "3d point"):
             raise rsgislib.RSGISPyException(
-                f"The layer geometry type must be point: Got '{lyr_geom_type}'.")
+                f"The layer geometry type must be point: Got '{lyr_geom_type}'."
+            )
+
+        if vec_def_epsg is None:
+            veclyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
+            if veclyr_spatial_ref is None:
+                raise rsgislib.RSGISPyException(
+                    "Could not retrieve a projection object from the "
+                    "vector layer - projection might be be defined."
+                )
+            epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        else:
+            epsg_vec_spatial = vec_def_epsg
+
+        img_bbox = rsgislib.imageutils.get_img_bbox(input_img)
+        vec_bbox = vec_lyr_obj.GetExtent(True)
+        if reproj_vec:
+            img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
+            vec_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(
+                vec_bbox, epsg_vec_spatial, img_epsg
+            )
+        if not rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox):
+            print(f"Image BBOX: {img_bbox}")
+            print(f"Vector BBOX: {vec_bbox}")
+            raise rsgislib.RSGISPyException(
+                "The vector layer and image do not overlap."
+            )
 
         imgDS = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
         if imgDS is None:
@@ -1474,16 +1528,6 @@ def ext_point_band_values(
         imgNoDataVal = img_band_obj.GetNoDataValue()
         out_no_data_val = float(out_no_data_val)
 
-        if vec_def_epsg is None:
-            veclyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
-            if veclyr_spatial_ref is None:
-                raise rsgislib.RSGISPyException(
-                    "Could not retrieve a projection object from the "
-                    "vector layer - projection might be be defined."
-                )
-            epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
-        else:
-            epsg_vec_spatial = vec_def_epsg
         veclyr_spatial_ref = osr.SpatialReference()
         veclyr_spatial_ref.ImportFromEPSG(int(epsg_vec_spatial))
         pt_reprj = False
