@@ -758,6 +758,7 @@ def create_thematic_raster_map(
     title_str: str = None,
     alpha_backgd: bool = True,
     img_alpha: float = 1.0,
+    ctab_alpha: bool = True,
     show_scale_bar: bool = True,
     use_grid: bool = False,
     show_map_axis: bool = True,
@@ -778,6 +779,8 @@ def create_thematic_raster_map(
                          value will be transparent and not shown.
     :param img_alpha: a float specifying the alpha transparency value for all the image
                       layers provided. Default: 1.0 (i.e., not transparent)
+    :param ctab_alpha: boolean specifying that the alpha values from the colour
+                       table should be used to display the image (Default: True)
     :param show_scale_bar: boolean specifying whether a scale bar should be added to
                            the axis. Default: False
     :param use_grid: boolean specifying whether a grid should be added to the axis.
@@ -825,7 +828,11 @@ def create_thematic_raster_map(
             img_coords,
             lgd_patches,
         ) = rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(
-            input_img, band=1, bbox=bbox, alpha_lyr=alpha_backgd
+            input_img,
+            band=1,
+            bbox=bbox,
+            alpha_lyr=alpha_backgd,
+            ctab_alpha=ctab_alpha,
         )
         img_data_arr_scns.append(img_data_arr)
         img_coords_scns.append(img_coords)

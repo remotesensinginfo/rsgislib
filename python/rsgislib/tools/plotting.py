@@ -863,6 +863,7 @@ def get_gdal_thematic_raster_mpl_imshow(
     out_patches: bool = False,
     cls_names_lut: Dict = None,
     alpha_lyr: bool = False,
+    ctab_alpha: bool = True,
 ) -> Tuple[numpy.array, List[float], list]:
     """
     A function which retrieves thematic image data with a colour table as an
@@ -883,8 +884,10 @@ def get_gdal_thematic_raster_mpl_imshow(
                           key is the pixel value for the class and
     :param alpha_lyr: a boolean specifying whether an alpha channel should be
                       created and therefore the returned array will have 4
-                      rather than 3 dims. If an alpha channel is created then
+                      rather than 3 dims. If an alpha channel is created
                       then background will be transparent.
+    :param ctab_alpha: boolean specifying that the alpha values from the colour
+                       table should be used to display the image (Default: True)
     :return: numpy.array either [n,m,3 or 4], a bbox (xmin, xmax, ymin, ymax)
              specifying the extent of the image data and list of matplotlib patches,
              if out_patches=False then None is returned.
@@ -956,7 +959,7 @@ def get_gdal_thematic_raster_mpl_imshow(
     red_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
     grn_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
     blu_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
-    if alpha_lyr:
+    if alpha_lyr or ctab_alpha:
         alp_arr = numpy.zeros_like(img_data_arr, dtype=numpy.uint8)
 
     lgd_out_patches = None
@@ -968,23 +971,35 @@ def get_gdal_thematic_raster_mpl_imshow(
         red_arr[img_data_arr == i] = clr_tab_entry[0]
         grn_arr[img_data_arr == i] = clr_tab_entry[1]
         blu_arr[img_data_arr == i] = clr_tab_entry[2]
-        if alpha_lyr and (i > 0):
+        if ctab_alpha:
+            alp_arr[img_data_arr == i] = clr_tab_entry[3]
+            if alpha_lyr and (i == 0):
+                alp_arr[img_data_arr == i] = 0
+        elif alpha_lyr and (i > 0):
             alp_arr[img_data_arr == i] = 255
 
         if out_patches and (i > 0):
             cls_name = f"{i}"
             if (cls_names_lut is not None) and (i in cls_names_lut):
                 cls_name = f"{cls_names_lut[i]}"
-            rgb_clr = (
-                clr_tab_entry[0] / 255.0,
-                clr_tab_entry[1] / 255.0,
-                clr_tab_entry[2] / 255.0,
-            )
+            if ctab_alpha:
+                rgb_clr = (
+                    clr_tab_entry[0] / 255.0,
+                    clr_tab_entry[1] / 255.0,
+                    clr_tab_entry[2] / 255.0,
+                    clr_tab_entry[3] / 255.0,
+                )
+            else:
+                rgb_clr = (
+                    clr_tab_entry[0] / 255.0,
+                    clr_tab_entry[1] / 255.0,
+                    clr_tab_entry[2] / 255.0,
+                )
             lgd_out_patches.append(
                 Patch(facecolor=rgb_clr, edgecolor=rgb_clr, label=cls_name)
             )
 
-    if alpha_lyr:
+    if alpha_lyr or ctab_alpha:
         img_clr_data_arr = numpy.stack([red_arr, grn_arr, blu_arr, alp_arr], axis=-1)
     else:
         img_clr_data_arr = numpy.stack([red_arr, grn_arr, blu_arr], axis=-1)
