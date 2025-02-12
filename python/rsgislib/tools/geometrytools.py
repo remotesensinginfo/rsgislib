@@ -477,8 +477,8 @@ def find_extent_on_whole_num_grid(
 
 def get_bbox_grid(
     bbox: Union[Tuple[float, float, float, float], List[float]],
-    x_size: int,
-    y_size: int,
+    x_size: float,
+    y_size: float,
 ) -> List[Tuple[float, float, float, float]]:
     """
     Create a grid with size x_size, y_size for the area represented by bbox.

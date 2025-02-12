@@ -463,7 +463,7 @@ def create_name_col(
     postfix: str = "",
     coords_lat_lon: bool = True,
     int_coords: bool = True,
-    coord_gain: float = 0.0,
+    coord_gain: float = 1.0,
     zero_x_pad: int = 0,
     zero_y_pad: int = 0,
     round_n_digts: int = 0,
@@ -489,7 +489,7 @@ def create_name_col(
     :param coords_lat_lon: A boolean specifying if the coordinates are lat / long
     :param int_coords: A boolean specifying whether to integerise the coordinates.
     :param coord_gain: Apply a gain to the coordinate before integerise.
-                       Default = 0.0 (i.e., no gain)
+                       Default = 1.0 (i.e., no gain)
     :param zero_x_pad: If larger than zero then the X coordinate will be zero padded.
     :param zero_y_pad: If larger than zero then the Y coordinate will be zero padded.
     :param round_n_digts: If larger than zero then the coordinates will be rounded
@@ -1319,7 +1319,7 @@ def drop_vec_cols(
     """
     A function which allows vector columns to be removed from the layer.
 
-    param vec_file: Input vector file
+    :param vec_file: Input vector file
     :param vec_lyr: Input vector layer
     :param drop_cols: List of columns to remove from layer
     :param out_vec_file: the output vector file

@@ -340,7 +340,6 @@ def plot_image_comparison(
     gdal_driver.Delete(tmp_out_file)
 
 
-
 def plot_image_histogram(
     input_img,
     img_band,

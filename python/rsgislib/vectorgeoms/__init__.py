@@ -3762,17 +3762,17 @@ def thin_vector_geoms(
 
 
 def clip_vec_into_sets(
-    vec_file:str,
-    vec_lyr:str,
-    vec_roi_file:str,
-    vec_roi_lyr:str,
-    roi_att_col:str,
-    out_vec_dir:str,
-    out_vec_base_pre:str = "",
-    out_vec_base_post:str = "",
-    out_vec_ext:str = "gpkg",
-    out_format:str="GPKG",
-    out_name_lower:bool=False,
+    vec_file: str,
+    vec_lyr: str,
+    vec_roi_file: str,
+    vec_roi_lyr: str,
+    roi_att_col: str,
+    out_vec_dir: str,
+    out_vec_base_pre: str = "",
+    out_vec_base_post: str = "",
+    out_vec_ext: str = "gpkg",
+    out_format: str = "GPKG",
+    out_name_lower: bool = False,
 ):
     """
     A function which clips (subsets) a vector file (vec_file) by a region of interest (roi) specified
@@ -3919,5 +3919,3 @@ def pts_to_line_geoms(
         line_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         line_gdf.to_file(out_vec_file, driver=out_format)
-
-

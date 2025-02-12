@@ -426,10 +426,10 @@ def create_poly_vec_for_lst_bboxs(
 
 def define_grid(
     bbox: Union[Tuple[float, float, float, float], List[float]],
-    x_size: int,
-    y_size: int,
+    x_size: float,
+    y_size: float,
     in_epsg_code: int,
-    out_vec: str,
+    out_vec_file: str,
     out_vec_lyr: str,
     out_format: str = "GPKG",
     out_epsg_code: int = None,
@@ -449,7 +449,7 @@ def define_grid(
     :param y_size: Output grid size in Y axis. If out_epsg_code or utm_grid defined
                    then the grid size needs to be in the output unit.
     :param in_epsg_code: EPSG code for the projection of the bbox
-    :param out_vec: output vector file.
+    :param out_vec_file: output vector file.
     :param out_vec_lyr: output vector layer name.
     :param out_format: output vector file format (see OGR codes). Default is GPKG.
     :param out_epsg_code: if provided the output grid is reprojected to the projection
@@ -519,7 +519,7 @@ def define_grid(
                 x_size,
                 y_size,
                 in_epsg_code,
-                out_vec,
+                out_vec_file,
                 out_vec_lyr,
                 out_format=out_format,
                 out_epsg_code=utm_proj_epsg,
@@ -589,7 +589,7 @@ def define_grid(
                     zone_roi[0], utm_top_hemi.lower()
                 )
                 create_poly_vec_bboxs(
-                    out_vec,
+                    out_vec_file,
                     utm_out_vec_lyr,
                     out_format,
                     utm_proj_epsg,
@@ -612,10 +612,12 @@ def define_grid(
         bboxs = rsgislib.tools.geometrytools.get_bbox_grid(proj_bbox, x_size, y_size)
 
         if out_epsg_code is None:
-            create_poly_vec_bboxs(out_vec, out_vec_lyr, out_format, in_epsg_code, bboxs)
+            create_poly_vec_bboxs(
+                out_vec_file, out_vec_lyr, out_format, in_epsg_code, bboxs
+            )
         else:
             create_poly_vec_bboxs(
-                out_vec, out_vec_lyr, out_format, out_epsg_code, bboxs
+                out_vec_file, out_vec_lyr, out_format, out_epsg_code, bboxs
             )
 
 

@@ -878,7 +878,9 @@ def reproj_vector_layer(
 
     if out_vec_lyr is None:
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
-    out_layer = out_data_set.CreateLayer(out_vec_lyr, out_spatial_ref, in_layer.GetGeomType())
+    out_layer = out_data_set.CreateLayer(
+        out_vec_lyr, out_spatial_ref, in_layer.GetGeomType()
+    )
 
     # add fields
     in_layer_defn = in_layer.GetLayerDefn()
