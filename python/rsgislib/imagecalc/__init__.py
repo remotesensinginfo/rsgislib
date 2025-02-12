@@ -750,7 +750,7 @@ def get_pca_eigen_vector(
     # Read input data from image file.
     X = rsgislib.imageutils.extract_img_pxl_sample(input_img, pxl_n_sample, no_data_val)
 
-    print(str(X.shape[0]) + " values were extracted from the input image.")
+    print(f"{X.shape[0]} values were extracted from the input image.")
 
     pca = PCA()
     pca.fit(X)
@@ -770,11 +770,63 @@ def get_pca_eigen_vector(
         f.flush()
         f.close()
 
-    pcaComp = 1
+    pca_comp = 1
     print("Prop. of variance explained:")
     for val in pca.explained_variance_ratio_:
-        print("\t PCA Component " + str(pcaComp) + " = " + str(round(val, 4)))
-        pcaComp = pcaComp + 1
+        print("\t PCA Component " + str(pca_comp) + " = " + str(round(val, 4)))
+        pca_comp = pca_comp + 1
+
+    return pca.components_, pca.explained_variance_ratio_
+
+
+def get_pca_eigen_vector_from_h5_data(
+    in_h5_file: str,
+    out_matrix_file: str = None,
+):
+    """
+    A function which takes a sample from an input image and uses it to
+    generate eigenvector for a PCA. Note. this can be used as input
+    to rsgislib.imagecalc.pca
+
+    :param in_h5_file: the file path to the input HDF5 file with the data on
+                       which eigenvectors are calculated
+    :param out_matrix_file: path and name for the output rsgislib matrix file.
+                            If None file is not created (Default: None)
+
+    :returns: 1. array with the eigenvector, 2. array with the ratio of the
+              explained variance
+    """
+    from sklearn.decomposition import PCA
+    import rsgislib.zonalstats
+
+    # Read input data from HDF5 file.
+    X = rsgislib.zonalstats.get_hdf5_data([in_h5_file])
+
+    print(f"{X.shape[0]} values were provided for the PCA.")
+
+    pca = PCA()
+    pca.fit(X)
+
+    if out_matrix_file is not None:
+        f = open(out_matrix_file, "w")
+        f.write("m=" + str(pca.components_.shape[0]) + "\n")
+        f.write("n=" + str(pca.components_.shape[1]) + "\n")
+        first = True
+        for val in pca.components_.flatten():
+            if first:
+                f.write(str(val))
+                first = False
+            else:
+                f.write("," + str(val))
+        f.write("\n\n")
+        f.flush()
+        f.close()
+
+    pca_comp = 1
+    print("Prop. of variance explained:")
+    for val in pca.explained_variance_ratio_:
+        print("\t PCA Component " + str(pca_comp) + " = " + str(round(val, 4)))
+        pca_comp = pca_comp + 1
 
     return pca.components_, pca.explained_variance_ratio_
 

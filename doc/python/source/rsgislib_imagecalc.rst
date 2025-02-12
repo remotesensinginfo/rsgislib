@@ -61,6 +61,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.image_pixel_linear_fit
 .. autofunction:: rsgislib.imagecalc.pca
 .. autofunction:: rsgislib.imagecalc.get_pca_eigen_vector
+.. autofunction:: rsgislib.imagecalc.get_pca_eigen_vector_from_h5_data
 .. autofunction:: rsgislib.imagecalc.perform_image_pca
 .. autofunction:: rsgislib.imagecalc.perform_image_mnf
 .. autofunction:: rsgislib.imagecalc.calculate_img_band_rmse
