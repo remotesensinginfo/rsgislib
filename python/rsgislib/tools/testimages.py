@@ -27,6 +27,11 @@ def create_random_int_img(
     datatype: int = rsgislib.TYPE_8UINT,
     calc_stats: bool = True,
     tmp_path: str = None,
+    tl_x: float = 427000.0,
+    tl_y: float = 5809000.0,
+    img_res_x: float = 10.0,
+    img_res_y: float = -10.0,
+    epsg_code: int = 32630,
 ):
     """
     A function which creates an image with pixels values randomly assigned from the
@@ -42,11 +47,16 @@ def create_random_int_img(
     :param calc_stats: calculate image statistics and pyramids
     :param tmp_path: Can optionally provide a temporary path where a reference
                      image will be created and then removed.
+    :param tl_x: The TL coordinate of the left edge of the output image
+    :param tl_y: The TL coordinate of the top edge of the output image
+    :param img_res_x: The resolution of the output image in the x axis
+    :param img_res_y: The resolution of the output image in the y axis
+    :param epsg_code: The EPSG code of the output image
 
     """
     import numpy.random
     from rios import applier
-
+    import rsgislib.tools.projection
     import rsgislib.imageutils
     import rsgislib.tools.utils
 
@@ -57,16 +67,18 @@ def create_random_int_img(
 
     tmp_ref_img = os.path.join(tmp_path, f"tmp_ref_img_{uid_str}.kea")
 
+    wtr_str = rsgislib.tools.projection.get_wkt_from_epsg_code(epsg_code)
+
     rsgislib.imageutils.create_blank_img_py(
         tmp_ref_img,
         n_bands,
         x_size,
         y_size,
-        100000,
-        500000,
-        1,
-        1,
-        "",
+        tl_x,
+        tl_y,
+        img_res_x,
+        img_res_y,
+        wtr_str,
         "KEA",
         datatype,
         options=[],
