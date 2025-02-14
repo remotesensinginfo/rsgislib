@@ -3977,6 +3977,53 @@ def create_valid_mask(
         shutil.rmtree(tmp_lcl_dir)
 
 
+def get_img_coords_pxl_values(
+    input_img: str, img_band: int, x_coords: numpy.array, y_coords: numpy.array
+) -> numpy.array:
+    """
+    Function which gets pixel values from a image for specified
+    image pixels. The coordinate should be within the projection
+    of the input image.
+
+    :param input_img: The input image name and path
+    :param img_band: The band within the input image.
+    :param x_coords: A numpy array of image X coordinates
+    :param y_coords: A numpy array of image Y coordinates
+    :return: An array of image pixel values.
+
+    """
+    import tqdm
+
+    if x_coords.shape[0] != y_coords.shape[0]:
+        raise rsgislib.RSGISPyException(
+            "The X and Y image coordinates are not the same."
+        )
+
+    img_bbox = get_img_bbox(input_img)
+    img_res_x, img_res_y = get_img_res(input_img, abs_vals=True)
+
+    x_pxl_locs = numpy.floor(((x_coords) - img_bbox[0]) / img_res_x).astype(int)
+    y_pxl_locs = numpy.floor((img_bbox[3] - (y_coords)) / img_res_y).astype(int)
+
+    image_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
+    if image_ds is None:
+        raise rsgislib.RSGISPyException(
+            "Could not open the input image file: '{}'".format(input_img)
+        )
+    image_band = image_ds.GetRasterBand(img_band)
+    if image_band is None:
+        raise rsgislib.RSGISPyException("The image band wasn't opened")
+
+    out_pxl_vals = numpy.zeros(x_coords.shape[0], dtype=float)
+
+    img_data = image_band.ReadAsArray()
+    for i in tqdm.tqdm(range(x_coords.shape[0])):
+        out_pxl_vals[i] = img_data[y_pxl_locs[i], x_pxl_locs[i]]
+    image_ds = None
+
+    return out_pxl_vals
+
+
 def get_img_pxl_values(
     input_img: str, img_band: int, x_coords: numpy.array, y_coords: numpy.array
 ) -> numpy.array:

@@ -233,6 +233,7 @@ Image File Operations:
 Image I/O
 ----------
 
+.. autofunction:: rsgislib.imageutils.get_img_coords_pxl_values
 .. autofunction:: rsgislib.imageutils.get_img_pxl_values
 .. autofunction:: rsgislib.imageutils.set_img_pxl_values
 .. autofunction:: rsgislib.imageutils.get_img_pxl_column
