@@ -35,19 +35,20 @@
 import tqdm
 from osgeo import gdal
 
+
 def create_random_ref_smpls_darts(
-        input_img: str,
-        n_smpls: int,
-        out_vec_file: str,
-        out_vec_lyr: str,
-        out_format: str = "GPKG",
-        img_cls_col: str = "img_cls",
-        ref_cls_col: str = "cls_ref",
-        processed_col: str = "Processed",
-        rnd_seed: int = None,
-        img_band: int = 1,
-        cls_no_data=None,
-        rat_cls_name_col: str = None,
+    input_img: str,
+    n_smpls: int,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_format: str = "GPKG",
+    img_cls_col: str = "img_cls",
+    ref_cls_col: str = "cls_ref",
+    processed_col: str = "Processed",
+    rnd_seed: int = None,
+    img_band: int = 1,
+    cls_no_data=None,
+    rat_cls_name_col: str = None,
 ):
     import secrets
     import numpy.random
@@ -112,8 +113,12 @@ def create_random_ref_smpls_darts(
             x_pxl_loc = numpy.floor((x_coord - img_bbox[0]) / img_res_x).astype(int)
             y_pxl_loc = numpy.floor((img_bbox[3] - y_coord) / img_res_y).astype(int)
             if not pxl_chk_arr[y_pxl_loc, x_pxl_loc]:
-                x_coord_pxl_grid = img_bbox[0] + (img_res_x * x_pxl_loc) + (img_res_x / 2)
-                y_coord_pxl_grid = img_bbox[3] - (img_res_y * y_pxl_loc) - (img_res_y / 2)
+                x_coord_pxl_grid = (
+                    img_bbox[0] + (img_res_x * x_pxl_loc) + (img_res_x / 2)
+                )
+                y_coord_pxl_grid = (
+                    img_bbox[3] - (img_res_y * y_pxl_loc) - (img_res_y / 2)
+                )
 
                 cls_pxl_val = img_data[y_pxl_loc, x_pxl_loc]
 
@@ -125,7 +130,9 @@ def create_random_ref_smpls_darts(
                     processed_col_arr[found_pts] = 0
                     if rat_cls_name_col is not None:
                         if cls_pxl_val < n_cls:
-                            img_cls_names.append(cls_names_arr[cls_pxl_val].decode("utf-8"))
+                            img_cls_names.append(
+                                cls_names_arr[cls_pxl_val].decode("utf-8")
+                            )
                             ref_cls_names.append("")
 
                     found_pts += 1
@@ -142,9 +149,7 @@ def create_random_ref_smpls_darts(
         data_dict[ref_cls_col] = ref_cls_col_arr
     data_dict[processed_col] = processed_col_arr
 
-    data_df = pandas.DataFrame(
-        data=data_dict
-    )
+    data_df = pandas.DataFrame(data=data_dict)
 
     pts_gdf = geopandas.GeoDataFrame(
         data_df,
@@ -157,4 +162,3 @@ def create_random_ref_smpls_darts(
         pts_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         pts_gdf.to_file(out_vec_file, driver=out_format)
-
