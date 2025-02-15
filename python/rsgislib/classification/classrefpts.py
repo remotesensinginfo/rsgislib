@@ -92,6 +92,8 @@ def create_random_ref_smpls_darts(
     img_data = image_band.ReadAsArray()
     image_ds = None
 
+    pxl_chk_arr = numpy.zeros_like(img_data, dtype=bool)
+
     x_coords_arr = numpy.zeros([n_smpls], dtype=float)
     y_coords_arr = numpy.zeros([n_smpls], dtype=float)
     cls_pxl_vals_arr = numpy.zeros([n_smpls], dtype=int)
@@ -109,25 +111,25 @@ def create_random_ref_smpls_darts(
 
             x_pxl_loc = numpy.floor((x_coord - img_bbox[0]) / img_res_x).astype(int)
             y_pxl_loc = numpy.floor((img_bbox[3] - y_coord) / img_res_y).astype(int)
+            if not pxl_chk_arr[y_pxl_loc, x_pxl_loc]:
+                x_coord_pxl_grid = img_bbox[0] + (img_res_x * x_pxl_loc) + (img_res_x / 2)
+                y_coord_pxl_grid = img_bbox[3] - (img_res_y * y_pxl_loc) - (img_res_y / 2)
 
-            x_coord_pxl_grid = img_bbox[0] + (img_res_x * x_pxl_loc) + (img_res_x / 2)
-            y_coord_pxl_grid = img_bbox[3] - (img_res_y * y_pxl_loc) - (img_res_y / 2)
+                cls_pxl_val = img_data[y_pxl_loc, x_pxl_loc]
 
-            cls_pxl_val = img_data[y_pxl_loc, x_pxl_loc]
+                if (cls_no_data is None) or (cls_pxl_val != cls_no_data):
+                    x_coords_arr[found_pts] = x_coord_pxl_grid
+                    y_coords_arr[found_pts] = y_coord_pxl_grid
+                    cls_pxl_vals_arr[found_pts] = cls_pxl_val
+                    ref_cls_col_arr[found_pts] = cls_pxl_val
+                    processed_col_arr[found_pts] = 0
+                    if rat_cls_name_col is not None:
+                        if cls_pxl_val < n_cls:
+                            img_cls_names.append(cls_names_arr[cls_pxl_val].decode("utf-8"))
+                            ref_cls_names.append("")
 
-            if (cls_no_data is None) or (cls_pxl_val != cls_no_data):
-                x_coords_arr[found_pts] = x_coord_pxl_grid
-                y_coords_arr[found_pts] = y_coord_pxl_grid
-                cls_pxl_vals_arr[found_pts] = cls_pxl_val
-                ref_cls_col_arr[found_pts] = cls_pxl_val
-                processed_col_arr[found_pts] = 0
-                if rat_cls_name_col is not None:
-                    if cls_pxl_val < n_cls:
-                        img_cls_names.append(cls_names_arr[cls_pxl_val].decode("utf-8"))
-                        ref_cls_names.append("")
-
-                found_pts += 1
-                pbar.update(1)
+                    found_pts += 1
+                    pbar.update(1)
 
     data_dict = dict()
     data_dict["tmp_x"] = x_coords_arr
