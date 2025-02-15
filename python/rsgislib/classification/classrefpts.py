@@ -41,18 +41,20 @@ def create_random_ref_smpls_darts(
         out_vec_file: str,
         out_vec_lyr: str,
         out_format: str = "GPKG",
-        img_cls_col: str = "img_cls_id",
-        ref_cls_col: str = "cls_ref_id",
+        img_cls_col: str = "img_cls",
+        ref_cls_col: str = "cls_ref",
         processed_col: str = "Processed",
         rnd_seed: int = None,
         img_band: int = 1,
         cls_no_data=None,
+        rat_cls_name_col: str = None,
 ):
     import secrets
     import numpy.random
     import pandas
     import geopandas
     import rsgislib.imageutils
+    import rsgislib.rastergis
 
     img_bbox = rsgislib.imageutils.get_img_bbox(input_img)
     x_range = img_bbox[1] - img_bbox[0]
@@ -74,6 +76,10 @@ def create_random_ref_smpls_darts(
 
     rng = numpy.random.default_rng(rnd_seed)
 
+    if rat_cls_name_col is not None:
+        cls_names_arr = rsgislib.rastergis.get_column_data(input_img, rat_cls_name_col)
+        n_cls = len(cls_names_arr)
+
     image_ds = gdal.Open(input_img, gdal.GA_ReadOnly)
     if image_ds is None:
         raise rsgislib.RSGISPyException(
@@ -91,6 +97,9 @@ def create_random_ref_smpls_darts(
     cls_pxl_vals_arr = numpy.zeros([n_smpls], dtype=int)
     processed_col_arr = numpy.zeros([n_smpls], dtype=int)
     ref_cls_col_arr = numpy.zeros([n_smpls], dtype=int)
+
+    img_cls_names = list()
+    ref_cls_names = list()
 
     with tqdm.tqdm(total=n_smpls) as pbar:
         found_pts = 0
@@ -112,17 +121,27 @@ def create_random_ref_smpls_darts(
                 cls_pxl_vals_arr[found_pts] = cls_pxl_val
                 ref_cls_col_arr[found_pts] = cls_pxl_val
                 processed_col_arr[found_pts] = 0
+                if rat_cls_name_col is not None:
+                    if cls_pxl_val < n_cls:
+                        img_cls_names.append(cls_names_arr[cls_pxl_val].decode("utf-8"))
+                        ref_cls_names.append("")
+
                 found_pts += 1
                 pbar.update(1)
 
+    data_dict = dict()
+    data_dict["tmp_x"] = x_coords_arr
+    data_dict["tmp_y"] = y_coords_arr
+    if rat_cls_name_col is not None:
+        data_dict[img_cls_col] = img_cls_names
+        data_dict[ref_cls_col] = ref_cls_names
+    else:
+        data_dict[img_cls_col] = cls_pxl_vals_arr
+        data_dict[ref_cls_col] = ref_cls_col_arr
+    data_dict[processed_col] = processed_col_arr
+
     data_df = pandas.DataFrame(
-        data={
-            "tmp_x": x_coords_arr,
-            "tmp_y": y_coords_arr,
-            img_cls_col: cls_pxl_vals_arr,
-            ref_cls_col: ref_cls_col_arr,
-            processed_col: processed_col_arr,
-        }
+        data=data_dict
     )
 
     pts_gdf = geopandas.GeoDataFrame(
