@@ -41,8 +41,8 @@ def create_random_ref_smpls_darts(
         out_vec_file: str,
         out_vec_lyr: str,
         out_format: str = "GPKG",
-        img_cls_col: str = "img_cls",
-        ref_cls_col: str = "cls_ref",
+        img_cls_col: str = "img_cls_id",
+        ref_cls_col: str = "cls_ref_id",
         processed_col: str = "Processed",
         rnd_seed: int = None,
         img_band: int = 1,
@@ -92,23 +92,28 @@ def create_random_ref_smpls_darts(
     processed_col_arr = numpy.zeros([n_smpls], dtype=int)
     ref_cls_col_arr = numpy.zeros([n_smpls], dtype=int)
 
-    for i in tqdm.tqdm(range(n_smpls)):
-        x_coord = (rng.random() * x_range) + img_bbox[0]
-        y_coord = (rng.random() * y_range) + img_bbox[2]
+    with tqdm.tqdm(total=n_smpls) as pbar:
+        found_pts = 0
+        while found_pts < n_smpls:
+            x_coord = (rng.random() * x_range) + img_bbox[0]
+            y_coord = (rng.random() * y_range) + img_bbox[2]
 
-        x_pxl_loc = numpy.floor((x_coord - img_bbox[0]) / img_res_x).astype(int)
-        y_pxl_loc = numpy.floor((img_bbox[3] - y_coord) / img_res_y).astype(int)
+            x_pxl_loc = numpy.floor((x_coord - img_bbox[0]) / img_res_x).astype(int)
+            y_pxl_loc = numpy.floor((img_bbox[3] - y_coord) / img_res_y).astype(int)
 
-        x_coord_pxl_grid = img_bbox[0] + (img_res_x * x_pxl_loc) + (img_res_x / 2)
-        y_coord_pxl_grid = img_bbox[3] - (img_res_y * y_pxl_loc) - (img_res_y / 2)
+            x_coord_pxl_grid = img_bbox[0] + (img_res_x * x_pxl_loc) + (img_res_x / 2)
+            y_coord_pxl_grid = img_bbox[3] - (img_res_y * y_pxl_loc) - (img_res_y / 2)
 
-        cls_pxl_val = img_data[y_pxl_loc, x_pxl_loc]
+            cls_pxl_val = img_data[y_pxl_loc, x_pxl_loc]
 
-        x_coords_arr[i] = x_coord_pxl_grid
-        y_coords_arr[i] = y_coord_pxl_grid
-        cls_pxl_vals_arr[i] = cls_pxl_val
-        ref_cls_col_arr[i] = cls_pxl_val
-        processed_col_arr[i] = 0
+            if (cls_no_data is None) or (cls_pxl_val != cls_no_data):
+                x_coords_arr[found_pts] = x_coord_pxl_grid
+                y_coords_arr[found_pts] = y_coord_pxl_grid
+                cls_pxl_vals_arr[found_pts] = cls_pxl_val
+                ref_cls_col_arr[found_pts] = cls_pxl_val
+                processed_col_arr[found_pts] = 0
+                found_pts += 1
+                pbar.update(1)
 
     data_df = pandas.DataFrame(
         data={
