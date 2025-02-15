@@ -163,6 +163,7 @@ def create_random_ref_smpls_darts(
     else:
         pts_gdf.to_file(out_vec_file, driver=out_format)
 
+
 def create_stratified_random_ref_smpls_darts(
     input_img: str,
     n_smpls: int,
@@ -235,7 +236,7 @@ def create_stratified_random_ref_smpls_darts(
         for cls_val in cls_unq_vals:
             cls_count_out[cls_val] = eq_n_smpls
 
-    n_smpls_prop = n_smpls/n_pxls_tot
+    n_smpls_prop = n_smpls / n_pxls_tot
     cls_info_dict = dict()
     cls_info_dict["Class ID"] = list()
     cls_info_dict["N Image Pixels"] = list()
@@ -248,7 +249,9 @@ def create_stratified_random_ref_smpls_darts(
             if cls_count_out[cls_val] > cls_id_count[cls_val]:
                 cls_count_out[cls_val] = cls_id_count[cls_val]
         else:
-            cls_count_out[cls_val] = int(numpy.ceil(cls_id_count[cls_val] * n_smpls_prop))
+            cls_count_out[cls_val] = int(
+                numpy.ceil(cls_id_count[cls_val] * n_smpls_prop)
+            )
 
         if min_cls_smpls is not None:
             if cls_count_out[cls_val] < min_cls_smpls:
@@ -262,7 +265,8 @@ def create_stratified_random_ref_smpls_darts(
     print("The number of output samples to be generated per-class:")
     try:
         import tabulate
-        print(tabulate.tabulate(cls_info_dict, headers = "keys", tablefmt="grid"))
+
+        print(tabulate.tabulate(cls_info_dict, headers="keys", tablefmt="grid"))
     except ImportError:
         print("Class ID, N Pixels in Image, N Samples")
         for cls_val in cls_unq_vals:
