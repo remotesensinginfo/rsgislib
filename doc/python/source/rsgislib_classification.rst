@@ -57,6 +57,7 @@ Accuracy Assessment Samples
 ----------------------------
 
 .. autofunction:: rsgislib.classification.classrefpts.create_random_ref_smpls_darts
+.. autofunction:: rsgislib.classification.classrefpts.create_stratified_random_ref_smpls_darts
 .. autofunction:: rsgislib.classification.generate_random_accuracy_pts
 .. autofunction:: rsgislib.classification.generate_stratified_random_accuracy_pts
 .. autofunction:: rsgislib.classification.generate_stratified_prop_random_accuracy_pts
