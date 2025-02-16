@@ -34,7 +34,8 @@
 
 import tqdm
 from osgeo import gdal
-
+import numpy
+import numpy.random
 
 def create_random_ref_smpls_darts(
     input_img: str,
@@ -51,7 +52,6 @@ def create_random_ref_smpls_darts(
     rat_cls_name_col: str = None,
 ):
     import secrets
-    import numpy.random
     import pandas
     import geopandas
     import rsgislib.imageutils
@@ -181,7 +181,6 @@ def create_stratified_random_ref_smpls_darts(
     rat_cls_name_col: str = None,
 ):
     import secrets
-    import numpy.random
     import pandas
     import geopandas
     import rsgislib.imageutils
