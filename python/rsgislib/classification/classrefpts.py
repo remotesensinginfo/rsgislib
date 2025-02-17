@@ -51,6 +51,29 @@ def create_random_ref_smpls_darts(
     cls_no_data=None,
     rat_cls_name_col: str = None,
 ):
+    """
+    A function to create random reference point sets using random coordinate
+    sampling of the input image. The points are intended to be used to assess
+    the accuracy of a map, usually derived from an image classification.
+
+    :param input_img: Path to the input image file.
+    :param n_smpls: Number of random reference samples to generate.
+    :param out_vec_file: Path to the output vector file.
+    :param out_vec_lyr: Name of the layer in the output vector file.
+    :param out_format: Format of the output vector file (default is "GPKG").
+    :param img_cls_col: Name of the column in the output vector file for image class.
+    :param ref_cls_col: Name of the column in the output vector file for
+                        reference class.
+    :param processed_col: Name of the column in the output vector file for
+                          processed status.
+    :param rnd_seed: Random seed for reproducibility (default is None).
+    :param img_band: Band index of the input image to be used for sampling
+                     (default is 1).
+    :param cls_no_data: No data value for the image class (default is None).
+    :param rat_cls_name_col: Name of the column containing class names in the
+                             raster attribute table (default is None).
+
+    """
     import secrets
     import pandas
     import geopandas
@@ -180,6 +203,35 @@ def create_stratified_random_ref_smpls_darts(
     cls_no_data=None,
     rat_cls_name_col: str = None,
 ):
+    """
+    A function to create random reference point sets using random coordinate
+    sampling of the input image. The points are intended to be used to assess
+    the accuracy of a map, usually derived from an image classification.
+
+    :param input_img: Path to the input image file.
+    :param n_smpls: Number of random reference samples to generate.
+    :param out_vec_file: Path to the output vector file.
+    :param out_vec_lyr: Name of the layer in the output vector file.
+    :param eq_n_smpls: Flag indicating if the samples should be equally distributed
+                       among classes. Default is False and therefore the points
+                       will be statified by the area mapped for each class.
+    :param min_cls_smpls: Minimum number of samples per class if provided.
+                          Default is None and therefore this parameter is
+                          ignored.
+    :param out_format: Format of the output vector file (default is "GPKG").
+    :param img_cls_col: Name of the column in the output vector file for image class.
+    :param ref_cls_col: Name of the column in the output vector file for
+                        reference class.
+    :param processed_col: Name of the column in the output vector file for
+                          processed status.
+    :param rnd_seed: Random seed for reproducibility (default is None).
+    :param img_band: Band index of the input image to be used for sampling
+                     (default is 1).
+    :param cls_no_data: No data value for the image class (default is None).
+    :param rat_cls_name_col: Name of the column containing class names in the
+                             raster attribute table (default is None).
+
+    """
     import secrets
     import pandas
     import geopandas
