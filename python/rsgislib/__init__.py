@@ -346,9 +346,9 @@ def get_rsgislib_version() -> str:
 
     # Try calling rsgis-config to get minor version number
     try:
-        import distutils.spawn
+        import shutil
 
-        if distutils.spawn.find_executable("rsgis-config") is not None:
+        if shutil.which("rsgis-config") is not None:
             import subprocess
 
             out = subprocess.run(
