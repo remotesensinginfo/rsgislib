@@ -1331,14 +1331,15 @@ def vec_lyr_intersection_gp(
     # Perform Intersection
     data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how="intersection")
 
-    if out_format == "GPKG":
-        if out_vec_lyr is None:
-            raise rsgislib.RSGISPyException(
-                "If output format is GPKG then an output layer is required."
-            )
-        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+    if (data_inter_gdf is not None) and len(data_inter_gdf) > 0:
+        if out_format == "GPKG":
+            if out_vec_lyr is None:
+                raise rsgislib.RSGISPyException(
+                    "If output format is GPKG then an output layer is required."
+                )
+            data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def vec_lyr_difference_gp(
@@ -1383,14 +1384,15 @@ def vec_lyr_difference_gp(
     # Perform Difference
     data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how="difference")
 
-    if out_format == "GPKG":
-        if out_vec_lyr is None:
-            raise rsgislib.RSGISPyException(
-                "If output format is GPKG then an output layer is required."
-            )
-        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+    if (data_inter_gdf is not None) and len(data_inter_gdf) > 0:
+        if out_format == "GPKG":
+            if out_vec_lyr is None:
+                raise rsgislib.RSGISPyException(
+                        "If output format is GPKG then an output layer is required."
+                )
+            data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def vec_lyr_sym_difference_gp(
@@ -1437,14 +1439,15 @@ def vec_lyr_sym_difference_gp(
         data_gdf, over_data_gdf, how="symmetric_difference"
     )
 
-    if out_format == "GPKG":
-        if out_vec_lyr is None:
-            raise rsgislib.RSGISPyException(
-                "If output format is GPKG then an output layer is required."
-            )
-        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+    if (data_inter_gdf is not None) and len(data_inter_gdf) > 0:
+        if out_format == "GPKG":
+            if out_vec_lyr is None:
+                raise rsgislib.RSGISPyException(
+                        "If output format is GPKG then an output layer is required."
+                )
+            data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def vec_lyr_identity_gp(
@@ -1492,14 +1495,15 @@ def vec_lyr_identity_gp(
     # Perform identity
     data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how="identity")
 
-    if out_format == "GPKG":
-        if out_vec_lyr is None:
-            raise rsgislib.RSGISPyException(
-                "If output format is GPKG then an output layer is required."
-            )
-        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+    if (data_inter_gdf is not None) and len(data_inter_gdf) > 0:
+        if out_format == "GPKG":
+            if out_vec_lyr is None:
+                raise rsgislib.RSGISPyException(
+                        "If output format is GPKG then an output layer is required."
+                )
+            data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def vec_lyr_union_gp(
@@ -1544,14 +1548,15 @@ def vec_lyr_union_gp(
     # Perform union
     data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how="union")
 
-    if out_format == "GPKG":
-        if out_vec_lyr is None:
-            raise rsgislib.RSGISPyException(
-                "If output format is GPKG then an output layer is required."
-            )
-        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
-    else:
-        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+    if (data_inter_gdf is not None) and len(data_inter_gdf) > 0:
+        if out_format == "GPKG":
+            if out_vec_lyr is None:
+                raise rsgislib.RSGISPyException(
+                        "If output format is GPKG then an output layer is required."
+                )
+            data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def get_vec_lyr_as_pts(vec_file: str, vec_lyr: str) -> List:
