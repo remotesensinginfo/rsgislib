@@ -1024,6 +1024,7 @@ def rescale_img_pxl_vals(
 
     """
     from rios import applier
+    import rsgislib.imageutils
 
     bandRescaleDict = dict()
     for rescaleObj in band_rescale_objs:
@@ -1564,6 +1565,7 @@ def recode_int_raster(
 
     """
     from rios import applier
+    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -2062,6 +2064,7 @@ def count_imgs_int_val_occur(
 
     """
     from rios import applier
+    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -3004,6 +3007,7 @@ def calc_band_range_thres_msk(
 
     """
     from rios import applier
+    import rsgislib.imageutils
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
