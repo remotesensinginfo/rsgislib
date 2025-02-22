@@ -22,43 +22,54 @@
 
 #include "RSGISImageFilter.h"
 
-namespace rsgis{namespace filter{
+namespace rsgis
+{
+    namespace filter
+    {
+        RSGISImageFilter::RSGISImageFilter(
+            int numberOutBands, int size, std::string filenameEnding
+        ) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+        {
+            this->size = size;
+            this->filenameEnding = filenameEnding;
+        }
 
-	RSGISImageFilter::RSGISImageFilter(int numberOutBands, int size, std::string filenameEnding) : rsgis::img::RSGISCalcImageValue(numberOutBands)
-	{
-		this->size = size;
-		this->filenameEnding = filenameEnding;
-	}
-	
-	void RSGISImageFilter::runFilter(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat, GDALDataType outDataType)
-	{
-		rsgis::img::RSGISCalcImage* calcImage = this->getCalcImage();
-		try
-		{
-			calcImage->calcImageWindowData(datasets, numDS, outputImage, this->size, gdalFormat, outDataType);
-			delete calcImage;
-		}
-		catch(RSGISImageException &e)
-		{
-			delete calcImage;
-			throw e;
-		}
-	}
-	
-	rsgis::img::RSGISCalcImage* RSGISImageFilter::getCalcImage()
-	{
-		return new rsgis::img::RSGISCalcImage(this, "", true);
-	}
-	
-	std::string RSGISImageFilter::getFileNameEnding()
-	{
-		return this->filenameEnding;
-	}
-	
-	RSGISImageFilter::~RSGISImageFilter()
-	{
-		
-	}
-}}
+        void RSGISImageFilter::runFilter(
+            GDALDataset **datasets, int numDS, std::string outputImage,
+            std::string gdalFormat, GDALDataType outDataType
+        )
+        {
+            rsgis::img::RSGISCalcImage *calcImage = this->getCalcImage();
+            try
+            {
+                calcImage->calcImageWindowData(
+                    datasets,
+                    numDS,
+                    outputImage,
+                    this->size,
+                    gdalFormat,
+                    outDataType
+                );
+                delete calcImage;
+            }
+            catch (RSGISImageException &e)
+            {
+                delete calcImage;
+                throw e;
+            }
+        }
 
+        rsgis::img::RSGISCalcImage *RSGISImageFilter::getCalcImage()
+        {
+            return new rsgis::img::RSGISCalcImage(this, "", true);
+        }
 
+        std::string RSGISImageFilter::getFileNameEnding()
+        {
+            return this->filenameEnding;
+        }
+
+        RSGISImageFilter::~RSGISImageFilter()
+        {}
+    }
+}

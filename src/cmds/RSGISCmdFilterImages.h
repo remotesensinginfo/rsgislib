@@ -35,38 +35,45 @@
 // them exported by Visual Studio
 #undef DllExport
 #ifdef _MSC_VER
-    #ifdef rsgis_cmds_EXPORTS
+#ifdef rsgis_cmds_EXPORTS
         #define DllExport   __declspec( dllexport )
-    #else
-        #define DllExport   __declspec( dllimport )
-    #endif
 #else
-    #define DllExport
+        #define DllExport   __declspec( dllimport )
+#endif
+#else
+#define DllExport
 #endif
 
-namespace rsgis{ namespace cmds {
-
-    struct DllExport RSGISFilterParameters
+namespace rsgis
+{
+    namespace cmds
     {
-        std::string type;
-        std::string fileEnding;
-        std::string option;
-        unsigned int size;
-        unsigned int nLooks;
-        float stddev;
-        float stddevX;
-        float stddevY;
-        float angle;
-    };
+        struct DllExport RSGISFilterParameters
+        {
+            std::string type;
+            std::string fileEnding;
+            std::string option;
+            unsigned int size;
+            unsigned int nLooks;
+            float stddev;
+            float stddevX;
+            float stddevY;
+            float angle;
+        };
 
-    /** Function to apply filters to an image */
-    DllExport void executeFilter(std::string inputImage, std::vector <rsgis::cmds::RSGISFilterParameters*> *filterParameters, std::string outputImageBase, std::string imageFormat, std::string imageExt, RSGISLibDataType outDataType);
+        /** Function to apply filters to an image */
+        DllExport void executeFilter(
+            std::string inputImage,
+            std::vector<rsgis::cmds::RSGISFilterParameters *> *filterParameters,
+            std::string outputImageBase, std::string imageFormat, std::string imageExt,
+            RSGISLibDataType outDataType
+        );
 
-    /** Function to set up LeuncMalik Filter Band */
-    DllExport std::vector<rsgis::cmds::RSGISFilterParameters*> *createLeungMalikFilterBank();
-    
-}}
+        /** Function to set up LeuncMalik Filter Band */
+        DllExport std::vector<rsgis::cmds::RSGISFilterParameters *> *
+        createLeungMalikFilterBank();
+    }
+}
 
 
 #endif
-

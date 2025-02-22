@@ -40,164 +40,375 @@
 // them exported by Visual Studio
 #undef DllExport
 #ifdef _MSC_VER
-    #ifdef rsgis_filter_EXPORTS
+#ifdef rsgis_filter_EXPORTS
         #define DllExport   __declspec( dllexport )
-    #else
-        #define DllExport   __declspec( dllimport )
-    #endif
 #else
-    #define DllExport
+        #define DllExport   __declspec( dllimport )
+#endif
+#else
+#define DllExport
 #endif
 
-namespace rsgis{namespace filter{
-
-	class DllExport RSGISMeanFilter : public RSGISImageFilter
-		{
-		public:
-			RSGISMeanFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISMeanFilter();
-		};
-
-	class DllExport RSGISMedianFilter : public RSGISImageFilter
-		{
-		public:
-			RSGISMedianFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISMedianFilter();
-		};
-
-	class DllExport RSGISModeFilter : public RSGISImageFilter
-		{
-		public:
-			RSGISModeFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISModeFilter();
-		};
-
-	class DllExport RSGISRangeFilter : public RSGISImageFilter
-		{
-		public:
-			RSGISRangeFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISRangeFilter();
-		};
-
-	class DllExport RSGISStdDevFilter : public RSGISImageFilter
-		{
-		public:
-			RSGISStdDevFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISStdDevFilter();
-		};
-
-    class DllExport RSGISCoeffOfVarFilter : public RSGISImageFilter
-		{
-        /**
-
-        Coefficient of variation filter.
-        Ratio of standard devation to the mean.
-        See http://en.wikipedia.org/wiki/Coefficient_of_variation
-        */
-		public:
-			RSGISCoeffOfVarFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISCoeffOfVarFilter();
-		};
-
-	class DllExport RSGISMinFilter : public RSGISImageFilter
-		{
-		public:
-			RSGISMinFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISMinFilter();
-		};
-
-	class DllExport RSGISMaxFilter : public RSGISImageFilter
-		{
-		public:
-			RSGISMaxFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISMaxFilter();
-		};
-
-	class DllExport RSGISTotalFilter : public RSGISImageFilter
-		{
-		public:
-			RSGISTotalFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISTotalFilter();
-		};
-
-	class DllExport RSGISKuwaharaFilter : public RSGISImageFilter
-		{
-		public:
-			RSGISKuwaharaFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-			virtual void exportAsImage(std::string filename);
-			~RSGISKuwaharaFilter();
-		};
-    
-    class DllExport RSGISMeanDiffFilter : public RSGISImageFilter
+namespace rsgis
+{
+    namespace filter
     {
-    public:
-        RSGISMeanDiffFilter(int numberOutBands, int size, std::string filenameEnding);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-        virtual void exportAsImage(std::string filename);
-        ~RSGISMeanDiffFilter();
-    };
-    
-    class DllExport RSGISMeanDiffAbsFilter : public RSGISImageFilter
-    {
-    public:
-        RSGISMeanDiffAbsFilter(int numberOutBands, int size, std::string filenameEnding);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-        virtual void exportAsImage(std::string filename);
-        ~RSGISMeanDiffAbsFilter();
-    };
-    
-    class DllExport RSGISTotalDiffFilter : public RSGISImageFilter
-    {
-    public:
-        RSGISTotalDiffFilter(int numberOutBands, int size, std::string filenameEnding);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-        virtual void exportAsImage(std::string filename);
-        ~RSGISTotalDiffFilter();
-    };
-    
-    class DllExport RSGISTotalDiffAbsFilter : public RSGISImageFilter
-    {
-    public:
-        RSGISTotalDiffAbsFilter(int numberOutBands, int size, std::string filenameEnding);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
-        virtual void exportAsImage(std::string filename);
-        ~RSGISTotalDiffAbsFilter();
-    };
-}}
+        class DllExport RSGISMeanFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISMeanFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISMeanFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISMedianFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISMedianFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISMedianFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISModeFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISModeFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISModeFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISRangeFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISRangeFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISRangeFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISStdDevFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISStdDevFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISStdDevFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISCoeffOfVarFilter : public RSGISImageFilter
+        {
+            /**
+
+            Coefficient of variation filter.
+            Ratio of standard devation to the mean.
+            See http://en.wikipedia.org/wiki/Coefficient_of_variation
+            */
+        public:
+            RSGISCoeffOfVarFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISCoeffOfVarFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISMinFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISMinFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISMinFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISMaxFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISMaxFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISMaxFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISTotalFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISTotalFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISTotalFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISKuwaharaFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISKuwaharaFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISKuwaharaFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISMeanDiffFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISMeanDiffFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISMeanDiffFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISMeanDiffAbsFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISMeanDiffAbsFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISMeanDiffAbsFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISTotalDiffFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISTotalDiffFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISTotalDiffFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+
+        class DllExport RSGISTotalDiffAbsFilter : public RSGISImageFilter
+        {
+        public:
+            RSGISTotalDiffAbsFilter(
+                int numberOutBands, int size, std::string filenameEnding,
+                bool useNoDataVal, float noDataVal
+            );
+
+            virtual void calcImageValue(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual bool calcImageValueCondition(
+                float ***dataBlock, int numBands, int winSize, double *output
+            );
+
+            virtual void exportAsImage(std::string filename);
+
+            ~RSGISTotalDiffAbsFilter();
+
+        protected:
+            bool useNoDataVal;
+            float noDataVal;
+        };
+    }
+}
 
 #endif
-
-
