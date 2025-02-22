@@ -51,10 +51,13 @@ namespace rsgis{namespace filter{
     {
         /**
          
-         Lee (1980) filter. Implemented for multiplicative noise, as described in Lopes et. al. (1990).
-         nLooks is to the equivalent number of looks and is passed in as a filter parameter.
+         Lee (1980) filter. Implemented for multiplicative noise, as described in
+         Lopes et. al. (1990). nLooks is to the equivalent number of looks and is
+         passed in as a filter parameter.
          
-         J. Lee, 1980, “Digital Image-Enhancement and Noise Filtering by Use of Local Statistics,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 2, no. 2, pp. 165–168
+         J. Lee, 1980, “Digital Image-Enhancement and Noise Filtering by Use
+         of Local Statistics,” IEEE Transactions on Pattern Analysis and Machine
+         Intelligence, vol. 2, no. 2, pp. 165–168
          
          The implementation of the algorithm is as described:
 
@@ -64,14 +67,17 @@ namespace rsgis{namespace filter{
         
     public: 
         
-        RSGISLeeFilter(int numberOutBands, int size, std::string filenameEnding, unsigned int nLooks, float internalScaleFactor=100);
+        RSGISLeeFilter(int numberOutBands, int size, std::string filenameEnding, unsigned int nLooks, float internalScaleFactor=
+                               100, bool useNoDataVal=false, float noDataVal=0.0);
         virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageFilterException("Not implemented for Lee filter!");};;
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageFilterException("Not implemented for Lee filter!");};
         virtual void exportAsImage(std::string filename){throw RSGISImageFilterException("No image to output!");};
         ~RSGISLeeFilter();
     protected:
         unsigned int nLooks;
         float internalScaleFactor;
+        bool useNoDataVal;
+        float noDataVal;
     };
 }}
 
