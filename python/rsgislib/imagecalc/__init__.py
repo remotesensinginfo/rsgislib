@@ -1059,42 +1059,38 @@ def rescale_img_pxl_vals(
         This is an internal rios function
         """
         outputs.outimage = numpy.zeros_like(inputs.image, dtype=numpyDT)
-        for idx in range(inputs.image.shape[0]):
-            outputs.outimage[idx] = numpy.where(
-                inputs.image[idx] == otherargs.rescaleDict[idx].no_data_val,
-                otherargs.rescaleDict[idx].out_no_data,
+        inputs.image = inputs.image.astype(numpy.float32)
+        for b_idx in range(inputs.image.shape[0]):
+            outputs.outimage[b_idx] = numpy.where(
+                inputs.image[b_idx] == otherargs.rescaleDict[b_idx].no_data_val,
+                otherargs.rescaleDict[b_idx].out_no_data,
                 (
                     (
-                        (inputs.image[idx] - otherargs.rescaleDict[idx].in_min)
+                        (inputs.image[b_idx] - otherargs.rescaleDict[b_idx].in_min)
                         / (
-                            inputs.image[idx]
-                            - otherargs.rescaleDict[idx].in_max
-                            - inputs.image[idx]
-                            - otherargs.rescaleDict[idx].in_min
+                            otherargs.rescaleDict[b_idx].in_max
+                            - otherargs.rescaleDict[b_idx].in_min
                         )
                     )
                     * (
-                        inputs.image[idx]
-                        - otherargs.rescaleDict[idx].out_max
-                        - inputs.image[idx]
-                        - otherargs.rescaleDict[idx].out_min
+                        otherargs.rescaleDict[b_idx].out_max
+                        - otherargs.rescaleDict[b_idx].out_min
                     )
                 )
-                + inputs.image[idx]
-                - otherargs.rescaleDict[idx].out_min,
+                + otherargs.rescaleDict[b_idx].out_min,
             )
             if otherargs.trim:
-                outputs.outimage[idx] = numpy.where(
-                    (outputs.outimage[idx] != otherargs.rescaleDict[idx].out_no_data)
-                    & (outputs.outimage[idx] < otherargs.rescaleDict[idx].out_min),
-                    otherargs.rescaleDict[idx].out_min,
-                    outputs.outimage[idx],
+                outputs.outimage[b_idx] = numpy.where(
+                    (outputs.outimage[b_idx] != otherargs.rescaleDict[b_idx].out_no_data)
+                    & (outputs.outimage[b_idx] < otherargs.rescaleDict[b_idx].out_min),
+                    otherargs.rescaleDict[b_idx].out_min,
+                    outputs.outimage[b_idx],
                 )
-                outputs.outimage[idx] = numpy.where(
-                    (outputs.outimage[idx] != otherargs.rescaleDict[idx].out_no_data)
-                    & (outputs.outimage[idx] > otherargs.rescaleDict[idx].out_max),
-                    otherargs.rescaleDict[idx].out_max,
-                    outputs.outimage[idx],
+                outputs.outimage[b_idx] = numpy.where(
+                    (outputs.outimage[b_idx] != otherargs.rescaleDict[b_idx].out_no_data)
+                    & (outputs.outimage[b_idx] > otherargs.rescaleDict[b_idx].out_max),
+                    otherargs.rescaleDict[b_idx].out_max,
+                    outputs.outimage[b_idx],
                 )
 
     applier.apply(_applyRescale, infiles, outfiles, otherargs, controls=aControls)
