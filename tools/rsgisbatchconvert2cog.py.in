@@ -62,6 +62,20 @@ if __name__ == "__main__":
         help="Only convert images which are not already "
         "present in the output directory.",
     )
+    parser.add_argument(
+            "-b",
+            "--byte",
+            action="store_true",
+            default=False,
+            help="Convert the output image data type to Byte.",
+    )
+    parser.add_argument(
+            "-d",
+            "--deflate",
+            action="store_true",
+            default=False,
+            help="Use deflate compression.",
+    )
 
     args = parser.parse_args()
 
@@ -72,13 +86,22 @@ if __name__ == "__main__":
         basename = rsgislib.tools.utils.check_str(
             basename, rm_non_ascii=True, rm_dashs=False, rm_spaces=True, rm_punc=True
         )
+
+        out_dt = ""
+        if args.byte:
+            out_dt = "-ot Byte"
+
+        out_compress = "COMPRESS=LZW"
+        if args.byte:
+            out_compress = "COMPRESS=DEFLATE"
+
         over_resample = "CUBIC"
         if rsgislib.imageutils.is_img_thematic(img):
             over_resample = "NEAREST"
         out_img = os.path.join(args.output, "{}.tif".format(basename))
         if not (args.chkimgs and os.path.exists(out_img)):
             cmd = (
-                f"gdal_translate -of COG -co COMPRESS=LZW "
+                f"gdal_translate -of COG {out_dt} -co {out_compress} "
                 f"-co OVERVIEW_RESAMPLING={over_resample} "
                 f"-co BIGTIFF=IF_SAFER {img} {out_img}"
             )
