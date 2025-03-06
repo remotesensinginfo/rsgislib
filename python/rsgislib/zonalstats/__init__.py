@@ -539,7 +539,7 @@ def calc_zonal_poly_pts_band_stats_file(
     vec_def_epsg: int = None,
 ):
     """
-    A funtion which extracts zonal stats for a polygon using the polygon centroid.
+    A function which extracts zonal stats for a polygon using the polygon centroid.
     This is useful when you are intersecting a low resolution image with respect to
     the polygon resolution.
 
@@ -585,7 +585,7 @@ def calc_zonal_poly_pts_band_stats(
     vec_def_epsg: int = None,
 ):
     """
-    A funtion which extracts zonal stats for a polygon using the polygon centroid.
+    A function which extracts zonal stats for a polygon using the polygon centroid.
     This is useful when you are intesecting a low resolution image with respect to
     the polygon resolution.
 
