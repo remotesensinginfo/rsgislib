@@ -38,6 +38,8 @@ Polygons
 .. autofunction:: rsgislib.zonalstats.calc_zonal_poly_pts_band_stats
 .. autofunction:: rsgislib.zonalstats.calc_zonal_band_stats_test_poly_pts_file
 .. autofunction:: rsgislib.zonalstats.calc_zonal_band_stats_test_poly_pts
+.. autofunction:: rsgislib.zonalstats.calc_zonal_band_pxl_counts_file
+.. autofunction:: rsgislib.zonalstats.calc_zonal_band_pxl_counts
 
 
 Extracting Pixels to HDF5
