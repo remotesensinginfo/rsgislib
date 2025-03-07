@@ -43,7 +43,7 @@ respect to the method of intersection. The options for intersection are:
 
 import math
 import sys
-from typing import List
+from typing import List, Dict
 
 import numpy
 import tqdm
@@ -1348,6 +1348,344 @@ def calc_zonal_band_stats_test_poly_pts(
         pbar.close()
 
         imgDS = None
+    except Exception as e:
+        print("Error Image File: {}".format(input_img), file=sys.stderr)
+        raise e
+
+
+def calc_zonal_band_pxl_counts_file(
+    vec_file: str,
+    vec_lyr: str,
+    input_img: str,
+    img_band: int,
+    vals_lut: Dict[int, str],
+    total_field: str = "pxl_count",
+    vec_def_epsg: int = None,
+):
+    """
+    A function which counts the number of pixels for a set of image pixel values.
+    It is expected that this function will be used with integer input images with
+    specific values (e.g., Land cover map).
+
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer within the input file which specifies the
+                    features and where the output stats will be written.
+    :param input_img: the values image
+    :param img_band: the index (starting at 1) of the image band for which the stats
+                     will be calculated. If defined the no data value of the band
+                     will be ignored.
+    :param vals_lut: a dictionary with the pixel value of to be coutned as the key
+                     and the field name as the value.
+    :param total_field: The field name for the total number of pixels within the
+                        polygon. Default: pxl_count
+    :param vec_def_epsg: an EPSG code can be specified for the vector layer is the
+                         projection is not well defined within the inputted
+                         vector layer.
+
+    """
+    try:
+        vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR | gdal.OF_UPDATE)
+        if vecDS is None:
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(vec_file))
+
+        vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
+        if vec_lyr_obj is None:
+            raise rsgislib.RSGISPyException("Could not open layer '{}'".format(vec_lyr))
+
+        calc_zonal_band_pxl_val_counts(
+            vec_lyr_obj,
+            input_img,
+            img_band,
+            vals_lut,
+            total_field,
+            vec_def_epsg,
+        )
+
+        vecDS = None
+    except Exception as e:
+        print("Error Vector File: {}".format(vec_file), file=sys.stderr)
+        print("Error Vector Layer: {}".format(vec_lyr), file=sys.stderr)
+        print("Error Image File: {}".format(input_img), file=sys.stderr)
+        raise e
+
+
+def calc_zonal_band_pxl_counts(
+    vec_lyr_obj: ogr.Layer,
+    input_img: str,
+    img_band: int,
+    vals_lut: Dict[int, str],
+    total_field: str = "pxl_count",
+    vec_def_epsg: int = None,
+):
+    """
+    A function which counts the number of pixels for a set of image pixel values.
+    It is expected that this function will be used with integer input images with
+    specific values (e.g., Land cover map).
+
+    :param vec_lyr_obj: OGR vector layer object containing the geometries being
+                        processed and to which the stats will be written.
+    :param input_img: the values image
+    :param img_band: the index (starting at 1) of the image band for which the stats
+                     will be calculated. If defined the no data value of the band
+                     will be ignored.
+    :param vals_lut: a dictionary with the pixel value of to be coutned as the key
+                     and the field name as the value.
+    :param total_field: The field name for the total number of pixels within the
+                        polygon. Default: pxl_count
+    :param vec_def_epsg: an EPSG code can be specified for the vector layer is the
+                         projection is not well defined within the inputted
+                         vector layer.
+
+    """
+    try:
+        if vec_lyr_obj is None:
+            raise rsgislib.RSGISPyException("The inputted vector layer was None")
+
+        if (vals_lut is None) or len(vals_lut) == 0:
+            raise rsgislib.RSGISPyException(
+                "At least one field needs to be specified within the dictionary."
+            )
+
+        img_bbox = rsgislib.imageutils.get_img_bbox(input_img)
+        vec_bbox = vec_lyr_obj.GetExtent(True)
+        if not rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox):
+            print(f"Image BBOX: {img_bbox}")
+            print(f"Vector BBOX: {vec_bbox}")
+            raise rsgislib.RSGISPyException(
+                "The vector layer and image do not overlap."
+            )
+
+        img_ds = gdal.OpenEx(input_img, gdal.GA_ReadOnly)
+        if img_ds is None:
+            raise rsgislib.RSGISPyException("Could not open '{}'".format(input_img))
+        img_band_obj = img_ds.GetRasterBand(img_band)
+        if img_band_obj is None:
+            raise rsgislib.RSGISPyException(
+                "Could not find image band '{}'".format(img_band)
+            )
+        img_geo_trans = img_ds.GetGeoTransform()
+        img_wkt_str = img_ds.GetProjection()
+        img_spatial_ref = osr.SpatialReference()
+        img_spatial_ref.ImportFromWkt(img_wkt_str)
+        img_spatial_ref.AutoIdentifyEPSG()
+        epsg_img_spatial = img_spatial_ref.GetAuthorityCode(None)
+
+        pixel_width = img_geo_trans[1]
+        pixel_height = img_geo_trans[5]
+
+        img_size_x = img_ds.RasterXSize
+        img_size_y = img_ds.RasterYSize
+
+        img_no_data_val = img_band_obj.GetNoDataValue()
+
+        if vec_def_epsg is None:
+            veclyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
+            if veclyr_spatial_ref is None:
+                raise rsgislib.RSGISPyException(
+                    "Could not retrieve a projection object from the vector layer - "
+                    "projection might not be be defined."
+                )
+            epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        else:
+            epsg_vec_spatial = vec_def_epsg
+            veclyr_spatial_ref = osr.SpatialReference()
+            veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
+
+        if epsg_vec_spatial != epsg_img_spatial:
+            img_ds = None
+            vecDS = None
+            raise rsgislib.RSGISPyException(
+                "Inputted raster and vector layers have different "
+                "projections: ('{0}' '{1}') ".format("Vector Layer Provided", input_img)
+            )
+
+        veclyr_defn = vec_lyr_obj.GetLayerDefn()
+
+        out_field_atts = list()
+
+        for pxl_val, out_att_name in vals_lut.items():
+            out_att_name_low = out_att_name.lower()
+            out_field_atts.append(out_att_name_low)
+            found = False
+            for i in range(veclyr_defn.GetFieldCount()):
+                if veclyr_defn.GetFieldDefn(i).GetName().lower() == out_att_name_low:
+                    found = True
+                    break
+            if not found:
+                vec_lyr_obj.CreateField(ogr.FieldDefn(out_att_name_low, ogr.OFTReal))
+
+        # Add Total Pixels Count Field
+        out_att_name_low = total_field.lower()
+        out_field_atts.append(out_att_name_low)
+        found = False
+        for i in range(veclyr_defn.GetFieldCount()):
+            if veclyr_defn.GetFieldDefn(i).GetName().lower() == out_att_name_low:
+                found = True
+                break
+        if not found:
+            vec_lyr_obj.CreateField(ogr.FieldDefn(out_att_name_low, ogr.OFTReal))
+
+        fieldAttIdxs = dict()
+        for out_att_name in out_field_atts:
+            if out_att_name is not None:
+                fieldAttIdxs[out_att_name] = vec_lyr_obj.FindFieldIndex(
+                    out_att_name, True
+                )
+
+        vec_mem_drv = ogr.GetDriverByName("Memory")
+        img_mem_drv = gdal.GetDriverByName("MEM")
+
+        # Iterate through features.
+        open_transaction = False
+        transaction_step = 20000
+        next_transaction = transaction_step
+        n_feats = vec_lyr_obj.GetFeatureCount(True)
+        pbar = tqdm.tqdm(total=n_feats)
+        counter = 0
+        vec_lyr_obj.ResetReading()
+        feat = vec_lyr_obj.GetNextFeature()
+        while feat is not None:
+            if not open_transaction:
+                vec_lyr_obj.StartTransaction()
+                open_transaction = True
+
+            if feat is not None:
+                feat_geom = feat.geometry()
+                if feat_geom is not None:
+                    feat_bbox = feat_geom.GetEnvelope()
+                    havepxls = True
+
+                    x1Sp = float(feat_bbox[0] - img_geo_trans[0])
+                    x2Sp = float(feat_bbox[1] - img_geo_trans[0])
+                    y1Sp = float(feat_bbox[3] - img_geo_trans[3])
+                    y2Sp = float(feat_bbox[2] - img_geo_trans[3])
+
+                    if math.isclose(x1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
+                        x1 = 0
+                    else:
+                        x1 = int(x1Sp / pixel_width) - 1
+
+                    if math.isclose(x2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
+                        x2 = 0
+                    else:
+                        x2 = int(x2Sp / pixel_width) + 1
+
+                    if math.isclose(y1Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
+                        y1 = 0
+                    else:
+                        y1 = int(y1Sp / pixel_height) - 1
+
+                    if math.isclose(y2Sp, 0.0, rel_tol=1e-09, abs_tol=1e-09):
+                        y2 = 0
+                    else:
+                        y2 = int(y2Sp / pixel_height) + 1
+
+                    if x1 < 0:
+                        x1 = 0
+                    elif x1 >= img_size_x:
+                        x1 = img_size_x - 1
+
+                    if x2 < 0:
+                        x2 = 0
+                    elif x2 >= img_size_x:
+                        x2 = img_size_x - 1
+
+                    if y1 < 0:
+                        y1 = 0
+                    elif y1 >= img_size_y:
+                        y1 = img_size_y - 1
+
+                    if y2 < 0:
+                        y2 = 0
+                    elif y2 >= img_size_y:
+                        y2 = img_size_y - 1
+
+                    xsize = x2 - x1
+                    ysize = y2 - y1
+
+                    if (xsize == 0) or (ysize == 0):
+                        havepxls = False
+
+                    # Define the image ROI for the feature
+                    src_offset = (x1, y1, xsize, ysize)
+
+                    if havepxls:
+                        # Read the band array.
+                        src_array = img_band_obj.ReadAsArray(*src_offset)
+                    else:
+                        src_array = None
+
+                    if (src_array is not None) and havepxls:
+                        # calculate new geotransform of the feature subset
+                        subGeoTrans = (
+                            (img_geo_trans[0] + (src_offset[0] * img_geo_trans[1])),
+                            img_geo_trans[1],
+                            0.0,
+                            (img_geo_trans[3] + (src_offset[1] * img_geo_trans[5])),
+                            0.0,
+                            img_geo_trans[5],
+                        )
+
+                        # Create a temporary vector layer in memory
+                        vec_mem_ds = vec_mem_drv.CreateDataSource("out")
+                        vec_mem_lyr = vec_mem_ds.CreateLayer(
+                            "poly", veclyr_spatial_ref, ogr.wkbPolygon
+                        )
+                        vec_mem_lyr.CreateFeature(feat.Clone())
+
+                        # Rasterize the feature.
+                        img_tmp_ds = img_mem_drv.Create(
+                            "", src_offset[2], src_offset[3], 1, gdal.GDT_Byte
+                        )
+                        img_tmp_ds.SetGeoTransform(subGeoTrans)
+                        img_tmp_ds.SetProjection(img_wkt_str)
+                        gdal.RasterizeLayer(
+                            img_tmp_ds, [1], vec_mem_lyr, burn_values=[1]
+                        )
+                        rv_array = img_tmp_ds.ReadAsArray()
+
+                        # Mask the data vals array to feature.
+                        mask_arr = numpy.ones_like(src_array, dtype=numpy.uint8)
+                        mask_arr[rv_array == 0] = 0
+                        mask_arr = mask_arr.flatten()
+                        src_array_flat = src_array.flatten()
+                        src_array_flat = src_array_flat[mask_arr == 1]
+
+                        if src_array_flat.shape[0] > 0:
+                            n_pxls = src_array_flat.shape[0]
+                            feat.SetField(fieldAttIdxs[total_field.lower()], n_pxls)
+                            for pxl_val, out_att_name in vals_lut.items():
+                                out_att_name_low = out_att_name.lower()
+                                tmp_arr = src_array_flat[src_array_flat == pxl_val]
+                                feat.SetField(
+                                    fieldAttIdxs[out_att_name_low], tmp_arr.shape[0]
+                                )
+                        else:
+                            feat.SetField(fieldAttIdxs[total_field.lower()], 0)
+                            for pxl_val, out_att_name in vals_lut.items():
+                                out_att_name_low = out_att_name.lower()
+                                feat.SetField(fieldAttIdxs[out_att_name_low], 0)
+
+                        # Write the updated feature to the vector layer.
+                        vec_lyr_obj.SetFeature(feat)
+
+                        vec_mem_ds = None
+                        img_tmp_ds = None
+
+            if (counter == next_transaction) and open_transaction:
+                vec_lyr_obj.CommitTransaction()
+                open_transaction = False
+                next_transaction = next_transaction + transaction_step
+
+            feat = vec_lyr_obj.GetNextFeature()
+            counter = counter + 1
+            pbar.update(counter)
+        if open_transaction:
+            vec_lyr_obj.CommitTransaction()
+            open_transaction = False
+        pbar.close()
+
+        img_ds = None
     except Exception as e:
         print("Error Image File: {}".format(input_img), file=sys.stderr)
         raise e
