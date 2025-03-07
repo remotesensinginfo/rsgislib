@@ -143,6 +143,10 @@ if __name__ == "__main__":
             for i, lyr in enumerate(vec_lyrs):
                 print(f"{i + 1}: {lyr}")
 
+        if args.veclyr is None:
+            args.veclyr = rsgislib.vectorutils.get_vec_lyrs_lst(args.vecfile)[0]
+            print(f"Vector layer not provided so using '{args.veclyr}'")
+
         if args.cols:
             vec_cols = rsgislib.vectorutils.get_vec_lyr_cols(args.vecfile, args.veclyr)
             for i, col in enumerate(vec_cols):
@@ -175,4 +179,3 @@ if __name__ == "__main__":
             geom_type = rsgislib.vectorutils.get_vec_lyr_geom_type(args.vecfile, args.veclyr)
             geom_type_name = rsgislib.vectorutils.get_geom_type_name(geom_type)
             print(geom_type_name)
-
