@@ -37,6 +37,7 @@ from osgeo import gdal
 import numpy
 import numpy.random
 
+
 def create_random_ref_smpls_darts(
     input_img: str,
     n_smpls: int,

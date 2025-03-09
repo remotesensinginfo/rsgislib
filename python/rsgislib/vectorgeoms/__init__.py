@@ -1388,7 +1388,7 @@ def vec_lyr_difference_gp(
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
-                        "If output format is GPKG then an output layer is required."
+                    "If output format is GPKG then an output layer is required."
                 )
             data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
@@ -1443,7 +1443,7 @@ def vec_lyr_sym_difference_gp(
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
-                        "If output format is GPKG then an output layer is required."
+                    "If output format is GPKG then an output layer is required."
                 )
             data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
@@ -1499,7 +1499,7 @@ def vec_lyr_identity_gp(
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
-                        "If output format is GPKG then an output layer is required."
+                    "If output format is GPKG then an output layer is required."
                 )
             data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
@@ -1552,7 +1552,7 @@ def vec_lyr_union_gp(
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
-                        "If output format is GPKG then an output layer is required."
+                    "If output format is GPKG then an output layer is required."
                 )
             data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:

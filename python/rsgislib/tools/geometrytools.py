@@ -135,7 +135,7 @@ def does_bbox_contain(
 
 
 def calc_bbox_area(
-    bbox: Union[Tuple[float, float, float, float], List[float]]
+    bbox: Union[Tuple[float, float, float, float], List[float]],
 ) -> float:
     """
     Calculate the area of the bbox.
@@ -207,7 +207,7 @@ def bbox_intersection(
 
 
 def bboxes_intersection(
-    bboxes: List[Union[Tuple[float, float, float, float], List[float]]]
+    bboxes: List[Union[Tuple[float, float, float, float], List[float]]],
 ) -> Tuple[float, float, float, float]:
     """
     A function to find the intersection between a list of
@@ -248,7 +248,7 @@ def buffer_bbox(
 
 
 def find_bbox_union(
-    bboxes: List[Union[Tuple[float, float, float, float], List[float]]]
+    bboxes: List[Union[Tuple[float, float, float, float], List[float]]],
 ) -> Tuple[float, float, float, float]:
     """
     A function which finds the union of all the bboxes inputted.
@@ -278,7 +278,7 @@ def find_bbox_union(
 
 
 def unwrap_wgs84_bbox(
-    bbox: Union[Tuple[float, float, float, float], List[float]]
+    bbox: Union[Tuple[float, float, float, float], List[float]],
 ) -> List[Tuple[float, float, float, float]]:
     """
     A function which unwraps a bbox if it projected in WGS84 and over the 180/-180 boundary.
@@ -544,7 +544,7 @@ def get_bbox_grid(
 
 
 def get_bbox_geojson_poly(
-    bbox: Union[Tuple[float, float, float, float], List[float]]
+    bbox: Union[Tuple[float, float, float, float], List[float]],
 ) -> Dict:
     """
     Get the bbox (xMin, xMax, yMin, yMax) represented as a GeoJSON polygon
@@ -568,7 +568,7 @@ def get_bbox_geojson_poly(
 
 
 def get_bbox_centre_pt(
-    bbox: Union[Tuple[float, float, float, float], List[float]]
+    bbox: Union[Tuple[float, float, float, float], List[float]],
 ) -> Tuple[float, float]:
     """
     Function which returns the centre point of a bbox (xMin, xMax, yMin, yMax)
@@ -699,7 +699,7 @@ def find_point_on_whole_num_grid(
 
 
 def get_bbox_wkt_poly(
-    bbox: Union[Tuple[float, float, float, float], List[float]]
+    bbox: Union[Tuple[float, float, float, float], List[float]],
 ) -> str:
     """
     A function which creates a WKT polygon from a bounding box.

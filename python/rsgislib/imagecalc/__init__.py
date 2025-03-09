@@ -1081,13 +1081,19 @@ def rescale_img_pxl_vals(
             )
             if otherargs.trim:
                 outputs.outimage[b_idx] = numpy.where(
-                    (outputs.outimage[b_idx] != otherargs.rescaleDict[b_idx].out_no_data)
+                    (
+                        outputs.outimage[b_idx]
+                        != otherargs.rescaleDict[b_idx].out_no_data
+                    )
                     & (outputs.outimage[b_idx] < otherargs.rescaleDict[b_idx].out_min),
                     otherargs.rescaleDict[b_idx].out_min,
                     outputs.outimage[b_idx],
                 )
                 outputs.outimage[b_idx] = numpy.where(
-                    (outputs.outimage[b_idx] != otherargs.rescaleDict[b_idx].out_no_data)
+                    (
+                        outputs.outimage[b_idx]
+                        != otherargs.rescaleDict[b_idx].out_no_data
+                    )
                     & (outputs.outimage[b_idx] > otherargs.rescaleDict[b_idx].out_max),
                     otherargs.rescaleDict[b_idx].out_max,
                     outputs.outimage[b_idx],
