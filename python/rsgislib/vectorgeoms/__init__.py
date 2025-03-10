@@ -6,6 +6,7 @@ The vector geometries module performs geometric operations on vectors.
 import math
 import os
 from typing import List, Tuple, Union
+import datetime
 
 import tqdm
 from osgeo import gdal, ogr
@@ -3924,3 +3925,135 @@ def pts_to_line_geoms(
         line_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         line_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def estimate_future_coastline(
+    curr_vec_file: str,
+    curr_vec_lyr: str,
+    curr_vec_date: datetime.date,
+    trans_vec_file: str,
+    trans_vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    out_pred_date: datetime.date,
+    trans_rate_col: str = "LRR",
+    out_format: str = "GeoJSON",
+    trans_pt_order_land_first: bool = False,
+):
+    """
+    This function uses the outputs from an analysis such as DSAS
+    (https://www.usgs.gov/centers/whcmsc/science/digital-shoreline-analysis-system-dsas)
+    to predict where a coastline will be in the future.
+
+    :param curr_vec_file: The path to the current or baseline coastline vector file.
+    :param curr_vec_lyr: The layer name of the current or baseline coastline vector.
+    :param curr_vec_date: The date of the current coastline data (datetime.date object).
+    :param trans_vec_file: The path to the transect vector file.
+    :param trans_vec_lyr: The layer name of the transect vector file.
+    :param out_vec_file: The path to save the output coastline vector file.
+    :param out_vec_lyr: The layer name of the output coastline vector file.
+    :param out_pred_date: The future date for the coastline estimation
+                          (datetime.date object).
+    :param trans_rate_col: The column name in the transect file containing the
+                            rate of change values (Default: "LRR").
+    :param out_format: The output format for the new coastline data
+                       (Default: "GeoJSON").
+    :param trans_pt_order_land_first: Flag indicating the order of points on the
+                                      transect (land first if True, sea first if False).
+
+    """
+    import geopandas
+    import shapely
+
+    if curr_vec_date > out_pred_date:
+        raise rsgislib.RSGISPyException(
+            "The current date needs to be before the prediction date."
+        )
+
+    pred_time_period = out_pred_date - curr_vec_date
+    pred_period_years = pred_time_period.days / 365
+
+    if pred_period_years < 1:
+        raise rsgislib.RSGISPyException(
+            "Difference between the current and predicted "
+            "date needs to be more than 1 year."
+        )
+
+    print(f"Prediction will be for a period of {pred_period_years} years.")
+
+    # Open the transect and current coastline vector files.
+    curr_data_gdf = geopandas.read_file(curr_vec_file, layer=curr_vec_lyr)
+    trans_data_gdf = geopandas.read_file(trans_vec_file, layer=trans_vec_lyr)
+
+    # List for new coastline point locations.
+    pt_geoms = list()
+    # Iterate through each of the transects
+    for trans_idx, trans_row in tqdm.tqdm(trans_data_gdf.iterrows()):
+        trans_geom = trans_row["geometry"]
+        trans_geom_coords = list(trans_geom.coords)
+
+        # Check whether the transects coordinated are order
+        # land to sea or sea to land
+        if trans_pt_order_land_first:
+            pt1 = trans_geom_coords[-1]
+            pt2 = trans_geom_coords[0]
+        else:
+            pt1 = trans_geom_coords[0]
+            pt2 = trans_geom_coords[-1]
+
+        # Calculate the transect diff x & y
+        dy = pt2[1] - pt1[1]
+        dx = pt2[0] - pt1[0]
+        # Calculate the slope of the transect line
+        slp = dy / dx
+
+        # Get angle between Adjacent and Hypotenuse
+        theta = math.atan(slp)
+
+        # Get the annual rate of change for transect
+        rate_of_chng = trans_row[trans_rate_col]
+        # Get the total change for the period
+        new_coast_dist = pred_period_years * rate_of_chng
+
+        # Get the X and Y additions for the period of change
+        x_add = math.cos(theta) * new_coast_dist
+        y_add = math.sin(theta) * new_coast_dist
+
+        for curr_idx, curr_row in curr_data_gdf.iterrows():
+            # Get the intersection point between the current coast position
+            # and the transect.
+            intersect = trans_geom.intersection(curr_row["geometry"])
+            st_pt_geom_coords = list(intersect.coords)
+            # Check there is only 1 point of intersection otherwise ignore.
+            if len(st_pt_geom_coords) == 1:
+                # Get the intersection point geometry
+                st_pt = st_pt_geom_coords[0]
+                # Calculate the end point (i.e., the predicted coastline position)
+                end_pt = shapely.Point(st_pt[0] + x_add, st_pt[1] + y_add)
+
+                # Append the new coastline geometry
+                pt_geoms.append(end_pt)
+            else:
+                print(
+                    f"Warning: Transect {trans_idx} has more than "
+                    f"1 intersect with the coastline."
+                )
+
+    # Create the new coastline geometry.
+    new_coastline_geom = shapely.LineString(pt_geoms)
+
+    # Create a geopandas layer for the new coastline
+    out_ids = [1]
+    out_gdf = geopandas.GeoDataFrame(
+        out_ids,
+        geometry=[new_coastline_geom],
+        columns=["coastline_id"],
+        crs=trans_data_gdf.crs,
+    )
+
+    # Save the output to file.
+    if out_gdf.shape[0] > 0:
+        if out_format == "GPKG":
+            out_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            out_gdf.to_file(out_vec_file, driver=out_format)

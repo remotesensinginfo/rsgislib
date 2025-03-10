@@ -3619,7 +3619,7 @@ def create_mosaic_images_vrt(
     :param vrt_out_res_y: An optional (If None then ignored) set defining the
                           y resolution of the output VRT.
     :param interp_method: define the interpolation algorithm used when resampling
-                          is required.
+                          is required. Default: rsgislib.INTERP_NEAREST_NEIGHBOUR
     :param align_out_pxls: align the output pixels to force output bounds to be
                            multiple of output resolution.
 
