@@ -62,6 +62,10 @@ Spatial Index
 .. autofunction:: rsgislib.vectorgeoms.create_rtree_index
 .. autofunction:: rsgislib.vectorgeoms.bbox_intersects_index
 
+Applications Tools
+-------------------------
+.. autofunction:: rsgislib.vectorgeoms.estimate_future_coastline
+
 
 Internal Utilities
 --------------------
@@ -76,6 +80,8 @@ Internal Utilities
 Calculate Geometry Info
 -------------------------
 .. autofunction:: rsgislib.vectorgeoms.get_poly_hole_area
+
+
 
 
 
