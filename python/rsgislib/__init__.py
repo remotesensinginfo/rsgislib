@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-This namespace contains rsgislib Python bindings 
+This namespace contains rsgislib Python bindings
 
-Please be aware that the following variables have been 
+Please be aware that the following variables have been
 defined to match enums within RSGISLib.
 
 Data Types for images:
