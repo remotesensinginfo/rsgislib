@@ -8,7 +8,7 @@ helper function which will run all the required steps to generate a segmentation
 .. code:: python
 
     from rsgislib.segmentation import segutils
-    
+
     segutils.run_shepherd_segmentation(inImage,
                                      outputClumps,
                                      tmpath='',

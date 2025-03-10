@@ -1388,7 +1388,7 @@ def vec_lyr_difference_gp(
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
-                        "If output format is GPKG then an output layer is required."
+                    "If output format is GPKG then an output layer is required."
                 )
             data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
@@ -1443,7 +1443,7 @@ def vec_lyr_sym_difference_gp(
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
-                        "If output format is GPKG then an output layer is required."
+                    "If output format is GPKG then an output layer is required."
                 )
             data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
@@ -1499,7 +1499,7 @@ def vec_lyr_identity_gp(
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
-                        "If output format is GPKG then an output layer is required."
+                    "If output format is GPKG then an output layer is required."
                 )
             data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
@@ -1552,7 +1552,7 @@ def vec_lyr_union_gp(
         if out_format == "GPKG":
             if out_vec_lyr is None:
                 raise rsgislib.RSGISPyException(
-                        "If output format is GPKG then an output layer is required."
+                    "If output format is GPKG then an output layer is required."
                 )
             data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
         else:
@@ -3407,7 +3407,7 @@ def buffer_vec_layer_gp(
 
     data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
     # Perform Buffer
-    data_buf_gdf = data_gdf.buffer(
+    data_gdf["geometry"] = data_gdf["geometry"].buffer(
         distance=buf_dist,
         resolution=buf_res,
         single_sided=buf_sgl_sided,
@@ -3420,9 +3420,9 @@ def buffer_vec_layer_gp(
             raise rsgislib.RSGISPyException(
                 "If output format is GPKG then an output layer is required."
             )
-        data_buf_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
-        data_buf_gdf.to_file(out_vec_file, driver=out_format)
+        data_gdf.to_file(out_vec_file, driver=out_format)
 
 
 def split_vec_by_grid(

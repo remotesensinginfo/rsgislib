@@ -6,7 +6,7 @@ These utilities allow for a more 'intelligent tiling process to be carried out:
 
     import rsgislib
     from rsgislib.imageutils import tilingutils
-    
+
     inputImage = 'LS5TM_20110428_sref_submask_osgb.kea'
     tileShp = 'LS5TM_20110428_sref_submask_osgb_tiles.shp'
     outTilesMaskBase = 'tilesmeta/LS5TM_20110428_sref_submask_osgb_tile'
@@ -14,7 +14,7 @@ These utilities allow for a more 'intelligent tiling process to be carried out:
     width = 2500
     height = 2500
     validDataThreshold = 0.3
-    
+
     tilingutils.create_min_data_tiles(inputImage, tileShp, width, height, validDataThreshold)
     tilingutils.createTileMaskImages(inputImage, tileShp, outTilesMaskBase)
     tilingutils.create_tiles_from_masks(inputImage, outTilesMaskBase, outTilesImgBase, rsgislib.TYPE_16UINT, 'KEA')
