@@ -396,7 +396,7 @@ def calc_acc_metrics_vecsamples(
         cls_id_lut[cls_id] = cls_name
         n_clses = cls_id
 
-    if n_clses < 2:
+    if n_clses < 1:
         raise rsgislib.RSGISPyException("Must have at least two classes.")
 
     # Create cls_id arrays
