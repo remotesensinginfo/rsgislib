@@ -4023,7 +4023,12 @@ def estimate_future_coastline(
             # Get the intersection point between the current coast position
             # and the transect.
             intersect = trans_geom.intersection(curr_row["geometry"])
-            st_pt_geom_coords = list(intersect.coords)
+
+            try:
+                st_pt_geom_coords = list(intersect.coords)
+            except:
+                print("Transect ignored as an error when intersecting")
+                continue
             # Check there is only 1 point of intersection otherwise ignore.
             if len(st_pt_geom_coords) == 1:
                 # Get the intersection point geometry
