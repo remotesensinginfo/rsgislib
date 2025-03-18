@@ -1258,8 +1258,9 @@ def create_hex_grid_bbox(
 
     """
     import geopandas
-    from h3 import h3
+    import h3
     from shapely.geometry import Polygon
+    import shapely
 
     import rsgislib.tools.geometrytools
 
@@ -1272,9 +1273,9 @@ def create_hex_grid_bbox(
 
     bbox_poly = rsgislib.tools.geometrytools.get_bbox_geojson_poly(bbox_wgs84)
 
-    hexs = h3.polyfill(bbox_poly, hex_scale, geo_json_conformant=True)
+    hexs = h3.h3shape_to_cells(h3.geo_to_h3shape(bbox_poly), hex_scale)
 
-    polygonise = lambda hex_id: Polygon(h3.h3_to_geo_boundary(hex_id, geo_json=True))
+    polygonise = lambda hex_id: Polygon(h3.cell_to_boundary(hex_id))
 
     all_polys = geopandas.GeoSeries(
         list(map(polygonise, hexs)), index=hexs, crs="EPSG:4326"
@@ -1284,6 +1285,9 @@ def create_hex_grid_bbox(
     if all_polys.shape[0] > 0:
         h3_all = geopandas.GeoDataFrame(
             {"geometry": all_polys, "hex_id": all_polys.index}, crs=all_polys.crs
+        )
+        h3_all["geometry"] = h3_all.geometry.map(
+            lambda polygon: shapely.ops.transform(lambda x, y: (y, x), polygon)
         )
 
         if bbox_epsg != 4326:
@@ -1311,7 +1315,8 @@ def create_hex_grid_poly(poly_series, hex_scale: int):
 
     """
     import geopandas
-    from h3 import h3
+    import shapely
+    import h3
     from shapely.geometry import MultiPolygon, Polygon
 
     geom = poly_series.geometry
@@ -1328,9 +1333,9 @@ def create_hex_grid_poly(poly_series, hex_scale: int):
                 new_multi_p.append(new_p)
             geom = MultiPolygon(new_multi_p)
 
-    hexs = h3.polyfill(geom.__geo_interface__, hex_scale, geo_json_conformant=True)
+    hexs = h3.h3shape_to_cells(h3.geo_to_h3shape(geom.__geo_interface__), hex_scale)
 
-    polygonise = lambda hex_id: Polygon(h3.h3_to_geo_boundary(hex_id, geo_json=True))
+    polygonise = lambda hex_id: Polygon(h3.cell_to_boundary(hex_id))
 
     all_polys = geopandas.GeoSeries(
         list(map(polygonise, hexs)), index=hexs, crs="EPSG:4326"
@@ -1339,6 +1344,9 @@ def create_hex_grid_poly(poly_series, hex_scale: int):
     if all_polys.shape[0] > 0:
         h3_all = geopandas.GeoDataFrame(
             {"geometry": all_polys, "hex_id": all_polys.index}, crs=all_polys.crs
+        )
+        h3_all["geometry"] = h3_all.geometry.map(
+            lambda polygon: shapely.ops.transform(lambda x, y: (y, x), polygon)
         )
     else:
         h3_all = None
