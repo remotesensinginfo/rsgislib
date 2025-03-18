@@ -3861,7 +3861,7 @@ def create_n_random_subsets(
     for i in tqdm.tqdm(range(n_subs)):
         if n_smpl is not None:
             sub_gdf = base_gdf.sample(
-                n=n_subs, frac=None, replace=replacement, random_state=rnd_seed, axis=0
+                n=n_smpl, frac=None, replace=replacement, random_state=rnd_seed, axis=0
             )
         else:
             sub_gdf = base_gdf.sample(
