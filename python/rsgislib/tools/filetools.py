@@ -870,16 +870,16 @@ def sort_imgs_to_dirs_utm(input_imgs_dir: str, file_search_str: str, out_base_di
 
     in_files = glob.glob(os.path.join(input_imgs_dir, file_search_str))
     for img_file in in_files:
-        utm_zone = rsgislib.imageutils.getUTMZone(img_file)
+        utm_zone = rsgislib.imageutils.get_utm_zone(img_file)
         if utm_zone is not None:
             out_dir = os.path.join(out_base_dir, "utm" + utm_zone)
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            img_file_list = rsgislib.imageutils.getImageFiles(img_file)
+            img_file_list = rsgislib.imageutils.get_img_files(img_file)
             for tmp_file in img_file_list:
-                print("Moving: " + tmp_file)
-                outFile = os.path.join(out_dir, os.path.basename(tmp_file))
-                shutil.move(tmp_file, outFile)
+                print(f"Moving: {tmp_file}")
+                out_file = os.path.join(out_dir, os.path.basename(tmp_file))
+                shutil.move(tmp_file, out_file)
 
 
 def natural_sort_file_names(in_file_lst: List[str]) -> List[str]:
