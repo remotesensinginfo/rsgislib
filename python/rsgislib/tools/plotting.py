@@ -1044,6 +1044,7 @@ def linear_stretch_np_arr(
     out_int_type: bool = False,
     min_out_val: float = 0,
     max_out_val: float = 1,
+    no_data_clr:Tuple[float, float, float] = None,
 ) -> numpy.array:
     """
     A function which performs a linear stretch using the min-max values on a per
@@ -1086,9 +1087,14 @@ def linear_stretch_np_arr(
 
     """
     arr_shp = arr_data.shape
+    if len(arr_shp) == 2:
+        n_bands = 1
+    else:
+        n_bands = arr_shp[2]
 
     if no_data_val is not None:
-        arr_data_out = arr_data.astype(float)
+        arr_data_out = arr_data.copy()
+        arr_data_out = arr_data_out.astype(float)
         arr_data_out[arr_data == no_data_val] = numpy.nan
     else:
         arr_data_out = arr_data.copy()
@@ -1101,7 +1107,6 @@ def linear_stretch_np_arr(
 
         arr_data_out = (((arr_data_out - min_val) / range_val) * out_gain) + out_off
     else:
-        n_bands = arr_shp[2]
         for n in range(n_bands):
             min_val = numpy.nanmin(arr_data_out[..., n])
             max_val = numpy.nanmax(arr_data_out[..., n])
@@ -1119,6 +1124,11 @@ def linear_stretch_np_arr(
         max_out_val=max_out_val,
     )
 
+    if (no_data_val is not None) and (no_data_clr is not None):
+        for n in range(n_bands):
+            no_data_msk = arr_data[..., n] == no_data_val
+            arr_data_out[no_data_msk, n] = no_data_clr[n]
+
     if out_int_type:
         arr_data_out = arr_data_out.astype(int)
 
@@ -1135,6 +1145,7 @@ def cumulative_stretch_np_arr(
     out_int_type: bool = False,
     min_out_val: float = 0,
     max_out_val: float = 1,
+    no_data_clr:Tuple[float, float, float] = None,
 ) -> numpy.array:
     """
     A function which performs a cumulative stretch using an upper and lower
@@ -1179,9 +1190,14 @@ def cumulative_stretch_np_arr(
 
     """
     arr_shp = arr_data.shape
+    if len(arr_shp) == 2:
+        n_bands = 1
+    else:
+        n_bands = arr_shp[2]
 
     if no_data_val is not None:
-        arr_data_out = arr_data.astype(float)
+        arr_data_out = arr_data.copy()
+        arr_data_out = arr_data_out.astype(float)
         arr_data_out[arr_data == no_data_val] = numpy.nan
     else:
         arr_data_out = arr_data.copy()
@@ -1193,7 +1209,6 @@ def cumulative_stretch_np_arr(
 
         arr_data_out = (((arr_data_out - min_val) / range_val) * out_gain) + out_off
     else:
-        n_bands = arr_shp[2]
         for n in range(n_bands):
             min_val, max_val = numpy.nanpercentile(arr_data_out[..., n], [lower, upper])
             range_val = max_val - min_val
@@ -1210,6 +1225,11 @@ def cumulative_stretch_np_arr(
         max_out_val=max_out_val,
     )
 
+    if (no_data_val is not None) and (no_data_clr is not None):
+        for n in range(n_bands):
+            no_data_msk = arr_data[..., n] == no_data_val
+            arr_data_out[no_data_msk, n] = no_data_clr[n]
+
     if out_int_type:
         arr_data_out = arr_data_out.astype(int)
 
@@ -1225,6 +1245,7 @@ def stdev_stretch_np_arr(
     out_int_type: bool = False,
     min_out_val: float = 0,
     max_out_val: float = 1,
+    no_data_clr:Tuple[float, float, float] = None,
 ) -> numpy.array:
     """
     A function which performs a standard deviation stretch using an upper and lower
@@ -1269,9 +1290,14 @@ def stdev_stretch_np_arr(
 
     """
     arr_shp = arr_data.shape
+    if len(arr_shp) == 2:
+        n_bands = 1
+    else:
+        n_bands = arr_shp[2]
 
     if no_data_val is not None:
-        arr_data_out = arr_data.astype(float)
+        arr_data_out = arr_data.copy()
+        arr_data_out = arr_data_out.astype(float)
         arr_data_out[arr_data == no_data_val] = numpy.nan
     else:
         arr_data_out = arr_data.copy()
@@ -1323,6 +1349,11 @@ def stdev_stretch_np_arr(
         max_out_val=max_out_val,
     )
 
+    if (no_data_val is not None) and (no_data_clr is not None):
+        for n in range(n_bands):
+            no_data_msk = arr_data[..., n] == no_data_val
+            arr_data_out[no_data_msk, n] = no_data_clr[n]
+
     if out_int_type:
         arr_data_out = arr_data_out.astype(int)
 
@@ -1338,6 +1369,7 @@ def manual_stretch_np_arr(
     out_int_type: bool = False,
     min_out_val: float = 0,
     max_out_val: float = 1,
+    no_data_clr:Tuple[float, float, float] = None,
 ) -> numpy.array:
     """
     A function which performs a linear stretch using the min-max values provided
@@ -1392,9 +1424,14 @@ def manual_stretch_np_arr(
 
     """
     arr_shp = arr_data.shape
+    if len(arr_shp) == 2:
+        n_bands = 1
+    else:
+        n_bands = arr_shp[2]
 
     if no_data_val is not None:
-        arr_data_out = arr_data.astype(float)
+        arr_data_out = arr_data.copy()
+        arr_data_out = arr_data_out.astype(float)
         arr_data_out[arr_data == no_data_val] = numpy.nan
     else:
         arr_data_out = arr_data.copy()
@@ -1453,6 +1490,11 @@ def manual_stretch_np_arr(
         max_thres=max_out_val,
         max_out_val=max_out_val,
     )
+
+    if (no_data_val is not None) and (no_data_clr is not None):
+        for n in range(n_bands):
+            no_data_msk = arr_data[..., n] == no_data_val
+            arr_data_out[no_data_msk, n] = no_data_clr[n]
 
     if out_int_type:
         arr_data_out = arr_data_out.astype(int)
