@@ -1044,7 +1044,7 @@ def linear_stretch_np_arr(
     out_int_type: bool = False,
     min_out_val: float = 0,
     max_out_val: float = 1,
-    no_data_clr:Tuple[float, float, float] = None,
+    no_data_clr: Tuple[float, float, float] = None,
 ) -> numpy.array:
     """
     A function which performs a linear stretch using the min-max values on a per
@@ -1145,7 +1145,7 @@ def cumulative_stretch_np_arr(
     out_int_type: bool = False,
     min_out_val: float = 0,
     max_out_val: float = 1,
-    no_data_clr:Tuple[float, float, float] = None,
+    no_data_clr: Tuple[float, float, float] = None,
 ) -> numpy.array:
     """
     A function which performs a cumulative stretch using an upper and lower
@@ -1245,7 +1245,7 @@ def stdev_stretch_np_arr(
     out_int_type: bool = False,
     min_out_val: float = 0,
     max_out_val: float = 1,
-    no_data_clr:Tuple[float, float, float] = None,
+    no_data_clr: Tuple[float, float, float] = None,
 ) -> numpy.array:
     """
     A function which performs a standard deviation stretch using an upper and lower
@@ -1369,7 +1369,7 @@ def manual_stretch_np_arr(
     out_int_type: bool = False,
     min_out_val: float = 0,
     max_out_val: float = 1,
-    no_data_clr:Tuple[float, float, float] = None,
+    no_data_clr: Tuple[float, float, float] = None,
 ) -> numpy.array:
     """
     A function which performs a linear stretch using the min-max values provided

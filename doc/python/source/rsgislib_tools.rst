@@ -11,6 +11,7 @@ RSGISLib Tools
    rsgislib_tools_projection
    rsgislib_tools_plotting
    rsgislib_tools_stats
+   rsgislib_tools_maths
    rsgislib_tools_imagetools
    rsgislib_tools_sensors
    rsgislib_tools_sysprofile

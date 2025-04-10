@@ -163,6 +163,12 @@ Options for variable type
     * VAR_TYPE_CONTINUOUS = 1
     * VAR_TYPE_CATEGORICAL = 2
 
+
+Options for rounding numbers:
+    * ROUND_NEAREST = 1
+    * ROUND_UP = 2
+    * ROUND_DOWN = 3
+
 """
 from __future__ import print_function
 
@@ -300,6 +306,10 @@ LOGIC_OR = 2
 VAR_TYPE_UNDEFINED = 0
 VAR_TYPE_CONTINUOUS = 1
 VAR_TYPE_CATEGORICAL = 2
+
+ROUND_NEAREST = 1
+ROUND_UP = 2
+ROUND_DOWN = 3
 
 
 def get_install_base_path() -> pathlib.PurePath:

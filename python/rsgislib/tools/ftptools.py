@@ -417,12 +417,13 @@ def download_curl_ftp_file(
                 )
             )
         success = True
-    except:
+    except pycurl.error as e:
         print(
             "An error occurred when downloading {}.".format(
                 os.path.join(ftp_url, remote_file)
             )
         )
+        print(e)
         success = False
     return success
 
