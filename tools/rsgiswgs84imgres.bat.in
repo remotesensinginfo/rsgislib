@@ -1,0 +1,1 @@
+python @CMAKE_INSTALL_PREFIX@\bin\rsgiswgs84imgres.py %*
