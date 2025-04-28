@@ -1,7 +1,7 @@
 RSGISLib Maths Tools
 =============================
 
-Normalisation
+Conversion
 ----------------
 .. autofunction:: rsgislib.tools.maths.round_to_nearest_val
 
