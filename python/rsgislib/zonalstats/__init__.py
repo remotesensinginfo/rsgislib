@@ -285,12 +285,12 @@ def calc_zonal_band_stats(
             veclyr_spatial_ref = osr.SpatialReference()
             veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
 
-        if epsg_vec_spatial != epsg_img_spatial:
+        if f"{epsg_vec_spatial}" != f"{epsg_img_spatial}":
             imgDS = None
-            vecDS = None
             raise rsgislib.RSGISPyException(
-                "Inputted raster and vector layers have different "
-                "projections: ('{0}' '{1}') ".format("Vector Layer Provided", input_img)
+                f"Inputted raster and vector layers have different "
+                f"projections: (Vector Layer: '{epsg_vec_spatial}' "
+                f"'{input_img}': '{epsg_img_spatial}')"
             )
 
         veclyrDefn = vec_lyr_obj.GetLayerDefn()
@@ -645,12 +645,12 @@ def calc_zonal_poly_pts_band_stats(
         else:
             epsg_vec_spatial = vec_def_epsg
 
-        if epsg_vec_spatial != epsg_img_spatial:
+        if f"{epsg_vec_spatial}" != f"{epsg_img_spatial}":
             imgDS = None
-            vecDS = None
             raise rsgislib.RSGISPyException(
-                "Inputted raster and vector layers have different "
-                "projections: ('{0}' '{1}') ".format("Vector Layer Provided", input_img)
+                    f"Inputted raster and vector layers have different "
+                    f"projections: (Vector Layer: '{epsg_vec_spatial}' "
+                    f"'{input_img}': '{epsg_img_spatial}')"
             )
 
         veclyrDefn = vec_lyr_obj.GetLayerDefn()
@@ -1032,12 +1032,12 @@ def calc_zonal_band_stats_test_poly_pts(
             veclyr_spatial_ref = osr.SpatialReference()
             veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
 
-        if epsg_vec_spatial != epsg_img_spatial:
+        if f"{epsg_vec_spatial}" != f"{epsg_img_spatial}":
             imgDS = None
-            vecDS = None
             raise rsgislib.RSGISPyException(
-                "Inputted raster and vector layers have different "
-                "projections: ('{0}' '{1}') ".format("Vector Layer Provided", input_img)
+                    f"Inputted raster and vector layers have different "
+                    f"projections: (Vector Layer: '{epsg_vec_spatial}' "
+                    f"'{input_img}': '{epsg_img_spatial}')"
             )
 
         veclyrDefn = vec_lyr_obj.GetLayerDefn()
@@ -1476,8 +1476,6 @@ def calc_zonal_band_pxl_counts(
         img_size_x = img_ds.RasterXSize
         img_size_y = img_ds.RasterYSize
 
-        img_no_data_val = img_band_obj.GetNoDataValue()
-
         if vec_def_epsg is None:
             veclyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
             if veclyr_spatial_ref is None:
@@ -1491,12 +1489,12 @@ def calc_zonal_band_pxl_counts(
             veclyr_spatial_ref = osr.SpatialReference()
             veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
 
-        if epsg_vec_spatial != epsg_img_spatial:
+        if f"{epsg_vec_spatial}" != f"{epsg_img_spatial}":
             img_ds = None
-            vecDS = None
             raise rsgislib.RSGISPyException(
-                "Inputted raster and vector layers have different "
-                "projections: ('{0}' '{1}') ".format("Vector Layer Provided", input_img)
+                    f"Inputted raster and vector layers have different "
+                    f"projections: (Vector Layer: '{epsg_vec_spatial}' "
+                    f"'{input_img}': '{epsg_img_spatial}')"
             )
 
         veclyr_defn = vec_lyr_obj.GetLayerDefn()
@@ -1829,11 +1827,17 @@ def ext_point_band_values(
             epsg_vec_spatial = vec_def_epsg
 
         img_bbox = rsgislib.imageutils.get_img_bbox(input_img)
+        img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
         vec_bbox = vec_lyr_obj.GetExtent(True)
         if reproj_vec:
-            img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(input_img)
             vec_bbox = rsgislib.tools.geometrytools.reproj_bbox_epsg(
                 vec_bbox, epsg_vec_spatial, img_epsg
+            )
+        elif f"{epsg_vec_spatial}" != f"{img_epsg}":
+            raise rsgislib.RSGISPyException(
+                    f"Inputted raster and vector layers have different "
+                    f"projections: (Vector Layer: '{epsg_vec_spatial}' "
+                    f"'{input_img}': {img_epsg})"
             )
         if not rsgislib.tools.geometrytools.bbox_intersection(img_bbox, vec_bbox):
             print(f"Image BBOX: {img_bbox}")
