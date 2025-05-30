@@ -40,21 +40,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "-i",
-        "--input",
-        type=str,
-        required=True,
-        help="Input base directory",
+            "-i",
+            "--input",
+            type=str,
+            required=True,
+            help="Input base directory",
     )
     parser.add_argument(
-        "-e",
-        "--ext",
-        type=str,
-        default="tif",
-        required=False,
-        help="The image file extension for building VRTs (default: tif)",
+            "-s",
+            "--search",
+            type=str,
+            default="*.tif",
+            required=False,
+            help="The image search string - NOTE NEEDS TO BE IN QUOTES (default: *.tif)",
     )
-    
+
     parser.add_argument(
             "-r",
             "--replace",
@@ -64,23 +64,23 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    
+
     base_dir = args.input
-    
-    img_dirs = rsgislib.tools.filetools.get_dir_list(dir_path = base_dir, inc_hidden = False)
+
+    img_dirs = rsgislib.tools.filetools.get_dir_list(dir_path=base_dir,
+                                                     inc_hidden=False)
 
     for img_dir in img_dirs:
         img_dir_name = rsgislib.tools.filetools.get_file_basename(img_dir)
-        
-        img_lst = glob.glob(os.path.join(img_dir, f"*.{args.ext}"))
-        if len(img_lst) > 0: 
+
+        img_lst = glob.glob(os.path.join(img_dir, args.search))
+        if len(img_lst) > 0:
             print(img_dir_name)
             out_vrt_file = os.path.join(base_dir, f"{img_dir_name}.vrt")
 
             if os.path.exists(out_vrt_file) and (not args.replace):
                 print("\tSkipping as already exists")
             else:
-                rsgislib.imageutils.create_mosaic_images_vrt(input_imgs = img_lst, out_vrt_file = out_vrt_file)
+                rsgislib.imageutils.create_mosaic_images_vrt(input_imgs=img_lst,
+                                                             out_vrt_file=out_vrt_file)
     print("Finished")
-
-   
