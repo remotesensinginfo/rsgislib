@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgiscreateptsvec.py
+#
+#  Copyright 2025 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Batch convert a set of images to GEOTIFFs tiling, compressing
+#           and copying any image overviews.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 13/05/2025
+# Version: 1.0
+#
+#############################################
+
+import argparse
+import os
+import geopandas
+import rsgislib.tools.filetools
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        required=True,
+        help="Output vector path",
+    )
+    parser.add_argument(
+        "-l",
+        "--lyr",
+        type=str,
+        required=False,
+        help="Option layer name",
+    )
+    parser.add_argument(
+        "-f",
+        "--format",
+        type=str,
+        default="GeoJSON",
+        required=False,
+        help="The output vector format (default: GeoJSON)",
+    )
+
+    args = parser.parse_args()
+       
+    if os.path.exists(args.output):
+        raise Exception("The output file already exists")
+    
+    if args.lyr != None:
+        vec_lyr = args.lyr
+    else:
+        vec_lyr = rsgislib.tools.filetools.get_file_basename(args.output)
+       
+    data_gdf = geopandas.GeoDataFrame(geometry=geopandas.points_from_xy(x=[0.0], y=[0.0], z=None, crs="EPSG:4326"))
+    
+    if args.format == "GPKG":
+        data_gdf.to_file(args.output, layer=vec_lyr, driver=args.format)
+    else:
+        data_gdf.to_file(args.output, driver=args.format)
