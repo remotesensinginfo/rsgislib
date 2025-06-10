@@ -698,19 +698,29 @@ def create_raster_img_map(
                 "Manual stretch requires user parameters to be passed"
             )
         img_data_strch = rsgislib.tools.plotting.manual_stretch_np_arr(
-            img_data, min_max_vals=stch_min_max_vals, no_data_val=img_no_data_val, no_data_clr=no_data_out_clr,
+            img_data,
+            min_max_vals=stch_min_max_vals,
+            no_data_val=img_no_data_val,
+            no_data_clr=no_data_out_clr,
         )
     elif img_stch == rsgislib.IMG_STRETCH_LINEAR:
         img_data_strch = rsgislib.tools.plotting.linear_stretch_np_arr(
-            img_data, no_data_val=img_no_data_val, no_data_clr=no_data_out_clr,
+            img_data,
+            no_data_val=img_no_data_val,
+            no_data_clr=no_data_out_clr,
         )
     elif img_stch == rsgislib.IMG_STRETCH_STDEV:
         img_data_strch = rsgislib.tools.plotting.stdev_stretch_np_arr(
-            img_data, n_stdevs=stch_n_stdevs, no_data_val=img_no_data_val, no_data_clr=no_data_out_clr,
+            img_data,
+            n_stdevs=stch_n_stdevs,
+            no_data_val=img_no_data_val,
+            no_data_clr=no_data_out_clr,
         )
     elif img_stch == rsgislib.IMG_STRETCH_CUMULATIVE:
         img_data_strch = rsgislib.tools.plotting.cumulative_stretch_np_arr(
-            img_data, no_data_val=img_no_data_val, no_data_clr=no_data_out_clr,
+            img_data,
+            no_data_val=img_no_data_val,
+            no_data_clr=no_data_out_clr,
         )
     else:
         print("No stretch is being used - is this what you intended?!")

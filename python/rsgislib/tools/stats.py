@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-The tools.stats module contains some useful tools for calculating useful statistics which aren't
-easily available else where.
+The tools.stats module contains some useful tools for calculating useful statistics
+which aren't easily available else where.
 """
 from typing import Union, List
 

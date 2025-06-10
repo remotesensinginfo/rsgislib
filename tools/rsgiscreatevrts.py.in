@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgiscreateptsvec.py
+#
+#  Copyright 2025 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Batch convert a set of images to GEOTIFFs tiling, compressing
+#           and copying any image overviews.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 14/05/2025
+# Version: 1.0
+#
+#############################################
+
+import argparse
+import os
+import glob
+import rsgislib.tools.filetools
+import rsgislib.imageutils
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+            "-i",
+            "--input",
+            type=str,
+            required=True,
+            help="Input base directory",
+    )
+    parser.add_argument(
+            "-s",
+            "--search",
+            type=str,
+            default="*.tif",
+            required=False,
+            help="The image search string - NOTE NEEDS TO BE IN QUOTES (default: *.tif)",
+    )
+
+    parser.add_argument(
+            "-r",
+            "--replace",
+            action="store_true",
+            default=False,
+            help="Replace VRT file(s) if already exist.",
+    )
+
+    args = parser.parse_args()
+
+    base_dir = args.input
+
+    img_dirs = rsgislib.tools.filetools.get_dir_list(dir_path=base_dir,
+                                                     inc_hidden=False)
+
+    for img_dir in img_dirs:
+        img_dir_name = rsgislib.tools.filetools.get_file_basename(img_dir)
+
+        img_lst = glob.glob(os.path.join(img_dir, args.search))
+        if len(img_lst) > 0:
+            print(img_dir_name)
+            out_vrt_file = os.path.join(base_dir, f"{img_dir_name}.vrt")
+
+            if os.path.exists(out_vrt_file) and (not args.replace):
+                print("\tSkipping as already exists")
+            else:
+                rsgislib.imageutils.create_mosaic_images_vrt(input_imgs=img_lst,
+                                                             out_vrt_file=out_vrt_file)
+    print("Finished")

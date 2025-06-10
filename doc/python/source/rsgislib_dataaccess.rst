@@ -64,3 +64,9 @@ Planet Data
 .. autofunction:: rsgislib.dataaccess.planet_data_api.get_item_type_str
 .. autofunction:: rsgislib.dataaccess.planet_data_api.get_asset_type_str
 .. autofunction:: rsgislib.dataaccess.planet_data_api.get_bundle_type_str
+
+Open Street Map (OSM)
+-----------------------
+
+.. autofunction:: rsgislib.dataaccess.openstreetmap.get_osm_to_file
+.. autofunction:: rsgislib.dataaccess.openstreetmap.get_osm_gdf

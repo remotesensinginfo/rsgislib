@@ -818,7 +818,7 @@ def create_year_month_start_end_lst(
 
 
 def create_year_month_n_months_lst(
-    start_year: int, start_month: int, n_months: int
+    start_year: int, start_month: int, n_months_fwd: int, n_months_bwd: int = 0
 ) -> List[Tuple[int, int]]:
     """
     A function which creates a list of year and month tuples from a start
@@ -826,7 +826,8 @@ def create_year_month_n_months_lst(
 
     :param start_year: int with the start year
     :param start_month: int with the start month
-    :param n_months: int with the number of months ahead
+    :param n_months_fwd: int with the number of months ahead
+    :param n_months_bwd: int with the number of months behind
     :return: List of tuples (year, month)
 
     """
@@ -836,21 +837,37 @@ def create_year_month_n_months_lst(
         raise rsgislib.RSGISPyException("Month must be between 1-12")
 
     out_year_mnt_lst = list()
-    out_year_mnt_lst.append((start_year, start_month))
-    months = numpy.arange(0, n_months, 1)
-    months = months + start_month
 
-    month_vals = months % 12
-    year = start_year
-    first = True
-    for month in month_vals:
-        if first:
-            out_year_mnt_lst.append((year, month + 1))
-            first = False
-        else:
-            if month == 0:
-                year += 1
-            out_year_mnt_lst.append((year, month + 1))
+    if n_months_bwd > 0:
+        bwd_s_month = start_month - n_months_bwd
+        months = numpy.arange(bwd_s_month - 1, start_month - 1, 1)
+        for c_month in months:
+            if c_month < 0:
+                year = start_year - 1
+                month = 12 + c_month
+            else:
+                year = start_year
+                month = c_month
+
+            out_year_mnt_lst.append((year, int(month + 1)))
+
+    # Add Current Year
+    out_year_mnt_lst.append((start_year, start_month))
+
+    if n_months_fwd > 0:
+        months = numpy.arange(0, n_months_fwd, 1)
+        months = months + start_month
+        month_vals = months % 12
+        year = start_year
+        first = True
+        for month in month_vals:
+            if first:
+                out_year_mnt_lst.append((year, int(month + 1)))
+                first = False
+            else:
+                if month == 0:
+                    year += 1
+                out_year_mnt_lst.append((year, int(month + 1)))
 
     return out_year_mnt_lst
 

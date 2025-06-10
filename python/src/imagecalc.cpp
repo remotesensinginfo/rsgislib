@@ -1818,16 +1818,16 @@ static PyMethodDef ImageCalcMethods[] = {
 "   \n"
 "   # Calculating a product from multiple bands:\n"
 "   band_defns = list()\n"
-"   band_defns.append(rsgislib.imagecalc.BandDefn('b1', 'img.kea', 1))\n"
-"   band_defns.append(rsgislib.imagecalc.BandDefn('b2', 'img.kea', 2))\n"
-"   rsgislib.imagecalc.band_math('out.kea', 'b1*b2', 'KEA', rsgislib.TYPE_32FLOAT, band_defns)\n"
+"   band_defns.append(rsgislib.imagecalc.BandDefn(band_name='b1', input_img='img.kea', img_band=1))\n"
+"   band_defns.append(rsgislib.imagecalc.BandDefn(band_name='b2', input_img='img.kea', img_band=2))\n"
+"   rsgislib.imagecalc.band_math(output_img='out.kea', exp='b1*b2', gdalformat='KEA', datatype=rsgislib.TYPE_32FLOAT, band_defs=band_defns)\n"
 "   \n\n"
 "   # Apply if-else statement:\n"
 "   band_defns = list()\n"
-"   band_defns.append(rsgislib.imagecalc.BandDefn('b1', 'img1.kea', 1))\n"
-"   band_defns.append(rsgislib.imagecalc.BandDefn('b2', 'img2.kea', 1))\n"
-"   band_defns.append(rsgislib.imagecalc.BandDefn('b3', 'img3.kea', 2))\n"
-"   rsgislib.imagecalc.band_math('out.kea', '(b1==1) || (b2==1) || (b3==1)?1:0', 'KEA', rsgislib.TYPE_8UINT, band_defns)\n"
+"   band_defns.append(rsgislib.imagecalc.BandDefn(band_name='b1', input_img='img1.kea', img_band=1))\n"
+"   band_defns.append(rsgislib.imagecalc.BandDefn(band_name='b2', input_img='img2.kea', img_band=1))\n"
+"   band_defns.append(rsgislib.imagecalc.BandDefn(band_name='b3', input_img='img3.kea', img_band=2))\n"
+"   rsgislib.imagecalc.band_math(output_img='out.kea', exp='(b1==1) || (b2==1) || (b3==1)?1:0', gdalformat='KEA', datatype=rsgislib.TYPE_8UINT, band_defs=band_defns)\n"
 "\n\n"},
 
 {"image_math", (PyCFunction)ImageCalc_ImageMath, METH_VARARGS | METH_KEYWORDS,
@@ -1850,10 +1850,10 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "   import rsgislib\n"
 "   import rsgislib.imagecalc\n"
-"   rsgislib.imagecalc.image_math('img.kea', 'out.kea', 'b1*1000', 'KEA', rsgislib.TYPE_32UINT)\n"
+"   rsgislib.imagecalc.image_math(input_img='img.kea', output_img='out.kea', exp='b1*1000', gdalformat='KEA', datatype=rsgislib.TYPE_32UINT)\n"
 "   \n\n"
 "   # Apply if-else statement:\n"
-"   rsgislib.imagecalc.image_math('img.kea', 'out.kea', 'b1<10?1:0', 'KEA', rsgislib.TYPE_8UINT)\n"
+"   rsgislib.imagecalc.image_math(input_img='img.kea', output_img='out.kea', exp='b1<10?1:0', gdalformat='KEA', datatype=rsgislib.TYPE_8UINT)\n"
 "\n"
 "\n"},
 
@@ -1879,10 +1879,10 @@ static PyMethodDef ImageCalcMethods[] = {
 "   import rsgislib.imagecalc\n"
 "   \n"
 "   # Calculate product of multiple bands:\n"
-"   rsgislib.imagecalc.image_band_math('img.kea', 'out.kea', '(b1+b2+b3+b4)/4', 'KEA', rsgislib.TYPE_32UINT)\n"
+"   rsgislib.imagecalc.image_band_math(input_img='img.kea', output_img='out.kea', exp='(b1+b2+b3+b4)/4', gdalformat='KEA', datatype=rsgislib.TYPE_32UINT)\n"
 "   \n\n"
 "   # Apply if-else statement:\n"
-"   rsgislib.imagecalc.image_band_math('img.kea', 'out.kea', '(b1==1) || (b2==1) || (b3==1)?1:0', 'KEA', rsgislib.TYPE_8UINT)\n"
+"   rsgislib.imagecalc.image_band_math(input_img='img.kea', output_img='out.kea', exp='(b1==1) || (b2==1) || (b3==1)?1:0', gdalformat='KEA', datatype=rsgislib.TYPE_8UINT)\n"
 "\n"
 "\n"},
 
