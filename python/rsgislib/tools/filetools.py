@@ -673,6 +673,37 @@ def get_dir_list(dir_path: str, inc_hidden: bool = False) -> list:
                 out_dir_lst.append(c_path)
     return out_dir_lst
 
+def get_dir_list_srch(dir_path: str, name_inc:str, inc_hidden: bool = False) -> list:
+    """
+    Function which get the list of directories within the specified path where
+    the name contains a particular string.
+
+    :param dir_path: file path to search within
+    :param name_inc: string within the directory name
+    :param inc_hidden: boolean specifying whether hidden files should be
+                       included (default=False)
+    :return: list of directory paths
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.tools.filetools
+        files = rsgislib.tools.filetools.get_dir_list("in/dir")
+
+    """
+    out_dir_lst = list()
+    dir_listing = os.listdir(dir_path)
+    for item in dir_listing:
+        c_path = os.path.join(dir_path, item)
+        if os.path.isdir(c_path):
+            if name_inc in item:
+                if not inc_hidden:
+                    if not file_is_hidden(c_path):
+                        out_dir_lst.append(c_path)
+                else:
+                    out_dir_lst.append(c_path)
+    return out_dir_lst
 
 def convert_file_size_units(in_size: int, in_unit: str, out_unit: str) -> float:
     """
