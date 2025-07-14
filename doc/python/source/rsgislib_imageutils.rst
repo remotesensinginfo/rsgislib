@@ -237,6 +237,7 @@ Image I/O
 .. autofunction:: rsgislib.imageutils.get_img_pxl_values
 .. autofunction:: rsgislib.imageutils.set_img_pxl_values
 .. autofunction:: rsgislib.imageutils.get_img_pxl_column
+.. autofunction:: rsgislib.imageutils.get_img_column
 .. autofunction:: rsgislib.imageutils.assign_random_pxls
 .. autofunction:: rsgislib.imageutils.generate_random_pxl_vals_img
 .. autofunction:: rsgislib.imageutils.get_img_band_pxl_data
