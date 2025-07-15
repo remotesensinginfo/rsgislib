@@ -17,6 +17,7 @@ def animate_img_set(
     input_imgs: List[str],
     output_img: str,
     fps: int = 1,
+    loop: int = 0,
     resize: bool = False,
     out_x_size: int = 720,
     out_y_size: int = None,
@@ -34,6 +35,8 @@ def animate_img_set(
     :param output_img: output image file path.
     :param fps: the number of frames per second. Higher values will result in
                 faster video (i.e., less time per frame). Default: 1.
+    :param loop: How many times the GIF animation should be looped. Default: 0.
+                 If 0 (default) then it will loop forever.
     :param resize: boolean specifying whether to resize the input images.
     :param out_x_size: the size of the output image (if resizing) for the x axis.
                        Default: 720
@@ -73,7 +76,7 @@ def animate_img_set(
         ani_input_imgs = input_imgs
 
     print("Create animated file:")
-    with imageio.v2.get_writer(output_img, mode="i", fps=fps) as writer:
+    with imageio.v2.get_writer(output_img, mode="i", fps=fps, loop=loop) as writer:
         for in_img in tqdm.tqdm(ani_input_imgs):
             image = imageio.v2.imread(in_img)
             writer.append_data(image)

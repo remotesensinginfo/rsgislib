@@ -150,7 +150,7 @@ def get_osm_to_file(
              be empty if there is no data for the bbox for the tags and geometry type
              specified.
 
-    
+
     """
 
     data_gdf = get_osm_gdf(
