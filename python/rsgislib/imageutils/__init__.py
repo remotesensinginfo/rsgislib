@@ -4269,6 +4269,7 @@ def get_img_data_as_arr(input_img: str, img_bands: List[int] = None) -> numpy.nd
         )
 
         for i, b in enumerate(img_bands):
+            b = int(b)
             band_obj = img_ds_obj.GetRasterBand(b)
 
             band_obj.ReadAsArray(
