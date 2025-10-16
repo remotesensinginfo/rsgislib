@@ -787,6 +787,24 @@ def get_file_size(file_path: str, unit: str = "bytes") -> float:
     return out_file_size
 
 
+def get_file_mod_time(file_path: str) -> datetime.datetime:
+    """
+    A function which finding the modification time of a file and returns it as
+    a datetime object.
+
+    :param file_path: The file path as a string
+    :return: The modification time as a datetime object
+
+    """
+    if not os.path.exists(file_path):
+        raise rsgislib.RSGISPyException(f"File path does not exist: {file_path}")
+
+    mod_time_stamp = os.path.getmtime(file_path)
+    mod_datetime_obj = datetime.datetime.fromtimestamp(mod_time_stamp)
+
+    return mod_datetime_obj
+
+
 def get_file_lock(
     input_file: str,
     sleep_period: int = 1,

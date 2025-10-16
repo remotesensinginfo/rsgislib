@@ -2307,27 +2307,37 @@ def create_blank_img_from_bbox(
             bbox, out_img_res, full_contain=True
         )
 
-    xMin = bbox[0]
-    xMax = bbox[1]
-    yMin = bbox[2]
-    yMax = bbox[3]
+    x_min = bbox[0]
+    x_max = bbox[1]
+    y_min = bbox[2]
+    y_max = bbox[3]
 
-    tlX = xMin
-    tlY = yMax
+    tl_x = x_min
+    tl_y = y_max
 
-    widthCoord = xMax - xMin
-    heightCoord = yMax - yMin
+    width_coord = x_max - x_min
+    height_coord = y_max - y_min
 
-    width = int(math.ceil(widthCoord / out_img_res))
-    height = int(math.ceil(heightCoord / out_img_res))
+    width_remainder = abs(width_coord / out_img_res - math.floor(width_coord / out_img_res))
+    height_remainder = abs(height_coord / out_img_res - math.floor(height_coord / out_img_res))
+
+    if width_remainder < 0.0001:
+        width = int(math.floor(width_coord / out_img_res))
+    else:
+        width = int(math.ceil(width_coord / out_img_res))
+
+    if height_remainder < 0.0001:
+        height = int(math.floor(height_coord / out_img_res))
+    else:
+        height = int(math.ceil(height_coord / out_img_res))
 
     create_blank_img(
         output_img,
         out_img_n_bands,
         width,
         height,
-        tlX,
-        tlY,
+        tl_x,
+        tl_y,
         out_img_res,
         (out_img_res * -1),
         out_img_pxl_val,
@@ -4290,6 +4300,7 @@ def get_img_data_as_arr(input_img: str, img_bands: List[int] = None) -> numpy.nd
         )
 
         for i, b in enumerate(img_bands):
+            b = int(b)
             band_obj = img_ds_obj.GetRasterBand(b)
 
             band_obj.ReadAsArray(

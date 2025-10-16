@@ -33,6 +33,7 @@ File Info
 ------------
 .. autofunction:: rsgislib.tools.filetools.file_is_hidden
 .. autofunction:: rsgislib.tools.filetools.get_file_size
+.. autofunction:: rsgislib.tools.filetools.get_file_mod_time
 
 Sorting
 --------

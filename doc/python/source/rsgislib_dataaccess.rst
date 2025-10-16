@@ -69,4 +69,5 @@ Open Street Map (OSM)
 -----------------------
 
 .. autofunction:: rsgislib.dataaccess.openstreetmap.get_osm_to_file
+.. autofunction:: rsgislib.dataaccess.openstreetmap.get_osm_multi_to_file
 .. autofunction:: rsgislib.dataaccess.openstreetmap.get_osm_gdf
