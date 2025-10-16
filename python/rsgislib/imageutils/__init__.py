@@ -4155,6 +4155,27 @@ def get_img_pxl_column(
     return numpy.array(out_pxl_vals)
 
 
+def get_img_column(input_img: str, x_coord: float, y_coord: float) -> numpy.array:
+    """
+    Function which gets pixel band values for a single pixel within an image.
+    The coordinate should be within the projection of the input image.
+
+    :param input_img: The input image name and path
+    :param x_coord: An image X coordinate (in the image spatial coordinates)
+    :param y_coord: An image Y coordinate (in the image spatial coordinates)
+    :return: An array of image pixel values (length = the number of image bands).
+
+    """
+    img_bbox = get_img_bbox(input_img)
+    img_res_x, img_res_y = get_img_res(input_img, abs_vals=True)
+
+    x_pxl_coord = numpy.floor(((x_coord) - img_bbox[0]) / img_res_x).astype(int)
+    y_pxl_coord = numpy.floor((img_bbox[3] - (y_coord)) / img_res_y).astype(int)
+
+    return get_img_pxl_column(input_img, x_pxl_coord, y_pxl_coord)
+
+
+
 def get_img_band_pxl_data(
     input_img: str, img_band: int, bbox_sub: List[float]
 ) -> numpy.array:

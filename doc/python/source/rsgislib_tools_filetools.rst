@@ -18,6 +18,7 @@ Searching
 .. autofunction:: rsgislib.tools.filetools.get_files_mod_time
 .. autofunction:: rsgislib.tools.filetools.find_files_size_limits
 .. autofunction:: rsgislib.tools.filetools.get_dir_list
+.. autofunction:: rsgislib.tools.filetools.get_dir_list_srch
 
 Archives
 ---------

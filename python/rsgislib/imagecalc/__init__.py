@@ -1176,6 +1176,7 @@ def calc_sum_stats_msk_vals(
     use_no_data: bool = True,
     no_data_val: float = None,
     out_no_data_val: float = -9999,
+    calc_percentiles: bool = True,
 ):
     """
     A function which reads the image bands (values and mask) into memory
@@ -1193,7 +1194,9 @@ def calc_sum_stats_msk_vals(
                         input image header)
     :param out_no_data_val: output no data value written to output dict if there are
                             no valid pixel values.
-    :return: returns a dict summary statistics (Min, Max, Mean, Std Dev, Median)
+    :param calc_percentiles: If true (Default) return also return the percentiles
+                             (1%, 2.5%, 5%, 25%, 75%, 95%, 97.55 and 99%)
+    :return: returns a dict summary statistics (Min, Max, Mean, Std Dev, Median, Sum)
 
     """
     import rsgislib.imageutils
@@ -1229,6 +1232,16 @@ def calc_sum_stats_msk_vals(
     stats_dict["mean"] = out_no_data_val
     stats_dict["stddev"] = out_no_data_val
     stats_dict["median"] = out_no_data_val
+    stats_dict["sum"] = out_no_data_val
+    if calc_percentiles:
+        stats_dict["98_lower_percentile"] = out_no_data_val
+        stats_dict["95_lower_percentile"] = out_no_data_val
+        stats_dict["90_lower_percentile"] = out_no_data_val
+        stats_dict["lower_quartile"] = out_no_data_val
+        stats_dict["upper_quartile"] = out_no_data_val
+        stats_dict["90_upper_percentile"] = out_no_data_val
+        stats_dict["95_upper_percentile"] = out_no_data_val
+        stats_dict["98_upper_percentile"] = out_no_data_val
 
     pxls_vals = numpy.stack(pxls_vals_lst).flatten()
     if use_no_data:
@@ -1240,6 +1253,17 @@ def calc_sum_stats_msk_vals(
         stats_dict["mean"] = pxls_vals.mean()
         stats_dict["stddev"] = pxls_vals.std()
         stats_dict["median"] = numpy.median(pxls_vals)
+        stats_dict["sum"] = pxls_vals.sum()
+        if calc_percentiles:
+            percentile_outs = numpy.percentile(pxls_vals, [1, 2.5, 5, 25, 75, 95, 97.5, 99])
+            stats_dict["98_lower_percentile"] = percentile_outs[0]
+            stats_dict["95_lower_percentile"] = percentile_outs[1]
+            stats_dict["90_lower_percentile"] = percentile_outs[2]
+            stats_dict["lower_quartile"] = percentile_outs[3]
+            stats_dict["upper_quartile"] = percentile_outs[4]
+            stats_dict["90_upper_percentile"] = percentile_outs[5]
+            stats_dict["95_upper_percentile"] = percentile_outs[6]
+            stats_dict["98_upper_percentile"] = percentile_outs[7]
 
     vals_arr = None
     msk_arr = None
