@@ -17,6 +17,12 @@ try:
 except ImportError:
     GEOPANDAS_AVAIL = False
 
+PANDAS_AVAIL = True
+try:
+    import pandas
+except ImportError:
+    PANDAS_AVAIL = False
+
 
 def get_osm_geom_type_name(geom_type: int) -> str:
     """
@@ -83,7 +89,7 @@ def get_osm_gdf(
         )
     if not GEOPANDAS_AVAIL:
         raise rsgislib.RSGISPyException(
-            "geopandas module is not available, " "please install"
+            "geopandas module is not available, please install"
         )
 
     try:
@@ -170,3 +176,83 @@ def get_osm_to_file(
             data_gdf.to_file(out_vec_file, driver=out_format)
     else:
         print("The geodataframe was empty - check the geometry type, tags and ROI.")
+
+
+
+def get_osm_multi_to_file(
+    out_vec_file: str,
+    out_vec_lyr: str,
+    bbox: Union[Tuple[float, float, float, float], List[float]],
+    osm_tags_lst: List[Dict[str, Union[bool, str]]],
+    rsgis_geom_type: int = rsgislib.GEOM_POLY,
+    bbox_epsg: int = 4326,
+    out_format: str = "GPKG",
+    out_vec_epsg: int = 4326,
+    clip_to_roi: bool = False,
+):
+    """
+    A function to downloads OpenStreetMap data and save it to a vector file for
+    specified tags and geometry type. For information on the OSM tags, which you need
+    to specify for the download see here: https://wiki.openstreetmap.org/wiki/Tags.
+
+    You might also find https://wiki.openstreetmap.org/wiki/Map_features useful as
+    these are the most common tags you might have to download. It is recommended to
+    use the higher level tags such as 'building' (rsgislib.GEOM_POLY),
+    'highway' (rsgislib.GEOM_LINE), 'railway' (rsgislib.GEOM_LINE),
+    'ferry_terminal' (rsgislib.GEOM_PT), 'aeroway' (rsgislib.GEOM_PT),
+
+    :param bbox: is a bbox (xMin, xMax, yMin, yMax) in defining the region
+                 of interest. Ideally in EPSG:4326 but will reproject if bbox_epsg
+                 is correctly defined.
+    :param osm_tags_lst: A list of multiple OSM tags to download (e.g., {"building": True},
+                     {"highway": True}, {"railway": True},
+                     {"amenity": "ferry_terminal"}, {"aeroway": True}) in a list,
+                     each tag will be search and the results merged into a single
+                     output vector file.
+    :param rsgis_geom_type: The geometry type for the data of interest (e.g.,
+                            rsgislib.GEOM_PT, rsgislib.GEOM_LINE, rsgislib.GEOM_POLY)
+    :param bbox_epsg: the EPSG code of the bounding box - define is 4326.
+    :param clip_to_roi: Open to clip the OSM output to the bbox specified for the
+                        region of interest. (Default: False)
+    :return: a geopandas GeoDataFrame with the OSM data - note this dataframe could
+             be empty if there is no data for the bbox for the tags and geometry type
+             specified.
+
+
+    """
+    if not PANDAS_AVAIL:
+        raise rsgislib.RSGISPyException(
+            "pandas module is not available, please install"
+        )
+
+    data_lst = list()
+    for osm_tags in osm_tags_lst:
+        try:
+            data_gdf = get_osm_gdf(
+                bbox=bbox,
+                osm_tags=osm_tags,
+                rsgis_geom_type=rsgis_geom_type,
+                bbox_epsg=bbox_epsg,
+                clip_to_roi=clip_to_roi,
+            )
+            if len(data_gdf) > 0:
+                data_lst.append(data_gdf)
+        except Exception as e:
+            print(f"Unable to download OSM data for tags: {osm_tags} - there might not be any data within the ROI.")
+
+    if len(data_lst) > 0:
+        data_gdf = pandas.concat(data_lst)
+        data_gdf = data_gdf.set_crs(epsg=4326, allow_override=True)
+
+        if out_vec_epsg != 4326:
+            data_gdf = data_gdf.to_crs(epsg=out_vec_epsg)
+
+        if len(data_gdf) > 0:
+            if out_format == "GPKG":
+                data_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+            else:
+                data_gdf.to_file(out_vec_file, driver=out_format)
+        else:
+            print("The geodataframe was empty - check the geometry type, tags and ROI.")
+    else:
+        print("The geodataframes were empty - check the geometry type, tags and ROI.")
