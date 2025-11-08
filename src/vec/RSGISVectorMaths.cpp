@@ -44,7 +44,7 @@ namespace rsgis{namespace vec{
 	{
 		try 
 		{
-			OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
+			const OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
 			// Get variables
 			for(int i = 0; i < numVariables; ++i)
 			{
@@ -55,7 +55,7 @@ namespace rsgis{namespace vec{
 			result = muParser->Eval();
 			
 			// Save out Variables
-			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
+			const OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
 			outFeature->SetField(outFeatureDefn->GetFieldIndex(this->outHeading.c_str()), result);
 			
 			
