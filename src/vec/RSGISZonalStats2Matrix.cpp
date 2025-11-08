@@ -520,7 +520,7 @@ namespace rsgis{namespace vec{
             }
             else
             {
-                OGRFeatureDefn *inFeatureDefn = feature->GetDefnRef();
+                const OGRFeatureDefn *inFeatureDefn = feature->GetDefnRef();
                 unsigned int fieldIdx = inFeatureDefn->GetFieldIndex(this->outNameHeading.c_str());
                 if(fieldIdx > 0)
                 {

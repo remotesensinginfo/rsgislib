@@ -58,7 +58,7 @@ namespace rsgis{ namespace cmds {
             GDALDriver *ogrVecDriver = NULL;
             GDALDataset *outputVecDS = NULL;
             OGRLayer *outputVecLayer = NULL;
-            OGRSpatialReference* inputSpatialRef = NULL;
+            const OGRSpatialReference* inputSpatialRef = NULL;
             OGRFeatureDefn *inFeatureDefn = NULL;
             
             rsgis::vec::RSGISProcessVector *processVector = NULL;
@@ -188,7 +188,7 @@ namespace rsgis{ namespace cmds {
             GDALDriver *ogrVecDriver = NULL;
             GDALDataset *outputVecDS = NULL;
             OGRLayer *outputVecLayer = NULL;
-            OGRSpatialReference* inputSpatialRef = NULL;
+            const OGRSpatialReference* inputSpatialRef = NULL;
             OGRFeatureDefn *inFeatureDefn = NULL;
 
             rsgis::vec::RSGISProcessVector *processVector = NULL;
@@ -311,7 +311,7 @@ namespace rsgis{ namespace cmds {
             GDALDriver *ogrVecDriver = NULL;
             GDALDataset *outputVecDS = NULL;
             OGRLayer *outputVecLayer = NULL;
-            OGRSpatialReference* inputSpatialRef = NULL;
+            const OGRSpatialReference* inputSpatialRef = NULL;
             OGRFeatureDefn *inFeatureDefn = NULL;
 
             if(outFormat == "ESRI Shapefile")
