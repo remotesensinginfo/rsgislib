@@ -164,10 +164,7 @@ namespace rsgis{ namespace cmds {
     
     /** Function to generate a per-band image band mask of the saturated image pixels */
     DllExport void executeGenerateSaturationMask(std::string outputImage, std::string gdalFormat, std::vector<CmdsSaturatedPixel> imgBandInfo);
-    
-    /** Function to apply the FMask algorithm for classifying cloud for Landsat TM and ETM+ data */
-    DllExport void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string validImg, std::string outputImage, std::string gdalFormat, double sunAz, double sunZen, double senAz, double senZen, float whitenessThreshold, float scaleFactorIn, std::string tmpImgsBase, std::string tmpImgFileExt, bool rmTmpImgs=true);
-    
+
     /** Function to apply DOS offsets (per band) to the input image */
     DllExport void executeApplySubtractSingleOffsets(std::string inputImage, std::string outputImage, std::vector<double> offsetValues, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal, float darkObjReflVal);
     

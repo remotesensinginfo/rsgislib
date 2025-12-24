@@ -35,7 +35,6 @@
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageCalcException.h"
 
-#include "utils/RSGISExportData2HDF.h"
 #include "math/RSGISMathsUtils.h"
 
 #include "gdal_priv.h"
@@ -59,28 +58,11 @@ namespace rsgis{namespace img{
     {
     public:
         RSGISSampleImage();
-        void subSampleImage(GDALDataset *inputImage, std::string outputFile, unsigned int sample, float noData, bool useNoData);
         void randomSampleImageMask(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples);
         void randomSampleImageMaskSmallPxlCount(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples, int rndSeed);
         ~RSGISSampleImage();
     };
-    
-    class DllExport RSGISSampleCalcImage : public RSGISCalcImageValue
-    {
-    public:
-        RSGISSampleCalcImage(unsigned int sample, float noData, bool useNoData, rsgis::utils::RSGISExportColumnData2HDF *dataExport, float *dataRow);
-        void calcImageValue(float *bandValues, int numBands);
-        void reset(){this->currentPxl = 1;};
-        ~RSGISSampleCalcImage();
-    private:
-        rsgis::utils::RSGISExportColumnData2HDF *dataExport;
-        unsigned int sample;
-        float noData;
-        bool useNoData;
-        unsigned int currentPxl;
-        float *dataRow;
-    };
-    
+
     
     class DllExport RSGISGetPxlLocAsVec : public RSGISCalcImageValue
     {

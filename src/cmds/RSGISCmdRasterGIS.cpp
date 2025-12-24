@@ -50,7 +50,6 @@
 #include "rastergis/RSGISCollapseRAT.h"
 #include "rastergis/RSGISInputShapefileAttributes2RAT.h"
 #include "rastergis/RSGISRATKNN.h"
-#include "rastergis/RSGISRATFunctionFitting.h"
 #include "rastergis/RSGISDefineClumpsInTiles.h"
 #include "rastergis/RSGISRATStats.h"
 #include "rastergis/RSGISExportClumps2Imgs.h"
@@ -1595,36 +1594,6 @@ namespace rsgis{ namespace cmds {
             
             rsgis::rastergis::RSGISStatsSamplingClumps statsSampling;
             statsSampling.histogramSampling(clumpsDataset, varCol, outSelectCol, propOfSample, binWidth, classRestrict, classColumn, classVal, ratBand);
-            
-            GDALClose(clumpsDataset);
-        }
-        catch(rsgis::RSGISAttributeTableException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-            
-            
-    void executeFitHistGausianMixtureModel(std::string clumpsImage, unsigned int ratBand, std::string outH5File, std::string varCol, float binWidth, std::string classColumn, std::string classVal, bool outputHist, std::string outHistFile)
-    {
-        try
-        {
-            GDALAllRegister();
-            std::cout.precision(12);
-            
-            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
-            if(clumpsDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + clumpsImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-            
-            rsgis::rastergis::RSGISFitHistGausianMixtureModel fitGauModel;
-            fitGauModel.performFit(clumpsDataset, outH5File, varCol, binWidth, classColumn, classVal, outputHist, outHistFile);
             
             GDALClose(clumpsDataset);
         }
