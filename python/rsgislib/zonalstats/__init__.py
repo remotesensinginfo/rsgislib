@@ -2060,8 +2060,10 @@ def merge_extracted_hdf5_data(
         shuffle=True,
         dtype=h5_dtype,
     )
-    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describ_ds[0] = "Merged".encode()
+    str_out = "Merged"
+    str_len = len(str_out)
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+    describ_ds[0] = str_out.encode()
     f_h5_out.close()
 
 
@@ -2138,8 +2140,10 @@ def merge_extracted_hdf5_vars_data(
         shuffle=True,
         dtype=h5_dtype,
     )
-    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describ_ds[0] = "Merged".encode()
+    str_out = "Merged"
+    str_len = len(str_out)
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+    describ_ds[0] = str_out.encode()
     f_h5_out.close()
 
 
@@ -3127,9 +3131,9 @@ def msk_h5_smpls_to_finite_values(
         chunk_size = n_samples
 
     fH5Out = h5py.File(out_h5_file, "w")
-    dataGrp = fH5Out.create_group("DATA")
-    metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset(
+    data_grp = fH5Out.create_group("DATA")
+    meta_grp = fH5Out.create_group("META-DATA")
+    data_grp.create_dataset(
         "DATA",
         data=data,
         chunks=(chunk_size, num_vars),
@@ -3137,8 +3141,10 @@ def msk_h5_smpls_to_finite_values(
         shuffle=True,
         dtype=h5_dtype,
     )
-    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describDS[0] = "finite values".encode()
+    str_out = "finite values"
+    str_len = len(str_out)
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+    describ_ds[0] = str_out.encode()
     fH5Out.close()
 
 
@@ -3201,9 +3207,9 @@ def filter_h5_smpls_var_range(
             chunk_size = n_samples
 
         fH5Out = h5py.File(out_h5_file, "w")
-        dataGrp = fH5Out.create_group("DATA")
-        metaGrp = fH5Out.create_group("META-DATA")
-        dataGrp.create_dataset(
+        data_grp = fH5Out.create_group("DATA")
+        meta_grp = fH5Out.create_group("META-DATA")
+        data_grp.create_dataset(
             "DATA",
             data=data,
             chunks=(chunk_size, num_vars),
@@ -3211,8 +3217,10 @@ def filter_h5_smpls_var_range(
             shuffle=True,
             dtype=h5_dtype,
         )
-        describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-        describDS[0] = "Filtered values".encode()
+        str_out = "Filtered values"
+        str_len = len(str_out)
+        describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+        describ_ds[0] = str_out.encode()
         fH5Out.close()
     else:
         raise rsgislib.RSGISPyException(
@@ -3609,10 +3617,12 @@ def extract_zone_band_values_to_h5(
                                 shuffle=True,
                                 dtype=h5_dtype,
                             )
-                            describ_ds = meta_grp.create_dataset(
-                                "DESCRIPTION", (1,), dtype="S10"
-                            )
-                            describ_ds[0] = f"Pixels from feature {feat_id}".encode()
+
+                            str_out = f"Pixels from feature {feat_id}"
+                            str_len = len(str_out)
+                            describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+                            describ_ds[0] = str_out.encode()
+
                             f_h5_out.close()
 
                         vec_mem_ds = None
@@ -3662,6 +3672,175 @@ def write_data_to_h5(
         shuffle=True,
         dtype=h5_dtype,
     )
-    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype="S10")
-    describ_ds[0] = "Written Data".encode()
+
+    str_out = "Written Data"
+    str_len = len(str_out)
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+    describ_ds[0] = str_out.encode()
+    f_h5_out.close()
+
+
+def random_sample_hdf5_file(in_h5_file:str, out_h5_file:str, sample:int, rnd_seed:int, datatype:int = None):
+    """
+    A function which randomly samples a HDF5 of extracted values.
+
+    :param in_h5_file: is a string with the path to the input file.
+    :param out_h5_file: is a string with the path to the output file.
+    :param sample: is an integer with the number values to be sampled from the input file.
+    :param rnd_seed: is an integer which seeds the random number generator.
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
+
+    """
+    import h5py
+
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+
+    f_h5 = h5py.File(in_h5_file, "r")
+    data_shp = f_h5["DATA/DATA"].shape
+    num_vars = data_shp[1]
+    n_rows = data_shp[0]
+
+
+    rnd_obj = numpy.random.RandomState(rnd_seed)
+
+    # Find sufficient unique sample indexes.
+    smp_idxs = numpy.zeros(sample, dtype=int)
+    while numpy.unique(smp_idxs).shape[0] != sample:
+        tmp_idxs = rnd_obj.randint(0, n_rows, sample)
+        tmp_uniq_idxs = numpy.unique(tmp_idxs)
+        c_idx = 0
+        if numpy.sum(smp_idxs) > 0:
+            c_smp = smp_idxs[smp_idxs > 0]
+            tmp_idxs = numpy.concatenate((c_smp, tmp_uniq_idxs))
+            tmp_uniq_idxs = numpy.unique(tmp_idxs)
+
+        max_idx = sample - 1
+        if tmp_uniq_idxs.shape[0] < max_idx:
+            max_idx = tmp_uniq_idxs.shape[0]
+        smp_idxs[0:max_idx] = tmp_uniq_idxs[0:max_idx]
+    smp_idxs = numpy.sort(smp_idxs)
+
+    out_data_arr = f_h5["DATA/DATA"][smp_idxs]
+
+    f_h5.close()
+
+    chunk_len = 1000
+    if sample < chunk_len:
+        chunk_len = sample
+
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
+
+    f_h5_out = h5py.File(out_h5_file, "w")
+    data_grp = f_h5_out.create_group("DATA")
+    meta_grp = f_h5_out.create_group("META-DATA")
+    data_grp.create_dataset(
+        "DATA",
+        data=out_data_arr,
+        chunks=(chunk_len, num_vars),
+        compression="gzip",
+        shuffle=True,
+        dtype=h5_dtype,
+    )
+    str_out = "Sampled: random_sample_hdf5_file"
+    str_len = len(str_out)
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+    describ_ds[0] = str_out.encode()
+    f_h5_out.close()
+
+
+def split_sample_hdf5_file(in_h5_file:str, out_h5_p1_file:str, out_h5_p2_file:str, sample:int, rnd_seed:int, datatype:int = None):
+    """
+
+    :param in_h5_file: is a string with the path to the input file.
+    :param out_h5_p1_file: is a string with the path to the output file.
+    :param out_h5_p2_file: is a string with the path to the output file.
+    :param sample: is an integer with the number values to be sampled from the input file.
+    :param rnd_seed: is an integer which seeds the random number generator.
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
+
+    """
+    import h5py
+
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+
+    f_h5 = h5py.File(in_h5_file, "r")
+    data_shp = f_h5["DATA/DATA"].shape
+    num_vars = data_shp[1]
+    n_rows = data_shp[0]
+
+    rnd_obj = numpy.random.RandomState(rnd_seed)
+
+    # Find sufficient unique sample indexes.
+    smp_idxs = numpy.zeros(sample, dtype=int)
+    while numpy.unique(smp_idxs).shape[0] != sample:
+        tmp_idxs = rnd_obj.randint(0, n_rows, sample)
+        tmp_uniq_idxs = numpy.unique(tmp_idxs)
+        c_idx = 0
+        if numpy.sum(smp_idxs) > 0:
+            c_smp = smp_idxs[smp_idxs > 0]
+            tmp_idxs = numpy.concatenate((c_smp, tmp_uniq_idxs))
+            tmp_uniq_idxs = numpy.unique(tmp_idxs)
+
+        max_idx = sample - 1
+        if tmp_uniq_idxs.shape[0] < max_idx:
+            max_idx = tmp_uniq_idxs.shape[0]
+        smp_idxs[0:max_idx] = tmp_uniq_idxs[0:max_idx]
+    smp_idxs = numpy.sort(smp_idxs)
+
+    # Get the remaining indexes
+    remain_idxs = numpy.arange(0, n_rows)
+    remain_idxs = remain_idxs[
+        numpy.isin(remain_idxs, smp_idxs, assume_unique=True, invert=True)
+    ]
+    remain_len = remain_idxs.shape[0]
+
+    out_data_p1_arr = f_h5["DATA/DATA"][smp_idxs]
+    out_data_p2_arr = f_h5["DATA/DATA"][remain_idxs]
+
+    f_h5.close()
+
+    h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
+
+    chunk_p1_len = 1000
+    if sample < chunk_p1_len:
+        chunk_p1_len = sample
+
+    f_h5_out = h5py.File(out_h5_p1_file, "w")
+    data_grp = f_h5_out.create_group("DATA")
+    meta_grp = f_h5_out.create_group("META-DATA")
+    data_grp.create_dataset(
+        "DATA",
+        data=out_data_p1_arr,
+        chunks=(chunk_p1_len, num_vars),
+        compression="gzip",
+        shuffle=True,
+        dtype=h5_dtype,
+    )
+    str_out = "Sampled (P1): split_sample_hdf5_file"
+    str_len = len(str_out)
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+    describ_ds[0] = str_out.encode()
+    f_h5_out.close()
+
+    chunk_p2_len = 1000
+    if remain_len < chunk_p2_len:
+        chunk_p2_len = remain_len
+
+    f_h5_out = h5py.File(out_h5_p2_file, "w")
+    data_grp = f_h5_out.create_group("DATA")
+    meta_grp = f_h5_out.create_group("META-DATA")
+    data_grp.create_dataset(
+        "DATA",
+        data=out_data_p2_arr,
+        chunks=(chunk_p2_len, num_vars),
+        compression="gzip",
+        shuffle=True,
+        dtype=h5_dtype,
+    )
+    str_out = "Sampled (P2): split_sample_hdf5_file"
+    str_len = len(str_out)
+    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+    describ_ds[0] = str_out.encode()
     f_h5_out.close()
