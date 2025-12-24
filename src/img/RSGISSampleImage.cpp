@@ -30,44 +30,6 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISSampleImage::subSampleImage(GDALDataset *inputImage, std::string outputFile, unsigned int sample, float noData, bool useNoData)
-    {
-        try
-        {
-            rsgis::math::RSGISMathsUtils mathUtils;
-            rsgis::utils::RSGISExportColumnData2HDF *export2HDF = new rsgis::utils::RSGISExportColumnData2HDF();
-            std::string description = "Data subsampled with a sample of " + mathUtils.uinttostring(sample) + " from " + std::string(inputImage->GetFileList()[0]);
-            std::cout << "Description: " << description << std::endl;
-            export2HDF->createFile(outputFile, inputImage->GetRasterCount(), description, H5::PredType::IEEE_F32LE);
-            
-            float *dataRow = new float[inputImage->GetRasterCount()];
-            
-            RSGISSampleCalcImage *calcImageSample = new RSGISSampleCalcImage(sample, noData, useNoData, export2HDF, dataRow);
-			RSGISCalcImage calcImg = RSGISCalcImage(calcImageSample, "", true);
-			calcImg.calcImage(&inputImage, 1);
-            delete calcImageSample;
-            delete[] dataRow;
-            
-            export2HDF->close();
-        }
-        catch (RSGISImageCalcException &e)
-        {
-            throw RSGISImageException(e.what());
-        }
-        catch (RSGISImageException &e)
-        {
-            throw e;
-        }
-        catch (RSGISException &e)
-        {
-            throw RSGISImageException(e.what());
-        }
-        catch (std::exception &e)
-        {
-            throw RSGISImageException(e.what());
-        }
-    }
-    
     void RSGISSampleImage::randomSampleImageMask(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples)
     {
         try
@@ -247,77 +209,7 @@ namespace rsgis{namespace img{
     {
         
     }
-    
-    
-    RSGISSampleCalcImage::RSGISSampleCalcImage(unsigned int sample, float noData, bool useNoData, rsgis::utils::RSGISExportColumnData2HDF *dataExport, float *dataRow):RSGISCalcImageValue(0)
-    {
-        this->sample = sample;
-        this->noData = noData;
-        this->useNoData = useNoData;
-        this->currentPxl = 1;
-        this->dataExport = dataExport;
-        this->dataRow = dataRow;
-    }
-    
-    void RSGISSampleCalcImage::calcImageValue(float *bandValues, int numBands) 
-    {
-        try
-        {
-            bool noDataFound = false;
-            if(useNoData)
-            {
-                for(unsigned int i = 0; i < numBands; ++i)
-                {
-                    if(bandValues[i] == this->noData)
-                    {
-                        noDataFound = true;
-                        break;
-                    }
-                }
-            }
-            
-            if(!noDataFound)
-            {
-                if(currentPxl == sample)
-                {
-                    for(unsigned int i = 0; i < numBands; ++i)
-                    {
-                        this->dataRow[i] = bandValues[i];
-                    }
-                    dataExport->addDataRow(dataRow, H5::PredType::NATIVE_FLOAT);
-                    currentPxl = 1;
-                }
-                else
-                {
-                    ++currentPxl;
-                }
-            }
-        
-        }
-        catch (RSGISImageCalcException &e)
-        {
-            throw e;
-        }
-        catch (RSGISImageException &e)
-        {
-            throw RSGISImageCalcException(e.what());
-        }
-        catch (RSGISException &e)
-        {
-            throw RSGISImageCalcException(e.what());
-        }
-        catch (std::exception &e)
-        {
-            throw RSGISImageCalcException(e.what());
-        }
-    }
-    
-    
-    RSGISSampleCalcImage::~RSGISSampleCalcImage()
-    {
-        
-    }
-    
+
     
     
     

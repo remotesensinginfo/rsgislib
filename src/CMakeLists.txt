@@ -40,7 +40,6 @@ set(LIB_CALIBRATION_H
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISDEMTools.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h
-	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCloudMasking.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISHydroDEMFillSoilleGratin94.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISImgCalibUtils.h
 	)
@@ -56,8 +55,6 @@ set(LIB_CALIBRATION_CPP
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.cpp 
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h
-	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCloudMasking.cpp
-	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCloudMasking.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISHydroDEMFillSoilleGratin94.cpp
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISHydroDEMFillSoilleGratin94.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISImgCalibUtils.cpp
@@ -328,7 +325,6 @@ set(LIB_IMG_H
 		${RSGIS_SRC_IMG_DIR}/RSGISStretchImage.h
 		${RSGIS_SRC_IMG_DIR}/RSGISCountValsAboveThresInCol.h
 		${RSGIS_SRC_IMG_DIR}/RSGISCalcRMSE.h
-		${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.h
 		${RSGIS_SRC_IMG_DIR}/RSGISPanSharpen.h
 		${RSGIS_SRC_IMG_DIR}/RSGISLinearSpectralUnmixing.h
 		${RSGIS_SRC_IMG_DIR}/RSGISImageClustering.h
@@ -344,6 +340,7 @@ set(LIB_IMG_H
 		${RSGIS_SRC_IMG_DIR}/RSGISSharpenLowResImagery.h
 		${RSGIS_SRC_IMG_DIR}/RSGISImgSummaryStatsFromMultiResImgs.h
 		${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.h
+		${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.h
 		)
 	
 set(LIB_IMG_CPP
@@ -375,8 +372,6 @@ set(LIB_IMG_CPP
 		${RSGIS_SRC_IMG_DIR}/RSGISCopyImage.h
 		${RSGIS_SRC_IMG_DIR}/RSGISCopyImageBands.cpp
 		${RSGIS_SRC_IMG_DIR}/RSGISCopyImageBands.h
-		${RSGIS_SRC_IMG_DIR}/RSGISExtractImageValues.cpp
-		${RSGIS_SRC_IMG_DIR}/RSGISExtractImageValues.h
 		${RSGIS_SRC_IMG_DIR}/RSGISImageBand2Matrix.cpp
 		${RSGIS_SRC_IMG_DIR}/RSGISImageBand2Matrix.h
 		${RSGIS_SRC_IMG_DIR}/RSGISImageBandException.cpp
@@ -423,8 +418,6 @@ set(LIB_IMG_CPP
 		${RSGIS_SRC_IMG_DIR}/RSGISCountValsAboveThresInCol.h
 		${RSGIS_SRC_IMG_DIR}/RSGISCalcRMSE.cpp
 		${RSGIS_SRC_IMG_DIR}/RSGISCalcRMSE.h
-		${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.cpp
-		${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.h
 		${RSGIS_SRC_IMG_DIR}/RSGISPanSharpen.cpp
 		${RSGIS_SRC_IMG_DIR}/RSGISPanSharpen.h
 		${RSGIS_SRC_IMG_DIR}/RSGISLinearSpectralUnmixing.cpp
@@ -455,6 +448,8 @@ set(LIB_IMG_CPP
 		${RSGIS_SRC_IMG_DIR}/RSGISImgSummaryStatsFromMultiResImgs.h
 		${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.cpp
 		${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.h
+		${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.cpp
+		${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.h
 		)
 ###############################################################################
 
@@ -587,7 +582,6 @@ set(LIB_RASTERGIS_H
 		${RSGIS_SRC_RASTERGIS_DIR}/RSGISCollapseRAT.h
 		${RSGIS_SRC_RASTERGIS_DIR}/RSGISInputShapefileAttributes2RAT.h
 		${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.h
-		${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.h
 		${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATStats.h
 		)
 	
@@ -630,8 +624,6 @@ set(LIB_RASTERGIS_CPP
 		${RSGIS_SRC_RASTERGIS_DIR}/RSGISInputShapefileAttributes2RAT.cpp
 		${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.h
 		${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.cpp
-		${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.h
-		${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.cpp
 		${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATStats.h
 		${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATStats.cpp
 		)
@@ -733,7 +725,6 @@ set(LIB_UTILS_H
 		${RSGIS_SRC_UTILS_DIR}/RSGISTextUtils.h
 		${RSGIS_SRC_UTILS_DIR}/RSGISAllometricSpecies.h
 		${RSGIS_SRC_UTILS_DIR}/RSGISAllometricEquations.h
-		${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.h
 		${RSGIS_SRC_UTILS_DIR}/RSGISGeometryUtils.h
 		)
 	
@@ -749,8 +740,6 @@ set(LIB_UTILS_CPP
 		${RSGIS_SRC_UTILS_DIR}/RSGISAllometricSpecies.h
 		${RSGIS_SRC_UTILS_DIR}/RSGISAllometricEquations.cpp
 		${RSGIS_SRC_UTILS_DIR}/RSGISAllometricEquations.h
-		${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.cpp
-		${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.h
 		${RSGIS_SRC_UTILS_DIR}/RSGISGeometryUtils.cpp
 		${RSGIS_SRC_UTILS_DIR}/RSGISGeometryUtils.h
 		)
@@ -777,8 +766,6 @@ set(LIB_VEC_ZONALSTATS_CPP
 		${RSGIS_SRC_VEC_DIR}/RSGISExtractEndMembers2Matrix.h
 		${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalException.cpp
 		${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalException.h
-		${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.cpp
-		${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.h
 		)
 
 set(LIB_VEC_UTILS_CPP
@@ -808,7 +795,6 @@ set(LIB_VEC_H
 		${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.h
 		${RSGIS_SRC_VEC_DIR}/RSGISProcessVectorSQL.h
 		${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h
-		${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.h
 		)
 
 ###############################################################################

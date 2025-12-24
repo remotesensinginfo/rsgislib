@@ -46,6 +46,7 @@ static void FreePythonObjects(std::vector<PyObject*> toFree) {
 }
 */
 
+
 static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),

@@ -30,8 +30,8 @@ set (PROJECT_DATA_DIR share)
 
 # The version number.
 set (RSGISLIB_VERSION_MAJOR 5)
-set (RSGISLIB_VERSION_MINOR 1)
-set (RSGISLIB_VERSION_PATCH 9)
+set (RSGISLIB_VERSION_MINOR 2)
+set (RSGISLIB_VERSION_PATCH 0)
 set (RSGISLIB_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_VERSION_PATCH}")
 set (RSGISLIB_PACKAGE_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_VERSION_PATCH}")
 set (RSGISLIB_PACKAGE_STRING "RSGISLib ${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_VERSION_PATCH}")
@@ -135,9 +135,6 @@ set(GDAL_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for GDAL")
 set(MUPARSER_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for MU Parser")
 set(MUPARSER_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for MU Parser")
 
-set(HDF5_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for HDF5")
-set(HDF5_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for HDF5")
-
 set(KEA_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for KEA")
 set(KEA_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for KEA")
 
@@ -214,9 +211,6 @@ if(WIN32)
         
         # get GSL functions
         add_definitions(-DGSL_DLL)
-        # HDF5 functions/classes
-        add_definitions(-DH5_BUILT_AS_DYNAMIC_LIB)
-        
     endif()
 
 else()
@@ -310,13 +304,6 @@ if (MSVC)
     set(MUPARSER_LIBRARIES -LIBPATH:${MUPARSER_LIB_PATH} muparser.lib)
 else()
     set(MUPARSER_LIBRARIES -L${MUPARSER_LIB_PATH} -lmuparser)
-endif(MSVC)
-
-include_directories(${HDF5_INCLUDE_DIR})
-if (MSVC)
-    set(HDF5_LIBRARIES -LIBPATH:${HDF5_LIB_PATH} hdf5.lib hdf5_hl.lib hdf5_cpp.lib)
-else()
-    set(HDF5_LIBRARIES -L${HDF5_LIB_PATH} -lhdf5 -lhdf5_hl -lhdf5_cpp)
 endif(MSVC)
 
 include_directories(${KEA_INCLUDE_DIR})

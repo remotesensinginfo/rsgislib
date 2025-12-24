@@ -1378,7 +1378,7 @@ static PyObject *RasterGIS_HistoSampling(PyObject *self, PyObject *args, PyObjec
     Py_RETURN_NONE;
 }
 
-
+/*
 static PyObject *RasterGIS_FitHistGausianMixtureModel(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inClumpsImage = "";
@@ -1454,6 +1454,7 @@ static PyObject *RasterGIS_ClassSplitFitHistGausianMixtureModel(PyObject *self, 
     
     Py_RETURN_NONE;
 }
+ */
 
 static PyObject *RasterGIS_PopulateRATWithPropValidPxls(PyObject *self, PyObject *args, PyObject *keywds)
 {
@@ -2145,7 +2146,7 @@ static PyMethodDef RasterGISMethods[] = {
 "    \n"
 "    rastergis.histo_sampling(clumps='N00E103_10_grid_knn.kea', varCol='HH', outSelectCol='HHSampling', propOfSample=0.25, binWidth=0.01, classColumn='Class', classVal='2')\n"
 "\n"},
-    
+/*
 {"fit_hist_gausian_mixture_model", (PyCFunction)RasterGIS_FitHistGausianMixtureModel, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.fit_hist_gausian_mixture_model(clumps_img=string, out_h5_file=string, out_hist_file=string, val_col=string, bin_width=float, cls_col=string, cls_val=string, rat_band=int)\n"
 "This function fits a Gaussian mixture model to the histogram for a variable in the RAT. \n"
@@ -2184,7 +2185,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "    rastergis.class_split_fit_hist_gausian_mixture_model(clumps='FrenchGuiana_10_ALL_sl_HH_lee_UTM_mosaic_dB_segs.kea', outCol='MangroveSubClass', varCol='HVdB', binWidth=0.1, classColumn='Classes', classVal='Mangroves')\n"
 "\n"},
-    
+*/
 {"populate_rat_with_prop_valid_pxls", (PyCFunction)RasterGIS_PopulateRATWithPropValidPxls, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.populate_rat_with_prop_valid_pxls(input_img=string, clumps_img=string, out_col=string, no_data_val=float, rat_band=uint)\n"
 "Populates the attribute table with the proportion of valid pixels within the clump.\n"

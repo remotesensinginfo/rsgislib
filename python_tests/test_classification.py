@@ -280,7 +280,8 @@ def test_flip_ref_chip_hdf5_file(tmp_path):
 
     assert os.path.exists(out_h5_file)
 
-
+#@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+@pytest.mark.skip("Need to add rsgislib.zonalstats.extract_zone_img_band_values_to_hdf in pure python.")
 def test_get_class_training_data(tmp_path):
     import rsgislib.imageutils
     import rsgislib.classification

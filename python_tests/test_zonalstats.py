@@ -1108,7 +1108,7 @@ def test_calc_zonal_band_stats_file_Median(tmp_path):
             break
     assert vals_eq
 
-
+"""
 def test_image_zone_to_hdf(tmp_path):
     import rsgislib.zonalstats
 
@@ -1192,7 +1192,7 @@ def test_split_sample_hdf5_file(tmp_path):
     )
 
     assert os.path.exists(out_h5_p1_file) and os.path.exists(out_h5_p2_file)
-
+"""
 
 @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_merge_extracted_hdf5_data(tmp_path):
