@@ -54,7 +54,7 @@ import rsgislib.imageutils
 import rsgislib.tools.geometrytools
 
 # import the C++ extension into this level
-from ._zonalstats import *
+#from ._zonalstats import *
 
 gdal.UseExceptions()
 
