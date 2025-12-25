@@ -1621,45 +1621,6 @@ static PyObject *ImageCalibration_CalcSolarDistance(PyObject *self, PyObject *ar
     return Py_BuildValue("f", solarDistance);
 }
 
-
-static PyObject *ImageCalibration_calcCloudShadowMask(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_cld_msk_img"), RSGIS_PY_C_TEXT("in_refl_img"),
-                             RSGIS_PY_C_TEXT("in_vld_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("dark_band"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("scale_factor"), RSGIS_PY_C_TEXT("tmp_img_base"),
-                             RSGIS_PY_C_TEXT("tmp_img_ext"), RSGIS_PY_C_TEXT("solar_azimuth"),
-                             RSGIS_PY_C_TEXT("solar_zenith"), RSGIS_PY_C_TEXT("sensor_azimuth"),
-                             RSGIS_PY_C_TEXT("sensor_zenith"),  RSGIS_PY_C_TEXT("rm_tmp_imgs"), nullptr};
-
-    const char *pszInputReflFile, *pszInputCloudMaskFile, *pszValidAreaImg, *pszOutputFile, *pszTmpImgsBase, *pszTmpImgsFileExt, *pszGDALFormat;
-    float sunAz, sunZen, senAz, senZen = 0.0;
-    float scaleFactor;
-    int darkImgBand;
-    int rmTmpImages = true;
-    
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssisfssffff|i:calc_cloud_shadow_mask", kwlist, &pszInputCloudMaskFile, &pszInputReflFile,
-                                     &pszValidAreaImg, &pszOutputFile, &darkImgBand, &pszGDALFormat, &scaleFactor, &pszTmpImgsBase,
-                                     &pszTmpImgsFileExt, &sunAz, &sunZen, &senAz, &senZen, &rmTmpImages))
-    {
-        return nullptr;
-    }
-    
-    try
-    {
-        bool rmTmpImgs = (bool)rmTmpImages;
-        rsgis::cmds::executePerformCloudShadowMasking(std::string(pszInputCloudMaskFile), std::string(pszInputReflFile), std::string(pszValidAreaImg), darkImgBand, std::string(pszOutputFile), std::string(pszGDALFormat), scaleFactor, std::string(pszTmpImgsBase), std::string(pszTmpImgsFileExt), rmTmpImgs, sunAz, sunZen, senAz, senZen);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
 {"landsat_to_radiance", (PyCFunction)ImageCalibration_landsat2Radiance, METH_VARARGS | METH_KEYWORDS,
@@ -1950,28 +1911,6 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":return: solarDistance - float\n"
 "\n"},
 
-    
-{"calc_cloud_shadow_mask", (PyCFunction)ImageCalibration_calcCloudShadowMask, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calc_cloud_shadow_mask(in_cld_msk_img, in_refl_img, in_vld_img, output_img, dark_band, gdalformat, scale_factor, tmp_img_base, tmp_img_ext, solar_azimuth, solar_zenith, sensor_azimuth, sensor_zenith, rm_tmp_imgs)\n"
-"Calculate a cloud shadow mask from an inputted cloud mask.\n"
-"\n"
-":param in_cld_msk_img: is a string containing the name of the input cloud mask\n"
-":param in_refl_img: is a string containing the name of the input image TOA reflectance file\n"
-":param in_vld_img: is a string containing the name of a binary image specifying the valid area of the image data (1 is valid area)\n"
-":param output_img: is a string containing the name of the output image file\n"
-":param dark_band: is an integer specifying the image band from the reflectance image which is to used to find the shadows (the NIR is often recommended).\n"
-":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
-":param scale_factor: is a float with the scale factor used to multiple the input image reflectance data.\n"
-":param tmp_img_base: is a string specifying a base path and name for the tmp images used for this processing\n"
-":param tmp_img_ext: is a string for the file extention of the output images (e.g., .kea)\n"
-":param solar_azimuth: is the solar azimuth of the input image\n"
-":param solar_zenith: is the solar azimuth of the input image\n"
-":param sensor_azimuth: is the sensor azimuth of the input image\n"
-":param sensor_zenith: is the sensor azimuth of the input image\n"
-":param rm_tmp_imgs: is a bool specifying whether the tmp images should be deleted at the end of the processing (Optional; Default = True)\n"
-"\n"
-},
-    
     {nullptr}        /* Sentinel */
 };
 
