@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgiscmprefimgs.py
+#
+#  Copyright 2026 RSGISLib.
+#
+#  RSGISLib: 'The Remote Sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Check if a gdal file (raster or vector) is valid.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 01/01/2026
+# Version: 1.0
+#
+#############################################
+
+import argparse
+import glob
+
+import rsgislib
+import rsgislib.tools.checkdatasets
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="A utility which checks an image against a reference image "
+        "(i.e., projection matches, number of pixels and coordinates). "
+        "Note. the reference image file name assumed to be within the name "
+        "of the images within the --input directory. If there are multiple "
+        "images which match the reference image file name they will all be checked."
+    )
+    parser.add_argument(
+        "-r",
+        "--ref",
+        type=str,
+        required=True,
+        help="Input file search path for reference images (i.e., '/path/to/*.tif')",
+    )
+    parser.add_argument(
+        "-i",
+        "--input",
+        type=str,
+        required=True,
+        help="Input path to images which are being checked.",
+    )
+    parser.add_argument(
+        "-e",
+        "--ext",
+        type=str,
+        required=True,
+        help="Input image file extension (pairs with --input).",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        required=False,
+        help="Optional output JSON file with list of files checked, "
+        "not-checked and those with errors.",
+    )
+    parser.add_argument(
+        "--rmerr",
+        action="store_true",
+        default=False,
+        help="Delete error files from system.",
+    )
+
+    args = parser.parse_args()
+    t = rsgislib.RSGISTime()
+    t.start(print_start_time=True)
+    print(f"Reference Images: {args.ref}")
+    print(f"Directory to be checked: {args.input}")
+
+    ref_imgs = glob.glob(args.ref)
+    print(f"{len(ref_imgs)} reference images files found...:")
+
+    rsgislib.tools.checkdatasets.cmp_to_ref_imgs(
+        ref_imgs=ref_imgs,
+        input_img_dir=args.input,
+        input_img_ext=args.ext,
+        rm_errs=args.rmerr,
+        output_file=args.output,
+    )
+    t.end(report_diff=True, precede_str="Finished Checks")

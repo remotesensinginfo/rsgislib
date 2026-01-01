@@ -6,6 +6,7 @@ Images
 .. autofunction:: rsgislib.tools.checkdatasets.run_check_gdal_image_file
 .. autofunction:: rsgislib.tools.checkdatasets.run_check_gdal_image_files
 .. autofunction:: rsgislib.tools.checkdatasets.check_gdal_image_file
+.. autofunction:: rsgislib.tools.checkdatasets.cmp_to_ref_imgs
 
 
 Vectors
@@ -25,4 +26,3 @@ HDF5 Files
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
