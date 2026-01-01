@@ -922,6 +922,7 @@ def cmp_to_ref_imgs(
     out_report["not_checked"] = list()
     out_report["errors"] = list()
     out_report["ref_no_match"] = list()
+    n_errs = 0
 
     for ref_img in tqdm.tqdm(ref_imgs):
         ref_base = rsgislib.tools.filetools.get_file_basename(ref_img)
@@ -944,6 +945,7 @@ def cmp_to_ref_imgs(
                 ):
                     out_report["errors"].append(chk_img)
                     error = True
+                    n_errs += 1
                 elif (
                     (ref_img_bbox[0] != chk_img_bbox[0])
                     or (ref_img_bbox[1] != chk_img_bbox[1])
@@ -952,9 +954,11 @@ def cmp_to_ref_imgs(
                 ):
                     out_report["errors"].append(chk_img)
                     error = True
+                    n_errs += 1
                 elif ref_img_epsg != chk_img_epsg:
                     out_report["errors"].append(chk_img)
                     error = True
+                    n_errs += 1
 
                 out_report["checked"].append(chk_img)
                 chk_basename = rsgislib.tools.filetools.get_file_basename(chk_img)
@@ -971,5 +975,7 @@ def cmp_to_ref_imgs(
 
     if output_file is not None:
         rsgislib.tools.utils.write_dict_to_json(out_report, output_file)
+
+    print(f"Found {n_errs} images with errors...")
 
     return out_report
