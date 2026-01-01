@@ -4,12 +4,15 @@ The tools.validate_datesets module contains functions for checking that datasets
 """
 
 import os
+import glob
+from typing import List, Dict
 
 import numpy
 from osgeo import gdal, osr
 
 import rsgislib
 import rsgislib.tools.filetools
+import rsgislib.imageutils
 
 
 def check_gdal_image_file(
@@ -881,3 +884,92 @@ def run_check_hdf5_files(
         print("Finished with pool")
 
     return files_ok
+
+
+def cmp_to_ref_imgs(
+    ref_imgs: List[str],
+    input_img_dir: str,
+    input_img_ext: str,
+    rm_errs: bool = False,
+    output_file: str = None,
+) -> Dict:
+    """
+    A utility which checks an image against a reference image
+    (i.e., projection matches, number of pixels and coordinates).
+    Note. the reference image file name assumed to be within the name
+    of the images within the --input directory. If there are multiple
+    images which match the reference image file name they will all be checked.
+
+    :param ref_imgs: List of reference image paths.
+    :param input_img_dir: Input image directory, containing the images to be checked
+    :param input_img_ext: The image extension to be checked (e.g., tif, kea)
+    :param rm_errs: Boolean specifying whether to delete the file if an error is found
+    :param output_file: optional output report with list of images checked,
+                        not checked and errors.
+
+    """
+    import tqdm
+    import rsgislib.tools.utils
+
+    input_imgs = glob.glob(os.path.join(input_img_dir, f"*.{input_img_ext}"))
+    input_imgs_lut = dict()
+    for input_img in input_imgs:
+        basename = rsgislib.tools.filetools.get_file_basename(input_img)
+        input_imgs_lut[basename] = [input_img, False]
+
+    out_report = dict()
+    out_report["checked"] = list()
+    out_report["not_checked"] = list()
+    out_report["errors"] = list()
+    out_report["ref_no_match"] = list()
+
+    for ref_img in tqdm.tqdm(ref_imgs):
+        ref_base = rsgislib.tools.filetools.get_file_basename(ref_img)
+        chk_imgs = glob.glob(
+            os.path.join(input_img_dir, f"*{ref_base}*.{input_img_ext}")
+        )
+        if len(chk_imgs) > 0:
+            ref_img_size = rsgislib.imageutils.get_img_size(ref_img)
+            ref_img_bbox = rsgislib.imageutils.get_img_bbox(ref_img)
+            ref_img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(ref_img)
+
+            for chk_img in chk_imgs:
+                error = False
+                chk_img_size = rsgislib.imageutils.get_img_size(chk_img)
+                chk_img_bbox = rsgislib.imageutils.get_img_bbox(chk_img)
+                chk_img_epsg = rsgislib.imageutils.get_epsg_proj_from_img(chk_img)
+
+                if (ref_img_size[0] != chk_img_size[0]) or (
+                    ref_img_size[1] != chk_img_size[1]
+                ):
+                    out_report["errors"].append(chk_img)
+                    error = True
+                elif (
+                    (ref_img_bbox[0] != chk_img_bbox[0])
+                    or (ref_img_bbox[1] != chk_img_bbox[1])
+                    or (ref_img_bbox[2] != chk_img_bbox[2])
+                    or (ref_img_bbox[3] != chk_img_bbox[3])
+                ):
+                    out_report["errors"].append(chk_img)
+                    error = True
+                elif ref_img_epsg != chk_img_epsg:
+                    out_report["errors"].append(chk_img)
+                    error = True
+
+                out_report["checked"].append(chk_img)
+                chk_basename = rsgislib.tools.filetools.get_file_basename(chk_img)
+                input_imgs_lut[chk_basename][1] = True
+
+                if error and rm_errs:
+                    rsgislib.tools.filetools.delete_file_silent(chk_img)
+        else:
+            out_report["ref_no_match"].append(ref_img)
+
+    for input_base in input_imgs_lut:
+        if not input_imgs_lut[input_base][1]:
+            out_report["not_checked"].append(input_imgs_lut[input_base][0])
+
+    if output_file is not None:
+        rsgislib.tools.utils.write_dict_to_json(out_report, output_file)
+
+    return out_report
