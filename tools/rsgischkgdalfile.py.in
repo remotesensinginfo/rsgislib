@@ -31,9 +31,11 @@
 
 import argparse
 import glob
+import datetime
 
 import rsgislib
 import rsgislib.tools.checkdatasets
+import rsgislib.tools.filetools
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -108,18 +110,26 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Specifies that the vector file has multiple files (e.g., shapefile) "
-             "and they should all be deleted if error and --rmerr is selected.",
+        "and they should all be deleted if error and --rmerr is selected.",
     )
     parser.add_argument(
         "--nosort",
         action="store_true",
         default=False,
         help="Do not sort the list of files.",
-        )
+    )
+    parser.add_argument(
+        "-d",
+        "--modate",
+        type=str,
+        required=False,
+        help="If provided, only files modified after this date "
+        "will be checked. (YYYY-MM-DD)",
+    )
 
     args = parser.parse_args()
     t = rsgislib.RSGISTime()
-    t.start(print_start_time = True)
+    t.start(print_start_time=True)
     print(args.input)
 
     chk_projection = args.chkproj
@@ -130,9 +140,18 @@ if __name__ == "__main__":
     if not args.nosort:
         try:
             from natsort import os_sorted
+
             files = os_sorted(files)
         except ModuleNotFoundError:
             files = sorted(files)
+
+    if args.modate is not None:
+        dt_mod = datetime.datetime.strptime(args.modate, "%Y-%m-%d")
+        files = rsgislib.tools.filetools.get_files_mod_time(
+            file_lst=files,
+            dt_before=None,
+            dt_after=dt_mod,
+        )
 
     print("File Checks ({} Files Found):".format(len(files)))
     if args.vec:
@@ -160,4 +179,4 @@ if __name__ == "__main__":
             print_err=args.printerrs,
             print_file_names=args.printnames,
         )
-    t.end(report_diff = True, precede_str = "Finished Checks")
+    t.end(report_diff=True, precede_str="Finished Checks")
