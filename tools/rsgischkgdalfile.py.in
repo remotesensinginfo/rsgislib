@@ -124,7 +124,7 @@ if __name__ == "__main__":
         type=str,
         required=False,
         help="If provided, only files modified after this date "
-        "will be checked. (YYYY-MM-DD)",
+        "will be checked. (YYYYMMDD)",
     )
 
     args = parser.parse_args()
@@ -146,7 +146,7 @@ if __name__ == "__main__":
             files = sorted(files)
 
     if args.modate is not None:
-        dt_mod = datetime.datetime.strptime(args.modate, "%Y-%m-%d")
+        dt_mod = datetime.datetime.strptime(args.modate, "%Y%m%d")
         files = rsgislib.tools.filetools.get_files_mod_time(
             file_lst=files,
             dt_before=None,
