@@ -86,7 +86,7 @@ if __name__ == "__main__":
     print(f"Directory to be checked: {args.input}")
 
     ref_imgs = glob.glob(args.ref)
-    print(f"{len(ref_imgs)} reference images files found...:")
+    print(f"{len(ref_imgs)} reference images files found:")
 
     rsgislib.tools.checkdatasets.cmp_to_ref_imgs(
         ref_imgs=ref_imgs,
