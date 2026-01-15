@@ -97,7 +97,7 @@ def test_populate_rat_with_stats(tmp_path):
     clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     copy2(base_clumps_img, clumps_img)
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     band_stats = list()
     band_stats.append(
@@ -314,7 +314,7 @@ def test_populate_rat_with_percentiles(tmp_path):
     clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     copy2(input_ref_img, clumps_img)
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     band_percents = []
     band_percents.append(
@@ -340,8 +340,8 @@ def test_populate_rat_with_meanlit_stats(tmp_path):
     clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps_cls_out.kea")
     copy2(input_ref_img, clumps_img)
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    input_ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    input_ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
 
     band_stats = list()
     band_stats.append(rsgislib.rastergis.BandAttStats(band=1, mean_field="b1_meanlit"))
@@ -411,7 +411,7 @@ def test_populate_rat_with_mode(tmp_path):
     clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     copy2(input_ref_img, clumps_img)
 
-    in_cls_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
+    in_cls_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.tif")
 
     rsgislib.rastergis.populate_rat_with_mode(
         in_cls_img,
@@ -432,7 +432,7 @@ def test_populate_rat_with_prop_valid_pxls(tmp_path):
     clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     copy2(input_ref_img, clumps_img)
 
-    in_cls_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
+    in_cls_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.tif")
 
     rsgislib.rastergis.populate_rat_with_prop_valid_pxls(
         in_cls_img, clumps_img, out_col="cls_val", no_data_val=0, rat_band=1

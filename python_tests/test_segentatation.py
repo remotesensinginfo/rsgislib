@@ -17,7 +17,7 @@ IMGCALC_DATA_DIR = os.path.join(DATA_DIR, "imagecalc")
 def test_clump(tmp_path):
     import rsgislib.segmentation.tiledclump
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     clumps_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.segmentation.clump(
         input_img,
@@ -41,7 +41,7 @@ def test_clump(tmp_path):
 def test_union_of_clumps(tmp_path):
     import rsgislib.segmentation.tiledclump
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     clumps_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.segmentation.union_of_clumps(
         [input_img, input_img],
@@ -61,7 +61,7 @@ def test_union_of_clumps(tmp_path):
 def test_generate_regular_grid(tmp_path):
     import rsgislib.segmentation.tiledclump
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     clumps_img = os.path.join(tmp_path, "out_img.kea")
     rsgislib.segmentation.generate_regular_grid(
         input_img, clumps_img, "KEA", 500, 500, 250

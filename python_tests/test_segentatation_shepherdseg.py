@@ -77,7 +77,7 @@ def test_run_shepherd_segmentation_pre_calcd_stats(tmp_path):
 def test_run_shepherd_segmentation_pre_calcd_stats_sub_bands(tmp_path):
     import rsgislib.segmentation.shepherdseg
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     tmp_dir = os.path.join(tmp_path, "seg_tmp")
     out_clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     out_mean_img = os.path.join(tmp_path, "sen2_20210527_aber_mean_img.kea")
