@@ -327,7 +327,10 @@ def calc_zonal_band_stats(
                     outattname.lower(), True
                 )
 
-        vec_mem_drv = ogr.GetDriverByName("Memory")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            vec_mem_drv = ogr.GetDriverByName("MEM")
+        else:
+            vec_mem_drv = ogr.GetDriverByName("MEMORY")
         img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.
@@ -664,9 +667,6 @@ def calc_zonal_poly_pts_band_stats(
             vec_lyr_obj.CreateField(ogr.FieldDefn(out_field.lower(), ogr.OFTReal))
 
         outfieldidx = vec_lyr_obj.FindFieldIndex(out_field.lower(), True)
-
-        vec_mem_drv = ogr.GetDriverByName("Memory")
-        img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.
         openTransaction = False
@@ -1075,7 +1075,10 @@ def calc_zonal_band_stats_test_poly_pts(
                     outattname.lower(), True
                 )
 
-        vec_mem_drv = ogr.GetDriverByName("Memory")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            vec_mem_drv = ogr.GetDriverByName("MEM")
+        else:
+            vec_mem_drv = ogr.GetDriverByName("MEMORY")
         img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.
@@ -1530,7 +1533,10 @@ def calc_zonal_band_pxl_counts(
                     out_att_name, True
                 )
 
-        vec_mem_drv = ogr.GetDriverByName("Memory")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            vec_mem_drv = ogr.GetDriverByName("MEM")
+        else:
+            vec_mem_drv = ogr.GetDriverByName("MEMORY")
         img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.
@@ -3478,7 +3484,10 @@ def extract_zone_band_values_to_h5(
                 "check case as some drivers are case sensitive."
             )
 
-        vec_mem_drv = ogr.GetDriverByName("Memory")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            vec_mem_drv = ogr.GetDriverByName("MEM")
+        else:
+            vec_mem_drv = ogr.GetDriverByName("MEMORY")
         img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.

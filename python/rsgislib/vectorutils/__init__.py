@@ -977,6 +977,9 @@ def reproj_vec_lyr_obj(
     ## This code has been editted from https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
     ## Updated for GDAL 2.0
 
+    if (int(gdal.VersionInfo("VERSION_NUM")) < 3110000) and (out_format == "MEM"):
+        out_format = "MEMORY"
+
     vec_lyr_obj.ResetReading()
 
     # input SpatialReference
@@ -1142,7 +1145,10 @@ def get_att_lst_select_feats(
                     "the vector layer.".format(attName)
                 )
 
-        mem_driver = ogr.GetDriverByName("MEM")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            mem_driver = ogr.GetDriverByName("MEM")
+        else:
+            mem_driver = ogr.GetDriverByName("MEMORY")
 
         mem_sel_ds = mem_driver.CreateDataSource("MemSelData")
         mem_sel_lyr = mem_sel_ds.CopyLayer(lyrSelVecObj, vec_sel_lyr, ["OVERWRITE=YES"])
@@ -1231,7 +1237,10 @@ def get_att_lst_select_feats_lyr_objs(
                     "the vector layer.".format(attName)
                 )
 
-        mem_driver = ogr.GetDriverByName("MEM")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            mem_driver = ogr.GetDriverByName("MEM")
+        else:
+            mem_driver = ogr.GetDriverByName("MEMORY")
 
         mem_result_ds = mem_driver.CreateDataSource("MemResultData")
         mem_result_lyr = mem_result_ds.CreateLayer(
@@ -1364,7 +1373,11 @@ def get_att_lst_select_bbox_feats_lyr_objs(
                 )
 
         # Create in-memory layer for the BBOX layer.
-        mem_driver = ogr.GetDriverByName("MEM")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            mem_driver = ogr.GetDriverByName("MEM")
+        else:
+            mem_driver = ogr.GetDriverByName("MEMORY")
+
         mem_bbox_ds = mem_driver.CreateDataSource("MemBBOXData")
         mem_bbox_lyr = mem_bbox_ds.CreateLayer(
             "MemBBOXLyr", in_vec_lyr_spat_ref, geom_type=ogr.wkbPolygon
@@ -1465,7 +1478,11 @@ def select_intersect_feats(
     if lyrROIVecObj is None:
         raise rsgislib.RSGISPyException("Could not find layer '" + vec_roi_lyr + "'")
 
-    mem_driver = ogr.GetDriverByName("MEM")
+    if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+        mem_driver = ogr.GetDriverByName("MEM")
+    else:
+        mem_driver = ogr.GetDriverByName("MEMORY")
+
     mem_roi_ds = mem_driver.CreateDataSource("MemSelData")
     mem_roi_lyr = mem_roi_ds.CopyLayer(lyrROIVecObj, vec_roi_lyr, ["OVERWRITE=YES"])
 
@@ -1708,7 +1725,11 @@ def subset_envs_vec_lyr_obj(
     lyrDefn = vec_lyr_obj.GetLayerDefn()
 
     # Copy the Layer to a new in memory OGR Layer.
-    mem_driver = ogr.GetDriverByName("MEM")
+    if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+        mem_driver = ogr.GetDriverByName("MEM")
+    else:
+        mem_driver = ogr.GetDriverByName("MEMORY")
+
     mem_result_ds = mem_driver.CreateDataSource("MemResultData")
     mem_result_lyr = mem_result_ds.CreateLayer(
         "MemResultLyr", lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType()
@@ -1834,7 +1855,10 @@ def read_vec_lyr_to_mem(vec_file: str, vec_lyr: str) -> (ogr.DataSource, ogr.Lay
         if vec_lyr_obj is None:
             raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
-        mem_driver = ogr.GetDriverByName("MEM")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            mem_driver = ogr.GetDriverByName("MEM")
+        else:
+            mem_driver = ogr.GetDriverByName("MEMORY")
 
         mem_ds = mem_driver.CreateDataSource("MemSelData")
         mem_lyr = mem_ds.CopyLayer(vec_lyr_obj, vec_lyr, ["OVERWRITE=YES"])
@@ -2248,12 +2272,19 @@ def does_vmsk_img_intersect(
         # Rasterise the vector layer to the input image extent.
         mem_ds, mem_lyr = get_mem_vec_lyr_subset(vec_roi_file, vec_roi_lyr, img_bbox)
 
+
+
         if not projs_match:
+            if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+                out_mem_format = "MEM"
+            else:
+                out_mem_format = "MEMORY"
+
             mem_result_ds, mem_result_lyr = reproj_vec_lyr_obj(
                 mem_lyr,
                 "mem_vec",
                 img_epsg,
-                out_format="MEM",
+                out_format=out_mem_format,
                 out_vec_lyr=None,
                 in_epsg=None,
                 print_feedback=False,
