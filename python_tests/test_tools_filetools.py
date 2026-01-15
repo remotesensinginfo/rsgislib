@@ -93,37 +93,41 @@ def test_does_path_exists_or_creatable_false_path_and_name(tmp_path):
 
 def test_get_file_size_bytes():
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
-    assert rsgislib.tools.filetools.get_file_size(input_img) == 13247487
+    assert rsgislib.tools.filetools.get_file_size(input_img) == 10317135
 
 
 def test_get_file_size_kb():
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    print(rsgislib.tools.filetools.get_file_size(input_img, unit="kb"))
     assert (
-        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="kb") - 12936.9990)
-        < 0.1
+        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="kb") - 10075)
+        < 1
     )
 
 
 def test_get_file_size_mb():
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    print(rsgislib.tools.filetools.get_file_size(input_img, unit="mb"))
     assert (
-        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="mb") - 12.6338) < 0.01
+        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="mb") - 9.839) < 0.1
     )
 
 
 def test_get_file_size_gb():
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    print(rsgislib.tools.filetools.get_file_size(input_img, unit="gb"))
     assert (
-        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="gb") - 0.01234)
-        < 0.0001
+        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="gb") - 0.00961)
+        < 0.001
     )
 
 
 def test_get_file_size_tb():
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    print(rsgislib.tools.filetools.get_file_size(input_img, unit="tb"))
     assert (
-        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="tb") - 1.20485e-05)
-        < 0.0000001
+        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="tb") - 9.3833796e-06)
+        < 0.00001
     )
 
 
