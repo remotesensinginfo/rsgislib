@@ -15,8 +15,8 @@ except ImportError:
 def test_perform_least_cost_path_calc(tmp_path):
     import rsgislib.imagecalc.leastcostpath
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     start_coord = (257938, 280795)
     stop_coord = (260201, 280445)
     rsgislib.imagecalc.leastcostpath.perform_least_cost_path_calc(
@@ -24,7 +24,7 @@ def test_perform_least_cost_path_calc(tmp_path):
         output_img,
         start_coord,
         stop_coord,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         cost_img_band=1,
     )
     assert os.path.exists(output_img)

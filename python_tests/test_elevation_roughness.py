@@ -23,7 +23,7 @@ def test_calc_simple_roughness_profile_metrics(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
 
-    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.kea")
+    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.tif")
     vec_file = os.path.join(ROUGH_DATA_DIR, "rough_smpl_pts.geojson")
     vec_lyr = "rough_smpl_pts"
 
@@ -84,7 +84,7 @@ def test_calc_simple_roughness_profile_metrics_plots(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
 
-    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.kea")
+    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.tif")
     vec_file = os.path.join(ROUGH_DATA_DIR, "rough_smpl_pts.geojson")
     vec_lyr = "rough_smpl_pts"
 
@@ -122,7 +122,7 @@ def test_calc_munro_roughness_profile_metrics(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
 
-    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.kea")
+    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.tif")
     vec_file = os.path.join(ROUGH_DATA_DIR, "rough_smpl_pts.geojson")
     vec_lyr = "rough_smpl_pts"
 
@@ -175,7 +175,7 @@ def test_calc_munro_roughness_profile_metrics_plots(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
 
-    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.kea")
+    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.tif")
     vec_file = os.path.join(ROUGH_DATA_DIR, "rough_smpl_pts.geojson")
     vec_lyr = "rough_smpl_pts"
 
@@ -213,7 +213,7 @@ def test_calc_smith_roughness_metrics(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
 
-    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.kea")
+    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.tif")
     vec_file = os.path.join(ROUGH_DATA_DIR, "rough_smpl_pts.geojson")
     vec_lyr = "rough_smpl_pts"
 
@@ -265,7 +265,7 @@ def test_calc_smith_roughness_metrics_plots(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
 
-    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.kea")
+    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.tif")
     vec_file = os.path.join(ROUGH_DATA_DIR, "rough_smpl_pts.geojson")
     vec_lyr = "rough_smpl_pts"
 
@@ -302,7 +302,7 @@ def test_calc_all_roughness_profile_metrics(tmp_path):
     import rsgislib.elevation.roughness
     import rsgislib.vectorattrs
 
-    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.kea")
+    input_dem_img = os.path.join(DATA_DIR, "SRTM_aber.tif")
     vec_file = os.path.join(ROUGH_DATA_DIR, "rough_smpl_pts.geojson")
     vec_lyr = "rough_smpl_pts"
 

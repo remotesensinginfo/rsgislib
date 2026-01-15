@@ -29,10 +29,10 @@ def test_find_class_pyod_outliers(tmp_path):
     import pyod.models.knn
 
     pyod_obj = pyod.models.knn.KNN()
-    input_img = os.path.join(CHANGEDETECT_DATA_DIR, "LS8_20180608_ndvi_sub.kea")
-    in_msk_img = os.path.join(CHANGEDETECT_DATA_DIR, "base_1997_class_img_sub.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
-    out_scores_img = os.path.join(tmp_path, "out_score_img.kea")
+    input_img = os.path.join(CHANGEDETECT_DATA_DIR, "LS8_20180608_ndvi_sub.tif")
+    in_msk_img = os.path.join(CHANGEDETECT_DATA_DIR, "base_1997_class_img_sub.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
+    out_scores_img = os.path.join(tmp_path, "out_score_img.tif")
 
     rsgislib.changedetect.pxloutlierchng.find_class_pyod_outliers(
         pyod_obj,
@@ -42,7 +42,7 @@ def test_find_class_pyod_outliers(tmp_path):
         out_scores_img=out_scores_img,
         img_mask_val=1,
         img_bands=None,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
     )
 
     assert os.path.exists(output_img) and os.path.exists(out_scores_img)
@@ -55,9 +55,9 @@ def test_find_class_pyod_outliers(tmp_path):
 def test_find_class_kurt_skew_outliers(tmp_path):
     from rsgislib.changedetect.pxloutlierchng import find_class_kurt_skew_outliers
 
-    input_img = os.path.join(CHANGEDETECT_DATA_DIR, "LS8_20180608_ndvi_sub.kea")
-    in_msk_img = os.path.join(CHANGEDETECT_DATA_DIR, "base_1997_class_img_sub.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(CHANGEDETECT_DATA_DIR, "LS8_20180608_ndvi_sub.tif")
+    in_msk_img = os.path.join(CHANGEDETECT_DATA_DIR, "base_1997_class_img_sub.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     plot_thres_file = os.path.join(tmp_path, "out_plot.png")
 
     find_class_kurt_skew_outliers(
@@ -73,7 +73,7 @@ def test_find_class_kurt_skew_outliers(tmp_path):
         img_mask_val=1,
         img_band=1,
         img_val_no_data=-999,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         plot_thres_file=plot_thres_file,
     )
 
@@ -84,9 +84,9 @@ def test_find_class_kurt_skew_outliers(tmp_path):
 def test_find_class_otsu_outliers(tmp_path):
     from rsgislib.changedetect.pxloutlierchng import find_class_otsu_outliers
 
-    input_img = os.path.join(CHANGEDETECT_DATA_DIR, "LS8_20180608_ndvi_sub.kea")
-    in_msk_img = os.path.join(CHANGEDETECT_DATA_DIR, "base_1997_class_img_sub.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(CHANGEDETECT_DATA_DIR, "LS8_20180608_ndvi_sub.tif")
+    in_msk_img = os.path.join(CHANGEDETECT_DATA_DIR, "base_1997_class_img_sub.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     plot_thres_file = os.path.join(tmp_path, "out_plot.png")
 
     find_class_otsu_outliers(
@@ -97,7 +97,7 @@ def test_find_class_otsu_outliers(tmp_path):
         img_mask_val=1,
         img_band=1,
         img_val_no_data=-999,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         plot_thres_file=plot_thres_file,
     )
 
@@ -108,9 +108,9 @@ def test_find_class_otsu_outliers(tmp_path):
 def test_find_class_li_outliers(tmp_path):
     from rsgislib.changedetect.pxloutlierchng import find_class_li_outliers
 
-    input_img = os.path.join(CHANGEDETECT_DATA_DIR, "LS8_20180608_ndvi_sub.kea")
-    in_msk_img = os.path.join(CHANGEDETECT_DATA_DIR, "base_1997_class_img_sub.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(CHANGEDETECT_DATA_DIR, "LS8_20180608_ndvi_sub.tif")
+    in_msk_img = os.path.join(CHANGEDETECT_DATA_DIR, "base_1997_class_img_sub.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     plot_thres_file = os.path.join(tmp_path, "out_plot.png")
 
     find_class_li_outliers(
@@ -123,7 +123,7 @@ def test_find_class_li_outliers(tmp_path):
         img_mask_val=1,
         img_band=1,
         img_val_no_data=-999,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         plot_thres_file=plot_thres_file,
     )
 

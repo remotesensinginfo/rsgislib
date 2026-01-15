@@ -1033,22 +1033,22 @@ def perform_tiled_img_filter(
         int(height),
         int(tileOverlap),
         False,
-        "KEA",
+        "GTIFF",
         datatype,
-        "kea",
+        "tif",
     )
-    imageTiles = glob.glob(tilesImgBase + "*.kea")
+    imageTiles = glob.glob(tilesImgBase + "*.tif")
 
     filterImgsVals = []
     for tile in imageTiles:
         tileBaseName = os.path.splitext(os.path.basename(tile))[0]
-        filterTile = os.path.join(tilesFilterDIR, tileBaseName + "_filter.kea")
+        filterTile = os.path.join(tilesFilterDIR, tileBaseName + "_filter.tif")
         filterImgsVals.append([tile, filterTile, filter_inst])
 
     with Pool(n_cores) as p:
         p.map(_perform_filtering_func, filterImgsVals)
 
-    imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.kea"))
+    imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.tif"))
 
     numOutBands = rsgislib.imageutils.get_img_band_count(input_img)
 
@@ -1164,11 +1164,11 @@ def perform_tiled_img_multi_filter(
         int(height),
         int(tileOverlap),
         False,
-        "KEA",
+        "GTIFF",
         datatype,
-        "kea",
+        "tif",
     )
-    imageTiles = glob.glob(tilesImgBase + "*.kea")
+    imageTiles = glob.glob(tilesImgBase + "*.tif")
 
     for i in range(numFilters):
         filter_inst = filter_insts[i]
@@ -1180,13 +1180,13 @@ def perform_tiled_img_multi_filter(
         filterImgsVals = []
         for tile in imageTiles:
             tileBaseName = os.path.splitext(os.path.basename(tile))[0]
-            filterTile = os.path.join(tilesFilterDIR, tileBaseName + "_filter.kea")
+            filterTile = os.path.join(tilesFilterDIR, tileBaseName + "_filter.tif")
             filterImgsVals.append([tile, filterTile, filter_inst])
 
         with Pool(n_cores) as p:
             p.map(_perform_filtering_func, filterImgsVals)
 
-        imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.kea"))
+        imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR, "*_filter.tif"))
 
         numOutBands = rsgislib.imageutils.get_img_band_count(input_img)
 

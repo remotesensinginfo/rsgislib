@@ -265,20 +265,20 @@ def extract_image_footprint(
 
     in_img_base = os.path.splitext(os.path.basename(input_img))[0]
 
-    valid_out_img = os.path.join(tmp_dir, in_img_base + "_" + uid_str + "_validimg.kea")
+    valid_out_img = os.path.join(tmp_dir, f"{in_img_base}_{uid_str}_validimg.tif")
     if no_data_val is None:
         no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
 
     if no_data_val is None:
         raise rsgislib.RSGISPyException("A no data value has not been specified.")
     rsgislib.imageutils.gen_valid_mask(
-        input_img, valid_out_img, gdalformat="KEA", no_data_val=no_data_val
+        input_img, valid_out_img, gdalformat="GTIFF", no_data_val=no_data_val
     )
 
     out_vec_tmp_file = out_vec_file
     if reproj_to is not None:
         out_vec_tmp_file = os.path.join(
-            tmp_dir, in_img_base + "_" + uid_str + "_initVecOut.gpkg"
+            tmp_dir, f"{in_img_base}_{uid_str}_initVecOut.gpkg"
         )
 
     polygonise_raster_to_vec_lyr(
@@ -332,7 +332,7 @@ def extract_image_footprint(
         shutil.rmtree(tmp_dir)
     else:
         if reproj_to is not None:
-            driver = ogr.GetDriverByName("ESRI Shapefile")
+            driver = ogr.GetDriverByName(out_format)
             driver.DeleteDataSource(out_vec_tmp_file)
 
 

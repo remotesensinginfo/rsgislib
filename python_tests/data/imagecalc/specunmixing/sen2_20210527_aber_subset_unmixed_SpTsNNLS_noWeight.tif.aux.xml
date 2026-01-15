@@ -1,0 +1,13 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>Band 1</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="2">
+    <Description>Band 2</Description>
+    <ColorInterp>Gray</ColorInterp>
+  </PAMRasterBand>
+  <PAMRasterBand band="3">
+    <Description>Band 3</Description>
+    <ColorInterp>Gray</ColorInterp>
+  </PAMRasterBand>
+</PAMDataset>

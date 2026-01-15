@@ -254,7 +254,7 @@ def _computeProximityArrArgsFunc(arg_vals):
     # 1: distTileFile
     # 2: proxOptions
     # 3: no_data_val,
-    # 4: format (e.g., KEA)
+    # 4: format (e.g., GTIFF)
     # 5: img_band
     try:
         import tqdm
@@ -387,11 +387,11 @@ def calc_dist_to_img_vals_tiled(
         tile_size,
         tileOverlap,
         0,
-        "KEA",
+        "GTIFF",
         rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
-        "kea",
+        "tif",
     )
-    imgTileFiles = glob.glob(imgTileBase + "*.kea")
+    imgTileFiles = glob.glob(imgTileBase + "*.tif")
 
     distTilesDIR = os.path.join(tmp_dir, "DistTiles_" + uid)
     distTilesDIRPresent = True
@@ -433,7 +433,7 @@ def calc_dist_to_img_vals_tiled(
             distTileFile,
             proxOptions,
             out_no_data_val,
-            "KEA",
+            "GTIFF",
             img_band,
         ]
         distTiles.append(distTileFile)
@@ -499,14 +499,14 @@ def buffer_img_pxl_vals(
 
     basename = rsgislib.tools.filetools.get_file_basename(input_img)
 
-    dist_img = os.path.join(tmp_dir, f"{basename}_dist.kea")
+    dist_img = os.path.join(tmp_dir, f"{basename}_dist.tif")
 
     calc_dist_to_img_vals(
         input_img,
         dist_img,
         pxl_vals,
         img_band,
-        "KEA",
+        "GTIFF",
         max_dist=(buf_thres * 1.1),
         no_data_val=None,
         out_no_data_val=-999,
@@ -944,11 +944,11 @@ def perform_image_mnf(
                 "A no data value for the input image must be provided."
             )
 
-    valid_msk_img = os.path.join(tmp_dir, "{}_vld_msk.kea".format(img_basename))
-    rsgislib.imageutils.gen_valid_mask(input_img, valid_msk_img, "KEA", in_img_no_data)
+    valid_msk_img = os.path.join(tmp_dir, "{}_vld_msk.tif".format(img_basename))
+    rsgislib.imageutils.gen_valid_mask(input_img, valid_msk_img, "GTIFF", in_img_no_data)
 
-    whiten_img = os.path.join(tmp_dir, "{}_whiten.kea".format(img_basename))
-    rsgislib.imageutils.whiten_image(input_img, valid_msk_img, 1, whiten_img, "KEA")
+    whiten_img = os.path.join(tmp_dir, "{}_whiten.tif".format(img_basename))
+    rsgislib.imageutils.whiten_image(input_img, valid_msk_img, 1, whiten_img, "GTIFF")
 
     # Read input data from image file.
     X = rsgislib.imageutils.extract_img_pxl_sample(

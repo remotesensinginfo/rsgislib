@@ -1,0 +1,39 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>Band 1</Description>
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">1066</MDI>
+      <MDI key="STATISTICS_MEAN">63.134063512874</MDI>
+      <MDI key="STATISTICS_MINIMUM">1</MDI>
+      <MDI key="STATISTICS_STDDEV">32.439124187591</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">100</MDI>
+    </Metadata>
+  </PAMRasterBand>
+  <PAMRasterBand band="2">
+    <Description>Band 2</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="3">
+    <Description>Band 3</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="4">
+    <Description>Band 4</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="5">
+    <Description>Band 5</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="6">
+    <Description>Band 6</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="7">
+    <Description>Band 7</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="8">
+    <Description>Band 8</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="9">
+    <Description>Band 9</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="10">
+    <Description>Band 10</Description>
+  </PAMRasterBand>
+</PAMDataset>

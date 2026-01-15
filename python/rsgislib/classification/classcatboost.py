@@ -244,7 +244,7 @@ def apply_catboost_binary_classifier(
                     )
                 )
 
-        outputs.out_image = out_class_vals
+        outputs.out_image = out_class_vals.astype(numpy.uint8)
         if otherargs.out_probs:
             outputs.out_prob_img = out_class_probs
 
@@ -291,7 +291,7 @@ def apply_catboost_binary_classifier(
         rsgislib.rastergis.pop_rat_img_stats(
             out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
-    elif gdalformat == "GTIFF":
+    else:
         rsgislib.imageutils.pop_thmt_img_stats(
             out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )

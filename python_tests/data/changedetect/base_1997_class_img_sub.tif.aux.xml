@@ -1,0 +1,69 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>Band 1</Description>
+    <GDALRasterAttributeTable tableType="thematic">
+      <FieldDefn index="0">
+        <Name>Histogram</Name>
+        <Type>1</Type>
+        <Usage>1</Usage>
+      </FieldDefn>
+      <FieldDefn index="1">
+        <Name>Red</Name>
+        <Type>0</Type>
+        <Usage>6</Usage>
+      </FieldDefn>
+      <FieldDefn index="2">
+        <Name>Green</Name>
+        <Type>0</Type>
+        <Usage>7</Usage>
+      </FieldDefn>
+      <FieldDefn index="3">
+        <Name>Blue</Name>
+        <Type>0</Type>
+        <Usage>8</Usage>
+      </FieldDefn>
+      <FieldDefn index="4">
+        <Name>Alpha</Name>
+        <Type>0</Type>
+        <Usage>9</Usage>
+      </FieldDefn>
+      <FieldDefn index="5">
+        <Name>class_names</Name>
+        <Type>2</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <Row index="0">
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>255</F>
+        <F></F>
+      </Row>
+      <Row index="1">
+        <F>233454</F>
+        <F>0</F>
+        <F>255</F>
+        <F>0</F>
+        <F>255</F>
+        <F>mangroves</F>
+      </Row>
+      <Row index="2">
+        <F>541809</F>
+        <F>180</F>
+        <F>180</F>
+        <F>180</F>
+        <F>255</F>
+        <F>other_terrestrial</F>
+      </Row>
+      <Row index="3">
+        <F>445698</F>
+        <F>0</F>
+        <F>0</F>
+        <F>255</F>
+        <F>255</F>
+        <F>water</F>
+      </Row>
+    </GDALRasterAttributeTable>
+  </PAMRasterBand>
+</PAMDataset>

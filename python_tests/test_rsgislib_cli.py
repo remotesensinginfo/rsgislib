@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 import pprint
 import glob
@@ -6,13 +7,18 @@ from shutil import copy2
 import platform
 import pytest
 import rsgislib.tools.filetools
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 RASTERGIS_DATA_DIR = os.path.join(DATA_DIR, "rastergis")
 IMGUTILS_DATA_DIR = os.path.join(DATA_DIR, "imageutils")
 
 # TODO Need to figure out what is happening on windows but get it building first!
-on_windows = platform.system() == "Windows"
+ON_WINDOWS = platform.system() == "Windows"
 
 JINJA2_NOT_AVAIL = False
 try:
@@ -28,7 +34,7 @@ gdal_translate_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail(
 )
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgis_config_version():
     rtn_info = subprocess.run(
         ["rsgis-config", "--version"], capture_output=True, text=True, check=True
@@ -37,7 +43,7 @@ def test_rsgis_config_version():
     assert (rtn_info.returncode == 0) and ("5" in rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgis_config_prefix():
     rtn_info = subprocess.run(
         ["rsgis-config", "--prefix"], capture_output=True, text=True, check=True
@@ -46,7 +52,7 @@ def test_rsgis_config_prefix():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgis_config_libs():
     rtn_info = subprocess.run(
         ["rsgis-config", "--libs"], capture_output=True, text=True, check=True
@@ -55,7 +61,7 @@ def test_rsgis_config_libs():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgis_config_cflags():
     rtn_info = subprocess.run(
         ["rsgis-config", "--cflags"], capture_output=True, text=True, check=True
@@ -64,7 +70,7 @@ def test_rsgis_config_cflags():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgis_config_ldflags():
     rtn_info = subprocess.run(
         ["rsgis-config", "--ldflags"], capture_output=True, text=True, check=True
@@ -73,7 +79,7 @@ def test_rsgis_config_ldflags():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgis_config_libdir():
     rtn_info = subprocess.run(
         ["rsgis-config", "--libdir"], capture_output=True, text=True, check=True
@@ -82,7 +88,7 @@ def test_rsgis_config_libdir():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgis_config_includes():
     rtn_info = subprocess.run(
         ["rsgis-config", "--includes"], capture_output=True, text=True, check=True
@@ -91,7 +97,7 @@ def test_rsgis_config_includes():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgis_config_fail():
     rtn_info = subprocess.run(
         ["rsgis-config", "--hello"], capture_output=True, text=True, check=True
@@ -101,7 +107,7 @@ def test_rsgis_config_fail():
 
 
 @pytest.mark.skipif(
-    (JINJA2_NOT_AVAIL or on_windows or (not gdal_translate_cmd_avail)),
+    (JINJA2_NOT_AVAIL or ON_WINDOWS or (not gdal_translate_cmd_avail)),
     reason="Either jinja2 not available or command not tested on Windows, "
     "or gdal_translate is not available",
 )
@@ -111,11 +117,11 @@ def test_rsgisapplycmd_run(tmp_path):
     out_dir = os.path.join(tmp_path, "out")
     os.mkdir(out_dir)
 
-    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.kea")
+    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.tif")
     copy2(img1_in, img1_out)
-    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.kea")
+    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.tif")
     copy2(img2_in, img2_out)
 
     rtn_info = subprocess.run(
@@ -126,7 +132,7 @@ def test_rsgisapplycmd_run(tmp_path):
             "--outdir",
             out_dir,
             "--inext",
-            "kea",
+            "tif",
             "--outext",
             "tif",
             "--nameapp",
@@ -147,7 +153,7 @@ def test_rsgisapplycmd_run(tmp_path):
 
 
 @pytest.mark.skipif(
-    (JINJA2_NOT_AVAIL or on_windows or (not gdal_translate_cmd_avail)),
+    (JINJA2_NOT_AVAIL or ON_WINDOWS or (not gdal_translate_cmd_avail)),
     reason="Either jinja2 not available or command not tested on "
     "Windows or gdal_translate is not available",
 )
@@ -157,11 +163,11 @@ def test_rsgisapplycmd_print(tmp_path):
     out_dir = os.path.join(tmp_path, "out")
     os.mkdir(out_dir)
 
-    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.kea")
+    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.tif")
     copy2(img1_in, img1_out)
-    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.kea")
+    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.tif")
     copy2(img2_in, img2_out)
 
     rtn_info = subprocess.run(
@@ -172,7 +178,7 @@ def test_rsgisapplycmd_print(tmp_path):
             "--outdir",
             out_dir,
             "--inext",
-            "kea",
+            "tif",
             "--outext",
             "tif",
             "--nameapp",
@@ -190,7 +196,7 @@ def test_rsgisapplycmd_print(tmp_path):
 
 
 @pytest.mark.skipif(
-    ((not gdal_translate_cmd_avail) or on_windows),
+    ((not gdal_translate_cmd_avail) or ON_WINDOWS),
     reason="Command not tested on Windows or gdal_translate is not available",
 )
 def test_rsgisbatchconvert2tif(tmp_path):
@@ -199,14 +205,14 @@ def test_rsgisbatchconvert2tif(tmp_path):
     out_dir = os.path.join(tmp_path, "out")
     os.mkdir(out_dir)
 
-    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.kea")
+    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.tif")
     copy2(img1_in, img1_out)
-    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.kea")
+    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.tif")
     copy2(img2_in, img2_out)
 
-    in_srch = os.path.join(in_dir, "*.kea")
+    in_srch = os.path.join(in_dir, "*.tif")
     rtn_info = subprocess.run(
         ["rsgisbatchconvert2tif.py", "-i", in_srch, "-o", out_dir],
         capture_output=True,
@@ -220,7 +226,7 @@ def test_rsgisbatchconvert2tif(tmp_path):
 
 
 @pytest.mark.skipif(
-    ((not gdal_translate_cmd_avail) or on_windows),
+    ((not gdal_translate_cmd_avail) or ON_WINDOWS),
     reason="Command not tested on Windows or gdal_translate is not available",
 )
 def test_rsgisbatchconvert2tif_chk(tmp_path):
@@ -229,14 +235,14 @@ def test_rsgisbatchconvert2tif_chk(tmp_path):
     out_dir = os.path.join(tmp_path, "out")
     os.mkdir(out_dir)
 
-    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.kea")
+    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.tif")
     copy2(img1_in, img1_out)
-    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.kea")
+    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.tif")
     copy2(img2_in, img2_out)
 
-    in_srch = os.path.join(in_dir, "*.kea")
+    in_srch = os.path.join(in_dir, "*.tif")
     rtn_info = subprocess.run(
         ["rsgisbatchconvert2tif.py", "-i", in_srch, "-o", out_dir, "--chkimgs"],
         capture_output=True,
@@ -249,19 +255,19 @@ def test_rsgisbatchconvert2tif_chk(tmp_path):
     )
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisbuildimglut(tmp_path):
     in_dir = os.path.join(tmp_path, "in")
     os.mkdir(in_dir)
 
-    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.kea")
+    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.tif")
     copy2(img1_in, img1_out)
-    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.kea")
+    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.tif")
     copy2(img2_in, img2_out)
 
-    in_srch = os.path.join(in_dir, "*.kea")
+    in_srch = os.path.join(in_dir, "*.tif")
     out_lut_file = os.path.join(tmp_path, "lut.gpkg")
     rtn_info = subprocess.run(
         [
@@ -283,19 +289,19 @@ def test_rsgisbuildimglut(tmp_path):
     assert (rtn_info.returncode == 0) and os.path.exists(out_lut_file)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisbuildimglut_wgs84(tmp_path):
     in_dir = os.path.join(tmp_path, "in")
     os.mkdir(in_dir)
 
-    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.kea")
+    img1_in = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    img1_out = os.path.join(in_dir, "sen2_20210527_aber_vldmsk.tif")
     copy2(img1_in, img1_out)
-    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.kea")
+    img2_in = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    img2_out = os.path.join(in_dir, "sen2_20210527_aber_subset_vldmsk.tif")
     copy2(img2_in, img2_out)
 
-    in_srch = os.path.join(in_dir, "*.kea")
+    in_srch = os.path.join(in_dir, "*.tif")
     out_lut_file = os.path.join(tmp_path, "lut.gpkg")
     rtn_info = subprocess.run(
         [
@@ -318,10 +324,10 @@ def test_rsgisbuildimglut_wgs84(tmp_path):
     assert (rtn_info.returncode == 0) and os.path.exists(out_lut_file)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgiscalcimgstats_cont(tmp_path):
-    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    img = os.path.join(tmp_path, "sen2_20210527_aber.kea")
+    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    img = os.path.join(tmp_path, "sen2_20210527_aber.tif")
     copy2(img_ref, img)
 
     rtn_info = subprocess.run(
@@ -334,10 +340,10 @@ def test_rsgiscalcimgstats_cont(tmp_path):
     assert rtn_info.returncode == 0
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgiscalcimgstats_therm(tmp_path):
-    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    img = os.path.join(tmp_path, "sen2_20210527_aber_vldmsk.kea")
+    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    img = os.path.join(tmp_path, "sen2_20210527_aber_vldmsk.tif")
     copy2(img_ref, img)
 
     rtn_info = subprocess.run(
@@ -350,7 +356,7 @@ def test_rsgiscalcimgstats_therm(tmp_path):
     assert rtn_info.returncode == 0
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgiscalcimgstats_therm_tif(tmp_path):
     img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
     img = os.path.join(tmp_path, "sen2_20210527_aber_vldmsk.tif")
@@ -366,10 +372,10 @@ def test_rsgiscalcimgstats_therm_tif(tmp_path):
     assert rtn_info.returncode == 0
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgischkgdalfile_sgl_img(tmp_path):
-    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    img = os.path.join(tmp_path, "sen2_20210527_aber_vldmsk.kea")
+    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    img = os.path.join(tmp_path, "sen2_20210527_aber_vldmsk.tif")
     copy2(img_ref, img)
 
     rtn_info = subprocess.run(
@@ -392,17 +398,17 @@ def test_rsgischkgdalfile_sgl_img(tmp_path):
     assert rtn_info.returncode == 0
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgischkgdalfile_multi_img(tmp_path):
-    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    img = os.path.join(tmp_path, "sen2_20210527_aber_vldmsk.kea")
+    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    img = os.path.join(tmp_path, "sen2_20210527_aber_vldmsk.tif")
     copy2(img_ref, img)
 
-    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    img = os.path.join(tmp_path, "sen2_20210527_aber_subset_vldmsk.kea")
+    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    img = os.path.join(tmp_path, "sen2_20210527_aber_subset_vldmsk.tif")
     copy2(img_ref, img)
 
-    in_srch = os.path.join(tmp_path, "*.kea")
+    in_srch = os.path.join(tmp_path, "*.tif")
     rtn_info = subprocess.run(
         [
             "rsgischkgdalfile.py",
@@ -423,7 +429,7 @@ def test_rsgischkgdalfile_multi_img(tmp_path):
     assert rtn_info.returncode == 0
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgischkgdalfile_sgl_vec(tmp_path):
     vec_ref = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     vec = os.path.join(tmp_path, "aber_osgb_multi_polys.geojson")
@@ -439,7 +445,7 @@ def test_rsgischkgdalfile_sgl_vec(tmp_path):
     assert rtn_info.returncode == 0
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgischkgdalfile_multi_vec(tmp_path):
     vec_ref = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     vec = os.path.join(tmp_path, "aber_osgb_multi_polys.geojson")
@@ -460,13 +466,13 @@ def test_rsgischkgdalfile_multi_vec(tmp_path):
     assert rtn_info.returncode == 0
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgiscopybandnames(tmp_path):
-    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    img = os.path.join(tmp_path, "sen2_20210527_aber.kea")
+    img_ref = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    img = os.path.join(tmp_path, "sen2_20210527_aber.tif")
     copy2(img_ref, img)
 
-    img_bandnames_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    img_bandnames_ref = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     rtn_info = subprocess.run(
         ["rsgiscopybandnames.py", "-r", img_bandnames_ref, "-o", img],
@@ -478,9 +484,9 @@ def test_rsgiscopybandnames(tmp_path):
     assert rtn_info.returncode == 0
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_sha1():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "SHA1"],
@@ -492,9 +498,9 @@ def test_rsgisfilehash_sha1():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_sha224():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "SHA224"],
@@ -506,9 +512,9 @@ def test_rsgisfilehash_sha224():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_sha256():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "SHA256"],
@@ -520,9 +526,9 @@ def test_rsgisfilehash_sha256():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_sha384():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "SHA384"],
@@ -534,9 +540,9 @@ def test_rsgisfilehash_sha384():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_sha512():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "SHA512"],
@@ -548,9 +554,9 @@ def test_rsgisfilehash_sha512():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_md5():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "MD5"],
@@ -562,9 +568,9 @@ def test_rsgisfilehash_md5():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_blake2b():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "Blake2B"],
@@ -576,9 +582,9 @@ def test_rsgisfilehash_blake2b():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_black2s():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "Blake2S"],
@@ -590,9 +596,9 @@ def test_rsgisfilehash_black2s():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_sha3_224():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "SHA3_224"],
@@ -604,9 +610,9 @@ def test_rsgisfilehash_sha3_224():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_sha3_256():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "SHA3_256"],
@@ -618,9 +624,9 @@ def test_rsgisfilehash_sha3_256():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_sha3_234():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "SHA3_384"],
@@ -632,9 +638,9 @@ def test_rsgisfilehash_sha3_234():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilehash_sha3_512():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisfilehash.py", "-i", img, "-o", "SHA3_512"],
@@ -646,12 +652,12 @@ def test_rsgisfilehash_sha3_512():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilelut_copy(tmp_path):
     import rsgislib.imageutils.imagelut
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_lut_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lut_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(
@@ -690,12 +696,12 @@ def test_rsgisfilelut_copy(tmp_path):
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisfilelut_targz(tmp_path):
     import rsgislib.imageutils.imagelut
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_lut_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lut_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(
@@ -736,9 +742,9 @@ def test_rsgisfilelut_targz(tmp_path):
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisimg2kmz(tmp_path):
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     out_file = os.path.join(tmp_path, "sen2_20210527_aber.kmz")
 
     rtn_info = subprocess.run(
@@ -752,11 +758,11 @@ def test_rsgisimg2kmz(tmp_path):
 
 
 @pytest.mark.skipif(
-    (not gdal2tiles_cmd_avail) or on_windows,
+    (not gdal2tiles_cmd_avail) or ON_WINDOWS,
     reason="Command not tested on Windows or gdal2tiles.py command not available.",
 )
 def test_rsgisimg2webtiles(tmp_path):
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisimg2webtiles.py", "-i", img, "-o", tmp_path, "-b", "3,2,1"],
@@ -768,9 +774,9 @@ def test_rsgisimg2webtiles(tmp_path):
     assert rtn_info.returncode == 0
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisimginfo():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisimginfo.py", "-i", img], capture_output=True, text=True, check=True
@@ -779,7 +785,7 @@ def test_rsgisimginfo():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS or ON_MACOS, reason="Command not tested on Windows. skipping MacOS due to KEA/HDF5 issues")
 def test_rsgisimginfo_rat():
     img = os.path.join(RASTERGIS_DATA_DIR, "sen2_20210527_aber_clumps_attref.kea")
 
@@ -790,9 +796,9 @@ def test_rsgisimginfo_rat():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisproj_img_epsg():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisproj.py", "--image", img, "-o", "EPSG"],
@@ -804,9 +810,9 @@ def test_rsgisproj_img_epsg():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisproj_img_wkt():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisproj.py", "--image", img, "-o", "WKT"],
@@ -818,9 +824,9 @@ def test_rsgisproj_img_wkt():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisproj_img_wktpretty():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisproj.py", "--image", img, "-o", "WKTPretty"],
@@ -832,9 +838,9 @@ def test_rsgisproj_img_wktpretty():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisproj_img_proj4():
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     rtn_info = subprocess.run(
         ["rsgisproj.py", "--image", img, "-o", "PROJ4"],
@@ -846,7 +852,7 @@ def test_rsgisproj_img_proj4():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisproj_utm_36n_epsg():
     rtn_info = subprocess.run(
         ["rsgisproj.py", "--utm", "36N", "-o", "EPSG"],
@@ -858,7 +864,7 @@ def test_rsgisproj_utm_36n_epsg():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisproj_utm_01n_epsg():
     rtn_info = subprocess.run(
         ["rsgisproj.py", "--utm", "01N", "-o", "EPSG"],
@@ -870,7 +876,7 @@ def test_rsgisproj_utm_01n_epsg():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisproj_utm_55s_epsg():
     rtn_info = subprocess.run(
         ["rsgisproj.py", "--utm", "55S", "-o", "EPSG"],
@@ -882,7 +888,7 @@ def test_rsgisproj_utm_55s_epsg():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisproj_wkt_epsg():
     file_path = os.path.join(IMGUTILS_DATA_DIR, "utm30n.wkt")
 
@@ -896,7 +902,7 @@ def test_rsgisproj_wkt_epsg():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisproj_epsg_wkt():
     rtn_info = subprocess.run(
         ["rsgisproj.py", "--epsg", "27700", "-o", "WKT"],
@@ -909,11 +915,11 @@ def test_rsgisproj_epsg_wkt():
 
 
 @pytest.mark.skipif(
-    ((not gdal_translate_cmd_avail) or on_windows),
+    ((not gdal_translate_cmd_avail) or ON_WINDOWS),
     reason="Command not tested on Windows or gdal_translate is not available",
 )
 def test_rsgistranslate2tif(tmp_path):
-    img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     out_img = os.path.join(tmp_path, "out_img.tif")
     rtn_info = subprocess.run(
         ["rsgistranslate2tif.py", "-i", img, "-o", out_img],
@@ -925,7 +931,7 @@ def test_rsgistranslate2tif(tmp_path):
     assert (rtn_info.returncode == 0) and os.path.exists(out_img)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisvectools_lyrs():
     vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     rtn_info = subprocess.run(
@@ -938,7 +944,7 @@ def test_rsgisvectools_lyrs():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisvectools_cols():
     vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     rtn_info = subprocess.run(
@@ -958,7 +964,7 @@ def test_rsgisvectools_cols():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisvectools_nfeats():
     vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     rtn_info = subprocess.run(
@@ -978,7 +984,7 @@ def test_rsgisvectools_nfeats():
     assert (rtn_info.returncode == 0) and ("" != rtn_info.stdout)
 
 
-@pytest.mark.skipif(on_windows, reason="Command not tested on Windows")
+@pytest.mark.skipif(ON_WINDOWS, reason="Command not tested on Windows")
 def test_rsgisvectools_proj():
     vec_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     rtn_info = subprocess.run(

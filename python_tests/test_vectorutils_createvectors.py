@@ -13,7 +13,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 def test_polygonise_raster_to_vec_lyr_4_conn(tmp_path):
     import rsgislib.vectorutils.createvectors
 
-    input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.kea")
+    input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.tif")
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
@@ -35,7 +35,7 @@ def test_polygonise_raster_to_vec_lyr_4_conn(tmp_path):
 def test_polygonise_raster_to_vec_lyr_8_conn(tmp_path):
     import rsgislib.vectorutils.createvectors
 
-    input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.kea")
+    input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.tif")
 
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
@@ -58,7 +58,7 @@ def test_polygonise_raster_to_vec_lyr_8_conn(tmp_path):
 def test_vectorise_pxls_to_pts(tmp_path):
     import rsgislib.vectorutils.createvectors
 
-    input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.kea")
+    input_img = os.path.join(DATA_DIR, "aber_osgb_multi_polys_rasters.tif")
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
@@ -79,7 +79,7 @@ def test_vectorise_pxls_to_pts(tmp_path):
 def test_extract_image_footprint(tmp_path):
     import rsgislib.vectorutils.createvectors
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
@@ -99,7 +99,7 @@ def test_extract_image_footprint(tmp_path):
 def test_extract_image_footprint_exception(tmp_path):
     import rsgislib.vectorutils.createvectors
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 
@@ -117,7 +117,7 @@ def test_extract_image_footprint_exception(tmp_path):
 def test_extract_image_footprint_reproj(tmp_path):
     import rsgislib.vectorutils.createvectors
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     out_vec_file = os.path.join(tmp_path, "out_vec.gpkg")
     out_vec_lyr = "out_vec"
 

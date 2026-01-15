@@ -1,5 +1,12 @@
 import os
+import sys
 import pytest
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 GEOPANDAS_NOT_AVAIL = False
 try:
@@ -14,9 +21,9 @@ IMGREG_DATA_DIR = os.path.join(DATA_DIR, "imageregistration")
 def test_find_image_offset():
     import rsgislib.imageregistration
 
-    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     in_float_img = os.path.join(
-        IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset.kea"
+        IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset.tif"
     )
     x_off, y_off = rsgislib.imageregistration.find_image_offset(
         in_ref_img,
@@ -36,10 +43,10 @@ def test_find_image_offset():
 def test_apply_offset_to_image(tmp_path):
     import rsgislib.imageregistration
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imageregistration.apply_offset_to_image(
-        input_img, output_img, "KEA", rsgislib.TYPE_16UINT, 50, 30
+        input_img, output_img, "GTIFF", rsgislib.TYPE_16UINT, 50, 30
     )
     assert os.path.exists(output_img)
 
@@ -47,9 +54,9 @@ def test_apply_offset_to_image(tmp_path):
 def test_basic_registration(tmp_path):
     import rsgislib.imageregistration
 
-    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     in_float_img = os.path.join(
-        IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset.kea"
+        IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset.tif"
     )
     out_gcp_file = os.path.join(tmp_path, "out_gcps.txt")
     rsgislib.imageregistration.basic_registration(
@@ -73,9 +80,9 @@ def test_basic_registration(tmp_path):
 def test_single_layer_registration(tmp_path):
     import rsgislib.imageregistration
 
-    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     in_float_img = os.path.join(
-        IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset.kea"
+        IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset.tif"
     )
     out_gcp_file = os.path.join(tmp_path, "out_gcps.txt")
     rsgislib.imageregistration.single_layer_registration(
@@ -104,20 +111,21 @@ def test_gcp_to_gdal(tmp_path):
     import rsgislib.imageutils
 
     input_img = os.path.join(
-        IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset.kea"
+        IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset.tif"
     )
     in_gcp_file = os.path.join(IMGREG_DATA_DIR, "reg_gcps.txt")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imageregistration.gcp_to_gdal(
-        input_img, in_gcp_file, output_img, "KEA", rsgislib.TYPE_16UINT
+        input_img, in_gcp_file, output_img, "GTIFF", rsgislib.TYPE_16UINT
     )
     assert os.path.exists(output_img) and rsgislib.imageutils.has_gcps(output_img)
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_warp_with_gcps_with_gdal(tmp_path):
     import rsgislib.imageregistration
 
-    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     in_process_img = os.path.join(
         IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_offset_gcps.kea"
     )
@@ -126,7 +134,7 @@ def test_warp_with_gcps_with_gdal(tmp_path):
         in_ref_img,
         in_process_img,
         output_img,
-        "KEA",
+        "GTIFF",
         rsgislib.INTERP_NEAREST_NEIGHBOUR,
         use_tps=False,
         use_poly=True,
@@ -140,12 +148,12 @@ def test_add_vec_pts_as_gcps_to_img(tmp_path):
     import rsgislib.imageregistration
     import rsgislib.imageutils
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123_nostats.tif")
     vec_gcp_pts_file = os.path.join(
         IMGREG_DATA_DIR, "sen2_20210527_aber_subset_b123_gcp_pts.geojson"
     )
     vec_gcp_pts_lyr = "sen2_20210527_aber_subset_b123_gcp_pts"
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
 
     rsgislib.imageregistration.add_vec_pts_as_gcps_to_img(
         input_img,

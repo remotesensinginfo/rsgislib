@@ -1350,9 +1350,12 @@ def apply_lightgbm_binary_classifier(
             gdalformat,
             rsgislib.TYPE_8UINT,
         )
-        rsgislib.rastergis.pop_rat_img_stats(
-            out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
-        )
+        if gdalformat == "KEA":
+            rsgislib.rastergis.pop_rat_img_stats(
+                out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            )
+        else:
+            rsgislib.imageutils.pop_thmt_img_stats(input_img = out_class_img, add_clr_tab = True, calc_pyramids = True, ignore_zero = True)
 
 
 def optimise_lightgbm_multiclass_classifier(

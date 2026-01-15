@@ -21,7 +21,7 @@ try:
 except ImportError:
     SHAPELY_NOT_AVAIL = True
 
-on_windows = platform.system() == "Windows"
+ON_WINDOWS = platform.system() == "Windows"
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 VECTORUTILS_DATA_DIR = os.path.join(DATA_DIR, "vectorutils")
@@ -31,7 +31,7 @@ REGRESS_DATA_DIR = os.path.join(DATA_DIR, "regression")
 
 
 # TODO - workout what is happening on Windows.
-@pytest.mark.skipif(on_windows, reason="Problems on Windows removing files")
+@pytest.mark.skipif(ON_WINDOWS, reason="Problems on Windows removing files")
 def test_delete_vector_file(tmp_path):
     import rsgislib.vectorutils
     import shutil
@@ -729,7 +729,7 @@ def test_copy_rat_cols_to_vector_lyr(tmp_path):
     import rsgislib.vectorutils.createrasters
     import rsgislib.rastergis
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     vec_ref_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     vec_file = os.path.join(tmp_path, "aber_osgb_multi_polys.geojson")
@@ -737,10 +737,10 @@ def test_copy_rat_cols_to_vector_lyr(tmp_path):
 
     copy2(vec_ref_file, vec_file)
 
-    clumps_img = os.path.join(tmp_path, "clumps_img.kea")
+    clumps_img = os.path.join(tmp_path, "clumps_img.img")
 
     rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
-        vec_file, vec_lyr, input_img, clumps_img, gdalformat="KEA", att_column="val"
+        vec_file, vec_lyr, input_img, clumps_img, gdalformat="HFA", att_column="val"
     )
 
     bs = []
@@ -847,7 +847,7 @@ def test_check_validate_geometries(tmp_path):
 def test_does_vmsk_img_intersect(tmp_path):
     import rsgislib.vectorutils
 
-    input_vmsk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
+    input_vmsk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
     vec_roi_file = os.path.join(DATA_DIR, "aber_osgb_multi_polys.geojson")
     vec_roi_lyr = "aber_osgb_multi_polys"
 
@@ -1121,7 +1121,7 @@ def test_geopd_check_polys_wgs84_bounds_geometry():
 
 # TODO - issues on windows so skipping for the moment.
 @pytest.mark.skipif(
-    on_windows or (GEOPANDAS_NOT_AVAIL and SHAPELY_NOT_AVAIL),
+    ON_WINDOWS or (GEOPANDAS_NOT_AVAIL and SHAPELY_NOT_AVAIL),
     reason="geopandas or shapely dependencies not available or skipping on Windows",
 )
 def test_merge_utm_vecs_wgs84(tmp_path):

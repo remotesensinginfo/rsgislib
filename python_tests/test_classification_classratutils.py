@@ -1,6 +1,13 @@
 import os
-import pytest
 from shutil import copy2
+import sys
+import pytest
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 H5PY_NOT_AVAIL = False
 try:
@@ -12,6 +19,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_populate_clumps_with_class_training(tmp_path):
     import rsgislib.classification
     import rsgislib.classification.classratutils
@@ -86,7 +94,7 @@ def test_populate_clumps_with_class_training(tmp_path):
     assert vars_eq_vals
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
+@pytest.mark.skipif((H5PY_NOT_AVAIL or ON_MACOS), reason="h5py dependency not available or skipping MacOS due to KEA/HDF5 issues")
 def test_extract_rat_col_data(tmp_path):
     import rsgislib.classification.classratutils
 

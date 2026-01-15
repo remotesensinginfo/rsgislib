@@ -1,6 +1,13 @@
 import os
 from shutil import copy2
+import sys
 import pytest
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 H5PY_NOT_AVAIL = False
 try:
@@ -198,8 +205,8 @@ def test_train_sklearn_classifier():
 
 
 @pytest.mark.skipif(
-    (H5PY_NOT_AVAIL or SKLEARN_NOT_AVAIL),
-    reason="h5py or scikit-learn dependencies not available",
+    (H5PY_NOT_AVAIL or SKLEARN_NOT_AVAIL or ON_MACOS),
+    reason="h5py or scikit-learn dependencies not available or skipping MacOS due to KEA/HDF5 issues",
 )
 def test_apply_sklearn_classifier(tmp_path):
     import rsgislib.imageutils
@@ -273,8 +280,8 @@ def test_apply_sklearn_classifier(tmp_path):
         blue=120,
     )
 
-    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    s2_vld_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    s2_vld_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
 
     img_band_info = []
     img_band_info.append(
@@ -286,8 +293,8 @@ def test_apply_sklearn_classifier(tmp_path):
         cls_info_dict, sk_classifier
     )
 
-    output_img = os.path.join(tmp_path, "out_cls_img.kea")
-    out_score_img = os.path.join(tmp_path, "out_cls_scr_img.kea")
+    output_img = os.path.join(tmp_path, "out_cls_img.tif")
+    out_score_img = os.path.join(tmp_path, "out_cls_scr_img.tif")
     rsgislib.classification.classsklearn.apply_sklearn_classifier(
         cls_info_dict,
         sk_classifier,
@@ -295,7 +302,7 @@ def test_apply_sklearn_classifier(tmp_path):
         1,
         img_band_info,
         output_img,
-        "KEA",
+        "GTIFF",
         class_clr_names=True,
         out_score_img=out_score_img,
     )

@@ -21,14 +21,14 @@ TOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools")
 def test_get_gdal_raster_mpl_imshow_basic():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(input_img, bands=None, bbox=None)
 
 
 def test_get_gdal_raster_mpl_imshow_bands():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[8, 9, 3], bbox=None
     )
@@ -38,7 +38,7 @@ def test_get_gdal_raster_mpl_imshow_bands_bbox():
     import rsgislib.tools.plotting
     import rsgislib.imageutils
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     sub_bbox = rsgislib.imageutils.get_img_bbox(input_img)
     rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[8, 9, 3], bbox=sub_bbox
@@ -48,7 +48,7 @@ def test_get_gdal_raster_mpl_imshow_bands_bbox():
 def test_linear_stretch_np_arr_3_bands():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[1, 2, 3], bbox=None
     )
@@ -58,7 +58,7 @@ def test_linear_stretch_np_arr_3_bands():
 def test_linear_stretch_np_arr_1_band():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[1], bbox=None
     )
@@ -68,7 +68,7 @@ def test_linear_stretch_np_arr_1_band():
 def test_cumulative_stretch_np_arr_3_bands():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[1, 2, 3], bbox=None
     )
@@ -78,7 +78,7 @@ def test_cumulative_stretch_np_arr_3_bands():
 def test_cumulative_stretch_np_arr_1_band():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[1], bbox=None
     )
@@ -88,7 +88,7 @@ def test_cumulative_stretch_np_arr_1_band():
 def test_stdev_stretch_np_arr_3_bands():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[1, 2, 3], bbox=None
     )
@@ -98,7 +98,7 @@ def test_stdev_stretch_np_arr_3_bands():
 def test_stdev_stretch_np_arr_1_band():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[1], bbox=None
     )
@@ -108,7 +108,7 @@ def test_stdev_stretch_np_arr_1_band():
 def test_manual_stretch_np_arr_3_bands():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[1, 2, 3], bbox=None
     )
@@ -126,7 +126,7 @@ def test_manual_stretch_np_arr_3_bands():
 def test_manual_stretch_np_arr_1_band():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
     img_data, img_coords = rsgislib.tools.plotting.get_gdal_raster_mpl_imshow(
         input_img, bands=[1], bbox=None
     )
@@ -140,7 +140,7 @@ def test_manual_stretch_np_arr_1_band():
 def test_get_gdal_thematic_raster_mpl_imshow_basic():
     import rsgislib.tools.plotting
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.tif")
     rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(input_img)
 
 
@@ -148,7 +148,7 @@ def test_get_gdal_thematic_raster_mpl_imshow_bbox():
     import rsgislib.tools.plotting
     import rsgislib.imageutils
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.tif")
     sub_bbox = rsgislib.imageutils.get_img_bbox(input_img)
     rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(
         input_img, bbox=sub_bbox
@@ -165,7 +165,7 @@ def test_get_gdal_thematic_raster_mpl_imshow_patches():
     cls_names_lut[3] = "Urban"
     cls_names_lut[4] = "Water"
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.tif")
     rsgislib.tools.plotting.get_gdal_thematic_raster_mpl_imshow(
         input_img, out_patches=True, cls_names_lut=cls_names_lut
     )

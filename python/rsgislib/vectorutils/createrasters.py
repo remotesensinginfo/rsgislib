@@ -118,15 +118,19 @@ def rasterise_vec_lyr(
         out_img_ds = None
         vec_ds = None
 
-        if thematic and (gdalformat == "KEA"):
-            import rsgislib.rastergis
+        if thematic:
+            if gdalformat == "KEA":
+                import rsgislib.rastergis
 
-            rsgislib.rastergis.pop_rat_img_stats(
-                clumps_img=output_img,
-                add_clr_tab=True,
-                calc_pyramids=True,
-                ignore_zero=True,
-            )
+                rsgislib.rastergis.pop_rat_img_stats(
+                    clumps_img=output_img,
+                    add_clr_tab=True,
+                    calc_pyramids=True,
+                    ignore_zero=True,
+                )
+            else:
+                rsgislib.imageutils.pop_thmt_img_stats(
+                    input_img = output_img, add_clr_tab = True, calc_pyramids = True, ignore_zero = True)
         else:
             rsgislib.imageutils.pop_img_stats(output_img, True, no_data_val, True)
     except Exception as e:
@@ -172,6 +176,9 @@ def rasterise_vec_lyr_obj(
         if out_img_ds is None:
             raise rsgislib.RSGISPyException("Could not open '{}'".format(output_img))
 
+        out_img_drv = out_img_ds.GetDriver()
+        gdalformat = out_img_drv.ShortName
+
         # Run the algorithm.
         err = 0
         if att_column is None:
@@ -188,18 +195,22 @@ def rasterise_vec_lyr_obj(
         out_img_ds = None
 
         if calc_stats:
+            import rsgislib.imageutils
             if thematic:
-                import rsgislib.rastergis
+                if gdalformat == "KEA":
+                    import rsgislib.rastergis
 
-                rsgislib.rastergis.pop_rat_img_stats(
-                    clumps_img=output_img,
-                    add_clr_tab=True,
-                    calc_pyramids=True,
-                    ignore_zero=True,
-                )
+                    rsgislib.rastergis.pop_rat_img_stats(
+                            clumps_img=output_img,
+                            add_clr_tab=True,
+                            calc_pyramids=True,
+                            ignore_zero=True,
+                    )
+                else:
+                    rsgislib.imageutils.pop_thmt_img_stats(
+                            input_img=output_img, add_clr_tab=True, calc_pyramids=True,
+                            ignore_zero=True)
             else:
-                import rsgislib.imageutils
-
                 rsgislib.imageutils.pop_img_stats(output_img, True, no_data_val, True)
     except Exception as e:
         print("Failed rasterising: {}".format(output_img))

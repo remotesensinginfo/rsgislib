@@ -8,7 +8,7 @@ def test_create_img_extent_lut(tmp_path):
     import rsgislib.imageutils.imagelut
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(
@@ -28,7 +28,7 @@ def test_create_img_extent_lut_wgs84(tmp_path):
     import rsgislib.imageutils.imagelut
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(
@@ -48,7 +48,7 @@ def test_get_all_lut_imgs(tmp_path):
     import rsgislib.imageutils.imagelut
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(
@@ -69,7 +69,7 @@ def test_query_img_lut(tmp_path):
     import rsgislib.imageutils
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(
@@ -83,7 +83,7 @@ def test_query_img_lut(tmp_path):
     )
 
     scn_bbox = rsgislib.imageutils.get_img_bbox(
-        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     )
 
     rsgislib.imageutils.imagelut.query_img_lut(scn_bbox, vec_file, vec_lyr)
@@ -94,7 +94,7 @@ def test_get_raster_lyr(tmp_path):
     import rsgislib.imageutils
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(
@@ -108,7 +108,7 @@ def test_get_raster_lyr(tmp_path):
     )
 
     scn_bbox = rsgislib.imageutils.get_img_bbox(
-        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     )
 
     out_img = rsgislib.imageutils.imagelut.get_raster_lyr(
@@ -122,7 +122,7 @@ def test_query_file_lut(tmp_path):
     import rsgislib.imageutils
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(
@@ -148,7 +148,7 @@ def test_query_file_lut_gztar(tmp_path):
     import rsgislib.imageutils
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(
@@ -175,7 +175,7 @@ def test_query_file_lut_cp(tmp_path):
     import rsgislib.imageutils
     import glob
 
-    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.kea"))
+    input_imgs = glob.glob(os.path.join(IMGUTILS_DATA_DIR, "s2_tiles", "*.tif"))
     vec_file = os.path.join(tmp_path, "test_lut.gpkg")
     vec_lyr = "test_lut"
     rsgislib.imageutils.imagelut.create_img_extent_lut(

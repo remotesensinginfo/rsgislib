@@ -111,9 +111,9 @@ def test_apply_regress_sklearn_mdl(tmp_path):
 
     et_obj.fit(x, y)
 
-    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    vld_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    out_img = os.path.join(tmp_path, "out_img.kea")
+    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    vld_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    out_img = os.path.join(tmp_path, "out_img.tif")
 
     rsgislib.regression.regresssklearn.apply_regress_sklearn_mdl(
         et_obj,
@@ -123,7 +123,7 @@ def test_apply_regress_sklearn_mdl(tmp_path):
         vld_msk_img,
         1,
         out_img,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         out_band_names=None,
         calc_stats=True,
         out_no_date_val=0.0,

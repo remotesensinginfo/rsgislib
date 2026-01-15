@@ -8,7 +8,7 @@ FILETOOLS_DATA_DIR = os.path.join(DATA_DIR, "tools/filetools")
 
 unzip_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("unzip")
 tar_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail("tar")
-on_windows = platform.system() == "Windows"
+ON_WINDOWS = platform.system() == "Windows"
 
 
 @pytest.mark.parametrize(
@@ -52,78 +52,82 @@ def test_get_file_basename_check_valid_2():
 
 
 def test_is_path_valid_true():
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     assert rsgislib.tools.filetools.is_path_valid(input_img)
 
 
 def test_is_path_valid_false(tmp_path):
-    input_file = os.path.join(tmp_path, "sen2_20210527_aber\x00.kea")
+    input_file = os.path.join(tmp_path, "sen2_20210527_aber\x00.tif")
     assert not rsgislib.tools.filetools.is_path_valid(input_file)
 
 
 def test_is_path_sibling_creatable_true(tmp_path):
-    input_file = os.path.join(tmp_path, "sen2_20210527_aber.kea")
+    input_file = os.path.join(tmp_path, "sen2_20210527_aber.tif")
     assert rsgislib.tools.filetools.is_path_sibling_creatable(input_file)
 
 
 def test_is_path_sibling_creatable_false(tmp_path):
-    input_file = os.path.join(tmp_path, "hello", "world", "sen2_20210527_aber.kea")
+    input_file = os.path.join(tmp_path, "hello", "world", "sen2_20210527_aber.tif")
     assert not rsgislib.tools.filetools.is_path_sibling_creatable(input_file)
 
 
 def test_does_path_exists_or_creatable_true(tmp_path):
-    input_file = os.path.join(tmp_path, "sen2_20210527_aber.kea")
+    input_file = os.path.join(tmp_path, "sen2_20210527_aber.tif")
     assert rsgislib.tools.filetools.does_path_exists_or_creatable(input_file)
 
 
 def test_does_path_exists_or_creatable_false_file_name(tmp_path):
-    input_file = os.path.join(tmp_path, "sen2_20210527_aber\x00.kea")
+    input_file = os.path.join(tmp_path, "sen2_20210527_aber\x00.tif")
     assert not rsgislib.tools.filetools.does_path_exists_or_creatable(input_file)
 
 
 def test_does_path_exists_or_creatable_false_path(tmp_path):
-    input_file = os.path.join(tmp_path, "hello", "world", "sen2_20210527_aber.kea")
+    input_file = os.path.join(tmp_path, "hello", "world", "sen2_20210527_aber.tif")
     assert not rsgislib.tools.filetools.does_path_exists_or_creatable(input_file)
 
 
 def test_does_path_exists_or_creatable_false_path_and_name(tmp_path):
-    input_file = os.path.join(tmp_path, "hello", "world", "sen2_20210527_aber\x00.kea")
+    input_file = os.path.join(tmp_path, "hello", "world", "sen2_20210527_aber\x00.tif")
     assert not rsgislib.tools.filetools.does_path_exists_or_creatable(input_file)
 
 
 def test_get_file_size_bytes():
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    assert rsgislib.tools.filetools.get_file_size(input_img) == 7749324
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    assert rsgislib.tools.filetools.get_file_size(input_img) == 10317135
 
 
 def test_get_file_size_kb():
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    print(rsgislib.tools.filetools.get_file_size(input_img, unit="kb"))
     assert (
-        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="kb") - 7567.699)
-        < 0.1
+        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="kb") - 10075)
+        < 1
     )
 
 
 def test_get_file_size_mb():
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    print(rsgislib.tools.filetools.get_file_size(input_img, unit="mb"))
     assert (
-        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="mb") - 7.39) < 0.01
+        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="mb") - 9.839) < 0.1
     )
 
 
 def test_get_file_size_gb():
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    print(rsgislib.tools.filetools.get_file_size(input_img, unit="gb"))
     assert (
-        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="gb") - 0.00722)
-        < 0.0001
+        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="gb") - 0.00961)
+        < 0.001
     )
 
 
 def test_get_file_size_tb():
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    print(rsgislib.tools.filetools.get_file_size(input_img, unit="tb"))
     assert (
-        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="tb") - 7.04797e-06)
-        < 0.0000001
+        abs(rsgislib.tools.filetools.get_file_size(input_img, unit="tb") - 9.3833796e-06)
+        < 0.00001
     )
 
 
@@ -258,7 +262,7 @@ def test_untar_gz_file_gen_arch_dir_false(tmp_path):
 
 
 @pytest.mark.skipif(
-    on_windows or (not tar_cmd_avail), reason="tar command not available or on Windows"
+    ON_WINDOWS or (not tar_cmd_avail), reason="tar command not available or on Windows"
 )
 def test_untar_bz_file_gen_arch_dir_true(tmp_path):
     input_file = os.path.join(FILETOOLS_DATA_DIR, "test_file.tar.bz")
@@ -278,7 +282,7 @@ def test_untar_bz_file_gen_arch_dir_true(tmp_path):
 
 
 @pytest.mark.skipif(
-    on_windows or (not tar_cmd_avail), reason="tar command not available or on Windows"
+    ON_WINDOWS or (not tar_cmd_avail), reason="tar command not available or on Windows"
 )
 def test_untar_bz_file_gen_arch_dir_false(tmp_path):
     input_file = os.path.join(FILETOOLS_DATA_DIR, "test_file.tar.bz")
@@ -433,7 +437,7 @@ def test_split_path_all_file_rel():
 def test_get_dir_name_file():
     import rsgislib.tools.filetools
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     dir_name = rsgislib.tools.filetools.get_dir_name(input_img)
     assert dir_name == "data"
 

@@ -382,7 +382,7 @@ def apply_sklearn_classifier(
                         inputs.image_mask.shape[2],
                     )
                 )
-        outputs.out_image = out_class_vals
+        outputs.out_image = out_class_vals.astype(dtype=numpy.uint8)
         if otherargs.out_score_img:
             outputs.out_score_img = out_score_vals
 

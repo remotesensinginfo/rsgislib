@@ -388,23 +388,23 @@ def test_apply_lightgbm_binary_classifier_bayesopt(tmp_path):
         mdl_cls_obj=None,
     )
 
-    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     img_band_info = []
     img_band_info.append(
         rsgislib.imageutils.ImageBandInfo(s2_img, "s2", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     )
 
-    out_prob_img = os.path.join(tmp_path, "out_prob_cls.kea")
-    out_class_img = os.path.join(tmp_path, "out_cls_img.kea")
+    out_prob_img = os.path.join(tmp_path, "out_prob_cls.tif")
+    out_class_img = os.path.join(tmp_path, "out_cls_img.tif")
     rsgislib.classification.classlightgbm.apply_lightgbm_binary_classifier(
         out_mdl_file,
         in_msk_img,
         1,
         img_band_info,
         out_prob_img,
-        "KEA",
+        "GTIFF",
         out_class_img,
         class_thres=5000,
     )
@@ -1113,15 +1113,15 @@ def test_apply_lightgbm_multiclass_classifier_bayesopt(tmp_path):
         n_threads=1,
     )
 
-    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     img_band_info = []
     img_band_info.append(
         rsgislib.imageutils.ImageBandInfo(s2_img, "s2", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     )
 
-    out_class_img = os.path.join(tmp_path, "out_cls_img.kea")
+    out_class_img = os.path.join(tmp_path, "out_cls_img.tif")
     rsgislib.classification.classlightgbm.apply_lightgbm_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
@@ -1129,8 +1129,8 @@ def test_apply_lightgbm_multiclass_classifier_bayesopt(tmp_path):
         1,
         img_band_info,
         out_class_img,
-        "KEA",
-        class_clr_names=True,
+        "GTIFF",
+        class_clr_names=False,
     )
 
     assert os.path.exists(out_class_img)

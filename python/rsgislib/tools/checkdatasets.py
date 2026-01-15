@@ -142,7 +142,7 @@ def check_gdal_image_file(
                             band = 1
                         else:
                             band = int(
-                                numpy.random.randint(1, high=n_img_bands, size=1)
+                                numpy.random.randint(1, high=n_img_bands, size=1)[0]
                             )
 
                         img_band = raster_ds.GetRasterBand(band)

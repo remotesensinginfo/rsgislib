@@ -11,64 +11,58 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 ZONALSTATS_DATA_DIR = os.path.join(DATA_DIR, "zonalstats")
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_check_gdal_image_file_base():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_gdal_image_file(input_img)
     assert file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_check_gdal_image_file_n_bands():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_gdal_image_file(
         input_img, check_bands=True, n_bands=10
     )
     assert file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_check_gdal_image_file_n_bands_err():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_gdal_image_file(
         input_img, check_bands=True, n_bands=5
     )
     assert not file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_check_gdal_image_file_proj():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_gdal_image_file(
         input_img, check_bands=True, n_bands=0, chk_proj=True, epsg_code=27700
     )
     assert file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_check_gdal_image_file_proj_err():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_gdal_image_file(
         input_img, check_bands=True, n_bands=0, chk_proj=True, epsg_code=4326
     )
     assert not file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_check_gdal_image_file_read_img():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_gdal_image_file(
         input_img,
         check_bands=True,
@@ -81,11 +75,10 @@ def test_check_gdal_image_file_read_img():
     assert file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_check_gdal_image_file_check_sum():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_gdal_image_file(
         input_img,
         check_bands=True,
@@ -99,11 +92,10 @@ def test_check_gdal_image_file_check_sum():
     assert file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_check_gdal_image_file_filesize():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_gdal_image_file(
         input_img,
         check_bands=True,
@@ -113,16 +105,15 @@ def test_check_gdal_image_file_filesize():
         read_img=True,
         smpl_n_pxls=10,
         calc_chk_sum=True,
-        max_file_size=8000000,
+        max_file_size=15000000,
     )
     assert file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_check_gdal_image_file_filesize_err():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_gdal_image_file(
         input_img,
         check_bands=True,
@@ -132,16 +123,15 @@ def test_check_gdal_image_file_filesize_err():
         read_img=True,
         smpl_n_pxls=10,
         calc_chk_sum=True,
-        max_file_size=4000000,
+        max_file_size=5000000,
     )
     assert not file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_run_check_gdal_image_file():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     file_ok = rsgislib.tools.checkdatasets.run_check_gdal_image_file(
         input_img,
         check_bands=True,
@@ -151,20 +141,19 @@ def test_run_check_gdal_image_file():
         read_img=True,
         smpl_n_pxls=10,
         calc_chk_sum=True,
-        max_file_size=8000000,
+        max_file_size=15000000,
         rm_err=False,
         print_err=True,
     )
     assert file_ok
 
 
-@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_run_check_gdal_image_files():
     import rsgislib.tools.checkdatasets
 
     input_imgs = [
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
-        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber.tif"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif"),
     ]
     files_ok = rsgislib.tools.checkdatasets.run_check_gdal_image_files(
         input_imgs,
@@ -175,7 +164,7 @@ def test_run_check_gdal_image_files():
         read_img=True,
         smpl_n_pxls=10,
         calc_chk_sum=True,
-        max_file_size=8000000,
+        max_file_size=15000000,
         rm_err=False,
         print_err=True,
     )
@@ -259,7 +248,7 @@ def test_run_check_gdal_vector_files():
 def test_check_hdf5_file():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_kea.kea")
     file_ok, err_msg = rsgislib.tools.checkdatasets.check_hdf5_file(input_img)
     assert file_ok
 
@@ -268,7 +257,7 @@ def test_check_hdf5_file():
 def test_run_check_hdf5_file():
     import rsgislib.tools.checkdatasets
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_kea.kea")
     file_ok = rsgislib.tools.checkdatasets.run_check_hdf5_file(input_img)
     assert file_ok
 
@@ -278,8 +267,8 @@ def test_run_check_hdf5_files():
     import rsgislib.tools.checkdatasets
 
     input_imgs = [
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
-        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber_kea.kea"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber_subset_kea.kea"),
     ]
     files_ok = rsgislib.tools.checkdatasets.run_check_hdf5_files(input_imgs)
     assert files_ok

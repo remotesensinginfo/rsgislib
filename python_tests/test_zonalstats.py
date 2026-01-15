@@ -22,7 +22,7 @@ def test_ext_point_band_values_file(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(
         ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pt_samples.geojson"
     )
@@ -69,7 +69,7 @@ def test_ext_point_band_values_file_reproj(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.tif")
     vec_file = os.path.join(
         ZONALSTATS_DATA_DIR, "sen2_20210527_aber_wgs84_pt_samples.geojson"
     )
@@ -116,7 +116,7 @@ def test_ext_point_band_values_file_reproj_specepsg(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.tif")
     vec_file = os.path.join(
         ZONALSTATS_DATA_DIR, "sen2_20210527_aber_wgs84_pt_samples.geojson"
     )
@@ -163,7 +163,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Min(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -216,7 +216,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Max(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -269,7 +269,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Mean(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -329,7 +329,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_StdDev(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -389,7 +389,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Sum(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -442,7 +442,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Count(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -496,7 +496,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Mode(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -549,7 +549,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Median(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -602,7 +602,7 @@ def test_calc_zonal_band_stats_test_poly_pts_file_Percentile(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -655,7 +655,7 @@ def test_calc_zonal_poly_pts_band_stats_file(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -691,7 +691,7 @@ def test_calc_zonal_band_stats_file_Min(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -742,7 +742,7 @@ def test_calc_zonal_band_stats_file_Max(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -793,7 +793,7 @@ def test_calc_zonal_band_stats_file_Mean(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -851,7 +851,7 @@ def test_calc_zonal_band_stats_file_StdDev(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -909,7 +909,7 @@ def test_calc_zonal_band_stats_file_Sum(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -960,7 +960,7 @@ def test_calc_zonal_band_stats_file_Count(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -1012,7 +1012,7 @@ def test_calc_zonal_band_stats_file_Mode(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -1063,7 +1063,7 @@ def test_calc_zonal_band_stats_file_Median(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -1112,7 +1112,7 @@ def test_calc_zonal_band_stats_file_Median(tmp_path):
 def test_image_zone_to_hdf(tmp_path):
     import rsgislib.zonalstats
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
     vec_lyr = "sen2_20210527_aber_polygons"
 
@@ -1133,8 +1133,8 @@ def test_image_zone_to_hdf(tmp_path):
 def test_extract_zone_img_values_to_hdf(tmp_path):
     import rsgislib.zonalstats
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polys.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polys.tif")
 
     out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
 
@@ -1149,8 +1149,8 @@ def test_extract_zone_img_band_values_to_hdf(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polys.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polys.tif")
 
     in_img_info = []
     in_img_info.append(
@@ -1258,8 +1258,8 @@ def test_extract_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.tif")
 
     in_img_info = []
     in_img_info.append(
@@ -1290,8 +1290,8 @@ def test_extract_chip_zone_image_band_values_to_hdf_with_rot(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.tif")
 
     in_img_info = []
     in_img_info.append(
@@ -1322,9 +1322,9 @@ def test_extract_ref_chip_zone_image_band_values_to_hdf_no_rot(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.tif")
 
     in_img_info = []
     in_img_info.append(
@@ -1357,9 +1357,9 @@ def test_extract_ref_chip_zone_image_band_values_to_hdf_with_rot(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    in_msk_img = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_pts.tif")
 
     in_img_info = []
     in_img_info.append(

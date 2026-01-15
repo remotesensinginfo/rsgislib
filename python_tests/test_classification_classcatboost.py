@@ -106,16 +106,16 @@ def test_apply_catboost_binary_classifier(tmp_path):
         verbose_training=False,
     )
 
-    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     img_band_info = []
     img_band_info.append(
         rsgislib.imageutils.ImageBandInfo(s2_img, "s2", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     )
 
-    out_prob_img = os.path.join(tmp_path, "out_prob_cls.kea")
-    out_class_img = os.path.join(tmp_path, "out_cls_img.kea")
+    out_prob_img = os.path.join(tmp_path, "out_prob_cls.tif")
+    out_class_img = os.path.join(tmp_path, "out_cls_img.tif")
 
     rsgislib.classification.classcatboost.apply_catboost_binary_classifier(
         mdl_cls_obj,
@@ -123,7 +123,7 @@ def test_apply_catboost_binary_classifier(tmp_path):
         1,
         img_band_info,
         out_class_img,
-        "KEA",
+        "GTIFF",
         out_prob_img,
     )
 
@@ -300,15 +300,15 @@ def test_apply_catboost_multiclass_classifier(tmp_path):
         verbose_training=False,
     )
 
-    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     img_band_info = []
     img_band_info.append(
         rsgislib.imageutils.ImageBandInfo(s2_img, "s2", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     )
 
-    out_class_img = os.path.join(tmp_path, "out_cls_img.kea")
+    out_class_img = os.path.join(tmp_path, "out_cls_img.tif")
     rsgislib.classification.classcatboost.apply_catboost_multiclass_classifier(
         mdl_cls_obj,
         cls_info_dict,
@@ -316,8 +316,8 @@ def test_apply_catboost_multiclass_classifier(tmp_path):
         1,
         img_band_info,
         out_class_img,
-        gdalformat="KEA",
-        class_clr_names=True,
+        gdalformat="GTIFF",
+        class_clr_names=False,
     )
 
     assert os.path.exists(out_class_img)

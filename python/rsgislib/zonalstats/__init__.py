@@ -327,7 +327,10 @@ def calc_zonal_band_stats(
                     outattname.lower(), True
                 )
 
-        vec_mem_drv = ogr.GetDriverByName("Memory")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            vec_mem_drv = ogr.GetDriverByName("MEM")
+        else:
+            vec_mem_drv = ogr.GetDriverByName("MEMORY")
         img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.
@@ -477,7 +480,7 @@ def calc_zonal_band_stats(
                                 mode_val, mode_count = scipy.stats.mstats.mode(
                                     src_array_flat
                                 )
-                                mode_val = float(mode_val)
+                                mode_val = float(mode_val[0])
                                 feat.SetField(fieldAttIdxs[mode_field], mode_val)
                             if median_field is not None:
                                 median_val = float(numpy.ma.median(src_array_flat))
@@ -664,9 +667,6 @@ def calc_zonal_poly_pts_band_stats(
             vec_lyr_obj.CreateField(ogr.FieldDefn(out_field.lower(), ogr.OFTReal))
 
         outfieldidx = vec_lyr_obj.FindFieldIndex(out_field.lower(), True)
-
-        vec_mem_drv = ogr.GetDriverByName("Memory")
-        img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.
         openTransaction = False
@@ -1075,7 +1075,10 @@ def calc_zonal_band_stats_test_poly_pts(
                     outattname.lower(), True
                 )
 
-        vec_mem_drv = ogr.GetDriverByName("Memory")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            vec_mem_drv = ogr.GetDriverByName("MEM")
+        else:
+            vec_mem_drv = ogr.GetDriverByName("MEMORY")
         img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.
@@ -1226,7 +1229,7 @@ def calc_zonal_band_stats_test_poly_pts(
                                 mode_val, mode_count = scipy.stats.mstats.mode(
                                     src_array_flat
                                 )
-                                mode_val = float(mode_val)
+                                mode_val = float(mode_val[0])
                                 feat.SetField(fieldAttIdxs[mode_field], mode_val)
                             if median_field is not None:
                                 median_val = float(numpy.ma.median(src_array_flat))
@@ -1530,7 +1533,10 @@ def calc_zonal_band_pxl_counts(
                     out_att_name, True
                 )
 
-        vec_mem_drv = ogr.GetDriverByName("Memory")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            vec_mem_drv = ogr.GetDriverByName("MEM")
+        else:
+            vec_mem_drv = ogr.GetDriverByName("MEMORY")
         img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.
@@ -3478,7 +3484,10 @@ def extract_zone_band_values_to_h5(
                 "check case as some drivers are case sensitive."
             )
 
-        vec_mem_drv = ogr.GetDriverByName("Memory")
+        if int(gdal.VersionInfo("VERSION_NUM")) >= 3110000:
+            vec_mem_drv = ogr.GetDriverByName("MEM")
+        else:
+            vec_mem_drv = ogr.GetDriverByName("MEMORY")
         img_mem_drv = gdal.GetDriverByName("MEM")
 
         # Iterate through features.

@@ -14,10 +14,10 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 def test_img_pixel_sample_cluster(tmp_path):
     import rsgislib.classification.clustersklearn
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    output_img = os.path.join(tmp_path, "sen2_20210527_aber_clustered.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    output_img = os.path.join(tmp_path, "sen2_20210527_aber_clustered.tif")
     rsgislib.classification.clustersklearn.img_pixel_sample_cluster(
-        input_img, output_img, gdalformat="KEA"
+        input_img, output_img, gdalformat="GTIFF"
     )
     assert os.path.exists(output_img)
 
@@ -26,10 +26,10 @@ def test_img_pixel_sample_cluster(tmp_path):
 def test_img_pixel_tiled_cluster(tmp_path):
     import rsgislib.classification.clustersklearn
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    output_img = os.path.join(tmp_path, "sen2_20210527_aber_clustered.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    output_img = os.path.join(tmp_path, "sen2_20210527_aber_clustered.tif")
     rsgislib.classification.clustersklearn.img_pixel_tiled_cluster(
-        input_img, output_img, gdalformat="KEA"
+        input_img, output_img, gdalformat="GTIFF"
     )
     assert os.path.exists(output_img)
 
@@ -38,9 +38,9 @@ def test_img_pixel_tiled_cluster(tmp_path):
 def test_img_pixel_cluster(tmp_path):
     import rsgislib.classification.clustersklearn
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    output_img = os.path.join(tmp_path, "sen2_20210527_aber_clustered.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    output_img = os.path.join(tmp_path, "sen2_20210527_aber_clustered.tif")
     rsgislib.classification.clustersklearn.img_pixel_cluster(
-        input_img, output_img, gdalformat="KEA"
+        input_img, output_img, gdalformat="GTIFF"
     )
     assert os.path.exists(output_img)
