@@ -3912,7 +3912,7 @@ def mask_img_with_vec(
                 mem_lyr,
                 "mem_vec",
                 img_epsg,
-                out_format="MEMORY",
+                out_format="MEM",
                 out_vec_lyr=None,
                 in_epsg=None,
                 print_feedback=True,
@@ -3922,8 +3922,8 @@ def mask_img_with_vec(
             mem_result_ds = mem_ds
             mem_result_lyr = mem_lyr
 
-        roi_img = os.path.join(tmp_file_dir, "{}_roiimg.kea".format(base_vmsk_img))
-        create_copy_img(input_img, roi_img, 1, 0, "KEA", rsgislib.TYPE_8UINT)
+        roi_img = os.path.join(tmp_file_dir, "{}_roiimg.tif".format(base_vmsk_img))
+        create_copy_img(input_img, roi_img, 1, 0, "GTIFF", rsgislib.TYPE_8UINT)
         rsgislib.vectorutils.createrasters.rasterise_vec_lyr_obj(
             mem_result_lyr,
             roi_img,
@@ -3976,10 +3976,10 @@ def create_valid_mask(
         validMasks = []
         for imgInfo in img_band_info:
             tmpBaseName = rsgislib.tools.filetools.get_file_basename(imgInfo.file_name)
-            vdmskFile = os.path.join(tmp_lcl_dir, "{}_vmsk.kea".format(tmpBaseName))
+            vdmskFile = os.path.join(tmp_lcl_dir, "{}_vmsk.tif".format(tmpBaseName))
             no_data_val = get_img_no_data_value(imgInfo.file_name)
             gen_valid_mask(
-                imgInfo.file_name, vdmskFile, gdalformat="KEA", no_data_val=no_data_val
+                imgInfo.file_name, vdmskFile, gdalformat="GTIFF", no_data_val=no_data_val
             )
             validMasks.append(vdmskFile)
 

@@ -1,0 +1,62 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>Band 1</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="2">
+    <Description>Band 2</Description>
+    <ColorInterp>Gray</ColorInterp>
+    <Metadata>
+      <MDI key="STATISTICS_MINIMUM">30</MDI>
+      <MDI key="STATISTICS_MAXIMUM">595</MDI>
+      <MDI key="STATISTICS_MEAN">81.14948969064</MDI>
+      <MDI key="STATISTICS_STDDEV">22.517204385952</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">100</MDI>
+    </Metadata>
+  </PAMRasterBand>
+  <PAMRasterBand band="3">
+    <Description>Band 3</Description>
+    <ColorInterp>Gray</ColorInterp>
+  </PAMRasterBand>
+  <PAMRasterBand band="4">
+    <Description>Band 4</Description>
+    <ColorInterp>Gray</ColorInterp>
+    <Metadata>
+      <MDI key="STATISTICS_MINIMUM">61</MDI>
+      <MDI key="STATISTICS_MAXIMUM">617</MDI>
+      <MDI key="STATISTICS_MEAN">141.49329375724</MDI>
+      <MDI key="STATISTICS_STDDEV">24.498713030556</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">100</MDI>
+    </Metadata>
+  </PAMRasterBand>
+  <PAMRasterBand band="5">
+    <Description>Band 5</Description>
+    <ColorInterp>Gray</ColorInterp>
+    <Metadata>
+      <MDI key="STATISTICS_MINIMUM">94</MDI>
+      <MDI key="STATISTICS_MAXIMUM">588</MDI>
+      <MDI key="STATISTICS_MEAN">354.08166537039</MDI>
+      <MDI key="STATISTICS_STDDEV">77.955580937803</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">100</MDI>
+    </Metadata>
+  </PAMRasterBand>
+  <PAMRasterBand band="6">
+    <Description>Band 6</Description>
+    <ColorInterp>Gray</ColorInterp>
+  </PAMRasterBand>
+  <PAMRasterBand band="7">
+    <Description>Band 7</Description>
+    <ColorInterp>Gray</ColorInterp>
+  </PAMRasterBand>
+  <PAMRasterBand band="8">
+    <Description>Band 8</Description>
+    <ColorInterp>Gray</ColorInterp>
+  </PAMRasterBand>
+  <PAMRasterBand band="9">
+    <Description>Band 9</Description>
+    <ColorInterp>Gray</ColorInterp>
+  </PAMRasterBand>
+  <PAMRasterBand band="10">
+    <Description>Band 10</Description>
+    <ColorInterp>Gray</ColorInterp>
+  </PAMRasterBand>
+</PAMDataset>

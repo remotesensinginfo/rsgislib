@@ -1171,13 +1171,13 @@ def summarise_multi_endmember_linear_unmixing(
         basename = rsgislib.tools.filetools.get_file_basename(
             unmixed_dataset.in_unmix_img
         )
-        out_err_img = os.path.join(tmp_dir, "{}_err_img.kea".format(basename))
+        out_err_img = os.path.join(tmp_dir, "{}_err_img.tif".format(basename))
         calc_unmixing_rmse_residual_err(
             input_img,
             unmixed_dataset.in_unmix_img,
             unmixed_dataset.endmembers_file,
             out_err_img,
-            gdalformat="KEA",
+            gdalformat="GTIFF",
             calc_stats=False,
         )
         out_rmspe_img = os.path.join(tmp_dir, "{}_rmspe_img.vrt".format(basename))
@@ -1241,7 +1241,7 @@ def summarise_multi_endmember_linear_unmixing(
                 img_band_to_stack[endmember_name_bands[endmember_name]] = band_img
 
             first = True
-            zeros_img = os.path.join(tmp_dir, "{}_zeros_img.kea".format(basename))
+            zeros_img = os.path.join(tmp_dir, "{}_zeros_img.tif".format(basename))
             for img_band_idx in img_band_to_stack:
                 if img_band_to_stack[img_band_idx] == "":
                     if first:
@@ -1250,7 +1250,7 @@ def summarise_multi_endmember_linear_unmixing(
                             zeros_img,
                             1,
                             0.0,
-                            "KEA",
+                            "GTIFF",
                             rsgislib.TYPE_32FLOAT,
                         )
                         first = False

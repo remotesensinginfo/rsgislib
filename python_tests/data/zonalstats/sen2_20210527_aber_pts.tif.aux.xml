@@ -1,0 +1,46 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>Band 1</Description>
+    <GDALRasterAttributeTable tableType="thematic">
+      <FieldDefn index="0">
+        <Name>Histogram</Name>
+        <Type>1</Type>
+        <Usage>1</Usage>
+      </FieldDefn>
+      <FieldDefn index="1">
+        <Name>Red</Name>
+        <Type>0</Type>
+        <Usage>6</Usage>
+      </FieldDefn>
+      <FieldDefn index="2">
+        <Name>Green</Name>
+        <Type>0</Type>
+        <Usage>7</Usage>
+      </FieldDefn>
+      <FieldDefn index="3">
+        <Name>Blue</Name>
+        <Type>0</Type>
+        <Usage>8</Usage>
+      </FieldDefn>
+      <FieldDefn index="4">
+        <Name>Alpha</Name>
+        <Type>0</Type>
+        <Usage>9</Usage>
+      </FieldDefn>
+      <Row index="0">
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>255</F>
+      </Row>
+      <Row index="1">
+        <F>6</F>
+        <F>129</F>
+        <F>91</F>
+        <F>231</F>
+        <F>255</F>
+      </Row>
+    </GDALRasterAttributeTable>
+  </PAMRasterBand>
+</PAMDataset>

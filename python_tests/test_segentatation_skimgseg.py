@@ -1,5 +1,12 @@
 import os
+import sys
 import pytest
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 SKIMG_NOT_AVAIL = False
 try:
@@ -11,11 +18,11 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SEGMENT_DATA_DIR = os.path.join(DATA_DIR, "segment")
 
 
-@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
+@pytest.mark.skipif(SKIMG_NOT_AVAIL or ON_MACOS, reason="scikit-image dependency not available or skipping MacOS due to KEA/HDF5 issues")
 def test_perform_felsenszwalb_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     tmp_dir = os.path.join(tmp_path, "seg_tmp")
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
@@ -37,11 +44,11 @@ def test_perform_felsenszwalb_segmentation(tmp_path):
     assert os.path.exists(out_clumps_img)
 
 
-@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
+@pytest.mark.skipif(SKIMG_NOT_AVAIL or ON_MACOS, reason="scikit-image dependency not available or skipping MacOS due to KEA/HDF5 issues")
 def test_perform_quickshift_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     tmp_dir = os.path.join(tmp_path, "seg_tmp")
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
@@ -65,11 +72,11 @@ def test_perform_quickshift_segmentation(tmp_path):
     assert os.path.exists(out_clumps_img)
 
 
-@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
+@pytest.mark.skipif(SKIMG_NOT_AVAIL or ON_MACOS, reason="scikit-image dependency not available or skipping MacOS due to KEA/HDF5 issues")
 def test_perform_slic_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     tmp_dir = os.path.join(tmp_path, "seg_tmp")
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
@@ -98,11 +105,11 @@ def test_perform_slic_segmentation(tmp_path):
     assert os.path.exists(out_clumps_img)
 
 
-@pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
+@pytest.mark.skipif(SKIMG_NOT_AVAIL or ON_MACOS, reason="scikit-image dependency not available or skipping MacOS due to KEA/HDF5 issues")
 def test_perform_watershed_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     tmp_dir = os.path.join(tmp_path, "seg_tmp")
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
@@ -132,7 +139,7 @@ def test_perform_watershed_segmentation(tmp_path):
 @pytest.mark.skipif(SKIMG_NOT_AVAIL, reason="scikit-image dependency not available")
 def test_perform_random_walker_segmentation(tmp_path):
     import rsgislib.segmentation.skimgseg
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     tmp_dir = os.path.join(tmp_path, 'seg_tmp')
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)

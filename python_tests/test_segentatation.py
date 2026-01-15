@@ -1,10 +1,19 @@
 import os
+import sys
+import pytest
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SEGMENT_DATA_DIR = os.path.join(DATA_DIR, "segment")
 IMGCALC_DATA_DIR = os.path.join(DATA_DIR, "imagecalc")
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_clump(tmp_path):
     import rsgislib.segmentation.tiledclump
 
@@ -28,6 +37,7 @@ def test_clump(tmp_path):
 # TODO rsgislib.segmentation.rm_small_clumps_stepwise
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_union_of_clumps(tmp_path):
     import rsgislib.segmentation.tiledclump
 
@@ -47,6 +57,7 @@ def test_union_of_clumps(tmp_path):
 # TODO rsgislib.segmentation.merge_segmentation_tiles
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_generate_regular_grid(tmp_path):
     import rsgislib.segmentation.tiledclump
 

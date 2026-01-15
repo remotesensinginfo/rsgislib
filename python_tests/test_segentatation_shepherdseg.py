@@ -1,14 +1,21 @@
 import os
+import sys
 import pytest
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SEGMENT_DATA_DIR = os.path.join(DATA_DIR, "segment")
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_run_shepherd_segmentation_all_bands(tmp_path):
     import rsgislib.segmentation.shepherdseg
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     tmp_dir = os.path.join(tmp_path, "seg_tmp")
     out_clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     out_mean_img = os.path.join(tmp_path, "sen2_20210527_aber_mean_img.kea")
@@ -19,11 +26,11 @@ def test_run_shepherd_segmentation_all_bands(tmp_path):
 
     assert os.path.exists(out_clumps_img) and os.path.exists(out_mean_img)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_run_shepherd_segmentation_sub_bands(tmp_path):
     import rsgislib.segmentation.shepherdseg
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     tmp_dir = os.path.join(tmp_path, "seg_tmp")
     out_clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     out_mean_img = os.path.join(tmp_path, "sen2_20210527_aber_mean_img.kea")
@@ -35,14 +42,11 @@ def test_run_shepherd_segmentation_sub_bands(tmp_path):
     assert os.path.exists(out_clumps_img) and os.path.exists(out_mean_img)
 
 
-@pytest.mark.skipif(
-    True,
-    reason="Sometimes stretch_img_with_stats freezes on MacOS and haven't figured out why yet...",
-)
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues - Also some issues with pre-calcd stats on MacOS.")
 def test_run_shepherd_segmentation_pre_calcd_stats(tmp_path):
     import rsgislib.segmentation.shepherdseg
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     tmp_dir = os.path.join(tmp_path, "seg_tmp")
     out_clumps_img = os.path.join(tmp_path, "sen2_20210527_aber_clumps.kea")
     out_mean_img = os.path.join(tmp_path, "sen2_20210527_aber_mean_img.kea")
@@ -69,10 +73,7 @@ def test_run_shepherd_segmentation_pre_calcd_stats(tmp_path):
     assert os.path.exists(out_clumps_img) and os.path.exists(out_mean_img)
 
 
-@pytest.mark.skipif(
-    True,
-    reason="Sometimes stretch_img_with_stats freezes on MacOS and haven't figured out why yet...",
-)
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues - Also some issues with pre-calcd stats on MacOS.")
 def test_run_shepherd_segmentation_pre_calcd_stats_sub_bands(tmp_path):
     import rsgislib.segmentation.shepherdseg
 

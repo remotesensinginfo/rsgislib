@@ -1,13 +1,20 @@
 import os
 from shutil import copy2
+import sys
 import pytest
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 RASTERGIS_DATA_DIR = os.path.join(DATA_DIR, "rastergis")
 CLASSIFICATION_DATA_DIR = os.path.join(DATA_DIR, "classification")
 IMGCALC_DATA_DIR = os.path.join(DATA_DIR, "imagecalc")
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_get_rat_length():
     import rsgislib.rastergis
 
@@ -18,7 +25,7 @@ def test_get_rat_length():
     n_clumps = rsgislib.rastergis.get_rat_length(ref_clumps_img)
     assert n_clumps == 11949
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_get_rat_columns():
     import rsgislib.rastergis
 
@@ -52,7 +59,7 @@ def test_get_rat_columns():
                 break
     assert cols_match
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_get_rat_columns_info():
     import rsgislib.rastergis
     from osgeo import gdal
@@ -81,7 +88,7 @@ def test_get_rat_columns_info():
 
     assert correct_info
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_populate_rat_with_stats(tmp_path):
     import rsgislib.rastergis
     import numpy
@@ -166,7 +173,7 @@ def test_populate_rat_with_stats(tmp_path):
 
     assert vars_eq_vals
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_pop_rat_img_stats(tmp_path):
     import rsgislib.rastergis
 
@@ -180,7 +187,7 @@ def test_pop_rat_img_stats(tmp_path):
         clumps_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
     )
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_collapse_rat(tmp_path):
     import rsgislib.rastergis
 
@@ -193,7 +200,7 @@ def test_collapse_rat(tmp_path):
 
     assert os.path.exists(output_img)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_calc_border_length(tmp_path):
     import rsgislib.rastergis
 
@@ -203,7 +210,7 @@ def test_calc_border_length(tmp_path):
 
     rsgislib.rastergis.calc_border_length(clumps_img, "out_col", True)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_calc_rel_border(tmp_path):
     import rsgislib.rastergis
 
@@ -259,7 +266,7 @@ def test_calc_rel_diff_neigh_stats_abs(tmp_path):
     )
     rsgislib.rastergis.calc_rel_diff_neigh_stats(clumps_img, fieldInfo, True, 1)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_define_border_clumps(tmp_path):
     import rsgislib.rastergis
 
@@ -272,7 +279,7 @@ def test_define_border_clumps(tmp_path):
 
 # TODO rsgislib.rastergis.define_clump_tile_positions
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_find_boundary_pixels(tmp_path):
     import rsgislib.rastergis
 
@@ -286,7 +293,7 @@ def test_find_boundary_pixels(tmp_path):
 
     assert os.path.exists(output_img)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_find_neighbours(tmp_path):
     import rsgislib.rastergis
 
@@ -299,7 +306,7 @@ def test_find_neighbours(tmp_path):
 
 # TODO rsgislib.rastergis.populate_rat_with_cat_proportions
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_populate_rat_with_percentiles(tmp_path):
     import rsgislib.rastergis
 
@@ -323,7 +330,7 @@ def test_populate_rat_with_percentiles(tmp_path):
         input_img, clumps_img, 1, band_percents
     )
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_populate_rat_with_meanlit_stats(tmp_path):
     import rsgislib.rastergis
 
@@ -363,7 +370,7 @@ def test_populate_rat_with_meanlit_stats(tmp_path):
 
 # TODO rsgislib.rastergis.select_clumps_on_grid
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_clumps_spatial_location(tmp_path):
     import rsgislib.rastergis
 
@@ -375,7 +382,7 @@ def test_clumps_spatial_location(tmp_path):
         clumps_img, eastings="eastings", northings="northings"
     )
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_clumps_spatial_extent(tmp_path):
     import rsgislib.rastergis
 
@@ -396,7 +403,7 @@ def test_clumps_spatial_extent(tmp_path):
         rat_band=1,
     )
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_populate_rat_with_mode(tmp_path):
     import rsgislib.rastergis
 
@@ -417,7 +424,7 @@ def test_populate_rat_with_mode(tmp_path):
         rat_band=1,
     )
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_populate_rat_with_prop_valid_pxls(tmp_path):
     import rsgislib.rastergis
 
@@ -431,7 +438,7 @@ def test_populate_rat_with_prop_valid_pxls(tmp_path):
         in_cls_img, clumps_img, out_col="cls_val", no_data_val=0, rat_band=1
     )
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_export_col_to_gdal_img(tmp_path):
     import rsgislib.rastergis
 
@@ -446,7 +453,7 @@ def test_export_col_to_gdal_img(tmp_path):
 
     assert os.path.exists(output_img)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_export_cols_to_gdal_img(tmp_path):
     import rsgislib.rastergis
 
@@ -466,7 +473,7 @@ def test_export_cols_to_gdal_img(tmp_path):
 
     assert os.path.exists(output_img)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_export_rat_cols_to_ascii(tmp_path):
     import rsgislib.rastergis
 
@@ -481,7 +488,7 @@ def test_export_rat_cols_to_ascii(tmp_path):
 
     assert os.path.exists(out_file)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_export_clumps_to_images(tmp_path):
     import rsgislib.rastergis
     import glob
@@ -495,7 +502,7 @@ def test_export_clumps_to_images(tmp_path):
 
     assert len(glob.glob("{}*.kea".format(out_img_base))) == 4
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_get_column_data():
     import rsgislib.rastergis
     import numpy
@@ -516,7 +523,7 @@ def test_get_column_data():
 
     assert hist_col_vals
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_set_column_data(tmp_path):
     import rsgislib.rastergis
     import numpy
@@ -532,7 +539,7 @@ def test_set_column_data(tmp_path):
     read_col_vals = rsgislib.rastergis.get_column_data(clumps_img, "test_col")
     assert numpy.array_equal(read_col_vals, uid_col)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_create_uid_col(tmp_path):
     import rsgislib.rastergis
 
@@ -542,7 +549,7 @@ def test_create_uid_col(tmp_path):
 
     rsgislib.rastergis.create_uid_col(clumps_img)
 
-
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_get_global_class_stats(tmp_path):
     import rsgislib.rastergis
 

@@ -477,7 +477,7 @@ def calc_zonal_band_stats(
                                 mode_val, mode_count = scipy.stats.mstats.mode(
                                     src_array_flat
                                 )
-                                mode_val = float(mode_val)
+                                mode_val = float(mode_val[0])
                                 feat.SetField(fieldAttIdxs[mode_field], mode_val)
                             if median_field is not None:
                                 median_val = float(numpy.ma.median(src_array_flat))
@@ -1226,7 +1226,7 @@ def calc_zonal_band_stats_test_poly_pts(
                                 mode_val, mode_count = scipy.stats.mstats.mode(
                                     src_array_flat
                                 )
-                                mode_val = float(mode_val)
+                                mode_val = float(mode_val[0])
                                 feat.SetField(fieldAttIdxs[mode_field], mode_val)
                             if median_field is not None:
                                 median_val = float(numpy.ma.median(src_array_flat))

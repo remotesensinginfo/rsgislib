@@ -1,5 +1,12 @@
 import os
 import pytest
+import sys
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 SKLEARN_NOT_AVAIL = False
 try:
@@ -11,7 +18,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TIMESERIES_DATA_DIR = os.path.join(DATA_DIR, "timeseries")
 
 
-@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL or ON_MACOS, reason="scikit-learn dependency not available or skipping MacOS due to KEA/HDF5 issues")
 def test_get_ST_model_coeffs(tmp_path):
     from rsgislib.timeseries import modelfitting
     import rsgislib.tools.utils
@@ -37,7 +44,7 @@ def test_get_ST_model_coeffs(tmp_path):
     assert os.path.exists(coeffs_img)
 
 
-@pytest.mark.skipif(SKLEARN_NOT_AVAIL, reason="scikit-learn dependency not available")
+@pytest.mark.skipif(SKLEARN_NOT_AVAIL or ON_MACOS, reason="scikit-learn dependency not available or skipping MacOS due to KEA/HDF5 issues")
 def test_predict_for_date(tmp_path):
     from rsgislib.timeseries import modelfitting
 

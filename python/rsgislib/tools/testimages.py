@@ -23,7 +23,7 @@ def create_random_int_img(
     x_size: int,
     y_size: int,
     out_vals: List[int],
-    gdalformat: str = "KEA",
+    gdalformat: str = "GTIFF",
     datatype: int = rsgislib.TYPE_8UINT,
     calc_stats: bool = True,
     tmp_path: str = None,
@@ -65,7 +65,7 @@ def create_random_int_img(
     if tmp_path is None:
         tmp_path = ""
 
-    tmp_ref_img = os.path.join(tmp_path, f"tmp_ref_img_{uid_str}.kea")
+    tmp_ref_img = os.path.join(tmp_path, f"tmp_ref_img_{uid_str}.tif")
 
     wtr_str = rsgislib.tools.projection.get_wkt_from_epsg_code(epsg_code)
 
@@ -79,7 +79,7 @@ def create_random_int_img(
         img_res_x,
         img_res_y,
         wtr_str,
-        "KEA",
+        "GTIFF",
         datatype,
         options=[],
         no_data_val=0,
@@ -116,8 +116,11 @@ def create_random_int_img(
 
     applier.apply(_applyPopVals, infiles, outfiles, otherargs, controls=aControls)
     if calc_stats:
-        import rsgislib.rastergis
-
-        rsgislib.rastergis.pop_rat_img_stats(output_img, True, True, True)
+        if gdalformat == "KEA":
+            import rsgislib.rastergis
+            rsgislib.rastergis.pop_rat_img_stats(output_img, True, True, True)
+        else:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                input_img = output_img, add_clr_tab = True, calc_pyramids = True, ignore_zero = True)
 
     rsgislib.imageutils.delete_gdal_layer(tmp_ref_img)

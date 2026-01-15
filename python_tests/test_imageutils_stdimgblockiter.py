@@ -9,8 +9,8 @@ def test_stdimgblockiter_ndvi(tmp_path):
     import numpy
     import tqdm
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    output_img = os.path.join(tmp_path, "sen2_20210527_aber_ndvi.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    output_img = os.path.join(tmp_path, "sen2_20210527_aber_ndvi.tif")
 
     imgBandInfo = []
     imgBandInfo.append(
@@ -26,7 +26,7 @@ def test_stdimgblockiter_ndvi(tmp_path):
             name="sen2_ndvi",
             nbands=1,
             no_data_val=-999,
-            gdalformat="KEA",
+            gdalformat="GTIFF",
             datatype=rsgislib.TYPE_32FLOAT,
         )
     )
@@ -49,9 +49,9 @@ def test_stdimgblockiter_ndvi_ndwi(tmp_path):
     import numpy
     import tqdm
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    out_ndvi_img = os.path.join(tmp_path, "sen2_20210527_aber_ndvi.kea")
-    out_ndwi_img = os.path.join(tmp_path, "sen2_20210527_aber_ndwi.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    out_ndvi_img = os.path.join(tmp_path, "sen2_20210527_aber_ndvi.tif")
+    out_ndwi_img = os.path.join(tmp_path, "sen2_20210527_aber_ndwi.tif")
 
     imgBandInfo = []
     imgBandInfo.append(
@@ -67,7 +67,7 @@ def test_stdimgblockiter_ndvi_ndwi(tmp_path):
             name="sen2_ndvi",
             nbands=1,
             no_data_val=-999,
-            gdalformat="KEA",
+            gdalformat="GTIFF",
             datatype=rsgislib.TYPE_32FLOAT,
         )
     )
@@ -77,7 +77,7 @@ def test_stdimgblockiter_ndvi_ndwi(tmp_path):
             name="sen2_ndwi",
             nbands=1,
             no_data_val=-999,
-            gdalformat="KEA",
+            gdalformat="GTIFF",
             datatype=rsgislib.TYPE_32FLOAT,
         )
     )

@@ -8,14 +8,14 @@ def test_calc_ndvi(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_ndvi_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_ndvi_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_ndvi(
-        input_img, 3, 8, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 3, 8, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -28,14 +28,14 @@ def test_calc_wbi(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_wbi_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_wbi_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_wbi(
-        input_img, 1, 8, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 1, 8, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -48,14 +48,14 @@ def test_calc_ndwi(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_ndwi_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_ndwi_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_ndwi(
-        input_img, 8, 9, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 8, 9, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -68,14 +68,14 @@ def test_calc_gndwi(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_gndwi_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_gndwi_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_gndwi(
-        input_img, 2, 8, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 2, 8, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -88,14 +88,14 @@ def test_calc_gmndwi(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_gmndwi_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_gmndwi_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_gmndwi(
-        input_img, 2, 9, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 2, 9, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -108,14 +108,14 @@ def test_calc_whiteness(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_whiteness_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_whiteness_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_whiteness(
-        input_img, 1, 2, 3, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 1, 2, 3, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -128,12 +128,12 @@ def test_calc_brightness(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_brightness_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_brightness_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_brightness(
         input_img,
         1,
@@ -141,7 +141,7 @@ def test_calc_brightness(tmp_path):
         3,
         output_img,
         calc_stats=True,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         scale_factor=1000,
     )
 
@@ -155,12 +155,12 @@ def test_calc_brightness_scaled(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_brightness_scaled_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_brightness_scaled_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_brightness_scaled(
         input_img,
         1,
@@ -168,7 +168,7 @@ def test_calc_brightness_scaled(tmp_path):
         3,
         output_img,
         calc_stats=True,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         scale_factor=1000,
     )
 
@@ -182,14 +182,14 @@ def test_calc_ctvi(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_ctvi_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_ctvi_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_ctvi(
-        input_img, 1, 8, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 1, 8, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -202,14 +202,14 @@ def test_calc_ndsi(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_ndsi_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_ndsi_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_ndsi(
-        input_img, 2, 9, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 2, 9, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -222,14 +222,14 @@ def test_calc_nbr(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_nbr_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_nbr_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_nbr(
-        input_img, 8, 10, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 8, 10, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -242,19 +242,19 @@ def test_calc_bai(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_bai_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_bai_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_bai(
         input_img,
         8,
         3,
         output_img,
         calc_stats=True,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         scale_factor=1000,
     )
 
@@ -268,14 +268,14 @@ def test_calc_mvi(tmp_path):
     import rsgislib.imagecalc
     import rsgislib.imagecalc.calcindices
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     ref_img = os.path.join(
-        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_mvi_ref.kea"
+        IMGCALC_INDICES_DATA_DIR, "sen2_20210527_aber_subset_mvi_ref.tif"
     )
 
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calcindices.calc_mvi(
-        input_img, 2, 8, 9, output_img, calc_stats=True, gdalformat="KEA"
+        input_img, 2, 8, 9, output_img, calc_stats=True, gdalformat="GTIFF"
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(

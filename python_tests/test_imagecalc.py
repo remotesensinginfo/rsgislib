@@ -20,7 +20,7 @@ except ImportError:
 def test_count_pxls_of_val_band1():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.tif")
     val_counts = rsgislib.imagecalc.count_pxls_of_val(
         input_img, [1, 2, 3, 4], img_band=1
     )
@@ -35,7 +35,7 @@ def test_count_pxls_of_val_band1():
 def test_count_pxls_of_val_band1_sel_vals():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.tif")
     val_counts = rsgislib.imagecalc.count_pxls_of_val(input_img, [2, 1], img_band=1)
     assert (val_counts[0] == 612) and (val_counts[1] == 614)
 
@@ -43,7 +43,7 @@ def test_count_pxls_of_val_band1_sel_vals():
 def test_count_pxls_of_val_all_bands():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.tif")
     val_counts = rsgislib.imagecalc.count_pxls_of_val(
         input_img, [1, 2, 3, 4], img_band=None
     )
@@ -58,7 +58,7 @@ def test_count_pxls_of_val_all_bands():
 def test_get_unique_values():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.tif")
     unq_vals = rsgislib.imagecalc.get_unique_values(input_img, img_band=1)
     for val in [1, 2, 3, 4]:
         if val not in unq_vals:
@@ -69,7 +69,7 @@ def test_get_unique_values():
 def test_are_imgs_equal_true():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.tif")
     img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(input_img, input_img)
     assert img_eq
 
@@ -77,8 +77,8 @@ def test_are_imgs_equal_true():
 def test_are_imgs_equal_false():
     import rsgislib.imagecalc
 
-    in_ref_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
-    in_cmp_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls_v2.kea")
+    in_ref_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.tif")
+    in_cmp_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls_v2.tif")
     img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(in_ref_img, in_cmp_img)
     assert not img_eq
 
@@ -86,7 +86,7 @@ def test_are_imgs_equal_false():
 def test_are_img_bands_equal_true():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.tif")
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
         input_img, 1, input_img, 1
     )
@@ -96,7 +96,7 @@ def test_are_img_bands_equal_true():
 def test_are_img_bands_equal_dif_bands_false():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.tif")
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
         input_img, 1, input_img, 2
     )
@@ -106,8 +106,8 @@ def test_are_img_bands_equal_dif_bands_false():
 def test_are_img_bands_equal_false():
     import rsgislib.imagecalc
 
-    in_ref_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.kea")
-    in_cmp_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls_v2.kea")
+    in_ref_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls.tif")
+    in_cmp_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls_v2.tif")
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
         in_ref_img, 1, in_cmp_img, 1
     )
@@ -117,14 +117,14 @@ def test_are_img_bands_equal_false():
 def test_band_maths_sgl_band(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     band_def_seq = list()
     band_def_seq.append(
         rsgislib.imagecalc.BandDefn(band_name="Blue", input_img=input_img, img_band=1)
     )
-    output_img = os.path.join(tmp_path, "sen2_20210527_aber_b1.kea")
+    output_img = os.path.join(tmp_path, "sen2_20210527_aber_b1.tif")
     rsgislib.imagecalc.band_math(
-        output_img, "Blue", "KEA", rsgislib.TYPE_16UINT, band_defs=band_def_seq
+        output_img, "Blue", "GTIFF", rsgislib.TYPE_16UINT, band_defs=band_def_seq
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -136,8 +136,8 @@ def test_band_maths_sgl_band(tmp_path):
 def test_band_maths_multi_band(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    ref_ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    ref_ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
     band_def_seq = list()
     band_def_seq.append(
         rsgislib.imagecalc.BandDefn(band_name="red", input_img=input_img, img_band=3)
@@ -145,10 +145,10 @@ def test_band_maths_multi_band(tmp_path):
     band_def_seq.append(
         rsgislib.imagecalc.BandDefn(band_name="nir", input_img=input_img, img_band=8)
     )
-    output_img = os.path.join(tmp_path, "ndvi_test_band_maths.kea")
+    output_img = os.path.join(tmp_path, "ndvi_test_band_maths.tif")
     exp = "(nir-red)/(nir+red)"
     rsgislib.imagecalc.band_math(
-        output_img, exp, "KEA", rsgislib.TYPE_32FLOAT, band_defs=band_def_seq
+        output_img, exp, "GTIFF", rsgislib.TYPE_32FLOAT, band_defs=band_def_seq
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -160,18 +160,18 @@ def test_band_maths_multi_band(tmp_path):
 def test_band_maths_binary_out(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
     ref_ndvi_cats_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif"
     )
     band_def_seq = list()
     band_def_seq.append(
         rsgislib.imagecalc.BandDefn(band_name="ndvi", input_img=input_img, img_band=1)
     )
-    output_img = os.path.join(tmp_path, "ndvi_cats_test_band_maths.kea")
+    output_img = os.path.join(tmp_path, "ndvi_cats_test_band_maths.tif")
     exp = "ndvi>0.95?1:ndvi>0.85?2:ndvi>0.75?3:0"
     rsgislib.imagecalc.band_math(
-        output_img, exp, "KEA", rsgislib.TYPE_8UINT, band_defs=band_def_seq
+        output_img, exp, "GTIFF", rsgislib.TYPE_8UINT, band_defs=band_def_seq
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
@@ -183,28 +183,28 @@ def test_band_maths_binary_out(tmp_path):
 def test_band_maths_exp_err(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
     band_def_seq = list()
     band_def_seq.append(
         rsgislib.imagecalc.BandDefn(band_name="ndvi", input_img=input_img, img_band=1)
     )
-    output_img = os.path.join(tmp_path, "ndvi_cats_test_err.kea")
+    output_img = os.path.join(tmp_path, "ndvi_cats_test_err.tif")
     exp = "ndvi>0.5?1:ndvi>0.75?2:0?"
     with pytest.raises(Exception):
         rsgislib.imagecalc.band_math(
-            output_img, exp, "KEA", rsgislib.TYPE_32FLOAT, band_defs=band_def_seq
+            output_img, exp, "GTIFF", rsgislib.TYPE_32FLOAT, band_defs=band_def_seq
         )
 
 
 def test_image_band_math_multi_band(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    ref_ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
-    output_img = os.path.join(tmp_path, "ndvi_test_imageband_math.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    ref_ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
+    output_img = os.path.join(tmp_path, "ndvi_test_imageband_math.tif")
     exp = "(b8-b3)/(b8+b3)"
     rsgislib.imagecalc.image_band_math(
-        input_img, output_img, exp, "KEA", rsgislib.TYPE_32FLOAT
+        input_img, output_img, exp, "GTIFF", rsgislib.TYPE_32FLOAT
     )
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
         ref_ndvi_img, 1, output_img, 1
@@ -215,14 +215,14 @@ def test_image_band_math_multi_band(tmp_path):
 def test_image_math_binary_out(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
     ref_ndvi_cats_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif"
     )
-    output_img = os.path.join(tmp_path, "ndvi_cats_test_image_math.kea")
+    output_img = os.path.join(tmp_path, "ndvi_cats_test_image_math.tif")
     exp = "b1>0.95?1:b1>0.85?2:b1>0.75?3:0"
     rsgislib.imagecalc.image_math(
-        input_img, output_img, exp, "KEA", rsgislib.TYPE_8UINT
+        input_img, output_img, exp, "GTIFF", rsgislib.TYPE_8UINT
     )
     img_eq, prop_match = rsgislib.imagecalc.are_img_bands_equal(
         ref_ndvi_cats_img, 1, output_img, 1
@@ -233,8 +233,8 @@ def test_image_math_binary_out(tmp_path):
 def test_buffer_img_pxl_vals(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    output_img = os.path.join(tmp_path, "test_buf_vals.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
+    output_img = os.path.join(tmp_path, "test_buf_vals.tif")
 
     rsgislib.imagecalc.buffer_img_pxl_vals(
         input_img,
@@ -242,7 +242,7 @@ def test_buffer_img_pxl_vals(tmp_path):
         pxl_vals=[2, 3],
         buf_thres=100,
         tmp_dir=tmp_path,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         img_band=1,
         unit_geo=True,
     )
@@ -253,18 +253,18 @@ def test_buffer_img_pxl_vals(tmp_path):
 def test_calc_dist_to_img_vals_sgl_val_geo(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_geo.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_geo.tif"
     )
 
-    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.kea")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.tif")
     rsgislib.imagecalc.calc_dist_to_img_vals(
         input_img,
         output_img,
         2,
         img_band=1,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         max_dist=100,
         no_data_val=0,
         unit_geo=True,
@@ -279,18 +279,18 @@ def test_calc_dist_to_img_vals_sgl_val_geo(tmp_path):
 def test_calc_dist_to_img_vals_sgl_val_pxl(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_pxl.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_pxl.tif"
     )
 
-    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.kea")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.tif")
     rsgislib.imagecalc.calc_dist_to_img_vals(
         input_img,
         output_img,
         2,
         img_band=1,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         max_dist=10,
         no_data_val=0,
         unit_geo=False,
@@ -305,14 +305,14 @@ def test_calc_dist_to_img_vals_sgl_val_pxl(tmp_path):
 def test_calc_dist_to_img_vals_sgl_val_pxl_out_no_data(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.tif")
     rsgislib.imagecalc.calc_dist_to_img_vals(
         input_img,
         output_img,
         2,
         img_band=1,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         max_dist=10,
         no_data_val=0,
         out_no_data_val=11,
@@ -323,18 +323,18 @@ def test_calc_dist_to_img_vals_sgl_val_pxl_out_no_data(tmp_path):
 def test_calc_dist_to_img_vals_multi_val_geo(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_geo.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_geo.tif"
     )
 
-    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.kea")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.tif")
     rsgislib.imagecalc.calc_dist_to_img_vals(
         input_img,
         output_img,
         [2, 3],
         img_band=1,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         max_dist=100,
         no_data_val=0,
         unit_geo=True,
@@ -349,18 +349,18 @@ def test_calc_dist_to_img_vals_multi_val_geo(tmp_path):
 def test_calc_dist_to_img_vals_multi_val_pxl(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_pxl.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_pxl.tif"
     )
 
-    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.kea")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals.tif")
     rsgislib.imagecalc.calc_dist_to_img_vals(
         input_img,
         output_img,
         [2, 3],
         img_band=1,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         max_dist=10,
         no_data_val=0,
         unit_geo=False,
@@ -375,12 +375,12 @@ def test_calc_dist_to_img_vals_multi_val_pxl(tmp_path):
 def test_calc_dist_to_img_vals_tiled_sgl_val_geo(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_geo.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_geo.tif"
     )
 
-    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals_tiled.kea")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals_tiled.tif")
     tmp_dist_dir = os.path.join(tmp_path, "dist_tmp")
     rsgislib.imagecalc.calc_dist_to_img_vals_tiled(
         input_img,
@@ -389,7 +389,7 @@ def test_calc_dist_to_img_vals_tiled_sgl_val_geo(tmp_path):
         img_band=1,
         max_dist=100,
         no_data_val=0,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         unit_geo=True,
         tmp_dir=tmp_dist_dir,
         tile_size=250,
@@ -405,12 +405,12 @@ def test_calc_dist_to_img_vals_tiled_sgl_val_geo(tmp_path):
 def test_calc_dist_to_img_vals_tiled_sgl_val_pxl(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_pxl.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_pxl.tif"
     )
 
-    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals_tiled.kea")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals_tiled.tif")
     tmp_dist_dir = os.path.join(tmp_path, "dist_tmp")
     rsgislib.imagecalc.calc_dist_to_img_vals_tiled(
         input_img,
@@ -419,7 +419,7 @@ def test_calc_dist_to_img_vals_tiled_sgl_val_pxl(tmp_path):
         img_band=1,
         max_dist=10,
         no_data_val=0,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         unit_geo=False,
         tmp_dir=tmp_dist_dir,
         tile_size=250,
@@ -435,12 +435,12 @@ def test_calc_dist_to_img_vals_tiled_sgl_val_pxl(tmp_path):
 def test_calc_dist_to_img_vals_tiled_multi_val_geo(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_geo.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_geo.tif"
     )
 
-    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals_tiled.kea")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals_tiled.tif")
     tmp_dist_dir = os.path.join(tmp_path, "dist_tmp")
     rsgislib.imagecalc.calc_dist_to_img_vals_tiled(
         input_img,
@@ -449,7 +449,7 @@ def test_calc_dist_to_img_vals_tiled_multi_val_geo(tmp_path):
         img_band=1,
         max_dist=100,
         no_data_val=0,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         unit_geo=True,
         tmp_dir=tmp_dist_dir,
         tile_size=250,
@@ -465,12 +465,12 @@ def test_calc_dist_to_img_vals_tiled_multi_val_geo(tmp_path):
 def test_calc_dist_to_img_vals_tiled_multi_val_pxl(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
     ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_pxl.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_pxl.tif"
     )
 
-    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals_tiled.kea")
+    output_img = os.path.join(tmp_path, "test_calc_dist_to_img_vals_tiled.tif")
     tmp_dist_dir = os.path.join(tmp_path, "dist_tmp")
     rsgislib.imagecalc.calc_dist_to_img_vals_tiled(
         input_img,
@@ -479,7 +479,7 @@ def test_calc_dist_to_img_vals_tiled_multi_val_pxl(tmp_path):
         img_band=1,
         max_dist=10,
         no_data_val=0,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         unit_geo=False,
         tmp_dir=tmp_dist_dir,
         tile_size=250,
@@ -495,7 +495,7 @@ def test_calc_dist_to_img_vals_tiled_multi_val_pxl(tmp_path):
 def test_calc_prop_true_exp_no_vld_msk():
     import rsgislib.imagecalc
 
-    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
 
     band_defns = [rsgislib.imagecalc.BandDefn("ndvi", ndvi_img, 1)]
     prop = rsgislib.imagecalc.calc_prop_true_exp("ndvi>0.5?1:0", band_defns)
@@ -506,8 +506,8 @@ def test_calc_prop_true_exp_no_vld_msk():
 def test_calc_prop_true_exp_vld_msk():
     import rsgislib.imagecalc
 
-    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
-    vld_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
+    vld_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
 
     band_defns = [rsgislib.imagecalc.BandDefn("ndvi", ndvi_img, 1)]
     prop = rsgislib.imagecalc.calc_prop_true_exp("ndvi>0.5?1:0", band_defns, vld_img)
@@ -518,7 +518,7 @@ def test_calc_prop_true_exp_vld_msk():
 def test_calc_band_percentile():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
     percent_val = rsgislib.imagecalc.calc_band_percentile(input_img, 0.5, 0)
 
@@ -529,15 +529,15 @@ def test_calc_img_rescale_sgl_img(tmp_path):
     import rsgislib.imagecalc
 
     rescale_ndvi_ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_g100_o100_int.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_g100_o100_int.tif"
     )
-    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
     print(ndvi_img)
 
-    output_img = os.path.join(tmp_path, "rescaled_ndvi_img.kea")
+    output_img = os.path.join(tmp_path, "rescaled_ndvi_img.tif")
 
     rsgislib.imagecalc.calc_img_rescale(
-        ndvi_img, output_img, "KEA", rsgislib.TYPE_16INT, -999, 0, 1, 999, 100, 100
+        ndvi_img, output_img, "GTIFF", rsgislib.TYPE_16INT, -999, 0, 1, 999, 100, 100
     )
 
     img_eq, prop_match = rsgislib.imagecalc.are_imgs_equal(
@@ -550,17 +550,17 @@ def test_calc_img_rescale_multi_imgs(tmp_path):
     import rsgislib.imagecalc
 
     rescale_ndvi_ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_bs2_g100_o100_int.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_bs2_g100_o100_int.tif"
     )
-    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
     print(ndvi_img)
 
-    output_img = os.path.join(tmp_path, "rescaled_ndvi_imgs.kea")
+    output_img = os.path.join(tmp_path, "rescaled_ndvi_imgs.tif")
 
     rsgislib.imagecalc.calc_img_rescale(
         [ndvi_img, ndvi_img],
         output_img,
-        "KEA",
+        "GTIFF",
         rsgislib.TYPE_16INT,
         -999,
         0,
@@ -580,9 +580,9 @@ def test_calc_img_rescale_multi_imgs(tmp_path):
 def test_perform_image_pca(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
-    output_img = os.path.join(tmp_path, "pca_result_img.kea")
+    output_img = os.path.join(tmp_path, "pca_result_img.tif")
     out_eigen_vec_file = os.path.join(tmp_path, "pca_eign_vec.mtxt")
 
     rsgislib.imagecalc.perform_image_pca(
@@ -591,7 +591,7 @@ def test_perform_image_pca(tmp_path):
         out_eigen_vec_file,
         n_comps=None,
         pxl_n_sample=100,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         datatype=rsgislib.TYPE_32FLOAT,
         no_data_val=None,
         calc_stats=True,
@@ -604,9 +604,9 @@ def test_perform_image_pca(tmp_path):
 def test_perform_image_mnf(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
 
-    output_img = os.path.join(tmp_path, "pca_result_img.kea")
+    output_img = os.path.join(tmp_path, "pca_result_img.tif")
     tmp_dir = os.path.join(tmp_path, "tmp")
 
     rsgislib.imagecalc.perform_image_mnf(
@@ -616,7 +616,7 @@ def test_perform_image_mnf(tmp_path):
         pxl_n_sample=100,
         in_img_no_data=0,
         tmp_dir=tmp_dir,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         datatype=rsgislib.TYPE_32FLOAT,
         calc_stats=True,
     )
@@ -627,9 +627,9 @@ def test_perform_image_mnf(tmp_path):
 def test_recode_int_raster(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
 
-    output_img = os.path.join(tmp_path, "recoded_ndvi_cats.kea")
+    output_img = os.path.join(tmp_path, "recoded_ndvi_cats.tif")
 
     recode_dict = dict()
     recode_dict[1] = 100
@@ -641,7 +641,7 @@ def test_recode_int_raster(tmp_path):
         output_img,
         recode_dict,
         keep_vals_not_in_dict=True,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         datatype=rsgislib.TYPE_16UINT,
     )
     assert os.path.exists(output_img)
@@ -650,10 +650,10 @@ def test_recode_int_raster(tmp_path):
 def test_all_bands_equal_to(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.all_bands_equal_to(
-        input_img, output_img, 0, 1, 2, "KEA", rsgislib.TYPE_8UINT
+        input_img, output_img, 0, 1, 2, "GTIFF", rsgislib.TYPE_8UINT
     )
     assert os.path.exists(output_img)
 
@@ -661,7 +661,7 @@ def test_all_bands_equal_to(tmp_path):
 def test_kmeans_clustering(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     out_file = os.path.join(tmp_path, "out_file")
     rsgislib.imagecalc.kmeans_clustering(
         input_img,
@@ -681,7 +681,7 @@ def test_kmeans_clustering(tmp_path):
 def test_isodata_clustering(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     out_file = os.path.join(tmp_path, "out_file")
     rsgislib.imagecalc.isodata_clustering(
         input_img,
@@ -706,8 +706,8 @@ def test_isodata_clustering(tmp_path):
 def test_image_pixel_column_summary(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     stats_to_calc = rsgislib.imagecalc.StatsSummary()
     stats_to_calc.calc_min = True
     stats_to_calc.calc_max = True
@@ -717,7 +717,7 @@ def test_image_pixel_column_summary(tmp_path):
     stats_to_calc.calc_median = True
     stats_to_calc.calc_mode = True
     rsgislib.imagecalc.image_pixel_column_summary(
-        input_img, output_img, stats_to_calc, "KEA", rsgislib.TYPE_32FLOAT, 0.0, True
+        input_img, output_img, stats_to_calc, "GTIFF", rsgislib.TYPE_32FLOAT, 0.0, True
     )
     assert os.path.exists(output_img)
 
@@ -725,7 +725,7 @@ def test_image_pixel_column_summary(tmp_path):
 def test_get_img_band_stats_in_env():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_wgs84.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_wgs84.tif")
     stats = rsgislib.imagecalc.get_img_band_stats_in_env(
         input_img, 1, 0, -4.0932, -4.0774, 52.4033, 52.4229
     )
@@ -743,7 +743,7 @@ def test_get_img_band_stats_in_env():
 def test_get_img_band_mode_in_env_0():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_wgs84.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_wgs84.tif")
     mode = rsgislib.imagecalc.get_img_band_mode_in_env(
         input_img, 1, 1, -999, -4.0932, -4.0774, 52.4033, 52.4229
     )
@@ -754,7 +754,7 @@ def test_get_img_band_mode_in_env_0():
 def test_get_img_band_mode_in_env_2():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_wgs84.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_wgs84.tif")
     mode = rsgislib.imagecalc.get_img_band_mode_in_env(
         input_img, 1, 1, -999, -4.0154, -3.9880, 52.4004, 52.4257
     )
@@ -766,13 +766,13 @@ def test_get_img_band_mode_in_env_2():
 def test_calc_multi_img_band_stats(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calc_multi_img_band_stats(
         [input_img, input_img],
         output_img,
         rsgislib.SUMTYPE_MEAN,
-        "KEA",
+        "GTIFF",
         rsgislib.TYPE_32FLOAT,
         0,
         True,
@@ -784,7 +784,7 @@ def test_calc_multi_img_band_stats(tmp_path):
 def test_get_img_band_min_max():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     min, max = rsgislib.imagecalc.get_img_band_min_max(input_img, 1, True, 0)
     assert min == 1 and max == 1066
 
@@ -797,8 +797,8 @@ def test_get_img_band_min_max():
 def test_calc_img_mean_in_mask():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
     val = rsgislib.imagecalc.calc_img_mean_in_mask(
         input_img,
         in_msk_img,
@@ -813,11 +813,11 @@ def test_calc_img_mean_in_mask():
 def test_calc_img_basic_stats_for_ref_region(tmp_path):
     import rsgislib.imagecalc
 
-    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    in_stats_imgs = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    in_ref_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    in_stats_imgs = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calc_img_basic_stats_for_ref_region(
-        in_ref_img, [in_stats_imgs], output_img, gdalformat="KEA"
+        in_ref_img, [in_stats_imgs], output_img, gdalformat="GTIFF"
     )
 
     assert os.path.exists(output_img)
@@ -828,12 +828,12 @@ def test_calc_fill_regions_knn(tmp_path):
     import rsgislib.imagecalc
 
     in_ref_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_subset.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_subset.tif"
     )
     in_fill_regions_img = os.path.join(
-        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_subset.kea"
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_subset.tif"
     )
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calc_fill_regions_knn(
         in_ref_img,
         0,
@@ -842,7 +842,7 @@ def test_calc_fill_regions_knn(tmp_path):
         output_img,
         k=5,
         summary=rsgislib.SUMTYPE_MODE,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         datatype=rsgislib.TYPE_16INT,
     )
     assert os.path.exists(output_img)
@@ -851,11 +851,11 @@ def test_calc_fill_regions_knn(tmp_path):
 def test_image_pixel_linear_fit(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     band_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.image_pixel_linear_fit(
-        input_img, output_img, "KEA", band_values, 0, True
+        input_img, output_img, "GTIFF", band_values, 0, True
     )
     assert os.path.exists(output_img)
 
@@ -863,17 +863,17 @@ def test_image_pixel_linear_fit(tmp_path):
 def test_calculate_img_band_rmse():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     rsgislib.imagecalc.calculate_img_band_rmse(input_img, 1, input_img, 2)
 
 
 def test_correlation_window(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.correlation_window(
-        input_img, output_img, 5, 1, 2, "KEA", rsgislib.TYPE_32FLOAT
+        input_img, output_img, 5, 1, 2, "GTIFF", rsgislib.TYPE_32FLOAT
     )
     assert os.path.exists(output_img)
 
@@ -881,11 +881,11 @@ def test_correlation_window(tmp_path):
 def test_calc_mask_img_pxl_val_prob(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    in_msk_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    in_msk_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calc_mask_img_pxl_val_prob(
-        input_img, [1, 2, 3], in_msk_img, 2, output_img, "KEA", [5, 5, 5], False, False
+        input_img, [1, 2, 3], in_msk_img, 2, output_img, "GTIFF", [5, 5, 5], False, False
     )
     assert os.path.exists(output_img)
 
@@ -893,10 +893,10 @@ def test_calc_mask_img_pxl_val_prob(tmp_path):
 def test_calc_img_difference(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.calc_img_difference(
-        input_img, input_img, output_img, "KEA", rsgislib.TYPE_32FLOAT
+        input_img, input_img, output_img, "GTIFF", rsgislib.TYPE_32FLOAT
     )
     assert os.path.exists(output_img)
 
@@ -904,8 +904,8 @@ def test_calc_img_difference(tmp_path):
 def test_histogram(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
     output_file = os.path.join(tmp_path, "out_img.txt")
     rsgislib.imagecalc.histogram(
         input_img, in_msk_img, output_file, 1, 1, 10, True, 0, 0
@@ -917,20 +917,20 @@ def test_histogram(tmp_path):
 def test_get_histogram():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
     rsgislib.imagecalc.get_histogram(input_img, 1, 1, True, 0, 0)
 
 
 def test_get_2d_img_histogram(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.get_2d_img_histogram(
         input_img,
         input_img,
         output_img,
-        "KEA",
+        "GTIFF",
         1,
         2,
         100,
@@ -950,8 +950,8 @@ def test_get_2d_img_histogram(tmp_path):
 def test_calc_histograms_for_msk_vals():
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
 
     rsgislib.imagecalc.calc_histograms_for_msk_vals(
         input_img, 1, in_msk_img, 1, 1, 1000, 1, msk_vals=None
@@ -961,9 +961,9 @@ def test_calc_histograms_for_msk_vals():
 def test_normalise_image_band(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
-    rsgislib.imagecalc.normalise_image_band(input_img, 1, output_img, gdalformat="KEA")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
+    rsgislib.imagecalc.normalise_image_band(input_img, 1, output_img, gdalformat="GTIFF")
     assert os.path.exists(output_img)
 
 
@@ -1005,12 +1005,12 @@ def test_rescale_img_pxl_vals(tmp_path):
         )
     )
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_b123.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.rescale_img_pxl_vals(
         input_img,
         output_img,
-        "KEA",
+        "GTIFF",
         rsgislib.TYPE_32FLOAT,
         band_rescale_objs,
         trim_to_limits=True,
@@ -1021,10 +1021,10 @@ def test_rescale_img_pxl_vals(tmp_path):
 def test_mahalanobis_dist_filter(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.mahalanobis_dist_filter(
-        input_img, output_img, 5, "KEA", rsgislib.TYPE_32FLOAT
+        input_img, output_img, 5, "GTIFF", rsgislib.TYPE_32FLOAT
     )
     assert os.path.exists(output_img)
 
@@ -1032,10 +1032,10 @@ def test_mahalanobis_dist_filter(tmp_path):
 def test_mahalanobis_dist_to_img_filter(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
     rsgislib.imagecalc.mahalanobis_dist_to_img_filter(
-        input_img, output_img, 5, "KEA", rsgislib.TYPE_32FLOAT
+        input_img, output_img, 5, "GTIFF", rsgislib.TYPE_32FLOAT
     )
     assert os.path.exists(output_img)
 
@@ -1043,7 +1043,7 @@ def test_mahalanobis_dist_to_img_filter(tmp_path):
 def test_calc_split_win_thresholds_otsu(tmp_path):
     import rsgislib.imagecalc
 
-    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.tif")
 
     thres_vals = rsgislib.imagecalc.calc_split_win_thresholds(
         input_img,

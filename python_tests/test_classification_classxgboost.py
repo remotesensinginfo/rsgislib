@@ -1,6 +1,13 @@
 import os
 from shutil import copy2
+import sys
 import pytest
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 H5PY_NOT_AVAIL = False
 try:
@@ -385,23 +392,23 @@ def test_apply_xgboost_binary_classifier_bayesopt(tmp_path):
         out_params_file=None,
     )
 
-    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     img_band_info = []
     img_band_info.append(
         rsgislib.imageutils.ImageBandInfo(s2_img, "s2", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     )
 
-    out_prob_img = os.path.join(tmp_path, "out_prob_cls.kea")
-    out_class_img = os.path.join(tmp_path, "out_cls_img.kea")
+    out_prob_img = os.path.join(tmp_path, "out_prob_cls.tif")
+    out_class_img = os.path.join(tmp_path, "out_cls_img.tif")
     rsgislib.classification.classxgboost.apply_xgboost_binary_classifier(
         out_mdl_file,
         in_msk_img,
         1,
         img_band_info,
         out_prob_img,
-        "KEA",
+        "GTIFF",
         out_class_img,
         class_thres=5000,
         n_threads=1,
@@ -1104,15 +1111,15 @@ def test_apply_xgboost_multiclass_classifier_bayesopt(tmp_path):
         mdl_cls_obj=None,
     )
 
-    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
-    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    in_msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.tif")
+    s2_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     img_band_info = []
     img_band_info.append(
         rsgislib.imageutils.ImageBandInfo(s2_img, "s2", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     )
 
-    out_class_img = os.path.join(tmp_path, "out_cls_img.kea")
+    out_class_img = os.path.join(tmp_path, "out_cls_img.tif")
     rsgislib.classification.classxgboost.apply_xgboost_multiclass_classifier(
         out_mdl_file,
         cls_info_dict,
@@ -1120,17 +1127,16 @@ def test_apply_xgboost_multiclass_classifier_bayesopt(tmp_path):
         1,
         img_band_info,
         out_class_img,
-        "KEA",
-        class_clr_names=True,
+        "GTIFF",
+        class_clr_names=False,
         n_threads=1,
     )
 
     assert os.path.exists(out_class_img)
 
-
 @pytest.mark.skipif(
-    (H5PY_NOT_AVAIL or XGBOOST_NOT_AVAIL or BAYESOPT_NOT_AVAIL),
-    reason="h5py, bayes_opt or xgboost dependencies not available",
+    (H5PY_NOT_AVAIL or XGBOOST_NOT_AVAIL or BAYESOPT_NOT_AVAIL or ON_MACOS),
+    reason="h5py, bayes_opt or xgboost dependencies not available or skipping MacOS due to KEA/HDF5 issues",
 )
 def test_apply_xgboost_multiclass_classifier_bayesopt_rat(tmp_path):
     import rsgislib.classification.classxgboost

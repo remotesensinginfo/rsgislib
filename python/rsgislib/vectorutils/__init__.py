@@ -951,7 +951,7 @@ def reproj_vec_lyr_obj(
     vec_lyr_obj: ogr.Layer,
     out_vec_file: str,
     out_epsg: int,
-    out_format: str = "MEMORY",
+    out_format: str = "MEM",
     out_vec_lyr: str = None,
     in_epsg: int = None,
     print_feedback: bool = True,
@@ -964,7 +964,7 @@ def reproj_vec_lyr_obj(
     :param vec_lyr_obj: is a GDAL vector layer object.
     :param out_vec_file: is a string with name and path to output vector file - is created.
     :param out_epsg: is an int with the EPSG code to which the input vector layer is to be reprojected to.
-    :param out_format: is the output vector file format. Default is MEMORY - i.e., nothing written to disk.
+    :param out_format: is the output vector file format. Default is MEM - i.e., nothing written to disk.
     :param out_vec_lyr: is a string for the output layer name. If None then ignored and
                        assume there is just a single layer in the vector and layer name
                        is the same as the file name.
@@ -1142,7 +1142,7 @@ def get_att_lst_select_feats(
                     "the vector layer.".format(attName)
                 )
 
-        mem_driver = ogr.GetDriverByName("MEMORY")
+        mem_driver = ogr.GetDriverByName("MEM")
 
         mem_sel_ds = mem_driver.CreateDataSource("MemSelData")
         mem_sel_lyr = mem_sel_ds.CopyLayer(lyrSelVecObj, vec_sel_lyr, ["OVERWRITE=YES"])
@@ -1231,7 +1231,7 @@ def get_att_lst_select_feats_lyr_objs(
                     "the vector layer.".format(attName)
                 )
 
-        mem_driver = ogr.GetDriverByName("MEMORY")
+        mem_driver = ogr.GetDriverByName("MEM")
 
         mem_result_ds = mem_driver.CreateDataSource("MemResultData")
         mem_result_lyr = mem_result_ds.CreateLayer(
@@ -1364,7 +1364,7 @@ def get_att_lst_select_bbox_feats_lyr_objs(
                 )
 
         # Create in-memory layer for the BBOX layer.
-        mem_driver = ogr.GetDriverByName("MEMORY")
+        mem_driver = ogr.GetDriverByName("MEM")
         mem_bbox_ds = mem_driver.CreateDataSource("MemBBOXData")
         mem_bbox_lyr = mem_bbox_ds.CreateLayer(
             "MemBBOXLyr", in_vec_lyr_spat_ref, geom_type=ogr.wkbPolygon
@@ -1465,7 +1465,7 @@ def select_intersect_feats(
     if lyrROIVecObj is None:
         raise rsgislib.RSGISPyException("Could not find layer '" + vec_roi_lyr + "'")
 
-    mem_driver = ogr.GetDriverByName("MEMORY")
+    mem_driver = ogr.GetDriverByName("MEM")
     mem_roi_ds = mem_driver.CreateDataSource("MemSelData")
     mem_roi_lyr = mem_roi_ds.CopyLayer(lyrROIVecObj, vec_roi_lyr, ["OVERWRITE=YES"])
 
@@ -1708,7 +1708,7 @@ def subset_envs_vec_lyr_obj(
     lyrDefn = vec_lyr_obj.GetLayerDefn()
 
     # Copy the Layer to a new in memory OGR Layer.
-    mem_driver = ogr.GetDriverByName("MEMORY")
+    mem_driver = ogr.GetDriverByName("MEM")
     mem_result_ds = mem_driver.CreateDataSource("MemResultData")
     mem_result_lyr = mem_result_ds.CreateLayer(
         "MemResultLyr", lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType()
@@ -1834,7 +1834,7 @@ def read_vec_lyr_to_mem(vec_file: str, vec_lyr: str) -> (ogr.DataSource, ogr.Lay
         if vec_lyr_obj is None:
             raise rsgislib.RSGISPyException("Could not find layer '{}'".format(vec_lyr))
 
-        mem_driver = ogr.GetDriverByName("MEMORY")
+        mem_driver = ogr.GetDriverByName("MEM")
 
         mem_ds = mem_driver.CreateDataSource("MemSelData")
         mem_lyr = mem_ds.CopyLayer(vec_lyr_obj, vec_lyr, ["OVERWRITE=YES"])
@@ -2253,7 +2253,7 @@ def does_vmsk_img_intersect(
                 mem_lyr,
                 "mem_vec",
                 img_epsg,
-                out_format="MEMORY",
+                out_format="MEM",
                 out_vec_lyr=None,
                 in_epsg=None,
                 print_feedback=False,
@@ -2263,9 +2263,9 @@ def does_vmsk_img_intersect(
             mem_result_ds = mem_ds
             mem_result_lyr = mem_lyr
 
-        roi_img = os.path.join(tmp_file_dir, "{}_roiimg.kea".format(base_vmsk_img))
+        roi_img = os.path.join(tmp_file_dir, "{}_roiimg.tif".format(base_vmsk_img))
         rsgislib.imageutils.create_copy_img(
-            input_vmsk_img, roi_img, 1, 0, "KEA", rsgislib.TYPE_8UINT
+            input_vmsk_img, roi_img, 1, 0, "GTIFF", rsgislib.TYPE_8UINT
         )
         rsgislib.vectorutils.createrasters.rasterise_vec_lyr_obj(
             mem_result_lyr,
@@ -2282,17 +2282,14 @@ def does_vmsk_img_intersect(
         bandDefns.append(rsgislib.imagecalc.BandDefn("vmsk", input_vmsk_img, 1))
         bandDefns.append(rsgislib.imagecalc.BandDefn("roi", roi_img, 1))
         intersect_img = os.path.join(
-            tmp_file_dir, "{}_intersectimg.kea".format(base_vmsk_img)
+            tmp_file_dir, "{}_intersectimg.tif".format(base_vmsk_img)
         )
         rsgislib.imagecalc.band_math(
             intersect_img,
             "(vmsk==1) && (roi==1)?1:0",
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             bandDefns,
-        )
-        rsgislib.rastergis.pop_rat_img_stats(
-            intersect_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
         n_vals = rsgislib.imagecalc.count_pxls_of_val(intersect_img, vals=[1])
         if n_vals[0] > 0:

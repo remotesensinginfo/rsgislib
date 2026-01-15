@@ -9,7 +9,7 @@ import rsgislib
 
 
 def fft_dem_fusion(
-    high_res_dem_img: str, low_res_dem_img: str, fused_dem_img: str, c_size: int = 20
+    high_res_dem_img: str, low_res_dem_img: str, fused_dem_img: str, c_size: int = 20, gdalformat: str = "KEA",
 ):
     """
     This function merges DEMs (any single band file) using a fourier
@@ -83,7 +83,7 @@ def fft_dem_fusion(
     img_back = numpy.abs(img_back)
 
     rsgislib.imageutils.create_copy_img(
-        high_res_dem_img, fused_dem_img, 1, -9999, "KEA", rsgislib.TYPE_32FLOAT
+        high_res_dem_img, fused_dem_img, 1, -9999, gdalformat, rsgislib.TYPE_32FLOAT
     )
 
     try:

@@ -90,31 +90,31 @@ def create_kmz_img(
         s_bands = []
         for str_band in band_lst:
             s_bands.append(int(str_band))
-        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.kea")
+        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.tif")
         rsgislib.imageutils.select_img_bands(
             input_img,
             sel_img_bands_img,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             s_bands,
         )
 
     img_to_strch = sel_img_bands_img
     if finite_msk:
-        finite_msk_img = os.path.join(tmp_dir, f"{base_name}_FiniteMsk.kea")
-        rsgislib.imageutils.gen_finite_mask(sel_img_bands_img, finite_msk_img, "KEA")
-        img_to_strch = os.path.join(tmp_dir, f"{base_name}_Msk2FiniteRegions.kea")
+        finite_msk_img = os.path.join(tmp_dir, f"{base_name}_FiniteMsk.tif")
+        rsgislib.imageutils.gen_finite_mask(sel_img_bands_img, finite_msk_img, "GTIFF")
+        img_to_strch = os.path.join(tmp_dir, f"{base_name}_Msk2FiniteRegions.tif")
         rsgislib.imageutils.mask_img(
             sel_img_bands_img,
             finite_msk_img,
             img_to_strch,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             0,
             0,
         )
 
-    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.kea")
+    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.tif")
     rsgislib.imageutils.stretch_img(
         img_to_strch,
         stretch_img,
@@ -122,7 +122,7 @@ def create_kmz_img(
         "",
         True,
         False,
-        "KEA",
+        "GTIFF",
         rsgislib.TYPE_8UINT,
         rsgislib.imageutils.STRETCH_LINEARSTDDEV,
         2,
@@ -130,7 +130,7 @@ def create_kmz_img(
 
     gdal_input_img = stretch_img
     if reproj_wgs84:
-        lat_long_img = os.path.join(tmp_dir, f"{base_name}_latlong.kea")
+        lat_long_img = os.path.join(tmp_dir, f"{base_name}_latlong.tif")
         out_wkt = os.path.join(tmp_dir, f"{base_name}_latlong.wkt")
         wgs84_wkt = rsgislib.tools.projection.get_wkt_from_epsg_code(4326)
         rsgislib.tools.utils.write_list_to_file([wgs84_wkt], out_wkt)
@@ -138,7 +138,7 @@ def create_kmz_img(
             stretch_img,
             lat_long_img,
             out_wkt,
-            gdalformat="KEA",
+            gdalformat="GTIFF",
             interp_method=rsgislib.INTERP_CUBIC,
             in_wkt=None,
             no_data_val=0.0,
@@ -223,31 +223,31 @@ def create_webtiles_img_no_stats_msk(
         s_bands = []
         for str_band in band_lst:
             s_bands.append(int(str_band))
-        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.kea")
+        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.tif")
         rsgislib.imageutils.select_img_bands(
             input_img,
             sel_img_bands_img,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             s_bands,
         )
 
     img_to_strch = sel_img_bands_img
     if finite_msk:
-        finite_msk_img = os.path.join(tmp_dir, f"{base_name}_FiniteMsk.kea")
-        rsgislib.imageutils.gen_finite_mask(sel_img_bands_img, finite_msk_img, "KEA")
-        img_to_strch = os.path.join(tmp_dir, f"{base_name}_Msk2FiniteRegions.kea")
+        finite_msk_img = os.path.join(tmp_dir, f"{base_name}_FiniteMsk.tif")
+        rsgislib.imageutils.gen_finite_mask(sel_img_bands_img, finite_msk_img, "GTIFF")
+        img_to_strch = os.path.join(tmp_dir, f"{base_name}_Msk2FiniteRegions.tif")
         rsgislib.imageutils.mask_img(
             sel_img_bands_img,
             finite_msk_img,
             img_to_strch,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             0,
             0,
         )
 
-    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.kea")
+    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.tif")
     rsgislib.imageutils.stretch_img(
         img_to_strch,
         stretch_img,
@@ -255,7 +255,7 @@ def create_webtiles_img_no_stats_msk(
         "",
         True,
         False,
-        "KEA",
+        "GTIFF",
         rsgislib.TYPE_8UINT,
         rsgislib.imageutils.STRETCH_LINEARSTDDEV,
         2,
@@ -363,30 +363,30 @@ def create_webtiles_img(
         s_bands = []
         for str_band in band_lst:
             s_bands.append(int(str_band))
-        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.kea")
+        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.tif")
         rsgislib.imageutils.select_img_bands(
             input_img,
             sel_img_bands_img,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             s_bands,
         )
 
     img_to_strch = sel_img_bands_img
-    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.kea")
+    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.tif")
     if img_stats_msk is not None:
-        img_to_strch_mskd = os.path.join(tmp_dir, f"{base_name}_MskdImg.kea")
+        img_to_strch_mskd = os.path.join(tmp_dir, f"{base_name}_MskdImg.tif")
         rsgislib.imageutils.mask_img(
             sel_img_bands_img,
             img_stats_msk,
             img_to_strch_mskd,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             no_data_val,
             img_msk_vals,
         )
         stretch_img_stats = os.path.join(tmp_dir, f"{base_name}_stretch_statstmp.txt")
-        stretch_img_tmp = os.path.join(tmp_dir, f"{base_name}_stretch_tmp.kea")
+        stretch_img_tmp = os.path.join(tmp_dir, f"{base_name}_stretch_tmp.tif")
         rsgislib.imageutils.stretch_img(
             img_to_strch_mskd,
             stretch_img_tmp,
@@ -394,7 +394,7 @@ def create_webtiles_img(
             stretch_img_stats,
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -404,7 +404,7 @@ def create_webtiles_img(
             img_to_strch,
             stretch_img,
             stretch_img_stats,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             no_data_val,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
@@ -418,7 +418,7 @@ def create_webtiles_img(
             "",
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -554,41 +554,41 @@ def create_quicklook_imgs(
         s_bands = []
         for str_band in band_lst:
             s_bands.append(int(str_band))
-        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.kea")
+        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.tif")
         rsgislib.imageutils.select_img_bands(
             input_img,
             sel_img_bands_img,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             s_bands,
         )
 
     img_to_strch = sel_img_bands_img
-    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.kea")
+    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.tif")
     if stretch_file is not None:
         rsgislib.imageutils.stretch_img_with_stats(
             img_to_strch,
             stretch_img,
             stretch_file,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             no_data_val,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
             2,
         )
     elif img_stats_msk is not None:
-        img_to_strch_mskd = os.path.join(tmp_dir, f"{base_name}_MskdImg.kea")
+        img_to_strch_mskd = os.path.join(tmp_dir, f"{base_name}_MskdImg.tif")
         rsgislib.imageutils.mask_img(
             sel_img_bands_img,
             img_stats_msk,
             img_to_strch_mskd,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             no_data_val,
             img_msk_vals,
         )
         stretch_img_stats = os.path.join(tmp_dir, f"{base_name}_stretch_statstmp.txt")
-        stretch_img_tmp = os.path.join(tmp_dir, f"{base_name}_stretch_tmp.kea")
+        stretch_img_tmp = os.path.join(tmp_dir, f"{base_name}_stretch_tmp.tif")
         rsgislib.imageutils.stretch_img(
             img_to_strch_mskd,
             stretch_img_tmp,
@@ -596,7 +596,7 @@ def create_quicklook_imgs(
             stretch_img_stats,
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -606,7 +606,7 @@ def create_quicklook_imgs(
             img_to_strch,
             stretch_img,
             stretch_img_stats,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             no_data_val,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
@@ -620,7 +620,7 @@ def create_quicklook_imgs(
             "",
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -765,30 +765,30 @@ def create_mbtile_file(
         s_bands = []
         for str_band in band_lst:
             s_bands.append(int(str_band))
-        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.kea")
+        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.tif")
         rsgislib.imageutils.select_img_bands(
             input_img,
             sel_img_bands_img,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             s_bands,
         )
 
     img_to_strch = sel_img_bands_img
-    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.kea")
+    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.tif")
     if img_stats_msk is not None:
-        img_to_strch_mskd = os.path.join(tmp_dir, f"{base_name}_MskdImg.kea")
+        img_to_strch_mskd = os.path.join(tmp_dir, f"{base_name}_MskdImg.tif")
         rsgislib.imageutils.mask_img(
             sel_img_bands_img,
             img_stats_msk,
             img_to_strch_mskd,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             no_data_val,
             img_msk_vals,
         )
         stretch_img_stats = os.path.join(tmp_dir, f"{base_name}_stretch_statstmp.txt")
-        stretch_img_tmp = os.path.join(tmp_dir, f"{base_name}_stretch_tmp.kea")
+        stretch_img_tmp = os.path.join(tmp_dir, f"{base_name}_stretch_tmp.tif")
         rsgislib.imageutils.stretch_img(
             img_to_strch_mskd,
             stretch_img_tmp,
@@ -796,7 +796,7 @@ def create_mbtile_file(
             stretch_img_stats,
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -805,7 +805,7 @@ def create_mbtile_file(
             img_to_strch,
             stretch_img,
             stretch_img_stats,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             no_data_val,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
@@ -819,19 +819,19 @@ def create_mbtile_file(
             "",
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
         )
 
-    stretch_img_re_proj = os.path.join(tmp_dir, f"{base_name}_stretch_epsg3857.kea")
+    stretch_img_re_proj = os.path.join(tmp_dir, f"{base_name}_stretch_epsg3857.tif")
     rsgislib.imageutils.gdal_warp(
         stretch_img,
         stretch_img_re_proj,
         3857,
         interp_method=rsgislib.INTERP_NEAREST_NEIGHBOUR,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         options=[],
     )
 
@@ -951,41 +951,41 @@ def create_webtiles_vis_gtiff_img(
         s_bands = []
         for str_band in band_lst:
             s_bands.append(int(str_band))
-        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.kea")
+        sel_img_bands_img = os.path.join(tmp_dir, f"{base_name}_sband.tif")
         rsgislib.imageutils.select_img_bands(
             input_img,
             sel_img_bands_img,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             s_bands,
         )
 
     img_to_strch = sel_img_bands_img
-    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.kea")
+    stretch_img = os.path.join(tmp_dir, f"{base_name}_stretch.tif")
     if stretch_file is not None:
         rsgislib.imageutils.stretch_img_with_stats(
             img_to_strch,
             stretch_img,
             stretch_file,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             no_data_val,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
             2,
         )
     elif img_stats_msk is not None:
-        img_to_strch_mskd = os.path.join(tmp_dir, f"{base_name}_MskdImg.kea")
+        img_to_strch_mskd = os.path.join(tmp_dir, f"{base_name}_MskdImg.tif")
         rsgislib.imageutils.mask_img(
             sel_img_bands_img,
             img_stats_msk,
             img_to_strch_mskd,
-            "KEA",
+            "GTIFF",
             rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img),
             no_data_val,
             img_msk_vals,
         )
         stretch_img_stats = os.path.join(tmp_dir, f"{base_name}_stretch_statstmp.txt")
-        stretch_img_tmp = os.path.join(tmp_dir, f"{base_name}_stretch_tmp.kea")
+        stretch_img_tmp = os.path.join(tmp_dir, f"{base_name}_stretch_tmp.tif")
         rsgislib.imageutils.stretch_img(
             img_to_strch_mskd,
             stretch_img_tmp,
@@ -993,7 +993,7 @@ def create_webtiles_vis_gtiff_img(
             stretch_img_stats,
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -1003,7 +1003,7 @@ def create_webtiles_vis_gtiff_img(
             img_to_strch,
             stretch_img,
             stretch_img_stats,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             no_data_val,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
@@ -1017,7 +1017,7 @@ def create_webtiles_vis_gtiff_img(
             "",
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -1221,12 +1221,12 @@ def create_quicklook_overview_imgs(
                 img, check_valid=True
             )
             sel_img_bands_img = os.path.join(
-                usr_tmp_dir, "{}_sband.kea".format(lcl_img_basename)
+                usr_tmp_dir, "{}_sband.tif".format(lcl_img_basename)
             )
             rsgislib.imageutils.select_img_bands(
                 img,
                 sel_img_bands_img,
-                "KEA",
+                "GTIFF",
                 rsgislib.imageutils.get_rsgislib_datatype_from_img(img),
                 s_bands,
             )
@@ -1236,13 +1236,13 @@ def create_quicklook_overview_imgs(
     tmp_vrt_img = os.path.join(usr_tmp_dir, "{}_{}.vrt".format(img_basename, uid_str))
     rsgislib.imageutils.create_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img)
 
-    stretch_img = os.path.join(usr_tmp_dir, "{}_stretch.kea".format(img_basename))
+    stretch_img = os.path.join(usr_tmp_dir, "{}_stretch.tif".format(img_basename))
     if stretch_file is not None:
         rsgislib.imageutils.stretch_img_with_stats(
             tmp_vrt_img,
             stretch_img,
             stretch_file,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             no_data_val,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
@@ -1256,7 +1256,7 @@ def create_quicklook_overview_imgs(
             "",
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -1530,12 +1530,12 @@ def create_quicklook_overview_imgs_vec_overlay(
                 img, check_valid=True
             )
             sel_img_bands_img = os.path.join(
-                usr_tmp_dir, "{}_sband.kea".format(lcl_img_basename)
+                usr_tmp_dir, "{}_sband.tif".format(lcl_img_basename)
             )
             rsgislib.imageutils.select_img_bands(
                 img,
                 sel_img_bands_img,
-                "KEA",
+                "GTIFF",
                 rsgislib.imageutils.get_rsgislib_datatype_from_img(img),
                 s_bands,
             )
@@ -1550,13 +1550,13 @@ def create_quicklook_overview_imgs_vec_overlay(
     tmp_vrt_img = os.path.join(usr_tmp_dir, "{}_{}.vrt".format(img_basename, uid_str))
     rsgislib.imageutils.create_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img)
 
-    stretch_img = os.path.join(usr_tmp_dir, "{}_stretch.kea".format(img_basename))
+    stretch_img = os.path.join(usr_tmp_dir, "{}_stretch.tif".format(img_basename))
     if stretch_file is not None:
         rsgislib.imageutils.stretch_img_with_stats(
             tmp_vrt_img,
             stretch_img,
             stretch_file,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             no_data_val,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
@@ -1570,7 +1570,7 @@ def create_quicklook_overview_imgs_vec_overlay(
             "",
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -1584,7 +1584,7 @@ def create_quicklook_overview_imgs_vec_overlay(
             scale_axis = "height"
 
     if n_out_imgs == 1:
-        cmd = ["gdal_translate", "-of", "KEA", "-ot", "Byte"]
+        cmd = ["gdal_translate", "-of", "GTIFF", "-ot", "Byte"]
         if scale_axis == "width":
             cmd.append("-outsize")
             cmd.append(f"{int(output_img_sizes)}")
@@ -1599,7 +1599,7 @@ def create_quicklook_overview_imgs_vec_overlay(
             output_imgs, check_valid=True
         )
         tmp_resized_img = os.path.join(
-            usr_tmp_dir, "{}_resized.kea".format(lcl_img_basename)
+            usr_tmp_dir, "{}_resized.tif".format(lcl_img_basename)
         )
 
         cmd.append("-r")
@@ -1614,14 +1614,14 @@ def create_quicklook_overview_imgs_vec_overlay(
             raise rsgislib.RSGISPyException("Could not execute command: {}".format(cmd))
         # Rasterise the overlay vector to the output raster grid.
         tmp_vec_overlay_img = os.path.join(
-            usr_tmp_dir, "{}_vec_overlay.kea".format(lcl_img_basename)
+            usr_tmp_dir, "{}_vec_overlay.tif".format(lcl_img_basename)
         )
         rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
             vec_overlay_file,
             vec_overlay_lyr,
             tmp_resized_img,
             tmp_vec_overlay_img,
-            gdalformat="KEA",
+            gdalformat="GTIFF",
             burn_val=1,
             datatype=rsgislib.TYPE_8UINT,
             att_column=None,
@@ -1630,10 +1630,10 @@ def create_quicklook_overview_imgs_vec_overlay(
         )
         # Merge the overlay and base image
         tmp_final_img = os.path.join(
-            usr_tmp_dir, "{}_final.kea".format(lcl_img_basename)
+            usr_tmp_dir, "{}_final.tif".format(lcl_img_basename)
         )
         burn_in_binary_msk(
-            tmp_resized_img, tmp_vec_overlay_img, tmp_final_img, "KEA", overlay_clrs
+            tmp_resized_img, tmp_vec_overlay_img, tmp_final_img, "GTIFF", overlay_clrs
         )
         # Convert to final format (e.g., JPG, TIFF or PNG)
         if not rsgislib.tools.filetools.does_path_exists_or_creatable(output_imgs):
@@ -1646,7 +1646,7 @@ def create_quicklook_overview_imgs_vec_overlay(
 
     elif n_out_imgs > 1:
         for i in range(n_out_imgs):
-            cmd = ["gdal_translate", "-of", "KEA", "-ot", "Byte"]
+            cmd = ["gdal_translate", "-of", "GTIFF", "-ot", "Byte"]
             if scale_axis == "width":
                 cmd.append("-outsize")
                 cmd.append(f"{int(output_img_sizes[i])}")
@@ -1661,7 +1661,7 @@ def create_quicklook_overview_imgs_vec_overlay(
                 output_imgs[i], check_valid=True
             )
             tmp_resized_img = os.path.join(
-                usr_tmp_dir, "{}_resized.kea".format(lcl_img_basename)
+                usr_tmp_dir, "{}_resized.tif".format(lcl_img_basename)
             )
             cmd.append("-r")
             cmd.append("average")
@@ -1677,14 +1677,14 @@ def create_quicklook_overview_imgs_vec_overlay(
                 )
             # Rasterise the overlay vector to the output raster grid.
             tmp_vec_overlay_img = os.path.join(
-                usr_tmp_dir, "{}_vec_overlay.kea".format(lcl_img_basename)
+                usr_tmp_dir, "{}_vec_overlay.tif".format(lcl_img_basename)
             )
             rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
                 vec_overlay_file,
                 vec_overlay_lyr,
                 tmp_resized_img,
                 tmp_vec_overlay_img,
-                gdalformat="KEA",
+                gdalformat="GTIFF",
                 burn_val=1,
                 datatype=rsgislib.TYPE_8UINT,
                 att_column=None,
@@ -1693,10 +1693,10 @@ def create_quicklook_overview_imgs_vec_overlay(
             )
             # Merge the overlay and base image
             tmp_final_img = os.path.join(
-                usr_tmp_dir, "{}_final.kea".format(lcl_img_basename)
+                usr_tmp_dir, "{}_final.tif".format(lcl_img_basename)
             )
             burn_in_binary_msk(
-                tmp_resized_img, tmp_vec_overlay_img, tmp_final_img, "KEA", overlay_clrs
+                tmp_resized_img, tmp_vec_overlay_img, tmp_final_img, "GTIFF", overlay_clrs
             )
             # Convert to final format (e.g., JPG, TIFF or PNG)
             if not rsgislib.tools.filetools.does_path_exists_or_creatable(
@@ -1858,12 +1858,12 @@ def create_visual_overview_imgs_vec_extent(
                 img, check_valid=True
             )
             sel_img_bands_img = os.path.join(
-                usr_tmp_dir, "{}_sband.kea".format(lcl_img_basename)
+                usr_tmp_dir, "{}_sband.tif".format(lcl_img_basename)
             )
             rsgislib.imageutils.select_img_bands(
                 img,
                 sel_img_bands_img,
-                "KEA",
+                "GTIFF",
                 rsgislib.imageutils.get_rsgislib_datatype_from_img(img),
                 s_bands,
             )
@@ -1887,13 +1887,13 @@ def create_visual_overview_imgs_vec_extent(
             b_sel_imgs, tmp_vrt_img, vrt_extent
         )
 
-    stretch_img = os.path.join(usr_tmp_dir, "{}_stretch.kea".format(img_basename))
+    stretch_img = os.path.join(usr_tmp_dir, "{}_stretch.tif".format(img_basename))
     if (stretch_file is not None) and (export_stretch_file == False):
         rsgislib.imageutils.stretch_img_with_stats(
             tmp_vrt_img,
             stretch_img,
             stretch_file,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             no_data_val,
             rsgislib.imageutils.STRETCH_LINEARMINMAX,
@@ -1907,7 +1907,7 @@ def create_visual_overview_imgs_vec_extent(
             stretch_file,
             no_data_val,
             False,
-            "KEA",
+            "GTIFF",
             rsgislib.TYPE_8UINT,
             rsgislib.imageutils.STRETCH_LINEARSTDDEV,
             2,
@@ -2031,14 +2031,14 @@ def overlay_vec_on_img(
 
     # Create raster of the vector to be overlain.
     tmp_vec_overlay_img = os.path.join(
-        usr_tmp_dir, "{}_vec_overlay.kea".format(img_basename)
+        usr_tmp_dir, "{}_vec_overlay.tif".format(img_basename)
     )
     rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
         vec_overlay_file,
         vec_overlay_lyr,
         input_img,
         tmp_vec_overlay_img,
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         burn_val=1,
         datatype=rsgislib.TYPE_8UINT,
         att_column=None,
@@ -2047,9 +2047,9 @@ def overlay_vec_on_img(
     )
 
     # Merge the overlay and base image
-    tmp_final_img = os.path.join(usr_tmp_dir, "{}_final.kea".format(img_basename))
+    tmp_final_img = os.path.join(usr_tmp_dir, "{}_final.tif".format(img_basename))
     burn_in_binary_msk(
-        input_img, tmp_vec_overlay_img, tmp_final_img, "KEA", overlay_clrs
+        input_img, tmp_vec_overlay_img, tmp_final_img, "GTIFF", overlay_clrs
     )
 
     # Convert to final format (e.g., JPG, TIFF or PNG)

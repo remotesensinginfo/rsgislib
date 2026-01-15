@@ -16,7 +16,7 @@ CALCPTWIN_DATA_DIR = os.path.join(IMGCALC_DATA_DIR, "calc_pt_win_smpls")
 def test_count_pxls_of_val_band1(tmp_path):
     import rsgislib.imagecalc.calc_pt_win_smpls
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.tif")
     vec_file = os.path.join(CALCPTWIN_DATA_DIR, "calc_pt_win_smpls_debug.geojson")
     vec_lyr = "calc_pt_win_smpls_debug"
     sum_img_obj = rsgislib.imagecalc.calc_pt_win_smpls.RSGISDebugExportImg(

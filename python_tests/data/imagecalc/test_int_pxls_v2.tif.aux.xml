@@ -1,0 +1,81 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>Band 1</Description>
+    <ColorInterp>Palette</ColorInterp>
+    <ColorTable>
+      <Entry c1="0" c2="0" c3="0" c4="255" />
+      <Entry c1="119" c2="140" c3="185" c4="255" />
+      <Entry c1="210" c2="96" c3="5" c4="255" />
+      <Entry c1="2" c2="212" c3="86" c4="255" />
+      <Entry c1="187" c2="33" c3="83" c4="255" />
+    </ColorTable>
+    <GDALRasterAttributeTable tableType="thematic">
+      <FieldDefn index="0">
+        <Name>Histogram</Name>
+        <Type>1</Type>
+        <Usage>1</Usage>
+      </FieldDefn>
+      <FieldDefn index="1">
+        <Name>Red</Name>
+        <Type>0</Type>
+        <Usage>6</Usage>
+      </FieldDefn>
+      <FieldDefn index="2">
+        <Name>Green</Name>
+        <Type>0</Type>
+        <Usage>7</Usage>
+      </FieldDefn>
+      <FieldDefn index="3">
+        <Name>Blue</Name>
+        <Type>0</Type>
+        <Usage>8</Usage>
+      </FieldDefn>
+      <FieldDefn index="4">
+        <Name>Alpha</Name>
+        <Type>0</Type>
+        <Usage>9</Usage>
+      </FieldDefn>
+      <Row index="0">
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>0</F>
+        <F>255</F>
+      </Row>
+      <Row index="1">
+        <F>626</F>
+        <F>119</F>
+        <F>140</F>
+        <F>185</F>
+        <F>255</F>
+      </Row>
+      <Row index="2">
+        <F>622</F>
+        <F>210</F>
+        <F>96</F>
+        <F>5</F>
+        <F>255</F>
+      </Row>
+      <Row index="3">
+        <F>596</F>
+        <F>2</F>
+        <F>212</F>
+        <F>86</F>
+        <F>255</F>
+      </Row>
+      <Row index="4">
+        <F>656</F>
+        <F>187</F>
+        <F>33</F>
+        <F>83</F>
+        <F>255</F>
+      </Row>
+    </GDALRasterAttributeTable>
+  </PAMRasterBand>
+  <PAMRasterBand band="2">
+    <Description>Band 2</Description>
+  </PAMRasterBand>
+  <PAMRasterBand band="3">
+    <Description>Band 3</Description>
+  </PAMRasterBand>
+</PAMDataset>

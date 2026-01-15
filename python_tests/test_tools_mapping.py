@@ -31,7 +31,7 @@ def test_create_raster_img_map(tmp_path):
     import rsgislib.tools.mapping
     import matplotlib.pyplot as plt
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     fig, ax = plt.subplots(figsize=(5, 5))
     rsgislib.tools.mapping.create_raster_img_map(
@@ -57,7 +57,7 @@ def test_create_raster_img_map_subset(tmp_path):
 
     bbox = [257500, 260200, 281000, 282500]
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     fig, ax = plt.subplots(figsize=(5, 5))
     rsgislib.tools.mapping.create_raster_img_map(
@@ -82,7 +82,7 @@ def test_create_raster_cmap_img_map(tmp_path):
     import rsgislib.tools.mapping
     import matplotlib.pyplot as plt
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     fig, ax = plt.subplots(figsize=(5, 5))
     rsgislib.tools.mapping.create_raster_cmap_img_map(
@@ -107,7 +107,7 @@ def test_create_raster_cmap_img_map_subset(tmp_path):
 
     bbox = [257500, 260200, 281000, 282500]
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif")
 
     fig, ax = plt.subplots(figsize=(5, 5))
     rsgislib.tools.mapping.create_raster_cmap_img_map(
@@ -131,7 +131,7 @@ def test_create_thematic_raster_map(tmp_path):
     import rsgislib.tools.mapping
     import matplotlib.pyplot as plt
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.tif")
 
     fig, ax = plt.subplots(figsize=(5, 5))
     rsgislib.tools.mapping.create_thematic_raster_map(
@@ -155,7 +155,7 @@ def test_create_thematic_raster_map_subset(tmp_path):
 
     bbox = [257500, 260200, 281000, 282500]
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_cls.tif")
 
     fig, ax = plt.subplots(figsize=(5, 5))
     rsgislib.tools.mapping.create_thematic_raster_map(

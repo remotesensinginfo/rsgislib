@@ -19,7 +19,7 @@ gdal_translate_cmd_avail = rsgislib.tools.filetools.is_cmd_tool_avail(
 def test_create_kmz_img(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_file = os.path.join(tmp_path, "out_img.kmz")
     rsgislib.tools.visualisation.create_kmz_img(
         input_img,
@@ -39,7 +39,7 @@ def test_create_kmz_img(tmp_path):
 def test_create_webtiles_img_no_stats_msk_tms_true(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_dir = os.path.join(tmp_path, "out_files")
     os.mkdir(output_dir)
 
@@ -60,7 +60,7 @@ def test_create_webtiles_img_no_stats_msk_tms_true(tmp_path):
 def test_create_webtiles_img_no_stats_msk_tms_false(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_dir = os.path.join(tmp_path, "out_files")
     os.mkdir(output_dir)
 
@@ -81,7 +81,7 @@ def test_create_webtiles_img_no_stats_msk_tms_false(tmp_path):
 def test_create_webtiles_img_no_stats_msk_tms_true_finite(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_dir = os.path.join(tmp_path, "out_files")
     os.mkdir(output_dir)
 
@@ -102,7 +102,7 @@ def test_create_webtiles_img_no_stats_msk_tms_true_finite(tmp_path):
 def test_create_webtiles_img_nodata_exp(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_dir = os.path.join(tmp_path, "out_files")
     os.mkdir(output_dir)
     with pytest.raises(rsgislib.RSGISPyException):
@@ -122,7 +122,7 @@ def test_create_webtiles_img_nodata_exp(tmp_path):
 def test_create_webtiles_img_tms_true(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_dir = os.path.join(tmp_path, "out_files")
     os.mkdir(output_dir)
 
@@ -143,7 +143,7 @@ def test_create_webtiles_img_tms_true(tmp_path):
 def test_create_webtiles_img_tms_false(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_dir = os.path.join(tmp_path, "out_files")
     os.mkdir(output_dir)
 
@@ -164,7 +164,7 @@ def test_create_webtiles_img_tms_false(tmp_path):
 def test_create_quicklook_imgs_sgl(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_file = os.path.join(tmp_path, "out_img.jpg")
     rsgislib.tools.visualisation.create_quicklook_imgs(
         input_img,
@@ -184,7 +184,7 @@ def test_create_quicklook_imgs_sgl(tmp_path):
 def test_create_quicklook_imgs_multi(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_files = [
         os.path.join(tmp_path, "out_img_1.jpg"),
         os.path.join(tmp_path, "out_img_2.jpg"),
@@ -204,7 +204,7 @@ def test_create_quicklook_imgs_multi(tmp_path):
 def test_create_mbtile_file(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_file = os.path.join(tmp_path, "out_img.mbtiles")
 
     rsgislib.tools.visualisation.create_mbtile_file(
@@ -227,7 +227,7 @@ def test_create_mbtile_file(tmp_path):
 def test_create_webtiles_vis_gtiff_img(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
     output_dir = os.path.join(tmp_path, "out_files")
     output_file = os.path.join(tmp_path, "out_img.tif")
 
@@ -253,8 +253,8 @@ def test_create_quicklook_overview_imgs_sgl(tmp_path):
     import rsgislib.tools.visualisation
 
     input_imgs = [
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
-        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber.tif"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif"),
     ]
     output_file = os.path.join(tmp_path, "out_img.jpg")
 
@@ -277,8 +277,8 @@ def test_create_quicklook_overview_imgs_multi(tmp_path):
     import rsgislib.tools.visualisation
 
     input_imgs = [
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
-        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber.tif"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber_subset.tif"),
     ]
     output_files = [
         os.path.join(tmp_path, "out_img_1.jpg"),
@@ -300,12 +300,12 @@ def test_create_quicklook_overview_imgs_multi(tmp_path):
 def test_burn_in_binary_msk(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
-    msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.kea")
-    output_img = os.path.join(tmp_path, "out_img.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
+    msk_img = os.path.join(DATA_DIR, "sen2_20210527_aber_vldmsk.tif")
+    output_img = os.path.join(tmp_path, "out_img.tif")
 
     rsgislib.tools.visualisation.burn_in_binary_msk(
-        input_img, msk_img, output_img, "KEA", msk_colour=None
+        input_img, msk_img, output_img, "GTIFF", msk_colour=None
     )
 
     assert os.path.exists(output_img)
@@ -314,7 +314,7 @@ def test_burn_in_binary_msk(tmp_path):
 def test_create_quicklook_overview_imgs_vec_overlay_sgl(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.kea")]
+    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.tif")]
     vec_overlay_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
     vec_overlay_lyr = "aber_osgb_single_poly"
     output_file = os.path.join(tmp_path, "out_img.jpg")
@@ -340,7 +340,7 @@ def test_create_quicklook_overview_imgs_vec_overlay_sgl(tmp_path):
 def test_create_quicklook_overview_imgs_vec_overlay_sgl_clr(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.kea")]
+    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.tif")]
     vec_overlay_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
     vec_overlay_lyr = "aber_osgb_single_poly"
     output_file = os.path.join(tmp_path, "out_img.jpg")
@@ -368,8 +368,8 @@ def test_create_quicklook_overview_imgs_vec_overlay_multi(tmp_path):
     import rsgislib.tools.visualisation
 
     input_imgs = [
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber.tif"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber.tif"),
     ]
     vec_overlay_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
     vec_overlay_lyr = "aber_osgb_single_poly"
@@ -397,8 +397,8 @@ def test_create_quicklook_overview_imgs_vec_overlay_multi_clr(tmp_path):
     import rsgislib.tools.visualisation
 
     input_imgs = [
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber.tif"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber.tif"),
     ]
     vec_overlay_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
     vec_overlay_lyr = "aber_osgb_single_poly"
@@ -427,8 +427,8 @@ def test_create_quicklook_overview_imgs_vec_overlay_multi_clr_multi_out(tmp_path
     import rsgislib.tools.visualisation
 
     input_imgs = [
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
-        os.path.join(DATA_DIR, "sen2_20210527_aber.kea"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber.tif"),
+        os.path.join(DATA_DIR, "sen2_20210527_aber.tif"),
     ]
     vec_overlay_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")
     vec_overlay_lyr = "aber_osgb_single_poly"
@@ -459,7 +459,7 @@ def test_create_quicklook_overview_imgs_vec_overlay_multi_clr_multi_out(tmp_path
 def test_create_visual_overview_imgs_vec_extent(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.kea")]
+    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.tif")]
     output_file = os.path.join(tmp_path, "out_img.tif")
     stretch_file = os.path.join(tmp_path, "strch_info.txt")
     rsgislib.tools.visualisation.create_visual_overview_imgs_vec_extent(
@@ -486,7 +486,7 @@ def test_create_visual_overview_imgs_vec_extent(tmp_path):
 def test_create_visual_overview_imgs_vec_extent_multi_out(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.kea")]
+    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.tif")]
     output_files = [
         os.path.join(tmp_path, "out_img_0.tif"),
         os.path.join(tmp_path, "out_img_1.tif"),
@@ -521,7 +521,7 @@ def test_create_visual_overview_imgs_vec_extent_multi_out(tmp_path):
 def test_create_visual_overview_imgs_vec_extent_vec_ext(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.kea")]
+    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.tif")]
     output_file = os.path.join(tmp_path, "out_img.tif")
     stretch_file = os.path.join(tmp_path, "strch_info.txt")
     vec_extent_file = os.path.join(TOOLS_VIS_DATA_DIR, "wales_bbox.geojson")
@@ -551,7 +551,7 @@ def test_create_visual_overview_imgs_vec_extent_vec_ext(tmp_path):
 def test_create_visual_overview_imgs_vec_extent_multi_out_vec_ext(tmp_path):
     import rsgislib.tools.visualisation
 
-    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.kea")]
+    input_imgs = [os.path.join(DATA_DIR, "sen2_20210527_aber.tif")]
     output_files = [
         os.path.join(tmp_path, "out_img_0.tif"),
         os.path.join(tmp_path, "out_img_1.tif"),
@@ -586,7 +586,7 @@ def test_overlay_vec_on_img(tmp_path):
     import rsgislib.tools.visualisation
 
     input_img = os.path.join(
-        TOOLS_VIS_DATA_DIR, "sen2_20210527_aber_subset_b123_stch.kea"
+        TOOLS_VIS_DATA_DIR, "sen2_20210527_aber_subset_b123_stch.tif"
     )
     output_img = os.path.join(tmp_path, "out_img.png")
     vec_overlay_file = os.path.join(DATA_DIR, "aber_osgb_single_poly.geojson")

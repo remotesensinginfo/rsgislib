@@ -9,7 +9,7 @@ def test_create_random_int_img(tmp_path):
 
     uid_str = rsgislib.tools.utils.uid_generator()
 
-    output_img = os.path.join(tmp_path, f"out_test_img_{uid_str}.kea")
+    output_img = os.path.join(tmp_path, f"out_test_img_{uid_str}.tif")
 
     rsgislib.tools.testimages.create_random_int_img(
         output_img,
@@ -17,7 +17,7 @@ def test_create_random_int_img(tmp_path):
         x_size=100,
         y_size=250,
         out_vals=[1, 2, 3, 4],
-        gdalformat="KEA",
+        gdalformat="GTIFF",
         datatype=rsgislib.TYPE_8UINT,
         calc_stats=True,
         tmp_path=tmp_path,
