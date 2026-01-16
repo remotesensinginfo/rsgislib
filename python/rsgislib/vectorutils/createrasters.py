@@ -23,6 +23,7 @@ def rasterise_vec_lyr(
     use_vec_extent: bool = False,
     thematic: bool = True,
     no_data_val: float = 0,
+    calc_stats: bool = True,
 ):
     """
     A utility to rasterise a vector layer to an image covering the same region and at
@@ -50,6 +51,8 @@ def rasterise_vec_lyr(
                      an thematic dataset so a colour table will be populated.
     :param no_data_val: is a float specifying the no data value associated with a
                         continuous output image.
+    :param calc_stats: is a boolean specifying that the output image
+                       statistics and pyramids should be calculated
 
     .. code:: python
 
@@ -118,21 +121,22 @@ def rasterise_vec_lyr(
         out_img_ds = None
         vec_ds = None
 
-        if thematic:
-            if gdalformat == "KEA":
-                import rsgislib.rastergis
+        if calc_stats:
+            if thematic:
+                if gdalformat == "KEA":
+                    import rsgislib.rastergis
 
-                rsgislib.rastergis.pop_rat_img_stats(
-                    clumps_img=output_img,
-                    add_clr_tab=True,
-                    calc_pyramids=True,
-                    ignore_zero=True,
-                )
+                    rsgislib.rastergis.pop_rat_img_stats(
+                        clumps_img=output_img,
+                        add_clr_tab=True,
+                        calc_pyramids=True,
+                        ignore_zero=True,
+                    )
+                else:
+                    rsgislib.imageutils.pop_thmt_img_stats(
+                        input_img = output_img, add_clr_tab = True, calc_pyramids = True, ignore_zero = True)
             else:
-                rsgislib.imageutils.pop_thmt_img_stats(
-                    input_img = output_img, add_clr_tab = True, calc_pyramids = True, ignore_zero = True)
-        else:
-            rsgislib.imageutils.pop_img_stats(output_img, True, no_data_val, True)
+                rsgislib.imageutils.pop_img_stats(output_img, True, no_data_val, True)
     except Exception as e:
         raise e
 

@@ -23,22 +23,6 @@ the polygon then the centriod is used.
 
 * rsgislib.zonalstats.calc_zonal_band_stats_test_poly_pts
 
-
-Alternatively, the other functions are slower to execute but have more options with
-respect to the method of intersection. The options for intersection are:
-
-* METHOD_POLYCONTAINSPIXEL = 0           # Polygon completely contains pixel
-* METHOD_POLYCONTAINSPIXELCENTER = 1     # Pixel center is within the polygon
-* METHOD_POLYOVERLAPSPIXEL = 2           # Polygon overlaps the pixel
-* METHOD_POLYOVERLAPSORCONTAINSPIXEL = 3 # Polygon overlaps or contains the pixel
-* METHOD_PIXELCONTAINSPOLY = 4           # Pixel contains the polygon
-* METHOD_PIXELCONTAINSPOLYCENTER = 5     # Polygon center is within pixel
-* METHOD_ADAPTIVE = 6                    # The method is chosen based on relative areas
-                                         # of pixel and polygon.
-* METHOD_ENVELOPE = 7                    # All pixels in polygon envelope chosen
-* METHOD_PIXELAREAINPOLY = 8             # Percent of pixel area that is within
-                                         # the polygon
-* METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within pixel
 """
 
 import math
@@ -46,15 +30,19 @@ import sys
 from typing import List, Dict
 
 import numpy
-import tqdm
 from osgeo import gdal, ogr, osr
 
 import rsgislib
 import rsgislib.imageutils
 import rsgislib.tools.geometrytools
 
-# import the C++ extension into this level
-#from ._zonalstats import *
+TQDM_AVAIL = True
+try:
+    import tqdm
+except ImportError:
+    import rios.cuiprogress
+
+    TQDM_AVAIL = False
 
 gdal.UseExceptions()
 
@@ -3853,3 +3841,284 @@ def split_sample_hdf5_file(in_h5_file:str, out_h5_p1_file:str, out_h5_p2_file:st
     describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
     describ_ds[0] = str_out.encode()
     f_h5_out.close()
+
+
+
+def extract_zone_img_values_to_hdf(input_img:str, in_msk_img:str, out_h5_file:str, mask_val:int = 1, datatype: int = None, msk_img_band:int = 1):
+    """
+    Extract the all the pixel values for raster regions to a HDF5 file
+    (1 column for each image band).
+
+    :param input_img: is a string containing the name and path of the input file
+    :param in_msk_img: is a string containing the name and path of the input
+                       image mask file.
+    :param out_h5_file: is a string containing the name and path of the output
+                        HDF5 file
+    :param mask_val: is an integer with the value of the pixel within the mask for
+                     which values are to be extracted (Default: 1)
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of
+                     the output image. Default is None and therefore the datatype
+                     will match the input_img.
+    :param msk_img_band: is the bands within the mask image (Default: 1)
+
+    .. code:: python
+
+        import rsgislib.zonalstats
+        rsgislib.zonalstats.extract_zone_img_values_to_hdf(input_img = "landsat.tif",
+                                                           in_msk_img = "mask_img.tif",
+                                                           out_h5_file = "img_pxl_vals.h5",
+                                                           mask_val = 1,
+                                                           msk_img_band = 1,
+                                                           datatype = None)
+
+    """
+    import h5py
+    import rsgislib.imageutils
+    import rsgislib.imagecalc
+    from rios import applier
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    n_msk_bands = rsgislib.imageutils.get_img_band_count(input_img=in_msk_img)
+    if (msk_img_band <= 0) or (msk_img_band > n_msk_bands):
+        raise rsgislib.RSGISPyException(f"The specified band ({msk_img_band}) for the mask image ({in_msk_img}) is not within the image.")
+
+    if datatype is None:
+        datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img=input_img)
+    np_datatype = rsgislib.get_numpy_datatype(rsgislib_datatype = datatype)
+
+    print("Count the number of pixels within the mask...")
+    num_vals = rsgislib.imagecalc.count_pxls_of_val(input_img = in_msk_img, vals = [mask_val], img_band = msk_img_band)[0]
+    if num_vals > 0:
+        num_vars = rsgislib.imageutils.get_img_band_count(input_img=input_img)
+
+        data_arr = numpy.zeros([num_vals, num_vars], dtype=np_datatype)
+        data_arr_off = 0
+
+        in_files = applier.FilenameAssociations()
+        in_files.input_img = input_img
+        in_files.in_msk_img = in_msk_img
+        out_files = applier.FilenameAssociations()
+        other_args = applier.OtherInputs()
+        other_args.mask_val = mask_val
+        other_args.data_arr = data_arr
+        other_args.data_arr_off = data_arr_off
+        other_args.msk_img_band_idx = msk_img_band - 1
+        a_controls = applier.ApplierControls()
+        a_controls.progress = progress_bar
+
+        def _extract_pxl_vals(info, inputs, outputs, otherargs):
+            # Convert image mask to boolean mask
+            img_bin_msk_arr = inputs.in_msk_img[otherargs.msk_img_band_idx] == otherargs.mask_val
+            # Check there are pixels which meet the condition.
+            if numpy.sum(img_bin_msk_arr) > 0:
+                # Flatten to 1d array
+                img_bin_msk_flt_arr = img_bin_msk_arr.reshape(-1)
+                # Get image data.
+                img_data_arr = inputs.input_img
+                # Move band axis to the end
+                img_data_b_arr = numpy.moveaxis(img_data_arr, source=0, destination=2)
+                # Flatten to 2d array (n-pixels x bands)
+                img_data_b_flt_arr = img_data_b_arr.reshape(-1, img_data_b_arr.shape[2])
+                # Mask to only the pixels within the boolean mask value of True.
+                img_data_b_flt_mskd_arr = img_data_b_flt_arr[img_bin_msk_flt_arr]
+                # Get the number of pixels to be outputted
+                num_rows = img_data_b_flt_mskd_arr.shape[0]
+                # Use the offset to write the pixels into the right part of the output array.
+                otherargs.data_arr[otherargs.data_arr_off: (otherargs.data_arr_off + num_rows)] = img_data_b_flt_mskd_arr
+                # Move the offset counter along.
+                otherargs.data_arr_off += num_rows
+
+        print(f"Extracting {num_vals} pixels with {num_vars} values each:")
+        applier.apply(_extract_pxl_vals, in_files, out_files, other_args, controls=a_controls)
+
+        chunk_len = 1000
+        if num_vals < chunk_len:
+            chunk_len = num_vals
+
+        h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
+
+        f_h5_out = h5py.File(out_h5_file, "w")
+        data_grp = f_h5_out.create_group("DATA")
+        meta_grp = f_h5_out.create_group("META-DATA")
+        data_grp.create_dataset(
+                "DATA",
+                data=data_arr,
+                chunks=(chunk_len, num_vars),
+                compression="gzip",
+                shuffle=True,
+                dtype=h5_dtype,
+        )
+        str_out = f"Extracted from {input_img} using {in_msk_img} as a mask with value {mask_val}."
+        str_len = len(str_out)
+        describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+        describ_ds[0] = str_out.encode()
+        f_h5_out.close()
+    else:
+        print("Warning: there were no pixels within the pixel provided - was this intended.")
+
+
+
+def extract_zone_img_band_values_to_hdf(in_img_info: List[rsgislib.imageutils.ImageBandInfo], in_msk_img:str, out_h5_file:str, mask_val:int = 1, datatype: int = None, msk_img_band:int = 1):
+    """
+    Extract the all the pixel values for raster regions to a HDF5 file
+    (1 column for each image band).
+
+    :param in_img_info: is a list of rsgislib.imageutils.ImageBandInfo objects with
+                        the image file names and list of image bands within that file
+                        to be extracted.
+    :param in_msk_img: is a string containing the name and path of the input
+                       image mask file.
+    :param out_h5_file: is a string containing the name and path of the output HDF5 file
+    :param mask_val: is an integer with the value of the pixel within the mask for
+                     which values are to be extracted (Default: 1)
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of
+                     the output image. Default is None and therefore the datatype
+                     will match the first image in the in_img_info list.
+    :param msk_img_band: is the bands within the mask image (Default: 1)
+
+    .. code:: python
+
+        import rsgislib.zonalstats
+        import rsgislib.imageutils
+
+        in_img_info = list()
+        in_img_info.append(
+            rsgislib.imageutils.ImageBandInfo(
+                file_name="landsat.tif",
+                name="ls",
+                bands=[1, 2, 3, 4, 5, 6],
+            )
+        )
+        in_img_info.append(
+            rsgislib.imageutils.ImageBandInfo(
+                file_name="ndvi.tif",
+                name="ndvi",
+                bands=[1],
+            )
+        )
+
+        zonalstats.extract_zone_img_band_values_to_hdf(
+            in_img_info=in_img_info,
+            in_msk_img="mask_img.tif",
+            out_h5_file="out_pxl_vals.h5",
+            mask_val=1,
+            msk_img_band=1,
+            datatype=rsgislib.TYPE_32FLOAT,
+        )
+
+    """
+    import h5py
+    import rsgislib.imageutils
+    import rsgislib.imagecalc
+    from rios import applier
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    if datatype is None:
+        datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(
+            input_img=in_img_info[0].file_name)
+    np_datatype = rsgislib.get_numpy_datatype(rsgislib_datatype=datatype)
+
+    n_msk_bands = rsgislib.imageutils.get_img_band_count(input_img=in_msk_img)
+    if (msk_img_band <= 0) or (msk_img_band > n_msk_bands):
+        raise rsgislib.RSGISPyException(
+            f"The specified band ({msk_img_band}) for the mask image ({in_msk_img}) is not within the image.")
+
+    print("Count the number of pixels within the mask...")
+    num_vals = rsgislib.imagecalc.count_pxls_of_val(input_img=in_msk_img, vals=[mask_val], img_band=msk_img_band)[0]
+    if num_vals > 0:
+        num_vars = 0
+        file_names_str = ""
+        for img_info in in_img_info:
+            num_vars += len(img_info.bands)
+            img_n_bands = rsgislib.imageutils.get_img_band_count(img_info.file_name)
+            for band in img_info.bands:
+                if (band <= 0) or (band > img_n_bands):
+                    raise rsgislib.RSGISPyException(f"Band {band} is not within {img_info.file_name}.")
+            if file_names_str == "":
+                file_names_str = f"{img_info.name}: {img_info.file_name} ({img_info.bands})"
+            else:
+                file_names_str = f"{file_names_str}, {img_info.name}: {img_info.file_name} ({img_info.bands})"
+
+        data_arr = numpy.zeros([num_vals, num_vars], dtype=np_datatype)
+        data_arr_off = 0
+
+        in_files = applier.FilenameAssociations()
+        for img_info in in_img_info:
+            in_files.__dict__[img_info.name] = img_info.file_name
+        in_files.in_msk_img = in_msk_img
+        out_files = applier.FilenameAssociations()
+        other_args = applier.OtherInputs()
+        other_args.in_img_info = in_img_info
+        other_args.mask_val = mask_val
+        other_args.data_arr = data_arr
+        other_args.data_arr_off = data_arr_off
+        other_args.num_vars = num_vars
+        other_args.msk_img_band_idx = msk_img_band - 1
+        other_args.np_datatype = np_datatype
+        a_controls = applier.ApplierControls()
+        a_controls.progress = progress_bar
+
+        def _extract_pxl_vals(info, inputs, outputs, otherargs):
+            # Convert image mask to boolean mask
+            img_bin_msk_arr = inputs.in_msk_img[otherargs.msk_img_band_idx] == otherargs.mask_val
+            # Check there are pixels which meet the condition.
+            if numpy.sum(img_bin_msk_arr) > 0:
+                # Flatten to 1d array
+                img_bin_msk_flt_arr = img_bin_msk_arr.reshape(-1)
+                # Create array for the image data combined into a single array.
+                img_data_arr = numpy.zeros(
+                        (img_bin_msk_flt_arr.shape[0], otherargs.num_vars),
+                        dtype=otherargs.np_datatype
+                )
+                # Iterate through the input images to get image data.
+                data_vars_idx = 0
+                for img_info in otherargs.in_img_info:
+                    img_arr = inputs.__dict__[img_info.name]
+                    for band in img_info.bands:
+                        img_data_arr[..., data_vars_idx] = img_arr[(band - 1)].flatten()
+                        data_vars_idx += 1
+
+                # Mask to only the pixels within the boolean mask value of True.
+                img_data_mskd_arr = img_data_arr[img_bin_msk_flt_arr]
+                # Get the number of pixels to be outputted
+                num_rows = img_data_mskd_arr.shape[0]
+                # Use the offset to write the pixels into the right part of the output array.
+                otherargs.data_arr[otherargs.data_arr_off: (otherargs.data_arr_off + num_rows)] = img_data_mskd_arr
+                # Move the offset counter along.
+                otherargs.data_arr_off += num_rows
+
+        print(f"Extracting {num_vals} pixels with {num_vars} values each:")
+        applier.apply(_extract_pxl_vals, in_files, out_files, other_args, controls=a_controls)
+
+        chunk_len = 1000
+        if num_vals < chunk_len:
+            chunk_len = num_vals
+
+        h5_dtype = rsgislib.get_numpy_char_codes_datatype(datatype)
+
+        f_h5_out = h5py.File(out_h5_file, "w")
+        data_grp = f_h5_out.create_group("DATA")
+        meta_grp = f_h5_out.create_group("META-DATA")
+        data_grp.create_dataset(
+                "DATA",
+                data=data_arr,
+                chunks=(chunk_len, num_vars),
+                compression="gzip",
+                shuffle=True,
+                dtype=h5_dtype,
+        )
+        str_out = f"Extracted from {file_names_str} using {in_msk_img} as a mask with value {mask_val}."
+        str_len = len(str_out)
+        describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+        describ_ds[0] = str_out.encode()
+        f_h5_out.close()
+    else:
+        print("Warning: there were no pixels within the pixel provided - was this intended.")

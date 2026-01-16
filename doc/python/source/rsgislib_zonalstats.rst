@@ -45,7 +45,6 @@ Polygons
 Extracting Pixels to HDF5
 --------------------------
 
-.. autofunction:: rsgislib.zonalstats.image_zone_to_hdf
 .. autofunction:: rsgislib.zonalstats.extract_zone_img_values_to_hdf
 .. autofunction:: rsgislib.zonalstats.extract_zone_img_band_values_to_hdf
 .. autofunction:: rsgislib.zonalstats.extract_zone_band_values_to_h5_file
