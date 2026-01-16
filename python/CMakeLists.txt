@@ -231,5 +231,5 @@ endif(MSVC)
 install(TARGETS _specunmixing DESTINATION "${PYRSGIS_INSTALL_PATH}/imagecalc/specunmixing")
 
 # custom install step to create .pyc files
-install(CODE "execute_process(COMMAND ${Python_EXECUTABLE} -m compileall ${PYRSGIS_INSTALL_PATH})")
-
+file(TO_CMAKE_PATH "${Python_EXECUTABLE}" SAFE_PYTHON_EXECUTABLE)
+install(CODE "execute_process(COMMAND \"${SAFE_PYTHON_EXECUTABLE}\" -m compileall \"${PYRSGIS_INSTALL_PATH}\")")
