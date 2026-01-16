@@ -1108,28 +1108,7 @@ def test_calc_zonal_band_stats_file_Median(tmp_path):
             break
     assert vals_eq
 
-"""
-def test_image_zone_to_hdf(tmp_path):
-    import rsgislib.zonalstats
-
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.tif")
-    vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_polygons.geojson")
-    vec_lyr = "sen2_20210527_aber_polygons"
-
-    out_h5_file = os.path.join(tmp_path, "out_h5_file.h5")
-
-    rsgislib.zonalstats.image_zone_to_hdf(
-        input_img,
-        vec_file,
-        vec_lyr,
-        out_h5_file,
-        no_prj_warn=False,
-        pxl_in_poly_method=rsgislib.zonalstats.METHOD_POLYCONTAINSPIXELCENTER,
-    )
-
-    assert os.path.exists(out_h5_file)
-
-
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_extract_zone_img_values_to_hdf(tmp_path):
     import rsgislib.zonalstats
 
@@ -1144,7 +1123,7 @@ def test_extract_zone_img_values_to_hdf(tmp_path):
 
     assert os.path.exists(out_h5_file)
 
-
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_extract_zone_img_band_values_to_hdf(tmp_path):
     import rsgislib.zonalstats
     import rsgislib.imageutils
@@ -1166,7 +1145,7 @@ def test_extract_zone_img_band_values_to_hdf(tmp_path):
 
     assert os.path.exists(out_h5_file)
 
-
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_random_sample_hdf5_file(tmp_path):
     import rsgislib.zonalstats
 
@@ -1179,7 +1158,7 @@ def test_random_sample_hdf5_file(tmp_path):
 
     assert os.path.exists(out_h5_file)
 
-
+@pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_split_sample_hdf5_file(tmp_path):
     import rsgislib.zonalstats
 
@@ -1192,7 +1171,7 @@ def test_split_sample_hdf5_file(tmp_path):
     )
 
     assert os.path.exists(out_h5_p1_file) and os.path.exists(out_h5_p2_file)
-"""
+
 
 @pytest.mark.skipif(H5PY_NOT_AVAIL, reason="h5py dependency not available")
 def test_merge_extracted_hdf5_data(tmp_path):

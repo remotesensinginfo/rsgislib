@@ -322,9 +322,9 @@ def get_class_training_data(
 
     rasterise_ref_img = ref_img
     if ref_img is None:
-        rasterise_ref_img = os.path.join(tmp_lcl_dir, "ref_img_vmsk.kea")
+        rasterise_ref_img = os.path.join(tmp_lcl_dir, "ref_img_vmsk.tif")
         rsgislib.imageutils.create_valid_mask(
-            img_band_info, rasterise_ref_img, "KEA", tmp_lcl_dir
+            img_band_info, rasterise_ref_img, "GTIFF", tmp_lcl_dir
         )
 
     class_info = dict()
@@ -332,29 +332,30 @@ def get_class_training_data(
         cls_basename = rsgislib.tools.filetools.get_file_basename(
             class_sample_info.file_h5
         )
-        out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
+        out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.tif".format(cls_basename))
         rsgislib.vectorutils.createrasters.rasterise_vec_lyr(
             class_sample_info.vec_file,
             class_sample_info.vec_lyr,
             rasterise_ref_img,
             out_vec_img,
-            gdalformat="KEA",
+            gdalformat="GTIFF",
             burn_val=class_sample_info.id,
             datatype=rsgislib.TYPE_16UINT,
             att_column=None,
             use_vec_extent=False,
             thematic=True,
             no_data_val=0,
+            calc_stats = False,
         )
 
         if sub_sample is not None:
             out_vec_img_subsample = os.path.join(
-                tmp_lcl_dir, "{}_img_subsample.kea".format(cls_basename)
+                tmp_lcl_dir, "{}_img_subsample.tif".format(cls_basename)
             )
             rsgislib.imageutils.perform_random_pxl_sample_in_mask(
                 out_vec_img,
                 out_vec_img_subsample,
-                "KEA",
+                "GTIFF",
                 mask_vals=[class_sample_info.id],
                 n_samples=sub_sample,
             )
