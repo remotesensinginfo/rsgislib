@@ -406,7 +406,7 @@ def apply_sklearn_classifier(
                 out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
             )
             rsgislib.classification.apply_class_clrs(input_cls_img = out_class_img,
-            cls_train_info = cls_train_info)
+            cls_info_dict = cls_train_info)
 
     if create_out_score_img:
         rsgislib.imageutils.pop_img_stats(
