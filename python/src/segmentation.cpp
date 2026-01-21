@@ -42,20 +42,22 @@ static PyObject *Segmentation_labelPixelsFromClusterCentres(PyObject *self, PyOb
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("cluster_centres_file"), RSGIS_PY_C_TEXT("ignore_zeros"),
-                             RSGIS_PY_C_TEXT("gdalformat"),  nullptr};
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pszInputImage, *pszOutputImage, *pszClusterCentres, *pszgdalformat;
     int ignoreZeros;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssis:label_pixels_from_cluster_centres", kwlist, &pszInputImage, &pszOutputImage,
-                                &pszClusterCentres, &ignoreZeros, &pszgdalformat ))
+    int nDataType;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssisi:label_pixels_from_cluster_centres", kwlist, &pszInputImage, &pszOutputImage,
+                                &pszClusterCentres, &ignoreZeros, &pszgdalformat, &nDataType ))
     {
         return nullptr;
     }
 
     try
     {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
         rsgis::cmds::executeLabelPixelsFromClusterCentres(std::string(pszInputImage), std::string(pszOutputImage),
                                                           std::string(pszClusterCentres),ignoreZeros,
-                                                          std::string(pszgdalformat) );
+                                                          std::string(pszgdalformat), type );
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -659,7 +661,7 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
 // Our list of functions in this module
 static PyMethodDef SegmentationMethods[] = {
     {"label_pixels_from_cluster_centres", (PyCFunction)Segmentation_labelPixelsFromClusterCentres, METH_VARARGS | METH_KEYWORDS,
-"segmentation.label_pixels_from_cluster_centres(input_img, output_img, cluster_centres_file, ignore_zeros, gdalformat)\n"
+"segmentation.label_pixels_from_cluster_centres(input_img, output_img, cluster_centres_file, ignore_zeros, gdalformat, datatype)\n"
 "Labels image pixels with the ID of the nearest cluster centre.\n"
 "\n"
 ":param input_img: is a string containing the name of the input file\n"
@@ -667,6 +669,7 @@ static PyMethodDef SegmentationMethods[] = {
 ":param cluster_centres_file: is a string containing the name of the cluster centre file\n"
 ":param ignore_zeros: zeros is a bool\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
     {"eliminate_single_pixels", (PyCFunction)Segmentation_eliminateSinglePixels, METH_VARARGS | METH_KEYWORDS,

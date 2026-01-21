@@ -58,7 +58,7 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISLabelPixelsUsingClusters();
-        void labelPixelsUsingClusters(GDALDataset **datasets, int numDatasets, std::string output, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat, bool useImageProj, std::string outProjStr);
+        void labelPixelsUsingClusters(GDALDataset **datasets, int numDatasets, std::string output, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat, GDALDataType outDataType, bool useImageProj, std::string outProjStr);
         ~RSGISLabelPixelsUsingClusters();
     };
     
@@ -76,7 +76,3 @@ namespace rsgis{namespace segment{
 }}
 
 #endif
-
-
-
-

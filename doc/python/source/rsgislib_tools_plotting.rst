@@ -33,6 +33,7 @@ Visualise Raster Data
 Legends
 --------
 .. autofunction:: rsgislib.tools.plotting.create_legend_info_dict
+.. autofunction:: rsgislib.tools.plotting.create_legend_info_dict_from_cls_info
 .. autofunction:: rsgislib.tools.plotting.create_legend_img
 .. autofunction:: rsgislib.tools.plotting.create_legend_img_file
 .. autofunction:: rsgislib.tools.plotting.create_legend_img_mpl_ax

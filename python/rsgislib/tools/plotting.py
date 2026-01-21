@@ -14,6 +14,7 @@ from matplotlib.patches import Patch
 from osgeo import gdal
 
 import rsgislib
+import rsgislib.classification
 from rsgislib import imagecalc, zonalstats
 
 have_mpl_scatter_density = True
@@ -1503,7 +1504,7 @@ def manual_stretch_np_arr(
 
 
 def create_legend_img(
-    legend_info: Dict,
+    legend_info: Dict[str, Tuple[int, int, int, int]],
     n_cols: int = 1,
     box_size: Tuple[int] = (10, 20),
     title_str: str = None,
@@ -1622,7 +1623,7 @@ def create_legend_img(
 
 
 def create_legend_img_file(
-    legend_info: Dict,
+    legend_info: Dict[str, Tuple[int, int, int, int]],
     out_img_file: str,
     n_cols: int = 1,
     box_size: Tuple[int] = (10, 20),
@@ -1690,7 +1691,7 @@ def create_legend_img_file(
 
 def create_legend_img_mpl_ax(
     ax: plt.axis,
-    legend_info: Dict,
+    legend_info: Dict[str, Tuple[int, int, int, int]],
     n_cols: int = 1,
     box_size: Tuple[int] = (10, 20),
     title_str: str = None,
@@ -1777,7 +1778,7 @@ def create_legend_info_dict(
     blue_col: str = "Blue",
     alpha_col: str = "Alpha",
     histogram_col: str = "Histogram",
-) -> Dict[str, Tuple[int]]:
+) -> Dict[str, Tuple[int, int, int, int]]:
     """
     A function which creates the legend_info dict for the create_legend_img function
     from an input image file with RAT. It assumes that the RAT contains a column with
@@ -1829,6 +1830,43 @@ def create_legend_info_dict(
                 cls_name_str = cls_name_str.title()
 
             out_cls_info[cls_name_str] = (red_val, green_val, blue_val, alpha_val)
+
+    return out_cls_info
+
+
+def create_legend_info_dict_from_cls_info(
+    cls_info_dict: Dict[str, rsgislib.classification.ClassInfoObj],
+    use_title_case=False,
+    underscore_to_space=False,
+) -> Dict[str, Tuple[int, int, int, int]]:
+    """
+    A function which creates the legend_info dict for the create_legend_img function
+    from an input image file with RAT. It assumes that the RAT contains a column with
+    the class names and columns with the class colours.
+
+    :param cls_info_dict: a dict where the key is string with class name
+                          of ClassInfoObj objects defining the training data.
+                          This is used to define the class names and colours
+                          if class_clr_names is True.
+    :param use_title_case: Change the class name to title case (Default: False)
+    :param underscore_to_space: Convert underscores in the class name to spaces
+                                (Default: False)
+    :return: dictionary with the classification name as the key and the value a tuple
+             of [Red, Green, Blue, Alpha] values.
+
+    """
+
+    out_cls_info = dict()
+    for cls_name in cls_info_dict:
+        cls_name_str = str(cls_name)
+        if (cls_name_str != ""):
+            if underscore_to_space:
+                cls_name_str = cls_name_str.replace("_", " ")
+
+            if use_title_case:
+                cls_name_str = cls_name_str.title()
+
+            out_cls_info[cls_name_str] = (int(cls_info_dict[cls_name].red), int(cls_info_dict[cls_name].green), int(cls_info_dict[cls_name].blue), 255)
 
     return out_cls_info
 

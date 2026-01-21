@@ -1594,3 +1594,27 @@ def convert_mutli_cls_smpls_to_pandas_df(
 
     data_cls_vals_df = pandas.concat((cls_id_df, data_vals_df), axis=1)
     return data_cls_vals_df
+
+
+def apply_class_clrs(input_cls_img: str,
+                     cls_info_dict: Dict[str, ClassInfoObj]):
+    """
+    A function which uses the cls_train_info dict to define the colours for the
+    input image colour table.
+
+    :param input_cls_img: Input classification image (needs to be 8 bit unsigned int)
+    :param cls_info_dict: dict (where the key is the class name) of
+                           rsgislib.classification.ClassInfoObj objects which will be
+                           used to train the classifier provide pixel value id and
+                           RGB class values.
+
+    """
+    import rsgislib.imageutils
+
+    clr_lut = dict()
+    for class_key in cls_info_dict:
+        clr_lut[cls_info_dict[class_key].out_id] = [cls_info_dict[class_key].red,
+                                                     cls_info_dict[class_key].green,
+                                                     cls_info_dict[class_key].blue]
+
+    rsgislib.imageutils.define_colour_table(input_cls_img, clr_lut)

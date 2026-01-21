@@ -52,6 +52,7 @@ Utilities
 -----------
 .. autofunction:: rsgislib.classification.collapse_classes
 .. autofunction:: rsgislib.classification.gen_rgb_img_from_clr_tbl
+.. autofunction:: rsgislib.classification.apply_class_clrs
 
 Accuracy Assessment Samples
 ----------------------------

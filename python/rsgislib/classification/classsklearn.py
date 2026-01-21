@@ -227,6 +227,7 @@ def apply_sklearn_classifier(
     class_clr_names: bool = True,
     out_score_img: str = None,
     ignore_consec_cls_ids: bool = False,
+    datatype: int = rsgislib.TYPE_8UINT,
 ):
     """
     This function uses a trained classifier and applies it to the provided input image.
@@ -299,6 +300,7 @@ def apply_sklearn_classifier(
     otherargs.img_file_info = img_file_info
     otherargs.out_score_img = out_score_img
     otherargs.cls_id_lut = cls_id_lut
+    otherargs.np_datatype = rsgislib.get_numpy_datatype(datatype)
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -382,7 +384,7 @@ def apply_sklearn_classifier(
                         inputs.image_mask.shape[2],
                     )
                 )
-        outputs.out_image = out_class_vals.astype(dtype=numpy.uint8)
+        outputs.out_image = out_class_vals.astype(dtype=otherargs.np_datatype)
         if otherargs.out_score_img:
             outputs.out_score_img = out_score_vals
 
@@ -399,9 +401,12 @@ def apply_sklearn_classifier(
             ignore_zero=True,
         )
     else:
-        rsgislib.imageutils.pop_thmt_img_stats(
-            out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
-        )
+        if datatype == rsgislib.TYPE_8UINT:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            )
+            rsgislib.classification.apply_class_clrs(input_cls_img = out_class_img,
+            cls_train_info = cls_train_info)
 
     if create_out_score_img:
         rsgislib.imageutils.pop_img_stats(
