@@ -50,7 +50,7 @@
 
 namespace rsgis{ namespace cmds {
     
-    void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat)
+    void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -64,7 +64,7 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::segment::RSGISLabelPixelsUsingClusters labelPixels;
-            labelPixels.labelPixelsUsingClusters(datasets, 1, outputImage, clusterCentresFile, ignoreZeros, imageFormat, true, "");
+            labelPixels.labelPixelsUsingClusters(datasets, 1, outputImage, clusterCentresFile, ignoreZeros, imageFormat, RSGIS_to_GDAL_Type(outDataType), true, "");
             
             // Tidy up
             GDALClose(datasets[0]);
@@ -950,4 +950,3 @@ namespace rsgis{ namespace cmds {
 
     
 }}
-

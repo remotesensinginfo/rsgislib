@@ -31,7 +31,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISLabelPixelsUsingClusters::labelPixelsUsingClusters(GDALDataset **datasets, int numDatasets, std::string output, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat, bool useImageProj, std::string outProjStr)
+    void RSGISLabelPixelsUsingClusters::labelPixelsUsingClusters(GDALDataset **datasets, int numDatasets, std::string output, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat, GDALDataType outDataType, bool useImageProj, std::string outProjStr)
     {
         try 
         {
@@ -43,7 +43,7 @@ namespace rsgis{namespace segment{
             
             RSGISLabelPixelsUsingClustersCalcImg *calcValue = new RSGISLabelPixelsUsingClustersCalcImg(1, clusterCentres, ignoreZeros);
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcValue, outProjStr, useImageProj);
-            calcImage.calcImage(datasets, numDatasets, output, true, bandNames, imageFormat);
+            calcImage.calcImage(datasets, numDatasets, output, true, bandNames, imageFormat, outDataType);
             
             delete calcValue;
             matrixUtils.freeMatrix(clusterCentres);
@@ -129,7 +129,3 @@ namespace rsgis{namespace segment{
     }
     
 }}
-
-
-
-

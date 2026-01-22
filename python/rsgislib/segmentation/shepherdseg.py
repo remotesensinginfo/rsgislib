@@ -272,7 +272,7 @@ def run_shepherd_segmentation(
         tmp_dir, "{}_kmeans.{}".format(basename, out_file_ext)
     )
     rsgislib.segmentation.label_pixels_from_cluster_centres(
-        segmentFile, kMeansFileZones, outMatrixFile + str(".gmtxt"), True, gdalformat
+        segmentFile, kMeansFileZones, outMatrixFile + str(".gmtxt"), True, gdalformat, rsgislib.TYPE_16UINT
     )
 
     # Eliminate Single Pixels
@@ -574,7 +574,7 @@ def run_shepherd_segmentation_pre_calcd_stats(
         tmp_dir, "{}_kmeans.{}".format(basename, out_file_ext)
     )
     rsgislib.segmentation.label_pixels_from_cluster_centres(
-        segmentFile, kMeansFileZones, kmeans_centres, True, gdalformat
+        segmentFile, kMeansFileZones, kmeans_centres, True, gdalformat, rsgislib.TYPE_16UINT
     )
 
     # Elimininate Single Pixels

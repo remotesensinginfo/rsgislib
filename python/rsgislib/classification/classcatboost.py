@@ -430,6 +430,7 @@ def apply_catboost_multiclass_classifier(
     out_class_img: str,
     gdalformat: str = "KEA",
     class_clr_names: bool = True,
+    datatype: int = rsgislib.TYPE_8UINT
 ):
     """
     This function applies a trained multiple classes catboost model. The function
@@ -500,7 +501,7 @@ def apply_catboost_multiclass_classifier(
                 axis=0,
             )
 
-        outputs.out_cls_img = out_class_id_vals
+        outputs.out_cls_img = out_class_id_vals.astype(dtype=otherargs.np_datatype)
 
     infiles = applier.FilenameAssociations()
     infiles.imageMask = in_msk_img
@@ -529,6 +530,7 @@ def apply_catboost_multiclass_classifier(
     otherargs.imgFileInfo = img_file_info
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
+    otherargs.np_datatype = rsgislib.get_numpy_datatype(datatype)
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -549,7 +551,7 @@ def apply_catboost_multiclass_classifier(
     )
     print("Completed Classification")
 
-    if class_clr_names:
+    if class_clr_names and (gdalformat == "KEA"):
         rsgislib.rastergis.pop_rat_img_stats(
             out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
@@ -572,3 +574,10 @@ def apply_catboost_multiclass_classifier(
         rat.writeColumn(ratDataset, "Blue", blue)
         rat.writeColumn(ratDataset, "class_names", class_names)
         ratDataset = None
+    elif class_clr_names:
+        if datatype == rsgislib.TYPE_8UINT:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            )
+            rsgislib.classification.apply_class_clrs(input_cls_img = out_class_img,
+            cls_train_info = cls_info_dict)

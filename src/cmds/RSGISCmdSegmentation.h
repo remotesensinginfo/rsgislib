@@ -63,7 +63,7 @@ namespace rsgis{ namespace cmds {
     
     
     /** Function to run the label pixels from clusters centres command */
-    DllExport void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat);
+    DllExport void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat, RSGISLibDataType outDataType);
     
     /** Function to run the eliminate single pixels command */
     DllExport void executeEliminateSinglePixels(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string tempImage, std::string imageFormat, bool processInMemory, bool ignoreZeros);
@@ -118,4 +118,3 @@ namespace rsgis{ namespace cmds {
 
 
 #endif
-

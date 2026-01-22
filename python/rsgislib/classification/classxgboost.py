@@ -1046,6 +1046,11 @@ def apply_xgboost_binary_classifier(
             rsgislib.rastergis.pop_rat_img_stats(
                 out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
             )
+        else:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                    out_class_img, add_clr_tab=True, calc_pyramids=True,
+                    ignore_zero=True
+            )
 
 
 def optimise_xgboost_multiclass_classifier(
@@ -1946,6 +1951,7 @@ def apply_xgboost_multiclass_classifier(
     gdalformat: str = "KEA",
     class_clr_names: bool = True,
     n_threads: int = 1,
+    datatype: int = rsgislib.TYPE_8UINT
 ):
     """
     A function for applying a trained multiclass xgboost model to a image or
@@ -2014,7 +2020,7 @@ def apply_xgboost_multiclass_classifier(
                 axis=0,
             )
 
-        outputs.outclsimage = out_class_id_vals
+        outputs.outclsimage = out_class_id_vals.astype(dtype=otherargs.np_datatype)
 
     classifier = xgb.Booster({"nthread": n_threads})
     classifier.load_model(model_file)
@@ -2045,6 +2051,7 @@ def apply_xgboost_multiclass_classifier(
     otherargs.imgFileInfo = img_file_info
     otherargs.n_classes = n_classes
     otherargs.cls_id_lut = cls_id_lut
+    otherargs.np_datatype = rsgislib.get_numpy_datatype(datatype)
 
     if TQDM_AVAIL:
         progress_bar = rsgislib.TQDMProgressBar()
@@ -2065,7 +2072,7 @@ def apply_xgboost_multiclass_classifier(
     )
     print("Completed Classification")
 
-    if class_clr_names:
+    if class_clr_names and (gdalformat == "KEA"):
         rsgislib.rastergis.pop_rat_img_stats(
             out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
         )
@@ -2088,6 +2095,13 @@ def apply_xgboost_multiclass_classifier(
         rat.writeColumn(rat_dataset, "Blue", blue)
         rat.writeColumn(rat_dataset, "class_names", class_names)
         rat_dataset = None
+    elif class_clr_names:
+        if datatype == rsgislib.TYPE_8UINT:
+            rsgislib.imageutils.pop_thmt_img_stats(
+                out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
+            )
+            rsgislib.classification.apply_class_clrs(input_cls_img = out_class_img,
+            cls_train_info = cls_info_dict)
 
 
 def apply_xgboost_multiclass_classifier_rat(
