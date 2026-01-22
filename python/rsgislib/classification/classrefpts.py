@@ -33,7 +33,8 @@
 ###########################################################################
 
 import tqdm
-from osgeo import gdal
+from typing import Dict
+from osgeo import gdal, ogr
 import numpy
 import numpy.random
 
@@ -51,6 +52,7 @@ def create_random_ref_smpls_darts(
     img_band: int = 1,
     cls_no_data=None,
     rat_cls_name_col: str = None,
+    class_names_lut: Dict[int,str] = None,
 ):
     """
     A function to create random reference point sets using random coordinate
@@ -158,6 +160,9 @@ def create_random_ref_smpls_darts(
                                 cls_names_arr[cls_pxl_val].decode("utf-8")
                             )
                             ref_cls_names.append("")
+                    elif class_names_lut is not None:
+                        img_cls_names.append(class_names_lut[cls_pxl_val])
+                        ref_cls_names.append("")
 
                     found_pts += 1
                     pbar.update(1)
@@ -166,6 +171,9 @@ def create_random_ref_smpls_darts(
     data_dict["tmp_x"] = x_coords_arr
     data_dict["tmp_y"] = y_coords_arr
     if rat_cls_name_col is not None:
+        data_dict[img_cls_col] = img_cls_names
+        data_dict[ref_cls_col] = ref_cls_names
+    elif class_names_lut is not None:
         data_dict[img_cls_col] = img_cls_names
         data_dict[ref_cls_col] = ref_cls_names
     else:
@@ -203,6 +211,7 @@ def create_stratified_random_ref_smpls_darts(
     img_band: int = 1,
     cls_no_data=None,
     rat_cls_name_col: str = None,
+    class_names_lut: Dict[int,str] = None,
 ):
     """
     A function to create random reference point sets using random coordinate
@@ -370,6 +379,9 @@ def create_stratified_random_ref_smpls_darts(
                                     cls_names_arr[cls_pxl_val].decode("utf-8")
                                 )
                                 ref_cls_names.append("")
+                        elif class_names_lut is not None:
+                            img_cls_names.append(class_names_lut[cls_pxl_val])
+                            ref_cls_names.append("")
                         created_smpls_count[cls_pxl_val] += 1
                         found_pts += 1
                         pbar.update(1)
@@ -378,6 +390,9 @@ def create_stratified_random_ref_smpls_darts(
     data_dict["tmp_x"] = x_coords_arr
     data_dict["tmp_y"] = y_coords_arr
     if rat_cls_name_col is not None:
+        data_dict[img_cls_col] = img_cls_names
+        data_dict[ref_cls_col] = ref_cls_names
+    elif class_names_lut is not None:
         data_dict[img_cls_col] = img_cls_names
         data_dict[ref_cls_col] = ref_cls_names
     else:
@@ -398,3 +413,167 @@ def create_stratified_random_ref_smpls_darts(
         pts_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
     else:
         pts_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def pop_class_info_accuracy_pts(
+    input_cls_img: str,
+    acc_pts_vec_file: str,
+    acc_pts_vec_lyr: str,
+    out_vec_file: str,
+    out_vec_lyr: str,
+    class_names_lut: Dict[int,str],
+    img_cls_col: str = "img_cls",
+    ref_cls_col: str = None,
+    processed_col: str = None,
+    out_format: str = "GPKG",
+    cls_img_band: int = 1,
+):
+    """
+    This function populates an existing set of reference points with data
+    from a classified image.
+
+    :param input_cls_img: Input classification image file.
+    :param acc_pts_vec_file: Is the vector file contining the reference points
+    :param acc_pts_vec_lyr: Is the vector layer contining the reference points
+    :param out_vec_file: The output file path for the vector with the accuracy data
+                         added. Note, this can be the same as the input vector file
+                         and it will be overwritten.
+    :param out_vec_lyr: The output layer for the vector with the accuracy data
+                        added. Note, this can be the same as the input vector file
+                        and it will be overwritten.
+    :param out_format: The output vector format (e.g., GPKG or ESRI Shapefile).
+    :param class_names_lut: a dict LUT in the integer pixel value as the key and
+                            the value the name of the class as a string.
+    :param img_cls_col: the output vector column for the classification.
+    :param ref_cls_col: Optionally (ignored is None; Default) create a column
+                        which will be populated with the reference values for the
+                        accuracy assessment.
+    :param processed_col: Optionally (ignored is None; Default) create a column
+                          which is used with the ClassAccuracy QGIS plugin to
+                          track whether a point has been visited or not.
+    :param cls_img_band: The band within the input image with the classification.
+
+    """
+    import rsgislib.zonalstats
+    import rsgislib.vectorutils
+    import rsgislib.tools.utils
+
+    uid_str = rsgislib.tools.utils.uid_generator()
+
+    acc_pts_ds, acc_pts_lyr = rsgislib.vectorutils.read_vec_lyr_to_mem(
+        vec_file=acc_pts_vec_file, vec_lyr=acc_pts_vec_lyr
+    )
+
+    # cls_pxl_val (cpv)
+    tmp_pxl_val_col = f"cpv_{uid_str}"
+    rsgislib.zonalstats.calc_zonal_poly_pts_band_stats(
+        vec_lyr_obj=acc_pts_lyr,
+        input_img=input_cls_img,
+        img_band=cls_img_band,
+        out_field=tmp_pxl_val_col,
+        vec_def_epsg=None,
+    )
+
+    col_img_exists = False
+    col_ref_exists = False
+    if ref_cls_col is None:
+        col_ref_exists = True
+    col_pro_exists = False
+    if processed_col is None:
+        col_pro_exists = True
+
+    lyr_defn = acc_pts_lyr.GetLayerDefn()
+    for i in range(lyr_defn.GetFieldCount()):
+        field_name = lyr_defn.GetFieldDefn(i).GetName().lower()
+        if not col_img_exists:
+            if field_name == img_cls_col.lower():
+                col_img_exists = True
+
+        if not col_ref_exists:
+            if field_name == ref_cls_col.lower():
+                col_ref_exists = True
+
+        if not col_pro_exists:
+            if field_name == processed_col.lower():
+                col_pro_exists = True
+
+        if col_ref_exists and col_img_exists and col_pro_exists:
+            break
+
+    if not col_img_exists:
+        field_defn = ogr.FieldDefn(img_cls_col, ogr.OFTString)
+        if acc_pts_lyr.CreateField(field_defn) != 0:
+            raise rsgislib.RSGISPyException(
+                f"Creating '{img_cls_col}' field failed; be careful with case, "
+                f"some drivers are case insensitive but column might "
+                f"not be found."
+            )
+
+    if (not col_ref_exists) and (ref_cls_col is not None):
+        field_defn = ogr.FieldDefn(ref_cls_col, ogr.OFTString)
+        if acc_pts_lyr.CreateField(field_defn) != 0:
+            raise rsgislib.RSGISPyException(
+                f"Creating '{ref_cls_col}' field failed; be careful with case, "
+                f"some drivers are case insensitive but column might "
+                f"not be found."
+            )
+
+    if (not col_pro_exists) and (processed_col is not None):
+        field_defn = ogr.FieldDefn(processed_col, ogr.OFTInteger)
+        if acc_pts_lyr.CreateField(field_defn) != 0:
+            raise rsgislib.RSGISPyException(
+                f"Creating '{ref_cls_col}' field failed; be careful with case, "
+                f"some drivers are case insensitive but column might "
+                f"not be found."
+            )
+
+    acc_pts_lyr.ResetReading()
+    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+    fids = []
+    for feat in acc_pts_lyr:
+        fids.append(feat.GetFID())
+
+    open_transaction = False
+    acc_pts_lyr.ResetReading()
+    i = 0
+    try:
+        # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+        for fid in fids:
+            if not open_transaction:
+                acc_pts_lyr.StartTransaction()
+                open_transaction = True
+            feat = acc_pts_lyr.GetFeature(fid)
+            if feat is not None:
+                feat_cls_val = feat.GetField(tmp_pxl_val_col)
+                if feat_cls_val not in class_names_lut:
+                    cls_name_val = ""
+                else:
+                    cls_name_val = class_names_lut[feat_cls_val]
+
+                feat.SetField(img_cls_col, cls_name_val)
+                if ref_cls_col is not None:
+                    feat.SetField(ref_cls_col, "")
+                if processed_col is not None:
+                    feat.SetField(processed_col, 0)
+                acc_pts_lyr.SetFeature(feat)
+            if ((i % 20000) == 0) and open_transaction:
+                acc_pts_lyr.CommitTransaction()
+                open_transaction = False
+            i = i + 1
+        if open_transaction:
+            acc_pts_lyr.CommitTransaction()
+            open_transaction = False
+        acc_pts_lyr.SyncToDisk()
+    except Exception as e:
+        raise e
+
+    rsgislib.vectorutils.write_vec_lyr_to_file(
+        vec_lyr_obj=acc_pts_lyr,
+        out_vec_file=out_vec_file,
+        out_vec_lyr=out_vec_lyr,
+        out_format=out_format,
+        options=[],
+        replace=True,
+    )
+
+    acc_pts_ds = None

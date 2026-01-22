@@ -1128,7 +1128,7 @@ def test_apply_xgboost_multiclass_classifier_bayesopt(tmp_path):
         img_band_info,
         out_class_img,
         "GTIFF",
-        class_clr_names=False,
+        class_clr_names=True,
         n_threads=1,
     )
 

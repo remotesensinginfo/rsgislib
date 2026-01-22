@@ -740,6 +740,124 @@ def calc_acc_metrics_vecsamples_img(
     return acc_metrics
 
 
+def calc_acc_metrics_vecsamples_norat_img(
+    vec_file: str,
+    vec_lyr: str,
+    ref_col: str,
+    cls_col: str,
+    cls_img: str,
+    class_names_lut: Dict[int,str],
+    out_json_file: str = None,
+    out_csv_file: str = None,
+) -> Dict:
+    """
+    A function which calculates classification accuracy metrics using a set of
+    reference samples in a vector file and the classification image defining
+    the area classified.
+    This would be often be used alongside the ClassAccuracy QGIS plugin.
+
+    :param vec_file: the input vector file with the reference points
+    :param vec_lyr: the input vector layer name with the reference points.
+    :param ref_col: the name of the reference classification column in the
+                    input vector file.
+    :param cls_col: the name of the classification column in the input vector file.
+    :param cls_img: an image of the classification from which the area
+                    (pixel counts) of each class are extracted to normalise the
+                    confusion matrix. Should have a RAT with class names and histogram.
+    :param class_names_lut: a dict LUT in the integer pixel value as the key and
+                            the value the name of the class as a string.
+    :param out_json_file: if specified the generated metrics and confusion matrix
+                          are written to a JSON file (Default=None).
+    :param out_csv_file: if specified the generated metrics and confusion matrix
+                         are written to a CSV file (Default=None).
+    :return: dict (matching JSON output) with the classification accuracy stats
+
+    Example:
+
+        import rsgislib
+        from rsgislib.classification import classaccuracymetrics
+
+        vec_file = "Sonoma_county_classification_refPoints.gpkg"
+        vec_lyr = "ref_points"
+        ref_col = "reference_classes"
+        cls_col = "classes"
+        cls_img = "Sonoma_county_Landsat8_2015_utm_RandomForest.kea"
+        img_cls_name_col = "RF_classes"
+        img_hist_col = "Histogram"
+        out_json_file = "Sonoma_county_class_acc_metrics.json"
+
+        classaccuracymetrics.calc_acc_metrics_vecsamples(vec_in_file, vec_in_lyr,
+                                                         ref_col, cls_col, cls_img,
+                                                         img_cls_name_col, img_hist_col,
+                                                         out_json_file)
+
+    """
+    import rsgislib.imageutils
+    import rsgislib.imagecalc
+    import rsgislib.vectorattrs
+
+    # Read columns from vector file.
+    ref_vals = numpy.array(
+        rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, ref_col)
+    )
+    ref_vals = ref_vals.astype(str)
+    cls_vals = numpy.array(
+        rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, cls_col)
+    )
+    cls_vals = cls_vals.astype(str)
+
+    # Find unique class values
+    unq_cls_names = numpy.unique(
+        numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
+    )
+    unq_cls_names.sort()
+
+    cls_calc_lut = dict()
+    for cls_name in unq_cls_names:
+        cls_calc_lut[cls_name] = False
+
+    pxl_vals = list()
+    for cls_id in class_names_lut:
+        pxl_vals.append(cls_id)
+
+    n_pxls = rsgislib.imagecalc.count_pxls_of_val(cls_img, pxl_vals)
+
+    pxl_size_x, pxl_size_y = rsgislib.imageutils.get_img_res(cls_img, abs_vals=True)
+    pxl_area = pxl_size_x * pxl_size_y
+
+    cls_area_dict = dict()
+    for cls_id, pxl_ct in zip(pxl_vals, n_pxls):
+        cls_name = class_names_lut[cls_id]
+        cls_calc_lut[cls_name] = True
+
+        cls_name_str = rsgislib.tools.utils.check_str(cls_name, rm_non_ascii=True)
+        cls_area_dict[cls_name_str] = pxl_ct * pxl_area
+
+    err_cls_names = ""
+    err_report = False
+    for cls_name in unq_cls_names:
+        if not cls_calc_lut[cls_name]:
+            err_report = True
+            if err_cls_names == "":
+                err_cls_names = cls_name
+            else:
+                err_cls_names = f"{err_cls_names}, {cls_name}"
+
+    if err_report:
+        raise rsgislib.RSGISPyException(f"Did not calculate the class areas for: {err_cls_names}")
+
+    acc_metrics = calc_acc_metrics_vecsamples(
+        vec_file=vec_file,
+        vec_lyr=vec_lyr,
+        ref_col=ref_col,
+        cls_col=cls_col,
+        cls_area_dict=cls_area_dict,
+        out_json_file=out_json_file,
+        out_csv_file=out_csv_file,
+    )
+    return acc_metrics
+
+
 def calc_acc_ptonly_metrics_vecsamples(
     vec_file: str,
     vec_lyr: str,

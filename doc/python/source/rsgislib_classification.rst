@@ -59,10 +59,7 @@ Accuracy Assessment Samples
 
 .. autofunction:: rsgislib.classification.classrefpts.create_random_ref_smpls_darts
 .. autofunction:: rsgislib.classification.classrefpts.create_stratified_random_ref_smpls_darts
-.. autofunction:: rsgislib.classification.generate_random_accuracy_pts
-.. autofunction:: rsgislib.classification.generate_stratified_random_accuracy_pts
-.. autofunction:: rsgislib.classification.generate_stratified_prop_random_accuracy_pts
-.. autofunction:: rsgislib.classification.pop_class_info_accuracy_pts
+.. autofunction:: rsgislib.classification.classrefpts.pop_class_info_accuracy_pts
 .. autofunction:: rsgislib.classification.create_acc_pt_sets
 .. autofunction:: rsgislib.classification.classaccuracymetrics.create_modelled_acc_pts
 .. autofunction:: rsgislib.classification.classaccuracymetrics.create_norm_modelled_err_matrix
@@ -71,6 +68,7 @@ Accuracy Assessment Stats
 ----------------------------
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples_img
+.. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_metrics_vecsamples_norat_img
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval
 .. autofunction:: rsgislib.classification.classaccuracymetrics.calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets

@@ -317,7 +317,7 @@ def test_apply_catboost_multiclass_classifier(tmp_path):
         img_band_info,
         out_class_img,
         gdalformat="GTIFF",
-        class_clr_names=False,
+        class_clr_names=True,
     )
 
     assert os.path.exists(out_class_img)

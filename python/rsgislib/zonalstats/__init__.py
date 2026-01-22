@@ -3821,26 +3821,27 @@ def split_sample_hdf5_file(in_h5_file:str, out_h5_p1_file:str, out_h5_p2_file:st
     describ_ds[0] = str_out.encode()
     f_h5_out.close()
 
-    chunk_p2_len = 1000
-    if remain_len < chunk_p2_len:
-        chunk_p2_len = remain_len
+    if remain_len > 0:
+        chunk_p2_len = 1000
+        if remain_len < chunk_p2_len:
+            chunk_p2_len = remain_len
 
-    f_h5_out = h5py.File(out_h5_p2_file, "w")
-    data_grp = f_h5_out.create_group("DATA")
-    meta_grp = f_h5_out.create_group("META-DATA")
-    data_grp.create_dataset(
-        "DATA",
-        data=out_data_p2_arr,
-        chunks=(chunk_p2_len, num_vars),
-        compression="gzip",
-        shuffle=True,
-        dtype=h5_dtype,
-    )
-    str_out = "Sampled (P2): split_sample_hdf5_file"
-    str_len = len(str_out)
-    describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
-    describ_ds[0] = str_out.encode()
-    f_h5_out.close()
+        f_h5_out = h5py.File(out_h5_p2_file, "w")
+        data_grp = f_h5_out.create_group("DATA")
+        meta_grp = f_h5_out.create_group("META-DATA")
+        data_grp.create_dataset(
+            "DATA",
+            data=out_data_p2_arr,
+            chunks=(chunk_p2_len, num_vars),
+            compression="gzip",
+            shuffle=True,
+            dtype=h5_dtype,
+        )
+        str_out = "Sampled (P2): split_sample_hdf5_file"
+        str_len = len(str_out)
+        describ_ds = meta_grp.create_dataset("DESCRIPTION", (1,), dtype=f"S{str_len}")
+        describ_ds[0] = str_out.encode()
+        f_h5_out.close()
 
 
 

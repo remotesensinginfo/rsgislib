@@ -1130,7 +1130,7 @@ def test_apply_lightgbm_multiclass_classifier_bayesopt(tmp_path):
         img_band_info,
         out_class_img,
         "GTIFF",
-        class_clr_names=False,
+        class_clr_names=True,
     )
 
     assert os.path.exists(out_class_img)
