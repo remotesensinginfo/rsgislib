@@ -2101,7 +2101,7 @@ def apply_xgboost_multiclass_classifier(
                 out_class_img, add_clr_tab=True, calc_pyramids=True, ignore_zero=True
             )
             rsgislib.classification.apply_class_clrs(input_cls_img = out_class_img,
-            cls_train_info = cls_info_dict)
+            cls_info_dict = cls_info_dict)
 
 
 def apply_xgboost_multiclass_classifier_rat(
