@@ -426,6 +426,16 @@ class RSGISGDALErrorHandler:
         :param err_msg: The message (string) associated with the error.
 
         """
+        ignored_msgs = [
+            "not a valid Cloud Optimized GeoTIFF",
+            "the layout is not optimal",
+            "overviews are not power-of-two",
+            "breaks COG layout",
+            "This file used to have optimizations in its layout",
+        ]
+        if any(msg.lower() in err_msg.lower() for msg in ignored_msgs):
+            return  # Silently drop the message and exit the handler
+
         self.err_level = err_level
         self.err_no = err_no
         self.err_msg = err_msg
