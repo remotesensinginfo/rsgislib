@@ -22,6 +22,7 @@ Statistical Summary
 ---------------------
 
 .. autofunction:: rsgislib.imagecalc.image_pixel_column_summary
+.. autofunction:: rsgislib.imagecalc.calc_basic_img_band_stats
 .. autofunction:: rsgislib.imagecalc.calc_img_min_max
 .. autofunction:: rsgislib.imagecalc.calc_img_mean
 .. autofunction:: rsgislib.imagecalc.calc_img_stdev

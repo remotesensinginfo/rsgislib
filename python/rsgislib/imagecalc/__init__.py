@@ -3372,3 +3372,129 @@ def calc_apply_img_band_threshold(
     exp = f"img {apply_thres_op} {thres}"
     band_math(output_img, exp, gdalformat, rsgislib.TYPE_8UINT, band_defns)
     return thres
+
+
+def calc_basic_img_band_stats(input_img: str, no_data_val: float = None, use_no_data = True) -> numpy.array:
+    """
+    Function which calculates the minimum, maximum, mean, standard deviation values
+    for each image band in the input image.
+
+    :param input_img: the input image file path.
+    :param no_data_val: the no data value
+    :return: arrays min_vals, max_vals, mean_vals, stddev_vals.
+
+    """
+    from rios import applier
+    import rsgislib.imageutils
+
+    if (no_data_val is None) and use_no_data:
+        no_data_val = rsgislib.imageutils.get_img_no_data_value(input_img)
+
+        if no_data_val is None:
+            raise rsgislib.RSGISPyException(
+                "A no data value needs to specified "
+                "either passed to the function or read "
+                "from the input image header."
+            )
+
+    datatype = rsgislib.imageutils.get_rsgislib_datatype_from_img(input_img)
+    numpyDT = rsgislib.get_numpy_datatype(datatype)
+
+    n_bands = rsgislib.imageutils.get_img_band_count(input_img)
+    min_vals = numpy.zeros(n_bands, dtype=numpyDT)
+    max_vals = numpy.zeros(n_bands, dtype=numpyDT)
+    sum_vals = numpy.zeros(n_bands, dtype=float)
+    n_vals = numpy.zeros(n_bands, dtype=int)
+    first_arr = numpy.ones(n_bands, dtype=bool)
+
+    if TQDM_AVAIL:
+        progress_bar = rsgislib.TQDMProgressBar()
+    else:
+        progress_bar = rios.cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.input_img = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.use_no_data = use_no_data
+    otherargs.n_bands = n_bands
+    otherargs.min_vals = min_vals
+    otherargs.max_vals = max_vals
+    otherargs.sum_vals = sum_vals
+    otherargs.n_vals = n_vals
+    otherargs.no_data_val = no_data_val
+    otherargs.first_arr = first_arr
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    def _applyCalcImgBaseStats(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        for n in range(otherargs.n_bands):
+            data = inputs.input_img[n].flatten()
+            if otherargs.use_no_data:
+                data = data[data != otherargs.no_data_val]
+            data = data[numpy.isfinite(data)]
+            if data.shape[0] > 0:
+                data_max = data.max()
+                data_min = data.min()
+
+                if otherargs.first_arr[n]:
+                    otherargs.min_vals[n] = data_min
+                    otherargs.max_vals[n] = data_max
+                    otherargs.sum_vals[n] = numpy.sum(data)
+                    otherargs.n_vals[n] = data.shape[0]
+                    otherargs.first_arr[n] = False
+                else:
+                    if data_min < otherargs.min_vals[n]:
+                        otherargs.min_vals[n] = data_min
+                    if data_max > otherargs.max_vals[n]:
+                        otherargs.max_vals[n] = data_max
+
+                    otherargs.sum_vals[n] += numpy.sum(sum_vals)
+                    otherargs.n_vals[n] += data.shape[0]
+
+    applier.apply(_applyCalcImgBaseStats, infiles, outfiles, otherargs, controls=aControls)
+
+    mean_vals = sum_vals / n_vals
+    sum_vals[...] = 0.0
+    n_vals[...] = 0.0
+    first_arr[...] = True
+
+    infiles = applier.FilenameAssociations()
+    infiles.input_img = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.use_no_data = use_no_data
+    otherargs.n_bands = n_bands
+    otherargs.mean_vals = mean_vals
+    otherargs.sum_vals = sum_vals
+    otherargs.n_vals = n_vals
+    otherargs.no_data_val = no_data_val
+    otherargs.first_arr = first_arr
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    def _applyCalcImgStdevStats(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        for n in range(otherargs.n_bands):
+            data = inputs.input_img[n].flatten()
+            if otherargs.use_no_data:
+                data = data[data != otherargs.no_data_val]
+            data = data[numpy.isfinite(data)]
+            if data.shape[0] > 0:
+                if otherargs.first_arr[n]:
+                    otherargs.sum_vals[n] = numpy.power(data - otherargs.mean_vals[n], 2).sum()
+                    otherargs.n_vals[n] = data.shape[0]
+                    otherargs.first_arr[n] = False
+                else:
+                    otherargs.sum_vals[n] += numpy.power(data - otherargs.mean_vals[n], 2).sum()
+                    otherargs.n_vals[n] += data.shape[0]
+
+    applier.apply(_applyCalcImgStdevStats, infiles, outfiles, otherargs, controls=aControls)
+
+    return min_vals, max_vals, mean_vals, numpy.sqrt(sum_vals / n_vals)
