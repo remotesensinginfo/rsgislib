@@ -4,6 +4,7 @@ RSGISLib Image Utilities Module
 
 Image Stats and Pyramids
 ------------------------
+.. autofunction:: rsgislib.imageutils.pop_img_stats_py
 .. autofunction:: rsgislib.imageutils.pop_img_stats
 .. autofunction:: rsgislib.imageutils.pop_thmt_img_stats
 .. autofunction:: rsgislib.imageutils.get_img_band_stats
