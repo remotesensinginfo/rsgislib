@@ -34,6 +34,7 @@
 #include "ogrsf_frmts.h"
 
 #include "common/rsgis-tqdm.h"
+#include "common/RSGISCommons.h"
 
 #include "img/RSGISImageBandException.h"
 
@@ -216,4 +217,3 @@ namespace rsgis
 }
 
 #endif
-

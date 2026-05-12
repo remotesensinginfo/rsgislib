@@ -32,6 +32,13 @@
 
 #define RSGIS_C_TEXT( text ) (const_cast<char*>(text))
 
+#if (GDAL_VERSION_MAJOR > 3) || ((GDAL_VERSION_MAJOR == 3) && (GDAL_VERSION_MINOR >= 13))
+    #define RSGIS_HAVE_METADATA_CSLCONST_LIST
+    #pragma message ("defining RSGIS_HAVE_METADATA_CSLCONST_LIST")
+#else
+    #pragma message ("RSGIS_HAVE_METADATA_CSLCONST_LIST not present")
+#endif
+
 namespace rsgis
 {
     enum RSGISLibDataType
@@ -105,4 +112,3 @@ namespace rsgis
 
 
 #endif
-
