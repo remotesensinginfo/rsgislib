@@ -4016,7 +4016,7 @@ namespace rsgis{namespace img{
 		#else
 		    char **gdalDriverMetaInfo;
 		#endif
-		
+
 		int numOutBands = 0;
 		int width = 0;
 		int height = 0;
