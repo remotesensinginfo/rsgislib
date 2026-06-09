@@ -3708,7 +3708,12 @@ namespace rsgis{namespace img{
 		std::stringstream *outStrStream;
 		double *transformation = new double[6];
 		float *imageData = NULL;
-		char **gdalDriverMetaInfo;
+
+		#ifdef RSGIS_HAVE_METADATA_CSLCONST_LIST:
+		    CSLConstList gdalDriverMetaInfo;
+		#else
+		    char **gdalDriverMetaInfo;
+		#endif
 		
 		try
 		{
@@ -3727,7 +3732,6 @@ namespace rsgis{namespace img{
 				throw RSGISImageException(message.c_str());
 			}
             char **papszOptions = this->getGDALCreationOptionsForFormat(format);
-			
 			gdalDriverMetaInfo = gdalDriver->GetMetadata();
 			if(CSLFetchBoolean(gdalDriverMetaInfo, GDAL_DCAP_CREATE, FALSE ))
 			{
@@ -4007,7 +4011,12 @@ namespace rsgis{namespace img{
 		
 		float *data = NULL;
 		
-		char **gdalDriverMetaInfo;
+		#ifdef RSGIS_HAVE_METADATA_CSLCONST_LIST:
+		    CSLConstList gdalDriverMetaInfo;
+		#else
+		    char **gdalDriverMetaInfo;
+		#endif
+
 		int numOutBands = 0;
 		int width = 0;
 		int height = 0;

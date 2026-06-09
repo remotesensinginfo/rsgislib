@@ -1,6 +1,13 @@
 import os
+import sys
 import pytest
 from shutil import copy2
+
+os_pltform = sys.platform
+
+ON_MACOS = False
+if os_pltform == "darwin":
+    ON_MACOS = True
 
 H5PY_NOT_AVAIL = False
 try:
@@ -405,6 +412,7 @@ def test_create_acc_pt_sets(tmp_path):
     )
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_generate_random_accuracy_pts(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -432,6 +440,7 @@ def test_generate_random_accuracy_pts(tmp_path):
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_generate_stratified_random_accuracy_pts(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -460,6 +469,7 @@ def test_generate_stratified_random_accuracy_pts(tmp_path):
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_generate_stratified_random_accuracy_pts_pxllst(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -488,6 +498,7 @@ def test_generate_stratified_random_accuracy_pts_pxllst(tmp_path):
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_generate_stratified_prop_random_accuracy_pts(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -516,6 +527,7 @@ def test_generate_stratified_prop_random_accuracy_pts(tmp_path):
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_generate_random_accuracy_pts_clslut(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -543,6 +555,7 @@ def test_generate_random_accuracy_pts_clslut(tmp_path):
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_generate_stratified_random_accuracy_pts_clslut(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -571,6 +584,7 @@ def test_generate_stratified_random_accuracy_pts_clslut(tmp_path):
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_generate_stratified_random_accuracy_pts_pxllst_clslut(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -599,6 +613,7 @@ def test_generate_stratified_random_accuracy_pts_pxllst_clslut(tmp_path):
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_generate_stratified_prop_random_accuracy_pts_clslut(tmp_path):
     import rsgislib.classification
     import rsgislib.vectorutils
@@ -627,6 +642,7 @@ def test_generate_stratified_prop_random_accuracy_pts_clslut(tmp_path):
     assert os.path.exists(out_vec_file) and (n_pts > 0)
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_pop_class_info_accuracy_pts_only_cls_col(tmp_path):
     import rsgislib.classification
 
@@ -644,6 +660,7 @@ def test_pop_class_info_accuracy_pts_only_cls_col(tmp_path):
     )
 
 
+@pytest.mark.skipif(ON_MACOS, reason="skipping MacOS due to KEA/HDF5 issues")
 def test_pop_class_info_accuracy_pts_all_col(tmp_path):
     import rsgislib.classification
 

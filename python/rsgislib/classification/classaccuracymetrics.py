@@ -1658,6 +1658,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
     shuffle_vec_file_order: bool = False,
     use_rand_choice: bool = False,
     n_choices: int = None,
+    merged_epsg: int = None,
 ) -> (bool, int, List[float], List[float]):
     """
     A function which calculates the f1-score and the confidence interval for each
@@ -1768,6 +1769,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
                 out_vec_file=tmp_vec_file,
                 out_vec_lyr=tmp_vec_lyr,
                 out_format="GPKG",
+                out_epsg=merged_epsg,
             )
             c_vec_file = tmp_vec_file
             c_vec_lyr = tmp_vec_lyr

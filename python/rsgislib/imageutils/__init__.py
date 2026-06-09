@@ -413,6 +413,204 @@ def pop_thmt_img_stats(
         gdal_ds = None
 
 
+def pop_img_stats_py(
+        input_img: str,
+        no_data_val: float = None,
+        calc_pyramids: bool = True,
+        ignore_cog: bool = False,
+        use_approx: bool = False,
+):
+    """
+    A function which populates a input image with pyramids and header statistics.
+    This makes visualisation of the results images faster and easier.
+
+    :param input_img: input image path
+    :param no_data_val: specifying a no data value for the input image. If None, then
+                        a no data value is not used and ignored. (default: None)
+    :param calc_pyramids: boolean specifying whether a image pyramids should be added
+                        (default: True)
+    :param ignore_cog: boolean specifying whether to ignore a COG layout if present
+                       (default: False)
+    :param use_approx: boolean specifying whether to use calculate approximate
+                       statistics (subsampling the image) rather that the true
+                       values using all the image data. This makes it faster to
+                       compute the statistics. (default: False)
+
+    Example:
+
+    .. code:: python
+
+        import rsgislib.imageutils
+        rsgislib.imageutils.pop_img_stats_py("input_img.tif", no_data_val=0.0)
+
+    """
+    # Some of the code here is modified from RIOS:
+    # https://github.com/ubarsc/rios/blob/master/rios/calcstats.py
+
+    import tqdm
+    import rsgislib.imagecalc
+
+    gdal_float_types = {gdal.GDT_Float32, gdal.GDT_Float64}
+
+    def _find_or_create_rat_column(rat_obj, usage, name, dtype):
+        """
+        Returns the index of an existing column matched
+        on usage. Creates it if not already existing using
+        the supplied name and dtype
+        Returns a tuple with index and a boolean specifying if
+        it is a new column or not
+        """
+        ncols = rat_obj.GetColumnCount()
+        for col in range(ncols):
+            if rat_obj.GetUsageOfCol(col) == usage:
+                return col, False
+
+        # got here so can't exist
+        rat_obj.CreateColumn(name, dtype, usage)
+        # new one will be last col
+        return ncols, True
+
+    open_options = []
+    if ignore_cog:
+        open_options = ["IGNORE_COG_LAYOUT_BREAK=YES"]
+
+    use_no_data = True
+    if no_data_val is None:
+        use_no_data = False
+
+    print("Calculate stats for bands:")
+    img_min, img_max, img_mean, img_std = rsgislib.imagecalc.calc_basic_img_band_stats(
+        input_img = input_img, no_data_val = no_data_val, use_no_data = use_no_data)
+
+    gdal_ds_obj = gdal.OpenEx(input_img, gdal.GA_Update, open_options=open_options)
+
+    gdal_drv_obj = gdal_ds_obj.GetDriver()
+
+    # Get the short name (e.g., 'GTiff')
+    img_format = gdal_drv_obj.ShortName
+
+    for i in range(gdal_ds_obj.RasterCount):
+        img_band_obj = gdal_ds_obj.GetRasterBand(i + 1)
+        if no_data_val is None:
+            img_band_obj.DeleteNoDataValue()
+        else:
+            img_band_obj.SetNoDataValue(no_data_val)
+
+        minval = img_min[i]
+        maxval = img_max[i]
+        meanval = img_mean[i]
+        stddev = img_std[i]
+        img_band_obj.SetStatistics(float(minval), float(maxval), float(meanval),
+                                   float(stddev))
+
+        img_band_no_data_val = img_band_obj.GetNoDataValue()
+        if img_band_no_data_val is not None:
+            img_band_obj.SetMetadataItem("STATISTICS_EXCLUDEDVALUES",
+                                         repr(img_band_no_data_val))
+
+        if use_approx:
+            img_band_obj.SetMetadataItem("STATISTICS_APPROXIMATE", "YES")
+        else:
+            img_band_obj.SetMetadataItem("STATISTICS_SKIPFACTORX", "1")
+            img_band_obj.SetMetadataItem("STATISTICS_SKIPFACTORY", "1")
+
+        # Calculate histogram
+        n_bins = 256
+        hist_min = float(minval)
+        hist_max = float(maxval)
+
+        calc_min = hist_min
+        calc_max = hist_max
+        if calc_min == calc_max:
+            calc_max = calc_max + 0.5
+            n_bins = 1
+        hist_step = float(calc_max - calc_min) / n_bins
+
+        include_out_of_range = True
+        hist = img_band_obj.GetHistogram(calc_min, calc_max, n_bins,
+                                         include_out_of_range, use_approx)
+        # comes back as a list for some reason
+        hist = numpy.array(hist)
+
+        # Check if GDAL's histogram code overflowed. This is not a
+        # fool-proof test, as some overflows will not result in negative
+        # counts. Since GDAL 3.x, it is no longer required, as counts
+        # are int64.
+        histogram_overflow = (hist.min() < 0)
+
+        if not histogram_overflow:
+            gdal_rat_obj = img_band_obj.GetDefaultRAT()
+            if gdal_rat_obj is not None:
+                hist_col_indx, hist_new_col = _find_or_create_rat_column(gdal_rat_obj,
+                                                                         gdal.GFU_PixelCount,
+                                                                         "Histogram",
+                                                                         gdal.GFT_Real)
+                # Write the hist in a single go. Note that this only works because we
+                # have forced histParams.min to be zero, which is why we only
+                # do it this way for thematic cases. For other cases, the use of
+                # the RAT Histogram column is questionable.
+                gdal_rat_obj.SetRowCount(n_bins)
+                gdal_rat_obj.WriteArray(hist, hist_col_indx)
+            else:
+                # Use GDAL's original metadata interface, for drivers which
+                # don't support the more modern approach
+                img_band_obj.SetMetadataItem("STATISTICS_HISTOBINVALUES",
+                                             '|'.join(map(str, hist)) + '|')
+                img_band_obj.SetMetadataItem("STATISTICS_HISTOMIN", repr(hist_min))
+                img_band_obj.SetMetadataItem("STATISTICS_HISTOMAX", repr(hist_max))
+                img_band_obj.SetMetadataItem("STATISTICS_HISTONUMBINS",
+                                             repr(int(n_bins)))
+
+            img_band_obj.SetMetadataItem("STATISTICS_HISTOBINFUNCTION", "Linear")
+
+            # estimate the median - bin with the middle number
+            middle_num = hist.astype(numpy.int64).sum() / 2
+            gt_middle = hist.astype(numpy.int64).cumsum() >= middle_num
+            median_bin = gt_middle.nonzero()[0][0]
+            median_val = median_bin * hist_step + hist_min
+            if img_band_obj.DataType in gdal_float_types:
+                img_band_obj.SetMetadataItem("STATISTICS_MEDIAN",
+                                             repr(float(median_val)))
+            else:
+                img_band_obj.SetMetadataItem("STATISTICS_MEDIAN",
+                                             repr(int(round(median_val))))
+
+            # do the mode - bin with the highest count
+            mode_bin = numpy.argmax(hist)
+            mode_val = mode_bin * hist_step + hist_min
+            if img_band_obj.DataType in gdal_float_types:
+                img_band_obj.SetMetadataItem("STATISTICS_MODE", repr(float(mode_val)))
+            else:
+                img_band_obj.SetMetadataItem("STATISTICS_MODE",
+                                             repr(int(round(mode_val))))
+
+    if calc_pyramids:
+        print("Calculate Pyramids:")
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+
+        img_x_size, img_y_size = get_img_size(input_img)
+        if img_x_size < img_y_size:
+            min_size = img_x_size
+        else:
+            min_size = img_y_size
+
+        n_overs = 0
+        pyd_lvls = [4, 8, 16, 32, 64, 128, 256, 512]
+        for i in pyd_lvls:
+            if (min_size // i) > 33:
+                n_overs = n_overs + 1
+
+        if img_format == "GTIFF":
+            gdal.SetConfigOption("COMPRESS_OVERVIEW", "LZW")
+
+        gdal_ds_obj.BuildOverviews("AVERAGE", pyd_lvls[:n_overs], callback)
+
+    gdal_ds_obj.Close()
+    gdal_ds_obj = None
+
+
+
 def get_colour_tab_info(input_img: str, img_band: int = 1) -> Dict[str, Dict]:
     """
     A function which returns the colour table info from an input image.
