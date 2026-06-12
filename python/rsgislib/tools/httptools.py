@@ -7,6 +7,7 @@ import os
 from typing import Dict
 
 import requests
+from requests.auth import HTTPBasicAuth
 import tqdm
 
 import rsgislib
@@ -30,18 +31,50 @@ class RSGISPyResponseException(rsgislib.RSGISPyException):
             self.response.status_code, self.response.reason, repr(self.value)
         )
 
-
-def check_url_exists(url: str) -> bool:
+def check_url_exists(url: str, username: str = None, password: str = None) -> bool:
     """
     A function which checks whether a url exists on a remote server (i.e., does
     not return a 404 or similar error code).
 
     :param url: the URL on the remote server.
+    :param username: optionally provided a username (Default: None)
+    :param password: optionally provided a password (Default: None)
     :return: boolean, true is url exists
 
     """
-    r = requests.head(url)
-    return r.status_code == requests.codes.ok
+    try:
+        # We use a HEAD request to save bandwidth
+        if (username is not None) and (password is not None):
+            r = requests.head(
+                url,
+                auth=HTTPBasicAuth(username, password),
+                timeout=10,
+                allow_redirects=True,
+            )
+        else:
+            r = requests.head(
+                url,
+                timeout=10,
+                allow_redirects=True,
+            )
+
+        # Raise an exception for 4xx or 5xx errors to handle them in the except block
+        r.raise_for_status()
+
+        return r.status_code == requests.codes.ok
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except requests.exceptions.ConnectionError:
+        print("Error: Could not connect to the server.")
+    except requests.exceptions.Timeout:
+        print("Error: The request timed out.")
+    except requests.exceptions.RequestException as err:
+        print(f"An unexpected error occurred: {err}")
+    except:
+        print(f"An unknown error occurred but couldn't access file")
+
+    return False
 
 
 def check_http_response(response: requests.Response, url: str) -> bool:

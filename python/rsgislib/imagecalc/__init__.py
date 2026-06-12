@@ -1058,10 +1058,10 @@ def rescale_img_pxl_vals(
         """
         This is an internal rios function
         """
-        outputs.outimage = numpy.zeros_like(inputs.image, dtype=numpyDT)
+        calc_arr = numpy.zeros_like(inputs.image, dtype=numpy.float32)
         inputs.image = inputs.image.astype(numpy.float32)
         for b_idx in range(inputs.image.shape[0]):
-            outputs.outimage[b_idx] = numpy.where(
+            calc_arr[b_idx] = numpy.where(
                 inputs.image[b_idx] == otherargs.rescaleDict[b_idx].no_data_val,
                 otherargs.rescaleDict[b_idx].out_no_data,
                 (
@@ -1080,24 +1080,25 @@ def rescale_img_pxl_vals(
                 + otherargs.rescaleDict[b_idx].out_min,
             )
             if otherargs.trim:
-                outputs.outimage[b_idx] = numpy.where(
+                calc_arr[b_idx] = numpy.where(
                     (
-                        outputs.outimage[b_idx]
+                        calc_arr[b_idx]
                         != otherargs.rescaleDict[b_idx].out_no_data
                     )
-                    & (outputs.outimage[b_idx] < otherargs.rescaleDict[b_idx].out_min),
+                    & (calc_arr[b_idx] < otherargs.rescaleDict[b_idx].out_min),
                     otherargs.rescaleDict[b_idx].out_min,
-                    outputs.outimage[b_idx],
+                    calc_arr[b_idx],
                 )
-                outputs.outimage[b_idx] = numpy.where(
+                calc_arr[b_idx] = numpy.where(
                     (
-                        outputs.outimage[b_idx]
+                        calc_arr[b_idx]
                         != otherargs.rescaleDict[b_idx].out_no_data
                     )
-                    & (outputs.outimage[b_idx] > otherargs.rescaleDict[b_idx].out_max),
+                    & (calc_arr[b_idx] > otherargs.rescaleDict[b_idx].out_max),
                     otherargs.rescaleDict[b_idx].out_max,
-                    outputs.outimage[b_idx],
+                    calc_arr[b_idx],
                 )
+        outputs.outimage = calc_arr.astype(dtype=numpyDT)
 
     applier.apply(_applyRescale, infiles, outfiles, otherargs, controls=aControls)
 
