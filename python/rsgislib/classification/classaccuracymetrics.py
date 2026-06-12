@@ -246,7 +246,7 @@ def calc_class_accuracy_metrics(
 
 
 def calc_class_pt_accuracy_metrics(
-    ref_samples: numpy.array, pred_samples: numpy.array, cls_names: numpy.array
+    ref_samples: numpy.array, pred_samples: numpy.array, cls_names: numpy.array, cls_ids_arr: numpy.array
 ) -> Dict:
     """
     A function which calculates a set of classification accuracy metrics for a set
@@ -258,6 +258,8 @@ def calc_class_pt_accuracy_metrics(
                          numeric class id
     :param cls_names: a 1d list of the class names (labels) in the order of
                       the class ids.
+    :param cls_ids_arr: a 1d array of class ids (ints) in the order of
+                        the class labels.
     :return: dict with classification accuracy metrics
 
     """
@@ -266,7 +268,7 @@ def calc_class_pt_accuracy_metrics(
     cls_names.sort()
 
     acc_metrics = sklearn.metrics.classification_report(
-        ref_samples, pred_samples, target_names=cls_names, output_dict=True
+        ref_samples, pred_samples, labels=cls_ids_arr, target_names=cls_names, output_dict=True
     )
 
     cohen_kappa = sklearn.metrics.cohen_kappa_score(ref_samples, pred_samples)
@@ -1059,6 +1061,7 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
     sample_frac: float = 0.2,
     sample_n_smps: int = None,
     bootstrap_n: int = 1000,
+    cls_names: List[str] = None,
 ) -> Dict:
     """
     A function which calculates classification accuracy metric confidence intervals
@@ -1078,6 +1081,7 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
                           samples can be specified. If None, then sample_frac
                           will be used to calculate sample_n_smps.
     :param bootstrap_n: The number of bootstrap iterations.
+    :param cls_names: a list of class names within the reference samples
     :return: dict with mean/median and bootstrap intervals.
 
     """
@@ -1088,26 +1092,32 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
 
     # Read columns from vector file.
     ref_vals = numpy.array(
-        rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, ref_col)
+            rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, ref_col)
     )
     ref_vals = ref_vals.astype(str)
     cls_vals = numpy.array(
-        rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, cls_col)
+            rsgislib.vectorattrs.read_vec_column(vec_file, vec_lyr, cls_col)
     )
     cls_vals = cls_vals.astype(str)
 
-    # Find unique class values
-    unq_cls_names = numpy.unique(
-        numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
-    )
+    if cls_names is None:
+        # Find unique class values
+        unq_cls_names = numpy.unique(
+            numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals)))
+        )
+    else:
+        unq_cls_names = cls_names
     # sort()
 
     # Create LUTs assigning each class a unique int ID.
     cls_name_lut = dict()
     cls_id_lut = dict()
+    cls_ids_lst = list()
     for cls_id, cls_name in enumerate(unq_cls_names):
         cls_name_lut[cls_name] = cls_id
         cls_id_lut[cls_id] = cls_name
+        cls_ids_lst.append(cls_id)
+    cls_ids_arr = numpy.array(cls_ids_lst)
 
     # Create cls_id arrays
     ref_int_vals = numpy.zeros_like(ref_vals, dtype=int)
@@ -1132,7 +1142,7 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
         cls_int_vals_smpls = cls_int_vals[bs_sel_idx]
         acc_metrics_runs.append(
             calc_class_pt_accuracy_metrics(
-                ref_int_vals_smpls, cls_int_vals_smpls, unq_cls_names
+                ref_int_vals_smpls, cls_int_vals_smpls, unq_cls_names, cls_ids_arr,
             )
         )
 
@@ -1177,13 +1187,27 @@ def calc_acc_ptonly_metrics_vecsamples_bootstrap_conf_interval(
             cls_stats[cls]["precision"].append(acc_metrics[cls]["precision"])
             cls_stats[cls]["recall"].append(acc_metrics[cls]["recall"])
             cls_stats[cls]["support"].append(acc_metrics[cls]["support"])
-            cls_stats[cls]["producer_accuracy"].append(
-                acc_metrics["producer_accuracy"][i]
-            )
-            cls_stats[cls]["user_accuracy"].append(acc_metrics["user_accuracy"][i])
+            if i < len(acc_metrics["producer_accuracy"]):
+                cls_stats[cls]["producer_accuracy"].append(
+                    acc_metrics["producer_accuracy"][i]
+                )
+            else:
+                cls_stats[cls]["producer_accuracy"].append(0)
 
-            cls_stats[cls]["commission"].append(acc_metrics["commission"][i])
-            cls_stats[cls]["omission"].append(acc_metrics["omission"][i])
+            if i < len(acc_metrics["producer_accuracy"]):
+                cls_stats[cls]["user_accuracy"].append(acc_metrics["user_accuracy"][i])
+            else:
+                cls_stats[cls]["user_accuracy"].append(0)
+
+            if i < len(acc_metrics["commission"]):
+                cls_stats[cls]["commission"].append(acc_metrics["commission"][i])
+            else:
+                cls_stats[cls]["commission"].append(0)
+
+            if i < len(acc_metrics["omission"]):
+                cls_stats[cls]["omission"].append(acc_metrics["omission"][i])
+            else:
+                cls_stats[cls]["omission"].append(0)
 
     conf_inters = [0.5, 2.5, 5, 50, 95, 97.5, 99.5]
 
@@ -1659,6 +1683,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
     use_rand_choice: bool = False,
     n_choices: int = None,
     merged_epsg: int = None,
+    cls_names: List[str] = None,
 ) -> (bool, int, List[float], List[float]):
     """
     A function which calculates the f1-score and the confidence interval for each
@@ -1755,6 +1780,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
             idx = file_idxs[i]
         vec_file = vec_files[idx]
         vec_lyr = vec_lyrs[idx]
+        print(vec_file)
         vecs_dict.append({"file": vec_file, "layer": vec_lyr})
         if first:
             c_vec_file = vec_file
@@ -1783,6 +1809,7 @@ def calc_acc_ptonly_metrics_vecsamples_f1_conf_inter_sets(
             sample_frac=sample_frac,
             sample_n_smps=sample_n_smps,
             bootstrap_n=bootstrap_n,
+            cls_names = cls_names,
         )
 
         f1_scores.append(calc_metrics["macro avg"]["f1-score"]["median"])
