@@ -41,22 +41,11 @@ jobs:
       - store_artifacts:
           path: pytest_reports
           destination: pytest_reports
-      - codecov/upload:
-          file: pytest_reports/coverage.xml
       - run:
           name: build documentation
           command: |
             cd doc/python
             sh run_doc_gen.sh
-      - aws-cli/setup:
-          aws_access_key_id: AWS_ACCESS_KEY_ID_RSGISLIB_WEB
-          aws_secret_access_key: AWS_SECRET_ACCESS_KEY_RSGISLIB_WEB
-          region: ${AWS_REGION_RSGISLIB_WEB}
-      - aws-s3/sync:
-          arguments: |
-            --acl public-read
-          from: doc/python/html
-          to: 's3://rsgislib.org/dev'
 
     # The resource_class feature allows configuring CPU and RAM resources for each job.
     # Different resource classes are available for different executors.
