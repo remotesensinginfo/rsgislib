@@ -246,7 +246,7 @@ def calc_class_accuracy_metrics(
 
 
 def calc_class_pt_accuracy_metrics(
-    ref_samples: numpy.array, pred_samples: numpy.array, cls_names: numpy.array, cls_ids_arr: numpy.array
+    ref_samples: numpy.array, pred_samples: numpy.array, cls_names: numpy.array, cls_ids_arr: numpy.array = None
 ) -> Dict:
     """
     A function which calculates a set of classification accuracy metrics for a set
