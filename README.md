@@ -2,23 +2,9 @@ RSGISLib has been replaced (Nov 2026) by a new pure Python library rsgispy (http
 
 
 # RSGISLib #
-
-[![<remotesensinginfo>](https://circleci.com/gh/remotesensinginfo/rsgislib/tree/main.svg?style=shield)](https://app.circleci.com/pipelines/github/remotesensinginfo/rsgislib)
-[![codecov](https://codecov.io/gh/remotesensinginfo/rsgislib/branch/main/graph/badge.svg?token=EHTF2G1KCL)](https://codecov.io/gh/remotesensinginfo/rsgislib)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=remotesensinginfo_rsgislib&metric=bugs)](https://sonarcloud.io/summary/new_code?id=remotesensinginfo_rsgislib)
-[![Install](https://anaconda.org/conda-forge/rsgislib/badges/version.svg)](https://anaconda.org/conda-forge/rsgislib)
-[![Downloads](https://anaconda.org/conda-forge/rsgislib/badges/downloads.svg)](https://anaconda.org/conda-forge/rsgislib)
-[![Platforms](https://anaconda.org/conda-forge/rsgislib/badges/platforms.svg)](https://anaconda.org/conda-forge/rsgislib)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12755969.svg)](https://doi.org/10.5281/zenodo.12755969)
-
   
 The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets.
 For more details see the project website: http://rsgislib.org/
-
-## Support the Project ##
-
-We provide updated and support for the project for free as a open source project but if you'd like to support us you can buy a coffee - thank you! :)
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/petebunting)
   
 ## Installing ##
 
