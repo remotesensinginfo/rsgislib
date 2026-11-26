@@ -1,4 +1,4 @@
-RSGISLib has been replaced (Nov 2026) by a new pure Python library [!["rsgispy"](https://github.com/remotesensinginfo/rsgispy), which has already ported much of the functionality within RSGISLib, but is easier to maintain and install etc. Please see the documentation for [!["rsgispy"](https://github.com/remotesensinginfo/rsgispy) on how to install and some migration information from RSGISLib to rsgispy.
+RSGISLib has been replaced (Nov 2026) by a new pure Python library rsgispy (https://github.com/remotesensinginfo/rsgispy), which has already ported much of the functionality within RSGISLib, but is easier to maintain and install etc. Please see the documentation for rsgispy on how to install and some migration information from RSGISLib to rsgispy.
 
 
 # RSGISLib #
